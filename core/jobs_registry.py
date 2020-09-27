@@ -64,6 +64,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.HintsAuditOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
+    exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     (
         interaction_jobs_one_off
@@ -93,6 +94,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
+    suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgMigrationOneOffJob,
@@ -108,7 +110,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
+    user_jobs_one_off.RemoveGaeUserIdOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -153,7 +156,6 @@ AUDIT_JOB_MANAGERS = [
         .ExplorationOpportunitySummaryModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRightsModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
@@ -175,6 +177,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralVoiceoverApplicationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CommunityContributionStatsModelAuditOneOffJob,
     prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,

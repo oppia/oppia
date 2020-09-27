@@ -39,6 +39,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     change_cmd = {}
     # Language code that would normally be derived from the change_cmd.
     translation_language_code = 'en'
+    # Language code that would normally be derived from the question_dict in
+    # the change_cmd.
+    question_language_code = 'en'
 
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
@@ -493,6 +496,178 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category2', score_categories)
 
+    def test_get_question_suggestions_waiting_longest_for_review(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            'skill1.thread1', self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'skill2.thread1', self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_3', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'skill3.thread1', self.question_language_code)
+
+        question_suggestion_models = (
+            suggestion_models.GeneralSuggestionModel
+            .get_question_suggestions_waiting_longest_for_review()
+        )
+
+        self.assertEqual(len(question_suggestion_models), 3)
+        # Assert that the order of the returned suggestion models represents
+        # the suggestions sorted in descending order, based on how long each
+        # suggestion has been waiting for review.
+        self.assertEqual(question_suggestion_models[0].id, 'skill1.thread1')
+        self.assertEqual(question_suggestion_models[1].id, 'skill2.thread1')
+        self.assertEqual(question_suggestion_models[2].id, 'skill3.thread1')
+
+    def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp2.thread1', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp3', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp3.thread1', self.translation_language_code)
+        # Create a translation suggestion that has a different language code.
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp4', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp4.thread1', 'fr')
+
+        translation_suggestion_models = (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                self.translation_language_code
+            )
+        )
+
+        self.assertEqual(len(translation_suggestion_models), 3)
+        # Assert that the order of the returned suggestion models represents
+        # the suggestions sorted in descending order, based on how long each
+        # suggestion has been waiting for review.
+        self.assertEqual(
+            translation_suggestion_models[0].id, 'exploration.exp1.thread1')
+        self.assertEqual(
+            translation_suggestion_models[1].id, 'exploration.exp2.thread1')
+        self.assertEqual(
+            translation_suggestion_models[2].id, 'exploration.exp3.thread1')
+
+        translation_suggestion_models_with_different_lang_code = (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'fr'
+            )
+        )
+
+        self.assertEqual(len(
+            translation_suggestion_models_with_different_lang_code), 1)
+        self.assertEqual(
+            translation_suggestion_models_with_different_lang_code[0].id,
+            'exploration.exp4.thread1')
+
+    def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
+            self):
+        translation_suggestion_models = (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'wrong_language_code'
+            )
+        )
+
+        self.assertEqual(len(translation_suggestion_models), 0)
+
+    def test_get_translation_suggestions_waiting_longest_for_review_max_fetch(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp2.thread1', self.translation_language_code)
+
+        with self.swap(
+            suggestion_models,
+            'MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS', 1):
+            translation_suggestion_models = (
+                suggestion_models.GeneralSuggestionModel.
+                get_translation_suggestions_waiting_longest_for_review_per_lang(
+                    self.translation_language_code)
+            )
+
+        # There should only be one translation suggestion returned since we
+        # changed the maximum translations to fetch to 1.
+        self.assertEqual(len(translation_suggestion_models), 1)
+        self.assertEqual(
+            translation_suggestion_models[0].id, 'exploration.exp1.thread1')
+
+    def test_get_question_suggestions_waiting_longest_for_review_max_fetch(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            'skill1.thread1', self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'skill2.thread1', self.question_language_code)
+
+        with self.swap(
+            suggestion_models,
+            'MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS', 1):
+            question_suggestion_models = (
+                suggestion_models.GeneralSuggestionModel
+                .get_question_suggestions_waiting_longest_for_review()
+            )
+
+        # There should only be one question suggestion returned since we
+        # changed the maximum questions to fetch to 1.
+        self.assertEqual(len(question_suggestion_models), 1)
+        self.assertEqual(question_suggestion_models[0].id, 'skill1.thread1')
+
     def test_export_data_trivial(self):
         user_data = (
             suggestion_models.GeneralSuggestionModel
@@ -748,3 +923,104 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel
             .export_data('author_1'))
         self.assertEqual(expected_data, user_data)
+
+
+class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the CommunityContributionStatsModel class."""
+
+    translation_reviewer_counts_by_lang_code = {
+        'hi': 0,
+        'en': 1
+    }
+
+    translation_suggestion_counts_by_lang_code = {
+        'fr': 6,
+        'en': 5
+    }
+
+    question_reviewer_count = 1
+    question_suggestion_count = 4
+
+    def test_get_returns_community_contribution_stats_model_when_it_exists(
+            self):
+        suggestion_models.CommunityContributionStatsModel(
+            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
+            translation_reviewer_counts_by_lang_code=(
+                self.translation_reviewer_counts_by_lang_code),
+            translation_suggestion_counts_by_lang_code=(
+                self.translation_suggestion_counts_by_lang_code),
+            question_reviewer_count=self.question_reviewer_count,
+            question_suggestion_count=self.question_suggestion_count
+        ).put()
+
+        community_contribution_stats_model = (
+            suggestion_models.CommunityContributionStatsModel.get()
+        )
+
+        self.assertEqual(
+            community_contribution_stats_model.id,
+            suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
+        )
+        self.assertEqual(
+            (
+                community_contribution_stats_model
+                .translation_reviewer_counts_by_lang_code
+            ),
+            self.translation_reviewer_counts_by_lang_code
+        )
+        self.assertEqual(
+            (
+                community_contribution_stats_model
+                .translation_suggestion_counts_by_lang_code
+            ),
+            self.translation_suggestion_counts_by_lang_code
+        )
+        self.assertEqual(
+            community_contribution_stats_model.question_reviewer_count,
+            self.question_reviewer_count
+        )
+        self.assertEqual(
+            community_contribution_stats_model.question_suggestion_count,
+            self.question_suggestion_count
+        )
+
+    def test_get_returns_new_community_contribution_stats_model_if_not_found(
+            self):
+        """If the model has not been created yet, get should create the model
+        with default values.
+        """
+        community_contribution_stats_model = (
+            suggestion_models.CommunityContributionStatsModel.get()
+        )
+
+        self.assertEqual(
+            community_contribution_stats_model.id,
+            suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
+        )
+        self.assertEqual(
+            (
+                community_contribution_stats_model
+                .translation_reviewer_counts_by_lang_code
+            ), {}
+        )
+        self.assertEqual(
+            (
+                community_contribution_stats_model
+                .translation_suggestion_counts_by_lang_code
+            ), {}
+        )
+        self.assertEqual(
+            community_contribution_stats_model.question_reviewer_count, 0
+        )
+        self.assertEqual(
+            community_contribution_stats_model.question_suggestion_count, 0
+        )
+
+    def test_get_deletion_policy_returns_not_applicable(self):
+        self.assertEqual(
+            (
+                suggestion_models.CommunityContributionStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )

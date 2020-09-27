@@ -28,14 +28,11 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
-
-USER_ID_RANDOM_PART_LENGTH = 32
-USER_ID_LENGTH = 36
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -63,6 +60,9 @@ class UserSettingsModel(base_models.BaseModel):
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     last_logged_in = ndb.DateTimeProperty(default=None)
+    # A code associated with profile and full user on Android to provide a PIN
+    # based authentication within the account.
+    pin = ndb.StringProperty(default=None)
     # Name of a user displayed in Android UI. Unlike username, it can be
     # edited and is unique only among the profiles of the corresponding
     # regular user account.
@@ -119,12 +119,11 @@ class UserSettingsModel(base_models.BaseModel):
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
-    # A code associated with profile and full user on Android to provide a PIN
-    # based authentication within the account.
-    pin = ndb.StringProperty(default=None)
 
-    # DEPRECATED in 2.8.7. Do not use.
-    gae_user_id = ndb.StringProperty(required=False, indexed=False)
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -168,7 +167,6 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -270,7 +268,7 @@ class UserSettingsModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 
@@ -288,19 +286,6 @@ class UserSettingsModel(base_models.BaseModel):
          """
         return bool(cls.get_all().filter(
             cls.normalized_username == normalized_username).get())
-
-    @classmethod
-    def get_by_gae_id(cls, gae_id):
-        """Returns a user model with given GAE user ID.
-
-        Args:
-            gae_id: str. The GAE user ID that is being queried for.
-
-        Returns:
-            UserSettingsModel. The UserSettingsModel instance which has the same
-            GAE user ID.
-        """
-        return cls.query(cls.gae_id == gae_id).get()
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
@@ -341,6 +326,11 @@ class CompletedActivitiesModel(base_models.BaseModel):
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections completed by the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -413,6 +403,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # The ids of the collections partially completed by the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -490,6 +485,11 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     # The name of the state at which the learner left the exploration when
     # he/she last played it.
     last_played_state_name = ndb.StringProperty(default=None)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -616,6 +616,11 @@ class LearnerPlaylistModel(base_models.BaseModel):
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections in the playlist of the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -824,7 +829,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     """
 
     # IDs of activities (e.g., explorations) that this user subscribes to.
-    # TODO(bhenning): Rename this to exploration_ids and perform a migration.
+    # TODO(#10727): Rename this to exploration_ids and perform a migration.
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of collections that this user subscribes to.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
@@ -1388,6 +1393,11 @@ class CollectionProgressModel(base_models.BaseModel):
     completed_explorations = ndb.StringProperty(repeated=True)
 
     @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
+
+    @staticmethod
     def get_deletion_policy():
         """CollectionProgressModel can be deleted since it only contains
         information relevant to the one user.
@@ -1555,6 +1565,11 @@ class StoryProgressModel(base_models.BaseModel):
     # The list of node ids which have been completed within the context of
     # the story represented by story_id.
     completed_node_ids = ndb.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -1824,7 +1839,7 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=cursor)
+        cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
@@ -1881,6 +1896,11 @@ class UserSkillMasteryModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The degree of mastery of the user in the skill.
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -2277,7 +2297,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     """
 
     # The email of the user.
-    email = ndb.StringProperty(required=True)
+    email = ndb.StringProperty(required=True, indexed=True)
+    # Role of the user. Needed to decide which storage models have to be deleted
+    # for it.
+    role = ndb.StringProperty(required=True, indexed=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
 
@@ -2286,23 +2309,24 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # A dict mapping model IDs to pseudonymous user IDs. Each type of activity
-    # is grouped under different key (story, skill, question), the keys need to
-    # be from the core.platform.models.NAMES enum. For each activity, we use
-    # a different pseudonymous user ID. Note that all these pseudonymous
-    # user IDs originate from the same about-to-be-deleted user. If a key is
-    # absent from the activity_mappings dict, this means that for this activity
-    # type the mappings are not yet generated.
+    # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
+    # is grouped under different key (e.g. config, feedback, story, skill,
+    # question), the keys need to be from the core.platform.models.NAMES enum.
+    # For each entity, we use a different pseudonymous user ID. Note that all
+    # these pseudonymous user IDs originate from the same about-to-be-deleted
+    # user. If a key is absent from the pseudonymizable_entity_mappings dict,
+    # this means that for this activity type the mappings are not yet generated.
     # Example structure: {
-    #     'skill': {'skill_id': 'pseudo_user_id_1'},
+    #     'config': {'some_config': 'pseudo_user_id_1'},
+    #     'skill': {'skill_id': 'pseudo_user_id_2'},
     #     'story': {
-    #         'story_1_id': 'pseudo_user_id_2',
-    #         'story_2_id': 'pseudo_user_id_3',
-    #         'story_3_id': 'pseudo_user_id_4'
+    #         'story_1_id': 'pseudo_user_id_3',
+    #         'story_2_id': 'pseudo_user_id_4',
+    #         'story_3_id': 'pseudo_user_id_5'
     #     },
     #     'question': {}
     # }
-    activity_mappings = ndb.JsonProperty(default={})
+    pseudonymizable_entity_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():
@@ -2322,7 +2346,9 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'activity_mappings': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'pseudonymizable_entity_mappings': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -2372,7 +2398,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'pid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
 
             if not cls.get_by_id(new_id):
                 return new_id
@@ -2394,6 +2420,11 @@ class UserAuthDetailsModel(base_models.BaseModel):
     # attribute is None for them, hence this attribute stores their association
     # with a full user who do have a gae_id.
     parent_user_id = ndb.StringProperty(indexed=True, default=None)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -2452,3 +2483,17 @@ class UserAuthDetailsModel(base_models.BaseModel):
         if auth_service == feconf.AUTH_METHOD_GAE:
             return cls.query(cls.gae_id == auth_id).get()
         return None
+
+    @classmethod
+    def get_all_profiles_by_parent_user_id(cls, parent_user_id):
+        """Fetch all user entries with the given parent_user_id.
+
+        Args:
+            parent_user_id: str. User id of the parent_user whose associated
+                profiles we are querying for.
+
+        Returns:
+            list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
+            mapped to the queried parent_user_id.
+        """
+        return cls.query(cls.parent_user_id == parent_user_id).fetch()

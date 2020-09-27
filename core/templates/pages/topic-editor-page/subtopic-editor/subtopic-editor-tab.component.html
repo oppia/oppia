@@ -81,13 +81,15 @@
                 Gives learner an overview of how to perform a skill. Go to the preview tab to preview.
               </em>
             </span>
-            <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
+            <div ng-if="$ctrl.schemaEditorIsShown">
               <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
                                    class="protractor-test-edit-subtopic-page-contents"
                                    local-value="$ctrl.htmlData">
               </schema-based-editor>
-              <button class="btn btn-default" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
-              <button class="btn btn-success protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
+              <div class="text-right pt-3">
+                <button class="btn btn-outline-dark" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
+                <button class="btn btn-success protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
+              </div>
             </div>
             <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="subtopic-html-content protractor-test-edit-html-content">
               <angular-html-bind html-data="$ctrl.htmlData" class="protractor-test-subtopic-html-content">

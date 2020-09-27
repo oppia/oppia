@@ -17,6 +17,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -34,7 +36,6 @@ describe('Story Viewer Page component', function() {
   var alertsService = null;
   var assetsBackendApiService = null;
   var readOnlyStoryNodeObjectFactory = null;
-  var pageTitleService = null;
   var storyNodeObjectFactory = null;
   var storyPlaythroughObjectFactory = null;
   var storyViewerBackendApiService = null;
@@ -49,7 +50,9 @@ describe('Story Viewer Page component', function() {
       imports: [HttpClientTestingModule]
     });
 
-    pageTitleService = TestBed.get(PageTitleService);
+    OppiaAngularRootComponent.pageTitleService = (
+      TestBed.get(PageTitleService)
+    );
     readOnlyStoryNodeObjectFactory = TestBed.get(
       ReadOnlyStoryNodeObjectFactory);
     storyNodeObjectFactory = TestBed.get(StoryNodeObjectFactory);
@@ -76,7 +79,6 @@ describe('Story Viewer Page component', function() {
     ctrl = $componentController('storyViewerPage', {
       $rootScope: $rootScope,
       AlertsService: alertsService,
-      PageTitleService: pageTitleService,
     });
 
     // This approach was choosen because spyOn() doesn't work on properties
@@ -171,6 +173,7 @@ describe('Story Viewer Page component', function() {
       story_title: 'Story Title 1',
       story_description: 'Story Description 1',
       topic_name: 'Topic 1',
+      meta_tag_content: 'Story Meta Tag Content'
     });
   }));
 
@@ -222,17 +225,22 @@ describe('Story Viewer Page component', function() {
       '/assets/images/path/to/image.png');
   });
 
-  it('should change page title when story data is fetched from backend',
+  it('should change page title and meta tag when story data is fetched',
     function() {
       spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
         $q.resolve(storyPlaythrough));
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
+      spyOn(OppiaAngularRootComponent.pageTitleService, 'updateMetaTag');
 
       ctrl.$onInit();
       $rootScope.$apply();
 
-      expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
-        'Learn Topic 1 | Story Title 1 | Oppia');
+      expect(
+        OppiaAngularRootComponent.pageTitleService.setPageTitle
+      ).toHaveBeenCalledWith('Learn Topic 1 | Story Title 1 | Oppia');
+      expect(
+        OppiaAngularRootComponent.pageTitleService.updateMetaTag
+      ).toHaveBeenCalledWith('Story Meta Tag Content');
     });
 
   it('should show story\'s chapters when story has chapters', function() {

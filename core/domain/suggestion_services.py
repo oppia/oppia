@@ -559,6 +559,46 @@ def get_reviewable_suggestions(user_id, suggestion_type):
     return all_suggestions
 
 
+def get_question_suggestions_waiting_longest_for_review():
+    """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
+    of question suggestions, sorted in descending order by review wait time.
+
+    Returns:
+        list(Suggestion). A list of question suggestions, sorted in descending
+        order based on how long the suggestions have been waiting for review.
+    """
+    return [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_question_suggestions_waiting_longest_for_review()
+        )
+    ]
+
+
+def get_translation_suggestions_waiting_longest_for_review_per_lang(
+        language_code):
+    """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
+    number of translation suggestions in the specified language code,
+    sorted in descending order by review wait time.
+
+    Args:
+        language_code: str. The ISO 639-1 language code of the translation
+            suggestions.
+
+    Returns:
+        list(Suggestion). A list of translation suggestions, sorted in
+        descending order based on how long the suggestions have been waiting
+        for review.
+    """
+    return [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                language_code)
+        )
+    ]
+
+
 def get_submitted_suggestions(user_id, suggestion_type):
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
@@ -766,3 +806,50 @@ def get_voiceover_application(voiceover_application_id):
         voiceover_application_model.filename,
         voiceover_application_model.content,
         voiceover_application_model.rejection_message)
+
+
+def create_community_contribution_stats_from_model(
+        community_contribution_stats_model):
+    """Creates a domain object that represents the community contribution
+    stats from the model given. Note that each call to this function returns
+    a new domain object, but the data copied into the domain object comes from
+    a single, shared source.
+
+    Args:
+        community_contribution_stats_model: CommunityContributionStatsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        CommunityContributionStats. The corresponding
+        CommunityContributionStats domain object.
+    """
+    return suggestion_registry.CommunityContributionStats(
+        (
+            community_contribution_stats_model
+            .translation_reviewer_counts_by_lang_code
+        ),
+        (
+            community_contribution_stats_model
+            .translation_suggestion_counts_by_lang_code
+        ),
+        community_contribution_stats_model.question_reviewer_count,
+        community_contribution_stats_model.question_suggestion_count
+    )
+
+
+def get_community_contribution_stats():
+    """Gets the CommunityContributionStatsModel and converts it into the
+    corresponding domain object that represents the community contribution
+    stats. Note that there is only ever one instance of this model and if the
+    model doesn't exist yet, it will be created.
+
+    Returns:
+        CommunityContributionStats. The corresponding
+        CommunityContributionStats domain object.
+    """
+    community_contribution_stats_model = (
+        suggestion_models.CommunityContributionStatsModel.get()
+    )
+
+    return create_community_contribution_stats_from_model(
+        community_contribution_stats_model)

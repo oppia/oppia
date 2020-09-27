@@ -22,10 +22,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { MultipleChoiceInputCustomizationArgs } from
   'interactions/customization-args-defs';
-/* eslint-disable max-len */
-import { MultipleChoiceInputValidationService } from
-  'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
-/* eslint-enable max-len */
+import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';

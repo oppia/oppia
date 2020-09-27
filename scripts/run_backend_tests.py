@@ -65,8 +65,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
     common.GOOGLE_APP_ENGINE_SDK_HOME,
     os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join(

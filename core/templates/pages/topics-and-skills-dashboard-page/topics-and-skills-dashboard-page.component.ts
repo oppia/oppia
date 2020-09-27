@@ -55,6 +55,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
 
 import { Subscription } from 'rxjs';
+import debounce from 'lodash/debounce';
 
 
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
@@ -78,10 +79,10 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';
 
       /**
-           * Calls the TopicsAndSkillsDashboardBackendApiService and fetches
-           * the topics and skills dashboard data.
-           * @param {Boolean} stayInSameTab - To stay in the same tab or not.
-           */
+       * Calls the TopicsAndSkillsDashboardBackendApiService and fetches
+       * the topics and skills dashboard data.
+       * @param {Boolean} stayInSameTab - To stay in the same tab or not.
+      */
       ctrl._initDashboard = function(stayInSameTab) {
         TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
           function(response) {
@@ -147,13 +148,13 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       };
 
       /**
-           * Tells whether the next skill page is present in memory or not.
-           * This case occurs when the next page is fetched from the backend
-           * and then we move back one page, but the next page is still in
-           * memory. So instead of making the backend call for the next page,
-           * we first check if the next page is present in memory.
-           * @returns {Boolean} - Whether the next page is present or not.
-           */
+       * Tells whether the next skill page is present in memory or not.
+       * This case occurs when the next page is fetched from the backend
+       * and then we move back one page, but the next page is still in
+       * memory. So instead of making the backend call for the next page,
+       * we first check if the next page is present in memory.
+       * @returns {Boolean} - Whether the next page is present or not.
+       */
       ctrl.isNextSkillPagePresent = function() {
         var totalSkillsPresent = ctrl.skillSummaries.length;
         // Here +1 is used since we are checking the next page and
@@ -165,9 +166,9 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       };
 
       /**
-           * Sets the active tab to topics or skills.
-           * @param {String} tabName - name of the tab to set.
-           */
+       * Sets the active tab to topics or skills.
+       * @param {String} tabName - name of the tab to set.
+       */
       ctrl.setActiveTab = function(tabName) {
         ctrl.activeTab = tabName;
         ctrl.filterObject.reset();
@@ -196,8 +197,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         SkillCreationService.createNewSkill();
       };
       /**
-           * @param {Number} pageNumber - Page number to navigate to.
-           */
+       * @param {Number} pageNumber - Page number to navigate to.
+       */
       ctrl.goToPageNumber = function(pageNumber) {
         if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
           ctrl.topicPageNumber = pageNumber;
@@ -245,16 +246,16 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
           if (ctrl.isNextSkillPagePresent()) {
             ctrl.goToPageNumber(ctrl.pageNumber + 1);
           } else {
-            ctrl.fetchSkills();
+            ctrl.fetchSkillsDebounced();
           }
         } else if (ctrl.pageNumber >= 1) {
           ctrl.goToPageNumber(ctrl.pageNumber - 1);
         }
       };
       /**
-           * @param {String} direction - Direction, whether to change the
-           * page to left or right by 1.
-           */
+       * @param {String} direction - Direction, whether to change the
+       * page to left or right by 1.
+       */
       ctrl.changePageByOne = function(direction) {
         ctrl.lastPage = parseInt(
           String(ctrl.currentCount / ctrl.itemsPerPage));
@@ -366,6 +367,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
           }
           return arr;
         };
+        ctrl.fetchSkillsDebounced = debounce(ctrl.fetchSkills, 300);
+
         ctrl.directiveSubscriptions.add(
           TopicsAndSkillsDashboardBackendApiService.
             onTopicsAndSkillsDashboardReinitialized.subscribe(
