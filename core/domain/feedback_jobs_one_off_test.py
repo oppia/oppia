@@ -24,12 +24,13 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
 (exp_models, feedback_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback])
-taskqueue_services = models.Registry.import_taskqueue_services()
+(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 
 class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
@@ -47,12 +48,12 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.enqueue(job_id)
         self.assertEqual(
             1,
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
             0,
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS))
         job_output = (
             feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.get_output(
