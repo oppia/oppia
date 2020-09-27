@@ -63,8 +63,8 @@ angular.module('oppia').directive('inputResponsePair', [
           };
 
           $scope.isVideoRteElementPresentInResponse = function() {
-           return $scope.data.oppiaResponse.includes(
-                'oppia-noninteractive-video');
+            return $scope.data.oppiaResponse.includes(
+              'oppia-noninteractive-video');
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
