@@ -532,3 +532,77 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
         model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
             self.thread_id)
         self.assertTrue(model_instance.created_on < model_instance.last_updated)
+
+
+class CleanupGeneralFeedbackMessageModelOneOffJobTest(
+        test_utils.GenericTestBase):
+    """Tests for one-off job to clean up general feedback message model."""
+
+    def setUp(self):
+        super(CleanupGeneralFeedbackMessageModelOneOffJobTest, self).setUp()
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.user_id, exp)
+
+        self.thread_id = feedback_services.create_thread(
+            'exploration', '0', self.user_id, 'Subject', 'Text',
+            has_suggestion=False)
+
+        model_instance = feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            '%s.0' % self.thread_id)
+        self.created_time = model_instance.created_on
+        self.last_updated_time = model_instance.last_updated
+
+    def test_standard_operation(self):
+        job_id = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackMessageModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackMessageModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+        model_instance = feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            '%s.0' % self.thread_id)
+        self.assertEqual(model_instance.created_on, self.created_time)
+        self.assertEqual(model_instance.last_updated, self.last_updated_time)
+
+    def test_job_updates_last_updated_time_if_it_is_less_than_created_on_time(
+            self):
+        model_instance = feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            '%s.0' % self.thread_id)
+        model_instance.last_updated = (
+            model_instance.created_on - datetime.timedelta(days=1))
+        model_instance.put(update_last_updated_time=False)
+        self.assertTrue(model_instance.created_on > model_instance.last_updated)
+
+        job_id = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackMessageModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackMessageModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Updated last_updated field for '
+                'GeneralFeedbackMessageModel\', 1]'])
+
+        model_instance = feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            '%s.0' % self.thread_id)
+        self.assertTrue(model_instance.created_on < model_instance.last_updated)

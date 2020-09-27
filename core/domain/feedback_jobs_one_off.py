@@ -160,3 +160,27 @@ class CleanupGeneralFeedbackThreadModelOneOffJob(
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
+
+
+class CleanupGeneralFeedbackMessageModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to clean up GeneralFeedbackMessageModel by updating
+    the last updated date time if it less than the creation time.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.GeneralFeedbackMessageModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            if item.created_on > item.last_updated:
+                item.put()
+                yield (
+                    'Updated last_updated field for '
+                    'GeneralFeedbackMessageModel', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

@@ -68,6 +68,7 @@ ONE_OFF_JOB_MANAGERS = [
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     feedback_jobs_one_off.CleanupFeedbackAnalyticsModelModelOneOffJob,
     feedback_jobs_one_off.CleanupGeneralFeedbackThreadModelOneOffJob,
+    feedback_jobs_one_off.CleanupGeneralFeedbackMessageModelOneOffJob,
     (
         interaction_jobs_one_off
         .DragAndDropSortInputInteractionOneOffJob),
