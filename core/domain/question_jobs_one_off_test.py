@@ -338,7 +338,7 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                 .MissingQuestionMigrationOneOffJob.get_output(job_id))
             self.assertEqual(output, [])
 
-    def test_migration_job_removes_commit_log_model_if_skill_model_is_missing(
+    def test_migration_job_removes_commit_log_model_if_question_model_is_missing(
             self):
         def mock_get_question_by_id(unused_question_id, strict=True): # pylint: disable=unused-argument
             return None
