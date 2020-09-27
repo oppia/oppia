@@ -2160,7 +2160,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'FOUND COMMIT LOGS-FOUND PARENT MODEL-' +
                 'CollectionSnapshotMetadataModel',
-                ['collection_id0-1']
+                1
             ]
         ]
 
@@ -2191,7 +2191,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'FOUND COMMIT LOGS-FOUND PARENT MODEL-' +
                 'ExplorationSnapshotMetadataModel',
-                ['exp_id0-1']
+                1
             ]
         ]
 
@@ -2216,7 +2216,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'FOUND COMMIT LOGS-FOUND PARENT MODEL' +
                 '-QuestionSnapshotMetadataModel',
-                ['question_id0-1']
+                1
             ]
         ]
 
@@ -2244,7 +2244,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'FOUND COMMIT LOGS-FOUND PARENT MODEL' +
                 '-SkillSnapshotMetadataModel',
-                ['skill_id0-1']
+                1
             ]
         ]
 
@@ -2268,7 +2268,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'FOUND COMMIT LOGS-FOUND PARENT MODEL' +
                 '-StorySnapshotMetadataModel',
-                ['story_id0-1']
+                1
             ]
         ]
 
@@ -2303,12 +2303,12 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'FOUND COMMIT LOGS-FOUND PARENT MODEL-' +
                 'TopicRightsSnapshotMetadataModel',
-                ['topic_id0-1']
+                1
             ],
             [
                 'FOUND COMMIT LOGS-FOUND PARENT MODEL-' +
                 'TopicSnapshotMetadataModel',
-                ['topic_id0-1']
+                1
             ]
         ]
 
@@ -2331,7 +2331,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'FOUND COMMIT LOGS-FOUND PARENT MODEL' +
                 '-SubtopicPageSnapshotMetadataModel',
-                ['topic_id0-1-1']
+                1
             ]
         ]
 

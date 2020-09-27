@@ -736,4 +736,7 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        yield (key, values)
+        if key.startswith('FOUND COMMIT LOGS-FOUND PARENT MODEL'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
