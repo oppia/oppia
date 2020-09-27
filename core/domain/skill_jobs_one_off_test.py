@@ -417,8 +417,6 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertFalse(self.model_instance.deleted)
 
     def test_migration_job_skips_deleted_model(self):
-        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
-        skill_model.delete(self.albert_id, 'Delete Model')
         self.model_instance.delete()
 
         def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument
