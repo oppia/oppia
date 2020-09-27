@@ -1829,3 +1829,133 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get_by_id(self.user_id))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1'])
+
+
+class CleanupUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CleanupUserContributionsModelOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup('user@email', 'user')
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.user = user_services.UserActionsInfo(self.user_id)
+
+        self.save_new_valid_exploration(
+            'exp0', self.user_id, end_state_name='End')
+        self.save_new_valid_exploration(
+            'exp1', self.owner_id, end_state_name='End')
+        exp_services.update_exploration(
+            self.user_id, 'exp1', [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+        rights_manager.publish_exploration(self.user, 'exp0')
+        rights_manager.publish_exploration(self.owner, 'exp1')
+
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            user_jobs_one_off
+            .CleanupUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
+        self.assertEqual(
+            model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, ['exp1'])
+
+    def test_job_removes_deleted_exp_from_created_explorations(self):
+        exp_services.delete_exploration(self.user_id, 'exp0')
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
+        self.assertEqual(
+            model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, ['exp1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanupUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(
+            output,
+            ['[u\'Successfully cleaned up UserContributionsModel\', 1]'])
+
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, [])
+        self.assertEqual(model_instance_1.edited_exploration_ids, ['exp1'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, ['exp1'])
+
+    def test_job_removes_deleted_exp_from_edited_explorations(self):
+        exp_services.delete_exploration(self.owner_id, 'exp1')
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
+        self.assertEqual(
+            model_instance_1.edited_exploration_ids, ['exp0', 'exp1'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, ['exp1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanupUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(
+            output,
+            ['[u\'Successfully cleaned up UserContributionsModel\', 2]'])
+
+        model_instance_1 = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        self.assertEqual(model_instance_1.created_exploration_ids, ['exp0'])
+        self.assertEqual(model_instance_1.edited_exploration_ids, ['exp0'])
+
+        model_instance_2 = user_models.UserContributionsModel.get_by_id(
+            self.owner_id)
+        self.assertEqual(model_instance_2.created_exploration_ids, [])
+        self.assertEqual(
+            model_instance_2.edited_exploration_ids, [])

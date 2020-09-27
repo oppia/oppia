@@ -542,3 +542,48 @@ class CleanupCollectionProgressModelOneOffJob(
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
+
+
+class CleanupUserContributionsModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that cleans up UserContributionsModel by removing deleted
+    explorations from user contribution.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserContributionsModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            fetched_created_exploration_model_instances = (
+                datastore_services.fetch_multiple_entities_by_ids_and_models(
+                    [('ExplorationModel', item.created_exploration_ids)]))[0]
+
+            exp_ids_removed = []
+            for exp_id, exp_instance in list(python_utils.ZIP(
+                    item.created_exploration_ids,
+                    fetched_created_exploration_model_instances)):
+                if exp_instance is None or exp_instance.deleted:
+                    exp_ids_removed.append(exp_id)
+                    item.created_exploration_ids.remove(exp_id)
+
+            fetched_edited_exploration_model_instances = (
+                datastore_services.fetch_multiple_entities_by_ids_and_models(
+                    [('ExplorationModel', item.edited_exploration_ids)]))[0]
+
+            for exp_id, exp_instance in list(python_utils.ZIP(
+                    item.edited_exploration_ids,
+                    fetched_edited_exploration_model_instances)):
+                if exp_instance is None or exp_instance.deleted:
+                    exp_ids_removed.append(exp_id)
+                    item.edited_exploration_ids.remove(exp_id)
+
+            if exp_ids_removed:
+                item.put()
+                yield ('Successfully cleaned up UserContributionsModel', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

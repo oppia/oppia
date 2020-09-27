@@ -114,6 +114,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.RemoveGaeUserIdOneOffJob,
     user_jobs_one_off.CleanupUserSubscribersModelOneOffJob,
     user_jobs_one_off.CleanupCollectionProgressModelOneOffJob,
+    user_jobs_one_off.CleanupUserContributionsModelOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
