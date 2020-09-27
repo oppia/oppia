@@ -18,6 +18,7 @@ from __future__ import absolute_import # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import datetime
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -432,3 +433,102 @@ class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
 
         model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
         self.assertIsNone(model_instance)
+
+
+class CleanupGeneralFeedbackThreadModelOneOffJobTest(
+        test_utils.GenericTestBase):
+    """Tests for one-off job to clean up general feedback thread model."""
+
+    def setUp(self):
+        super(CleanupGeneralFeedbackThreadModelOneOffJobTest, self).setUp()
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.user_id, exp)
+
+        self.thread_id = feedback_services.create_thread(
+            'exploration', '0', self.user_id, 'Subject', 'Text',
+            has_suggestion=False)
+
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        self.created_time = model_instance.created_on
+        self.last_updated_time = model_instance.last_updated
+
+    def test_standard_operation(self):
+        job_id = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        self.assertEqual(model_instance.created_on, self.created_time)
+        self.assertEqual(model_instance.last_updated, self.last_updated_time)
+
+    def test_job_removes_thread_model_for_deleted_explorations(self):
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        self.assertFalse(model_instance is None)
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, ['[u\'Deleted GeneralFeedbackThreadModel\', 1]'])
+
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        self.assertIsNone(model_instance)
+
+    def test_job_updates_last_updated_time_if_it_is_less_than_created_on_time(
+            self):
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        model_instance.last_updated = (
+            model_instance.created_on - datetime.timedelta(days=1))
+        model_instance.put(update_last_updated_time=False)
+        self.assertTrue(model_instance.created_on > model_instance.last_updated)
+
+        job_id = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanupGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Updated last_updated field for '
+                'GeneralFeedbackThreadModel\', 1]'])
+
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        self.assertTrue(model_instance.created_on < model_instance.last_updated)

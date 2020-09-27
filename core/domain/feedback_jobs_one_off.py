@@ -19,6 +19,7 @@ from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import feedback_services
+from core.domain import prod_validators
 from core.platform import models
 
 (exp_models, feedback_models,) = models.Registry.import_models([
@@ -121,6 +122,40 @@ class CleanupFeedbackAnalyticsModelModelOneOffJob(
             if exp_model is None or exp_model.deleted:
                 item.delete()
                 yield ('Deleted Feedback Analytics Model', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class CleanupGeneralFeedbackThreadModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to clean up GeneralFeedbackThreadModel by:
+    1. Removing the model if the target model for which feedback was created is
+    deleted. Target model can be exploration, question, skill or topic.
+    2. Update the last updated date time if it less than the creation time.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.GeneralFeedbackThreadModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            target_model = (
+                prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
+                    item.entity_type].get_by_id(item.entity_id))
+            if target_model is None or target_model.deleted:
+                item.delete()
+                yield ('Deleted GeneralFeedbackThreadModel', 1)
+                return
+
+            if item.created_on > item.last_updated:
+                item.put()
+                yield (
+                    'Updated last_updated field for '
+                    'GeneralFeedbackThreadModel', 1)
 
     @staticmethod
     def reduce(key, values):
