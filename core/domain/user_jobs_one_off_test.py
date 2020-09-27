@@ -29,6 +29,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import learner_progress_services
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -1697,3 +1698,134 @@ class CleanupUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
             self.owner_id)
         self.assertTrue(self.user_id in self.model_instance.subscriber_ids)
         self.assertTrue(self.owner_id not in self.model_instance.subscriber_ids)
+
+
+class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CleanupCollectionProgressModelOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.OWNER_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i
+        ) for i in python_utils.RANGE(3)]
+
+        collection = collection_domain.Collection.create_default_collection(
+            'col')
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+            rights_manager.publish_exploration(self.owner, exp.id)
+            collection.add_node(exp.id)
+
+        collection_services.save_new_collection(self.owner_id, collection)
+        rights_manager.publish_collection(self.owner, 'col')
+
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, '0')
+        collection_services.record_played_exploration_in_collection_context(
+            self.user_id, 'col', '0')
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, '1')
+        collection_services.record_played_exploration_in_collection_context(
+            self.user_id, 'col', '1')
+
+        self.model_instance = user_models.CollectionProgressModel.get_by_id(
+            '%s.col' % self.user_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            user_jobs_one_off
+            .CleanupCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanupCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+    def test_job_cleans_up_exploration_ids_not_present_in_collection(self):
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+        self.model_instance.completed_explorations.append('3')
+        self.model_instance.put()
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1', '3'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanupCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanupCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Invalid Exploartion IDs cleaned from '
+                'CollectionProgressModel\', 1]'])
+        self.model_instance = user_models.CollectionProgressModel.get_by_id(
+            '%s.col' % self.user_id)
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])
+
+    def test_job_creates_completed_activities_model_if_it_is_missing(self):
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])
+        completed_activities_model.delete()
+
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanupCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanupCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Regenerated Missing CompletedActivitiesModel\', 1]'])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])

@@ -491,3 +491,54 @@ class CleanupUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
+
+
+class CleanupCollectionProgressModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that cleans up CollectionProgressModel by:
+    1. Removing exploration ids which are not a part of the collection.
+    2. Creating CompletedActivitiesModel for completed explorations if it is
+    missing.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.CollectionProgressModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            col_model = collection_models.CollectionModel.get_by_id(
+                item.collection_id)
+
+            collection_node_ids = [
+                node['exploration_id'] for node in (
+                    col_model.collection_contents['nodes'])]
+            exp_ids_to_remove = [
+                exp_id
+                for exp_id in item.completed_explorations if exp_id not in (
+                    collection_node_ids)]
+
+            if exp_ids_to_remove:
+                item.completed_explorations = [
+                    exp_id for exp_id in item.completed_explorations
+                    if exp_id not in exp_ids_to_remove]
+                item.put()
+                yield (
+                    'Invalid Exploartion IDs cleaned from '
+                    'CollectionProgressModel', 1)
+
+            completed_activities_model = (
+                user_models.CompletedActivitiesModel.get_by_id(item.user_id))
+            if completed_activities_model is None or (
+                    completed_activities_model.deleted):
+                completed_activities_model = (
+                    user_models.CompletedActivitiesModel(id=item.user_id))
+                completed_activities_model.exploration_ids = (
+                    item.completed_explorations)
+                completed_activities_model.put()
+                yield ('Regenerated Missing CompletedActivitiesModel', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
