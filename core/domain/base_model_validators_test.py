@@ -110,12 +110,18 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         self.item = MockModel(id='mockmodel')
         self.item.put()
 
+        self.sys_item = MockModel(id=base_model_validators.MODEL_IDS_TO_SKIP[0])
+        self.sys_item.put()
+
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_id_relationships\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
             MockBaseModelValidator().validate(self.item)
+
+    def test_checks_are_skipped_for_base_model_with_system_id(self):
+        base_model_validators.BaseModelValidator().validate(self.sys_item)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaisesRegexp(
@@ -124,10 +130,19 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             ' derived class. It should be implemented in the derived class.'):
             MockSummaryModelValidator().validate(self.item)
 
+    def test_checks_are_skipped_for_summary_model_with_system_id(self):
+        base_model_validators.BaseSummaryModelValidator().validate(
+            self.sys_item)
+
     def test_error_is_raised_if_external_model_name_is_undefined(self):
         with self.assertRaisesRegexp(
             Exception, 'External model name should be specified'):
             MockSnapshotContentModelValidator().validate(self.item)
+
+    def test_checks_are_skipped_for_snapshot_content_model_with_system_id(
+            self):
+        base_model_validators.BaseSnapshotContentModelValidator().validate(
+            self.sys_item)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
         with self.assertRaisesRegexp(
@@ -137,6 +152,16 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             snapshot_model = MockSnapshotModel(id='mockmodel')
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
+
+    def test_checks_are_skipped_for_snapshot_metadata_model_with_system_id(
+            self):
+        base_model_validators.BaseSnapshotMetadataModelValidator().validate(
+            self.sys_item)
+
+    def test_checks_are_skipped_for_commit_log_model_with_system_id(
+            self):
+        base_model_validators.BaseCommitLogEntryModelValidator().validate(
+            self.sys_item)
 
     def test_error_is_raised_if_entity_classes_to_map_over_is_undefined(self):
         job_class = (
