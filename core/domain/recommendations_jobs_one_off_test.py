@@ -30,6 +30,7 @@ from core.domain import rights_manager
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
+import python_utils
 
 (exp_models, recommendations_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
@@ -203,3 +204,46 @@ class DeleteAllExplorationRecommendationsOneOffJobTests(
         self.assertIsNone(
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
                 self.RECOMMENDATION_3_ID))
+
+
+class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
+    """Test clean up exploration recommendations one-off job."""
+
+    def setUp(self):
+        super(CleanupExplorationRecommendationsOneOffJob, self).setUp()
+
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(4)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.user_id, exp)
+
+        recommendations_services.set_exploration_recommendations(
+            '0', ['1', '2'])
+
+
+    def test_standard_operation(self):
+        job_id = (
+            recommendations_jobs_one_off
+            .CleanupExplorationRecommendationsOneOffJob.create_new())
+        (
+            recommendations_jobs_one_off
+            .CleanupExplorationRecommendationsOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            recommendations_jobs_one_off
+            .CleanupExplorationRecommendationsOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+        recommendations_model = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id('0'
+                ))
+        self.assertEqual(
+            recommendations_models.recommended_exploration_ids, ['1', '2'])

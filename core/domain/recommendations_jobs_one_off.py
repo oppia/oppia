@@ -26,9 +26,11 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_domain
 from core.platform import models
+import python_utils
 
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
+datastore_services = models.Registry.import_datastore_services()
 
 MAX_RECOMMENDATIONS = 10
 # Note: There is a threshold so that bad recommendations will be
@@ -120,6 +122,47 @@ class DeleteAllExplorationRecommendationsOneOffJob(
     def map(model):
         model.delete()
         yield ('DELETED', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class CleanupExplorationRecommendationsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Cleans up ExplorationRecommendationsModel by:
+    1. Removing exploration ids from recommendation list of model if exploration
+    model is deleted.
+    2. Deleting the recommendations model if the exploration for which it was
+    created is deleted.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [recommendations_models.ExplorationRecommendationsModel]
+
+    @staticmethod
+    def map(item):
+        exp_model = exp_models.ExplorationModel.get_by_id(item.id)
+        if exp_model is None or exp_model.deleted:
+            item.delete()
+            yield('Removed recommendation model', 1)
+            return
+
+        fetched_exploration_model_instances = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [('ExplorationModel', item.recommended_exploration_ids)]))[0]
+
+        exp_ids_removed = []
+        for exp_id, exp_instance in list(python_utils.ZIP(
+                item.activity_ids,
+                fetched_exploration_model_instances)):
+            if exp_instance is None or exp_instance.deleted:
+                exp_ids_removed.append(exp_id)
+                item.recommended_exploration_ids.remove(exp_id)
+        if exp_ids_removed:
+            item.put()
+            yield ('Removed deleted exp ids from recommendations.', 1)
 
     @staticmethod
     def reduce(key, values):
