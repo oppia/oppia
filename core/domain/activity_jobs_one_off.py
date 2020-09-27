@@ -667,7 +667,7 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_models.ExplorationCommitLogEntryModel.get_by_id(
                     commit_log_id))
             if snapshot_model.commit_type in ['create', 'delete']:
-                missing_commit_log_msg = 'COMMIT LOGS SHOULD NOT EXISTS-'          
+                missing_commit_log_msg = 'COMMIT LOGS SHOULD NOT EXISTS-'
         if isinstance(
                 snapshot_model,
                 question_models.QuestionSnapshotMetadataModel):
