@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
+import feconf
+import python_utils
 
 from google.appengine.ext import ndb
 
@@ -98,16 +100,17 @@ class TopicModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether TopicModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -176,10 +179,32 @@ class TopicModel(base_models.VersionedModel):
             cls.url_fragment == url_fragment).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'abbreviated_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_story_references':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'additional_story_references':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_reference_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'uncategorized_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopic_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'practice_tab_is_displayed':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
 
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -215,12 +240,14 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'topic-%s-%s' % (topic_id, version)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class TopicSummaryModel(base_models.BaseModel):
@@ -291,10 +318,28 @@ class TopicSummaryModel(base_models.BaseModel):
         """
         return False
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'additional_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'uncategorized_skill_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopic_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -336,16 +381,17 @@ class SubtopicPageModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether SubtopicPageModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -375,10 +421,16 @@ class SubtopicPageModel(base_models.VersionedModel):
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_contents_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -416,12 +468,14 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -468,9 +522,9 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (cls.query(
-            cls.manager_ids == user_id).get(keys_only=True) is not None
-                or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return cls.query(
+            cls.manager_ids == user_id
+        ).get(keys_only=True) is not None
 
     @classmethod
     def get_by_user(cls, user_id):
@@ -528,10 +582,33 @@ class TopicRightsModel(base_models.VersionedModel):
             post_commit_is_private=not topic_rights.topic_is_published
         ).put()
 
-    @staticmethod
-    def get_export_policy():
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+
+        snapshot_metadata_model.content_user_ids = list(sorted(set(
+            self.manager_ids)))
+
+        commit_cmds_user_ids = set()
+        for commit_cmd in commit_cmds:
+            user_id_attribute_names = python_utils.NEXT(
+                cmd['user_id_attribute_names']
+                for cmd in feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                if cmd['name'] == commit_cmd['cmd']
+            )
+            for user_id_attribute_name in user_id_attribute_names:
+                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+        snapshot_metadata_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+
+        snapshot_metadata_model.put()
+
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def export_data(cls, user_id):

@@ -66,7 +66,7 @@ angular.module('oppia').directive('stateHintsEditor', [
         '/components/state-editor/state-hints-editor/' +
         'state-hints-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter', 'AlertsService',
+        '$filter', '$scope', '$uibModal', 'AlertsService',
         'EditabilityService', 'ExternalSaveService',
         'StateEditorService', 'StateHintsService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
@@ -74,7 +74,7 @@ angular.module('oppia').directive('stateHintsEditor', [
         'UrlInterpolationService', 'WindowDimensionsService',
         'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, $filter, AlertsService,
+            $filter, $scope, $uibModal, AlertsService,
             EditabilityService, ExternalSaveService,
             StateEditorService, StateHintsService,
             StateInteractionIdService, StateNextContentIdIndexService,
@@ -165,14 +165,10 @@ angular.module('oppia').directive('stateHintsEditor', [
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
-              var solutionContentId = StateSolutionService.displayed
-                .explanation.getContentId();
               StateSolutionService.displayed = null;
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
 
-              var hintContentId = StateHintsService.displayed[0]
-                .hintContent.getContentId();
               StateHintsService.displayed = [];
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
@@ -198,8 +194,6 @@ angular.module('oppia').directive('stateHintsEditor', [
                 StateHintsService.savedMemento.length === 1) {
                 openDeleteLastHintModal();
               } else {
-                var hintContentId = StateHintsService.displayed[index]
-                  .hintContent.getContentId();
                 StateHintsService.displayed.splice(index, 1);
                 StateHintsService.saveDisplayedValue();
                 $scope.onSaveHints(StateHintsService.displayed);

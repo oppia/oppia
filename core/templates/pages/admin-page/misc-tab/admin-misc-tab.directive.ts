@@ -40,15 +40,17 @@ angular.module('oppia').directive('adminMiscTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/misc-tab/admin-misc-tab.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
-        var ctrl = this;
-        var DATA_EXTRACTION_QUERY_HANDLER_URL = (
+      controller: [function() {
+        const ctrl = this;
+        const DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
-        var SEND_DUMMY_MAIL_HANDLER_URL = (
+        const SEND_DUMMY_MAIL_HANDLER_URL = (
           '/senddummymailtoadminhandler');
-        var MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
-        var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-        var irreversibleActionMessage = (
+        const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
+        const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
+        const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
+          '/numberofdeletionrequestshandler');
+        const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
         ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
@@ -151,7 +153,6 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.dataExtractionQueryStatusMessage = message;
         };
 
-
         ctrl.sendDummyMailToAdmin = function() {
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
             .then(function(response) {
@@ -206,11 +207,25 @@ angular.module('oppia').directive('adminMiscTab', [
           );
         };
 
+        ctrl.getNumberOfPendingDeletionRequestModels = function() {
+          ctrl.setStatusMessage(
+            'Getting the number of users that are being deleted...');
+          $http.get(NUMBER_OF_DELETION_REQUEST_HANDLER_URL).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'The number of users that are being deleted is: ' +
+                response.data.number_of_pending_deletion_models);
+            },
+            function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
-          var STATUS_FINISHED = 'Loading the extracted data ...';
-          var STATUS_FAILED = 'Error, ';
 
           setDataExtractionQueryStatusMessage(STATUS_PENDING);
 

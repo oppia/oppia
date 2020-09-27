@@ -81,16 +81,17 @@ class StoryModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether StoryModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -120,10 +121,23 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.story_id = self.id
         story_commit_log_entry.put()
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_contents_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'corresponding_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def get_by_url_fragment(cls, url_fragment):
@@ -175,12 +189,14 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'story-%s-%s' % (story_id, version)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StorySummaryModel(base_models.BaseModel):
@@ -240,7 +256,19 @@ class StorySummaryModel(base_models.BaseModel):
         """
         return False
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'node_titles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

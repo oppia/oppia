@@ -20,11 +20,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -89,16 +89,17 @@ class SkillModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether SkillModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def get_merged_skills(cls):
@@ -140,10 +141,25 @@ class SkillModel(base_models.VersionedModel):
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconceptions_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rubric_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconceptions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rubrics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_contents_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'prerequisite_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_misconception_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'superseding_skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -179,12 +195,14 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'skill-%s-%s' % (skill_id, version)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class SkillSummaryModel(base_models.BaseModel):
@@ -236,10 +254,19 @@ class SkillSummaryModel(base_models.BaseModel):
         """
         return False
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'worked_examples_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def fetch_page(cls, page_size, urlsafe_start_cursor, sort_by):
@@ -261,7 +288,8 @@ class SkillSummaryModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        cursor = (
+            datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor))
         sort = -cls.skill_model_created_on
         if sort_by == (
                 constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[

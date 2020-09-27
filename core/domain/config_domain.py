@@ -158,7 +158,8 @@ class ConfigPropertyChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CHANGE_PROPERTY_VALUE,
         'required_attribute_names': ['new_value'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -451,3 +452,7 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'The maximum number of explorations that can be send in a batch of math '
     'rich text svgs.',
     2)
+
+CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
+    'contributor_dashboard_is_enabled', BOOL_SCHEMA,
+    'Enable contributor dashboard page. The default value is true.', True)

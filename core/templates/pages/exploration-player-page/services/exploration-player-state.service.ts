@@ -19,14 +19,10 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/question/question-backend-api.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -53,7 +49,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
   'PlaythroughService', 'PretestQuestionBackendApiService',
   'QuestionBackendApiService', 'QuestionPlayerEngineService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'UrlService',
+  'StatsReportingService', 'UrlService',
   'EXPLORATION_MODE',
   function(
       $q, ContextService, EditableExplorationBackendApiService,
@@ -63,10 +59,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       PlaythroughService, PretestQuestionBackendApiService,
       QuestionBackendApiService, QuestionPlayerEngineService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, UrlService,
+      StatsReportingService, UrlService,
       EXPLORATION_MODE) {
-    StatsReportingService = (
-      OppiaAngularRootComponent.statsReportingService);
     var _totalQuestionsReceivedEventEmitter = new EventEmitter();
     var _oppiaFeedbackAvailableEventEmitter = new EventEmitter();
     var currentEngineService = null;
@@ -75,8 +69,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
-    var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
-      '/overrides/guppy/oppia_symbols.json');
     if (!questionPlayerMode) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(explorationId, version)

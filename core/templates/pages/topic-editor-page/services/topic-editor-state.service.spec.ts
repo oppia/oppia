@@ -54,7 +54,6 @@ describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var subtopicPageObjectFactory = null;
-  var rubricObjectFactory = null;
   var topicRightsObjectFactory = null;
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
@@ -63,7 +62,6 @@ describe('Topic editor state service', function() {
   var secondBackendTopicObject = null;
   var secondTopicRightsObject = null;
   var $rootScope = null;
-  var $scope = null;
   var $q = null;
 
   var testSubscriptions = null;
@@ -218,7 +216,6 @@ describe('Topic editor state service', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
     fakeEditableTopicBackendApiService.newBackendTopicObject = {
       topicDict: {
@@ -559,7 +556,7 @@ describe('Topic editor state service', function() {
     }
   );
 
-  it('it should report that a topic has loaded through loadTopic()',
+  it('should report that a topic has loaded through loadTopic()',
     function() {
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 
@@ -571,7 +568,7 @@ describe('Topic editor state service', function() {
     }
   );
 
-  it('it should report that a topic has loaded through setTopic()',
+  it('should report that a topic has loaded through setTopic()',
     function() {
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 

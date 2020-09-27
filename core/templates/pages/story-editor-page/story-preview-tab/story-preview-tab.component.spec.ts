@@ -48,8 +48,6 @@ describe('Story Preview tab', function() {
     var $rootScope = $injector.get('$rootScope');
     var StoryObjectFactory = $injector.get('StoryObjectFactory');
     var StoryEditorStateService = $injector.get('StoryEditorStateService');
-    var StoryEditorNavigationService = $injector.get(
-      'StoryEditorNavigationService');
     $scope = $rootScope.$new();
     MockStoryEditorNavigationService = {
       activeTab: 'story_preview',

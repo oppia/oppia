@@ -48,14 +48,6 @@
     <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">
       <[$ctrl.question.getValidationErrorMessage()]>
     </div>
-    <md-card class="misconception-parent-card" ng-if="$ctrl.question.getStateData().interaction.id && !$ctrl.question.getValidationErrorMessage() && $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill).length">
-      <div>
-        <h3>Misconceptions:</h3>
-        <div ng-repeat="misconceptionName in $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill)" class="misconception-list-item">
-          <[misconceptionName]>
-        </div>
-      </div>
-    </md-card>
   </div>
   <md-card class="question-data-container" ng-if="!$ctrl.editorIsOpen">
     <div class="question-list-container">
@@ -71,10 +63,14 @@
         <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
           <div class="question-data">
             <angular-html-bind class="question-text" html-data="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind>
-            <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
+            <span ng-if="!$ctrl.showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
+            <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription());$event.stopPropagation();"
                   class="link-off-icon">
               <i class="material-icons">link_off</i>
             </span>
+          </div>
+          <div class="question-interaction-id">
+            <span><[questionSummaryForOneSkill.getQuestionSummary().getInteractionId()]></span>
           </div>
         </div>
       </div>
@@ -117,8 +113,8 @@
           <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.hints.length}">5</div>
           <div class="checklist-item-text">Hints</div>
         </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
+        <div class="checklist-item-separator" ng-if="$ctrl.showSolutionCheckpoint()"></div>
+        <div class="checklist-item" ng-if="$ctrl.showSolutionCheckpoint()">
           <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.solution}">6</div>
           <div class="checklist-item-text">Solution</div>
         </div>
@@ -215,11 +211,16 @@
     font-weight: bold;
     text-align: center;
   }
+  questions-list .add-question-btn .btn.disabled, .btn:disabled {
+    cursor: not-allowed;
+  }
   questions-list .question-editor-parent {
     width: 60%;
   }
   questions-list .question-editor-open-container {
-    width: 35%;
+    position: fixed;
+    right: 13%;
+    width: 26%;
   }
   questions-list .checklist-item {
     display: flex;
@@ -281,15 +282,6 @@
   questions-list .oppia-cross-icon {
     color: #FF0000;
   }
-  questions-list .misconception-parent-card {
-    padding: 20px;
-  }
-  questions-list .misconception-list-item {
-    border: 1px solid #999999;
-    border-radius: 4px;
-    margin: 10px;
-    padding: 15px;
-  }
   questions-list .linked-skills-container {
     margin-top: 40px;
   }
@@ -299,6 +291,9 @@
   }
   questions-list .difficulty-card-header i {
     display: none;
+  }
+  questions-list .question-interaction-id {
+    color: #707070;
   }
   @media screen and (max-width: 768px) {
     questions-list .question-editor-container {
@@ -337,6 +332,9 @@
     }
     questions-list .difficulty-card-header h3 {
       margin: 0;
+    }
+    questions-list .question-editor-open-container {
+      position: inherit;
     }
   }
 </style>

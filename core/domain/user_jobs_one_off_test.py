@@ -30,6 +30,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
@@ -39,6 +40,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+
+from google.appengine.ext import ndb
 
 (user_models, feedback_models, exp_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
@@ -676,11 +679,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         self._run_one_off_job()
 
@@ -728,7 +731,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # The exploration becomes community-owned.
             rights_manager.publish_exploration(self.user_a, self.EXP_ID_1)
             rights_manager.release_ownership_of_exploration(
@@ -787,11 +790,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         self._run_one_off_job()
 
@@ -931,7 +934,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
 
             # The collection becomes community-owned.
             rights_manager.publish_collection(self.user_a, self.COLLECTION_ID_1)
@@ -1569,3 +1572,83 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             'removed explorations 0, 1, 2\', 1]' %
             self.user_id]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+
+class MockUserSettingsModel(user_models.UserSettingsModel):
+    """Mock UserSettingsModel so that it allows to set `gae_user_id`."""
+
+    gae_user_id = ndb.StringProperty(indexed=False, required=False)
+
+
+class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.RemoveGaeUserIdOneOffJob.create_new())
+        user_jobs_one_off.RemoveGaeUserIdOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_jobs_one_off.RemoveGaeUserIdOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_setting_model_with_gae_user_id(self):
+        with self.swap(user_models, 'UserSettingsModel', MockUserSettingsModel):
+            original_setting_model = (
+                user_models.UserSettingsModel(
+                    id='id',
+                    gae_id='gae_id',
+                    email='test@email.com',
+                    gae_user_id='gae_user_id'
+                )
+            )
+            original_setting_model.put()
+
+            self.assertIsNotNone(original_setting_model.gae_user_id)
+            self.assertIn('gae_user_id', original_setting_model._values)  # pylint: disable=protected-access
+            self.assertIn('gae_user_id', original_setting_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - UserSettingsModel', 1]], output)
+
+            migrated_setting_model = (
+                user_models.UserSettingsModel.get_by_id('id'))
+
+            self.assertNotIn('gae_user_id', migrated_setting_model._values)  # pylint: disable=protected-access
+            self.assertNotIn('gae_user_id', migrated_setting_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_setting_model.last_updated,
+                migrated_setting_model.last_updated)
+
+    def test_one_setting_model_without_gae_user_id(self):
+        original_setting_model = (
+            user_models.UserSettingsModel(
+                id='id',
+                gae_id='gae_id',
+                email='test@email.com',
+            )
+        )
+        original_setting_model.put()
+
+        self.assertNotIn('gae_user_id', original_setting_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('gae_user_id', original_setting_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        # There already exists a userSetting because it is being created
+        # test_utils. So 2 is used here.
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSettingsModel', 2]], output)
+
+        migrated_setting_model = user_models.UserSettingsModel.get_by_id('id')
+        self.assertNotIn('gae_user_id', migrated_setting_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('gae_user_id', migrated_setting_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_setting_model.last_updated,
+            migrated_setting_model.last_updated)

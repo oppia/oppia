@@ -26,8 +26,10 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import state_domain
@@ -48,6 +50,8 @@ import python_utils
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
 
+    IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
+    ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
     EXP_ID = 'exp1'
     TRANSLATION_LANGUAGE_CODE = 'en'
 
@@ -99,8 +103,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.editor, self.EXP_ID, self.owner_id,
-            rights_manager.ROLE_EDITOR)
+            self.editor, self.EXP_ID, self.owner_id, rights_domain.ROLE_EDITOR)
 
         self.new_content = state_domain.SubtitledHtml(
             'content', '<p>new content html</p>').to_dict()
@@ -308,7 +311,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id'],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1']
         }
 
         exp_id = 'new_exp_id'
@@ -729,6 +732,112 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED)
         self.logout()
 
+    def test_translation_suggestion_creation_with_new_images(self):
+        exp_id = '12345678exp1'
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                exp_id, self.editor_id, ['State 1'],
+                ['EndExploration'], category='Algebra'))
+
+        state_content_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>')
+        }
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        self.post_json(
+            '%s/exploration/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, exp_id),
+            {'filename': 'img.png'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),))
+        exp_services.update_exploration(
+            self.editor_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 1',
+                'new_value': state_content_dict
+            })], 'Changes content.')
+        rights_manager.publish_exploration(self.editor, exp_id)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        text_to_translate = exploration.states['State 1'].content.html
+        self.logout()
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+
+        self.assertTrue(fs.isfile('image/img.png'))
+
+        self.login(self.TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                'target_id': exp_id,
+                'target_version_at_submission': exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'state_name': 'State 1',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': text_to_translate,
+                    'translation_html': (
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&quot;translation_image.png&quot;" '
+                        'caption-with-value="&quot;&quot;" '
+                        'alt-with-value="&quot;Image&quot;">'
+                        '</oppia-noninteractive-image>')
+                },
+            }, csrf_token=csrf_token,
+            upload_files=(
+                ('translation_image.png', 'translation_image.png', raw_image), )
+            )
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS, exp_id))
+
+        self.assertTrue(fs.isfile('image/img.png'))
+        self.assertTrue(fs.isfile('image/img_compressed.png'))
+        self.assertTrue(fs.isfile('image/translation_image.png'))
+        self.assertTrue(fs.isfile('image/img_compressed.png'))
+
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.translator_id))['suggestions'][0]
+        self.logout()
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_accept['target_id'],
+            suggestion_to_accept['suggestion_id']), {
+                'action': u'accept',
+                'commit_message': u'Translated content of State 1',
+                'review_message': u'This looks good!',
+            }, csrf_token=csrf_token)
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        self.assertTrue(fs.isfile('image/img.png'))
+        self.assertTrue(fs.isfile('image/translation_image.png'))
+        self.assertTrue(fs.isfile('image/img_compressed.png'))
+
 
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
@@ -756,7 +865,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1']
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -864,7 +973,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id2'],
-            'inapplicable_misconception_ids': []
+            'inapplicable_skill_misconception_ids': []
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -913,7 +1022,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id2'],
-            'inapplicable_misconception_ids': []
+            'inapplicable_skill_misconception_ids': []
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -960,7 +1069,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id2'],
-            'inapplicable_misconception_ids': []
+            'inapplicable_skill_misconception_ids': []
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1023,7 +1132,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.skill_id],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1']
         }
 
         self.login(self.AUTHOR_EMAIL)
@@ -1285,7 +1394,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', ['skill_id_3'], 'image.svg',
+                1, 'Title', ['skill_id_333'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
@@ -1369,7 +1478,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1']
         }
 
         self.post_json(
@@ -1475,7 +1584,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', ['skill_id_3'], 'image.svg',
+                1, 'Title', ['skill_id_333'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
@@ -1554,7 +1663,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid12345-1']
         }
 
         self.post_json(

@@ -30,7 +30,6 @@ import { VoiceoverObjectFactory } from
 const constants = require('constants.ts');
 
 describe('States Object Factory', () => {
-  let scope = null;
   let sof = null;
   let ssof = null;
   let statesDict = null;
@@ -241,14 +240,10 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 10
-                }
-              ]
-            },
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 10}
+            }],
           }],
           default_outcome: {
             dest: 'second state',
@@ -297,14 +292,10 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 10
-                }
-              ]
-            },
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 10}
+            }],
           }],
           default_outcome: {
             dest: 'first state',
@@ -410,14 +401,10 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 20
-                }
-              ]
-            }
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 20}
+            }],
           }],
           confirmed_unclassified_answers: [],
           customization_args: {
@@ -589,14 +576,10 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 10
-                }
-              ]
-            }
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 10}
+            }],
           }],
           default_outcome: {
             dest: 'third state',

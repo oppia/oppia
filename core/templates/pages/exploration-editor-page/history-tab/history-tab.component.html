@@ -32,7 +32,8 @@
       </div>
       <div class="filter-container">
         <span>Filter</span>
-        <input type="text" ng-change="$ctrl.filterByUsername()" ng-model="$ctrl.username" placeholder="Search for a user">
+        <input class="form-control" type="text" ng-change="$ctrl.filterByUsername()" ng-model="$ctrl.username" placeholder="Search for a user">
+        <i class="fa fa-search"></i>
       </div>
       <div class="history-table-header">
         <div class="history-table-header-message">
@@ -41,7 +42,7 @@
         <div class="history-table-header-profile">
           <span>User</span>
         </div>
-        <div class="history-table-header-version">
+        <div class="history-table-header-version" ng-click="$ctrl.reverseDateOrder()">
           <span>Date</span>
         </div>
       </div>
@@ -154,6 +155,9 @@
   history-tab .history-table-header-version {
     width: 20%;
   }
+  history-tab .history-table-header-version {
+    cursor: pointer;
+  }
   history-tab .history-list-item {
     border-bottom: 1px solid #e6e6e6;
     display: flex;
@@ -223,9 +227,18 @@
     right: 0;
   }
   history-tab .filter-container {
-    margin: 0px 0 30px;
+    margin: 0 0 30px;
+    position: relative;
+    width: 35%;
+  }
+  history-tab .filter-container i {
+    bottom: 14%;
+    color: #707070;
+    position: absolute;
+    right: 5%;
   }
   history-tab .revision-container {
+    align-items: flex-end;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -240,7 +253,6 @@
   history-tab .history-card-header-text {
     font-size: 22px;
     margin-bottom: 0;
-    margin-left: -12px;
   }
   history-tab .history-table-profile a {
     color: #00609C;

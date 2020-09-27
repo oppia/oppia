@@ -25,7 +25,6 @@ var CreatorDashboardPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
 

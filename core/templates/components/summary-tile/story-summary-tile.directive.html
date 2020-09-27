@@ -28,7 +28,7 @@
     <strong class="title-text">
       <a ng-href="<[$ctrl.getStoryLink()]>" ng-class="{'disabled-link': !$ctrl.classroomUrlFragment}"><[$ctrl.storySummary.getTitle()]> </a>
     </strong>
-    <span style="padding-left: 10px; font-size: 0.75em; color: #404040;">
+    <span class="oppia-chapters-count">
        <[$ctrl.nodeCount]> <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span><[($ctrl.nodeCount > 1) ? 's' : '']>
     </span>
   </div>
@@ -192,6 +192,12 @@
     text-decoration: none;
   }
 
+  story-summary-tile .oppia-chapters-count {
+    color: #404040;
+    font-size: 0.75em;
+    padding-left: 10px;
+  }
+
   @media (max-width: 800px) {
     story-summary-tile .oppia-story-title {
       padding-top: 0;
@@ -231,6 +237,31 @@
     story-summary-tile .story-thumbnail {
       height: 150px;
       width: 225px;
+    }
+  }
+
+  .oppia-topic-viewer-container .background-banner-position {
+    position: inherit;
+  }
+
+  .oppia-page-card {
+    border-radius: 0.25em;
+    margin-top: 5vh;
+    padding-bottom: 7.5vh;
+    width: 704px;
+  }
+
+  @media(max-width: 1024px) {
+    .oppia-page-card {
+      margin-top: 5vh;
+      width: 80vw;
+    }
+  }
+
+  @media(max-width: 500px) {
+    .oppia-page-card {
+      padding: 15px 24px 64px 24px;
+      width: 90vw;
     }
   }
 </style>

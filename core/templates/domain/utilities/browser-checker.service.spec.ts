@@ -22,16 +22,13 @@ import { BrowserCheckerService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Browser Checker Service', function() {
-  let bcs, wrs;
+  let bcs: BrowserCheckerService, wrs: WindowRef;
 
   let mockUserAgent: (ua: string) => void;
 
   const mobileAgent = 'Mozilla/5.0 (Linux; Android 8.0.0; SM-G960F' +
   ' Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko)' +
   ' Chrome/62.0.3202.84 Mobile Safari/537.36';
-  const desktopAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +
-  ' AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.123' +
-  ' Safari/537.36 OPR/66.0.3515.44';
   beforeEach(() => {
     bcs = TestBed.get(BrowserCheckerService);
     wrs = TestBed.get(WindowRef);
@@ -64,8 +61,8 @@ describe('Browser Checker Service', function() {
   });
 
   it('should not support speech synthesis', () => {
-    spyOn(wrs.nativeWindow, 'hasOwnProperty').withArgs('speechSynthesis').and
-      .returnValue(false);
+    spyOn(<Object>wrs.nativeWindow, 'hasOwnProperty')
+      .withArgs('speechSynthesis').and.returnValue(false);
     expect(bcs.supportsSpeechSynthesis()).toBe(false);
   });
 

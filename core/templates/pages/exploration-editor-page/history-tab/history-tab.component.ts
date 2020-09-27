@@ -40,12 +40,12 @@ import cloneDeep from 'lodash/cloneDeep';
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$http', '$log', '$scope', '$uibModal', 'CompareVersionsService',
+    '$http', '$log', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
     'LoaderService', 'RouterService', 'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
-        $http, $log, $scope, $uibModal, CompareVersionsService,
+        $http, $log, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
         LoaderService, RouterService, UrlInterpolationService,
         VersionTreeService, WindowRef) {
@@ -180,11 +180,23 @@ angular.module('oppia').component('historyTab', {
           ctrl.selectedVersionsArray[0], ctrl.selectedVersionsArray[1]);
         var laterComparedVersion = Math.max(
           ctrl.selectedVersionsArray[0], ctrl.selectedVersionsArray[1]);
-
-        ctrl.compareVersionMetadata.earlierVersion =
-          ctrl.totalExplorationVersionMetadata[earlierComparedVersion - 1];
-        ctrl.compareVersionMetadata.laterVersion =
-          ctrl.totalExplorationVersionMetadata[laterComparedVersion - 1];
+        let earlierIndex = null, laterIndex = null;
+        for (let i = 0; i < ctrl.totalExplorationVersionMetadata.length; i++) {
+          if (ctrl.totalExplorationVersionMetadata[i].versionNumber ===
+              earlierComparedVersion) {
+            earlierIndex = i;
+          } else if (ctrl.totalExplorationVersionMetadata[i].versionNumber ===
+              laterComparedVersion) {
+            laterIndex = i;
+          }
+          if (earlierIndex !== null && laterIndex !== null) {
+            break;
+          }
+        }
+        ctrl.compareVersionMetadata.earlierVersion = (
+          ctrl.totalExplorationVersionMetadata[earlierIndex]);
+        ctrl.compareVersionMetadata.laterVersion = (
+          ctrl.totalExplorationVersionMetadata[laterIndex]);
 
         CompareVersionsService.getDiffGraphData(
           earlierComparedVersion, laterComparedVersion).then(
@@ -261,6 +273,10 @@ angular.module('oppia').component('historyTab', {
 
       ctrl.toggleHistoryOptions = function(index) {
         ctrl.highlightedIndex = !ctrl.highlightedIndex ? index : null;
+      };
+
+      ctrl.reverseDateOrder = function() {
+        ctrl.explorationVersionMetadata.reverse();
       };
 
       ctrl.$onInit = function() {

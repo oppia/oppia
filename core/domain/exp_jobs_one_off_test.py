@@ -39,6 +39,8 @@ import feconf
 import python_utils
 import utils
 
+from google.appengine.ext import ndb
+
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
@@ -392,7 +394,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(
+        exp_services.regenerate_exploration_summary(
             self.NEW_EXP_ID, None)
 
         # Delete the exploration before migration occurs.
@@ -701,7 +703,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(
+        exp_services.regenerate_exploration_summary(
             self.NEW_EXP_ID, None)
 
         # Delete the exploration before migration occurs.
@@ -1386,31 +1388,34 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'HasElementXAtPositionY': [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
                     'x': invalid_html_content2,
                     'y': 2
-                }],
-                'HasElementXBeforeElementY': [{
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[invalid_html_content2]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
                     'x': invalid_html_content1,
                     'y': invalid_html_content1
-                }],
-                'IsEqualToOrdering': [{
-                    'x': [
-                        [invalid_html_content1]
-                    ]
-                }, {
-                    'x': [
-                        [invalid_html_content2]
-                    ]
-                }],
-                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
-                    'x': [
-                        [invalid_html_content1]
-                    ]
-                }]
-            },
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                }
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1607,52 +1612,6 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         self.assertEqual(len(actual_output), 0)
 
 
-class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(
-            ExplorationMathRichTextInfoModelDeletionOneOffJobTests,
-            self).setUp()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='user_id.exp_id',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=1000).put()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='user_id1.exp_id1',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=2000).put()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='user_id2.exp_id2',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=3000).put()
-
-    def test_that_all_the_models_are_deleted(self):
-        no_of_models_before_job_is_run = (
-            exp_models.ExplorationMathRichTextInfoModel.
-            get_all().count())
-        self.assertEqual(no_of_models_before_job_is_run, 3)
-
-        job = (
-            exp_jobs_one_off.
-            ExplorationMathRichTextInfoModelDeletionOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = job.get_output(job_id)
-        no_of_models_after_job_is_run = (
-            exp_models.ExplorationMathRichTextInfoModel.
-            get_all().count())
-        self.assertEqual(no_of_models_after_job_is_run, 0)
-
-        expected_output = (
-            [u'[u\'model_deleted\', [u\'3 models successfully delelted.\']]'])
-        self.assertEqual(actual_output, expected_output)
-
-
 class ExplorationRteMathContentValidationOneOffJobTests(
         test_utils.GenericTestBase):
 
@@ -1734,31 +1693,34 @@ class ExplorationRteMathContentValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'HasElementXAtPositionY': [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
                     'x': invalid_html_content2,
                     'y': 2
-                }],
-                'HasElementXBeforeElementY': [{
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[invalid_html_content2]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
                     'x': invalid_html_content1,
                     'y': invalid_html_content1
-                }],
-                'IsEqualToOrdering': [{
-                    'x': [
-                        [invalid_html_content1]
-                    ]
-                }, {
-                    'x': [
-                        [invalid_html_content2]
-                    ]
-                }],
-                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
-                    'x': [
-                        [invalid_html_content1]
-                    ]
-                }]
-            },
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                }
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2257,3 +2219,94 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class MockExpSummaryModel(exp_models.ExpSummaryModel):
+    """Mock ExpSummaryModel so that it allows to set `translator_ids`."""
+
+    translator_ids = ndb.StringProperty(
+        indexed=True, repeated=True, required=False)
+
+
+class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.create_new())
+        exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            exp_jobs_one_off.RemoveTranslatorIdsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_summary_model_with_translator_id(self):
+        with self.swap(exp_models, 'ExpSummaryModel', MockExpSummaryModel):
+            original_summary_model = (
+                exp_models.ExpSummaryModel(
+                    id='id',
+                    title='title',
+                    category='category',
+                    objective='Objective',
+                    language_code='en',
+                    tags=[],
+                    ratings=feconf.get_empty_ratings(),
+                    scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+                    community_owned=False,
+                    translator_ids=['translator_id']
+                )
+            )
+            original_summary_model.put()
+
+            self.assertIsNotNone(original_summary_model.translator_ids)
+            self.assertIn('translator_ids', original_summary_model._values)  # pylint: disable=protected-access
+            self.assertIn('translator_ids', original_summary_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - ExpSummaryModel', 1]], output)
+
+            migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
+
+            self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_summary_model.last_updated,
+                migrated_summary_model.last_updated)
+
+    def test_one_summary_model_without_username(self):
+        original_summary_model = (
+            exp_models.ExpSummaryModel(
+                id='id',
+                title='title',
+                category='category',
+                objective='Objective',
+                language_code='en',
+                tags=[],
+                ratings=feconf.get_empty_ratings(),
+                scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+                community_owned=False,
+            )
+        )
+        original_summary_model.put()
+
+        self.assertNotIn('translator_ids', original_summary_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('translator_ids', original_summary_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - ExpSummaryModel', 1]], output)
+
+        migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
+        self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_summary_model.last_updated,
+            migrated_summary_model.last_updated)
