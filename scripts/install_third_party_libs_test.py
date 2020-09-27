@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import shutil
 import subprocess
 import tempfile
 
@@ -169,9 +170,47 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_tweak_yarn_executable():
             check_function_calls['tweak_yarn_executable_is_called'] = True
 
+        correct_google_path = os.path.join(
+            common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        def mock_is_dir(path):
+            directories_that_do_not_exist = {
+                os.path.join(correct_google_path, 'appengine'),
+                os.path.join(correct_google_path, 'net'),
+                os.path.join(correct_google_path, 'pyglib'),
+                correct_google_path
+            }
+            if path in directories_that_do_not_exist:
+                return False
+            return True
+        initialized_directories = []
+        def mock_mk_dir(path):
+            initialized_directories.append(path)
+
+        copied_src_dst_tuples = []
+        def mock_copy_tree(src, dst):
+            copied_src_dst_tuples.append((src, dst))
+
+        correct_copied_src_dst_tuples = [
+            (
+                os.path.join(
+                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+                os.path.join(correct_google_path, 'appengine')),
+            (
+                os.path.join(
+                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+                os.path.join(correct_google_path, 'net')),
+            (
+                os.path.join(
+                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+                os.path.join(correct_google_path, 'pyglib'))
+        ]
+
         ensure_pip_install_swap = self.swap(
             install_third_party_libs, 'ensure_pip_library_is_installed',
             mock_ensure_pip_library_is_installed)
+        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
+        swap_mk_dir = self.swap(os, 'mkdir', mock_mk_dir)
+        swap_copy_tree = self.swap(shutil, 'copytree', mock_copy_tree)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         install_third_party_main_swap = self.swap(
             install_third_party, 'main', mock_main_for_install_third_party)
@@ -208,17 +247,25 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'PQ_CONFIGPARSER_FILEPATH',
             temp_pq_config_file)
 
-        with ensure_pip_install_swap, check_call_swap:
+        with ensure_pip_install_swap, check_call_swap, self.Popen_swap:
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
                     with pre_push_hook_main_swap, py_config_swap:
                         with pq_config_swap, tweak_yarn_executable_swap:
-                            install_third_party_libs.main()
+                            with swap_is_dir, swap_mk_dir, swap_copy_tree:
+                                install_third_party_libs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
         with python_utils.open_file(temp_py_config_file, 'r') as f:
             self.assertEqual(f.read(), py_expected_text)
         with python_utils.open_file(temp_pq_config_file, 'r') as f:
             self.assertEqual(f.read(), pq_expected_text)
+
+        self.assertEqual(
+            copied_src_dst_tuples, correct_copied_src_dst_tuples)
+
+        self.assertEqual(
+            initialized_directories,
+            [correct_google_path])
 
     def test_function_calls_on_windows(self):
         check_function_calls = {
@@ -298,7 +345,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'PQ_CONFIGPARSER_FILEPATH',
             temp_pq_config_file)
 
-        with ensure_pip_install_swap, check_call_swap:
+        with ensure_pip_install_swap, check_call_swap, self.Popen_swap:
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
                     with pre_push_hook_main_swap, py_config_swap:

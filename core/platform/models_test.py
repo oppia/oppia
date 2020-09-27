@@ -23,6 +23,7 @@ from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class RegistryUnitTest(test_utils.GenericTestBase):
@@ -276,10 +277,21 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_taskqueue_services(self):
         """Tests import taskqueue services function."""
-        from core.platform.taskqueue import gae_taskqueue_services
+        def mock_is_local_server_environment():
+            return False
+        swap_to_prod = self.swap(
+            utils, 'is_local_server_environment',
+            mock_is_local_server_environment)
+        with self.swap(constants, 'DEV_MODE', False), swap_to_prod:
+            from core.platform.taskqueue import cloud_taskqueue_services
+            self.assertEqual(
+                self.registry_instance.import_taskqueue_services(),
+                cloud_taskqueue_services)
+
+        from core.platform.taskqueue import dev_mode_taskqueue_services
         self.assertEqual(
             self.registry_instance.import_taskqueue_services(),
-            gae_taskqueue_services)
+            dev_mode_taskqueue_services)
 
     def test_import_search_services(self):
         """Tests import search services function."""

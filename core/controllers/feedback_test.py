@@ -26,10 +26,10 @@ from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -754,8 +754,9 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
                 .start_computation()
             )
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_mapreduce_tasks()
             self.process_and_flush_pending_tasks()
 
             response = self.get_json(

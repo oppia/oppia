@@ -64,7 +64,6 @@ def send_email_to_recipients(
     Returns:
         bool. Whether the emails are "sent" successfully.
     """
-
     # Show the first 3 emails in the recipient list.
     recipient_email_list_str = ' '.join(
         ['%s' %

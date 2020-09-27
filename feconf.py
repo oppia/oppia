@@ -408,11 +408,17 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Replace this with the correct Redis Host and Port when switching to prod
-# server. Keep this in sync with redis.conf in the root folder. Specifically,
-# REDISPORT should always be the same as the port in redis.conf.
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
+# Port when switching to prod server. Keep this in sync with redis.conf in the
+# root folder. Specifically, REDISPORT should always be the same as the port in
+# redis.conf.
 REDISHOST = 'localhost'
 REDISPORT = 6379
+
+# NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
+# project id when switching to the prod server.
+OPPIA_PROJECT_ID = 'dev-project-id'
+GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -671,6 +677,12 @@ GOOGLE_GROUP_URL = (
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
+# NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
+# Change to the correct url for internal testing in the testing production
+# environment.
+# Change to the production URL when deploying to production site.
+OPPIA_SITE_URL = 'http://localhost:8181'
+
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
 TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
@@ -683,6 +695,8 @@ TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_SUGGESTION_EMAILS = (
     '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_DEFERRED = (
+    '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'

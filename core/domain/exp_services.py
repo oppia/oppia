@@ -54,6 +54,7 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -61,7 +62,6 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -780,9 +780,8 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        delete_explorations_from_subscribed_users,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        exploration_ids)
+        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):

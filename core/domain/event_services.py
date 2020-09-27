@@ -21,19 +21,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
-from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
 import python_utils
 
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class BaseEventHandler(python_utils.OBJECT):
@@ -49,7 +47,7 @@ class BaseEventHandler(python_utils.OBJECT):
         layers that are listening for them.
         """
         taskqueue_services.defer(
-            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event,
+            taskqueue_services.FUNCTION_ID_DISPATCH_EVENT,
             taskqueue_services.QUEUE_NAME_EVENTS, cls.EVENT_TYPE, *args,
             **kwargs)
 
@@ -90,8 +88,9 @@ class StatsEventsHandler(BaseEventHandler):
     def _handle_event(cls, exploration_id, exp_version, aggregated_stats):
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(
-                stats_services.update_stats,
-                taskqueue_services.QUEUE_NAME_STATS, exploration_id,
+                taskqueue_services.FUNCTION_ID_UPDATE_STATS,
+                taskqueue_services.QUEUE_NAME_STATS,
+                exploration_id,
                 exp_version, aggregated_stats)
 
 

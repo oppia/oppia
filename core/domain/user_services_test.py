@@ -1501,8 +1501,9 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
-        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
+        MockUserStatsAggregator.start_computation()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
