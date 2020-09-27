@@ -332,7 +332,7 @@ def _get_threads_user_info_keys(thread_ids):
         thread_ids: list(str). The ids of the threads.
 
     Returns:
-        list(datastore_services.Keys). The keys of the feedback thread user
+        list(datastore_services.Key). The keys of the feedback thread user
         model.
     """
     if thread_ids:
