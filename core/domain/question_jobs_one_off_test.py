@@ -318,7 +318,8 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertFalse(self.model_instance.deleted)
 
     def test_migration_job_skips_deleted_model(self):
-        self.model_instance.delete()
+        self.model_instance.deleted = True
+        self.model_instance.put()
 
         def mock_get_question_by_id(unused_question_id, strict=True): # pylint: disable=unused-argument
             return None
