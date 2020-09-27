@@ -317,8 +317,8 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
             'cmd': 'update_skill_property', 'new_value': 'Test description',
             'old_value': '', 'property_name': 'description'
         }]
+        self.model_instance_1.deleted = True
         self.model_instance_1.put()
-        self.model_instance_1.delete()
         job_id = (
             skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
@@ -417,7 +417,8 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertFalse(self.model_instance.deleted)
 
     def test_migration_job_skips_deleted_model(self):
-        self.model_instance.delete()
+        self.model_instance.deleted = True
+        self.model_instance.put()
 
         def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument
             return None
