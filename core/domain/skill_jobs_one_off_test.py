@@ -425,12 +425,12 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(skill_fetchers, 'get_skill_by_id', mock_get_skill_by_id):
             job_id = (
                 skill_jobs_one_off
-                .SkillCommitCmdMigrationOneOffJob.create_new())
-            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
+                .MissingSkillMigrationOneOffJob.create_new())
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
             output = (
-                skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
+                skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
                     job_id))
             self.assertEqual(output, [])
 
