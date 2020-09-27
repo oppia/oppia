@@ -264,6 +264,7 @@ def build_js_files(
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
             in dev mode.
+        build_only: bool. Represents whether to run the build and exit.
         deparallelize_terser: bool. Represents whether to use webpack
             compilation config that disables parallelism on terser plugin.
         source_maps: bool. Represents whether to use source maps while
@@ -283,7 +284,7 @@ def build_js_files(
         build.main(args=[])
         run_webpack_compilation(source_maps=source_maps)
     if build_only:
-        sys.exit(1)
+        sys.exit(0)
 
 
 @contextlib.contextmanager
