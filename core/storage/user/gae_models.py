@@ -28,10 +28,10 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -1839,7 +1839,7 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=cursor)
+        cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
@@ -2297,10 +2297,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     """
 
     # The email of the user.
-    email = ndb.StringProperty(required=True)
+    email = ndb.StringProperty(required=True, indexed=True)
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
-    role = ndb.StringProperty(required=True)
+    role = ndb.StringProperty(required=True, indexed=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
 
