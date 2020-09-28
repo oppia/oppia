@@ -27,6 +27,7 @@ from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -37,7 +38,6 @@ import python_utils
         [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
 
 datastore_services = models.Registry.import_datastore_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
@@ -804,7 +804,7 @@ def enqueue_feedback_message_batch_email_task(user_id):
     Args:
         user_id: str. The user to be notified.
     """
-    taskqueue_services.enqueue_email_task(
+    taskqueue_services.enqueue_task(
         feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, {'user_id': user_id},
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
@@ -821,7 +821,7 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
         'user_id': user_id,
         'reference_dict': reference.to_dict()
     }
-    taskqueue_services.enqueue_email_task(
+    taskqueue_services.enqueue_task(
         feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS, payload, 0)
 
 
@@ -842,7 +842,7 @@ def _enqueue_feedback_thread_status_change_email_task(
         'old_status': old_status,
         'new_status': new_status
     }
-    taskqueue_services.enqueue_email_task(
+    taskqueue_services.enqueue_task(
         feconf.TASK_URL_FEEDBACK_STATUS_EMAILS, payload, 0)
 
 
