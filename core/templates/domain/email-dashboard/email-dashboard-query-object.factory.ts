@@ -39,8 +39,8 @@ export class EmailDashboardQuery {
   createdOn?: string;
 
   constructor(
-    id: string, status: string, numQualifiedUsers?: number,
-    submitterUsername?: string, createdOn?: string) {
+      id: string, status: string, numQualifiedUsers?: number,
+      submitterUsername?: string, createdOn?: string) {
     this.id = id;
     this.status = status;
     this.numQualifiedUsers = numQualifiedUsers;
