@@ -33,6 +33,7 @@ import google.appengine.api.datastore_errors
 
 datastore_services = models.Registry.import_datastore_services()
 
+
 class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
         test_utils.GenericTestBase):
     """Tests for the one-off commit message indexing job."""
