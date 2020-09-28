@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import sys
 
+import pkg_resources
 from google.appengine.ext import vendor
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
@@ -41,15 +42,19 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
 
-    PROTOBUF_PATH = os.path.join(OPPIA_TOOLS_PATH, 'protobuf-3.12.0')
-    if not os.path.isdir(PROTOBUF_PATH):
-        raise Exception('Invalid path for oppia_tools library: %s' % (
-            PROTOBUF_PATH))
-    sys.path.insert(0, PROTOBUF_PATH)
-
 # Google App Engine (GAE) uses its own virtual environment that sets up the
 # python library system path using their third party python library, vendor. In
 # order to inform GAE of the packages that are required for Oppia, we need to
 # add it using the vendor library. More information can be found here:
 # https://cloud.google.com/appengine/docs/standard/python/tools/using-libraries-python-27
 vendor.add(os.path.join(THIRD_PARTY_PATH, 'python_libs'))
+pkg_resources.working_set.add_entry(
+    os.path.join(THIRD_PARTY_PATH, 'python_libs'))
+
+# It is necessary to reload the six module because of a bug in the google cloud
+# ndb imports. More details can be found here:
+# https://github.com/googleapis/python-ndb/issues/249.
+# We need to reload at the very end of this file because we have to add the
+# six python path to the app engine vendor first.
+import six # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+reload(six) # pylint: disable=reload-builtin

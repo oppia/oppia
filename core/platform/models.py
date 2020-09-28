@@ -33,6 +33,13 @@ NAMES = utils.create_enum(
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
+    NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
+    NAMES.question, NAMES.skill, NAMES.story, NAMES.suggestion, NAMES.topic)
+
 GAE_PLATFORM = 'gae'
 
 
@@ -253,13 +260,18 @@ class _Gae(Platform):
 
     @classmethod
     def import_taskqueue_services(cls):
-        """Imports and returns gae_taskqueue_services module.
+        """Imports and returns a taskqueue_services module from
+        core.platform.taskqueue.
 
         Returns:
-            module. The gae_taskqueue_services module.
+            module. The core.platform.taskqueue services module.
         """
-        from core.platform.taskqueue import gae_taskqueue_services
-        return gae_taskqueue_services
+        if (constants.DEV_MODE or utils.is_local_server_environment()):
+            from core.platform.taskqueue import dev_mode_taskqueue_services
+            return dev_mode_taskqueue_services
+        else:
+            from core.platform.taskqueue import cloud_taskqueue_services
+            return cloud_taskqueue_services
 
     @classmethod
     def import_search_services(cls):
