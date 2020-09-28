@@ -25,10 +25,18 @@ import moment from 'moment';
   providedIn: 'root'
 })
 export class DateTimeFormatService {
-  // Returns just the time if the local datetime representation has the
-  // same date as the current date. Otherwise, returns just the date if the
-  // local datetime representation has the same year as the current date.
-  // Otherwise, returns the full date (with the year abbreviated).
+/** 
+  * This function returns just the time if the local datetime representation has the
+  * same date as the current date. Otherwise, returns just the date if the
+  * local datetime representation has the same year as the current date.
+  * Otherwise, returns the full date (with the year abbreviated).
+  * @param {number} millisSinceEpoch - milliseconds since Epoch
+  * @returns {string} - The time if the local datetime representation has the
+  *                     same date as the current date. 
+  *                   -Otherwise the date if the local datetime representation has the
+  *                     same year as the current date.
+  *                   - Otherwise the full date (with the year abbreviated).
+  */
   getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
@@ -45,17 +53,29 @@ export class DateTimeFormatService {
       return moment(date).format('MM/DD/YY');
     }
   }
-  // Returns date along with time.
+  /**  
+   * This function converts a millisecond date to a human-readable date along with time.
+   * @param {number} millisSinceEpoch - The millisecond date to be converted
+   * @returns {string} The converted date and time string
+   */
   getLocaleDateTimeHourString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     return moment(date).format('MMM D HH:mm A');
   }
-  // Returns just the date.
+    /**  
+   * This function converts a millisecond date to a human-readable date.
+   * @param {number} millisSinceEpoch - The millisecond date to be converted
+   * @returns {string} The converted date string
+   */
   getLocaleDateString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     return date.toLocaleDateString();
   }
-  // Returns whether the date is at most one week before the current date.
+  /**  
+   * This function returns whether the date is at most one week before the current date.
+   * @param {number} millisSinceEpoch - milliseconds since Epoch
+   * @returns {boolean} Whether the date is at most one week before the current date
+   */
   isRecent(millisSinceEpoch: number): boolean {
     let ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
     return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
