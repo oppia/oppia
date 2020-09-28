@@ -43,8 +43,8 @@ export class HttpService {
   }
 
   /**
-   *Used when, instead of providing a completely new version of a resource,
-   *what we want to do is to just update a single property.
+   * Used when, instead of providing a completely new version of a resource,
+   * what we want to do is to just update a single property.
    */
   patch<T>(url: string, options?: HttpOptions): Promise<T> {
     return this.httpClient.patch<T>(url, options).toPromise();
