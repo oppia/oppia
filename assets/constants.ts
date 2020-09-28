@@ -5438,7 +5438,7 @@ export = {
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
 
   // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": true,
+  "ENABLE_ACCOUNT_DELETION": false,
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
