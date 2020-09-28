@@ -26,6 +26,7 @@ import json
 import logging
 import traceback
 
+from core.domain import taskqueue_services
 from core.platform import models
 import python_utils
 import utils
@@ -162,7 +163,6 @@ class BaseJobManager(python_utils.OBJECT):
         cls._require_correct_job_type(model.job_type)
 
         # Enqueue the job.
-        cls._pre_enqueue_hook(job_id)
         cls._real_enqueue(
             job_id, queue_name, additional_job_params, shard_count)
 
@@ -170,8 +170,6 @@ class BaseJobManager(python_utils.OBJECT):
         model.time_queued_msec = utils.get_current_time_in_millisecs()
         model.additional_job_params = additional_job_params
         model.put()
-
-        cls._post_enqueue_hook(job_id)
 
     @classmethod
     def register_start(cls, job_id, metadata=None):
@@ -192,8 +190,6 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_STARTED
         model.time_started_msec = utils.get_current_time_in_millisecs()
         model.put()
-
-        cls._post_start_hook(job_id)
 
     @classmethod
     def register_completion(
@@ -510,40 +506,12 @@ class BaseJobManager(python_utils.OBJECT):
                 'Invalid job type %s for class %s' % (job_type, cls.__name__))
 
     @classmethod
-    def _pre_enqueue_hook(cls, job_id):
-        """A hook or a callback function triggered before enqueuing a job.
-
-        Args:
-            job_id: str. The unique ID of the job which is to be enqueued.
-        """
-        pass
-
-    @classmethod
-    def _post_enqueue_hook(cls, job_id):
-        """A hook or a callback function triggered after enqueuing a job.
-
-        Args:
-            job_id: str. The unique ID of the job which was enqueued.
-        """
-        pass
-
-    @classmethod
     def _pre_start_hook(cls, job_id):
         """A hook or a callback function triggered before marking a job
         as started.
 
         Args:
             job_id: str. The unique ID of the job to be marked as started.
-        """
-        pass
-
-    @classmethod
-    def _post_start_hook(cls, job_id):
-        """A hook or a callback function triggered after marking a job as
-        started.
-
-        Args:
-            job_id: str. The unique ID of the job marked as started.
         """
         pass
 
@@ -589,77 +557,6 @@ class BaseJobManager(python_utils.OBJECT):
             cancel_message: str. The message to be displayed after cancellation.
         """
         pass
-
-
-class BaseDeferredJobManager(BaseJobManager):
-    """Base class to run a job/method as deferred task. These tasks will be
-    pushed to the default taskqueue.
-    """
-
-    @classmethod
-    def _run(cls, additional_job_params):
-        """Function that performs the main business logic of the job.
-
-        Args:
-            additional_job_params: dict(str : *). Additional parameters on jobs.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def _run_job(cls, job_id, additional_job_params):
-        """Starts the job.
-
-        Args:
-            job_id: str. The ID of the job to run.
-            additional_job_params: dict(str : *). Additional parameters on job.
-
-        Raises:
-            PermanentTaskFailure. No further work can be scheduled.
-        """
-        logging.info(
-            'Job %s started at %s' %
-            (job_id, utils.get_current_time_in_millisecs()))
-        cls.register_start(job_id)
-
-        try:
-            result = cls._run(additional_job_params)
-        except Exception as e:
-            logging.error(traceback.format_exc())
-            logging.error(
-                'Job %s failed at %s' %
-                (job_id, utils.get_current_time_in_millisecs()))
-            cls.register_failure(
-                job_id, '%s\n%s'
-                % (python_utils.UNICODE(e), traceback.format_exc()))
-            raise taskqueue_services.PermanentTaskFailure(
-                'Task failed: %s\n%s'
-                % (python_utils.UNICODE(e), traceback.format_exc()))
-
-        # Note that the job may have been canceled after it started and before
-        # it reached this stage. This will result in an exception when the
-        # validity of the status code transition is checked.
-        cls.register_completion(job_id, [result])
-        logging.info(
-            'Job %s completed at %s' %
-            (job_id, utils.get_current_time_in_millisecs()))
-
-    @classmethod
-    def _real_enqueue(
-            cls, job_id, queue_name, additional_job_params, unused_shard_count):
-        """Puts the job in the task queue.
-
-        Args:
-            job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in. See
-                core.platform.taskqueue.gae_taskqueue_services for supported
-                values.
-            additional_job_params: dict(str : *) or None. Additional params to
-                pass into the job's _run() method.
-            unused_shard_count: int. Number of shards used for the job.
-        """
-        taskqueue_services.defer(
-            cls._run_job, queue_name,
-            job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
@@ -909,7 +806,13 @@ class BaseMapReduceJobManager(BaseJobManager):
             cancel_message: str. The message to be displayed before
                 cancellation.
         """
+        super(BaseMapReduceJobManager, cls)._pre_cancel_hook(
+            job_id, cancel_message)
         metadata = cls.get_metadata(job_id)
+        if metadata is None:
+            # This indicates that the job has been queued but not started by the
+            # MapReduceJobPipeline.
+            return
         root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
@@ -1108,6 +1011,9 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         Args:
             job_id: str. The unique ID of the job marked as completed.
         """
+        super(
+            BaseMapReduceJobManagerForContinuousComputations,
+            cls)._post_completed_hook(job_id)
         cls._get_continuous_computation_class().on_batch_job_completion()
 
     @classmethod
@@ -1119,6 +1025,9 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             job_id: str. The unique ID of the job marked as cancelled.
             cancel_message: str. The message to be displayed after cancellation.
         """
+        super(
+            BaseMapReduceJobManagerForContinuousComputations,
+            cls)._post_cancel_hook(job_id, cancel_message)
         cls._get_continuous_computation_class().on_batch_job_canceled()
 
     @classmethod
@@ -1129,6 +1038,9 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         Args:
             job_id: str. The unique ID of the job marked as failed.
         """
+        super(
+            BaseMapReduceJobManagerForContinuousComputations,
+            cls)._post_failure_hook(job_id)
         cls._get_continuous_computation_class().on_batch_job_failure()
 
 
@@ -1840,6 +1752,6 @@ def get_continuous_computations_info(cc_classes):
 
 
 ABSTRACT_BASE_CLASSES = frozenset([
-    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager,
+    BaseJobManager, BaseMapReduceJobManager,
     BaseMapReduceOneOffJobManager,
     BaseMapReduceJobManagerForContinuousComputations])
