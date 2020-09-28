@@ -234,7 +234,7 @@ class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
         (
             recommendations_jobs_one_off
             .CleanupExplorationRecommendationsOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             recommendations_jobs_one_off
@@ -262,7 +262,7 @@ class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
         (
             recommendations_jobs_one_off
             .CleanupExplorationRecommendationsOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             recommendations_jobs_one_off
@@ -288,7 +288,7 @@ class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
         (
             recommendations_jobs_one_off
             .CleanupExplorationRecommendationsOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             recommendations_jobs_one_off
