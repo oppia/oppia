@@ -50,7 +50,7 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
         Raises:
             UnauthorizedUserException. The user does not have credentials to
                 access the page.
-            PageNotFoundException. The request was not made by the production
+            InternalErrorException. The request was not made in the correct
                 environment.
             InvalidInputException. The bucket parameter is malformed or missing.
         """
