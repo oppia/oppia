@@ -44,7 +44,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test questions.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.skill_id = 'skill_id'
         self.save_new_skill(
             self.skill_id, self.albert_id, description='Skill Description')
@@ -69,7 +69,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
         question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the question is exactly the same after migration.
         updated_question = (
@@ -106,7 +106,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted question is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the question is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -136,7 +136,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
         question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the question migrates correctly.
         updated_question = (
@@ -173,7 +173,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
@@ -203,7 +203,7 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_question(
             self.QUESTION_ID, self.albert_id,
             self._create_valid_question_data('ABC'), [self.skill_id])
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_skips_deleted_question(self):
         """Tests that the regenerate summary job skips deleted question."""
@@ -219,7 +219,7 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
             question_jobs_one_off
             .RegenerateQuestionSummaryOneOffJob.create_new())
         question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the question is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -241,7 +241,7 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
             question_jobs_one_off
             .RegenerateQuestionSummaryOneOffJob.create_new())
         question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off
@@ -266,7 +266,7 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
                 .RegenerateQuestionSummaryOneOffJob.create_new())
             question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(
                 job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off
@@ -289,7 +289,7 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.skill_id = 'skill_id'
         self.save_new_skill(
             self.skill_id, self.albert_id, description='Skill Description')
@@ -302,14 +302,14 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-question_id-1'))
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         job_id = (
             question_jobs_one_off
             .MissingQuestionMigrationOneOffJob.create_new())
         question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off.MissingQuestionMigrationOneOffJob.get_output(
@@ -332,7 +332,7 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                 .MissingQuestionMigrationOneOffJob.create_new())
             question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(
                 job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             output = (
                 question_jobs_one_off
@@ -352,7 +352,7 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                 .MissingQuestionMigrationOneOffJob.create_new())
             question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(
                 job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             output = (
                 question_jobs_one_off
@@ -378,7 +378,7 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.skill_id = 'skill_id'
         self.save_new_skill(
             self.skill_id, self.albert_id, description='Skill Description')
@@ -387,7 +387,7 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
             self.QUESTION_ID, self.albert_id,
             self._create_valid_question_data('ABC'), [self.skill_id])
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         job_id = (
@@ -396,7 +396,7 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
         (
             question_jobs_one_off
             .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off
@@ -413,7 +413,7 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
         (
             question_jobs_one_off
             .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off
@@ -432,7 +432,7 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
         (
             question_jobs_one_off
             .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off
@@ -456,7 +456,7 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
         (
             question_jobs_one_off
             .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off
@@ -480,7 +480,7 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
         (
             question_jobs_one_off
             .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off
