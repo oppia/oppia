@@ -17,12 +17,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.platform import models
 from core.tests import test_utils
 from export import cloud_datastore_admin
 
-from google.appengine.api import app_identity
 import requests
 import webtest
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 
 class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
@@ -40,7 +42,7 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
     def mock_production_environment(self):
         """Returns a context manager that mocks a production environment."""
         return self.swap(
-            app_identity, 'get_application_id',
+            app_identity_services, 'get_application_id',
             lambda: cloud_datastore_admin.APP_NAME_OPPIASERVER)
 
     def mock_http_response(self, content, status_code=200):

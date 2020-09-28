@@ -57,17 +57,13 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
             InvalidInputException. The bucket parameter is malformed or missing.
         """
 
-        access_token = app_identity_services.get_access_token(
-            'https://www.googleapis.com/auth/datastore')
-        app_id = app_identity_services.get_application_id()
-
         if not (self.is_cron_job or self.is_super_admin):
             e = self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
             logging.error(e)
             raise e
 
-        app_id = app_identity.get_application_id()
+        app_id = app_identity_services.get_application_id()
         if app_id != APP_NAME_OPPIASERVER:
             e = self.InternalErrorException(
                 'Export service has been pinged from a non-production '
@@ -82,7 +78,7 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
             logging.error(e)
             raise e
 
-        access_token, unused_expiration_time = app_identity.get_access_token(
+        access_token = app_identity_services.get_access_token(
             'https://www.googleapis.com/auth/datastore')
         output_url_prefix = '%s/%s' % (
             bucket, datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S'))
