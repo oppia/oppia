@@ -2122,9 +2122,9 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             activity_jobs_one_off.ValidateSnapshotMetadataModelsJob.create_new()) # pylint: disable=line-too-long
         activity_jobs_one_off.ValidateSnapshotMetadataModelsJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             activity_jobs_one_off.ValidateSnapshotMetadataModelsJob
             .get_output(job_id))
@@ -2158,7 +2158,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'COMMIT LOGS SHOULD NOT EXISTS-' +
                 'CollectionRightsSnapshotMetadataModel',
-                ['collection_id0-1']
+                1
             ]
         ]
 
@@ -2184,7 +2184,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             [
                 'COMMIT LOGS SHOULD NOT EXISTS-' +
                 'ExplorationRightsSnapshotMetadataModel',
-                ['exp_id0-1']
+                1
             ],
             ['FOUND COMMIT LOGS-ExplorationSnapshotMetadataModel', 1],
             ['FOUND PARENT MODEL-ExplorationSnapshotMetadataModel', 1],
