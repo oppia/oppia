@@ -32,10 +32,10 @@ export class DateTimeFormatService {
   * Otherwise, returns the full date (with the year abbreviated).
   * @param {number} millisSinceEpoch - milliseconds since Epoch
   * @returns {string} - The time if the local datetime representation has the
-  *                     same date as the current date. 
-  *                   -Otherwise the date if the local datetime representation has the
-  *                     same year as the current date.
-  *                   - Otherwise the full date (with the year abbreviated).
+  *                     same date as the current date. Otherwise the date if the local
+  *                     datetime representation has the same year as the current date.
+  *                     Otherwise the full date (with the year abbreviated).
+  *               
   */
   getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
