@@ -77,7 +77,7 @@ angular.module('oppia').directive('adminPage', [
             ctrl.statusMessage = statusMessage;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the directive is migrated to angular.
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           };
 
           ctrl.$onInit = function() {
