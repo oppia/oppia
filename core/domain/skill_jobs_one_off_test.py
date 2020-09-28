@@ -53,7 +53,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_skill(self):
         """Tests that the skill migration job does not convert a
@@ -78,7 +78,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the skill is exactly the same after migration.
         updated_skill = (
@@ -121,7 +121,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted skill is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the skill is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -177,7 +177,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify that the skill migrates correctly.
         updated_skill = (
@@ -215,7 +215,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             job_id = (
                 skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(
             job_id)
@@ -275,7 +275,7 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'skill-skill_id-2'))
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         self.assertEqual(
@@ -292,7 +292,7 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
             job_id)
@@ -322,7 +322,7 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
             job_id)
@@ -352,7 +352,7 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
             job_id)
@@ -403,13 +403,13 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'skill-skill_id-1'))
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         job_id = (
             skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
         skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
             job_id)
@@ -428,7 +428,7 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 skill_jobs_one_off
                 .MissingSkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             output = (
                 skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
@@ -443,7 +443,7 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             job_id = (
                 skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             output = (
                 skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
