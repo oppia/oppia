@@ -84,6 +84,10 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
             bucket, datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S'))
 
         url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
+        headers = {
+            b'Content-Type': b'application/json',
+            b'Authorization': b'Bearer %s' % access_token,
+        }
         payload = {
             'project_id': app_id,
             'output_url_prefix': output_url_prefix,
@@ -91,10 +95,6 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
                 'kinds': self.request.get_all('kind'),
                 'namespace_ids': self.request.get_all('namespace_id'),
             },
-        }
-        headers = {
-            b'Content-Type': b'application/json',
-            b'Authorization': b'Bearer %s' % access_token,
         }
 
         try:
