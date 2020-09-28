@@ -25,7 +25,6 @@ from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import user_services
@@ -933,8 +932,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         skill_services.update_skill(
             self.editor_id, 'skillid12345',
             change_list, 'Delete misconceptions.')
-        skill_fetchers.get_skill_by_id('skillid12345')
         self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         updated_question = question_services.get_question_by_id(
             self.question_id)
         updated_answer_groups = (

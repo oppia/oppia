@@ -82,7 +82,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_story(self):
         """Tests that the story migration job does not convert a
@@ -104,7 +104,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             story_jobs_one_off.StoryMigrationOneOffJob.create_new())
         story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the story is exactly the same after migration.
         updated_story = (
@@ -144,7 +144,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted story is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the story is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -198,7 +198,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             story_jobs_one_off.StoryMigrationOneOffJob.create_new())
         story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the story migrates correctly.
         updated_story = (
@@ -239,7 +239,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             job_id = (
                 story_jobs_one_off.StoryMigrationOneOffJob.create_new())
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(
             job_id)
@@ -277,7 +277,7 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_skips_deleted_story(self):
         """Tests that the regenerate summary job skips deleted story."""
@@ -302,7 +302,7 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted story is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the story is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -366,7 +366,7 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             story_jobs_one_off.RegenerateStorySummaryOneOffJob.create_new())
         story_jobs_one_off.RegenerateStorySummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the story summary is created correctly.
         story_summary_model = (
@@ -403,7 +403,7 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
             job_id = (
                 story_jobs_one_off.RegenerateStorySummaryOneOffJob.create_new())
             story_jobs_one_off.RegenerateStorySummaryOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         output = story_jobs_one_off.RegenerateStorySummaryOneOffJob.get_output(
             job_id)
