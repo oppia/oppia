@@ -28,14 +28,13 @@ from core.domain import recommendations_jobs_one_off
 from core.domain import recommendations_services
 from core.domain import recommendations_services_test
 from core.domain import rights_manager
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import python_utils
 
 (exp_models, recommendations_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class ExplorationRecommendationsOneOffJobUnitTests(
@@ -63,9 +62,9 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             ):
             self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
@@ -85,9 +84,9 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             ):
             self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
@@ -99,9 +98,9 @@ class ExplorationRecommendationsOneOffJobUnitTests(
 
             self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             recommendations = (
                 recommendations_services.get_exploration_recommendations(
                     'exp_id_1'))
@@ -126,9 +125,9 @@ class ExplorationRecommendationsOneOffJobUnitTests(
                 _mock_get_non_private_exploration_summaries):
                 self.job_class.enqueue(self.job_class.create_new())
                 self.assertEqual(
-                    self.count_jobs_in_taskqueue(
+                    self.count_jobs_in_mapreduce_taskqueue(
                         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-                self.process_and_flush_pending_tasks()
+                self.process_and_flush_pending_mapreduce_tasks()
 
                 recommendations = (
                     recommendations_services.get_exploration_recommendations(
@@ -156,9 +155,9 @@ class DeleteAllExplorationRecommendationsOneOffJobTests(
                 job_id)
         )
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             recommendations_jobs_one_off
             .DeleteAllExplorationRecommendationsOneOffJob.get_output(job_id))
