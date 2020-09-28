@@ -20,13 +20,29 @@ import { TestBed } from '@angular/core/testing';
 
 import { StorySummary, StorySummaryObjectFactory } from
   'domain/story/StorySummaryObjectFactory';
+import { StoryNodeObjectFactory } from './StoryNodeObjectFactory';
 
 describe('Story summary object factory', () => {
   let factory: StorySummaryObjectFactory;
   let _sampleStorySummary: StorySummary;
+  let storyNodeObjectFactory: StoryNodeObjectFactory;
 
   beforeEach(() => {
     factory = TestBed.get(StorySummaryObjectFactory);
+
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
 
     const sampleStorySummaryBackendDict = {
       id: 'sample_story_id',
@@ -37,11 +53,13 @@ describe('Story summary object factory', () => {
       description: 'Description',
       story_is_published: true,
       completed_node_titles: ['Chapter 1'],
-      url_fragment: 'story-url-fragment'
+      url_fragment: 'story-url-fragment',
+      pending_node_dicts: [nodeDict]
     };
     _sampleStorySummary = factory.createFromBackendDict(
       sampleStorySummaryBackendDict
     );
+    storyNodeObjectFactory = new StoryNodeObjectFactory();
   });
 
   it('should be able to get all the values', () => {
@@ -56,5 +74,20 @@ describe('Story summary object factory', () => {
     expect(_sampleStorySummary.isStoryPublished()).toBe(true);
     expect(_sampleStorySummary.isNodeCompleted('Chapter 1')).toBe(true);
     expect(_sampleStorySummary.isNodeCompleted('Chapter 2')).toBe(false);
+    expect(_sampleStorySummary.getPendingNodes()).toEqual([
+      storyNodeObjectFactory.createFromBackendDict({
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_2'],
+        destination_node_ids: ['node_2'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40'
+      })
+    ]);
   });
 });

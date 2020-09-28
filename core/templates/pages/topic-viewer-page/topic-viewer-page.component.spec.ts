@@ -57,7 +57,8 @@ describe('Topic viewer page', () => {
       thumbnail_filename: '',
       thumbnail_bg_color: '',
       description: 'Story Description',
-      story_is_published: true
+      story_is_published: true,
+      pending_node_dicts: []
     }],
     additional_story_dicts: [],
     uncategorized_skill_ids: [],

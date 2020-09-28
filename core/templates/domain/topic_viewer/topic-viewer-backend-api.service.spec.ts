@@ -24,6 +24,7 @@ import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
+import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -44,6 +45,7 @@ describe('Topic viewer backend API service', () => {
       'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
     $provide.value(
       'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
+        new StoryNodeObjectFactory(),
         new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
         new ShortSkillSummaryObjectFactory()));
   }));
@@ -76,7 +78,8 @@ describe('Topic viewer backend API service', () => {
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
         published: true,
-        completed_node_titles: ['Chapter 1']
+        completed_node_titles: ['Chapter 1'],
+        pending_node_dicts: []
       }],
       additional_story_dicts: [{
         id: '1',
@@ -86,7 +89,8 @@ describe('Topic viewer backend API service', () => {
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
         published: true,
-        completed_node_titles: ['Chapter 1']
+        completed_node_titles: ['Chapter 1'],
+        pending_node_dicts: []
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{

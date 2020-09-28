@@ -908,7 +908,8 @@ export class UpgradedServices {
     upgradedServices['StoryReferenceObjectFactory'] =
       new StoryReferenceObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
-      new StorySummaryObjectFactory();
+      new StorySummaryObjectFactory(
+        upgradedServices['StoryNodeObjectFactory']);
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
@@ -1465,6 +1466,7 @@ export class UpgradedServices {
         upgradedServices['SubtopicObjectFactory']);
     upgradedServices['ReadOnlyTopicObjectFactory'] =
       new ReadOnlyTopicObjectFactory(
+        upgradedServices['StoryNodeObjectFactory'],
         upgradedServices['SubtopicObjectFactory'],
         upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['ReviewTestBackendApiService'] =
