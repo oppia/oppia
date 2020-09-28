@@ -18,7 +18,7 @@
 import { DragAndDropSortInputRulesService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 
 describe('Drag and Drop Sort Input rules service', () => {
-  let ddsrs: DragAndDropSortInputRulesService = null;
+  let ddsrs: DragAndDropSortInputRulesService;
   beforeEach(() => {
     ddsrs = new DragAndDropSortInputRulesService();
   });

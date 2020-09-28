@@ -31,6 +31,8 @@
     }
   },
   "files": [
+    "core/templates/domain/email-dashboard/email-dashboard-query-object.factory.ts",
+    "core/templates/domain/email-dashboard/email-dashboard-query-object.factory.spec.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.spec.ts",
     "core/templates/domain/utilities/AudioFileObjectFactory.ts",
@@ -46,12 +48,16 @@
     "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts",
     "core/templates/services/audio-bar-status.service.ts",
     "core/templates/services/audio-bar-status.service.spec.ts",
+    "core/templates/services/editability.service.ts",
+    "core/templates/services/editability.service.spec.ts",
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
     "core/templates/services/stateful/background-mask.service.spec.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.spec.ts",
+    "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
+    "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
   ],
   "include": ["typings/*.ts"]
 }
