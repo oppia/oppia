@@ -39,6 +39,11 @@ export class NumericExpressionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  getCustomizationArgsWarnings(
+      customizationArgs: NumericExpressionInputCustomizationArgs): Warning[] {
+    return [];
+  }
+
   getAllWarnings(
       stateName: string,
       customizationArgs: NumericExpressionInputCustomizationArgs,

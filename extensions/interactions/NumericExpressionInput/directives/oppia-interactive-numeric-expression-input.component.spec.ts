@@ -24,6 +24,7 @@ import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
 
 require(
   'interactions/NumericExpressionInput/directives/' +
@@ -34,7 +35,7 @@ require(
   'interactions/NumericExpressionInput/directives/' +
   'oppia-interactive-numeric-expression-input.component.ts');
 
-describe('NumericExpressionInputInteractive', function() {
+fdescribe('NumericExpressionInputInteractive', function() {
   let ctrl = null, $window = null;
   let mockCurrentInteractionService = {
     onSubmit: function(answer, rulesService) {},
@@ -43,6 +44,15 @@ describe('NumericExpressionInputInteractive', function() {
     }
   };
   let mockNumericExpressionInputRulesService = {};
+  let mockInteractionAttributesExtractorService = {
+    getValuesFromAttributes: function(interactionId, attrs) {
+      return {
+        placeholder: {
+          getUnicode: function() {}
+        }
+      };
+    }
+  };
   let mockGuppyObject = {
     guppyInstance: {
       asciimath: function() {
@@ -83,6 +93,10 @@ describe('NumericExpressionInputInteractive', function() {
     $provide.value(
       'NumericExpressionInputRulesService',
       mockNumericExpressionInputRulesService);
+    $provide.value(
+      'InteractionAttributesExtractorService',
+      mockInteractionAttributesExtractorService);
+    $provide.value('$attrs', 'placeholder');
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);

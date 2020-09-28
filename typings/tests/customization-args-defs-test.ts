@@ -211,7 +211,7 @@ type TestNumberWithUnitsCustomizationArgsInterfacesMatch = AssertTrue<
 type TestNumericExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     NumericExpressionInputCustomizationArgsBackendDict,
-    {},
+    {placeholder: {value: SubtitledUnicode}},
     NumericExpressionInputCustomizationArgs
   >
 >;
