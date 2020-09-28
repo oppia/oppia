@@ -89,7 +89,7 @@ export class DragAndDropSortInputRulesService {
   HasElementXAtPositionY(
       answer: DragAndDropAnswer,
       inputs: DragAndDropHasElementXAtPositionYRuleInputs
-      ): boolean | undefined {
+  ): boolean | undefined {
     for (var i:number = 0; i < answer.length; i++) {
       var index = answer[i].indexOf(inputs.x);
       if (index !== -1) {
