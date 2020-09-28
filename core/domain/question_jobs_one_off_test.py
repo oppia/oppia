@@ -23,11 +23,11 @@ import ast
 
 from core.domain import question_jobs_one_off
 from core.domain import question_services
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-taskqueue_services = models.Registry.import_taskqueue_services()
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
@@ -170,7 +170,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
         question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         self.process_and_flush_pending_mapreduce_tasks()
