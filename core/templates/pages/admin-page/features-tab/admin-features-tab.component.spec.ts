@@ -21,7 +21,7 @@ import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks } from
   '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { AdminFeaturesTabComponent } from
