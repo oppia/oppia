@@ -63,9 +63,9 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
 
         app_id = app_identity.get_application_id()
         if app_id != APP_NAME_OPPIASERVER:
-            e = self.PageNotFoundException(
+            e = self.InternalErrorException(
                 'Export service has been pinged from a non-production '
-                'environment so the request has been ignored.')
+                'or non-Oppia environment, so the request has been ignored.')
             logging.error(e)
             raise e
 

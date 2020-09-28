@@ -107,6 +107,7 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
                 '/cloud_datastore_export?bucket=gs://abc',
                 expect_errors=True)
         self.assertEqual(response.status_code, 500)
+        self.assertIn('uh-oh!', response.body)
 
     def test_export_outside_of_prod_environment_fails(self):
         admin_ctx = self.login_context(self.ADMIN_EMAIL, is_super_admin=True)
@@ -114,7 +115,11 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
         with admin_ctx:
             response = self.testapp.get(
                 '/cloud_datastore_export?bucket=gs://abc', expect_errors=True)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(
+            'Export service has been pinged from a non-production '
+            'or non-Oppia environment, so the request has been ignored.',
+            response.body)
 
     def test_export_with_no_bucket_fails(self):
         admin_ctx = self.login_context(self.ADMIN_EMAIL, is_super_admin=True)
@@ -124,6 +129,7 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
             response = self.testapp.get(
                 '/cloud_datastore_export', expect_errors=True)
         self.assertEqual(response.status_code, 400)
+        self.assertIn('bucket must begin with gs://', response.body)
 
     def test_export_with_bucket_missing_prefix_fails(self):
         admin_ctx = self.login_context(self.ADMIN_EMAIL, is_super_admin=True)
@@ -133,6 +139,7 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
             response = self.testapp.get(
                 '/cloud_datastore_export?bucket=abc', expect_errors=True)
         self.assertEqual(response.status_code, 400)
+        self.assertIn('bucket must begin with gs://', response.body)
 
     def test_viewer_can_not_initiate_export(self):
         non_admin_ctx = (
@@ -143,3 +150,6 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
             response = self.testapp.get(
                 '/cloud_datastore_export?bucket=gs://abc', expect_errors=True)
         self.assertEqual(response.status_code, 401)
+        self.assertIn(
+            'You do not have the credentials to access this page',
+            response.body)

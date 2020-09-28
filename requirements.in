@@ -16,7 +16,6 @@ html5lib==1.0.1
 mutagen==1.43.0
 packaging==20.4
 pylatexenc==2.6
-requests==2.24.0
 simplejson==3.17.0
 six==1.15.0
 soupsieve==1.9.5
