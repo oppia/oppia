@@ -57,7 +57,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test topics.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_topic(self):
         """Tests that the topic migration job does not convert a
@@ -77,7 +77,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
         topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the topic is exactly the same after migration.
         updated_topic = (
@@ -115,7 +115,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted topic is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -155,7 +155,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
         topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the topic migrates correctly.
         updated_topic = (
@@ -194,7 +194,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
         topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
         with self.swap(logging, 'error', _mock_logging_function):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             observed_log_messages,
@@ -221,7 +221,7 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         # Setup user who will own the test topics.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
@@ -276,7 +276,7 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
             .create_new())
         topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Assert that only valid skills remain after
         # RemoveDeletedSkillsFromTopicOneOffJob.
@@ -328,7 +328,7 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
 
         # This running without errors indicates the deleted topic is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -353,7 +353,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.TOPIC_ID = topic_services.get_new_topic_id()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_skips_deleted_topic(self):
         """Tests that the regenerate summary job skips deleted topic."""
@@ -373,7 +373,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted topic is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -432,7 +432,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
         topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the topic summary is created correctly.
         topic_summary_model = (
@@ -472,7 +472,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
             job_id = (
                 topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
             topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
             job_id)
