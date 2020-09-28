@@ -1114,7 +1114,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_mapreduce_tasks()
@@ -1154,7 +1154,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -1190,7 +1190,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -1673,13 +1673,13 @@ class CleanupUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
 
         self.model_instance = user_models.UserSubscribersModel.get_by_id(
             self.owner_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         job_id = (
             user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.create_new())
         user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.get_output(
@@ -1692,7 +1692,7 @@ class CleanupUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.create_new())
         user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.get_output(
@@ -1745,7 +1745,7 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
 
         self.model_instance = user_models.CollectionProgressModel.get_by_id(
             '%s.col' % self.user_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         job_id = (
@@ -1753,7 +1753,7 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             .CleanupCollectionProgressModelOneOffJob.create_new())
         user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off
@@ -1780,7 +1780,7 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             .CleanupCollectionProgressModelOneOffJob.create_new())
         user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off
@@ -1817,7 +1817,7 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             .CleanupCollectionProgressModelOneOffJob.create_new())
         user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off
@@ -1862,14 +1862,14 @@ class CleanupUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.user, 'exp0')
         rights_manager.publish_exploration(self.owner, 'exp1')
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         job_id = (
             user_jobs_one_off
             .CleanupUserContributionsModelOneOffJob.create_new())
         user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
@@ -1906,7 +1906,7 @@ class CleanupUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off
             .CleanupUserContributionsModelOneOffJob.create_new())
         user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
@@ -1944,7 +1944,7 @@ class CleanupUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off
             .CleanupUserContributionsModelOneOffJob.create_new())
         user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
