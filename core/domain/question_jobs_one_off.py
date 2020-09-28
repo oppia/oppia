@@ -187,7 +187,7 @@ class RegenerateQuestionCommitAndSnapshotOneOffJob(
             commit_log_model = (
                 question_models.QuestionCommitLogEntryModel.get_by_id(
                     'question-%s-%s' % (question_model.id, version)))
-            if commit_log_model is None or commit_log_model.deleted:
+            if commit_log_model is None:
                 commit_log_model = (
                     question_models.QuestionCommitLogEntryModel.create(
                         question_model.id, version, feconf.SYSTEM_COMMITTER_ID,
@@ -197,13 +197,19 @@ class RegenerateQuestionCommitAndSnapshotOneOffJob(
                 commit_log_model.put()
                 yield ('Regenerated Question Commit Log Model', 1)
 
+            if commit_log_model.deleted:
+                commit_log_model.deleted = False
+                commit_log_model.put()
+                yield (
+                    'Reverted deleted status for Question Commit '
+                    'Log Model', 1)
+
             snapshot_id = '%s-%s' % (question_model.id, version)
 
             snapshot_metadata_model = (
                 question_models.QuestionSnapshotMetadataModel.get_by_id(
                     snapshot_id))
-            if snapshot_metadata_model is None or (
-                    snapshot_metadata_model.deleted):
+            if snapshot_metadata_model is None:
                 snapshot_metadata_model = (
                     question_models.QuestionSnapshotMetadataModel.create(
                         snapshot_id, feconf.SYSTEM_COMMITTER_ID, 'create',
@@ -211,16 +217,29 @@ class RegenerateQuestionCommitAndSnapshotOneOffJob(
                 snapshot_metadata_model.put()
                 yield ('Regenerated Question Snapshot Metadata Model', 1)
 
+            if snapshot_metadata_model.deleted:
+                snapshot_metadata_model.deleted = False
+                snapshot_metadata_model.put()
+                yield (
+                    'Reverted deleted status for Question Snapshot '
+                    'Metadata Model', 1)
+
             snapshot_content_model = (
                 question_models.QuestionSnapshotContentModel.get_by_id(
                     snapshot_id))
-            if snapshot_content_model is None or (
-                    snapshot_content_model.deleted):
+            if snapshot_content_model is None:
                 snapshot_content_model = (
                     question_models.QuestionSnapshotContentModel.create(
                         snapshot_id, question_model.compute_snapshot()))
                 snapshot_content_model.put()
                 yield ('Regenerated Question Snapshot Content Model', 1)
+
+            if snapshot_content_model.deleted:
+                snapshot_content_model.deleted = False
+                snapshot_content_model.put()
+                yield (
+                    'Reverted deleted status for Question Snapshot '
+                    'Content Model', 1)
 
     @staticmethod
     def reduce(key, values):

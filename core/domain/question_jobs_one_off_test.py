@@ -444,6 +444,34 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
         self.assertEqual(
             output, ['[u\'Regenerated Question Commit Log Model\', 1]'])
 
+    def test_migration_job_reverts_deleted_status_for_commit_log_model(
+            self):
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-question_id-1'))
+        commit_log_model.deleted = True
+        commit_log_model.put()
+
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.create_new())
+        (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.get_output(job_id))
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-question_id-1'))
+        self.assertFalse(commit_log_model.deleted)
+        self.assertEqual(
+            output, [
+                '[u\'Reverted deleted status for Question '
+                'Commit Log Model\', 1]'])
+
     def test_migration_job_regenerates_missing_snapshot_metadata_model(self):
         snapshot_metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -468,6 +496,34 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
         self.assertEqual(
             output, ['[u\'Regenerated Question Snapshot Metadata Model\', 1]'])
 
+    def test_migration_job_reverts_deleted_status_for_snapshot_metadata_model(
+            self):
+        snapshot_metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                'question_id-1'))
+        snapshot_metadata_model.deleted = True
+        snapshot_metadata_model.put()
+
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.create_new())
+        (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.get_output(job_id))
+        snapshot_metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                'question_id-1'))
+        self.assertFalse(snapshot_metadata_model.deleted)
+        self.assertEqual(
+            output, [
+                '[u\'Reverted deleted status for Question '
+                'Snapshot Metadata Model\', 1]'])
+
     def test_migration_job_regenerates_missing_snapshot_content_model(self):
         snapshot_content_model = (
             question_models.QuestionSnapshotContentModel.get_by_id(
@@ -491,3 +547,31 @@ class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
         self.assertFalse(snapshot_content_model.deleted)
         self.assertEqual(
             output, ['[u\'Regenerated Question Snapshot Content Model\', 1]'])
+
+    def test_migration_job_reverts_deleted_status_for_snapshot_content_model(
+            self):
+        snapshot_content_model = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                'question_id-1'))
+        snapshot_content_model.deleted = True
+        snapshot_content_model.put()
+
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.create_new())
+        (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.get_output(job_id))
+        snapshot_content_model = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                'question_id-1'))
+        self.assertFalse(snapshot_content_model.deleted)
+        self.assertEqual(
+            output, [
+                '[u\'Reverted deleted status for Question '
+                'Snapshot Content Model\', 1]'])
