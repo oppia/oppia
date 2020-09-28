@@ -403,7 +403,7 @@ class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
         (
             feedback_jobs_one_off
             .CleanupFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
@@ -425,7 +425,7 @@ class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
         (
             feedback_jobs_one_off
             .CleanupFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
@@ -468,7 +468,7 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
         (
             feedback_jobs_one_off
             .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
@@ -493,7 +493,7 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
         (
             feedback_jobs_one_off
             .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
@@ -520,7 +520,7 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
         (
             feedback_jobs_one_off
             .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
@@ -567,7 +567,7 @@ class CleanupGeneralFeedbackMessageModelOneOffJobTest(
         (
             feedback_jobs_one_off
             .CleanupGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
@@ -594,7 +594,7 @@ class CleanupGeneralFeedbackMessageModelOneOffJobTest(
         (
             feedback_jobs_one_off
             .CleanupGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
