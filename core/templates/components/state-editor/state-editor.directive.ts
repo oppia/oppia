@@ -66,6 +66,7 @@ angular.module('oppia').directive('stateEditor', [
         isInteractionShown: '&interactionIsShown',
         navigateToState: '=',
         onSaveHints: '=',
+        onSaveInapplicableSkillMisconceptionIds: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',

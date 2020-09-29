@@ -127,7 +127,6 @@ jobs:
       - persist_to_workspace:
           root: /home/circleci/
           paths:
-            - oppia/core/domain/proto/
             - oppia/node_modules/
             - oppia/third_party/
             - oppia_tools/
@@ -143,6 +142,9 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
+      - run:
+          name: Set up python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Run e2e navigation test
           command: |
@@ -171,6 +173,9 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
+      - run:
+          name: Set up python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Run e2e publication test
           command: |
@@ -201,6 +206,9 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
+      - run:
+          name: Set up python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Run e2e users test
           command: |
@@ -235,6 +243,9 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+          name: Set up python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
+      - run:
           name: Run e2e file upload features test
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
@@ -260,6 +271,9 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
+      - run:
+          name: Set up python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Run e2e topics and skills dashboard test
           command: |

@@ -25,10 +25,10 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 transaction_services = models.Registry.import_transaction_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
@@ -366,7 +366,8 @@ class BaseModel(ndb.Model):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
             start_cursor = None
 
@@ -1115,6 +1116,13 @@ class BaseSnapshotMetadataModel(BaseModel):
     # snapshot content model.
     content_user_ids = ndb.StringProperty(repeated=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Metadata models should always be pseudonymized in the context of
+        their parent models.
+        """
+        return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def get_export_policy(cls):
         """Snapshot Metadata is relevant to the user for Takeout."""
@@ -1128,7 +1136,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         })
 
     @classmethod
-    def exists_for_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id):
         """Check whether BaseSnapshotMetadataModel references the given user.
 
         Args:
@@ -1213,6 +1221,25 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The content models do not contain any user ID fields directly,
+        the user ID fields might be hidden inside the content field (because
+        content field contains all the fields from the parent model), e.g. the
+        owner_ids or viewer_ids in the ExplorationRightsModel that are then in
+        the content field of ExplorationRightsSnapshotContentModel.
+
+        The pseudonymization of these models is handled in the wipeout service
+        (in the relevant pseudonymization function, e.g. in
+        _pseudonymize_activity_models_with_associated_rights_models() for
+        CollectionRightsModel or ExplorationRightsModel), based on
+        the content_user_ids field of the relevant metadata model.
+        E.g. the content_user_ids in ExplorationRightsSnapshotMetadataModel are
+        used to pseudonymize the relevant fields in the corresponding
+        ExplorationRightsSnapshotContentModel.
+        """
+        return DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
