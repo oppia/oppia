@@ -109,12 +109,14 @@ export class CollectionRights {
   // internal, bindable objects are changed within this collection rights.
   // Note that the collection nodes within this collection will be completely
   // redefined as copies from the specified collection rights.
-  copyFromCollectionRights(otherCollectionRights: CollectionRights): void {
-    this._collectionId = otherCollectionRights.getCollectionId();
-    this._canEdit = otherCollectionRights.canEdit();
-    this._isPrivate = otherCollectionRights.isPrivate();
-    this._canUnpublish = otherCollectionRights.canUnpublish();
-    this._ownerNames = otherCollectionRights.getOwnerNames();
+  static copyFromCollectionRights(otherCollectionRights: CollectionRights): CollectionRights {
+    return new CollectionRights({
+      collection_id: otherCollectionRights.getCollectionId(),
+      can_edit: otherCollectionRights.canEdit(),
+      can_unpublish: otherCollectionRights.canUnpublish(),
+      is_private: otherCollectionRights.isPrivate(),
+      owner_names: otherCollectionRights.getOwnerNames()
+    });
   }
 }
 
@@ -133,15 +135,7 @@ export class CollectionRightsObjectFactory {
 
   // Create a new, empty collection rights object. This is not guaranteed to
   // pass validation tests.
-  createEmptyCollectionRights(): CollectionRights {
-    return new CollectionRights({
-      owner_names: [],
-      collection_id: 0,
-      can_edit: false,
-      can_unpublish: false,
-      is_private: false
-    });
-  }
+
 }
 
 angular.module('oppia').factory(

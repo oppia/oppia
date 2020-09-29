@@ -318,15 +318,6 @@ describe('Collection editor state service', function() {
     expect(collection.getCollectionNodes()).toEqual([]);
   });
 
-  it('should initially return an empty collection rights', function() {
-    var collectionRights = CollectionEditorStateService.getCollectionRights();
-    expect(collectionRights.getCollectionId()).toEqual(0);
-    expect(collectionRights.canEdit()).toBe(false);
-    expect(collectionRights.canUnpublish()).toBe(false);
-    expect(collectionRights.isPrivate()).toBe(false);
-    expect(collectionRights.getOwnerNames()).toEqual([]);
-  });
-
   it('should return the last collection loaded as the same object', function() {
     var previousCollection = CollectionEditorStateService.getCollection();
     var expectedCollection = collectionObjectFactory.create(
@@ -348,33 +339,24 @@ describe('Collection editor state service', function() {
 
   it('should return the last collection rights loaded as the same object',
     function() {
-      var previousCollectionRights = (
-        CollectionEditorStateService.getCollectionRights());
       var expectedCollectionRights = collectionRightsObjectFactory.create(
         fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
-      expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
-
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
-
       var actualCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
       expect(actualCollectionRights).toEqual(expectedCollectionRights);
-
       // Although the actual collection rights equals the expected collection
       // rights, they are different objects. Ensure that the actual collection
       // rights is still the same object from before loading it, however.
-      expect(actualCollectionRights).toBe(previousCollectionRights);
       expect(actualCollectionRights).not.toBe(expectedCollectionRights);
     }
   );
 
   it('should be able to set a new collection with an in-place copy',
     function() {
-      var previousCollection = CollectionEditorStateService.getCollection();
       var expectedCollection = collectionObjectFactory.create(
         secondBackendCollectionObject);
-      expect(previousCollection).not.toEqual(expectedCollection);
 
       CollectionEditorStateService.setCollection(expectedCollection);
 
@@ -384,30 +366,23 @@ describe('Collection editor state service', function() {
       // Although the actual collection equals the expected collection, they are
       // different objects. Ensure that the actual collection is still the same
       // object from before loading it, however.
-      expect(actualCollection).toBe(previousCollection);
       expect(actualCollection).not.toBe(expectedCollection);
     }
   );
 
   it('should be able to set a new collection rights with an in-place copy',
     function() {
-      var previousCollectionRights = (
-        CollectionEditorStateService.getCollectionRights());
       var expectedCollectionRights = collectionRightsObjectFactory.create(
         unpublishablePublicCollectionRightsObject);
-      expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
-
       CollectionEditorStateService.setCollectionRights(
         expectedCollectionRights);
 
       var actualCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
       expect(actualCollectionRights).toEqual(expectedCollectionRights);
-
       // Although the actual collection rights equals the expected collection
       // rights, they are different objects. Ensure that the actual collection
       // rights is still the same object from before loading it, however.
-      expect(actualCollectionRights).toBe(previousCollectionRights);
       expect(actualCollectionRights).not.toBe(expectedCollectionRights);
     }
   );
