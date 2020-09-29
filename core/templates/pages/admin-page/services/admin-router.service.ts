@@ -58,7 +58,7 @@ export class AdminRouterService {
   }
 
   /**
-   * @returns {boolean} Returns whether the activities tab is open.
+   * @returns {boolean} Whether the activities tab is open.
    */
   isActivitiesTabOpen(): boolean {
     return this.currentTabHash === (
