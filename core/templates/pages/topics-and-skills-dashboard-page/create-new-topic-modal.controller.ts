@@ -43,6 +43,8 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
     });
     $scope.allowedBgColors = (
       topicPropertiesConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+    $scope.validUrlFragmentRegex = new RegExp(
+      topicPropertiesConstants.VALID_URL_FRAGMENT_REGEX);
 
     $scope.isValid = function() {
       return Boolean(
