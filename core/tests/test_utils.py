@@ -47,6 +47,8 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -1809,6 +1811,31 @@ tags: []
                 'cmd': story_domain.CMD_CREATE_NEW,
                 'title': title
             }])
+
+    def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
+        """Creates an Oppia subtopic and saves it.
+
+        Args:
+            subtopic_id: str. ID for the subtopic to be created.
+            owner_id: str. The user_id of the creator of the topic.
+            topic_id: str. ID for the topic that the subtopic belongs to.
+
+        Returns:
+            SubtopicPage. A newly-created subtopic.
+        """
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id, topic_id))
+        subtopic_changes = [
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+                'topic_id': topic_id,
+                'subtopic_id': subtopic_id
+            })
+        ]
+        subtopic_page_services.save_subtopic_page(
+            owner_id, subtopic_page, 'Create new subtopic', subtopic_changes)
+        return subtopic_page
 
     def save_new_topic(
             self, topic_id, owner_id, name='topic', abbreviated_name='topic',

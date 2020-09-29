@@ -1392,7 +1392,7 @@ def _get_user_auth_details_from_model(user_auth_details_model):
     )
 
 
-def _get_pseudonymous_username(pseudonymous_id):
+def get_pseudonymous_username(pseudonymous_id):
     """Get the username from pseudonymous ID.
 
     Args:
@@ -1439,7 +1439,7 @@ def get_usernames(user_ids, strict=False):
         if user_id in feconf.SYSTEM_USERS:
             usernames[index] = feconf.SYSTEM_USERS[user_id]
         elif utils.is_pseudonymous_id(user_id):
-            usernames[index] = _get_pseudonymous_username(user_id)
+            usernames[index] = get_pseudonymous_username(user_id)
         else:
             non_system_user_indices.append(index)
             non_system_user_ids.append(user_id)
