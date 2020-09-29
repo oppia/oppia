@@ -1114,7 +1114,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_pending_mapreduce_tasks()
+        self.process_and_flush_pending_tasks()
 
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_mapreduce_tasks()
@@ -1154,7 +1154,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_pending_mapreduce_tasks()
+        self.process_and_flush_pending_tasks()
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -1190,7 +1190,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_pending_mapreduce_tasks()
+        self.process_and_flush_pending_tasks()
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_mapreduce_tasks()
 
