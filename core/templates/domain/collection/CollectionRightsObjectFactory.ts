@@ -18,7 +18,6 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
@@ -109,14 +108,15 @@ export class CollectionRights {
   // internal, bindable objects are changed within this collection rights.
   // Note that the collection nodes within this collection will be completely
   // redefined as copies from the specified collection rights.
-  static copyFromCollectionRights(otherCollectionRights: CollectionRights): CollectionRights {
-    return new CollectionRights({
-      collection_id: otherCollectionRights.getCollectionId(),
-      can_edit: otherCollectionRights.canEdit(),
-      can_unpublish: otherCollectionRights.canUnpublish(),
-      is_private: otherCollectionRights.isPrivate(),
-      owner_names: otherCollectionRights.getOwnerNames()
-    });
+  static copyFromCollectionRights(
+    otherCollectionRights: CollectionRights): CollectionRights {
+      return new CollectionRights({
+        collection_id: otherCollectionRights.getCollectionId(),
+        can_edit: otherCollectionRights.canEdit(),
+        can_unpublish: otherCollectionRights.canUnpublish(),
+        is_private: otherCollectionRights.isPrivate(),
+        owner_names: otherCollectionRights.getOwnerNames()
+      });
   }
 }
 
@@ -132,10 +132,8 @@ export class CollectionRightsObjectFactory {
       CollectionRights {
     return new CollectionRights(cloneDeep(collectionRightsBackendObject));
   }
-
   // Create a new, empty collection rights object. This is not guaranteed to
   // pass validation tests.
-
 }
 
 angular.module('oppia').factory(

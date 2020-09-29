@@ -16,7 +16,7 @@
  * @fileoverview Tests for CollectionRightsObjectFactory.
  */
 
-import { CollectionRightsObjectFactory,CollectionRights } from
+import { CollectionRightsObjectFactory, CollectionRights } from
   'domain/collection/CollectionRightsObjectFactory';
 
 describe('Collection rights object factory', () => {
@@ -160,12 +160,12 @@ describe('Collection rights object factory', () => {
     var sampleCollectionRights = collectionRightsObjectFactory.create(
       noUnpublishCollectionRightsBackendObject);
 
-    var emptyCollectionRightsBackendObject = CollectionRights.copyFromCollectionRights(
-      sampleCollectionRights);
-    expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
-    expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
-    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
-    expect(emptyCollectionRightsBackendObject.isPrivate()).toBe(false);
-    expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual(['A']);
+    var emptyCollectionRightsBackendObject =
+     CollectionRights.copyFromCollectionRights(sampleCollectionRights);
+      expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
+      expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
+      expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
+      expect(emptyCollectionRightsBackendObject.isPrivate()).toBe(false);
+      expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual(['A']);
   });
 });
