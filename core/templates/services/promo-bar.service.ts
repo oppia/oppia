@@ -17,7 +17,7 @@
  */
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { PromoBarServiceBackendApiService } from 'services/promo-bar-bakend-api.service';
+import { PromoBarBackendApiService } from 'services/promo-bar-bakend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 @Injectable({
   providedIn: 'root'
@@ -30,7 +30,7 @@ export class PromoBarService {
       promoBarMessage: ''
     };
     if (ServicesConstants.ENABLE_PROMO_BAR) {
-      return PromoBarServiceBackendApiService.makeRequest();
+      return PromoBarBackendApiService.makeRequest();
     } else {
       return Promise.resolve(promoBarData);
     }

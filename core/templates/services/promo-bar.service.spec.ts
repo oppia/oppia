@@ -20,7 +20,6 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from
    '@angular/common/http/testing';
 import 'jasmine';

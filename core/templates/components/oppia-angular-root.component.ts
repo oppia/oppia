@@ -429,6 +429,8 @@ import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { ProfileSummaryObjectFactory } from
   'domain/user/profile-summary-object.factory';
+import { PromoBarBackendApiService } from
+  'services/promo-bar-bakend-api.service';
 import { PromoBarService } from 'services/promo-bar.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
@@ -888,6 +890,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static profileSummaryObjectFactory: ProfileSummaryObjectFactory;
+  static promoBarBackendService: PromoBarBackendService;
   static promoBarService: PromoBarService;
   static pythonProgramTokenizer: PythonProgramTokenizer;
   static questionBackendApiService: QuestionBackendApiService;
@@ -1272,6 +1275,7 @@ private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
 private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
+private promoBarBackendService: PromoBarBackendService,
 private promoBarService: PromoBarService,
 private pythonProgramTokenizer: PythonProgramTokenizer,
 private questionBackendApiService: QuestionBackendApiService,
