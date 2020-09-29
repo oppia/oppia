@@ -1092,7 +1092,7 @@ export class UpgradedServices {
       upgradedServices['LoggerService']);
     upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
       upgradedServices['LearnerActionObjectFactory']);
-    upgradedServices['PromoBarSesrvice'] = new PromoBarService(HttpClient);
+    upgradedServices['PromoBarService'] = new PromoBarService();
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
     upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =

@@ -16,31 +16,21 @@
  * @fileoverview Service Promo bar.
  */
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { PromoBarServiceBackendApiService } from 'services/promo-bar-bakend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 @Injectable({
   providedIn: 'root'
 })
 export class PromoBarService {
-  constructor(
-      private http: HttpClient
-  ) {}
-  getPromoBarData(): Promise<{}> {
+  constructor() {}
+  static getPromoBarData(): Promise<{}> {
     var promoBarData = {
       promoBarEnabled: false,
       promoBarMessage: ''
     };
     if (ServicesConstants.ENABLE_PROMO_BAR) {
-      return this.http.get('/promo_bar_handler', { observe: 'response' })
-        .toPromise()
-        .then(
-          (response) => {
-            promoBarData.promoBarEnabled = response.data.promo_bar_enabled;
-            promoBarData.promoBarMessage = response.data.promo_bar_message;
-            return promoBarData;
-          }
-        );
+      return PromoBarServiceBackendApiService.makeRequest();
     } else {
       return Promise.resolve(promoBarData);
     }

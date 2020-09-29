@@ -20,36 +20,40 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { HttpClient } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from
+   '@angular/common/http/testing';
+import 'jasmine';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import 'core/templates/App';
+import { PromoBarService } from 'services/promo-bar.service.ts';
 
-require('App.ts');
-require('services/promo-bar.service.ts');
+describe('PromoBarService', () => {
+  var promoBarServiceInstance, httpTestingController;
 
-describe('Promo bar Service', function() {
-  var PromoBarService, $httpBackend;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    promoBarServiceInstance = TestBed.get(PromoBarService);
+  });
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    PromoBarService = $injector.get('PromoBarService');
-    $httpBackend = $injector.get('$httpBackend');
-  }));
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-  it('should return promo bar data', function() {
+  it('should return promo bar data', fakeAsync(() => {
+    PromoBarService.getPromoBarData().then((data) => {
+      expect(req.data.promoBarEnabled).toEqual(true);
+      expect(req.data.promoBarMessage).toEqual('test message');
+    });
     var requestUrl = '/promo_bar_handler';
-    $httpBackend.expect('GET', requestUrl).respond(200, {
+    var req =httpTestingController.expectOne('GET', requestUrl).respond(200, {
       promo_bar_enabled: true,
       promo_bar_message: 'test message'
-    });
-
-    PromoBarService.getPromoBarData().then(function(data) {
-      expect(data.promoBarEnabled).toBe(true);
-      expect(data.promoBarMessage).toBe('test message');
-    });
-    $httpBackend.flush();
+    }));
+    req.flush();
+    flushMicrotasks();
   });
 });
