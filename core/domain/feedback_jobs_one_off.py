@@ -116,12 +116,13 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJob(
 
     @staticmethod
     def map(item):
-        if not item.deleted:
-            exp_model = exp_models.ExplorationModel.get_by_id(
-                item.id)
-            if exp_model is None or exp_model.deleted:
-                yield ('Deleted Feedback Analytics Model', item.id)
-                item.delete()
+        if item.deleted:
+            return
+        exp_model = exp_models.ExplorationModel.get_by_id(
+            item.id)
+        if exp_model is None or exp_model.deleted:
+            yield ('Deleted Feedback Analytics Model', item.id)
+            item.delete()
 
     @staticmethod
     def reduce(key, values):
@@ -142,20 +143,21 @@ class CleanUpGeneralFeedbackThreadModelOneOffJob(
 
     @staticmethod
     def map(item):
-        if not item.deleted:
-            target_model = (
-                prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
-                    item.entity_type].get_by_id(item.entity_id))
-            if target_model is None or target_model.deleted:
-                yield ('Deleted GeneralFeedbackThreadModel', item.id)
-                item.delete()
-                return
+        if item.deleted:
+            return
+        target_model = (
+            prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
+                item.entity_type].get_by_id(item.entity_id))
+        if target_model is None or target_model.deleted:
+            yield ('Deleted GeneralFeedbackThreadModel', item.id)
+            item.delete()
+            return
 
-            if item.created_on > item.last_updated:
-                item.put()
-                yield (
-                    'Updated last_updated field for '
-                    'GeneralFeedbackThreadModel', item.id)
+        if item.created_on > item.last_updated:
+            item.put()
+            yield (
+                'Updated last_updated field for '
+                'GeneralFeedbackThreadModel', item.id)
 
     @staticmethod
     def reduce(key, values):
@@ -174,12 +176,13 @@ class CleanUpGeneralFeedbackMessageModelOneOffJob(
 
     @staticmethod
     def map(item):
-        if not item.deleted:
-            if item.created_on > item.last_updated:
-                item.put()
-                yield (
-                    'Updated last_updated field for '
-                    'GeneralFeedbackMessageModel', item.id)
+        if item.deleted:
+            return
+        if item.created_on > item.last_updated:
+            item.put()
+            yield (
+                'Updated last_updated field for '
+                'GeneralFeedbackMessageModel', item.id)
 
     @staticmethod
     def reduce(key, values):

@@ -413,6 +413,27 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
         model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
         self.assertFalse(model_instance is None)
 
+    def test_migration_job_skips_deleted_model(self):
+        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        model_instance.deleted = True
+        model_instance.put()
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+
+        job_id = (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
     def test_job_removes_analytics_model_for_deleted_explorations(self):
         model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
         self.assertFalse(model_instance is None)
@@ -480,6 +501,27 @@ class CleanUpGeneralFeedbackThreadModelOneOffJobTest(
             self.thread_id)
         self.assertEqual(model_instance.created_on, self.created_time)
         self.assertEqual(model_instance.last_updated, self.last_updated_time)
+
+    def test_migration_job_skips_deleted_model(self):
+        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id)
+        model_instance.deleted = True
+        model_instance.put()
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
 
     def test_job_removes_thread_model_for_deleted_explorations(self):
         model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -581,6 +623,27 @@ class CleanUpGeneralFeedbackMessageModelOneOffJobTest(
             '%s.0' % self.thread_id)
         self.assertEqual(model_instance.created_on, self.created_time)
         self.assertEqual(model_instance.last_updated, self.last_updated_time)
+
+    def test_migration_job_skips_deleted_model(self):
+        model_instance = feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            '%s.0' % self.thread_id)
+        model_instance.last_updated = (
+            model_instance.created_on - datetime.timedelta(days=1))
+        model_instance.deleted = True
+        model_instance.put(update_last_updated_time=False)
+
+        job_id = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
 
     def test_job_updates_last_updated_time_if_it_is_less_than_created_on_time(
             self):
