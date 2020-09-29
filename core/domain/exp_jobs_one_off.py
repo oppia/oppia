@@ -506,3 +506,45 @@ class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
+
+class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
+    """Job that regenerates missing commit log models for an exploration."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        rights_model = exp_models.ExplorationRightsModel.get_by_id(item.id)
+
+        for version in python_utils.RANGE(1, item.version + 1):
+            commit_log_model = (
+                exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                    'exploration-%s-%s' % (item.id, version)))
+            if commit_log_model is None:
+                metadata_model = (
+                    exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                        '%s-%s' % (item.id, version)))
+                commit_log_model = (
+                    exp_models.ExplorationCommitLogEntryModel.create(
+                        item.id, version, metadata_model.committer_id,
+                        metadata_model.commit_type,
+                        metadata_model.commit_message,
+                        metadata_model.commit_cmds,
+                        rights_model.status, rights_model.community_owned))
+                commit_log_model.exploration_id = item.id
+                commit_log_model.put()
+                yield ('Regenerated Exploration Commit Log Model', item.id)
+
+            if commit_log_model.deleted:
+                commit_log_model.deleted = False
+                commit_log_model.put()
+                yield (
+                    'Reverted deleted status for Exploration Commit '
+                    'Log Model', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

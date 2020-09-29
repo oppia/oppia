@@ -2310,3 +2310,114 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_summary_model.last_updated,
             migrated_summary_model.last_updated)
+
+
+class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+
+    def setUp(self):
+        super(RegenerateMissingExpCommitLogModelsTests, self).setUp()
+
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+        self.set_admins(['user'])
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.user_id, exp)
+
+    def test_standard_operation(self):
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_migration_job_regenerates_missing_commit_log_model(self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-1'))
+        actual_commit_log_details = [
+            commit_log_model.user_id, commit_log_model.commit_type,
+            commit_log_model.commit_message, commit_log_model.commit_cmds,
+            commit_log_model.version, commit_log_model.post_commit_status,
+            commit_log_model.post_commit_community_owned,
+            commit_log_model.post_commit_is_private,
+            commit_log_model.exploration_id
+        ]
+
+        commit_log_model.delete()
+
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        regenerated_commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-1'))
+        regenerated_commit_log_details = [
+            regenerated_commit_log_model.user_id,
+            regenerated_commit_log_model.commit_type,
+            regenerated_commit_log_model.commit_message,
+            regenerated_commit_log_model.commit_cmds,
+            regenerated_commit_log_model.version,
+            regenerated_commit_log_model.post_commit_status,
+            regenerated_commit_log_model.post_commit_community_owned,
+            regenerated_commit_log_model.post_commit_is_private,
+            regenerated_commit_log_model.exploration_id
+        ]
+        self.assertFalse(regenerated_commit_log_model.deleted)
+        self.assertEqual(
+            actual_commit_log_details, regenerated_commit_log_details)
+        self.assertEqual(
+            output, [
+                '[u\'Regenerated Exploration Commit Log Model\', [u\'0\']]'])
+
+    def test_migration_job_reverts_deleted_status_for_commit_log_model(
+            self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-1'))
+        commit_log_model.deleted = True
+        commit_log_model.put()
+
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-1'))
+        self.assertFalse(commit_log_model.deleted)
+        self.assertEqual(
+            output, [
+                '[u\'Reverted deleted status for Exploration '
+                'Commit Log Model\', [u\'0\']]'])
