@@ -35,6 +35,7 @@ import feconf
 
 datastore_services = models.Registry.import_datastore_services()
 
+
 class MockNumbersModel(datastore_services.Model):
     number = datastore_services.IntegerProperty()
 
