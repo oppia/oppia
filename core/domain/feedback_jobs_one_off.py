@@ -120,12 +120,12 @@ class CleanupFeedbackAnalyticsModelModelOneOffJob(
             exp_model = exp_models.ExplorationModel.get_by_id(
                 item.id)
             if exp_model is None or exp_model.deleted:
+                yield ('Deleted Feedback Analytics Model', item.id)
                 item.delete()
-                yield ('Deleted Feedback Analytics Model', 1)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        yield (key, values)
 
 
 class CleanupGeneralFeedbackThreadModelOneOffJob(
@@ -147,19 +147,19 @@ class CleanupGeneralFeedbackThreadModelOneOffJob(
                 prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
                     item.entity_type].get_by_id(item.entity_id))
             if target_model is None or target_model.deleted:
+                yield ('Deleted GeneralFeedbackThreadModel', item.id)
                 item.delete()
-                yield ('Deleted GeneralFeedbackThreadModel', 1)
                 return
 
             if item.created_on > item.last_updated:
                 item.put()
                 yield (
                     'Updated last_updated field for '
-                    'GeneralFeedbackThreadModel', 1)
+                    'GeneralFeedbackThreadModel', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        yield (key, values)
 
 
 class CleanupGeneralFeedbackMessageModelOneOffJob(
@@ -179,8 +179,8 @@ class CleanupGeneralFeedbackMessageModelOneOffJob(
                 item.put()
                 yield (
                     'Updated last_updated field for '
-                    'GeneralFeedbackMessageModel', 1)
+                    'GeneralFeedbackMessageModel', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        yield (key, values)

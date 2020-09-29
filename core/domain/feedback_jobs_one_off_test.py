@@ -430,7 +430,8 @@ class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
         output = (
             feedback_jobs_one_off
             .CleanupFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
-        self.assertEqual(output, ['[u\'Deleted Feedback Analytics Model\', 1]'])
+        self.assertEqual(
+            output, ['[u\'Deleted Feedback Analytics Model\', [u\'0\']]'])
 
         model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
         self.assertIsNone(model_instance)
@@ -499,7 +500,9 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
             feedback_jobs_one_off
             .CleanupGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
         self.assertEqual(
-            output, ['[u\'Deleted GeneralFeedbackThreadModel\', 1]'])
+            output, [
+                '[u\'Deleted GeneralFeedbackThreadModel\', [u\'%s\']]' % (
+                    self.thread_id)])
 
         model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
             self.thread_id)
@@ -528,7 +531,7 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
         self.assertEqual(
             output, [
                 '[u\'Updated last_updated field for '
-                'GeneralFeedbackThreadModel\', 1]'])
+                'GeneralFeedbackThreadModel\', [u\'%s\']]' % self.thread_id])
 
         model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
             self.thread_id)
@@ -602,7 +605,7 @@ class CleanupGeneralFeedbackMessageModelOneOffJobTest(
         self.assertEqual(
             output, [
                 '[u\'Updated last_updated field for '
-                'GeneralFeedbackMessageModel\', 1]'])
+                'GeneralFeedbackMessageModel\', [u\'%s.0\']]' % self.thread_id])
 
         model_instance = feedback_models.GeneralFeedbackMessageModel.get_by_id(
             '%s.0' % self.thread_id)
