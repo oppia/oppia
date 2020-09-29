@@ -592,51 +592,100 @@ class AuditSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that validates the commit logs of the SnapshotMetadataModels.
+    """Job that validates whether each SnapshotMetadata model has a
+    corresponding CommitLog model pair and the corresponding parent model.
     """
+
+    SnapshotMetadataModels = [
+        collection_models.CollectionSnapshotMetadataModel,
+        collection_models.CollectionRightsSnapshotMetadataModel,
+        exp_models.ExplorationSnapshotMetadataModel,
+        exp_models.ExplorationRightsSnapshotMetadataModel,
+        question_models.QuestionSnapshotMetadataModel,
+        skill_models.SkillSnapshotMetadataModel,
+        story_models.StorySnapshotMetadataModel,
+        topic_models.TopicSnapshotMetadataModel,
+        topic_models.SubtopicPageSnapshotMetadataModel,
+        topic_models.TopicRightsSnapshotMetadataModel
+    ]
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        # Considering all the models that has a SnapshotMetadata except
-        # config model because it does not have commit logs.
-        return [
-            collection_models.CollectionSnapshotMetadataModel,
-            collection_models.CollectionRightsSnapshotMetadataModel,
-            exp_models.ExplorationSnapshotMetadataModel,
-            exp_models.ExplorationRightsSnapshotMetadataModel,
-            question_models.QuestionSnapshotMetadataModel,
-            skill_models.SkillSnapshotMetadataModel,
-            story_models.StorySnapshotMetadataModel,
-            topic_models.TopicSnapshotMetadataModel,
-            topic_models.SubtopicPageSnapshotMetadataModel,
-            topic_models.TopicRightsSnapshotMetadataModel
-        ]
+        """Return a list of SnapshotMetadata models that is associated
+        with a CommitLogEntry model.
+        """
+        return ValidateSnapshotMetadataModelsJob.SnapshotMetadataModels
 
     @staticmethod
     def map(snapshot_model):
-
+        """Implements the map function for this job."""
         class_name = snapshot_model.__class__.__name__
-        missing_commit_log_msg = 'MISSING COMMIT LOGS-'
+        missing_commit_log_msg = 'MISSING COMMIT LOGS'
 
-        if isinstance(
-                snapshot_model,
-                topic_models.SubtopicPageSnapshotMetadataModel):
-            # The subtopic snapshot ID is in the format
-            # '<topicId>-<subtopicNum>-<version>'.
-            topic_id, subtopic_num, version = snapshot_model.id.split('-')
-            model_id = '%s-%s' % (topic_id, subtopic_num)
-        else:
-            model_id, version = snapshot_model.id.split('-')
+        # Note: The subtopic snapshot ID is in the format
+        # '<topicId>-<subtopicNum>-<version>'.
+        model_id, version = snapshot_model.id.rsplit('-', 1)
+        model_dict = [
+            {
+                'model': collection_models.CollectionSnapshotMetadataModel,
+                'parent_model': collection_models.CollectionModel,
+                'commit_log_model': (
+                    collection_models.CollectionCommitLogEntryModel),
+                'id_string_format': 'collection-%s-%s'
+            },
+            {
+                'model': exp_models.ExplorationSnapshotMetadataModel,
+                'parent_model': exp_models.ExplorationModel,
+                'commit_log_model': exp_models.ExplorationCommitLogEntryModel,
+                'id_string_format': 'exploration-%s-%s'
+            },
+            {
+                'model': question_models.QuestionSnapshotMetadataModel,
+                'parent_model': question_models.QuestionModel,
+                'commit_log_model': question_models.QuestionCommitLogEntryModel,
+                'id_string_format': 'question-%s-%s'
+            },
+            {
+                'model': skill_models.SkillSnapshotMetadataModel,
+                'parent_model': skill_models.SkillModel,
+                'commit_log_model': skill_models.SkillCommitLogEntryModel,
+                'id_string_format': 'skill-%s-%s'
+            },
+            {
+                'model': story_models.StorySnapshotMetadataModel,
+                'parent_model': story_models.StoryModel,
+                'commit_log_model': story_models.StoryCommitLogEntryModel,
+                'id_string_format': 'story-%s-%s'
+            },
+            {
+                'model': topic_models.TopicSnapshotMetadataModel,
+                'parent_model': topic_models.TopicModel,
+                'commit_log_model': topic_models.TopicCommitLogEntryModel,
+                'id_string_format': 'topic-%s-%s'
+            },
+            {
+                'model': topic_models.SubtopicPageSnapshotMetadataModel,
+                'parent_model': topic_models.SubtopicPageModel,
+                'commit_log_model': (
+                    topic_models.SubtopicPageCommitLogEntryModel),
+                'id_string_format': 'subtopicpage-%s-%s'
+            },
+            {
+                'model': topic_models.TopicRightsSnapshotMetadataModel,
+                'parent_model': topic_models.TopicRightsModel,
+                'commit_log_model': topic_models.TopicCommitLogEntryModel,
+                'id_string_format': 'rights-%s-%s'
+            },
+        ]
 
-        if isinstance(
-                snapshot_model,
-                collection_models.CollectionSnapshotMetadataModel):
-            commit_log_id = 'collection-%s-%s' % (model_id, version)
-            parent_model = (
-                collection_models.CollectionModel.get_by_id(model_id))
-            commit_log_model = (
-                collection_models.CollectionCommitLogEntryModel.get_by_id(
-                    commit_log_id))
+        for val in model_dict:
+            if isinstance(snapshot_model, val['model']):
+                commit_log_id = val['id_string_format'] % (model_id, version)
+                parent_model = val['parent_model'].get_by_id(model_id)
+                commit_log_model = val['commit_log_model'].get_by_id(
+                    commit_log_id)
+                break
+
         if isinstance(
                 snapshot_model,
                 collection_models.CollectionRightsSnapshotMetadataModel):
@@ -647,16 +696,7 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
                 collection_models.CollectionCommitLogEntryModel.get_by_id(
                     commit_log_id))
             if snapshot_model.commit_type in ['create', 'delete']:
-                missing_commit_log_msg = 'COMMIT LOGS SHOULD NOT EXISTS-'
-        if isinstance(
-                snapshot_model,
-                exp_models.ExplorationSnapshotMetadataModel):
-            commit_log_id = 'exploration-%s-%s' % (model_id, version)
-            parent_model = (
-                exp_models.ExplorationModel.get_by_id(model_id))
-            commit_log_model = (
-                exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                    commit_log_id))
+                missing_commit_log_msg = 'COMMIT LOGS SHOULD NOT EXIST'
         if isinstance(
                 snapshot_model,
                 exp_models.ExplorationRightsSnapshotMetadataModel):
@@ -667,71 +707,18 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_models.ExplorationCommitLogEntryModel.get_by_id(
                     commit_log_id))
             if snapshot_model.commit_type in ['create', 'delete']:
-                missing_commit_log_msg = 'COMMIT LOGS SHOULD NOT EXISTS-'
-        if isinstance(
-                snapshot_model,
-                question_models.QuestionSnapshotMetadataModel):
-            commit_log_id = 'question-%s-%s' % (model_id, version)
-            parent_model = (
-                question_models.QuestionModel.get_by_id(model_id))
-            commit_log_model = (
-                question_models.QuestionCommitLogEntryModel.get_by_id(
-                    commit_log_id))
-        if isinstance(
-                snapshot_model,
-                skill_models.SkillSnapshotMetadataModel):
-            commit_log_id = 'skill-%s-%s' % (model_id, version)
-            parent_model = (
-                skill_models.SkillModel.get_by_id(model_id))
-            commit_log_model = (
-                skill_models.SkillCommitLogEntryModel.get_by_id(
-                    commit_log_id))
-        if isinstance(
-                snapshot_model,
-                story_models.StorySnapshotMetadataModel):
-            commit_log_id = 'story-%s-%s' % (model_id, version)
-            parent_model = (
-                story_models.StoryModel.get_by_id(model_id))
-            commit_log_model = (
-                story_models.StoryCommitLogEntryModel.get_by_id(
-                    commit_log_id))
-        if isinstance(
-                snapshot_model,
-                topic_models.TopicSnapshotMetadataModel):
-            commit_log_id = 'topic-%s-%s' % (model_id, version)
-            parent_model = (
-                topic_models.TopicModel.get_by_id(model_id))
-            commit_log_model = (
-                topic_models.TopicCommitLogEntryModel.get_by_id(
-                    commit_log_id))
-        if isinstance(
-                snapshot_model,
-                topic_models.SubtopicPageSnapshotMetadataModel):
-            commit_log_id = 'subtopicpage-%s-%s' % (model_id, version)
-            parent_model = (
-                topic_models.SubtopicPageModel.get_by_id(model_id))
-            commit_log_model = (
-                topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
-                    commit_log_id))
-        if isinstance(
-                snapshot_model,
-                topic_models.TopicRightsSnapshotMetadataModel):
-            commit_log_id = 'rights-%s-%s' % (model_id, version)
-            parent_model = (
-                topic_models.TopicRightsModel.get_by_id(model_id))
-            commit_log_model = (
-                topic_models.TopicCommitLogEntryModel.get_by_id(
-                    commit_log_id))
+                missing_commit_log_msg = 'COMMIT LOGS SHOULD NOT EXIST'
+
         if commit_log_model is None:
             yield (
-                '%s%s' % (missing_commit_log_msg, class_name),
+                '%s - %s' % (missing_commit_log_msg, class_name),
                 snapshot_model.id)
         else:
-            yield ('FOUND COMMIT LOGS-%s' % class_name, snapshot_model.id)
+            yield ('FOUND COMMIT LOGS - %s' % class_name, snapshot_model.id)
         if parent_model is None:
-            yield ('MISSING PARENT MODEL-%s' % class_name, snapshot_model.id)
+            yield ('MISSING PARENT MODEL - %s' % class_name, snapshot_model.id)
         else:
-            yield ('FOUND PARENT MODEL-%s' % class_name, snapshot_model.id)
+            yield ('FOUND PARENT MODEL - %s' % class_name, snapshot_model.id)
 
     @staticmethod
     def reduce(key, values):

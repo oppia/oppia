@@ -2107,6 +2107,10 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             'different_field': 'test'
         }
     ]
+    EXCLUDED_CLASS_NAMES = [
+        'ConfigPropertySnapshotMetadataModel',
+        'PlatformParameterSnapshotMetadataModel'
+    ]
 
     def setUp(self):
         super(ValidateSnapshotMetadataModelsJobTests, self).setUp()
@@ -2118,8 +2122,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = (
-            activity_jobs_one_off.ValidateSnapshotMetadataModelsJob.create_new()) # pylint: disable=line-too-long
+        job_class = activity_jobs_one_off.ValidateSnapshotMetadataModelsJob
+        job_id = job_class.create_new()
         activity_jobs_one_off.ValidateSnapshotMetadataModelsJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -2129,9 +2133,22 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             activity_jobs_one_off.ValidateSnapshotMetadataModelsJob
             .get_output(job_id))
 
-        eval_output = [ast.literal_eval(stringified_item) for
-                       stringified_item in stringified_output]
+        eval_output = [
+            ast.literal_eval(stringified_item) for
+            stringified_item in stringified_output]
         return eval_output
+
+    def test_validate_snapshot_model_list(self):
+        job_class = activity_jobs_one_off.ValidateSnapshotMetadataModelsJob
+        actual_class_names = [
+            cls.__name__ for cls in job_class.SnapshotMetadataModels]
+        class_names = [
+            cls.__name__ for
+            cls in base_models.BaseSnapshotMetadataModel.__subclasses__()]
+        expected_class_names = [
+            i for i in class_names if i not in self.EXCLUDED_CLASS_NAMES]
+
+        self.assertItemsEqual(expected_class_names, actual_class_names)
 
     def test_correct_collection_models(self):
         rights_manager.create_new_collection_rights(
@@ -2152,11 +2169,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
 
         expected_output = [
-            ['FOUND PARENT MODEL-CollectionRightsSnapshotMetadataModel', 1],
-            ['FOUND COMMIT LOGS-CollectionSnapshotMetadataModel', 1],
-            ['FOUND PARENT MODEL-CollectionSnapshotMetadataModel', 1],
+            ['FOUND PARENT MODEL - CollectionRightsSnapshotMetadataModel', 1],
+            ['FOUND COMMIT LOGS - CollectionSnapshotMetadataModel', 1],
+            ['FOUND PARENT MODEL - CollectionSnapshotMetadataModel', 1],
             [
-                'COMMIT LOGS SHOULD NOT EXISTS-' +
+                'COMMIT LOGS SHOULD NOT EXIST - ' +
                 'CollectionRightsSnapshotMetadataModel',
                 1
             ]
@@ -2182,13 +2199,13 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'COMMIT LOGS SHOULD NOT EXISTS-' +
+                'COMMIT LOGS SHOULD NOT EXIST - ' +
                 'ExplorationRightsSnapshotMetadataModel',
                 1
             ],
-            ['FOUND COMMIT LOGS-ExplorationSnapshotMetadataModel', 1],
-            ['FOUND PARENT MODEL-ExplorationSnapshotMetadataModel', 1],
-            ['FOUND PARENT MODEL-ExplorationRightsSnapshotMetadataModel', 1]
+            ['FOUND COMMIT LOGS - ExplorationSnapshotMetadataModel', 1],
+            ['FOUND PARENT MODEL - ExplorationSnapshotMetadataModel', 1],
+            ['FOUND PARENT MODEL - ExplorationRightsSnapshotMetadataModel', 1]
         ]
 
         self.assertItemsEqual(expected_output, actual_output)
@@ -2209,8 +2226,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
 
         expected_output = [
-            ['FOUND PARENT MODEL-QuestionSnapshotMetadataModel', 1],
-            ['FOUND COMMIT LOGS-QuestionSnapshotMetadataModel', 1]
+            ['FOUND PARENT MODEL - QuestionSnapshotMetadataModel', 1],
+            ['FOUND COMMIT LOGS - QuestionSnapshotMetadataModel', 1]
         ]
 
         self.assertItemsEqual(expected_output, actual_output)
@@ -2234,8 +2251,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
 
         expected_output = [
-            ['FOUND PARENT MODEL-SkillSnapshotMetadataModel', 1],
-            ['FOUND COMMIT LOGS-SkillSnapshotMetadataModel', 1]
+            ['FOUND PARENT MODEL - SkillSnapshotMetadataModel', 1],
+            ['FOUND COMMIT LOGS - SkillSnapshotMetadataModel', 1]
         ]
 
         self.assertItemsEqual(expected_output, actual_output)
@@ -2255,8 +2272,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         actual_output = self._run_one_off_job()
         expected_output = [
-            ['FOUND PARENT MODEL-StorySnapshotMetadataModel', 1],
-            ['FOUND COMMIT LOGS-StorySnapshotMetadataModel', 1]
+            ['FOUND PARENT MODEL - StorySnapshotMetadataModel', 1],
+            ['FOUND COMMIT LOGS - StorySnapshotMetadataModel', 1]
         ]
 
         self.assertItemsEqual(expected_output, actual_output)
@@ -2287,10 +2304,10 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
 
         expected_output = [
-            ['FOUND PARENT MODEL-TopicRightsSnapshotMetadataModel', 1],
-            ['FOUND COMMIT LOGS-TopicSnapshotMetadataModel', 1],
-            ['FOUND PARENT MODEL-TopicSnapshotMetadataModel', 1],
-            ['FOUND COMMIT LOGS-TopicRightsSnapshotMetadataModel', 1]
+            ['FOUND PARENT MODEL - TopicRightsSnapshotMetadataModel', 1],
+            ['FOUND COMMIT LOGS - TopicSnapshotMetadataModel', 1],
+            ['FOUND PARENT MODEL - TopicSnapshotMetadataModel', 1],
+            ['FOUND COMMIT LOGS - TopicRightsSnapshotMetadataModel', 1]
         ]
 
         self.assertItemsEqual(expected_output, actual_output)
@@ -2309,8 +2326,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
 
         expected_output = [
-            ['FOUND COMMIT LOGS-SubtopicPageSnapshotMetadataModel', 1],
-            ['FOUND PARENT MODEL-SubtopicPageSnapshotMetadataModel', 1]
+            ['FOUND COMMIT LOGS - SubtopicPageSnapshotMetadataModel', 1],
+            ['FOUND PARENT MODEL - SubtopicPageSnapshotMetadataModel', 1]
         ]
 
         self.assertItemsEqual(expected_output, actual_output)
@@ -2326,11 +2343,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL-CollectionSnapshotMetadataModel',
+                'MISSING PARENT MODEL - CollectionSnapshotMetadataModel',
                 ['collection_id0-1']
             ],
             [
-                'MISSING COMMIT LOGS-CollectionSnapshotMetadataModel',
+                'MISSING COMMIT LOGS - CollectionSnapshotMetadataModel',
                 ['collection_id0-1']
             ]
         ]
@@ -2348,11 +2365,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL-ExplorationRightsSnapshotMetadataModel',
+                'MISSING PARENT MODEL - ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ],
             [
-                'MISSING COMMIT LOGS-ExplorationRightsSnapshotMetadataModel',
+                'MISSING COMMIT LOGS - ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ]
         ]
@@ -2370,11 +2387,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL-QuestionSnapshotMetadataModel',
+                'MISSING PARENT MODEL - QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ],
             [
-                'MISSING COMMIT LOGS-QuestionSnapshotMetadataModel',
+                'MISSING COMMIT LOGS - QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ]
         ]
@@ -2392,11 +2409,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL-SkillSnapshotMetadataModel',
+                'MISSING PARENT MODEL - SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ],
             [
-                'MISSING COMMIT LOGS-SkillSnapshotMetadataModel',
+                'MISSING COMMIT LOGS - SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ]
         ]
@@ -2414,11 +2431,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL-StorySnapshotMetadataModel',
+                'MISSING PARENT MODEL - StorySnapshotMetadataModel',
                 ['story_id0-1']
             ],
             [
-                'MISSING COMMIT LOGS-StorySnapshotMetadataModel',
+                'MISSING COMMIT LOGS - StorySnapshotMetadataModel',
                 ['story_id0-1']
             ]
         ]
@@ -2436,11 +2453,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL-TopicSnapshotMetadataModel',
+                'MISSING PARENT MODEL - TopicSnapshotMetadataModel',
                 ['topic_id0-1']
             ],
             [
-                'MISSING COMMIT LOGS-TopicSnapshotMetadataModel',
+                'MISSING COMMIT LOGS - TopicSnapshotMetadataModel',
                 ['topic_id0-1']
             ]
         ]
@@ -2458,11 +2475,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL-SubtopicPageSnapshotMetadataModel',
+                'MISSING PARENT MODEL - SubtopicPageSnapshotMetadataModel',
                 ['topic_id0-1-1']
             ],
             [
-                'MISSING COMMIT LOGS-SubtopicPageSnapshotMetadataModel',
+                'MISSING COMMIT LOGS - SubtopicPageSnapshotMetadataModel',
                 ['topic_id0-1-1']
             ]
         ]
@@ -2480,11 +2497,11 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL-TopicRightsSnapshotMetadataModel',
+                'MISSING PARENT MODEL - TopicRightsSnapshotMetadataModel',
                 ['topic_rights_id0-1']
             ],
             [
-                'MISSING COMMIT LOGS-TopicRightsSnapshotMetadataModel',
+                'MISSING COMMIT LOGS - TopicRightsSnapshotMetadataModel',
                 ['topic_rights_id0-1']
             ]
         ]
