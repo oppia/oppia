@@ -36,6 +36,7 @@
     <angular-html-bind ng-if="data.oppiaResponse !== null"
                        html-data="data.oppiaResponse"
                        class="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                       ng-style="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
                        ng-class="getFeedbackAudioHighlightClass()">
     </angular-html-bind>
   </div>
