@@ -88,14 +88,14 @@ export class DragAndDropSortInputRulesService {
 
   HasElementXAtPositionY(
       answer: DragAndDropAnswer,
-      inputs: DragAndDropHasElementXAtPositionYRuleInputs
-  ): boolean | undefined {
+      inputs: DragAndDropHasElementXAtPositionYRuleInputs): boolean {
     for (var i:number = 0; i < answer.length; i++) {
       var index = answer[i].indexOf(inputs.x);
       if (index !== -1) {
         return ((i + 1) === inputs.y);
       }
     }
+    return false;
   }
 
   HasElementXBeforeElementY(
