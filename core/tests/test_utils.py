@@ -350,53 +350,6 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
         return number_of_deleted_keys
 
 
-class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
-    """Mock for google.appengine.api.urlfetch."""
-
-    def __init__(self, service_name='urlfetch'):
-        super(URLFetchServiceMock, self).__init__(service_name)
-        self.return_values = {}
-        self.response = None
-        self.request = None
-
-    def set_return_values(self, content='', status_code=200, headers=None):
-        """Set the content, status_code and headers to return in subsequent
-        calls to the urlfetch mock.
-
-        Args:
-            content: str. The content to return in subsequent calls to the
-                urlfetch mock.
-            status_code: int. The status_code to return in subsequent calls to
-                the urlfetch mock.
-            headers: dict. The headers to return in subsequent calls to the
-                urlfetch mock. The keys of this dict are strings that represent
-                the header name and each value represents the corresponding
-                value of that header.
-        """
-        self.return_values['content'] = content
-        self.return_values['status_code'] = status_code
-        self.return_values['headers'] = headers
-
-    def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
-        """Simulates urlfetch mock by setting request & response object.
-
-        Args:
-            request: dict. Request object for the URLMock.
-            response: dict. Response object for the URLMock.
-        """
-        return_values = self.return_values
-        response.set_content(return_values.get('content', ''))
-        response.set_statuscode(return_values.get('status_code', 200))
-        for header_key, header_value in return_values.get(
-                'headers', {}).items():
-            new_header = response.add_header()
-            new_header.set_key(header_key)
-            new_header.set_value(header_value)
-
-        self.request = request
-        self.response = response
-
-
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
@@ -1195,26 +1148,20 @@ tags: []
             username: str. Username of the given user.
         """
         self.login(email)
-        # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
-        # of the stub provided by testbed. This custom mock is disabled
-        # immediately once the signup is complete. This is done to avoid
-        # external calls being made to Gravatar when running the backend
-        # tests.
         gae_id = self.get_gae_id_from_email(email)
         user_services.create_new_user(gae_id, email)
-        with self.urlfetch_mock():
-            response = self.get_html_response(feconf.SIGNUP_URL)
-            self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_new_csrf_token()
-            response = self.testapp.post(
-                feconf.SIGNUP_DATA_URL, params={
-                    'csrf_token': csrf_token,
-                    'payload': json.dumps({
-                        'username': username,
-                        'agreed_to_terms': True
-                    })
+        response = self.get_html_response(feconf.SIGNUP_URL)
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_new_csrf_token()
+        response = self.testapp.post(
+            feconf.SIGNUP_DATA_URL, params={
+                'csrf_token': csrf_token,
+                'payload': json.dumps({
+                    'username': username,
+                    'agreed_to_terms': True
                 })
-            self.assertEqual(response.status_int, 200)
+            })
+        self.assertEqual(response.status_int, 200)
         self.logout()
 
     def set_config_property(self, config_obj, new_config_value):
@@ -2486,7 +2433,6 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_blobstore_stub()
-        self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
         self.testbed.init_search_stub()
 
@@ -2549,44 +2495,6 @@ class AppEngineTestBase(TestBase):
             list(str). All the queue names.
         """
         return [q['name'] for q in self.mapreduce_taskqueue_stub.GetQueues()]
-
-    @contextlib.contextmanager
-    def urlfetch_mock(
-            self, content='', status_code=200, headers=None):
-        """Enables the custom urlfetch mock (URLFetchServiceMock) within the
-        context of a 'with' statement.
-
-        This mock is currently used for signup to prevent external HTTP
-        requests to fetch the Gravatar profile picture for new users while the
-        backend tests are being run.
-
-        Args:
-            content: str. Response content or body.
-            status_code: int. Response status code.
-            headers: dict. The headers in subsequent calls to the
-                urlfetch mock. The keys of this dict are strings that represent
-                the header name and the value represents corresponding value of
-                that header.
-
-        Yields:
-            None. Yields nothing.
-        """
-        if headers is None:
-            response_headers = {}
-        else:
-            response_headers = headers
-        self.testbed.init_urlfetch_stub(enable=False)
-        urlfetch_mock = URLFetchServiceMock()
-        apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', urlfetch_mock)
-        urlfetch_mock.set_return_values(
-            content=content, status_code=status_code, headers=response_headers)
-        try:
-            yield
-        finally:
-            # Disables the custom mock.
-            self.testbed.init_urlfetch_stub(enable=False)
-            # Enables the testbed urlfetch mock.
-            self.testbed.init_urlfetch_stub()
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name

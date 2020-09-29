@@ -383,7 +383,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             profile_picture = user_services.fetch_gravatar(user_email)
             gravatar_data_url = utils.convert_png_to_data_url(
                 expected_gravatar_filepath)
-            self.maxDiff = None
             self.assertEqual(profile_picture, gravatar_data_url)
 
     def test_fetch_gravatar_failure_404(self):
