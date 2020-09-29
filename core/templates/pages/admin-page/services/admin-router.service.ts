@@ -34,8 +34,8 @@ export class AdminRouterService {
    * Iterates through the ADMIN_TAB_URLS map and returns the
    * tab name corresponding to the hash.
    * @param {string} tabHash Represents hash name of a tab URL.
-   * @returns {string|null} Tab name of the hash value.
-   * If no match then null.
+   * @returns {string|null} Tab name corresponding to the given the hash value 
+   *     if found else null.
    */
   getTabNameByHash(tabHash: string): string | null {
     for (const [tabName, tabUrl] of Object.entries(
