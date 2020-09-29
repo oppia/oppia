@@ -1659,10 +1659,10 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
             migrated_setting_model.last_updated)
 
 
-class CleanupUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
+class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(CleanupUserSubscribersModelOneOffJobTests, self).setUp()
+        super(CleanUpUserSubscribersModelOneOffJobTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup('user@email', 'user')
@@ -1677,12 +1677,12 @@ class CleanupUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
 
     def test_standard_operation(self):
         job_id = (
-            user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.create_new())
-        user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.enqueue(job_id)
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.get_output(
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.get_output(
                 job_id))
         self.assertEqual(output, [])
 
@@ -1690,24 +1690,27 @@ class CleanupUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
         self.model_instance.subscriber_ids.append(self.owner_id)
         self.model_instance.put()
         job_id = (
-            user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.create_new())
-        user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.enqueue(job_id)
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.get_output(
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.get_output(
                 job_id))
-        self.assertEqual(output, ['[u\'Cleaned up User Subscribers\', 1]'])
+        self.assertEqual(
+            output, [
+                '[u\'Removed user from their own subscribers list\', '
+                '[u\'%s\']]' % self.owner_id])
         self.model_instance = user_models.UserSubscribersModel.get_by_id(
             self.owner_id)
         self.assertTrue(self.user_id in self.model_instance.subscriber_ids)
         self.assertTrue(self.owner_id not in self.model_instance.subscriber_ids)
 
 
-class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
+class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(CleanupCollectionProgressModelOneOffJobTests, self).setUp()
+        super(CleanUpCollectionProgressModelOneOffJobTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -1750,14 +1753,14 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         job_id = (
             user_jobs_one_off
-            .CleanupCollectionProgressModelOneOffJob.create_new())
-        user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off
-            .CleanupCollectionProgressModelOneOffJob.get_output(job_id))
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
         self.assertEqual(output, [])
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
@@ -1777,18 +1780,20 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
 
         job_id = (
             user_jobs_one_off
-            .CleanupCollectionProgressModelOneOffJob.create_new())
-        user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off
-            .CleanupCollectionProgressModelOneOffJob.get_output(job_id))
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
         self.assertEqual(
             output, [
-                '[u\'Invalid Exploartion IDs cleaned from '
-                'CollectionProgressModel\', 1]'])
+                '[u\'Invalid Exploration IDs cleaned from '
+                'CollectionProgressModel\', [u"Model id: '
+                '%s.col, Collection id: col, Removed exploration ids: '
+                '[u\'3\']"]]' % self.user_id])
         self.model_instance = user_models.CollectionProgressModel.get_by_id(
             '%s.col' % self.user_id)
         self.assertEqual(
@@ -1814,17 +1819,18 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
 
         job_id = (
             user_jobs_one_off
-            .CleanupCollectionProgressModelOneOffJob.create_new())
-        user_jobs_one_off.CleanupCollectionProgressModelOneOffJob.enqueue(
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             user_jobs_one_off
-            .CleanupCollectionProgressModelOneOffJob.get_output(job_id))
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
         self.assertEqual(
             output, [
-                '[u\'Regenerated Missing CompletedActivitiesModel\', 1]'])
+                '[u\'Regenerated Missing CompletedActivitiesModel\', '
+                '[u\'%s.col\']]' % self.user_id])
 
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
@@ -1834,11 +1840,46 @@ class CleanupCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1'])
 
+    def test_job_reverts_delete_status_for_completed_activities_model(self):
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])
+        completed_activities_model.deleted = True
+        completed_activities_model.put()
 
-class CleanupUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Reverted delete status for CompletedActivitiesModel\', '
+                '[u\'%s.col\']]' % self.user_id])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertFalse(completed_activities_model.deleted)
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1'])
+
+
+class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(CleanupUserContributionsModelOneOffJobTests, self).setUp()
+        super(CleanUpUserContributionsModelOneOffJobTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup('user@email', 'user')
@@ -1867,12 +1908,12 @@ class CleanupUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         job_id = (
             user_jobs_one_off
-            .CleanupUserContributionsModelOneOffJob.create_new())
-        user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
+            .CleanUpUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
+            user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.get_output(
                 job_id))
         self.assertEqual(output, [])
 
@@ -1904,16 +1945,18 @@ class CleanupUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
 
         job_id = (
             user_jobs_one_off
-            .CleanupUserContributionsModelOneOffJob.create_new())
-        user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
+            .CleanUpUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
+            user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.get_output(
                 job_id))
         self.assertEqual(
-            output,
-            ['[u\'Successfully cleaned up UserContributionsModel\', 1]'])
+            output, [
+                '[u\'Removed deleted exp ids UserContributionsModel\', '
+                '[u"Model id: %s, Removed exploration ids: [u\'exp0\', '
+                'u\'exp0\']"]]' % self.user_id])
 
         model_instance_1 = user_models.UserContributionsModel.get_by_id(
             self.user_id)
@@ -1942,16 +1985,23 @@ class CleanupUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
 
         job_id = (
             user_jobs_one_off
-            .CleanupUserContributionsModelOneOffJob.create_new())
-        user_jobs_one_off.CleanupUserContributionsModelOneOffJob.enqueue(job_id)
+            .CleanUpUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            user_jobs_one_off.CleanupUserContributionsModelOneOffJob.get_output(
+            user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.get_output(
                 job_id))
+        removed_exp_list = [
+            'Model id: %s, Removed exploration ids: '
+            '[u\'exp1\', u\'exp1\']' % self.owner_id,
+            'Model id: %s, Removed exploration ids: '
+            '[u\'exp1\']' % self.user_id]
+        removed_exp_list.sort()
         self.assertEqual(
-            output,
-            ['[u\'Successfully cleaned up UserContributionsModel\', 2]'])
+            output, [
+                '[u\'Removed deleted exp ids UserContributionsModel\', '
+                '[u"%s", u"%s"]]' % (removed_exp_list[0], removed_exp_list[1])])
 
         model_instance_1 = user_models.UserContributionsModel.get_by_id(
             self.user_id)

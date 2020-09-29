@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import copy
 
 from core import jobs
 from core.domain import exp_fetchers
@@ -472,7 +473,7 @@ class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
-class CleanupUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that cleans up UserSubscribersModel by removing user id if it is
     present in subscriber ids.
     """
@@ -486,14 +487,15 @@ class CleanupUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if not item.deleted and item.id in item.subscriber_ids:
             item.subscriber_ids.remove(item.id)
             item.put()
-            yield ('Cleaned up User Subscribers', 1)
+            yield ('Removed user from their own subscribers list', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        values.sort()
+        yield (key, values)
 
 
-class CleanupCollectionProgressModelOneOffJob(
+class CleanUpCollectionProgressModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that cleans up CollectionProgressModel by:
     1. Removing exploration ids which are not a part of the collection.
@@ -508,6 +510,24 @@ class CleanupCollectionProgressModelOneOffJob(
     @staticmethod
     def map(item):
         if not item.deleted:
+            completed_activities_model = (
+                user_models.CompletedActivitiesModel.get_by_id(item.user_id))
+
+            if completed_activities_model is None:
+                completed_activities_model = (
+                    user_models.CompletedActivitiesModel(id=item.user_id))
+                completed_activities_model.exploration_ids = (
+                    item.completed_explorations)
+                completed_activities_model.put()
+                yield ('Regenerated Missing CompletedActivitiesModel', item.id)
+
+            if completed_activities_model.deleted:
+                completed_activities_model.deleted = False
+                completed_activities_model.put()
+                yield (
+                    'Reverted delete status for CompletedActivitiesModel',
+                    item.id)
+
             col_model = collection_models.CollectionModel.get_by_id(
                 item.collection_id)
 
@@ -525,26 +545,19 @@ class CleanupCollectionProgressModelOneOffJob(
                     if exp_id not in exp_ids_to_remove]
                 item.put()
                 yield (
-                    'Invalid Exploartion IDs cleaned from '
-                    'CollectionProgressModel', 1)
-
-            completed_activities_model = (
-                user_models.CompletedActivitiesModel.get_by_id(item.user_id))
-            if completed_activities_model is None or (
-                    completed_activities_model.deleted):
-                completed_activities_model = (
-                    user_models.CompletedActivitiesModel(id=item.user_id))
-                completed_activities_model.exploration_ids = (
-                    item.completed_explorations)
-                completed_activities_model.put()
-                yield ('Regenerated Missing CompletedActivitiesModel', 1)
+                    'Invalid Exploration IDs cleaned from '
+                    'CollectionProgressModel',
+                    'Model id: %s, Collection id: %s, Removed exploration '
+                    'ids: %s' % (
+                        item.id, item.collection_id, exp_ids_to_remove))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        values.sort()
+        yield (key, values)
 
 
-class CleanupUserContributionsModelOneOffJob(
+class CleanUpUserContributionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that cleans up UserContributionsModel by removing deleted
     explorations from user contribution.
@@ -563,7 +576,7 @@ class CleanupUserContributionsModelOneOffJob(
 
             exp_ids_removed = []
             for exp_id, exp_instance in list(python_utils.ZIP(
-                    item.created_exploration_ids,
+                    copy.deepcopy(item.created_exploration_ids),
                     fetched_created_exploration_model_instances)):
                 if exp_instance is None or exp_instance.deleted:
                     exp_ids_removed.append(exp_id)
@@ -574,7 +587,7 @@ class CleanupUserContributionsModelOneOffJob(
                     [('ExplorationModel', item.edited_exploration_ids)]))[0]
 
             for exp_id, exp_instance in list(python_utils.ZIP(
-                    item.edited_exploration_ids,
+                    copy.deepcopy(item.edited_exploration_ids),
                     fetched_edited_exploration_model_instances)):
                 if exp_instance is None or exp_instance.deleted:
                     exp_ids_removed.append(exp_id)
@@ -582,8 +595,12 @@ class CleanupUserContributionsModelOneOffJob(
 
             if exp_ids_removed:
                 item.put()
-                yield ('Successfully cleaned up UserContributionsModel', 1)
+                yield (
+                    'Removed deleted exp ids UserContributionsModel',
+                    'Model id: %s, Removed exploration ids: %s' % (
+                        item.id, exp_ids_removed))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        values.sort()
+        yield (key, values)

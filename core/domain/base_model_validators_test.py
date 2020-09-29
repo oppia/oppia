@@ -110,7 +110,8 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         self.item = MockModel(id='mockmodel')
         self.item.put()
 
-        self.sys_item = MockModel(id=base_model_validators.MODEL_IDS_TO_SKIP[0])
+        self.sys_item = MockModel(
+            id=base_model_validators.IDS_FOR_OPPIA_BOTS[0])
         self.sys_item.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):

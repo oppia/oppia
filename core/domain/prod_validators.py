@@ -3543,6 +3543,9 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
+        # Note that some users have an associated UserContributionsModel.
+        # However, this only applies for users who have made contributions,
+        # and not for all users, so we don't check for it here.
         return []
 
     @classmethod
