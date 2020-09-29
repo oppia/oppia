@@ -53,6 +53,9 @@ export class NumericExpressionInputValidationService {
       new NumericExpressionInputRulesService());
 
     warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
