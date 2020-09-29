@@ -38,7 +38,8 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.api import urlfetch
+import requests
+import requests_mock
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -375,35 +376,32 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
+        expected_gravatar_url = user_services.get_gravatar_url(user_email)
         with python_utils.open_file(
             expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
-        with self.urlfetch_mock(content=gravatar):
+        with requests_mock.Mocker() as m:
+            m.get(expected_gravatar_url, content=gravatar)
             profile_picture = user_services.fetch_gravatar(user_email)
             gravatar_data_url = utils.convert_png_to_data_url(
                 expected_gravatar_filepath)
+            self.maxDiff = None
             self.assertEqual(profile_picture, gravatar_data_url)
 
     def test_fetch_gravatar_failure_404(self):
         user_email = 'user@example.com'
 
         error_messages = []
-        def mock_log_function(message):
-            error_messages.append(message)
+        mock_log_function = lambda message: error_messages.append(message)
 
         gravatar_url = user_services.get_gravatar_url(user_email)
         expected_error_message = (
             '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
-        logging_error_mock = test_utils.CallCounter(mock_log_function)
-        urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
-        urlfetch_mock_ctx = self.urlfetch_mock(status_code=404)
-        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
-        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_counter)
-        with urlfetch_mock_ctx, log_swap_ctx, fetch_swap_ctx:
+        mocked_logging_ctx = self.swap(logging, 'error', mock_log_function)
+        with mocked_logging_ctx, requests_mock.Mocker() as m:
+            m.get(gravatar_url, status_code=404)
             profile_picture = user_services.fetch_gravatar(user_email)
-            self.assertEqual(urlfetch_counter.times_called, 1)
-            self.assertEqual(logging_error_mock.times_called, 1)
-            self.assertEqual(expected_error_message, error_messages[0])
+            self.assertEqual(error_messages, [expected_error_message])
             self.assertEqual(
                 profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
 
@@ -411,22 +409,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
 
         error_messages = []
-        def mock_log_function(message):
-            error_messages.append(message)
+        mock_log_function = lambda message: error_messages.append(message)
 
         gravatar_url = user_services.get_gravatar_url(user_email)
         expected_error_message = (
             'Failed to fetch Gravatar from %s' % gravatar_url)
-        logging_error_mock = test_utils.CallCounter(mock_log_function)
-        urlfetch_fail_mock = test_utils.FailingFunction(
-            urlfetch.fetch, urlfetch.InvalidURLError,
-            test_utils.FailingFunction.INFINITY)
-        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
-        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_fail_mock)
-        with log_swap_ctx, fetch_swap_ctx:
+        mocked_logging_ctx = self.swap(logging, 'exception', mock_log_function)
+        with mocked_logging_ctx, requests_mock.Mocker() as m:
+            m.get(gravatar_url, exc=Exception)
             profile_picture = user_services.fetch_gravatar(user_email)
-            self.assertEqual(logging_error_mock.times_called, 1)
-            self.assertEqual(expected_error_message, error_messages[0])
+            self.assertEqual(error_messages, [expected_error_message])
             self.assertEqual(
                 profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
 
