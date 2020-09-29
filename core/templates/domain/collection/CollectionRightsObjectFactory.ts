@@ -109,7 +109,7 @@ export class CollectionRights {
   // Note that the collection nodes within this collection will be completely
   // redefined as copies from the specified collection rights.
   static copyFromCollectionRights(
-      therCollectionRights: CollectionRights): CollectionRights {
+      otherCollectionRights: CollectionRights): CollectionRights {
     return new CollectionRights({
       collection_id: otherCollectionRights.getCollectionId(),
       can_edit: otherCollectionRights.canEdit(),
