@@ -28,7 +28,7 @@ require('services/alerts.service.ts');
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
-
+import { CollectionRights } from 'domain/collection/CollectionRightsObjectFactory';
 angular.module('oppia').factory('CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
@@ -38,8 +38,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
       CollectionRightsBackendApiService, CollectionRightsObjectFactory,
       EditableCollectionBackendApiService, UndoRedoService) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
-    var _collectionRights = (
-      CollectionRightsObjectFactory.createEmptyCollectionRights());
+    var _collectionRights;
     var _collectionIsInitialized = false;
     var _collectionIsLoading = false;
     var _collectionIsBeingSaved = false;
@@ -58,7 +57,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
       _setCollection(newCollectionObject);
     };
     var _setCollectionRights = function(collectionRights) {
-      _collectionRights.copyFromCollectionRights(collectionRights);
+      _collectionRights = CollectionRights.copyFromCollectionRights(collectionRights)
     };
 
     return {
