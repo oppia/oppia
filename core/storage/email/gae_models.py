@@ -423,7 +423,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod

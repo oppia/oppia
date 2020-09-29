@@ -599,7 +599,7 @@ def _pseudonymize_config_models(pending_deletion_request):
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_id
 
-        ndb.put_multi(metadata_models)
+        datastore_services.put_multi(metadata_models)
 
     config_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -923,7 +923,7 @@ def _remove_user_id_from_contributors_in_summary_models(
             ]
             del summary_model.contributors_summary[user_id]
 
-        ndb.put_multi(summary_models)
+        datastore_services.put_multi(summary_models)
 
     for i in python_utils.RANGE(
             0, len(related_summary_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
