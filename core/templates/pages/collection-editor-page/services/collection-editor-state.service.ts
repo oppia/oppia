@@ -34,7 +34,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
   'EditableCollectionBackendApiService', 'UndoRedoService',
   function(
       $rootScope, AlertsService, CollectionObjectFactory,
-      CollectionRightsBackendApiService, 
+      CollectionRightsBackendApiService,
       EditableCollectionBackendApiService, UndoRedoService) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionRights;
