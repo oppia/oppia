@@ -1961,7 +1961,6 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
-    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
