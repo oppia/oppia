@@ -24,7 +24,6 @@ import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
-import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
 
 require(
   'interactions/NumericExpressionInput/directives/' +
@@ -35,7 +34,7 @@ require(
   'interactions/NumericExpressionInput/directives/' +
   'oppia-interactive-numeric-expression-input.component.ts');
 
-fdescribe('NumericExpressionInputInteractive', function() {
+describe('NumericExpressionInputInteractive', function() {
   let ctrl = null, $window = null;
   let mockCurrentInteractionService = {
     onSubmit: function(answer, rulesService) {},
