@@ -2939,13 +2939,10 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        print('INSIDE EXP DOMAIN')
         for state_dict in states_dict.values():
-            print('interaction id:', state_dict['interaction']['id'])
             if state_dict['interaction']['id'] == 'NumericExpressionInput':
                 customization_args = state_dict[
                     'interaction']['customization_args']
-                print('before: ', customization_args)
                 customization_args.update({
                     'placeholder': {
                         'value': {
@@ -2955,7 +2952,6 @@ class Exploration(python_utils.OBJECT):
                         }
                     }
                 })
-                print('after: ', customization_args)
 
         return states_dict
 
