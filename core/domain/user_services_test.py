@@ -36,9 +36,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
-
 import requests_mock
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -375,12 +374,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        expected_gravatar_url = user_services.get_gravatar_url(user_email)
+        gravatar_url = user_services.get_gravatar_url(user_email)
         with python_utils.open_file(
             expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
         with requests_mock.Mocker() as m:
-            m.get(expected_gravatar_url, content=gravatar)
+            m.get(gravatar_url, content=gravatar)
             profile_picture = user_services.fetch_gravatar(user_email)
             gravatar_data_url = utils.convert_png_to_data_url(
                 expected_gravatar_filepath)
