@@ -143,6 +143,9 @@ class CleanUpExplorationRecommendationsOneOffJob(
 
     @staticmethod
     def map(item):
+        if item.deleted:
+            return
+
         exp_model = exp_models.ExplorationModel.get_by_id(item.id)
         if exp_model is None or exp_model.deleted:
             yield ('Removed recommendation model', item.id)

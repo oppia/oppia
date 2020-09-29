@@ -247,6 +247,28 @@ class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
         self.assertEqual(
             recommendation_model.recommended_exploration_ids, ['1', '2'])
 
+    def test_migration_job_skips_deleted_model(self):
+        recommendation_model = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '0'))
+        recommendation_model.deleted = True
+        recommendation_model.put()
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.create_new())
+        (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
     def test_job_deletes_model_if_exp_model_is_deleted(self):
         recommendation_model = (
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
