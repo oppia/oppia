@@ -162,10 +162,10 @@ describe('Collection rights object factory', () => {
 
     var emptyCollectionRightsBackendObject =
      CollectionRights.copyFromCollectionRights(sampleCollectionRights);
-      expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
-      expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
-      expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
-      expect(emptyCollectionRightsBackendObject.isPrivate()).toBe(false);
-      expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual(['A']);
+    expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
+    expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
+    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
+    expect(emptyCollectionRightsBackendObject.isPrivate()).toBe(false);
+    expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual(['A']);
   });
 });
