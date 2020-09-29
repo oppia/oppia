@@ -42,7 +42,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/alerts.service.ts');
-require('services/context.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -72,17 +72,15 @@ angular.module('oppia').directive('answerGroupEditor', [
         'answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'INTERACTION_SPECS',
-        'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ExternalSaveService', 'ResponsesService',
+        'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
-        'ResponsesService',
+        'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, INTERACTION_SPECS,
-            StateEditorService, RuleObjectFactory,
+            AlertsService, ExternalSaveService, ResponsesService,
+            RuleObjectFactory, StateEditorService, StateInteractionIdService,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
-            ResponsesService) {
+            INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
 
@@ -133,6 +131,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   getDefaultInputValue('Real')];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
+              case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
                 return [];
@@ -286,21 +285,34 @@ angular.module('oppia').directive('answerGroupEditor', [
             // choice interaction's customization arguments.
             // TODO(sll): Remove the need for this watcher, or make it less
             // ad hoc.
-            $scope.$on('updateAnswerChoices', function() {
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
-            $scope.$on('externalSave', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.isRuleEditorOpen()) {
+                  if (StateEditorService.checkCurrentRuleInputIsValid()) {
+                    ctrl.saveRules();
+                  } else {
+                    var messageContent = (
+                      'There was an unsaved rule input which was invalid and ' +
+                      'has been discarded.');
+                    if (!AlertsService.messages.some(messageObject => (
+                      messageObject.content === messageContent))) {
+                      AlertsService.addInfoMessage(messageContent);
+                    }
+                  }
+                }
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onUpdateAnswerChoices.subscribe(() => {
+                ctrl.answerChoices = ctrl.getAnswerChoices();
+              })
+            );
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 () => {
                   if (ctrl.isRuleEditorOpen()) {
                     ctrl.saveRules();
                   }
-                  $scope.$broadcast('updateAnswerGroupInteractionId');
                   ctrl.answerChoices = ctrl.getAnswerChoices();
                 }
               )

@@ -25,7 +25,7 @@ require(
   'exploration-graph.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/state-name-editor/' +
-  'state-name-editor.directive.ts');
+  'state-name-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/state-param-changes-editor/' +
   'state-param-changes-editor.component.ts');
@@ -45,6 +45,8 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
+require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -53,21 +55,26 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/exploration-features.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('explorationEditorTab', {
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$rootScope', '$scope', '$uibModal', 'LoaderService',
-    'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
-    'ExplorationInitStateNameService', 'ExplorationStatesService',
-    'ExplorationWarningsService', 'GraphDataService', 'RouterService',
-    'StateEditorService', 'UrlInterpolationService',
+    '$scope', '$uibModal', 'ExplorationCorrectnessFeedbackService',
+    'ExplorationFeaturesService', 'ExplorationInitStateNameService',
+    'ExplorationStatesService', 'ExplorationWarningsService',
+    'GraphDataService', 'LoaderService', 'RouterService',
+    'StateEditorRefreshService', 'StateEditorService',
+    'UrlInterpolationService',
     function(
-        $rootScope, $scope, $uibModal, LoaderService,
-        ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
-        ExplorationInitStateNameService, ExplorationStatesService,
-        ExplorationWarningsService, GraphDataService, RouterService,
-        StateEditorService, UrlInterpolationService) {
+        $scope, $uibModal, ExplorationCorrectnessFeedbackService,
+        ExplorationFeaturesService, ExplorationInitStateNameService,
+        ExplorationStatesService, ExplorationWarningsService,
+        GraphDataService, LoaderService, RouterService,
+        StateEditorRefreshService, StateEditorService,
+        UrlInterpolationService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.getStateContentPlaceholder = function() {
         if (
           StateEditorService.getActiveStateName() ===
@@ -216,14 +223,17 @@ angular.module('oppia').component('explorationEditorTab', {
       };
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
-          contentId) {
+          contentIds) {
         var stateName = StateEditorService.getActiveStateName();
         var state = ExplorationStatesService.getState(stateName);
         var recordedVoiceovers = state.recordedVoiceovers;
         var writtenTranslations = state.writtenTranslations;
-        if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
-            writtenTranslations.hasUnflaggedWrittenTranslations(
-              contentId)) {
+        const shouldPrompt = contentIds.some(contentId => {
+          return (
+            recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
+            writtenTranslations.hasUnflaggedWrittenTranslations(contentId));
+        });
+        if (shouldPrompt) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/components/forms/forms-templates/mark-all-audio-and-' +
@@ -231,19 +241,21 @@ angular.module('oppia').component('explorationEditorTab', {
             backdrop: true,
             controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-              recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                contentId);
-              ExplorationStatesService.saveRecordedVoiceovers(
-                stateName, recordedVoiceovers);
-            }
-            if (writtenTranslations.hasUnflaggedWrittenTranslations(
-              contentId)) {
-              writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                contentId);
-              ExplorationStatesService.saveWrittenTranslations(
-                stateName, writtenTranslations);
-            }
+            contentIds.forEach(contentId => {
+              if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+                recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                  contentId);
+                ExplorationStatesService.saveRecordedVoiceovers(
+                  stateName, recordedVoiceovers);
+              }
+              if (writtenTranslations.hasUnflaggedWrittenTranslations(
+                contentId)) {
+                writtenTranslations.markAllTranslationsAsNeedingUpdate(
+                  contentId);
+                ExplorationStatesService.saveWrittenTranslations(
+                  stateName, writtenTranslations);
+              }
+            });
           }, function() {
             // This callback is triggered when the Cancel button is
             // clicked. No further action is needed.
@@ -258,9 +270,11 @@ angular.module('oppia').component('explorationEditorTab', {
         return ExplorationFeaturesService.areParametersEnabled();
       };
       ctrl.$onInit = function() {
-        $scope.$on('refreshStateEditor', function() {
-          ctrl.initStateEditor();
-        });
+        ctrl.directiveSubscriptions.add(
+          StateEditorRefreshService.onRefreshStateEditor.subscribe(() => {
+            ctrl.initStateEditor();
+          })
+        );
 
         $scope.$watch(ExplorationStatesService.getStates, function() {
           if (ExplorationStatesService.getStates()) {
@@ -269,6 +283,9 @@ angular.module('oppia').component('explorationEditorTab', {
           }
         }, true);
         ctrl.interactionIsShown = false;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

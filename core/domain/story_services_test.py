@@ -145,6 +145,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR),
                 'old_value': None,
                 'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0]
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_PROPERTY_META_TAG_CONTENT),
+                'old_value': None,
+                'new_value': 'new story meta tag content'
             })
         ]
         story_services.update_story(
@@ -158,6 +165,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
         self.assertEqual(story.version, 3)
+        self.assertEqual(story.meta_tag_content, 'new story meta tag content')
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')
@@ -442,6 +450,22 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list,
                 'Updated story outline.')
+
+    def test_cannot_update_story_with_no_commit_message(self):
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
+            'node_id': self.NODE_ID_1,
+            'old_value': '',
+            'new_value': 'New description.'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected a commit message but received none.'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, None)
 
     def test_update_story_acquired_skill_ids(self):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
@@ -751,7 +775,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, 'story_id_2', change_list,
                 'Added chapter.')
-
 
     def test_cannot_update_story_acquired_skill_ids_with_invalid_node_id(self):
         change_list = [story_domain.StoryChange({

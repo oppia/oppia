@@ -16,8 +16,8 @@
  * @fileoverview Constants for shared services across Oppia.
  */
 
-export class ServicesConstants {
-  public static PAGE_CONTEXT = {
+export const ServicesConstants = {
+  PAGE_CONTEXT: {
     COLLECTION_EDITOR: 'collection_editor',
     EXPLORATION_EDITOR: 'editor',
     EXPLORATION_PLAYER: 'learner',
@@ -27,46 +27,47 @@ export class ServicesConstants {
     STORY_EDITOR: 'story_editor',
     TOPIC_EDITOR: 'topic_editor',
     TOPICS_AND_SKILLS_DASHBOARD: 'topics_and_skills_dashboard',
+    CONTRIBUTOR_DASHBOARD: 'contributor_dashboard',
     OTHER: 'other'
-  };
+  },
 
-  public static EXPLORATION_EDITOR_TAB_CONTEXT = {
+  EXPLORATION_EDITOR_TAB_CONTEXT: {
     EDITOR: 'editor',
     PREVIEW: 'preview'
-  };
+  },
 
-  public static EXPLORATION_FEATURES_URL =
-    '/explorehandler/features/<exploration_id>';
+  EXPLORATION_FEATURES_URL:
+    '/explorehandler/features/<exploration_id>',
 
-  public static FETCH_ISSUES_URL = '/issuesdatahandler/<exploration_id>';
+  FETCH_ISSUES_URL: '/issuesdatahandler/<exploration_id>',
 
-  public static FETCH_PLAYTHROUGH_URL =
-    '/playthroughdatahandler/<exploration_id>/<playthrough_id>';
+  FETCH_PLAYTHROUGH_URL:
+    '/playthroughdatahandler/<exploration_id>/<playthrough_id>',
 
-  public static RESOLVE_ISSUE_URL = '/resolveissuehandler/<exploration_id>';
+  RESOLVE_ISSUE_URL: '/resolveissuehandler/<exploration_id>',
 
-  public static STORE_PLAYTHROUGH_URL =
-    '/explorehandler/store_playthrough/<exploration_id>';
+  STORE_PLAYTHROUGH_URL:
+    '/explorehandler/store_playthrough/<exploration_id>',
 
   // Enables recording playthroughs from learner sessions.
-  public static MIN_PLAYTHROUGH_DURATION_IN_SECS = 45;
-  public static EARLY_QUIT_THRESHOLD_IN_SECS = 300;
-  public static NUM_INCORRECT_ANSWERS_THRESHOLD = 3;
-  public static NUM_REPEATED_CYCLES_THRESHOLD = 3;
-  public static CURRENT_ACTION_SCHEMA_VERSION = 1;
-  public static CURRENT_ISSUE_SCHEMA_VERSION = 1;
+  MIN_PLAYTHROUGH_DURATION_IN_SECS: 45,
+  EARLY_QUIT_THRESHOLD_IN_SECS: 300,
+  NUM_INCORRECT_ANSWERS_THRESHOLD: 3,
+  NUM_REPEATED_CYCLES_THRESHOLD: 3,
+  CURRENT_ACTION_SCHEMA_VERSION: 1,
+  CURRENT_ISSUE_SCHEMA_VERSION: 1,
 
   // Whether to enable the promo bar functionality. This does not actually turn
   // on the promo bar, as that is gated by a config value (see config_domain).
   // This merely avoids checking for whether the promo bar is enabled for every
   // Oppia page visited.
-  public static ENABLE_PROMO_BAR = true;
+  ENABLE_PROMO_BAR: true,
 
-  public static SEARCH_DATA_URL = '/searchhandler/data';
+  SEARCH_DATA_URL: '/searchhandler/data',
 
-  public static STATE_ANSWER_STATS_URL =
-    '/createhandler/state_answer_stats/<exploration_id>';
+  STATE_ANSWER_STATS_URL:
+    '/createhandler/state_answer_stats/<exploration_id>',
 
-  public static RTE_COMPONENT_SPECS = (
-      require('rich_text_components_definitions.ts'));
-}
+  RTE_COMPONENT_SPECS: (
+    require('rich_text_components_definitions.ts')),
+} as const;

@@ -81,12 +81,11 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('user_id')
 
-    def test_get_export_policy(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            r'The get_export_policy\(\) method is missing from the '
-            r'derived class. It should be implemented in the derived class.'):
-            base_models.BaseModel.get_export_policy()
+    def test_get_lowest_supported_role_is_exploration_editor(self):
+        self.assertEqual(
+            base_models.BaseModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_EXPLORATION_EDITOR
+        )
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
@@ -247,7 +246,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             model = base_models.BaseModel.get_by_id(model_id)
             self.assertNotEqual(model.last_updated, last_updated)
 
-
     def test_get_multi(self):
         model1 = base_models.BaseModel()
         model2 = base_models.BaseModel()
@@ -340,16 +338,33 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
 class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
 
-    def test_exists_for_user_id(self):
+    def test_has_reference_to_user_id(self):
         model1 = base_models.BaseSnapshotMetadataModel(
-            id='model_id-1', committer_id='committer_id', commit_type='create')
+            id='model_id-1',
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds_user_ids=[
+                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+            content_user_ids=['content_user_1_id', 'content_user_2_id'])
         model1.put()
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
-            .exists_for_user_id('committer_id'))
+            .has_reference_to_user_id('committer_id'))
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .has_reference_to_user_id('commit_cmds_user_1_id'))
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .has_reference_to_user_id('commit_cmds_user_2_id'))
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .has_reference_to_user_id('content_user_1_id'))
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .has_reference_to_user_id('content_user_2_id'))
         self.assertFalse(
             base_models.BaseSnapshotMetadataModel
-            .exists_for_user_id('x_id'))
+            .has_reference_to_user_id('x_id'))
 
     def test_get_version_string(self):
         model1 = base_models.BaseSnapshotMetadataModel(
@@ -384,15 +399,10 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             'model_id-1': {
                 'commit_type': 'create',
                 'commit_message': None,
-                'commit_cmds': None
             },
             'model_id-2': {
                 'commit_type': 'create',
                 'commit_message': 'Hi this is a commit.',
-                'commit_cmds': [
-                    {'cmd': 'some_command'},
-                    {'cmd2': 'another_command'}
-                ]
             }
         }
         self.assertEqual(user_data, expected_data)

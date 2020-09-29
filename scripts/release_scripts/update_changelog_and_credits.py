@@ -52,8 +52,8 @@ GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
 # These constants should match the format defined in
 # about-page.constants.ts. If the patterns do not match,
 # update_changelog_and_credits_test will fail.
-CREDITS_START_LINE = '  public static CREDITS_CONSTANTS = [\n'
-CREDITS_END_LINE = '  ];\n'
+CREDITS_START_LINE = '  CREDITS_CONSTANTS: [\n'
+CREDITS_END_LINE = '  ]\n'
 CREDITS_INDENT = '    '
 
 # This ordering should not be changed. The automatic updates to

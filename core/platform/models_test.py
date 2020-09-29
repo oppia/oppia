@@ -23,6 +23,7 @@ from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class RegistryUnitTest(test_utils.GenericTestBase):
@@ -267,19 +268,30 @@ class RegistryUnitTest(test_utils.GenericTestBase):
                 'Invalid email service provider: invalid service provider'):
                 self.registry_instance.import_email_services()
 
-    def test_import_memcache_services(self):
-        """Tests import memcache services function."""
-        from core.platform.memcache import gae_memcache_services
+    def test_import_cache_services(self):
+        """Tests import cache services function."""
+        from core.platform.cache import redis_cache_services
         self.assertEqual(
-            self.registry_instance.import_memcache_services(),
-            gae_memcache_services)
+            self.registry_instance.import_cache_services(),
+            redis_cache_services)
 
     def test_import_taskqueue_services(self):
         """Tests import taskqueue services function."""
-        from core.platform.taskqueue import gae_taskqueue_services
+        def mock_is_local_server_environment():
+            return False
+        swap_to_prod = self.swap(
+            utils, 'is_local_server_environment',
+            mock_is_local_server_environment)
+        with self.swap(constants, 'DEV_MODE', False), swap_to_prod:
+            from core.platform.taskqueue import cloud_taskqueue_services
+            self.assertEqual(
+                self.registry_instance.import_taskqueue_services(),
+                cloud_taskqueue_services)
+
+        from core.platform.taskqueue import dev_mode_taskqueue_services
         self.assertEqual(
             self.registry_instance.import_taskqueue_services(),
-            gae_taskqueue_services)
+            dev_mode_taskqueue_services)
 
     def test_import_search_services(self):
         """Tests import search services function."""

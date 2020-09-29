@@ -21,7 +21,6 @@ var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -199,7 +198,7 @@ describe('Interactions', function() {
     await users.logout();
   });
 
-  it('publish and play exploration successfully', async function() {
+  it('should publish and play exploration successfully', async function() {
     /*
      * This suite should be expanded as new interaction's e2e utility is added.
      */
@@ -234,7 +233,8 @@ describe('Interactions', function() {
         'Please simplify the following expression: 16x^{12}/4x^2');
     });
 
-    await explorationEditorMainTab.setInteraction('AlgebraicExpressionInput');
+    await explorationEditorMainTab.setInteraction(
+      'AlgebraicExpressionInput', ['x']);
     // Proper Latex styling for rule spec is required.
     await explorationEditorMainTab.addResponse(
       'AlgebraicExpressionInput', await forms.toRichText('Good job!'), 'End',

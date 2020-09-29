@@ -54,9 +54,10 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'StateCustomizationArgsService', 'StateEditorService',
   'StateInteractionIdService', 'StateNextContentIdIndexService',
   'UrlInterpolationService',
+  'showMarkAllAudioAsNeedingUpdateModalIfRequired',
   'ALLOWED_INTERACTION_CATEGORIES',
   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
-  'CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS',
+  'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   'INTERACTION_SPECS',
   function(
       $controller, $injector, $scope, $uibModalInstance,
@@ -65,9 +66,10 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, StateNextContentIdIndexService,
       UrlInterpolationService,
+      showMarkAllAudioAsNeedingUpdateModalIfRequired,
       ALLOWED_INTERACTION_CATEGORIES,
       ALLOWED_QUESTION_INTERACTION_CATEGORIES,
-      CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS,
+      COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -78,16 +80,11 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
     // This binds the services to the HTML template, so that
     // their displayed values can be used in the HTML.
-    $scope.StateInteractionIdService =
-      StateInteractionIdService;
-    $scope.StateCustomizationArgsService = (
-      StateCustomizationArgsService);
-
-    $scope.getInteractionThumbnailImageUrl = function(
-        interactionId) {
-      return (
-        UrlInterpolationService.getInteractionThumbnailImageUrl(
-          interactionId));
+    $scope.StateInteractionIdService = StateInteractionIdService;
+    $scope.StateCustomizationArgsService = StateCustomizationArgsService;
+    $scope.getInteractionThumbnailImageUrl = function(interactionId) {
+      return UrlInterpolationService.getInteractionThumbnailImageUrl(
+        interactionId);
     };
 
     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
@@ -104,8 +101,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       $scope.customizationModalReopened = true;
       var interactionSpec = INTERACTION_SPECS[
         StateInteractionIdService.savedMemento];
-      $scope.customizationArgSpecs = (
-        interactionSpec.customization_arg_specs);
+      $scope.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
       StateInteractionIdService.displayed = angular.copy(
         StateInteractionIdService.savedMemento);
@@ -114,9 +110,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
 
       // Ensure that StateCustomizationArgsService.displayed is
       // fully populated.
-      for (
-        var i = 0; i < $scope.customizationArgSpecs.length;
-        i++) {
+      for (var i = 0; i < $scope.customizationArgSpecs.length; i++) {
         var argName = $scope.customizationArgSpecs[i].name;
         if (
           !StateCustomizationArgsService.savedMemento.hasOwnProperty(argName)
@@ -126,7 +120,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         }
       }
 
-      $scope.$broadcast('schemaBasedFormsShown');
+      StateCustomizationArgsService.onSchemaBasedFormsShown.emit();
       $scope.form = {};
       $scope.hasCustomizationArgs = (
         StateCustomizationArgsService.displayed &&
@@ -195,7 +189,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         $scope.hasCustomizationArgs = true;
       }
 
-      $scope.$broadcast('schemaBasedFormsShown');
+      StateCustomizationArgsService.onSchemaBasedFormsShown.emit();
       $scope.form = {};
     };
 
@@ -209,7 +203,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.isSaveInteractionButtonEnabled = function() {
-      return !!($scope.hasCustomizationArgs &&
+      return !!(
+        $scope.hasCustomizationArgs &&
         $scope.StateInteractionIdService.displayed &&
         $scope.form.schemaForm.$valid &&
         ($scope.getCustomizationArgsWarningsList().length === 0));
@@ -299,15 +294,98 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           traverseSchemaAndAssignContentIds(
             caValues[name].value,
             caSpec.schema,
-            `${CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS}_${name}`);
+            `${COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS}_${name}`);
         }
       }
     };
 
+    /**
+     * Extracts a mapping of content ids to the html or unicode content found
+     * in the customization arguments.
+     * @returns {Object} A Mapping of content ids (string) to content (string).
+     */
+    $scope.getContentIdToContent = function() {
+      const interactionId = $scope.StateInteractionIdService.displayed;
+      const contentIdToContent = {};
+
+      let traverseSchemaAndCollectContent = (
+          value: Object | Object[],
+          schema: Schema
+      ): void => {
+        const schemaIsSubtitledHtml = (
+          schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+          schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
+        const schemaIsSubtitledUnicode = (
+          schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+          schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+        );
+
+        if (schemaIsSubtitledHtml) {
+          const subtitledHtmlValue = <SubtitledHtml> value;
+          contentIdToContent[
+            subtitledHtmlValue.getContentId()
+          ] = subtitledHtmlValue.getHtml();
+        } else if (schemaIsSubtitledUnicode) {
+          const subtitledUnicodeValue = <SubtitledUnicode> value;
+          contentIdToContent[
+            subtitledUnicodeValue.getContentId()
+          ] = subtitledUnicodeValue.getUnicode();
+        } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
+          for (let i = 0; i < (<Object[]> value).length; i++) {
+            traverseSchemaAndCollectContent(value[i], <Schema> schema.items);
+          }
+        } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
+          schema.properties.forEach(property => {
+            const name = property.name;
+            traverseSchemaAndCollectContent(value[name], property.schema);
+          });
+        }
+      };
+
+      const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+      const caValues = StateCustomizationArgsService.displayed;
+      for (const caSpec of caSpecs) {
+        const name = caSpec.name;
+        if (caValues.hasOwnProperty(name)) {
+          traverseSchemaAndCollectContent(caValues[name].value, caSpec.schema);
+        }
+      }
+
+      return contentIdToContent;
+    };
+
     $scope.save = function() {
+      const updatedContentIdToContent = $scope.getContentIdToContent(
+        StateCustomizationArgsService.displayed);
+      const contentIdsWithModifiedContent = [];
+      Object.keys($scope.originalContentIdToContent).forEach(contentId => {
+        if (
+          $scope.originalContentIdToContent.hasOwnProperty(contentId) &&
+          updatedContentIdToContent.hasOwnProperty(contentId) &&
+          ($scope.originalContentIdToContent[contentId] !==
+            updatedContentIdToContent[contentId])
+        ) {
+          contentIdsWithModifiedContent.push(contentId);
+        }
+      });
+      showMarkAllAudioAsNeedingUpdateModalIfRequired(
+        contentIdsWithModifiedContent);
+
       $scope.populateNullContentIds();
       EditorFirstTimeEventsService.registerFirstSaveInteractionEvent();
       $uibModalInstance.close();
     };
+
+    $scope.init = function() {
+      $scope.originalContentIdToContent = {};
+      if (StateInteractionIdService.savedMemento) {
+        // We track the original html or unicode for each content id so that we
+        // can detect changes in $scope.save().
+        $scope.originalContentIdToContent = $scope.getContentIdToContent(
+          StateCustomizationArgsService.displayed);
+      }
+    };
+
+    $scope.init();
   }
 ]);

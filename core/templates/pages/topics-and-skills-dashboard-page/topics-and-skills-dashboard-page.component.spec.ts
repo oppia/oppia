@@ -19,6 +19,8 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { EventEmitter } from '@angular/core';
+
 // ^^^ This block is to be removed.
 
 require(
@@ -41,13 +43,12 @@ describe('Topics and Skills Dashboard Page', function() {
   var $rootScope = null;
   var $q = null;
   var $timeout = null;
-  var TopicsAndSkillsDashboardBackendApiService = null;
-  var WindowDimensionsService = null;
   var TopicsAndSkillsDashboardFilterObjectFactory = null;
   var TopicSummaryObjectFactory = null;
   var SkillSummaryObjectFactory = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
-  var AlertsService = null;
+
+  var mocktasdReinitalizedEventEmitter = null;
 
   describe('when backend dict contains topics', function() {
     var sampleDataResults = {
@@ -83,17 +84,15 @@ describe('Topics and Skills Dashboard Page', function() {
       $scope = $rootScope.$new();
       $timeout = $injector.get('$timeout');
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
-      WindowDimensionsService = $injector.get('WindowDimensionsService');
       $q = $injector.get('$q');
       TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
         'TopicsAndSkillsDashboardFilterObjectFactory');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       TopicSummaryObjectFactory = $injector.get(
         'TopicSummaryObjectFactory');
       SkillSummaryObjectFactory = $injector.get(
         'SkillSummaryObjectFactory');
+
+      mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
@@ -120,6 +119,9 @@ describe('Topics and Skills Dashboard Page', function() {
             skillSummaries: sampleDataResults.skill_summary_dicts
           });
           return deferred.promise;
+        },
+        get onTopicsAndSkillsDashboardReinitialized() {
+          return mocktasdReinitalizedEventEmitter;
         }
       };
       var MockWindowDimensionsService = {
@@ -137,6 +139,10 @@ describe('Topics and Skills Dashboard Page', function() {
       ctrl.$onInit();
       $rootScope.$apply();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should init the dashboard and fetch data', function() {
       const filterObject =
@@ -348,7 +354,7 @@ describe('Topics and Skills Dashboard Page', function() {
 
     it('should call initDashboard on reinitialized event', function() {
       var initDashboardSpy = spyOn(ctrl, '_initDashboard');
-      $rootScope.$broadcast('topicsAndSkillsDashboardReinitialized');
+      mocktasdReinitalizedEventEmitter.emit();
       expect(initDashboardSpy).toHaveBeenCalled();
     });
   });
@@ -357,12 +363,9 @@ describe('Topics and Skills Dashboard Page', function() {
     beforeEach(angular.mock.inject(function($injector) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
       TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
         'TopicsAndSkillsDashboardFilterObjectFactory');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       TopicSummaryObjectFactory = $injector.get(
         'TopicSummaryObjectFactory');
       SkillSummaryObjectFactory = $injector.get(
@@ -378,6 +381,9 @@ describe('Topics and Skills Dashboard Page', function() {
         can_create_topic: true,
         can_create_skill: true
       };
+
+      mocktasdReinitalizedEventEmitter = new EventEmitter();
+
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
           var deferred = $q.defer();
@@ -403,6 +409,9 @@ describe('Topics and Skills Dashboard Page', function() {
             nextCursor: 'kasfmk424'
           });
           return deferred.promise;
+        },
+        get onTopicsAndSkillsDashboardReinitialized() {
+          return mocktasdReinitalizedEventEmitter;
         }
       };
 
@@ -417,6 +426,10 @@ describe('Topics and Skills Dashboard Page', function() {
       ctrl.displayedSkillSummaries = [];
       $rootScope.$apply();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should change active tab to skills if topic summaries are null',
       function() {
@@ -478,7 +491,7 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should navigate skill page forward', function() {
-      var skillSpy = spyOn(ctrl, 'fetchSkills');
+      var skillSpy = spyOn(ctrl, 'fetchSkillsDebounced');
       ctrl.navigateSkillPage('next_page');
       expect(skillSpy).toHaveBeenCalled();
     });
@@ -496,13 +509,13 @@ describe('Topics and Skills Dashboard Page', function() {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       mockAlertsService = {
         addWarning: function() {}
       };
+
+      mocktasdReinitalizedEventEmitter = new EventEmitter();
+
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
           var deferred = $q.defer();
@@ -511,6 +524,9 @@ describe('Topics and Skills Dashboard Page', function() {
           };
           deferred.reject(errorResponse);
           return deferred.promise;
+        },
+        get onTopicsAndSkillsDashboardReinitialized() {
+          return mocktasdReinitalizedEventEmitter;
         }
       };
 
@@ -524,6 +540,10 @@ describe('Topics and Skills Dashboard Page', function() {
 
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should show warning if fetch dashboard data failed with fatal error',
       function() {
@@ -542,10 +562,10 @@ describe('Topics and Skills Dashboard Page', function() {
         addWarning: function() {}
       };
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
+
+      mocktasdReinitalizedEventEmitter = new EventEmitter();
+
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
           var deferred = $q.defer();
@@ -554,6 +574,9 @@ describe('Topics and Skills Dashboard Page', function() {
           };
           deferred.reject(errorResponse);
           return deferred.promise;
+        },
+        get onTopicsAndSkillsDashboardReinitialized() {
+          return mocktasdReinitalizedEventEmitter;
         }
       };
 
@@ -568,6 +591,10 @@ describe('Topics and Skills Dashboard Page', function() {
 
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should show warning if fetch dashboard data failed',
       function() {

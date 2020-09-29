@@ -28,10 +28,9 @@ import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('EndExplorationValidationService', () => {
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: EndExplorationValidationService;
 
   let currentState: string;
@@ -113,6 +112,11 @@ describe('EndExplorationValidationService', () => {
 
   it('should throw for missing recommendations argument', () => {
     expect(() => {
+      // This throws "Argument of type '{}' is not assignable to
+      // parameter of type 'EndExplorationCustomizationArgs'." We are purposely
+      // assigning the wrong type of customization args in order to test
+      // validations.
+      // @ts-expect-error
       validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrowError(
       'Expected customization arguments to have property: ' +

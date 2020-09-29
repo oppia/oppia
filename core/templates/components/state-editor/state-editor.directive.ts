@@ -50,6 +50,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
+require('services/contextual/window-dimensions.service');
 
 import { Subscription } from 'rxjs';
 
@@ -65,6 +66,7 @@ angular.module('oppia').directive('stateEditor', [
         isInteractionShown: '&interactionIsShown',
         navigateToState: '=',
         onSaveHints: '=',
+        onSaveInapplicableSkillMisconceptionIds: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
@@ -80,19 +82,19 @@ angular.module('oppia').directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', 'StateContentService',
+        '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
         'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
-        'StateSolutionService', 'INTERACTION_SPECS',
+        'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
-            $rootScope, $scope, StateContentService,
+            $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
             StateNextContentIdIndexService,
             StateParamChangesService, StateSolicitAnswerDetailsService,
-            StateSolutionService, INTERACTION_SPECS) {
+            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var updateInteractionVisibility = function(newInteractionId) {
@@ -108,10 +110,17 @@ angular.module('oppia').directive('stateEditor', [
           $scope.reinitializeEditor = function() {
             StateEditorService.onStateEditorInitialized.emit($scope.stateData);
           };
+
+          $scope.toggleConceptCard = function() {
+            $scope.conceptCardIsShown = !$scope.conceptCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg');
             $scope.currentStateIsTerminal = false;
+            $scope.conceptCardIsShown = true;
+            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             $scope.interactionIdIsSet = false;
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();

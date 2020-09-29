@@ -24,7 +24,6 @@ require(
   'background-banner.component.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 
-require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/collection/read-only-collection-backend-api.service.ts');
@@ -56,16 +55,14 @@ angular.module('oppia').directive('collectionPlayerPage', [
         '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
-        'AlertsService', 'CollectionObjectFactory',
+        '$anchorScroll', '$http', '$location', '$scope', 'AlertsService',
         'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
         'LoaderService', 'PageTitleService',
         'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
         'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location, $rootScope, $scope,
-            AlertsService, CollectionObjectFactory,
+            $anchorScroll, $http, $location, $scope, AlertsService,
             CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
             LoaderService, PageTitleService,
             ReadOnlyCollectionBackendApiService, UrlInterpolationService,
@@ -220,7 +217,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
           };
 
           ctrl.getExplorationTitlePosition = function(index) {
-            if (index % 2 === 0 ) {
+            if (index % 2 === 0) {
               return '8px';
             } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
               return '30px';
@@ -310,7 +307,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
               ctrl.collectionId).then(
               function(collection) {
                 ctrl.collection = collection;
-                $rootScope.$broadcast('collectionLoaded');
 
                 PageTitleService.setPageTitle(
                   ctrl.collection.getTitle() + ' - Oppia');

@@ -21,6 +21,7 @@ describe('Translation Modal Controller', function() {
   let $q = null;
   let $scope = null;
   let $uibModalInstance = null;
+  let CkEditorCopyContentService = null;
   let CsrfTokenService = null;
   let TranslateTextService = null;
   let TranslationLanguageService = null;
@@ -30,7 +31,6 @@ describe('Translation Modal Controller', function() {
     subheading: 'Subheading',
     heading: 'Heading'
   };
-  const userIsLoggedIn = true;
   let getTextToTranslateSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -41,6 +41,7 @@ describe('Translation Modal Controller', function() {
     CsrfTokenService = $injector.get('CsrfTokenService');
     TranslateTextService = $injector.get('TranslateTextService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
+    CkEditorCopyContentService = $injector.get('CkEditorCopyContentService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -52,6 +53,9 @@ describe('Translation Modal Controller', function() {
       .returnValue('English');
     spyOn(TranslationLanguageService, 'getActiveLanguageCode').and
       .returnValue('en');
+
+    spyOn(CkEditorCopyContentService, 'copyModeActive').and.returnValue(true);
+
     getTextToTranslateSpy = spyOn(TranslateTextService, 'getTextToTranslate');
     getTextToTranslateSpy.and.returnValue({
       text: 'Texto a traducir',
@@ -73,31 +77,32 @@ describe('Translation Modal Controller', function() {
     $controller('TranslationModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      opportunity: opportunity,
-      userIsLoggedIn: userIsLoggedIn
+      opportunity: opportunity
     });
   }));
 
-  it('should init the variables', function() {
-    expect($scope.userIsLoggedIn).toBe(userIsLoggedIn);
-    expect($scope.uploadingTranslation).toBe(false);
-    expect($scope.activeWrittenTranslation).toEqual({
-      html: ''
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.uploadingTranslation).toBe(false);
+      expect($scope.activeWrittenTranslation).toEqual({
+        html: ''
+      });
+      expect($scope.subheading).toBe('Subheading');
+      expect($scope.heading).toBe('Heading');
+      expect($scope.loadingData).toBe(true);
+      expect($scope.moreAvailable).toBe(false);
+      expect($scope.textToTranslate).toBe('');
+      expect($scope.languageDescription).toBe('English');
+      $httpBackend.flush();
+
+      expect($scope.textToTranslate).toBe('Texto a traducir');
+      expect($scope.moreAvailable).toBe(true);
+      expect($scope.loadingData).toBe(false);
     });
-    expect($scope.subheading).toBe('Subheading');
-    expect($scope.heading).toBe('Heading');
-    expect($scope.loadingData).toBe(true);
-    expect($scope.moreAvailable).toBe(false);
-    expect($scope.textToTranslate).toBe('');
-    expect($scope.languageDescription).toBe('English');
-    $httpBackend.flush();
 
-    expect($scope.textToTranslate).toBe('Texto a traducir');
-    expect($scope.moreAvailable).toBe(true);
-    expect($scope.loadingData).toBe(false);
-  });
-
-  it('should get suggested text to translated again', function() {
+  it('should suggest more text to be translated when contributor finish' +
+    ' translating text and they would like to continue translating',
+  function() {
     $httpBackend.flush();
     expect($scope.textToTranslate).toBe('Texto a traducir');
     expect($scope.moreAvailable).toBe(true);
@@ -120,6 +125,22 @@ describe('Translation Modal Controller', function() {
     });
     expect($scope.uploadingTranslation).toBe(false);
   });
+
+  it('should broadcast copy to ck editor when clicking on content',
+    function() {
+      spyOn(CkEditorCopyContentService, 'broadcastCopy').and
+        .callFake(() => {});
+
+      var mockEvent = {
+        stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
+        target: {}
+      };
+      $scope.onContentClick(mockEvent);
+
+      expect(mockEvent.stopPropagation).toHaveBeenCalled();
+      expect(CkEditorCopyContentService.broadcastCopy).toHaveBeenCalledWith(
+        mockEvent.target);
+    });
 
   it('should close modal when there is not more text to be translated',
     function() {

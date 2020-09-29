@@ -72,10 +72,8 @@ angular.module('oppia').directive('topNavigationBar', [
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
-          var truncateNavbarDebounced =
-            DebouncerService.debounce(truncateNavbar, 500);
 
-          ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
+          ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -234,12 +232,10 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.navElementsVisibilityStatus = {};
 
-            var classroomPageIsShownPromise = (
-              ClassroomBackendApiService.fetchClassroomPageIsShownStatusAsync()
-            );
-            classroomPageIsShownPromise.then(
-              function(classroomIsShown) {
-                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+            let service = ClassroomBackendApiService;
+            service.fetchClassroomPromosAreEnabledStatusAsync().then(
+              function(classroomPromosAreEnabled) {
+                ctrl.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
               });
 
             // Close the submenu if focus or click occurs anywhere outside of

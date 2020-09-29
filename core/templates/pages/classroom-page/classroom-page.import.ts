@@ -16,8 +16,6 @@
  * @fileoverview Directive scripts for the classroom page.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/classroom-page/classroom-page.module.ts');
@@ -25,3 +23,4 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/classroom-page/classroom-page.component.ts');
+require('pages/OppiaFooterDirective.ts');

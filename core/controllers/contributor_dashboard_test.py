@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -34,15 +35,17 @@ class ContributorDashboardPageTest(test_utils.GenericTestBase):
     """Test for showing contributor dashboard pages."""
 
     def test_page_with_disabled_contributor_dashboard_leads_to_404(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', False):
-            self.get_html_response(
-                feconf.CONTRIBUTOR_DASHBOARD_URL, expected_status_int=404)
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', False)
+        self.get_html_response(
+            feconf.CONTRIBUTOR_DASHBOARD_URL, expected_status_int=404)
 
     def test_page_with_enabled_contributor_dashboard_loads_correctly(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
-            response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
-            response.mustcontain(
-                '<contributor-dashboard-page></contributor-dashboard-page>')
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', True)
+        response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
+        response.mustcontain(
+            '<contributor-dashboard-page></contributor-dashboard-page>')
 
 
 class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
@@ -71,7 +74,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             '0', 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic('0', self.admin_id)
 
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
@@ -108,6 +120,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             story_services.save_new_story(self.owner_id, story)
             topic_services.add_canonical_story(
                 self.owner_id, topic.id, story.id)
+            topic_services.publish_story(
+                topic.id, story.id, self.admin_id)
             story_services.update_story(
                 self.owner_id, story.id, [story_domain.StoryChange({
                     'cmd': 'add_story_node',
@@ -131,7 +145,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'topic_name': 'topic',
             'story_title': 'title 0',
             'chapter_title': 'Node1',
-            'content_count': 4,
+            'content_count': 2,
             'translation_counts': {}
         }
 
@@ -140,66 +154,72 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'topic_name': 'topic',
             'story_title': 'title 1',
             'chapter_title': 'Node1',
-            'content_count': 4,
+            'content_count': 2,
             'translation_counts': {}
         }
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', True)
 
-    def test_handler_with_disabled_dashboard_flag(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', False):
-            self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={}, expected_status_int=404)
+    def test_handler_with_disabled_dashboard_flag_raise_404(self):
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', True)
+
+        self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={}, expected_status_int=200)
+
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', False)
+
+        self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={}, expected_status_int=404)
 
     def test_get_skill_opportunity_data(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
-            response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={})
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={})
 
-            self.assertEqual(
-                response['opportunities'], [
-                    self.expected_skill_opportunity_dict_0,
-                    self.expected_skill_opportunity_dict_1])
+        self.assertEqual(
+            response['opportunities'], [
+                self.expected_skill_opportunity_dict_0,
+                self.expected_skill_opportunity_dict_1])
 
-            self.assertFalse(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
-            response = self.get_json(
-                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi'})
+        response = self.get_json(
+            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'hi'})
 
-            self.assertEqual(
-                response['opportunities'], [
-                    self.expected_opportunity_dict_1,
-                    self.expected_opportunity_dict_2])
+        self.assertEqual(
+            response['opportunities'], [
+                self.expected_opportunity_dict_1,
+                self.expected_opportunity_dict_2])
 
-            self.assertFalse(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
-            response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en'})
+        response = self.get_json(
+            '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'en'})
 
-            self.assertEqual(len(response['opportunities']), 2)
-            self.assertEqual(
-                response['opportunities'], [
-                    self.expected_opportunity_dict_1,
-                    self.expected_opportunity_dict_2])
+        self.assertEqual(len(response['opportunities']), 2)
+        self.assertEqual(
+            response['opportunities'], [
+                self.expected_opportunity_dict_1,
+                self.expected_opportunity_dict_2])
 
-            self.assertFalse(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_skill_opportunity_data_pagination(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={})
@@ -226,9 +246,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data_pagination(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi'})
@@ -254,9 +272,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data_pagination(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en'})
@@ -281,43 +297,33 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_with_invalid_language_code(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
     def test_get_translation_opportunity_without_language_code(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_with_invalid_language_code(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_without_language_code(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_opportunity_for_invalid_opportunity_type(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/invalid_opportunity_type' % (
                     feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
@@ -329,9 +335,13 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TranslatableTextHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -346,7 +356,16 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             '0', 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -361,6 +380,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             story_services.save_new_story(self.owner_id, story)
             topic_services.add_canonical_story(
                 self.owner_id, topic.id, story.id)
+            topic_services.publish_story(topic.id, story.id, self.admin_id)
             story_services.update_story(
                 self.owner_id, story.id, [story_domain.StoryChange({
                     'cmd': 'add_story_node',

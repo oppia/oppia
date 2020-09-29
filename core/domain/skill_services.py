@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
+from core.domain import caching_services
 from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_services
@@ -28,6 +29,7 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -41,7 +43,6 @@ import python_utils
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
         models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_memcache_services()
 
 
 # Repository GET methods.
@@ -719,7 +720,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.next_misconception_id = skill.next_misconception_id
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
-    memcache_services.delete(skill_fetchers.get_skill_memcache_key(skill.id))
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_SKILL, None, [skill.id])
     skill.version += 1
 
 
@@ -746,6 +748,21 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
+    misconception_is_deleted = any([
+        change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
+        for change in change_list
+    ])
+    if misconception_is_deleted:
+        deleted_skill_misconception_ids = [
+            skill.generate_skill_misconception_id(change.misconception_id)
+            for change in change_list
+            if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
+        ]
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            committer_id, skill_id, skill.description,
+            deleted_skill_misconception_ids)
 
 
 def delete_skill(committer_id, skill_id, force_deletion=False):
@@ -767,8 +784,8 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
 
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.
-    skill_memcache_key = skill_fetchers.get_skill_memcache_key(skill_id)
-    memcache_services.delete(skill_memcache_key)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_SKILL, None, [skill_id])
 
     # Delete the summary of the skill (regardless of whether
     # force_deletion is True or not).

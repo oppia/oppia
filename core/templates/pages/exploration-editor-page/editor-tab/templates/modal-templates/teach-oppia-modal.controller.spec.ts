@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TeachOppiaModalController.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
@@ -28,6 +29,8 @@ import { AngularNameService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { StateSolutionService } from
@@ -54,7 +57,7 @@ describe('Teach Oppia Modal Controller', function() {
   var responsesService = null;
   var trainingDataService = null;
   var trainingModalService = null;
-
+  var mockExternalSaveEventEmitter = null;
   var explorationId = 'exp1';
   var stateName = 'Introduction';
   var state = {
@@ -75,10 +78,8 @@ describe('Teach Oppia Modal Controller', function() {
       },
       answer_groups: [{
         rule_specs: [{
-          inputs: {
-            x: 'Correct Answer'
-          },
-          rule_type: 'Equals'
+          rule_type: 'Equals',
+          inputs: { x: 'Correct Answer' }
         }],
         outcome: {
           dest: 'outcome 1',
@@ -136,8 +137,14 @@ describe('Teach Oppia Modal Controller', function() {
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
   }));
 
   describe('when successfully fetching top unresolved answers', function() {
@@ -196,7 +203,8 @@ describe('Teach Oppia Modal Controller', function() {
       $httpBackend.flush();
     }));
 
-    it('should init the variables', function() {
+    it('should initialize unresolved answer properties after controller is' +
+      ' initialized', function() {
       var unresolvedAnswers = $scope.unresolvedAnswers[0];
 
       expect(unresolvedAnswers.answer).toBe('Answer Text');
@@ -310,7 +318,7 @@ describe('Teach Oppia Modal Controller', function() {
       $httpBackend.flush();
     }));
 
-    it('should evaluate controller properties after initialization',
+    it('should initialize controller properties after its initialization',
       function() {
         expect($logSpy.calls.allArgs()).toContain(
           ['Error occurred while fetching unresolved answers ' +

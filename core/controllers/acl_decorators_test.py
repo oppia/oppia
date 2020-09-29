@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import story_services
@@ -977,7 +978,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 class VoiceoverExplorationTests(test_utils.GenericTestBase):
     """Tests for can_voiceover_exploration decorator."""
 
-    role = rights_manager.ROLE_VOICE_ARTIST
+    role = rights_domain.ROLE_VOICE_ARTIST
     username = 'user'
     user_email = 'user@example.com'
     banned_username = 'banneduser'
@@ -2186,11 +2187,15 @@ class StoryViewerTests(test_utils.GenericTestBase):
         self.save_new_story(
             self.story_id, self.admin_id, self.topic_id,
             url_fragment=self.story_url_fragment)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[subtopic_1], next_subtopic_id=2)
 
     def test_cannot_access_non_existent_story(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2271,6 +2276,18 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 'http://localhost/learn/staging/topic/story/%s'
                 % self.story_url_fragment,
+                response.headers['location'])
+
+    def test_redirect_lowercase_story_url_fragment(self):
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response(
+                '/mock_story_page/staging/topic/story/Story-frag',
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic/story/story-frag',
                 response.headers['location'])
 
 
@@ -2399,6 +2416,17 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 '/sub-one-frag',
                 response.headers['location'])
 
+    def test_redirect_with_lowercase_subtopic_url_fragment(self):
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response(
+                '/mock_subtopic_page/staging/topic-frag/revision/Sub-One-Frag',
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic-frag/revision'
+                '/sub-one-frag',
+                response.headers['location'])
+
 
 class TopicViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_topic_viewer_page."""
@@ -2440,11 +2468,15 @@ class TopicViewerTests(test_utils.GenericTestBase):
         ))
 
         self.topic_id = topic_services.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[subtopic_1], next_subtopic_id=2)
 
     def test_cannot_access_non_existent_topic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2487,6 +2519,16 @@ class TopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_topic_page/math/topic',
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic',
+                response.headers['location'])
+
+    def test_redirect_with_lowercase_topic_url_fragment(self):
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response(
+                '/mock_topic_page/staging/TOPIC',
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic',
@@ -3274,7 +3316,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 class SaveExplorationTests(test_utils.GenericTestBase):
     """Tests for can_save_exploration decorator."""
 
-    role = rights_manager.ROLE_VOICE_ARTIST
+    role = rights_domain.ROLE_VOICE_ARTIST
     username = 'user'
     user_email = 'user@example.com'
     banned_username = 'banneduser'

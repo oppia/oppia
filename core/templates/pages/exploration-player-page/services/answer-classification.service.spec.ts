@@ -37,37 +37,50 @@ import { StateClassifierMappingService } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('Answer Classification Service', () => {
+  const stateName = 'Test State';
+  const rules = {
+    Equals: (answer, inputs) => inputs.x === answer,
+    NotEquals: (answer, inputs) => inputs.x !== answer,
+    Contains: (answer, inputs) => (
+      answer.toLowerCase().includes(inputs.x.toLowerCase()))
+  };
+
+  let answerClassificationResultObjectFactory:
+    AnswerClassificationResultObjectFactory;
+  let answerClassificationService: AnswerClassificationService;
+  let appService: AppService;
+  let interactionSpecsService: InteractionSpecsService;
+  let outcomeObjectFactory: OutcomeObjectFactory;
+  let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
+  let stateClassifierMappingService: StateClassifierMappingService;
+  let stateObjectFactory: StateObjectFactory;
+
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
-    this.acs = TestBed.get(AnswerClassificationService);
-    this.as = TestBed.get(AppService);
-    this.iss = TestBed.get(InteractionSpecsService);
-    this.oof = TestBed.get(OutcomeObjectFactory);
-    this.pars = TestBed.get(PredictionAlgorithmRegistryService);
-    this.scms = TestBed.get(StateClassifierMappingService);
-    this.sof = TestBed.get(StateObjectFactory);
-
-    this.stateName = 'Test State';
-    this.rules = {
-      Equals: (answer, inputs) => inputs.x === answer,
-      NotEquals: (answer, inputs) => inputs.x !== answer,
-      Contains: (answer, inputs) => (
-        answer.toLowerCase().includes(inputs.x.toLowerCase()))
-    };
-
-    this.createStateFromBackendDict = (
-      () => this.sof.createFromBackendDict(this.stateName, this.stateDict));
+    answerClassificationResultObjectFactory = TestBed.get(
+      AnswerClassificationResultObjectFactory);
+    answerClassificationService = TestBed.get(AnswerClassificationService);
+    appService = TestBed.get(AppService);
+    interactionSpecsService = TestBed.get(InteractionSpecsService);
+    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
+    predictionAlgorithmRegistryService = TestBed.get(
+      PredictionAlgorithmRegistryService);
+    stateClassifierMappingService = TestBed.get(StateClassifierMappingService);
+    stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
   describe('with string classifier disabled', () => {
+    let stateDict;
+
     beforeEach(() => {
-      spyOn(this.iss, 'isInteractionTrainable').and.returnValue(false);
-      spyOn(this.as, 'isMachineLearningClassificationEnabled')
+      spyOn(
+        interactionSpecsService, 'isInteractionTrainable'
+      ).and.returnValue(false);
+      spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(false);
 
-      this.stateDict = {
+      stateDict = {
         content: {
           content_id: 'content',
           html: 'content'
@@ -95,11 +108,9 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
+              rule_type: 'Equals',
+              inputs: {x: 10}
+            }],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -113,21 +124,15 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             rule_specs: [{
-              inputs: {
-                x: 5
-              },
-              rule_type: 'Equals'
+              rule_type: 'Equals',
+              inputs: { x: 5 }
             }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'NotEquals'
+              rule_type: 'Equals',
+              inputs: { x: 6 }
             }, {
-              inputs: {
-                x: 6
-              },
-              rule_type: 'Equals'
-            }]
+              rule_type: 'NotEquals',
+              inputs: { x: 7 }
+            }],
           }],
           default_outcome: {
             dest: 'default',
@@ -156,10 +161,11 @@ describe('Answer Classification Service', () => {
     });
 
     it('should fail if no frontend rules are provided', () => {
-      const state = this.createStateFromBackendDict();
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
       expect(
-        () => this.acs.getMatchingClassificationResult(
+        () => answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 0, null)
       ).toThrowError(
         'No interactionRulesService was available to classify the answer.');
@@ -167,50 +173,58 @@ describe('Answer Classification Service', () => {
 
     it('should return the first matching answer group and first matching ' +
         'rule spec', () => {
-      const state = this.createStateFromBackendDict();
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
       expect(
-        this.acs.getMatchingClassificationResult(
-          state.name, state.interaction, 10, this.rules)
+        answerClassificationService.getMatchingClassificationResult(
+          state.name, state.interaction, 10, rules)
       ).toEqual(
-        this.acrof.createNew(
-          this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
+        answerClassificationResultObjectFactory.createNew(
+          outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []),
+          0, 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
       expect(
-        this.acs.getMatchingClassificationResult(
-          state.name, state.interaction, 5, this.rules)
+        answerClassificationService.getMatchingClassificationResult(
+          state.name, state.interaction, 5, rules)
       ).toEqual(
-        this.acrof.createNew(
-          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
+        answerClassificationResultObjectFactory.createNew(
+          outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
+          1, 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
       expect(
-        this.acs.getMatchingClassificationResult(
-          state.name, state.interaction, 6, this.rules)
+        answerClassificationService.getMatchingClassificationResult(
+          state.name, state.interaction, 6, rules)
       ).toEqual(
-        this.acrof.createNew(
-          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
+        answerClassificationResultObjectFactory.createNew(
+          outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
+          1, 1,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
     });
 
     it('should return the default rule if no answer group matches', () => {
-      const state = this.createStateFromBackendDict();
+      const state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
       expect(
-        this.acs.getMatchingClassificationResult(
-          state.name, state.interaction, 7, this.rules)
+        answerClassificationService.getMatchingClassificationResult(
+          state.name, state.interaction, 7, rules)
       ).toEqual(
-        this.acrof.createNew(
-          this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
-          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
+        answerClassificationResultObjectFactory.createNew(
+          outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
+          2, 0,
+          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
+        )
+      );
     });
 
     it(
       'should fail if no answer group matches and no default rule is ' +
         'provided',
       () => {
-        this.stateDict.interaction.answer_groups = [{
+        stateDict.interaction.answer_groups = [{
           outcome: {
             dest: 'outcome 1',
             feedback: {
@@ -223,17 +237,16 @@ describe('Answer Classification Service', () => {
             missing_prerequisite_skill_id: null
           },
           rule_specs: [{
-            inputs: {
-              x: 10
-            },
-            rule_type: 'Equals'
-          }]
+            rule_type: 'Equals',
+            inputs: {x: 10}
+          }],
         }];
 
-        const state = this.createStateFromBackendDict();
+        const state = (
+          stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
         expect(
-          () => this.acs.getMatchingClassificationResult(
+          () => answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 0, null)
         ).toThrowError(
           'No interactionRulesService was available to classify the answer.');
@@ -241,21 +254,48 @@ describe('Answer Classification Service', () => {
   });
 
   describe('with string classifier enabled', () => {
+    let stateDict;
+
     beforeEach(() => {
-      spyOn(this.as, 'isMachineLearningClassificationEnabled')
+      spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(true);
 
-      this.scms.init({
-        [this.stateName]: {
+      stateClassifierMappingService.init({
+        [stateName]: {
           algorithm_id: 'TestClassifier',
-          classifier_data: {},
+          classifier_data: {
+            KNN: {
+              occurrence: 40,
+              K: 30,
+              T: 20,
+              top: 10,
+              fingerprint_data: {},
+              token_to_id: {}
+            },
+            SVM: {
+              classes: [],
+              kernel_params: {
+                kernel: 'kernel',
+                coef0: 1,
+                degree: 2,
+                gamma: 3,
+              },
+              intercept: [],
+              n_support: [],
+              probA: [],
+              support_vectors: [[]],
+              probB: [],
+              dual_coef: [[]]
+            },
+            cv_vocabulary: {}
+          },
           data_schema_version: 1
         }
       });
-      this.pars.testOnlySetPredictionService(
+      predictionAlgorithmRegistryService.testOnlySetPredictionService(
         'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
 
-      this.stateDict = {
+      stateDict = {
         content: {
           content_id: 'content',
           html: 'content'
@@ -283,11 +323,9 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
+              rule_type: 'Equals',
+              inputs: { x: 10 }
+            }],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -300,17 +338,14 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
+            rule_input_translations: {},
             rule_specs: [{
-              inputs: {
-                x: 5
-              },
-              rule_type: 'Equals'
+              rule_type: 'Equals',
+              inputs: { x: 5 }
             }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'Equals'
-            }]
+              rule_type: 'Equals',
+              inputs: { x: 7 }
+            }],
           }],
           default_outcome: {
             dest: 'default',
@@ -342,15 +377,18 @@ describe('Answer Classification Service', () => {
       'should query the prediction service if no answer group matches and ' +
         'interaction is trainable',
       () => {
-        spyOn(this.iss, 'isInteractionTrainable').and.returnValue(true);
+        spyOn(
+          interactionSpecsService, 'isInteractionTrainable'
+        ).and.returnValue(true);
 
-        const state = this.createStateFromBackendDict();
+        const state = (
+          stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
         expect(
-          this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 0, this.rules)
+          answerClassificationService.getMatchingClassificationResult(
+            state.name, state.interaction, 0, rules)
         ).toEqual(
-          this.acrof.createNew(
+          answerClassificationResultObjectFactory.createNew(
             state.interaction.answerGroups[1].outcome, 1, null,
             ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
       });
@@ -359,27 +397,38 @@ describe('Answer Classification Service', () => {
       'should return the default rule if no answer group matches and ' +
         'interaction is not trainable',
       () => {
-        spyOn(this.iss, 'isInteractionTrainable').and.returnValue(false);
+        spyOn(
+          interactionSpecsService, 'isInteractionTrainable'
+        ).and.returnValue(false);
 
-        const state = this.createStateFromBackendDict();
+        const state = (
+          stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
         expect(
-          this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 0, this.rules)
+          answerClassificationService.getMatchingClassificationResult(
+            state.name, state.interaction, 0, rules)
         ).toEqual(
-          this.acrof.createNew(
-            this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
-            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
+          answerClassificationResultObjectFactory.createNew(
+            outcomeObjectFactory.createNew(
+              'default', 'default_outcome', '', []),
+            2, 0,
+            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
+          )
+        );
       });
   });
 
   describe('with training data classification', () => {
+    let stateDict;
+
     beforeEach(() => {
-      spyOn(this.iss, 'isInteractionTrainable').and.returnValue(true);
-      spyOn(this.as, 'isMachineLearningClassificationEnabled')
+      spyOn(
+        interactionSpecsService, 'isInteractionTrainable'
+      ).and.returnValue(true);
+      spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(true);
 
-      this.stateDict = {
+      stateDict = {
         content: {
           content_id: 'content',
           html: 'content'
@@ -408,11 +457,9 @@ describe('Answer Classification Service', () => {
             },
             training_data: ['abc', 'input'],
             rule_specs: [{
-              inputs: {
-                x: 'equal'
-              },
-              rule_type: 'Equals'
-            }]
+              rule_type: 'Equals',
+              inputs: { x: 'equal' }
+            }],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -427,11 +474,9 @@ describe('Answer Classification Service', () => {
             },
             training_data: ['xyz'],
             rule_specs: [{
-              inputs: {
-                x: 'npu'
-              },
-              rule_type: 'Contains'
-            }]
+              rule_type: 'Contains',
+              inputs: {x: 'npu'}
+            }],
           }],
           default_outcome: {
             dest: 'default',
@@ -463,21 +508,22 @@ describe('Answer Classification Service', () => {
       'should use training data classification if no answer group matches ' +
         'and interaction is trainable',
       () => {
-        const state = this.createStateFromBackendDict();
+        const state = (
+          stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
         expect(
-          this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 'abc', this.rules)
+          answerClassificationService.getMatchingClassificationResult(
+            state.name, state.interaction, 'abc', rules)
         ).toEqual(
-          this.acrof.createNew(
+          answerClassificationResultObjectFactory.createNew(
             state.interaction.answerGroups[0].outcome, 0, null,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
 
         expect(
-          this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 'xyz', this.rules)
+          answerClassificationService.getMatchingClassificationResult(
+            state.name, state.interaction, 'xyz', rules)
         ).toEqual(
-          this.acrof.createNew(
+          answerClassificationResultObjectFactory.createNew(
             state.interaction.answerGroups[1].outcome, 1, null,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
       });
@@ -486,13 +532,14 @@ describe('Answer Classification Service', () => {
       'should perform explicit classification before doing training data ' +
         'classification',
       () => {
-        const state = this.createStateFromBackendDict();
+        const state = (
+          stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
         expect(
-          this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 'input', this.rules)
+          answerClassificationService.getMatchingClassificationResult(
+            state.name, state.interaction, 'input', rules)
         ).toEqual(
-          this.acrof.createNew(
+          answerClassificationResultObjectFactory.createNew(
             state.interaction.answerGroups[1].outcome, 1, 0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });

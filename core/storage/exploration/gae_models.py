@@ -25,6 +25,7 @@ from constants import constants
 import core.storage.base_model.gae_models as base_models
 import feconf
 import python_utils
+import utils
 
 from google.appengine.ext import ndb
 
@@ -108,10 +109,29 @@ class ExplorationModel(base_models.VersionedModel):
         """Exploration is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'blurb': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'author_notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'states_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'init_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'states': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'param_specs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'correctness_feedback_enabled':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'default_skin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skin_customizations': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -124,7 +144,7 @@ class ExplorationModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def get_exploration_count(cls):
@@ -220,67 +240,16 @@ class ExplorationContextModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """Check whether ExplorationContextModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
-
-
-class ExplorationMathRichTextInfoModel(base_models.BaseModel):
-    """Temporary Storage model for storing information useful while
-    generating images for math rich-text components in explorations.
-
-    TODO(#9952): This model needs to removed once we generate SVG images for
-    all the math rich text componets in old explorations.
-
-    The id of each instance is the id of the corresponding exploration.
-    """
-
-    # A boolean which indicates whether the exploration requires images to be
-    # generated and saved for the math rich-text components. If this field is
-    # False, we will need to generate math rich-text component images for the
-    # exploration. The field will be true only if for each math rich-text
-    # components there is a valid image stored in the datastore.
-    math_images_generation_required = ndb.BooleanProperty(
-        indexed=True, required=True)
-    # Approximate maximum size of Math rich-text components SVG images that
-    # would be generated for the exploration according to the length of
-    # raw_latex string.
-    estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
-        indexed=True, required=True)
-    # List of unique LaTeX strings without an SVG saved from all the math-rich
-    # text components of the exploration.
-    latex_strings_without_svg = ndb.StringProperty(repeated=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """ExplorationMathRichTextInfoModel are temporary model that will be
-        deleted after user migration.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @staticmethod
-    def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether ExplorationMathRichTextInfoModel references the given
-        user.
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
@@ -355,10 +324,59 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationRightsModel reference user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(ndb.OR(
+            cls.owner_ids == user_id,
+            cls.editor_ids == user_id,
+            cls.voice_artist_ids == user_id,
+            cls.viewer_ids == user_id
+        )).get(keys_only=True) is not None
+
+    def save(self, committer_id, commit_message, commit_cmds):
+        """Saves a new version of the exploration, updating the Exploration
+        datastore model.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. The type of the command. A full list of command
+                        types can be found in core/domain/exp_domain.py.
+                and then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number',
+                 'version_number': 4}
+        """
+        super(ExplorationRightsModel, self).commit(
+            committer_id, commit_message, commit_cmds)
 
     @staticmethod
     def convert_to_valid_dict(model_dict):
@@ -382,57 +400,49 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # model, we need to remove it.
         if 'all_viewer_ids' in model_dict:
             del model_dict['all_viewer_ids']
+
         # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.
         if model_dict['status'] == 'publicized':
             model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+
         # The voice_artist_ids field was previously named translator_ids. We
         # need to move the values from translator_ids field to voice_artist_ids
         # and delete translator_ids.
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
             model_dict['translator_ids'] = []
+
+        # We need to remove pseudonymous IDs from all the fields that contain
+        # user IDs.
+        for field_name in (
+                'owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'):
+            model_dict[field_name] = [
+                user_id for user_id in model_dict[field_name]
+                if not utils.is_pseudonymous_id(user_id)
+            ]
+
         return model_dict
 
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether ExplorationRightsModel reference user.
+    def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+
+        Some old ExplorationRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationRightsModel from
+        them. We need to remove or replace these fields and values.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
 
         Returns:
-            bool. Whether any models refer to the given user ID.
+            VersionedModel. The instance of the VersionedModel class populated
+            with the the snapshot.
         """
-        return (
-            cls.query(ndb.OR(
-                cls.owner_ids == user_id,
-                cls.editor_ids == user_id,
-                cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id
-            )).get(keys_only=True) is not None
-            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
-
-    def save(self, committer_id, commit_message, commit_cmds):
-        """Saves a new version of the exploration, updating the Exploration
-        datastore model.
-
-        Args:
-            committer_id: str. The user_id of the user who committed the
-                change.
-            commit_message: str. The commit description message.
-            commit_cmds: list(dict). A list of commands, describing changes
-                made in this model, which should give sufficient information to
-                reconstruct the commit. Each dict always contains:
-                    cmd: str. The type of the command. A full list of command
-                        types can be found in core/domain/exp_domain.py.
-                and then additional arguments for that command. For example:
-
-                {'cmd': 'AUTO_revert_version_number',
-                 'version_number': 4}
-        """
-        super(ExplorationRightsModel, self).commit(
-            committer_id, commit_message, commit_cmds)
+        self.populate(
+            **ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
+        return self
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -475,6 +485,29 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
+
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+        snapshot_metadata_model.content_user_ids = list(sorted(
+            set(self.owner_ids) |
+            set(self.editor_ids) |
+            set(self.voice_artist_ids) |
+            set(self.viewer_ids)
+        ))
+
+        commit_cmds_user_ids = set()
+        for commit_cmd in commit_cmds:
+            user_id_attribute_names = python_utils.NEXT(
+                cmd['user_id_attribute_names']
+                for cmd in feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                if cmd['name'] == commit_cmd['cmd']
+            )
+            for user_id_attribute_name in user_id_attribute_names:
+                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+        snapshot_metadata_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+
+        snapshot_metadata_model.put()
 
     @classmethod
     def export_data(cls, user_id):
@@ -530,12 +563,14 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
@@ -688,9 +723,6 @@ class ExpSummaryModel(base_models.BaseModel):
     # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
 
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
-
     @staticmethod
     def get_deletion_policy():
         """Exploration summary is deleted only if the corresponding exploration
@@ -812,10 +844,32 @@ class ExpSummaryModel(base_models.BaseModel):
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model data has already been exported as a part of the
         ExplorationModel and thus does not need a separate export_data
         function.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ratings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'scaled_average_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_model_created_on':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'owner_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'editor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voice_artist_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

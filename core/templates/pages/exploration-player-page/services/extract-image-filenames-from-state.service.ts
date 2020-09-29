@@ -133,15 +133,15 @@ export class ExtractImageFilenamesFromStateService {
 
     /**
      * Extracts the filepath object from the filepath-value attribute of the
-     * oppia-noninteractive-image tags in the strHtml(given string).
-     * @param {string} strHtml - The string from which the object of
+     * oppia-noninteractive-image tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
      *                           filepath should be extracted.
      */
     _extractFilepathValueFromOppiaNonInteractiveImageTag(
-        strHtml: string): string[] {
+        htmlString: string): string[] {
       let filenames = [];
       let unescapedHtmlString = (
-        this.htmlEscaperService.escapedStrToUnescapedStr(strHtml));
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
       let dummyDocument = (
         new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
 
@@ -160,6 +160,30 @@ export class ExtractImageFilenamesFromStateService {
     }
 
     /**
+     * Extracts the SVG filename from the math-content attribute of the
+     * oppia-noninteractive-math tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
+     *                           filepath should be extracted.
+     */
+    _extractSvgFilenameFromOppiaNonInteractiveMathTag(
+        htmlString: string): string[] {
+      let filenames = [];
+      let unescapedHtmlString = (
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
+      let dummyDocument = (
+        new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
+
+      let mathTagList = dummyDocument.getElementsByTagName(
+        'oppia-noninteractive-math');
+      for (let i = 0; i < mathTagList.length; i++) {
+        let mathContentWithValue = JSON.parse(
+          mathTagList[i].getAttribute('math_content-with-value'));
+        filenames.push(mathContentWithValue.svg_filename);
+      }
+      return filenames;
+    }
+
+    /**
      * Gets the filenames of all the images that are a part of the state.
      * @param {object} state - The state from which the filenames of the image
      *                         should be extracted.
@@ -170,8 +194,8 @@ export class ExtractImageFilenamesFromStateService {
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath.
       if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        let filename = (
-          (<ImageClickInputCustomizationArgs> state.interaction
+        let filename = ((
+          <ImageClickInputCustomizationArgs> state.interaction
             .customizationArgs).imageAndRegions.value.imagePath);
         filenamesInState.push(filename);
       }
@@ -179,6 +203,8 @@ export class ExtractImageFilenamesFromStateService {
       allHtmlOfState.forEach((htmlStr) => {
         filenamesInState = filenamesInState.concat(
           this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+        filenamesInState = filenamesInState.concat(
+          this._extractSvgFilenameFromOppiaNonInteractiveMathTag(htmlStr));
       });
       return filenamesInState;
     }

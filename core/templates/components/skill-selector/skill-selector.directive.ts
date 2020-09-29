@@ -46,6 +46,16 @@ angular.module('oppia').directive('selectSkill', [
             $scope.checkIfEmpty = function(skills) {
               return (skills.length === 0);
             };
+            $scope.checkIfTopicIsEmpty = function(topicName) {
+              for (let key in $scope.categorizedSkills[topicName]) {
+                if (
+                  Object.keys(
+                    $scope.categorizedSkills[topicName][key]).length) {
+                  return true;
+                }
+              }
+              return false;
+            };
             $scope.setSelectedSkillId = function() {
               $scope.selectedSkillId = $scope.selectedSkill;
             };
@@ -73,7 +83,6 @@ angular.module('oppia').directive('selectSkill', [
             // The folowing function is called when the subtopic filter changes.
             // This updates the list of Skills displayed in the selector.
             $scope.updateSkillsListOnSubtopicFilterChange = function() {
-              var skills = $scope.getSortedSkillSummaries();
               var updatedSkillsDict = {};
               var isAnySubTopicChecked = false;
               for (var topicName in $scope.subTopicFilterDict) {

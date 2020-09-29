@@ -45,11 +45,11 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
   },
   template: require('./state-translation-status-graph.component.html'),
   controller: [
-    '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
+    '$scope', 'ExplorationStatesService', 'GraphDataService',
     'StateEditorService', 'StateRecordedVoiceoversService',
     'StateWrittenTranslationsService', 'TranslationStatusService',
     function(
-        $scope, $rootScope, ExplorationStatesService, GraphDataService,
+        $scope, ExplorationStatesService, GraphDataService,
         StateEditorService, StateRecordedVoiceoversService,
         StateWrittenTranslationsService, TranslationStatusService) {
       var ctrl = this;
@@ -65,7 +65,7 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
       };
       $scope.onClickStateInMap = function(newStateName) {
         if (ctrl.isTranslationTabBusy) {
-          $rootScope.$broadcast('showTranslationTabBusyModal');
+          StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
         }
         StateEditorService.setActiveStateName(newStateName);
@@ -78,7 +78,7 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
           StateWrittenTranslationsService.init(
             StateEditorService.getActiveStateName(),
             stateData.writtenTranslations);
-          $rootScope.$broadcast('refreshStateTranslation');
+          StateEditorService.onRefreshStateTranslation.emit();
         }
       };
     }

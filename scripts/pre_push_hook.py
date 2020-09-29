@@ -42,6 +42,7 @@ import sys
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
+from scripts import install_backend_python_libs # isort:skip  # pylint: disable=wrong-import-position
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
@@ -67,6 +68,8 @@ FRONTEND_TEST_CMDS = [
 TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
 TYPESCRIPT_CHECKS_CMDS = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
+STRICT_TYPESCRIPT_CHECKS_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.typescript_checks', '--strict_checks']
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -408,6 +411,38 @@ def does_diff_include_travis_yml_or_js_files(diff_files):
     return False
 
 
+def check_for_backend_python_library_inconsistencies():
+    """Checks the state of the 'third_party/python_libs' folder and compares it
+    to the required libraries specified in 'requirements.txt'.
+    If any inconsistencies are found, the script displays the inconsistencies
+    and exits.
+    """
+    mismatches = install_backend_python_libs.get_mismatches()
+
+    if mismatches:
+        python_utils.PRINT(
+            'Your currently installed python libraries do not match the\n'
+            'libraries listed in your "requirements.txt" file. Here is a\n'
+            'full list of library/version discrepancies:\n')
+
+        python_utils.PRINT(
+            '{:<35} |{:<25}|{:<25}'.format(
+                'Library', 'Requirements Version',
+                'Currently Installed Version'))
+        for library_name, version_strings in mismatches.items():
+            python_utils.PRINT('{:<35} |{:<25}|{:<25}'.format(
+                library_name, version_strings[0], version_strings[1]))
+        python_utils.PRINT('\n')
+        common.print_each_string_after_two_new_lines([
+            'Please fix these discrepancies by editing the `requirements.in`\n'
+            'file or running `scripts.install_third_party` to regenerate\n'
+            'the `third_party/python_libs` directory.\n'])
+        sys.exit(1)
+    else:
+        python_utils.PRINT(
+            'Python dependencies consistency check succeeded.')
+
+
 def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -433,6 +468,9 @@ def main(args=None):
             'Your repo is in a dirty state which prevents the linting from'
             ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
+
+    check_for_backend_python_library_inconsistencies()
+
     for branch, (modified_files, files_to_lint) in collected_files.items():
         with ChangedBranch(branch):
             if not modified_files and not files_to_lint:
@@ -451,6 +489,16 @@ def main(args=None):
             if typescript_checks_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing typescript checks.')
+                sys.exit(1)
+
+            strict_typescript_checks_status = 0
+            if does_diff_include_ts_files(files_to_lint):
+                strict_typescript_checks_status = run_script_and_get_returncode(
+                    STRICT_TYPESCRIPT_CHECKS_CMDS)
+            if strict_typescript_checks_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing typescript checks in '
+                    'strict mode.')
                 sys.exit(1)
 
             frontend_status = 0

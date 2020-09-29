@@ -18,12 +18,10 @@
  */
 
 var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
@@ -36,16 +34,14 @@ describe('Statistics tab', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
-  var explorationPlayerPage = null;
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('checks statistics tab for an exploration', async function() {
+  it('should check statistics tab for an exploration', async function() {
     var EXPLORATION_TITLE = 'Exploration for stats testing';
     var EXPLORATION_OBJECTIVE = 'To explore something';
     var EXPLORATION_CATEGORY = 'Algorithms';

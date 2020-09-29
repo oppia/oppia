@@ -17,8 +17,8 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+// Skill editor page is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/skill-editor-page/skill-editor-page.component.ts');
@@ -32,12 +32,7 @@ describe('Skill editor page', function() {
   var $uibModal = null;
   var UrlService = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
@@ -46,11 +41,10 @@ describe('Skill editor page', function() {
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
-
     ctrl = $componentController('skillEditorPage');
   }));
 
-  it('should load skill based on its id on url when component is initialized',
+  it('should load skill based on its id in url when component is initialized',
     function() {
       spyOn(SkillEditorStateService, 'loadSkill').and.stub();
       spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
@@ -59,37 +53,45 @@ describe('Skill editor page', function() {
       expect(SkillEditorStateService.loadSkill).toHaveBeenCalledWith('skill_1');
     });
 
-  it('should get active tab name', function() {
-    spyOn(SkillEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'questions');
-    expect(ctrl.getActiveTabName()).toBe('questions');
+  it('should call confirm before leaving', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    spyOn(window, 'addEventListener');
+    ctrl.setUpBeforeUnload();
+    ctrl.confirmBeforeLeaving({returnValue: ''});
+    expect(window.addEventListener).toHaveBeenCalledWith(
+      'beforeunload', ctrl.confirmBeforeLeaving);
   });
 
-  it('should call SkillEditorRoutingService to navigate to main tab',
+  it('should get active tab name from skill editor routing service',
     function() {
-      var routingSpy = spyOn(
-        SkillEditorRoutingService, 'navigateToMainTab');
-      ctrl.selectMainTab();
-      expect(routingSpy).toHaveBeenCalled();
+      spyOn(SkillEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'questions');
+      expect(ctrl.getActiveTabName()).toBe('questions');
     });
 
-  it('should call SkillEditorRoutingService to navigate to preview tab',
-    function() {
-      var routingSpy = spyOn(
-        SkillEditorRoutingService, 'navigateToPreviewTab');
-      ctrl.selectPreviewTab();
-      expect(routingSpy).toHaveBeenCalled();
-    });
+  it('should go to main tab when selecting main tab', function() {
+    var routingSpy = spyOn(
+      SkillEditorRoutingService, 'navigateToMainTab');
+    ctrl.selectMainTab();
+    expect(routingSpy).toHaveBeenCalled();
+  });
 
-  it('should call open save changes modal if unsaved changes are present',
-    function() {
-      spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
-      ctrl.selectQuestionsTab();
-      expect(modalSpy).toHaveBeenCalled();
-    });
+  it('should go to preview tab when selecting preview tab', function() {
+    var routingSpy = spyOn(
+      SkillEditorRoutingService, 'navigateToPreviewTab');
+    ctrl.selectPreviewTab();
+    expect(routingSpy).toHaveBeenCalled();
+  });
 
-  it('should call open save changes modal if unsaved changes are present',
+  it('should open save changes modal with $uibModal when unsaved changes are' +
+    ' present', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    ctrl.selectQuestionsTab();
+    expect(modalSpy).toHaveBeenCalled();
+  });
+
+  it('should navigate to questions tab when unsaved changes are not present',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
       var routingSpy = spyOn(

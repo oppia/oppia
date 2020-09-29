@@ -18,14 +18,11 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-misconception-editor.component.ts is upgraded to Angular 8.
-/* eslint-disable max-len */
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 // ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
@@ -78,10 +75,8 @@ describe('Question Validation Service', function() {
               refresher_exploration_id: null
             },
             rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
+              rule_type: 'Equals',
+              inputs: {x: 10}
             }],
             tagged_skill_misconception_id: null
           }, {
@@ -96,10 +91,8 @@ describe('Question Validation Service', function() {
               refresher_exploration_id: null
             },
             rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
+              rule_type: 'Equals',
+              inputs: {x: 10}
             }],
             tagged_skill_misconception_id: 'abc-1'
           }],
@@ -163,7 +156,8 @@ describe('Question Validation Service', function() {
       },
       language_code: 'en',
       version: 1,
-      linked_skill_ids: ['abc']
+      linked_skill_ids: ['abc'],
+      inapplicable_skill_misconception_ids: ['abc-2']
     };
     mockMisconceptionObject = {
       abc: [

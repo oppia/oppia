@@ -31,10 +31,12 @@ describe('Story viewer backend API service', () => {
   let httpTestingController: HttpTestingController;
 
   let sampleDataResults = {
+    story_id: 'qwerty',
     story_title: 'Story title',
     story_description: 'Story description',
     story_nodes: [],
-    topic_name: 'Topic name'
+    topic_name: 'Topic name',
+    meta_tag_content: 'Story meta tag content'
   };
 
   beforeEach(() => {

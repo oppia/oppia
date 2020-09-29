@@ -16,22 +16,27 @@
  * @fileoverview Controller for RteHelperService.
  */
 
+require('services/external-rte-save.service.ts');
+
 angular.module('oppia').controller('RteHelperModalController', [
   '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
-  'AssetsBackendApiService', 'ContextService', 'FocusManagerService',
+  'AssetsBackendApiService', 'ContextService',
+  'ExternalRteSaveService', 'FocusManagerService',
   'ImageLocalStorageService', 'ImageUploadHelperService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $scope, $timeout, $uibModalInstance, AlertsService,
-      AssetsBackendApiService, ContextService, FocusManagerService,
+      AssetsBackendApiService, ContextService,
+      ExternalRteSaveService, FocusManagerService,
       ImageLocalStorageService, ImageUploadHelperService,
       attrsCustomizationArgsDict, customizationArgSpecs,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
       videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-      return ((videoUrl[2] !== undefined) ?
-                videoUrl[2].split(/[^0-9a-z_\-]/i)[0] : videoUrl[0]);
+      return (
+        (videoUrl[2] !== undefined) ?
+        videoUrl[2].split(/[^0-9a-z_\-]/i)[0] : videoUrl[0]);
     };
 
     $scope.customizationArgSpecs = customizationArgSpecs;
@@ -96,7 +101,7 @@ angular.module('oppia').controller('RteHelperModalController', [
       }
     };
     $scope.save = function() {
-      $scope.$broadcast('externalSave');
+      ExternalRteSaveService.onExternalRteSave.emit();
 
       var customizationArgsDict = {};
       // For the case of the math rich text components, we need to handle the
@@ -119,6 +124,18 @@ angular.module('oppia').controller('RteHelperModalController', [
           $uibModalInstance.dismiss('cancel');
           return;
         }
+        var resampledFile = (
+          ImageUploadHelperService.convertImageDataToImageFile(svgFile));
+        const HUNDRED_KB_IN_BYTES = 100 * 1024;
+        if (resampledFile.size > HUNDRED_KB_IN_BYTES) {
+          AlertsService.addInfoMessage(
+            'The SVG file generated exceeds 100' +
+            ' KB. Please split the expression into smaller ones.' +
+            '   Example: x^2 + y^2 + z^2 can be split as \'x^2 + y^2\' ' +
+            'and \'+ z^2\'', 5000);
+          $uibModalInstance.dismiss('cancel');
+          return;
+        }
         if (
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
@@ -132,8 +149,6 @@ angular.module('oppia').controller('RteHelperModalController', [
           $uibModalInstance.close(customizationArgsDict);
           return;
         }
-        var resampledFile = (
-          ImageUploadHelperService.convertImageDataToImageFile(svgFile));
         AssetsBackendApiService.saveMathExpresionImage(
           resampledFile, svgFileName, ContextService.getEntityType(),
           ContextService.getEntityId()).then(function(response) {

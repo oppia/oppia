@@ -74,6 +74,11 @@ angular.module('oppia').factory('ImageLocalStorageService', [
         }
         return returnData;
       },
+
+      isInStorage: function(filename) {
+        return storedImageFilenames.indexOf(filename) !== -1;
+      },
+
       setThumbnailBgColor: function(bgColor) {
         thumbnailBgColor = bgColor;
       },

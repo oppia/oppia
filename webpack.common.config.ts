@@ -48,7 +48,12 @@ module.exports = {
     extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
       '@angular/upgrade/static': (
-        '@angular/upgrade/bundles/upgrade-static.umd.js')
+        '@angular/upgrade/bundles/upgrade-static.umd.js'),
+      // This is needed because in app.constants.ts we need to import
+      // assets/constants.ts. We can't directly write import 'constants'
+      // because a module named 'constants' is defined in '@types/node'
+      // package.
+      'assets/constants': 'constants.ts'
     }
   },
   entry: {
@@ -163,10 +168,11 @@ module.exports = {
       filename: 'admin-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on math, ' +
-          'physics, statistics, chemistry, music, history and more from ' +
-          'anywhere in the world. Learn from our pre-existing ' +
-          'explorations, or teach and create your own.'
+        description: 'With Oppia, you can access free lessons on ' +
+          'math, physics, statistics, chemistry, music, history and ' +
+          'more from anywhere in the world. Oppia is a nonprofit ' +
+          'with the mission of providing high-quality ' +
+          'education to those who lack access to it.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -719,7 +725,16 @@ module.exports = {
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'node_modules'),
       ],
-      use: ['cache-loader', 'style-loader', 'css-loader']
+      use: [
+        'cache-loader',
+        'style-loader',
+        {
+          loader: 'css-loader',
+          options: {
+            url: false,
+          }
+        }
+      ]
     }]
   },
   externals: {

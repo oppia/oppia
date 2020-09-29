@@ -20,16 +20,34 @@ import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
+import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 
 describe('Read only topic object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
   let _sampleReadOnlyTopic: ReadOnlyTopic = null;
+  let storyNodeObjectFactory: StoryNodeObjectFactory = null;
 
   beforeEach(() => {
     readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
+      new StoryNodeObjectFactory(),
       new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
       new ShortSkillSummaryObjectFactory());
+    storyNodeObjectFactory = new StoryNodeObjectFactory();
+
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
 
     let sampleTopicDataDict = {
       topic_name: 'topic_name',
@@ -44,7 +62,8 @@ describe('Read only topic object Factory', () => {
         thumbnail_bg_color: '#F8BF74',
         story_is_published: true,
         completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title'
+        url_fragment: 'story-title',
+        pending_node_dicts: [nodeDict]
       }],
       additional_story_dicts: [{
         id: '1',
@@ -55,7 +74,8 @@ describe('Read only topic object Factory', () => {
         thumbnail_bg_color: '#F8BF74',
         story_is_published: true,
         completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title-one'
+        url_fragment: 'story-title-one',
+        pending_node_dicts: [nodeDict]
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
@@ -74,27 +94,31 @@ describe('Read only topic object Factory', () => {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
       },
-      train_tab_should_be_displayed: false
+      practice_tab_is_displayed: false,
+      meta_tag_content: 'Topic meta tag content',
     };
 
     _sampleReadOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
       sampleTopicDataDict);
   });
 
-  it('should return correct values of topic name, description and id', () => {
+  it('should return correct values for read-only topic object', () => {
     expect(_sampleReadOnlyTopic.getTopicName()).toEqual('topic_name');
     expect(
       _sampleReadOnlyTopic.getTopicDescription()).toEqual('Topic description');
     expect(_sampleReadOnlyTopic.getTopicId()).toEqual('topic_id');
-    expect(_sampleReadOnlyTopic.getTrainTabShouldBeDisplayed()).toEqual(false);
+    expect(_sampleReadOnlyTopic.getPracticeTabIsDisplayed()).toEqual(false);
+    expect(_sampleReadOnlyTopic.getMetaTagContent()).toEqual(
+      'Topic meta tag content');
   });
 
   it('should return correct value of uncategorized skill summary object',
     () => {
       expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].getId())
         .toEqual('skill_id_1');
-      expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0]
-        .getDescription()).toEqual('Skill Description 1');
+      expect(
+        _sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0]
+          .getDescription()).toEqual('Skill Description 1');
     });
 
   it('should return correct values of subtopic object', () => {
@@ -103,8 +127,9 @@ describe('Read only topic object Factory', () => {
       'subtopic_name');
     expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0].getId())
       .toEqual('skill_id_2');
-    expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0]
-      .getDescription()).toEqual('Skill Description 2');
+    expect(
+      _sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0]
+        .getDescription()).toEqual('Skill Description 2');
   });
 
   it('should return correct values of skill descriptions', () => {
@@ -115,17 +140,28 @@ describe('Read only topic object Factory', () => {
   });
 
   it('should return correct values of canonical stories', () => {
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getId())
-      .toEqual('0');
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getTitle())
-      .toEqual('Story Title');
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0]
-      .getDescription()).toEqual('Story Description');
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeTitles())
-      .toEqual(['Chapter 1']);
-    expect(
-      _sampleReadOnlyTopic.getCanonicalStorySummaries()[0].isNodeCompleted(
-        'Chapter 1')).toEqual(true);
+    let expectedStorySummary = (
+      _sampleReadOnlyTopic.getCanonicalStorySummaries()[0]);
+    expect(expectedStorySummary.getId()).toEqual('0');
+    expect(expectedStorySummary.getTitle()).toEqual('Story Title');
+    expect(expectedStorySummary.getDescription()).toEqual('Story Description');
+    expect(expectedStorySummary.getNodeTitles()).toEqual(['Chapter 1']);
+    expect(expectedStorySummary.isNodeCompleted('Chapter 1')).toEqual(true);
+    expect(expectedStorySummary.getPendingNodes()).toEqual([
+      storyNodeObjectFactory.createFromBackendDict({
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_2'],
+        destination_node_ids: ['node_2'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40'
+      })
+    ]);
   });
 
   it('should return correct values of additional stories', () => {
@@ -133,10 +169,12 @@ describe('Read only topic object Factory', () => {
       .toEqual('1');
     expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getTitle())
       .toEqual('Story Title');
-    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
-      .getDescription()).toEqual('Story Description');
-    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
-      .getNodeTitles()).toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
+        .getDescription()).toEqual('Story Description');
+    expect(
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
+        .getNodeTitles()).toEqual(['Chapter 1']);
     expect(
       _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].isNodeCompleted(
         'Chapter 1')).toEqual(true);

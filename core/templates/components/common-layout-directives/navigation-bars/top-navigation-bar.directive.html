@@ -17,7 +17,7 @@
     </picture>
   </a>
 </div>
-<div class="nav-mobile-header-text-container">
+<div class="nav-mobile-header-text-container" ng-if="headerText().length">
   <span class="nav-mobile-header-editor"><[headerText()]></span>
   <span class="nav-mobile-header-text"><[subheaderText()]></span>
 </div>
@@ -102,7 +102,7 @@
             </li>
           </ul>
         </li>
-        <li ng-if="$ctrl.CLASSROOM_PAGE_IS_SHOWN"
+        <li ng-if="$ctrl.CLASSROOM_PROMOS_ARE_ENABLED"
             ng-class="{'open' : $ctrl.activeMenuName === 'classroomMenu'}"
             uib-dropdown
             ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
@@ -126,7 +126,7 @@
             <li class="nav-item">
               <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link"
-                 href="/math" translate="I18N_TOPNAV_CLASSROOM_BASIC_MATHS">
+                 href="/learn/math" translate="I18N_TOPNAV_CLASSROOM_BASIC_MATHS">
               </a>
             </li>
           </ul>
@@ -160,7 +160,7 @@
             <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture rounded-circle" alt="User Avatar">
           </span>
           <span ng-if="!$ctrl.profilePictureDataUrl">
-            <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
+            <i class="material-icons md-40 oppia-user-avatar-icon">&#xE853;</i>
             <span class="oppia-icon-accessibility-label">User Avatar</span>
           </span>
 
@@ -176,7 +176,7 @@
              from appearing off-center because 'A' is slightly thinner than 'M' in
              this font.
             -->
-            <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text protractor-test-admin-text" style="right: 4px;">A</span>
+            <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text oppia-admin-text protractor-test-admin-text">A</span>
             <span ng-if="$ctrl.isModerator && !$ctrl.isAdmin" class="oppia-navbar-role-text protract-test-moderator-text">M</span>
           </div>
         </div>
@@ -250,17 +250,16 @@
 
     <li uib-dropdown ng-if="!$ctrl.userIsLoggedIn && $ctrl.username !== ''" class="nav-item
      oppia-navbar-clickable-dropdown">
-      <div class="oppia-navbar-button-container" style="margin-right: 10px;">
+      <div class="oppia-navbar-button-container oppia-navbar-button-container-extra-info">
         <button class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
                 ng-click="$ctrl.onLoginButtonClicked()">
           <span translate="I18N_TOPNAV_SIGN_IN"></span>
         </button>
       </div>
-      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
-          style="margin-right: 15px; padding: 0;">
+      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-menu">
         <li class="nav-item">
-          <a href="" style="padding: 0; width: 190px;" ng-click="$ctrl.onLoginButtonClicked()"
-             class="nav-link">
+          <a href="" ng-click="$ctrl.onLoginButtonClicked()"
+             class="nav-link oppia-nav-link">
             <div class="oppia-signin-google">
               <div class="oppia-signin-g-icon">
                 <img ng-src="<[$ctrl.googleSignInIconUrl]>" alt="Google signin icon">
@@ -273,7 +272,7 @@
     </li>
 
     <li uib-dropdown ng-if="$ctrl.username === ''" class="oppia-navbar-clickable-dropdown">
-      <div class="oppia-navbar-button-container" style="margin-right: 10px;">
+      <div class="oppia-navbar-button-container oppia-navbar-button-container-extra-info">
       </div>
     </li>
   </ul>
@@ -382,6 +381,23 @@
     font-weight: 500;
     letter-spacing: .21px;
     line-height: 38px;
+  }
+  top-navigation-bar .oppia-user-avatar-icon {
+    margin-top: -1px;
+  }
+  top-navigation-bar .oppia-admin-text {
+    right: 4px;
+  }
+  top-navigation-bar .oppia-navbar-button-container-extra-info {
+    margin-right: 10px;
+  }
+  top-navigation-bar .oppia-navbar-dropdown-menu {
+    margin-right: 15px;
+    padding: 0;
+  }
+  top-navigation-bar .oppia-nav-link {
+    padding: 0;
+    width: 190px;
   }
   .oppia-navbar-profile > li:hover {
     background-color: #fff;

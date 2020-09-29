@@ -19,39 +19,26 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'third-party-imports/angular-js.import';
-import 'third-party-imports/headroom.import';
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { ServicesConstants } from 'services/services.constants';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-/* eslint-disable max-len */
-import { TopicsAndSkillsDashboardDomainConstants } from
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
-import { TopicsAndSkillsDashboardPageConstants } from
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-/* eslint-enable max-len */
 
 @NgModule({
   imports: [
@@ -66,17 +53,15 @@ import { TopicsAndSkillsDashboardPageConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    SkillDomainConstants,
-    TopicDomainConstants,
-    TopicsAndSkillsDashboardDomainConstants,
-    TopicsAndSkillsDashboardPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]

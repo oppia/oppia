@@ -78,13 +78,16 @@ describe('MathEquationInputInteractive', function() {
     guppyInitializationService = new GuppyInitializationService();
     deviceInfoService = new DeviceInfoService(new WindowRef());
 
-    $provide.value('CurrentInteractionService',
-      mockCurrentInteractionService);
-    $provide.value('MathEquationInputRulesService',
-      mockMathEquationInputRulesService);
+    $provide.value(
+      'CurrentInteractionService', mockCurrentInteractionService);
+    $provide.value(
+      'MathEquationInputRulesService', mockMathEquationInputRulesService);
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
+    $provide.value('$attrs', {
+      customOskLettersWithValue: '[&quot;a&quot;, &quot;b&quot;]'
+    });
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');
@@ -116,6 +119,8 @@ describe('MathEquationInputInteractive', function() {
     // Invalid answer.
     ctrl.value = '(x + y) = 3';
 
+    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+      ['x', 'y']);
     spyOn(mockCurrentInteractionService, 'onSubmit');
     ctrl.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();

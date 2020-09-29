@@ -28,19 +28,20 @@ require(
 require('services/contextual/device-info.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
+require('services/html-escaper.service.ts');
 require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
   template: require('./math-equation-input-interaction.component.html'),
   controller: [
-    '$scope', 'MathEquationInputRulesService',
-    'CurrentInteractionService', 'DeviceInfoService',
+    '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
+    'HtmlEscaperService', 'MathEquationInputRulesService',
     'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $scope, MathEquationInputRulesService,
-        CurrentInteractionService, DeviceInfoService,
+        $attrs, $scope, CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
+        HtmlEscaperService, MathEquationInputRulesService,
         MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
@@ -56,7 +57,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
           let answerIsValid = MathInteractionsService.validateEquation(
-            ctrl.value);
+            ctrl.value, GuppyInitializationService.getCustomOskLetters());
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
         }
@@ -74,6 +75,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
 
       ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'MathEquationInput';
       };
 
       ctrl.$onInit = function() {
@@ -82,6 +84,9 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
         GuppyInitializationService.init(
           'guppy-div-learner',
           MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+        GuppyInitializationService.setCustomOskLetters(
+          HtmlEscaperService.escapedJsonToObj(
+            $attrs.customOskLettersWithValue));
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

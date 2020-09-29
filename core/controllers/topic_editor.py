@@ -75,11 +75,13 @@ class TopicEditorStoryHandler(base.BaseHandler):
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
             summary['completed_node_titles'] = []
+            summary['pending_node_dicts'] = []
 
         for summary in additional_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
             summary['completed_node_titles'] = []
+            summary['pending_node_dicts'] = []
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
@@ -278,6 +280,13 @@ class EditableTopicDataHandler(base.BaseHandler):
         self._require_valid_version(version, topic.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if (commit_message is not None and
+                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         topic_and_subtopic_page_change_dicts = self.payload.get(
             'topic_and_subtopic_page_change_dicts')
         topic_and_subtopic_page_change_list = []
@@ -346,7 +355,7 @@ class TopicRightsHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Returns the TopicRights object of a topic."""
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise self.InvalidInputException(
                 'Expected a valid topic id to be provided.')

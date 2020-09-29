@@ -31,6 +31,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import user_services
@@ -143,7 +144,6 @@ class EditorTests(BaseEditorControllerTests):
         # Validates if the current NEW_STATE_TEMPLATE is the latest version
         # by validating it.
         exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
-
 
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error
@@ -1078,11 +1078,11 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
         rights_manager.assign_role_for_exploration(
             self.owner, unpublished_exp_id, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_exploration(
             self.owner, unpublished_exp_id, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_VOICE_ARTIST)
 
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
@@ -1117,10 +1117,10 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_VOICE_ARTIST)
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
@@ -1465,25 +1465,25 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.VIEWER_USERNAME,
-                'new_member_role': rights_manager.ROLE_VIEWER
+                'new_member_role': rights_domain.ROLE_VIEWER
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.VOICE_ARTIST_USERNAME,
-                'new_member_role': rights_manager.ROLE_VOICE_ARTIST
+                'new_member_role': rights_domain.ROLE_VOICE_ARTIST
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR2_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
 
         self.logout()
@@ -1501,9 +1501,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator can add a new state called 'State 4'.
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message': 'Added State 4',
@@ -1524,7 +1523,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
             }, csrf_token=csrf_token,
             expected_status_int=401)
 
@@ -1537,9 +1536,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator2 can add a new state called 'State 5'.
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message': 'Added State 5',
@@ -1560,7 +1558,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token, expected_status_int=401)
 
         self.logout()
@@ -1579,7 +1577,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token, expected_status_int=401)
 
         self.logout()
@@ -1666,6 +1664,45 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             params={'v': 'invalid_version'}, expected_status_int=404)
         self.logout()
+
+    def test_put_with_long_commit_message_raises_error(self):
+        # Create several users.
+        self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+
+        # Owner creates exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message':
+                    'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'Commit messages must be at most 1000 characters long.')
 
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)
@@ -2204,7 +2241,6 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         }
-
 
     def test_resolve_issue_handler(self):
         """Test that resolving an issue deletes associated playthroughs."""

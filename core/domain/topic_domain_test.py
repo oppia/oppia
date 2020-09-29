@@ -74,7 +74,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             'story_reference_schema_version': (
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
-            'version': 0
+            'version': 0,
+            'practice_tab_is_displayed': False,
+            'meta_tag_content': ''
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -489,6 +491,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')
 
+        self.topic.subtopics = []
+        self._assert_strict_validation_error(
+            'Topic should have at least 1 subtopic.')
+
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
@@ -569,6 +575,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Subtopic thumbnail background color is not specified.')
 
+    def test_topic_practice_tab_is_displayed_validation(self):
+        self.topic.practice_tab_is_displayed = 0
+        self._assert_validation_error(
+            'Practice tab is displayed property should be a boolean.'
+            'Received 0.')
+
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'
         self._assert_validation_error('Expected skill ids to be a list')
@@ -605,7 +617,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, validation_message):
             self.topic.validate()
 
-    def test_validation_fails_with_lenghty_url_fragment(self):
+    def test_validation_fails_with_lengthy_url_fragment(self):
         self.topic.url_fragment = 'a' * 25
         url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
         validation_message = (
@@ -908,6 +920,23 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Skill id skill_id_1 is already present in the target subtopic'):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
 
+    def test_topic_export_import_returns_original_object(self):
+        """Checks that to_dict and from_dict preserves all the data within a
+        Topic during export and import.
+        """
+        topic_dict = self.topic.to_dict()
+        topic_from_dict = topic_domain.Topic.from_dict(topic_dict)
+        self.assertEqual(topic_from_dict.to_dict(), topic_dict)
+
+    def test_serialize_and_deserialize_returns_unchanged_topic(self):
+        """Checks that serializing and then deserializing a default topic
+        works as intended by leaving the topic unchanged.
+        """
+        self.assertEqual(
+            self.topic.to_dict(),
+            topic_domain.Topic.deserialize(
+                self.topic.serialize()).to_dict())
+
 
 class TopicChangeTests(test_utils.GenericTestBase):
 
@@ -961,6 +990,19 @@ class TopicChangeTests(test_utils.GenericTestBase):
                 'invalid is not allowed')):
             topic_domain.TopicChange({
                 'cmd': 'update_subtopic_property',
+                'subtopic_id': 'subtopic_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_topic_change_object_with_invalid_subtopic_page_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_subtopic_page_property: '
+                'invalid is not allowed')):
+            topic_domain.TopicChange({
+                'cmd': 'update_subtopic_page_property',
                 'subtopic_id': 'subtopic_id',
                 'property_name': 'invalid',
                 'old_value': 'old_value',
@@ -1047,6 +1089,23 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.cmd, 'update_subtopic_property')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
         self.assertEqual(topic_change_object.property_name, 'title')
+        self.assertEqual(topic_change_object.new_value, 'new_value')
+        self.assertEqual(topic_change_object.old_value, 'old_value')
+
+    def test_topic_change_object_with_update_subtopic_page_property(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'update_subtopic_page_property',
+            'subtopic_id': 'subtopic_id',
+            'property_name': 'page_contents_html',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(
+            topic_change_object.cmd, 'update_subtopic_page_property')
+        self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
+        self.assertEqual(
+            topic_change_object.property_name, 'page_contents_html')
         self.assertEqual(topic_change_object.new_value, 'new_value')
         self.assertEqual(topic_change_object.old_value, 'old_value')
 

@@ -20,23 +20,14 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.directive.ts');
 
-require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/question/editable-question-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/skill-backend-api.service.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('services/alerts.service.ts');
-require('services/contextual/url.service.ts');
 require('services/questions-list.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -47,27 +38,13 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/topic-editor-page/questions-tab/' +
         'topic-questions-tab.directive.html'),
       controller: [
-        '$scope', '$q', '$uibModal', '$window',
-        'AlertsService', 'TopicEditorStateService',
-        'UrlService', 'EditableQuestionBackendApiService',
+        '$scope', 'QuestionsListService', 'TopicEditorStateService',
         'TopicsAndSkillsDashboardBackendApiService',
-        'SkillBackendApiService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'QuestionsListService',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService',
-        'NUM_QUESTIONS_PER_PAGE', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED', function(
-            $scope, $q, $uibModal, $window,
-            AlertsService, TopicEditorStateService,
-            UrlService, EditableQuestionBackendApiService,
-            TopicsAndSkillsDashboardBackendApiService,
-            SkillBackendApiService, MisconceptionObjectFactory,
-            QuestionObjectFactory, QuestionsListService,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService,
-            NUM_QUESTIONS_PER_PAGE, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED) {
+        function(
+            $scope, QuestionsListService, TopicEditorStateService,
+            TopicsAndSkillsDashboardBackendApiService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.getQuestionSummariesAsync =
             QuestionsListService.getQuestionSummariesAsync;
           $scope.getGroupedSkillSummaries =
@@ -113,9 +90,19 @@ angular.module('oppia').directive('questionsTab', [
           };
           ctrl.$onInit = function() {
             $scope.selectedSkillId = null;
-            $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => _initTab()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => _initTab()
+              ));
             _initTab();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

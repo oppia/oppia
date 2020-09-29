@@ -33,6 +33,13 @@ NAMES = utils.create_enum(
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
+    NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
+    NAMES.question, NAMES.skill, NAMES.story, NAMES.suggestion, NAMES.topic)
+
 GAE_PLATFORM = 'gae'
 
 
@@ -242,24 +249,29 @@ class _Gae(Platform):
                     feconf.EMAIL_SERVICE_PROVIDER))
 
     @classmethod
-    def import_memcache_services(cls):
-        """Imports and returns gae_memcache_services.
+    def import_cache_services(cls):
+        """Imports and returns a cache_services module from core.platform.cache.
 
         Returns:
-            module. The gae_memcache_services module.
+            module. The core.platform.cache services module.
         """
-        from core.platform.memcache import gae_memcache_services
-        return gae_memcache_services
+        from core.platform.cache import redis_cache_services
+        return redis_cache_services
 
     @classmethod
     def import_taskqueue_services(cls):
-        """Imports and returns gae_taskqueue_services module.
+        """Imports and returns a taskqueue_services module from
+        core.platform.taskqueue.
 
         Returns:
-            module. The gae_taskqueue_services module.
+            module. The core.platform.taskqueue services module.
         """
-        from core.platform.taskqueue import gae_taskqueue_services
-        return gae_taskqueue_services
+        if (constants.DEV_MODE or utils.is_local_server_environment()):
+            from core.platform.taskqueue import dev_mode_taskqueue_services
+            return dev_mode_taskqueue_services
+        else:
+            from core.platform.taskqueue import cloud_taskqueue_services
+            return cloud_taskqueue_services
 
     @classmethod
     def import_search_services(cls):
@@ -376,13 +388,13 @@ class Registry(python_utils.OBJECT):
         return cls._get().import_email_services()
 
     @classmethod
-    def import_memcache_services(cls):
-        """Imports and returns memcache_services module.
+    def import_cache_services(cls):
+        """Imports and returns the platform cache_services module.
 
         Returns:
-            module. The memcache_services module.
+            module. The platform cache_services module.
         """
-        return cls._get().import_memcache_services()
+        return cls._get().import_cache_services()
 
     @classmethod
     def import_taskqueue_services(cls):

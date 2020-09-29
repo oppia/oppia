@@ -254,6 +254,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             story_domain.Story.require_valid_story_id(story_id)
 
+    def test_serialize_and_deserialize_returns_unchanged_story(self):
+        """Checks that serializing and then deserializing a default story
+        works as intended by leaving the story unchanged.
+        """
+        topic_id = utils.generate_random_string(12)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Title', 'Description', topic_id, 'title')
+        self.assertEqual(
+            story.to_dict(),
+            story_domain.Story.deserialize(story.serialize()).to_dict())
+
     def test_valid_story_id(self):
         self._assert_valid_story_id('Story id should be a string', 10)
         self._assert_valid_story_id('Invalid story id', 'abc')
@@ -345,7 +356,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'corresponding_topic_id': topic_id,
             'version': 0,
-            'url_fragment': 'story-frag-default'
+            'url_fragment': 'story-frag-default',
+            'meta_tag_content': ''
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
 
@@ -1335,6 +1347,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(story_summary.to_dict(), expected_dict)
+
+    def test_story_export_import_returns_original_object(self):
+        """Checks that to_dict and from_dict preserves all the data within a
+        Story during export and import.
+        """
+        topic_id = utils.generate_random_string(12)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Title', 'Description', topic_id, 'title')
+        story_dict = story.to_dict()
+        story_from_dict = story_domain.Story.from_dict(
+            story_dict, story_version=0)
+        self.assertEqual(story_from_dict.to_dict(), story_dict)
 
 
 class StorySummaryTests(test_utils.GenericTestBase):

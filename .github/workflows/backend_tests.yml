@@ -1,4 +1,4 @@
-name: CI Backend
+name: Backend tests
 on:
   push:
     branches:
@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - name: Setup python by installing wheel
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: pip install wheel==0.35.0
       - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs

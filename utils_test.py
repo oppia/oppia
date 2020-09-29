@@ -241,6 +241,29 @@ class UtilsTests(test_utils.GenericTestBase):
                 datetime.datetime(2016, 12, 1, 0, 0, 3),
                 initial_time))
 
+    def test_conversion_between_string_and_naive_datetime_object(self):
+        """Tests to make sure converting a naive datetime object to a string and
+        back doesn't alter the naive datetime object data.
+        """
+        now = datetime.datetime.utcnow()
+        self.assertEqual(
+            utils.convert_string_to_naive_datetime_object(
+                utils.convert_naive_datetime_to_string(now)),
+            now)
+
+    def test_datetime_conversion_to_string_returns_correct_format(self):
+        initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
+        self.assertEqual(
+            utils.convert_naive_datetime_to_string(initial_time),
+            '12/01/2016, 01:02:03:000000')
+
+    def test_string_to_datetime_conversion_returns_correct_datetime(self):
+        time_string = '12/01/2016, 01:02:03:000000'
+        initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
+        self.assertEqual(
+            utils.convert_string_to_naive_datetime_object(time_string),
+            initial_time)
+
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]
         json2 = ['fee', {'fie': ['foe', 'fum']}]
@@ -271,6 +294,22 @@ class UtilsTests(test_utils.GenericTestBase):
         name = 0
         with self.assertRaisesRegexp(Exception, '0 must be a string.'):
             utils.require_valid_name(name, 'name_type')
+
+    def test_require_valid_meta_tag_content(self):
+        meta_tag_content = 'name'
+        utils.require_valid_meta_tag_content(meta_tag_content)
+
+        non_string_meta_tag_content = 0
+        invalid_type_error = (
+            'Expected meta tag content to be a string, received 0')
+        with self.assertRaisesRegexp(Exception, invalid_type_error):
+            utils.require_valid_meta_tag_content(non_string_meta_tag_content)
+        lengthy_meta_tag_content = 'a' * 200
+        max_length_error = (
+            'Meta tag content should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+        with self.assertRaisesRegexp(Exception, max_length_error):
+            utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
 
     def test_require_valid_url_fragment(self):
         name = 'name'
@@ -385,6 +424,13 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
 
+    def test_is_pseudonymous_id(self):
+        self.assertTrue(utils.is_pseudonymous_id('pid_' + 'a' * 32))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 32))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31))
+        self.assertFalse(utils.is_pseudonymous_id('a' * 36))
+
     def test_snake_case_to_camel_case(self):
         camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
         camel_case_str2 = utils.snake_case_to_camel_case('hello_world')
@@ -433,3 +479,26 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_get_current_appengine_environment(self):
+        saved_appengine_runtime = (
+            os.environ['APPENGINE_RUNTIME'] if 'APPENGINE_RUNTIME' in os.environ
+            else None)
+        saved_server_software = (
+            os.environ['SERVER_SOFTWARE'] if 'SERVER_SOFTWARE' in os.environ
+            else None)
+
+        os.environ['APPENGINE_RUNTIME'] = 'True'
+        self.assertTrue(utils.is_local_server_environment())
+        os.environ['SERVER_SOFTWARE'] = 'Google App Engine/'
+        self.assertTrue(utils.is_appengine_cloud_environment())
+
+        if saved_appengine_runtime is not None:
+            os.environ['SERVER_SOFTWARE'] = saved_appengine_runtime
+        else:
+            del os.environ['SERVER_SOFTWARE']
+
+        if saved_server_software is not None:
+            os.environ['SERVER_SOFTWARE'] = saved_server_software
+        else:
+            del os.environ['SERVER_SOFTWARE']

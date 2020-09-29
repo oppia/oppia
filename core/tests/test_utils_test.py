@@ -24,9 +24,9 @@ import os
 from constants import constants
 from core import jobs
 from core.domain import param_domain
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -229,10 +229,10 @@ class TestUtilsTests(test_utils.GenericTestBase):
         FailingMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(None), 1)
+            self.count_jobs_in_mapreduce_taskqueue(None), 1)
         with self.assertRaisesRegexp(
             RuntimeError, 'MapReduce task to URL .+ failed'):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
@@ -414,7 +414,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self):
         def mock_getcwd():
             raise ValueError('Exception raised from getcwd()')
-
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 

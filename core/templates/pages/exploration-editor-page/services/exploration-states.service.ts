@@ -39,28 +39,34 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/validators.service.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('ExplorationStatesService', [
-  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
+  '$filter', '$injector', '$location', '$q', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
-  'SolutionValidityService', 'StateEditorService', 'StatesObjectFactory',
-  'UrlInterpolationService', 'ValidatorsService',
+  'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
+  'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $filter, $injector, $location, $q, $rootScope, $uibModal,
+      $filter, $injector, $location, $q, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
-      SolutionValidityService, StateEditorService, StatesObjectFactory,
-      UrlInterpolationService, ValidatorsService) {
+      SolutionValidityService, StateEditorRefreshService, StateEditorService,
+      StatesObjectFactory, UrlInterpolationService, ValidatorsService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
     var stateDeletedCallbacks = [];
     var stateRenamedCallbacks = [];
     var stateInteractionSavedCallbacks = [];
+    /** @private */
+    var refreshGraphEventEmitter = new EventEmitter();
 
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -159,6 +165,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
           contentIds.add(solution.explanation.getContentId());
         }
         return contentIds;
+      },
+      widget_customization_args: function(customizationArgs) {
+        return new Set(
+          Interaction.getCustomizationArgContentIds(customizationArgs));
       }
     };
 
@@ -172,7 +182,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
     var _setState = function(stateName, stateData, refreshGraph) {
       _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
       }
     };
 
@@ -184,11 +194,12 @@ angular.module('oppia').factory('ExplorationStatesService', [
           propertyRef = propertyRef[key];
         });
       } catch (e) {
-        var additionalInfo = ('\nUndefined states error debug logs:' +
+        var additionalInfo = (
+          '\nUndefined states error debug logs:' +
           '\nRequested state name: ' + stateName +
           '\nExploration ID: ' + ContextService.getExplorationId() +
           '\nChange list: ' + JSON.stringify(
-          ChangeListService.getChangeList()) +
+            ChangeListService.getChangeList()) +
           '\nAll states names: ' + _states.getStateNames());
         e.message += additionalInfo;
         throw e;
@@ -416,7 +427,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateAddedCallbacks.forEach(function(callback) {
           callback(newStateName);
         });
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
         if (successCallback) {
           successCallback(newStateName);
         }
@@ -457,10 +468,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
             callback(deleteStateName);
           });
           $location.path('/gui/' + StateEditorService.getActiveStateName());
-          $rootScope.$broadcast('refreshGraph');
+          refreshGraphEventEmitter.emit();
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
-          $rootScope.$broadcast('refreshStateEditor');
+          StateEditorRefreshService.onRefreshStateEditor.emit();
         }, function() {
           AlertsService.clearWarnings();
         });
@@ -496,7 +507,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateRenamedCallbacks.forEach(function(callback) {
           callback(oldStateName, newStateName);
         });
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
       },
       registerOnStateAddedCallback: function(callback) {
         stateAddedCallbacks.push(callback);
@@ -509,6 +520,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       registerOnStateInteractionSavedCallback: function(callback) {
         stateInteractionSavedCallbacks.push(callback);
+      },
+      get onRefreshGraph() {
+        return refreshGraphEventEmitter;
       }
     };
   }

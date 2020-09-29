@@ -49,9 +49,7 @@ export class AnswerGroup {
 
   toBackendDict(): AnswerGroupBackendDict {
     return {
-      rule_specs: this.rules.map((rule: Rule) => {
-        return rule.toBackendDict();
-      }),
+      rule_specs: this.rules.map(rule => rule.toBackendDict()),
       outcome: this.outcome.toBackendDict(),
       training_data: this.trainingData,
       tagged_skill_misconception_id: this.taggedSkillMisconceptionId

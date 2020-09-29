@@ -25,24 +25,21 @@ require(
   'background-banner.component.ts');
 require('components/summary-tile/topic-summary-tile.directive.ts');
 
-require('domain/classroom/classroom-backend-api.service.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('pages/library-page/search-bar/search-bar.directive.ts');
+require('pages/library-page/search-bar/search-bar.component.ts');
 
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
   controller: [
-    '$filter', '$rootScope', 'AlertsService',
-    'ClassroomBackendApiService', 'LoaderService',
+    '$filter', 'AlertsService', 'LoaderService',
     'PageTitleService', 'UrlInterpolationService', 'UrlService',
     'FATAL_ERROR_CODES',
     function(
-        $filter, $rootScope, AlertsService,
-        ClassroomBackendApiService, LoaderService,
+        $filter, AlertsService, LoaderService,
         PageTitleService, UrlInterpolationService, UrlService,
         FATAL_ERROR_CODES) {
       var ctrl = this;
@@ -70,7 +67,7 @@ angular.module('oppia').component('classroomPage', {
           PageTitleService.setPageTitle(
             ctrl.classroomDisplayName + ' Classroom | Oppia');
           LoaderService.hideLoadingScreen();
-          ClassroomBackendApiService.onInitializeTranslation.emit();
+          ctrl.classroomBackendApiService.onInitializeTranslation.emit();
         }, function(errorResponse) {
           if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
             AlertsService.addWarning('Failed to get dashboard data');

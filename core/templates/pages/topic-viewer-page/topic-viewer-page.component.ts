@@ -16,98 +16,119 @@
  * @fileoverview Component for the topic viewer.
  */
 
-require('base-components/base-content.directive.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
-require('components/skills-mastery-list/skills-mastery-list.directive.ts');
-require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
-require(
-  'pages/topic-viewer-page/stories-list/' +
-  'topic-viewer-stories-list.component.ts');
-require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
-require('services/alerts.service.ts');
-require('services/page-title.service.ts');
-require('services/contextual/url.service.ts');
-require('services/contextual/window-dimensions.service.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('topicViewerPage', {
-  template: require('./topic-viewer-page.component.html'),
-  controller: [
-    '$rootScope', 'AlertsService', 'LoaderService',
-    'PageTitleService', 'TopicViewerBackendApiService',
-    'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
-    'FATAL_ERROR_CODES',
-    function(
-        $rootScope, AlertsService, LoaderService,
-        PageTitleService, TopicViewerBackendApiService,
-        UrlInterpolationService, UrlService, WindowDimensionsService,
-        FATAL_ERROR_CODES) {
-      var ctrl = this;
-      ctrl.setActiveTab = function(newActiveTabName) {
-        ctrl.activeTab = newActiveTabName;
-      };
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-      ctrl.checkMobileView = function() {
-        return (WindowDimensionsService.getWidth() < 500);
-      };
-      ctrl.$onInit = function() {
-        ctrl.canonicalStorySummaries = [];
-        if (UrlService.getPathname().endsWith('revision')) {
-          ctrl.setActiveTab('subtopics');
-        } else if (UrlService.getPathname().endsWith('practice')) {
-          ctrl.setActiveTab('practice');
-        } else if (UrlService.getPathname().endsWith('story')) {
-          ctrl.setActiveTab('story');
-        } else {
-          ctrl.setActiveTab('info');
-        }
-        ctrl.topicUrlFragment = (
-          UrlService.getTopicUrlFragmentFromLearnerUrl());
-        ctrl.classroomUrlFragment = (
-          UrlService.getClassroomUrlFragmentFromLearnerUrl());
+import { AppConstants } from 'app.constants';
+import { ReadOnlyTopic } from
+  'domain/topic_viewer/read-only-topic-object.factory';
+import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
+import { Subtopic, SkillIdToDescriptionMap } from
+  'domain/topic/SubtopicObjectFactory';
+import { DegreesOfMastery } from
+  'domain/topic_viewer/read-only-topic-object.factory';
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { LoaderService } from 'services/loader.service';
+import { PageTitleService } from 'services/page-title.service';
 
-        LoaderService.showLoadingScreen('Loading');
-        ctrl.topicIsLoading = true;
-        TopicViewerBackendApiService.fetchTopicData(
-          ctrl.topicUrlFragment, ctrl.classroomUrlFragment).then(
-          function(readOnlyTopic) {
-            ctrl.topicId = readOnlyTopic.getTopicId();
-            ctrl.topicName = readOnlyTopic.getTopicName();
-            PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
-            ctrl.topicDescription = readOnlyTopic.getTopicDescription();
-            ctrl.canonicalStorySummaries = (
-              readOnlyTopic.getCanonicalStorySummaries());
-            ctrl.chapterCount = 0;
-            for (var idx in ctrl.canonicalStorySummaries) {
-              ctrl.chapterCount += (
-                ctrl.canonicalStorySummaries[idx].getNodeTitles().length);
-            }
-            ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
-            ctrl.subtopics = readOnlyTopic.getSubtopics();
-            ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
-            ctrl.topicIsLoading = false;
-            LoaderService.hideLoadingScreen();
-            ctrl.trainTabShouldBeDisplayed = (
-              readOnlyTopic.getTrainTabShouldBeDisplayed());
-            if (
-              !ctrl.trainTabShouldBeDisplayed &&
-              ctrl.activeTab === 'practice') {
-              ctrl.setActiveTab('info');
-            }
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$apply();
-          },
-          function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              AlertsService.addWarning('Failed to get dashboard data');
-            }
-          }
-        );
-      };
+
+@Component({
+  selector: 'topic-viewer-page',
+  templateUrl: './topic-viewer-page.component.html',
+  styleUrls: []
+})
+export class TopicViewerPageComponent implements OnInit {
+  activeTab: string = '';
+  canonicalStorySummaries: StorySummary[] = [];
+  topicUrlFragment: string = '';
+  classroomUrlFragment: string = '';
+  topicIsLoading: boolean = true;
+  topicId: string = '';
+  topicName: string = '';
+  topicDescription: string = '';
+  chapterCount: number = 0;
+  degreesOfMastery: DegreesOfMastery = {};
+  subtopics: Subtopic[] = [];
+  skillDescriptions: SkillIdToDescriptionMap = {};
+  practiceTabIsDisplayed: boolean = false;
+
+  constructor(
+    private alertsService: AlertsService,
+    private loaderService: LoaderService,
+    private pageTitleService: PageTitleService,
+    private topicViewerBackendApiService: TopicViewerBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
+    private windowDimensionsService: WindowDimensionsService,
+  ) {}
+
+  ngOnInit(): void {
+    if (this.urlService.getPathname().endsWith('revision')) {
+      this.setActiveTab('subtopics');
+    } else if (this.urlService.getPathname().endsWith('practice')) {
+      this.setActiveTab('practice');
+    } else {
+      this.setActiveTab('story');
     }
-  ]
-});
+    this.topicUrlFragment = (
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    this.classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+
+    this.loaderService.showLoadingScreen('Loading');
+    this.topicViewerBackendApiService.fetchTopicData(
+      this.topicUrlFragment, this.classroomUrlFragment).then(
+      (readOnlyTopic: ReadOnlyTopic) => {
+        this.topicId = readOnlyTopic.getTopicId();
+        this.topicName = readOnlyTopic.getTopicName();
+        this.topicDescription = readOnlyTopic.getTopicDescription();
+        this.pageTitleService.setPageTitle(
+          `Learn ${this.topicName} | ${this.topicDescription} | Oppia`);
+        this.pageTitleService.updateMetaTag(readOnlyTopic.getMetaTagContent());
+        this.canonicalStorySummaries = (
+          readOnlyTopic.getCanonicalStorySummaries());
+        this.chapterCount = 0;
+        for (let idx in this.canonicalStorySummaries) {
+          this.chapterCount += (
+            this.canonicalStorySummaries[idx].getNodeTitles().length);
+        }
+        this.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
+        this.subtopics = readOnlyTopic.getSubtopics();
+        this.skillDescriptions = readOnlyTopic.getSkillDescriptions();
+        this.topicIsLoading = false;
+        this.loaderService.hideLoadingScreen();
+        this.practiceTabIsDisplayed = (
+          readOnlyTopic.getPracticeTabIsDisplayed());
+      },
+      errorResponse => {
+        let errorCodes = AppConstants.FATAL_ERROR_CODES;
+        if (errorCodes.indexOf(errorResponse.status) !== -1) {
+          this.alertsService.addWarning('Failed to get dashboard data');
+        }
+      }
+    );
+  }
+
+  checkMobileView(): boolean {
+    return this.windowDimensionsService.getWidth() < 500;
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  setActiveTab(newActiveTabName: string): void {
+    this.activeTab = newActiveTabName;
+  }
+}
+
+angular.module('oppia').directive(
+  'topicViewerPage', downgradeComponent(
+    {component: TopicViewerPageComponent}));

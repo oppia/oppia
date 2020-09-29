@@ -78,13 +78,17 @@ describe('AlgebraicExpressionInputInteractive', function() {
     guppyInitializationService = new GuppyInitializationService();
     deviceInfoService = new DeviceInfoService(new WindowRef());
 
-    $provide.value('CurrentInteractionService',
-      mockCurrentInteractionService);
-    $provide.value('AlgebraicExpressionInputRulesService',
+    $provide.value(
+      'CurrentInteractionService', mockCurrentInteractionService);
+    $provide.value(
+      'AlgebraicExpressionInputRulesService',
       mockAlgebraicExpressionInputRulesService);
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
+    $provide.value('$attrs', {
+      customOskLettersWithValue: '[&quot;a&quot;, &quot;b&quot;]'
+    });
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');

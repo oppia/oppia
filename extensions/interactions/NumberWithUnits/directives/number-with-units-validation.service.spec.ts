@@ -21,10 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
-/* eslint-disable max-len */
-import { NumberWithUnitsValidationService } from
-  'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
-/* eslint-enable max-len */
+import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -36,7 +33,6 @@ describe('NumberWithUnitsValidationService', () => {
   var answerGroups, goodDefaultOutcome;
   var equalsTwoRule, equalsTwoByThreeRule, equivalentToTwoThousandRule,
     equivalentToTwoByThreeRule, equivalentToTwoRule;
-  var createNumberWithUnitsDict;
   var oof, agof, rof;
 
   beforeEach(() => {

@@ -35,11 +35,12 @@ angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
   'CsrfTokenService', 'ImageLocalStorageService', 'ImagePreloaderService',
   'ImageUploadHelperService', 'UrlInterpolationService',
-  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
-  function($sce, AlertsService, AssetsBackendApiService, ContextService,
+  'ALLOWED_IMAGE_FORMATS', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  function(
+      $sce, AlertsService, AssetsBackendApiService, ContextService,
       CsrfTokenService, ImageLocalStorageService, ImagePreloaderService,
       ImageUploadHelperService, UrlInterpolationService,
-      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+      ALLOWED_IMAGE_FORMATS, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     return {
       restrict: 'E',
       scope: {},
@@ -91,6 +92,7 @@ angular.module('oppia').directive('filepathEditor', [
         CROP_CURSORS[MOUSE_LEFT] = 'ew-resize';
         CROP_CURSORS[MOUSE_INSIDE] = 'move';
         ctrl.imageContainerStyle = {};
+        ctrl.allowedImageFormats = ALLOWED_IMAGE_FORMATS;
 
         /** Internal functions (not visible in the view) */
 
@@ -351,7 +353,8 @@ angular.module('oppia').directive('filepathEditor', [
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           if (
             ContextService.getImageSaveDestination() ===
-            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+            ImageLocalStorageService.isInStorage(imageFileName)) {
             var imageUrl = ImageLocalStorageService.getObjectUrlForImage(
               imageFileName);
             return $sce.trustAsResourceUrl(imageUrl);
@@ -364,9 +367,12 @@ angular.module('oppia').directive('filepathEditor', [
 
         ctrl.resetFilePathEditor = function() {
           if (
-            ctrl.data.metadata.savedImageFilename &&
-            ContextService.getImageSaveDestination() ===
-            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+            ctrl.data.metadata.savedImageFilename && (
+              ContextService.getImageSaveDestination() ===
+              IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) &&
+            ImageLocalStorageService.isInStorage(
+              ctrl.data.metadata.savedImageFilename)
+          ) {
             ImageLocalStorageService.deleteImage(
               ctrl.data.metadata.savedImageFilename);
           }
@@ -818,8 +824,8 @@ angular.module('oppia').directive('filepathEditor', [
           }
         };
 
-        ctrl.postImageToServer = function(dimensions, resampledFile,
-            imageType = 'png') {
+        ctrl.postImageToServer = function(
+            dimensions, resampledFile, imageType = 'png') {
           let form = new FormData();
           form.append('image', resampledFile);
           form.append('payload', JSON.stringify({

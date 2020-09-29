@@ -19,27 +19,24 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'third-party-imports/angular-js.import';
-import 'third-party-imports/headroom.import';
-
 angular.module('oppia', [
-  'headroom', require('angular-cookies'), 'ngTouch', 'ngSanitize',
+  require('angular-cookies'), 'headroom', 'ngSanitize', 'ngTouch',
   'pascalprecht.translate', 'toastr', 'ui.bootstrap'
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
 import { DonatePageComponent } from './donate-page.component';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -48,18 +45,23 @@ import { SharedComponentsModule } from 'components/shared-component.module';
     SharedComponentsModule
   ],
   declarations: [
-    DonatePageComponent
+    DonatePageComponent,
+    OppiaAngularRootComponent
   ],
   entryComponents: [
-    DonatePageComponent
+    DonatePageComponent,
+    OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]
@@ -79,3 +81,11 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 const downgradedModule = downgradeModule(bootstrapFn);
 
 angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent
+  }) as angular.IDirectiveFactory);

@@ -34,6 +34,8 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('topicEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -41,18 +43,17 @@ angular.module('oppia').directive('topicEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/navbar/topic-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$window', 'AlertsService',
-        'UndoRedoService', 'TopicEditorStateService', 'UrlService',
-        'TopicRightsBackendApiService', 'TopicEditorRoutingService',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'TOPIC_VIEWER_URL_TEMPLATE',
+        '$scope', '$uibModal', '$window', 'AlertsService',
+        'TopicEditorRoutingService', 'TopicEditorStateService',
+        'TopicRightsBackendApiService', 'UndoRedoService', 'UrlService',
+        'TOPIC_VIEWER_URL_TEMPLATE',
         function(
-            $scope, $rootScope, $uibModal, $window, AlertsService,
-            UndoRedoService, TopicEditorStateService, UrlService,
-            TopicRightsBackendApiService, TopicEditorRoutingService,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, TOPIC_VIEWER_URL_TEMPLATE) {
+            $scope, $uibModal, $window, AlertsService,
+            TopicEditorRoutingService, TopicEditorStateService,
+            TopicRightsBackendApiService, UndoRedoService, UrlService,
+            TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.isSaveInProgress = function() {
             return TopicEditorStateService.isSavingTopic();
           };
@@ -198,10 +199,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
               controller: 'TopicEditorSaveModalController'
             }).result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
-            }, function() {}).then(function() {
               var successToast = 'Changes saved.';
               AlertsService.addSuccessMessage(
                 successToast, 1000);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -294,6 +298,14 @@ angular.module('oppia').directive('topicEditorNavbar', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => _validateTopic()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => _validateTopic()
+              ));
             $scope.topicId = UrlService.getTopicIdFromUrl();
             $scope.navigationChoices = ['Topic', 'Questions', 'Preview'];
             $scope.activeTab = 'Editor';
@@ -306,10 +318,15 @@ angular.module('oppia').directive('topicEditorNavbar', [
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             $scope.topicRights = TopicEditorStateService.getTopicRights();
-            $scope.$on(EVENT_TOPIC_INITIALIZED, _validateTopic);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, _validateTopic);
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateTopic);
+            ctrl.directiveSubscriptions.add(
+              UndoRedoService.onUndoRedoChangeApplied$().subscribe(
+                () => _validateTopic()
+              )
+            );
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

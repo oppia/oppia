@@ -23,17 +23,13 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 
 describe('Editable story backend API service', function() {
   var EditableStoryBackendApiService = null;
   var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
   var $httpBackend = null;
-  var UndoRedoService = null;
   var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -49,9 +45,6 @@ describe('Editable story backend API service', function() {
   beforeEach(angular.mock.inject(function($injector, $q) {
     EditableStoryBackendApiService = $injector.get(
       'EditableStoryBackendApiService');
-    UndoRedoService = $injector.get('UndoRedoService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
@@ -89,7 +82,9 @@ describe('Editable story backend API service', function() {
       skill_summaries: [{
         id: 'skill_1',
         description: 'Skill Description'
-      }]
+      }],
+      topic_url_fragment: 'topic-frag',
+      classroom_url_fragment: 'math'
     };
   }));
 
@@ -114,7 +109,9 @@ describe('Editable story backend API service', function() {
         story: sampleDataResults.story,
         topicName: sampleDataResults.topic_name,
         storyIsPublished: true,
-        skillSummaries: sampleDataResults.skill_summaries
+        skillSummaries: sampleDataResults.skill_summaries,
+        topicUrlFragment: sampleDataResults.topic_url_fragment,
+        classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
     }

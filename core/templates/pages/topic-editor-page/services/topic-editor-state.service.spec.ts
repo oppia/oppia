@@ -44,6 +44,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { Subscription } from 'rxjs';
 
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-update.service.ts');
@@ -53,7 +54,6 @@ describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var subtopicPageObjectFactory = null;
-  var rubricObjectFactory = null;
   var topicRightsObjectFactory = null;
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
@@ -62,8 +62,13 @@ describe('Topic editor state service', function() {
   var secondBackendTopicObject = null;
   var secondTopicRightsObject = null;
   var $rootScope = null;
-  var $scope = null;
   var $q = null;
+
+  var testSubscriptions = null;
+  var subtopicPageLoadedSpy = null;
+
+  const topicInitializedSpy = jasmine.createSpy('topicInitialized');
+  const topicReinitializedSpy = jasmine.createSpy('topicReinitialized');
 
   var FakeEditableTopicBackendApiService = function() {
     var self = {
@@ -211,7 +216,6 @@ describe('Topic editor state service', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
     fakeEditableTopicBackendApiService.newBackendTopicObject = {
       topicDict: {
@@ -347,6 +351,23 @@ describe('Topic editor state service', function() {
     };
   }));
 
+  beforeEach(() => {
+    subtopicPageLoadedSpy = jasmine.createSpy('subtopicPageLoaded');
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      TopicEditorStateService.onSubtopicPageLoaded.subscribe(
+        subtopicPageLoadedSpy));
+    testSubscriptions.add(TopicEditorStateService.onTopicInitialized.subscribe(
+      topicInitializedSpy));
+    testSubscriptions.add(
+      TopicEditorStateService.onTopicReinitialized.subscribe(
+        topicReinitializedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should request to load the topic from the backend', function() {
     spyOn(
       fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
@@ -426,8 +447,6 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete new subtopic pages without changing already ' +
     'existing subtopic pages from the local cache', function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -435,7 +454,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
     $rootScope.$apply();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+    expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 1);
 
@@ -451,8 +470,6 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete already existing subtopic pages without ' +
     'changing newly created subtopic pages from the local cache', function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -460,7 +477,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
     $rootScope.$apply();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+    expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 0);
 
@@ -487,25 +504,20 @@ describe('Topic editor state service', function() {
 
   it('should fire an init event after loading the first topic',
     function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       TopicEditorStateService.loadTopic(5);
       $rootScope.$apply();
       var skillIdToRubricsObject =
         TopicEditorStateService.getSkillIdToRubricsObject();
       expect(skillIdToRubricsObject.skill_1.length).toEqual(3);
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('topicInitialized');
+      expect(topicInitializedSpy).toHaveBeenCalled();
     }
   );
 
   it('should fire a loaded event after loading a new subtopic page',
     function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       TopicEditorStateService.loadSubtopicPage('validTopicId', 1);
       $rootScope.$apply();
-
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+      expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     }
   );
 
@@ -514,13 +526,11 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.loadTopic(5);
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     // Load a second topic.
     TopicEditorStateService.loadTopic(1);
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('topicReinitialized');
+    expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently loading the topic', function() {
@@ -546,7 +556,7 @@ describe('Topic editor state service', function() {
     }
   );
 
-  it('it should report that a topic has loaded through loadTopic()',
+  it('should report that a topic has loaded through loadTopic()',
     function() {
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 
@@ -558,7 +568,7 @@ describe('Topic editor state service', function() {
     }
   );
 
-  it('it should report that a topic has loaded through setTopic()',
+  it('should report that a topic has loaded through setTopic()',
     function() {
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 
@@ -644,11 +654,8 @@ describe('Topic editor state service', function() {
     function() {
       TopicEditorStateService.loadTopic(5);
       $rootScope.$apply();
-
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(TopicEditorStateService.saveTopic(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 
@@ -681,12 +688,10 @@ describe('Topic editor state service', function() {
       TopicEditorStateService.getTopic(), 'New name');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
     TopicEditorStateService.saveTopic('Commit message');
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'topicReinitialized');
+    expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently saving the topic', function() {

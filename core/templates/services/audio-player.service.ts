@@ -16,6 +16,8 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
   'ContextService', 'ngAudio',
@@ -24,7 +26,8 @@ angular.module('oppia').factory('AudioPlayerService', [
       ContextService, ngAudio) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
-    var _currentTrackDuration = null;
+
+    var _autoplayAudioEventEmitter = new EventEmitter();
 
     var _load = function(
         filename, successCallback, errorCallback) {
@@ -165,6 +168,9 @@ angular.module('oppia').factory('AudioPlayerService', [
       clear: function() {
         _currentTrack = null;
         _currentTrackFilename = null;
+      },
+      get onAutoplayAudio() {
+        return _autoplayAudioEventEmitter;
       }
     };
   }

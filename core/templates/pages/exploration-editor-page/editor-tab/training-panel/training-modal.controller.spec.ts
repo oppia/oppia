@@ -247,7 +247,7 @@ describe('Training Modal Controller', function() {
                 },
               },
               training_data: ['Answer'],
-              rule_specs: []
+              rule_specs: [],
             }, {
               outcome: {
                 dest: '',

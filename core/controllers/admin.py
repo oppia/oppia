@@ -25,6 +25,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import caching_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -32,8 +33,8 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import html_domain
 from core.domain import opportunity_services
+from core.domain import platform_feature_services as feature_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -51,6 +52,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import python_utils
@@ -120,6 +122,8 @@ class AdminHandler(base.BaseHandler):
                     utils.get_human_readable_time_string(
                         computation['last_finished_msec']))
 
+        feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
+
         self.render_json({
             'config_properties': (
                 config_domain.Registry.get_config_property_schemas()),
@@ -143,7 +147,8 @@ class AdminHandler(base.BaseHandler):
                 for role in role_services.VIEWABLE_ROLES
             },
             'topic_summaries': topic_summary_dicts,
-            'role_graph_data': role_services.get_role_graph_data()
+            'role_graph_data': role_services.get_role_graph_data(),
+            'feature_flags': feature_flag_dicts,
         })
 
     @acl_decorators.can_access_admin_page
@@ -244,6 +249,35 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
+            elif self.payload.get('action') == 'update_feature_flag_rules':
+                feature_name = self.payload.get('feature_name')
+                new_rule_dicts = self.payload.get('new_rules')
+                commit_message = self.payload.get('commit_message')
+                if not isinstance(feature_name, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
+                        'feature_name should be string, received \'%s\'.' % (
+                            feature_name))
+                elif not isinstance(commit_message, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
+                        'commit_message should be string, received \'%s\'.' % (
+                            commit_message))
+                elif (not isinstance(new_rule_dicts, list) or not all(
+                        [isinstance(rule_dict, dict)
+                         for rule_dict in new_rule_dicts])):
+                    raise self.InvalidInputException(
+                        'new_rules should be a list of dicts, received'
+                        ' \'%s\'.' % new_rule_dicts)
+                try:
+                    feature_services.update_feature_flag_rules(
+                        feature_name, self.user_id, commit_message,
+                        new_rule_dicts)
+                except (
+                        utils.ValidationError,
+                        feature_services.FeatureFlagNotFoundException) as e:
+                    raise self.InvalidInputException(e)
+                logging.info(
+                    '[ADMIN] %s updated feature %s with new rules: '
+                    '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
             self.render_json({'error': python_utils.UNICODE(e)})
@@ -331,7 +365,7 @@ class AdminHandler(base.BaseHandler):
         question = question_domain.Question(
             question_id, state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids)
+            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
         return question
 
     def _create_dummy_skill(self, skill_id, skill_description, explanation):
@@ -601,78 +635,6 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot generate dummy explorations in production.')
 
 
-class ExplorationsLatexSvgHandler(base.BaseHandler):
-    """Handler updating explorations having math rich-text components with
-    math SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        item_to_fetch = self.request.get('item_to_fetch')
-        if item_to_fetch == 'exp_id_to_latex_mapping':
-            latex_strings_to_exp_id_mapping = (
-                exp_services.get_batch_of_exps_for_latex_svg_generation())
-            self.render_json({
-                'latex_strings_to_exp_id_mapping': (
-                    latex_strings_to_exp_id_mapping)
-            })
-        elif item_to_fetch == 'number_of_explorations_left_to_update':
-            number_of_explorations_left_to_update = (
-                exp_services.
-                get_number_explorations_having_latex_strings_without_svgs())
-            self.render_json({
-                'number_of_explorations_left_to_update': '%d' % (
-                    number_of_explorations_left_to_update)
-            })
-        else:
-            raise self.InvalidInputException(
-                'Please specify a valid type of item to fetch.')
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        latex_to_svg_mappings = self.payload.get('latexMapping')
-        for exp_id, latex_to_svg_mapping_dict in latex_to_svg_mappings.items():
-            for latex_string in latex_to_svg_mapping_dict.keys():
-                svg_image = self.request.get(
-                    latex_to_svg_mappings[exp_id][latex_string]['latexId'])
-                if not svg_image:
-                    raise self.InvalidInputException(
-                        'SVG for LaTeX string %s in exploration %s is not '
-                        'supplied.' % (latex_string, exp_id))
-
-                dimensions = (
-                    latex_to_svg_mappings[exp_id][latex_string]['dimensions'])
-                latex_string_svg_image_dimensions = (
-                    html_domain.LatexStringSvgImageDimensions(
-                        dimensions['encoded_height_string'],
-                        dimensions['encoded_width_string'],
-                        dimensions['encoded_vertical_padding_string']))
-                latex_string_svg_image_data = (
-                    html_domain.LatexStringSvgImageData(
-                        svg_image, latex_string_svg_image_dimensions))
-                latex_to_svg_mappings[exp_id][latex_string] = (
-                    latex_string_svg_image_data)
-
-        for exp_id in latex_to_svg_mappings.keys():
-            exp_services.update_exploration_with_math_svgs(
-                exp_id, latex_to_svg_mappings[exp_id])
-            logging.info('Successfully updated exploration %s' % (exp_id))
-        number_of_explorations_left_to_update = (
-            exp_services.
-            get_number_explorations_having_latex_strings_without_svgs())
-        self.render_json({
-            'number_of_explorations_updated': '%d' % (
-                len(latex_to_svg_mappings.keys())),
-            'number_of_explorations_left_to_update': '%d' % (
-                number_of_explorations_left_to_update)
-        })
-
-
 class AdminRoleHandler(base.BaseHandler):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
@@ -871,8 +833,6 @@ class RemoveContributionReviewerHandler(base.BaseHandler):
         username = self.payload.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
-        removal_type = self.payload.get('removal_type')
-
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -884,6 +844,7 @@ class RemoveContributionReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
+        removal_type = self.payload.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_contribution_reviewer(user_id)
         elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
@@ -985,6 +946,26 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             raise self.InvalidInputException('This app cannot send emails.')
 
 
+class MemoryCacheAdminHandler(base.BaseHandler):
+    """Handler for memory cache functions used in the Misc Page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        cache_stats = caching_services.get_memory_cache_stats()
+        self.render_json({
+            'total_allocation': cache_stats.total_allocated_in_bytes,
+            'peak_allocation': cache_stats.peak_memory_usage_in_bytes,
+            'total_keys_stored': cache_stats.total_number_of_keys_stored
+        })
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        caching_services.flush_memory_cache()
+        self.render_json({})
+
+
 class UpdateUsernameHandler(base.BaseHandler):
     """Handler for renaming usernames."""
 
@@ -1028,3 +1009,18 @@ class UpdateUsernameHandler(base.BaseHandler):
         user_services.log_username_change(
             self.user_id, old_username, new_username)
         self.render_json({})
+
+
+class NumberOfDeletionRequestsHandler(base.BaseHandler):
+    """Handler for getting the number of pending deletion requests via admin
+    page.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        self.render_json({
+            'number_of_pending_deletion_models': (
+                wipeout_service.get_number_of_pending_deletion_requests())
+        })

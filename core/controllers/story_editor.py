@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -65,8 +66,16 @@ class EditableStoryDataHandler(base.BaseHandler):
         topic_id = story.corresponding_topic_id
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         skill_ids = topic.get_all_skill_ids()
+        for node in story.story_contents.nodes:
+            for skill_id in node.prerequisite_skill_ids:
+                if skill_id not in skill_ids:
+                    skill_ids.append(skill_id)
+
         skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
+        classroom_url_fragment = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic.id))
 
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id == story_id:
@@ -76,7 +85,9 @@ class EditableStoryDataHandler(base.BaseHandler):
             'story': story.to_dict(),
             'topic_name': topic.name,
             'story_is_published': story_is_published,
-            'skill_summaries': skill_summary_dicts
+            'skill_summaries': skill_summary_dicts,
+            'topic_url_fragment': topic.url_fragment,
+            'classroom_url_fragment': classroom_url_fragment
         })
 
         self.render_json(self.values)
@@ -90,6 +101,16 @@ class EditableStoryDataHandler(base.BaseHandler):
         self._require_valid_version(version, story.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if commit_message is None:
+            raise self.InvalidInputException(
+                'Expected a commit message but received none.')
+
+        if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_dicts = self.payload.get('change_dicts')
         change_list = [
             story_domain.StoryChange(change_dict)

@@ -50,6 +50,7 @@ describe('Skill editor state service', function() {
   var FakeSkillBackendApiService = function() {
     var self = {
       newBackendSkillObject: null,
+      skillObject: null,
       failure: null,
       fetchSkill: null,
       updateSkill: null
@@ -59,7 +60,7 @@ describe('Skill editor state service', function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
           resolve({
-            skill: self.newBackendSkillObject,
+            skill: self.skillObject,
             groupedSkillSummaries: {
               Name: [{
                 id: 'skill_id_1',
@@ -79,7 +80,7 @@ describe('Skill editor state service', function() {
     var _updateSkill = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(self.newBackendSkillObject);
+          resolve(self.skillObject);
         } else {
           reject();
         }
@@ -87,6 +88,7 @@ describe('Skill editor state service', function() {
     };
 
     self.newBackendSkillObject = {};
+    self.skillObject = null;
     self.failure = null;
     self.fetchSkill = _fetchSkill;
     self.updateSkill = _updateSkill;
@@ -248,6 +250,8 @@ describe('Skill editor state service', function() {
       skillRightsObject);
 
     fakeSkillBackendApiService.newBackendSkillObject = skillDict;
+    fakeSkillBackendApiService.skillObject = SkillObjectFactory
+      .createFromBackendDict(skillDict);
   }));
 
   it('should request to load the skill from the backend', function() {
@@ -320,8 +324,8 @@ describe('Skill editor state service', function() {
 
   it('should be able to save the collection and pending changes',
     function() {
-      spyOn(fakeSkillBackendApiService,
-        'updateSkill').and.callThrough();
+      spyOn(
+        fakeSkillBackendApiService, 'updateSkill').and.callThrough();
 
       SkillEditorStateService.loadSkill('skill_id_1');
       SkillUpdateService.setSkillDescription(

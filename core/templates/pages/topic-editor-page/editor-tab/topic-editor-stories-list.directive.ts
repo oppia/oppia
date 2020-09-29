@@ -20,13 +20,12 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/contextual/url.service.ts');
 
-angular.module('oppia').directive('storiesList', [
+angular.module('oppia').directive('topicEditorStoriesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -38,17 +37,12 @@ angular.module('oppia').directive('storiesList', [
         '/pages/topic-editor-page/editor-tab/' +
         'topic-editor-stories-list.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$window',
-        'EditableTopicBackendApiService', 'UrlService', 'UndoRedoService',
-        'UrlInterpolationService', 'TopicUpdateService',
-        'EVENT_STORY_SUMMARIES_INITIALIZED',
+        '$scope', '$uibModal', '$window', 'TopicUpdateService',
+        'UndoRedoService', 'UrlInterpolationService',
         function(
-            $scope, $rootScope, $uibModal, $window,
-            EditableTopicBackendApiService, UrlService, UndoRedoService,
-            UrlInterpolationService, TopicUpdateService,
-            EVENT_STORY_SUMMARIES_INITIALIZED) {
+            $scope, $uibModal, $window, TopicUpdateService,
+            UndoRedoService, UrlInterpolationService) {
           var ctrl = this;
-          var topicId = UrlService.getTopicIdFromUrl();
           var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
           $scope.openStoryEditor = function(storyId) {
             if (UndoRedoService.getChangeCount() > 0) {

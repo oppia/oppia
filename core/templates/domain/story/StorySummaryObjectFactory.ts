@@ -20,6 +20,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import {
+  StoryNode, StoryNodeBackendDict, StoryNodeObjectFactory
+} from './StoryNodeObjectFactory';
+
 export interface StorySummaryBackendDict {
   'id': string;
   'title': string;
@@ -29,20 +33,22 @@ export interface StorySummaryBackendDict {
   'description': string;
   'story_is_published': boolean;
   'completed_node_titles': string[],
-  'url_fragment': string
+  'url_fragment': string,
+  'pending_node_dicts': StoryNodeBackendDict[]
 }
 
 export class StorySummary {
   constructor(
     private _id: string,
     private _title: string,
-    private _nodeTitles: Array<string>,
+    private _nodeTitles: string[],
     private _thumbnailFilename: string,
     private _thumbnailBgColor: string,
     private _description: string,
     private _storyIsPublished: boolean,
     private _completedNodeTitles: string[],
     private _urlFragment: string,
+    private _pendingNodes: StoryNode[]
   ) {}
 
   getId(): string {
@@ -53,7 +59,7 @@ export class StorySummary {
     return this._title;
   }
 
-  getNodeTitles(): Array<string> {
+  getNodeTitles(): string[] {
     return this._nodeTitles.slice();
   }
 
@@ -80,14 +86,27 @@ export class StorySummary {
   getUrlFragment(): string {
     return this._urlFragment;
   }
+
+  getPendingNodes(): StoryNode[] {
+    return this._pendingNodes;
+  }
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorySummaryObjectFactory {
+  constructor(
+    private storyNodeObjectFactory: StoryNodeObjectFactory
+  ) {}
+
   createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
+    let pendingNodes = (
+      storySummaryBackendDict.pending_node_dicts.map(storyNodeDict => {
+        return this.storyNodeObjectFactory.createFromBackendDict(
+          storyNodeDict);
+      }));
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
@@ -97,7 +116,8 @@ export class StorySummaryObjectFactory {
       storySummaryBackendDict.description,
       storySummaryBackendDict.story_is_published,
       storySummaryBackendDict.completed_node_titles,
-      storySummaryBackendDict.url_fragment
+      storySummaryBackendDict.url_fragment,
+      pendingNodes
     );
   }
 }

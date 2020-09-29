@@ -23,18 +23,23 @@ import { AppConstants } from 'app.constants';
 import { ExpressionParserService } from
   'expressions/expression-parser.service.ts';
 
-interface SystemEnv {
-  eval: (args: string[]) => number | boolean | string;
+export type Expr = string | number | boolean;
+
+export interface SystemEnv {
+  eval: (args: Expr[]) => Expr;
   getType: (args: string[]) => string;
 }
 
-type Env = SystemEnv | string | number;
+export type Env = SystemEnv | Expr;
 
-interface EnvDict {
+export interface EnvDict {
   [param: string]: Env;
 }
 
 export class ExpressionError extends Error {
+  // 'message' is optional beacuse it is optional in the actual 'Error'
+  // constructor object. Also, we may not want a custom error message
+  // while throwing 'ExpressionError'.
   constructor(message?: string) {
     super(message);
     // NOTE TO DEVELOPERS: In order to properly extend Error, we must manually
@@ -53,7 +58,7 @@ export class ExprUndefinedVarError extends ExpressionError {
 
 export class ExprWrongNumArgsError extends ExpressionError {
   constructor(
-      public args: Array<number|string>,
+      public args: (number|string)[],
       public expectedMin: number, public expectedMax: number) {
     super(
       '{' + args + '} not in range [' + expectedMin + ', ' + expectedMax + ']');
@@ -65,7 +70,8 @@ export class ExprWrongArgTypeError extends ExpressionError {
       public arg: number|string,
       public actualType: string, public expectedType: string) {
     super(
-      (arg !== null ?
+      (
+        arg !== null ?
         (arg + ' has type ' + actualType + ' which') : ('Type ' + actualType)) +
       ' does not match expected type ' + expectedType);
   }
@@ -86,9 +92,8 @@ export class ExpressionSyntaxTreeService {
   }
 
   public applyFunctionToParseTree(
-      parsed: (string | string[])[], envs: EnvDict[],
-      func: (
-        parsed: (string | string[])[], envs: EnvDict[]) => string): string {
+      parsed: Expr | Expr[], envs: EnvDict[],
+      func: (parsed: Expr | Expr[], envs: EnvDict[]) => Expr): Expr {
     return func(parsed, envs.concat(this.system));
   }
 
@@ -103,7 +108,7 @@ export class ExpressionSyntaxTreeService {
     throw new ExprUndefinedVarError(name, envs);
   }
 
-  private findParams(parseTree: string[]|string): Set<string> {
+  private findParams(parseTree: string | string[]): Set<string> {
     const paramsFound = new Set<string>();
     if (parseTree instanceof Array) {
       if (parseTree[0] === '#') {
@@ -153,7 +158,7 @@ export class ExpressionSyntaxTreeService {
     return coercedValue;
   }
 
-  private coerceAllArgsToNumber(args: Array<number|string>): number[] {
+  private coerceAllArgsToNumber(args: (number|string)[]): number[] {
     return args.map(this.coerceToNumber);
   }
 
@@ -167,7 +172,7 @@ export class ExpressionSyntaxTreeService {
   // Arguments:
   //    for eval(): list of values of the evaluated sub-expression.
   //    for getType(): list of types of the evaluated sub-expression.
-  private system = {
+  private system: {[name: string]: SystemEnv} = {
     '+': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1, 2);

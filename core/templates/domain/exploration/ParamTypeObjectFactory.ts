@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface TypeDefinitionObject {
-  'validate': (arg0: Object) => Boolean;
+  'validate': (arg0: Object) => boolean;
 
   // The default value is typed as Object because it's type could be anything.
   // It depends on the arguments passed to the constructor.
@@ -32,7 +32,7 @@ interface TypeDefinitionObject {
 
 export class ParamType {
   _name: string;
-  valueIsValid: (arg0: Object) => Boolean;
+  valueIsValid: (arg0: Object) => boolean;
   defaultValue: Object;
 
   /**
@@ -84,9 +84,8 @@ export class ParamTypeObjectFactory {
     Object.keys(this.registry).forEach((paramTypeName: string) => {
       // The bracket notation is needed since 'paramTypeName' is a dynamic
       // property and is not defined on 'registry'.
-      /* eslint-disable dot-notation */
+      /* eslint-disable-next-line dot-notation */
       var paramType = this.registry[paramTypeName];
-      /* eslint-enable dot-notation */
       paramType._name = paramTypeName;
       Object.freeze(paramType);
     });
@@ -120,11 +119,7 @@ export class ParamTypeObjectFactory {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
-    // The bracket notation is needed since 'backendName' is a dynamic property
-    // and is not defined on 'registry'.
-    /* eslint-disable dot-notation */
     return this.registry[backendName];
-    /* eslint-enable dot-notation */
   }
 }
 

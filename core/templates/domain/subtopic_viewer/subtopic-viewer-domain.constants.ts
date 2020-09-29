@@ -16,10 +16,10 @@
  * @fileoverview Constants for the subtopic viewer domain.
  */
 
-export class SubtopicViewerDomainConstants {
-  public static SUBTOPIC_DATA_URL_TEMPLATE = (
+export const SubtopicViewerDomainConstants = {
+  SUBTOPIC_DATA_URL_TEMPLATE: (
     '/subtopic_data_handler/<classroom_url_fragment>/' +
-    '<topic_url_fragment>/<subtopic_url_fragment>');
-  public static TOPIC_VIEWER_URL_TEMPLATE = (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>');
-}
+    '<topic_url_fragment>/<subtopic_url_fragment>'),
+  TOPIC_VIEWER_URL_TEMPLATE: (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>')
+} as const;

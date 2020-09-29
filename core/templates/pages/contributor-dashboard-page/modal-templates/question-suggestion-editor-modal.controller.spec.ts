@@ -147,6 +147,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
             translations_mapping: {}
           },
         },
+        inapplicable_skill_misconception_ids: ['1-2']
       });
       questionId = question.getId();
       questionStateData = question.getStateData();
@@ -165,16 +166,17 @@ describe('Question Suggestion Editor Modal Controller', function() {
       });
     }));
 
-    it('should init the constiables', function() {
-      expect($scope.canEditQuestion).toBe(true);
-      expect($scope.newQuestionIsBeingCreated).toBe(true);
-      expect($scope.question).toEqual(question);
-      expect($scope.questionId).toBe(questionId);
-      expect($scope.questionStateData).toEqual(questionStateData);
-      expect($scope.skillDifficulty).toBe(skillDifficulty);
-      expect($scope.skillDifficultyString).toBe('Easy');
-      expect($scope.skill).toEqual(skill);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.canEditQuestion).toBe(true);
+        expect($scope.newQuestionIsBeingCreated).toBe(true);
+        expect($scope.question).toEqual(question);
+        expect($scope.questionId).toBe(questionId);
+        expect($scope.questionStateData).toEqual(questionStateData);
+        expect($scope.skillDifficulty).toBe(skillDifficulty);
+        expect($scope.skillDifficultyString).toBe('Easy');
+        expect($scope.skill).toEqual(skill);
+      });
 
     it('should evaluate question validity', function() {
       expect($scope.isQuestionValid()).toBe(true);
@@ -277,7 +279,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
       spyOn(QuestionSuggestionService, 'submitSuggestion').and.callThrough();
       $scope.done();
 
-      expect(QuestionSuggestionService.submitSuggestion).not.toHaveBeenCalled();
+      expect(QuestionSuggestionService.submitSuggestion).not
+        .toHaveBeenCalled();
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
   });

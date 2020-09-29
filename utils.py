@@ -40,6 +40,8 @@ sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
+DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""
@@ -422,6 +424,34 @@ def get_time_in_millisecs(datetime_obj):
     return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
+def convert_naive_datetime_to_string(datetime_obj):
+    """Returns a human-readable string representing the naive datetime object.
+
+    Args:
+        datetime_obj: datetime. An object of type datetime.datetime. Must be a
+            naive datetime object.
+
+    Returns:
+        str. The string representing the naive datetime object.
+    """
+    return datetime_obj.strftime(DATETIME_FORMAT)
+
+
+def convert_string_to_naive_datetime_object(date_time_string):
+    """Returns the naive datetime object equivalent of the date string.
+
+    Args:
+        date_time_string: str. The string format representing the datetime
+            object in the format: Month/Day/Year,
+            Hour:Minute:Second:MicroSecond.
+
+    Returns:
+        datetime. An object of type naive datetime.datetime corresponding to
+        that string.
+    """
+    return datetime.datetime.strptime(date_time_string, DATETIME_FORMAT)
+
+
 def get_current_time_in_millisecs():
     """Returns time in milliseconds since the Epoch.
 
@@ -617,6 +647,22 @@ def require_valid_thumbnail_filename(thumbnail_filename):
                 thumbnail_filename)
 
 
+def require_valid_meta_tag_content(meta_tag_content):
+    """Generic meta tag content validation.
+
+        Args:
+            meta_tag_content: str. The meta tag content to validate.
+        """
+    if not isinstance(meta_tag_content, python_utils.BASESTRING):
+        raise ValidationError(
+            'Expected meta tag content to be a string, received %s'
+            % meta_tag_content)
+    if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT:
+        raise ValidationError(
+            'Meta tag content should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+
+
 def capitalize_string(input_string):
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
@@ -713,6 +759,21 @@ def get_supported_audio_language_description(language_code):
     raise Exception('Unsupported audio language code: %s' % language_code)
 
 
+def is_pseudonymous_id(user_id):
+    """Check that the ID is a pseudonymous one.
+
+    Args:
+        user_id: str. The ID to be checked.
+
+    Returns:
+        bool. Whether the ID represents a pseudonymous user.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('pid_'),
+        len(user_id) == feconf.USER_ID_LENGTH))
+
+
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent.
 
@@ -780,6 +841,68 @@ def get_hashable_value(value):
             (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
+
+
+def compute_list_difference(list_a, list_b):
+    """Returns the set difference of two lists.
+
+    Args:
+        list_a: list. The first list.
+        list_b: list. The second list.
+
+    Returns:
+        list. List of the set difference of list_a - list_b.
+    """
+    return list(set(list_a) - set(list_b))
+
+
+def is_local_server_environment():
+    """Returns wheter the app is being run locally in a development server.
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    This is necessary because the DEV_MODE constant only differentiates between
+    local development and operations on the production server. However,
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
+
+    Returns:
+        bool. Whether the current instance is running locally on a developer's
+        computer.
+    """
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Development/' in os.environ['SERVER_SOFTWARE'])
+
+
+def is_appengine_cloud_environment():
+    """Returns whether the app is being run in production in the Google App
+    Engine Cloud.
+
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    This is necessary because the DEV_MODE constant only differentiates between
+    local development and operations on the production server. However,
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
+
+    Returns:
+        bool. Whether the current instance is running in production.
+    """
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Google App Engine/' in os.environ['SERVER_SOFTWARE'])
 
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):

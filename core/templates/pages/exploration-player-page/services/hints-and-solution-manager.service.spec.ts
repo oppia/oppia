@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // hints-and-solution-manager.service.spec.ts is upgraded to Angular 8.
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -34,13 +36,14 @@ require(
 
 describe('HintsAndSolutionManager service', function() {
   var $timeout;
-  var $rootScope;
   var hasms;
   var hof;
   var sof;
-  var EVENT_NEW_CARD_AVAILABLE;
   var firstHint, secondHint, thirdHint;
   var solution;
+  var pps;
+
+  var mockNewCardAvailableEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -61,11 +64,13 @@ describe('HintsAndSolutionManager service', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $timeout = $injector.get('$timeout');
-    $rootScope = $injector.get('$rootScope');
+    pps = $injector.get('PlayerPositionService');
+    spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
+      mockNewCardAvailableEmitter);
     hasms = $injector.get('HintsAndSolutionManagerService');
     hof = $injector.get('HintObjectFactory');
     sof = $injector.get('SolutionObjectFactory');
-    EVENT_NEW_CARD_AVAILABLE = $injector.get('EVENT_NEW_CARD_AVAILABLE');
+
 
     firstHint = hof.createFromBackendDict({
       hint_content: {
@@ -156,7 +161,7 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
-    $rootScope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
+    mockNewCardAvailableEmitter.emit();
     $timeout.flush();
 
     expect(hasms.isHintViewable(0)).toBe(true);
@@ -294,5 +299,16 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isSolutionViewable()).toBe(false);
 
     $timeout.verifyNoPendingTasks();
+  });
+
+  it('should send the solution viewed event emitter', () => {
+    let mockSolutionViewedEventEmitter = new EventEmitter();
+    expect(hasms.onSolutionViewedEventEmitter).toEqual(
+      mockSolutionViewedEventEmitter);
+  });
+
+  it('should fetch EventEmitter for consumption of hint', () => {
+    let mockHintConsumedEvent = new EventEmitter();
+    expect(hasms.onHintConsumed).toEqual(mockHintConsumedEvent);
   });
 });

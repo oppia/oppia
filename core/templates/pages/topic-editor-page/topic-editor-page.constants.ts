@@ -16,12 +16,6 @@
  * @fileoverview Constants for the topic editor page.
  */
 
-export class TopicEditorPageConstants {
-  public static TOPIC_NAME_INPUT_FOCUS_LABEL =
-    'topicNameInputFocusLabel';
-
-  public static EVENT_TOPIC_INITIALIZED = 'topicInitialized';
-  public static EVENT_TOPIC_REINITIALIZED = 'topicReinitialized';
-  public static EVENT_SUBTOPIC_PAGE_LOADED = 'subtopicPageLoaded';
-  public static EVENT_STORY_SUMMARIES_INITIALIZED = 'storySummariesInitialized';
-}
+export const TopicEditorPageConstants = {
+  TOPIC_NAME_INPUT_FOCUS_LABEL: 'topicNameInputFocusLabel'
+} as const;

@@ -37,22 +37,8 @@ class StoryModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        story_instance = story_models.StoryModel(
-            id='id',
-            title='title',
-            description='description',
-            notes='notes',
-            story_contents_schema_version=(
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
-            corresponding_topic_id='topic_id',
-            language_code='language_code',
-            url_fragment='title')
-        story_instance.commit(
-            'committer_id', 'commit_message', [{'cmd': 'test_command'}])
-        self.assertTrue(
-            story_models.StoryModel.has_reference_to_user_id('committer_id'))
         self.assertFalse(
-            story_models.StoryModel.has_reference_to_user_id('x_id'))
+            story_models.StoryModel.has_reference_to_user_id('any_id'))
 
     def test_story_model(self):
         """Method to test the StoryModel."""
@@ -154,7 +140,8 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             node_titles=['Chapter 1'],
             thumbnail_filename='image.svg',
             thumbnail_bg_color='#F8BF74',
-            version=1)
+            version=1,
+            url_fragment='story-summary-frag')
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
 
@@ -165,3 +152,5 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_summary_by_id.thumbnail_bg_color, '#F8BF74')
         self.assertEqual(story_summary_by_id.thumbnail_filename, 'image.svg')
         self.assertEqual(story_summary_by_id.version, 1)
+        self.assertEqual(
+            story_summary_by_id.url_fragment, 'story-summary-frag')

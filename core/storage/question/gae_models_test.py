@@ -42,16 +42,8 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
-        question_state_data = self._create_valid_question_data('ABC')
-        linked_skill_ids = ['skill_id1', 'skill_id2']
-        self.save_new_question(
-            'question_id1', 'owner_id', question_state_data, linked_skill_ids)
-        self.assertTrue(
-            question_models.QuestionModel
-            .has_reference_to_user_id('owner_id'))
         self.assertFalse(
-            question_models.QuestionModel
-            .has_reference_to_user_id('x_id'))
+            question_models.QuestionModel.has_reference_to_user_id('any_id'))
 
     def test_create_question_empty_skill_id_list(self):
         state = state_domain.State.create_default_state('ABC')
@@ -59,7 +51,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         language_code = 'en'
         version = 1
         question_model = question_models.QuestionModel.create(
-            question_state_data, language_code, version, [])
+            question_state_data, language_code, version, [], [])
 
         self.assertEqual(
             question_model.question_state_data, question_state_data)
@@ -74,13 +66,28 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         version = 1
         question_model = question_models.QuestionModel.create(
             question_state_data, language_code, version,
-            linked_skill_ids)
+            linked_skill_ids, ['skill-1'])
 
         self.assertEqual(
             question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
         self.assertItemsEqual(
             question_model.linked_skill_ids, linked_skill_ids)
+
+    def test_create_question_with_inapplicable_skill_misconception_ids(self):
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        linked_skill_ids = ['skill_id1', 'skill_id2']
+        inapplicable_skill_misconception_ids = ['skill_id-1', 'skill_id-2']
+        language_code = 'en'
+        version = 1
+        question_model = question_models.QuestionModel.create(
+            question_state_data, language_code, version,
+            linked_skill_ids, inapplicable_skill_misconception_ids)
+
+        self.assertItemsEqual(
+            question_model.inapplicable_skill_misconception_ids,
+            inapplicable_skill_misconception_ids)
 
     def test_put_multi_questions(self):
         question_state_data = self._create_valid_question_data('ABC')
@@ -114,7 +121,6 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_models.QuestionModel.get(
             question_ids[1]).linked_skill_ids, ['skill_id3'])
 
-
     def test_raise_exception_by_mocking_collision(self):
         state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
@@ -132,7 +138,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
                     lambda x, y: True,
                     question_models.QuestionModel)):
                 question_models.QuestionModel.create(
-                    question_state_data, language_code, version, set([]))
+                    question_state_data, language_code, version, set([]), [])
 
 
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
@@ -718,6 +724,7 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
         question_summary_model = question_models.QuestionSummaryModel(
             id='question',
             question_content='Question',
+            interaction_id='TextInput',
             question_model_created_on=datetime.datetime.utcnow(),
             question_model_last_updated=datetime.datetime.utcnow()
         )

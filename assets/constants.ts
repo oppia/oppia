@@ -1,3 +1,7 @@
+// We are using eslint disable here for multilines because we have used quotes
+// around properties at a lot of places so it is not possible to use
+// "eslint disable next line" for each of them.
+/* eslint-disable oppia/no-multiline-disable */
 /* eslint-disable quote-props */
 /* eslint-disable quotes */
 /* Don't modify anything outside the {} brackets.
@@ -72,6 +76,8 @@ export = {
     "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
   },
 
+  "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
+
   "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
   "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
   "TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS": "successive_incorrect_answers",
@@ -84,6 +90,12 @@ export = {
   "TASK_ENTITY_TYPE_EXPLORATION": "exploration",
 
   "TASK_TARGET_TYPE_STATE": "state",
+
+  // Regex to validate the format of Math rich-text component SVGs. If this is
+  // changed in the future, the existing filenames on the server should be
+  // handled as well.
+  // eslint-disable-next-line max-len
+  "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
 
   // The SVG tag-specific attribute whitelist is based on the list of tags and
   // and attributes specified in this project:
@@ -5136,8 +5148,8 @@ export = {
       "NumericExpressionInput",
       "AlgebraicExpressionInput",
       "MathEquationInput",
-      "MathExpressionInput",
-      "NumberWithUnits"
+      "NumberWithUnits",
+      "RatioExpressionInput"
     ]
   }, {
     "name": "Programming",
@@ -5214,13 +5226,6 @@ export = {
 
   "ENABLE_PREREQUISITE_SKILLS": false,
 
-  // For the full new structures viewer features, both
-  // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
-  // to be true. Only ENABLE_NEW_STRUCTURE_PLAYERS can be true if just the
-  // players need to be accessed, but without story progress updation.
-  // This is split up so as to access the viewers in production without
-  // exposing the POST and PUT endpoints just yet.
-  "ENABLE_NEW_STRUCTURE_PLAYERS": true,
   "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": true,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
@@ -5263,6 +5268,9 @@ export = {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
+  // The recommended length for meta tag contents. Search engines will truncate
+  // results greater than this limit.
+  "MAX_CHARS_IN_META_TAG_CONTENT": 160,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -5318,6 +5326,9 @@ export = {
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
+  // A regular expression for valid skill misconception id.
+  "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
+
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",
@@ -5325,12 +5336,57 @@ export = {
   ],
 
   // Greek letters allowed in math interactions.
-  "GREEK_LETTERS": [
+  "GREEK_LETTER_NAMES_TO_SYMBOLS": {
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "zeta": "ζ",
+    "eta": "η",
+    "theta": "θ",
+    "iota": "ι",
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μ",
+    "nu": "ν",
+    "xi": "ξ",
+    "pi": "π",
+    "rho": "ρ",
+    "sigma": "σ",
+    "tau": "τ",
+    "upsilon": "υ",
+    "phi": "φ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
+    "Gamma": "Γ",
+    "Delta": "Δ",
+    "Theta": "Θ",
+    "Lambda": "Λ",
+    "Xi": "Ξ",
+    "Pi": "Π",
+    "Sigma": "Σ",
+    "Phi": "Φ",
+    "Psi": "Ψ",
+    "Omega": "Ω"
+  },
+
+  // The greek letters in the list should be in sync with the
+  // GREEK_LETTER_NAMES_TO_SYMBOLS object's keys.
+  "VALID_ALGEBRAIC_IDENTIFIERS": [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
+    "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+    "T", "U", "V", "W", "X", "Y", "Z",
     "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
     "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
-    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
-  ],
+    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
+
+  // Number of custom letters allowed in the on-screen keyboard for math
+  // interactions.
+  "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
 
   // Functions allowed in math interactions.
   "MATH_FUNCTION_NAMES": [
@@ -5341,6 +5397,9 @@ export = {
   "OSK_MAIN_TAB": "mainTab",
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",
+
+  "CUSTOM_LETTERS_LATIN_TAB": "latinTab",
+  "CUSTOM_LETTERS_GREEK_TAB": "greekTab",
 
   // Name to human readable form mapping of the position of terms object.
   "POSITION_OF_TERMS_MAPPING": [{
@@ -5391,4 +5450,4 @@ export = {
   "MAX_USERNAME_LENGTH": 30,
 
   "DEV_MODE": true
-};
+} as const;

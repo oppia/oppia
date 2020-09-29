@@ -17,55 +17,82 @@
  * @fileoverview Unit tests for the skills list directive.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { EventEmitter } from '@angular/core';
+import { fakeAsync, tick } from '@angular/core/testing';
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
+import { Subscription } from 'rxjs';
 
 describe('Skills List Directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
+
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
   var $q = null;
-  var $httpBackend = null;
   var $rootScope = null;
   var directive = null;
   var $timeout = null;
   var EditableTopicBackendApiService = null;
-  var TopicsAndSkillsDashboardBackendApiService = null;
+  var SkillBackendApiService = null;
+
+  var mockTasdReinitializedEventEmitter;
+  var tasdReinitializedSpy = null;
+  var testSubscription = null;
+
+  var MockTopicsAndSkillsDashboardBackendApiService = {
+    mergeSkills: () => {
+      var deferred = $q.defer();
+      deferred.resolve();
+      return deferred.promise;
+    },
+
+    get onTopicsAndSkillsDashboardReinitialized() {
+      return mockTasdReinitializedEventEmitter;
+    }
+  };
 
   beforeEach(angular.mock.inject(function($injector) {
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    TopicsAndSkillsDashboardBackendApiService = (
-      $injector.get('TopicsAndSkillsDashboardBackendApiService'));
-    var MockTopicsAndSkillsDashboardBackendApiService = {
-      mergeSkills: () => {
-        var deferred = $q.defer();
-        deferred.resolve();
-        return deferred.promise;
-      }
-    };
+
     EditableTopicBackendApiService =
         $injector.get('EditableTopicBackendApiService');
+    SkillBackendApiService = $injector.get('SkillBackendApiService');
     directive = $injector.get('skillsListDirective')[0];
 
     ctrl = $injector.instantiate(directive.controller, {
       $scope: $scope,
+      SkillBackendApiService: SkillBackendApiService,
       TopicsAndSkillsDashboardBackendApiService:
       MockTopicsAndSkillsDashboardBackendApiService,
       $uibModal
     });
   }));
+
+  beforeEach(() => {
+    mockTasdReinitializedEventEmitter = new EventEmitter();
+    tasdReinitializedSpy = jasmine.createSpy('tasdReinitialized');
+    testSubscription = new Subscription();
+    testSubscription.add(
+      MockTopicsAndSkillsDashboardBackendApiService.
+        onTopicsAndSkillsDashboardReinitialized.subscribe(tasdReinitializedSpy)
+    );
+  });
+
+  afterEach(() => {
+    testSubscription.unsubscribe();
+  });
+
 
   it('should init the controller', function() {
     ctrl.$onInit();
@@ -109,22 +136,21 @@ describe('Skills List Directive', function() {
   });
 
   it('should reinitialize the page after successfully deleting the skill',
-    function() {
+    fakeAsync(() => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
-      spyOn($rootScope, '$broadcast');
+
+      spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
+        $q.resolve());
 
       var skillId = 'CdjnJUE332dd';
-      var url = '/skill_editor_handler/data/' + skillId;
-      $httpBackend.expectDELETE(url).respond(200);
       ctrl.deleteSkill(skillId);
 
-      $httpBackend.flush();
       $timeout.flush();
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'topicsAndSkillsDashboardReinitialized');
-    });
+      tick(100);
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
+    }));
 
   it('should select and show edit options for a skill', function() {
     const skillId1 = 'uXcdsad3f42';
@@ -158,7 +184,6 @@ describe('Skills List Directive', function() {
         })
       });
 
-      spyOn($rootScope, '$broadcast').and.callThrough();
       $scope.getMergeableSkillSummaries = function() {
         return [{id: 'dnfsdk', version: 1}];
       };
@@ -169,8 +194,7 @@ describe('Skills List Directive', function() {
       ctrl.mergeSkill(skillId);
       $timeout.flush(100);
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'topicsAndSkillsDashboardReinitialized');
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
     });
 
   it('should assign skill to a topic',
@@ -179,7 +203,6 @@ describe('Skills List Directive', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve(topicIds)
       });
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
       $scope.getEditableTopicSummaries = function() {
         return [{id: 'dnfsdk', version: 1}];
@@ -193,7 +216,6 @@ describe('Skills List Directive', function() {
       ctrl.assignSkillToTopic(skillId);
       $timeout.flush(100);
       expect(topicUpdateSpy).toHaveBeenCalled();
-      expect(broadcastSpy).toHaveBeenCalledWith(
-        'topicsAndSkillsDashboardReinitialized', true);
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
     });
 });

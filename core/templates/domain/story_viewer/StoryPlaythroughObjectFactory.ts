@@ -27,34 +27,42 @@ import {
 } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 
 export interface StoryPlaythroughBackendDict {
+  'story_id': string,
   'story_nodes': StoryNodeBackendDict[];
   'story_title': string;
   'story_description': string;
   'topic_name': string;
+  'meta_tag_content': string;
 }
 
 export class StoryPlaythrough {
+  id: string;
   nodes: ReadOnlyStoryNode[];
   title: string;
   description: string;
   topicName: string;
+  metaTagContent: string;
 
   constructor(
+      id: string,
       nodes: ReadOnlyStoryNode[],
       title: string,
       description: string,
-      topicName: string) {
+      topicName: string,
+      metaTagContent: string) {
+    this.id = id;
     this.nodes = nodes;
     this.title = title;
     this.description = description;
     this.topicName = topicName;
+    this.metaTagContent = metaTagContent;
   }
 
   getInitialNode(): ReadOnlyStoryNode {
     return this.nodes[0];
   }
 
-  getStoryNodeCount(): Number {
+  getStoryNodeCount(): number {
     return this.nodes.length;
   }
 
@@ -77,14 +85,22 @@ export class StoryPlaythrough {
   hasStartedStory(): boolean {
     return this.nodes[0].isCompleted();
   }
+
+  getStoryId(): string {
+    return this.id;
+  }
+
+  getMetaTagContent(): string {
+    return this.metaTagContent;
+  }
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoryPlaythroughObjectFactory {
-  constructor(private readOnlyStoryNodeObjectFactory:
-      ReadOnlyStoryNodeObjectFactory) {}
+  constructor(
+    private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory) {}
 
   createFromBackendDict(
       storyPlaythroughBackendDict:
@@ -94,10 +110,12 @@ export class StoryPlaythroughObjectFactory {
         .createFromBackendDict(storyNodeDict));
 
     return new StoryPlaythrough(
+      storyPlaythroughBackendDict.story_id,
       nodeObjects,
       storyPlaythroughBackendDict.story_title,
       storyPlaythroughBackendDict.story_description,
-      storyPlaythroughBackendDict.topic_name);
+      storyPlaythroughBackendDict.topic_name,
+      storyPlaythroughBackendDict.meta_tag_content);
   }
 }
 

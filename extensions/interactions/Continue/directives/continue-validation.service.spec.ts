@@ -28,13 +28,12 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { ContinueCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('ContinueValidationService', () => {
   let validatorService: ContinueValidationService;
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
@@ -88,6 +87,11 @@ describe('ContinueValidationService', () => {
 
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'ContinueCustomizationArgs'." We are purposely
+          // assigning the wrong type of customization args in order to test
+          // validations.
+          // @ts-expect-error
           currentState, {}, [], goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have property: buttonText');

@@ -19,15 +19,16 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/url.service.ts');
-require('services/contextual/window-dimensions.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
@@ -38,8 +39,8 @@ import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
   'interactions/LogicProof/static/js/generatedDefaultData.ts';
 
 angular.module('oppia').directive('oppiaInteractiveLogicProof', [
-  'InteractionAttributesExtractorService', 'EVENT_NEW_CARD_AVAILABLE',
-  function(InteractionAttributesExtractorService, EVENT_NEW_CARD_AVAILABLE) {
+  'InteractionAttributesExtractorService', 'PlayerPositionService',
+  function(InteractionAttributesExtractorService, PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -49,18 +50,18 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
       template: require('./logic-proof-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$timeout', '$uibModal', 'LogicProofRulesService',
-        'WindowDimensionsService', 'UrlService',
-        'CurrentInteractionService',
+        '$attrs', '$scope', '$timeout', '$uibModal',
+        'CurrentInteractionService', 'LogicProofRulesService',
         function(
-            $scope, $attrs, $timeout, $uibModal, LogicProofRulesService,
-            WindowDimensionsService, UrlService,
-            CurrentInteractionService) {
+            $attrs, $scope, $timeout, $uibModal,
+            CurrentInteractionService, LogicProofRulesService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           ctrl.codeEditor = function(editor) {
-            var proofString = (ctrl.interactionIsActive ?
+            var proofString = (
+              ctrl.interactionIsActive ?
               ctrl.localQuestionData.default_proof_string :
               ctrl.getLastAnswer().proof_string);
             editor.setValue(proofString);
@@ -233,9 +234,11 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             });
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => ctrl.interactionIsActive = false
+              )
+            );
             const {
               question
             } = InteractionAttributesExtractorService.getValuesFromAttributes(
@@ -309,6 +312,9 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
 
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitProof, null);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

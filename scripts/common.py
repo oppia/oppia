@@ -28,6 +28,7 @@ import subprocess
 import sys
 import time
 
+import feconf
 import python_utils
 import release_constants
 
@@ -44,6 +45,11 @@ PYLINT_VERSION = '1.9.5'
 PYLINT_QUOTES_VERSION = '0.1.8'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
+PIP_TOOLS_VERSION = '5.3.1'
+GRPCIO_VERSION = '1.0.0'
+ENUM_VERSION = '1.1.10'
+PROTOBUF_VERSION = '3.13.0'
+SETUPTOOLS_VERSION = '36.6.0'
 
 # Node version.
 NODE_VERSION = '12.16.2'
@@ -54,15 +60,39 @@ YARN_VERSION = '1.22.4'
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
 
+# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
+# there is a `make test` bug in redis 6.0.6 where the solution has not been
+# released. This is explained in this issue:
+# https://github.com/redis/redis/issues/7540.
+# IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
+# 1. Download the new version of the redis cli.
+# 2. Extract the cli in the folder that it was downloaded, most likely
+#    Downloads/.
+# 3. Change directories into the folder you extracted, titled
+#    redis-<new version>/ and change into that directory:
+#    cd redis-<new version>/
+# 4. From the top level of the redis-<new version> directory,
+#    run `make test`.
+# 5. All of the tests should pass with an [ok] status with no error codes. The
+#    final output should be 'All tests pass'.
+# 6. Be sure to leave a note in the PR description to confirm that you have read
+#    this message, and that all of the `make test` tests pass before you commit
+#    the upgrade to develop.
+# 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
+REDIS_CLI_VERSION = '6.0.5'
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-GOOGLE_APP_ENGINE_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google_appengine_1.9.67', 'google_appengine')
+THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
+GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
+    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
+GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
 PYCODESTYLE_PATH = os.path.join(
@@ -75,6 +105,12 @@ YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+REDIS_SERVER_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-server')
+REDIS_CLI_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-cli')
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
@@ -82,9 +118,23 @@ HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
-FECONF_PATH = os.path.join('.', 'feconf.py')
+FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+REDIS_CONF_PATH = os.path.join('redis.conf')
+# Path for the dump file the redis server autogenerates. It contains data
+# used by the Redis server.
+REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
+# The requirements.txt file is auto-generated and contains a deterministic list
+# of all libraries and versions that should exist in the
+# 'third_party/python_libs' directory.
+# NOTE: Developers should NOT modify this file.
+COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
+# The precompiled requirements file is the one that developers should be
+# modifying. It is the file that we use to recompile the
+# "requirements.txt" file so that all installations using "requirements.txt"
+# will be identical.
+REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
 
 
 def is_windows_os():
@@ -325,7 +375,11 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                 'git@github.com:oppia/release-scripts.git'])
 
     with CD(release_scripts_dirpath):
+        python_utils.PRINT('Verifying that ../release-scripts repo is clean...')
         verify_local_repo_is_clean()
+        python_utils.PRINT(
+            'Verifying that user is on master branch in '
+            '../release-scripts repo...')
         verify_current_branch_name('master')
 
         # Update the local repo.
@@ -599,6 +653,80 @@ def wait_for_port_to_be_open(port_number):
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
+
+
+def start_redis_server():
+    """Start the redis server with the daemonize argument to prevent
+    the redis-server from exiting on its own.
+    """
+    if is_windows_os():
+        raise Exception(
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
+
+    # Check if a redis dump file currently exists. This file contains residual
+    # data from a previous run of the redis server. If it exists, removes the
+    # dump file so that the redis server starts with a clean slate.
+    if os.path.exists(REDIS_DUMP_PATH):
+        os.remove(REDIS_DUMP_PATH)
+
+    # Redis-cli is only required in a development environment.
+    python_utils.PRINT('Starting Redis development server.')
+    # Start the redis local development server. Redis doesn't run on
+    # Windows machines.
+    subprocess.call([
+        REDIS_SERVER_PATH, REDIS_CONF_PATH,
+        '--daemonize', 'yes'
+    ])
+    wait_for_port_to_be_open(feconf.REDISPORT)
+
+
+def stop_redis_server():
+    """Stops the redis server by shutting it down."""
+    if is_windows_os():
+        raise Exception(
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
+
+    python_utils.PRINT('Cleaning up the redis_servers.')
+    # Shutdown the redis server before exiting.
+    subprocess.call([REDIS_CLI_PATH, 'shutdown'])
+
+
+def fix_third_party_imports():
+    """Sets up up the environment variables and corrects the system paths so
+    that the backend tests and imports work correctly.
+    """
+    # These environmental variables are required to allow Google Cloud Tasks to
+    # operate in a local development environment without connecting to the
+    # internet. These environment variables allow Cloud APIs to be instantiated.
+    os.environ['CLOUDSDK_CORE_PROJECT'] = 'dummy-cloudsdk-project-id'
+    os.environ['APPLICATION_ID'] = 'dummy-cloudsdk-project-id'
+
+    # The devappserver function fixes the system path by adding certain google
+    # appengine libraries that we need in oppia to the python system path. The
+    # Google Cloud SDK comes with certain packages preinstalled including
+    # webapp2, jinja2, and pyyaml so this function makes sure that those
+    # libraries are installed.
+    import dev_appserver
+    dev_appserver.fix_sys_path()
+    # In the process of migrating Oppia from Python 2 to Python 3, we are using
+    # both google app engine apis that are contained in the Google Cloud SDK
+    # folder, and also google cloud apis that are installed in our
+    # 'third_party/python_libs' directory. Therefore, there is a confusion of
+    # where the google module is located and which google module to import from.
+    # The following code ensures that the google module that python looks at
+    # imports from the 'third_party/python_libs' folder so that the imports are
+    # correct.
+    if 'google' in sys.modules:
+        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_module = sys.modules['google']
+        google_module.__path__ = [google_path]
+        google_module.__file__ = os.path.join(google_path, '__init__.py')
+
+    sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
 
 
 class CD(python_utils.OBJECT):

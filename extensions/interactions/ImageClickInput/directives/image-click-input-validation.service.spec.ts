@@ -22,19 +22,15 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ImageClickInputCustomizationArgs } from
   'interactions/customization-args-defs';
-/* eslint-disable max-len*/
-import { ImageClickInputValidationService } from
-  'interactions/ImageClickInput/directives/image-click-input-validation.service';
-/* eslint-enable max-len*/
+import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('ImageClickInputValidationService', () => {
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: ImageClickInputValidationService;
 
   let currentState: string;
@@ -96,8 +92,12 @@ describe('ImageClickInputValidationService', () => {
             }
           }]
         }
+      },
+      highlightRegionsOnHover: {
+        value: true
       }
     };
+
     goodAnswerGroups = [agof.createNew(
       [rof.createFromBackendDict({
         rule_type: 'IsInRegion',
@@ -115,6 +115,11 @@ describe('ImageClickInputValidationService', () => {
       goodAnswerGroups[0].rules = [];
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'ImageClickInputCustomizationArgs'." We are
+          // purposely assigning the wrong type of customization args in
+          // order to test validations.
+          // @ts-expect-error
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have property: imageAndRegions');

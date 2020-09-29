@@ -20,7 +20,6 @@
 // Note: Instantiating some of the editors, e.g. RichTextEditor, occurs
 // asynchronously and so must be prefixed by "await".
 
-var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
@@ -148,8 +147,7 @@ var ListEditor = function(elem) {
   return {
     editItem: async function(index, objectType) {
       var item = await elem.element(
-        await by.repeater('item in localValue track by $index'
-        ).row(index));
+        await by.repeater('item in localValue track by $index').row(index));
       var editor = getEditor(objectType);
       return await editor(item);
     },
@@ -373,8 +371,6 @@ var MultiSelectEditor = function(elem) {
     await elem.element(by.css(
       '.protractor-test-search-bar-dropdown-toggle')).click();
 
-    var allElements = elem.all(
-      by.css('.protractor-test-search-bar-dropdown-menu span'));
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
       var filteredElement = elem.element(
@@ -445,6 +441,8 @@ var MultiSelectEditor = function(elem) {
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = async function(richTextInstructions) {
+    // TODO(#9821): Find a better way to parse through the tags rather than
+    // using xpath.
     // We select all top-level non-paragraph elements, as well as all children
     // of paragraph elements. (Note that it is possible for <p> elements to
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
@@ -538,21 +536,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      // TODO(#9821) :The Math rich text components are now rendered as SVGs by
-      // Math-Jax, and the XPATH_SELECTOR defined in the method expectRichText()
-      // cannot effectively parse the SVG tags, hence the elem.getText() won't
-      // work for Math components.
-      if (componentName === 'Math') {
-        // Math-Jax renders the equations with the help of a script having
-        // innerHTML equal to the latex value. In future we will have to remove
-        // the checks below because Math-Jax will be removed from learner view.
-        var mathScriptTag = elem.element(by.tagName('script'));
-        expect(await mathScriptTag.isPresent()).toBe(true);
-        expect(args.length).toBe(2);
-        expect(await mathScriptTag.getAttribute('innerHTML')).toBe(args[1]);
-      } else {
-        expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
-      }
+      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
@@ -597,10 +581,9 @@ var toRichText = async function(text) {
  * loads more divs.
  */
 var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
-  // The number of pixels to scroll between reading different sections of
-  // CodeMirror's text. 400 pixels is about 15 lines, which will work if
-  // codemirror's buffer (viewportMargin) is set to at least 10 (the default).
-  var CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS = 400;
+  // The number of lines to scroll between reading different sections of
+  // CodeMirror's text.
+  var NUMBER_OF_LINES_TO_SCROLL = 15;
 
   /**
    * This recursive function is used by expectTextWithHighlightingToBe().
@@ -614,108 +597,63 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    *  - 'text': the exact string of text expected on that line
    *  - 'highlighted': true or false, whether the line is highlighted
    *  - 'checked': true or false, whether the line has been checked
+   * compareHightlighting: Whether highlighting should be compared.
    */
-  var _compareTextAndHighlightingFromLine = async function(
-      currentLineNumber, scrollTo, compareDict) {
-    // This is used to match and scroll the text in codemirror to a point
-    // scrollTo pixels from the top of the text or the bottom of the text
-    // if scrollTo is too large.
-    await browser.executeScript(
-      '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
-      '().scrollTop(' + String(scrollTo) + ');');
-    var lineNumbers = await elem.all(by.xpath('./div')).map(
-      async function(lineElement) {
-        var lineNumber = await lineElement.element(
-          by.css('.CodeMirror-linenumber')).getText();
-        // Note: the last line in codemirror will have an empty string for
-        // line number and for text. This is to skip that line.
-        if (lineNumber === '') {
-          return lineNumber;
-        }
-        if (!compareDict.hasOwnProperty(lineNumber)) {
+  var _compareText = async function(compareDict, compareHightlighting) {
+    var scrollTo = 0;
+    var prevScrollTop = -1;
+    var actualDiffDict = {};
+    var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
+    var scrollBarWebElement = null;
+    if (codeMirrorPaneToScroll === 'first') {
+      scrollBarWebElement = await scrollBarElements.first().getWebElement();
+    } else {
+      scrollBarWebElement = await scrollBarElements.last().getWebElement();
+    }
+    while (true) {
+      // This is used to match and scroll the text in codemirror to a point
+      // scrollTo pixels from the top of the text or the bottom of the text
+      // if scrollTo is too large.
+      await browser.executeScript(
+        '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
+        '().scrollTop(' + String(scrollTo) + ');');
+      var lineHeight = await elem.element(
+        by.css('.CodeMirror-linenumber')).getAttribute('clientHeight');
+      var currentScrollTop = await browser.executeScript(
+        'return arguments[0].scrollTop;', scrollBarWebElement);
+      if (currentScrollTop === prevScrollTop) {
+        break;
+      } else {
+        prevScrollTop = currentScrollTop;
+      }
+      var lineDivElements = elem.all(by.xpath('./div'));
+      var lineContentElements = elem.all(by.css('.CodeMirror-line'));
+      var lineNumberElements = elem.all(by.css('.CodeMirror-linenumber'));
+      var totalCount = await lineNumberElements.count();
+      for (var i = 0; i < totalCount; i++) {
+        var lineNumberElement = await lineNumberElements.get(i);
+        var lineNumber = await lineNumberElement.getText();
+        if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
-        expect(await lineElement.element(by.xpath('./pre')).getText())
-          .toEqual(compareDict[lineNumber].text);
-        expect(
-          await lineElement.element(
-            by.css('.CodeMirror-linebackground')).isPresent())
-          .toEqual(compareDict[lineNumber].highlighted);
-        compareDict[lineNumber].checked = true;
-        return lineNumber;
+        var lineDivElement = await lineDivElements.get(i);
+        var lineElement = await lineContentElements.get(i);
+        var isHighlighted = await lineDivElement.element(
+          by.css('.CodeMirror-linebackground')).isPresent();
+        var text = await lineElement.getText();
+        actualDiffDict[lineNumber] = {
+          text: text,
+          highlighted: isHighlighted
+        };
       }
-    );
-    var largestLineNumber = lineNumbers[lineNumbers.length - 1];
-    if (largestLineNumber !== currentLineNumber) {
-      await _compareTextAndHighlightingFromLine(
-        largestLineNumber,
-        scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-        compareDict);
-    } else {
-      for (var lineNumber in compareDict) {
-        if (compareDict[lineNumber].checked !== true) {
-          throw new Error(
-            'Expected line ' + lineNumber + ': \'' +
-            compareDict[lineNumber].text + '\' to be found in CodeMirror');
-        }
-      }
+      scrollTo = scrollTo + lineHeight * NUMBER_OF_LINES_TO_SCROLL;
     }
-  };
-
-  /**
-   * This recursive function is used by expectTextToBe(). The previous function
-   * is not used because it is very slow.
-   * currentLineNumber is the current largest line number processed,
-   * scrollTo is the number of pixels from the top of the text that
-   * codemirror should scroll to,
-   * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
-   * which is to be scrolled.
-   * compareDict is an object whose keys are line numbers and whose values are
-   * objects corresponding to that line with the following key-value pairs:
-   *  - 'text': the exact string of text expected on that line
-   *  - 'checked': true or false, whether the line has been checked
-   */
-  var _compareTextFromLine = async function(
-      currentLineNumber, scrollTo, compareDict) {
-    // This is used to match and scroll the text in codemirror to a point
-    // scrollTo pixels from the top of the text or the bottom of the text
-    // if scrollTo is too large.
-    await browser.executeScript(
-      '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
-      '().scrollTop(' + String(scrollTo) + ');');
-    var text = await elem.getText();
-    // The 'text' arg is a string 2n lines long representing n lines of text
-    // codemirror has loaded. The (2i)th line contains a line number and the
-    // (2i+1)th line contains the text on that line.
-    var textArray = text.split('\n');
-    // We have an empty line in the codemirror panes which is retrived as NULL
-    // in codemirror5's getText() method. Therefore, we need to add an empty
-    // string at the end of the textArray to match with compareDict.
-
-    textArray[textArray.length] = '';
-    for (var i = 0; i < textArray.length; i += 2) {
-      var lineNumber = textArray[i];
-      var lineText = textArray[i + 1];
-      if (!compareDict.hasOwnProperty(lineNumber)) {
-        throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
-      }
-      expect(lineText).toEqual(compareDict[lineNumber].text);
-      compareDict[lineNumber].checked = true;
-    }
-    var largestLineNumber = textArray[textArray.length - 2];
-    if (largestLineNumber !== currentLineNumber) {
-      await _compareTextFromLine(
-        largestLineNumber,
-        scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-        compareDict);
-    } else {
-      for (var dictLineNumber in compareDict) {
-        if (compareDict[dictLineNumber].checked !== true) {
-          throw new Error(
-            'Expected line ' + lineNumber + ': \'' +
-            compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
-          );
-        }
+    for (var lineNumber in compareDict) {
+      expect(actualDiffDict[lineNumber].text).toEqual(
+        compareDict[lineNumber].text);
+      if (compareHightlighting) {
+        expect(actualDiffDict[lineNumber].highlighted).toEqual(
+          compareDict[lineNumber].highlighted);
       }
     }
   };
@@ -734,7 +672,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
-      await _compareTextAndHighlightingFromLine(1, 0, expectedTextDict);
+      await _compareText(expectedTextDict, true);
     },
     /**
      * Compares text with codemirror. The input should be a string (with
@@ -750,7 +688,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
           checked: false
         };
       }
-      await _compareTextFromLine(1, 0, expectedDict);
+      await _compareText(expectedDict, false);
     }
   };
 };

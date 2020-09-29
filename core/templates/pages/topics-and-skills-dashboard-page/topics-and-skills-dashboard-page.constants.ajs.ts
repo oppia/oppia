@@ -16,25 +16,9 @@
  * @fileoverview Constants for the topics and skills dashboard.
  */
 
-/* eslint-disable max-len */
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { TopicsAndSkillsDashboardPageConstants } from
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-/* eslint-enable max-len */
-
-angular.module('oppia').constant(
-  'EVENT_TYPE_TOPIC_CREATION_ENABLED',
-  TopicsAndSkillsDashboardPageConstants.EVENT_TYPE_TOPIC_CREATION_ENABLED);
-
-angular.module('oppia').constant(
-  'EVENT_TYPE_SKILL_CREATION_ENABLED',
-  TopicsAndSkillsDashboardPageConstants.EVENT_TYPE_SKILL_CREATION_ENABLED);
-
-angular.module('oppia').constant(
-  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-  TopicsAndSkillsDashboardPageConstants
-    .EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 angular.module('oppia').constant(
   'SKILL_DESCRIPTION_STATUS_VALUES',

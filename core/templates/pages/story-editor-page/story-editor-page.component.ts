@@ -41,25 +41,25 @@ require('domain/story/editable-story-backend-api.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
+require('services/loader.service.ts');
+require('services/contextual/window-ref.service');
 
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
-    '$scope', '$uibModal', '$window', 'BottomNavbarStatusService',
-    'EditableStoryBackendApiService',
+    '$uibModal', '$window', 'BottomNavbarStatusService',
+    'EditableStoryBackendApiService', 'LoaderService',
     'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
-    'UrlInterpolationService', 'UrlService',
-    'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+    'UrlInterpolationService', 'UrlService', 'WindowRef',
     function(
-        $scope, $uibModal, $window, BottomNavbarStatusService,
-        EditableStoryBackendApiService,
+        $uibModal, $window, BottomNavbarStatusService,
+        EditableStoryBackendApiService, LoaderService,
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
-        UrlInterpolationService, UrlService,
-        EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+        UrlInterpolationService, UrlService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
@@ -186,10 +186,28 @@ angular.module('oppia').component('storyEditorPage', {
         StoryEditorNavigationService.navigateToStoryEditor();
       };
 
+      ctrl.setUpBeforeUnload = function() {
+        WindowRef.nativeWindow.addEventListener(
+          'beforeunload', ctrl.confirmBeforeLeaving);
+      };
+
+      ctrl.confirmBeforeLeaving = function(e) {
+        if (UndoRedoService.getChangeCount()) {
+          // This message is irrelevant, but is needed to trigger the
+          // confirmation before leaving.
+          e.returnValue = 'Sure?';
+          return false;
+        }
+      };
+
       ctrl.$onInit = function() {
+        LoaderService.showLoadingScreen('Loading Story');
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryInitialized.subscribe(
-            () => _initPage()
+            () => {
+              _initPage();
+              LoaderService.hideLoadingScreen();
+            }
           ));
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryReinitialized.subscribe(
@@ -201,6 +219,7 @@ angular.module('oppia').component('storyEditorPage', {
         ctrl.forceValidateExplorations = true;
         ctrl.warningsAreShown = false;
         BottomNavbarStatusService.markBottomNavbarStatus(true);
+        ctrl.setUpBeforeUnload();
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         ctrl.story = StoryEditorStateService.getStory();
 
@@ -212,7 +231,11 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorNavigationService.checkIfPresentInStoryPreviewTab()) {
           StoryEditorNavigationService.navigateToStoryPreviewTab();
         }
-        $scope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _initPage);
+        ctrl.directiveSubscriptions.add(
+          UndoRedoService.onUndoRedoChangeApplied$().subscribe(
+            () => _initPage()
+          )
+        );
       };
 
       ctrl.$onDestroy = function() {

@@ -13,7 +13,7 @@
   </div>
 
   <div ng-if="$ctrl.nextSubtopicSummaryIsShown" class="oppia-subtopic-viewer-next-subtopic-summary">
-    <div class="margin-right: 50px; margin-top: 80px;">
+    <div class="next-subtopic-section">
       <p class="oppia-subtopic-next-subtopic-label" translate="I18N_SUBTOPIC_VIEWER_NEXT_SKILL">Next Skill:</p>
       <subtopic-summary-tile topic-url-fragment="$ctrl.topicUrlFragment"
                              classroom-url-fragment="$ctrl.classroomUrlFragment"
@@ -24,6 +24,10 @@
   </div>
 </div>
 <style>
+  .oppia-subtopic-viewer-container .next-subtopic-section {
+    margin-top: 30px;
+  }
+
   .oppia-subtopic-summary-tile-container {
     margin-right: 50px;
     margin-top: 80px;
