@@ -1073,7 +1073,9 @@ states:
         tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: 'Type an expression here, using only numbers.'
       default_outcome:
         dest: Numeric Expression Input
         feedback:
