@@ -25,12 +25,10 @@ from constants import constants
 from core import jobs
 from core.domain import param_domain
 from core.domain import taskqueue_services
-from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()

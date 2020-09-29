@@ -63,8 +63,6 @@ import python_utils
 import schema_utils
 import utils
 
-from google.appengine.api import apiproxy_stub
-from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import datastore_types
 from google.appengine.api import mail
 import webtest
