@@ -592,7 +592,7 @@ def execute_deployment():
         release_dir_path = parsed_args.release_dir_path
         release_dir_name = os.path.basename(release_dir_path)
 
-        # These files are copied even when a existing dir is supplied
+        # These files are copied even when an existing dir is supplied
         # since we want to overwrite any previous changes that were made
         # to the config.
         config_filepaths = [
