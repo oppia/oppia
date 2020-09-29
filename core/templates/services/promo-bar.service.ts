@@ -17,7 +17,7 @@
  */
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { PromoBarBackendApiService } from 'services/promo-bar-bakend-api.service';
+import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.servicee';
 import { ServicesConstants } from 'services/services.constants';
 @Injectable({
   providedIn: 'root'

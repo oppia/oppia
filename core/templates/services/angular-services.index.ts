@@ -359,7 +359,7 @@ import { TranslationsBackendApiService } from 'services/translations-backend-api
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarService } from 'services/promo-bar.service';
-import { PromoBarBackendApiService } from 'services/promo-bar-bakend-api.service';
+import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],

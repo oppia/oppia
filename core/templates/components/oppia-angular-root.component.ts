@@ -430,7 +430,7 @@ import { ProfilePageBackendApiService } from
 import { ProfileSummaryObjectFactory } from
   'domain/user/profile-summary-object.factory';
 import { PromoBarBackendApiService } from
-  'services/promo-bar-bakend-api.service';
+  'services/promo-bar-backend-api.service';
 import { PromoBarService } from 'services/promo-bar.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
