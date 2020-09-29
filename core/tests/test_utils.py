@@ -1167,7 +1167,7 @@ tags: []
                     })
                 })
             self.assertEqual(response.status_int, 200)
-            self.logout()
+        self.logout()
 
     def set_config_property(self, config_obj, new_config_value):
         """Sets a given configuration object's value to the new value specified
