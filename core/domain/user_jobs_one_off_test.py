@@ -1686,6 +1686,21 @@ class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         self.assertEqual(output, [])
 
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance.subscriber_ids.append(self.owner_id)
+        self.model_instance.deleted = True
+        self.model_instance.put()
+
+        job_id = (
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+
     def test_job_removes_user_id_from_subscriber_ids(self):
         self.model_instance.subscriber_ids.append(self.owner_id)
         self.model_instance.put()
@@ -1764,6 +1779,23 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output, [])
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
+
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance.completed_explorations.append('3')
+        self.model_instance.deleted = True
+        self.model_instance.put()
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
 
     def test_job_cleans_up_exploration_ids_not_present_in_collection(self):
         completed_activities_model = (
@@ -1928,6 +1960,23 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(model_instance_2.created_exploration_ids, ['exp1'])
         self.assertEqual(
             model_instance_2.edited_exploration_ids, ['exp1'])
+
+    def test_migration_job_skips_deleted_model(self):
+        model_instance = user_models.UserContributionsModel.get_by_id(
+            self.user_id)
+        model_instance.deleted = True
+        model_instance.put()
+        exp_services.delete_exploration(self.user_id, 'exp0')
+        job_id = (
+            user_jobs_one_off
+            .CleanUpUserContributionsModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off.CleanUpUserContributionsModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
 
     def test_job_removes_deleted_exp_from_created_explorations(self):
         exp_services.delete_exploration(self.user_id, 'exp0')

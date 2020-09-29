@@ -484,7 +484,9 @@ class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not item.deleted and item.id in item.subscriber_ids:
+        if item.deleted:
+            return
+        if item.id in item.subscriber_ids:
             item.subscriber_ids.remove(item.id)
             item.put()
             yield ('Removed user from their own subscribers list', item.id)
@@ -509,47 +511,49 @@ class CleanUpCollectionProgressModelOneOffJob(
 
     @staticmethod
     def map(item):
-        if not item.deleted:
+        if item.deleted:
+            return
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(item.user_id))
+
+        if completed_activities_model is None:
             completed_activities_model = (
-                user_models.CompletedActivitiesModel.get_by_id(item.user_id))
+                user_models.CompletedActivitiesModel(id=item.user_id))
+            completed_activities_model.exploration_ids = (
+                item.completed_explorations)
+            completed_activities_model.put()
+            yield ('Regenerated Missing CompletedActivitiesModel', item.id)
 
-            if completed_activities_model is None:
-                completed_activities_model = (
-                    user_models.CompletedActivitiesModel(id=item.user_id))
-                completed_activities_model.exploration_ids = (
-                    item.completed_explorations)
-                completed_activities_model.put()
-                yield ('Regenerated Missing CompletedActivitiesModel', item.id)
+        if completed_activities_model.deleted:
+            completed_activities_model.deleted = False
+            completed_activities_model.put()
+            yield (
+                'Reverted delete status for CompletedActivitiesModel',
+                item.id)
 
-            if completed_activities_model.deleted:
-                completed_activities_model.deleted = False
-                completed_activities_model.put()
-                yield (
-                    'Reverted delete status for CompletedActivitiesModel',
-                    item.id)
+        col_model = collection_models.CollectionModel.get_by_id(
+            item.collection_id)
 
-            col_model = collection_models.CollectionModel.get_by_id(
-                item.collection_id)
+        collection_node_ids = [
+            node['exploration_id'] for node in (
+                col_model.collection_contents['nodes'])]
+        exp_ids_to_remove = [
+            exp_id
+            for exp_id in item.completed_explorations if exp_id not in (
+                collection_node_ids)]
 
-            collection_node_ids = [
-                node['exploration_id'] for node in (
-                    col_model.collection_contents['nodes'])]
-            exp_ids_to_remove = [
-                exp_id
-                for exp_id in item.completed_explorations if exp_id not in (
-                    collection_node_ids)]
-
-            if exp_ids_to_remove:
-                item.completed_explorations = [
-                    exp_id for exp_id in item.completed_explorations
-                    if exp_id not in exp_ids_to_remove]
-                item.put()
-                yield (
-                    'Invalid Exploration IDs cleaned from '
-                    'CollectionProgressModel',
-                    'Model id: %s, Collection id: %s, Removed exploration '
-                    'ids: %s' % (
-                        item.id, item.collection_id, exp_ids_to_remove))
+        if exp_ids_to_remove:
+            item.completed_explorations = [
+                exp_id for exp_id in item.completed_explorations
+                if exp_id not in exp_ids_to_remove]
+            item.put()
+            yield (
+                'Invalid Exploration IDs cleaned from '
+                'CollectionProgressModel',
+                'Model id: %s, Collection id: %s, Removed exploration '
+                'ids: %s' % (
+                    item.id, item.collection_id, exp_ids_to_remove))
 
     @staticmethod
     def reduce(key, values):
@@ -569,36 +573,38 @@ class CleanUpUserContributionsModelOneOffJob(
 
     @staticmethod
     def map(item):
-        if not item.deleted:
-            fetched_created_exploration_model_instances = (
-                datastore_services.fetch_multiple_entities_by_ids_and_models(
-                    [('ExplorationModel', item.created_exploration_ids)]))[0]
+        if item.deleted:
+            return
 
-            exp_ids_removed = []
-            for exp_id, exp_instance in list(python_utils.ZIP(
-                    copy.deepcopy(item.created_exploration_ids),
-                    fetched_created_exploration_model_instances)):
-                if exp_instance is None or exp_instance.deleted:
-                    exp_ids_removed.append(exp_id)
-                    item.created_exploration_ids.remove(exp_id)
+        fetched_created_exploration_model_instances = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [('ExplorationModel', item.created_exploration_ids)]))[0]
 
-            fetched_edited_exploration_model_instances = (
-                datastore_services.fetch_multiple_entities_by_ids_and_models(
-                    [('ExplorationModel', item.edited_exploration_ids)]))[0]
+        exp_ids_removed = []
+        for exp_id, exp_instance in list(python_utils.ZIP(
+                copy.deepcopy(item.created_exploration_ids),
+                fetched_created_exploration_model_instances)):
+            if exp_instance is None or exp_instance.deleted:
+                exp_ids_removed.append(exp_id)
+                item.created_exploration_ids.remove(exp_id)
 
-            for exp_id, exp_instance in list(python_utils.ZIP(
-                    copy.deepcopy(item.edited_exploration_ids),
-                    fetched_edited_exploration_model_instances)):
-                if exp_instance is None or exp_instance.deleted:
-                    exp_ids_removed.append(exp_id)
-                    item.edited_exploration_ids.remove(exp_id)
+        fetched_edited_exploration_model_instances = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [('ExplorationModel', item.edited_exploration_ids)]))[0]
 
-            if exp_ids_removed:
-                item.put()
-                yield (
-                    'Removed deleted exp ids UserContributionsModel',
-                    'Model id: %s, Removed exploration ids: %s' % (
-                        item.id, exp_ids_removed))
+        for exp_id, exp_instance in list(python_utils.ZIP(
+                copy.deepcopy(item.edited_exploration_ids),
+                fetched_edited_exploration_model_instances)):
+            if exp_instance is None or exp_instance.deleted:
+                exp_ids_removed.append(exp_id)
+                item.edited_exploration_ids.remove(exp_id)
+
+        if exp_ids_removed:
+            item.put()
+            yield (
+                'Removed deleted exp ids UserContributionsModel',
+                'Model id: %s, Removed exploration ids: %s' % (
+                    item.id, exp_ids_removed))
 
     @staticmethod
     def reduce(key, values):
