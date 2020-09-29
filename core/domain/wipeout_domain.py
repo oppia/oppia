@@ -23,6 +23,13 @@ import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
+USER_DELETION_SUCCESS = 'SUCCESS'
+USER_DELETION_ALREADY_DONE = 'ALREADY DONE'
+
+USER_VERIFICATION_NOT_DELETED = 'NOT DELETED'
+USER_VERIFICATION_SUCCESS = 'SUCCESS'
+USER_VERIFICATION_FAILURE = 'FAILURE'
+
 
 class PendingDeletionRequest(python_utils.OBJECT):
     """Domain object for a PendingDeletionRequest."""
