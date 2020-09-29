@@ -28,6 +28,7 @@ import inspect
 import itertools
 import json
 import os
+import re
 import unittest
 
 from constants import constants
@@ -60,6 +61,7 @@ import main
 import main_mail
 import main_taskqueue
 import python_utils
+import requests_mock
 import schema_utils
 import utils
 
@@ -1150,19 +1152,23 @@ tags: []
         self.login(email)
         gae_id = self.get_gae_id_from_email(email)
         user_services.create_new_user(gae_id, email)
-        response = self.get_html_response(feconf.SIGNUP_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_new_csrf_token()
-        response = self.testapp.post(
-            feconf.SIGNUP_DATA_URL, params={
-                'csrf_token': csrf_token,
-                'payload': json.dumps({
-                    'username': username,
-                    'agreed_to_terms': True
+        # We mock out all HTTP requests while trying to signup to avoid calling
+        # out to gravatar in the backend tests.
+        with requests_mock.Mocker() as requests_mocker:
+            requests_mocker.request(requests_mock.ANY, requests_mock.ANY)
+            response = self.get_html_response(feconf.SIGNUP_URL)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_new_csrf_token()
+            response = self.testapp.post(
+                feconf.SIGNUP_DATA_URL, params={
+                    'csrf_token': csrf_token,
+                    'payload': json.dumps({
+                        'username': username,
+                        'agreed_to_terms': True
+                    })
                 })
-            })
-        self.assertEqual(response.status_int, 200)
-        self.logout()
+            self.assertEqual(response.status_int, 200)
+            self.logout()
 
     def set_config_property(self, config_obj, new_config_value):
         """Sets a given configuration object's value to the new value specified
