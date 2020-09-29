@@ -20,11 +20,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -89,16 +89,17 @@ class SkillModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether SkillModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def get_merged_skills(cls):
@@ -287,7 +288,8 @@ class SkillSummaryModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        cursor = (
+            datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor))
         sort = -cls.skill_model_created_on
         if sort_by == (
                 constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[

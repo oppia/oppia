@@ -153,13 +153,8 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                         self.owner_id, self.EXP_0_ID, change_list, '')
 
         exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        interaction_id = exp.states[
-            feconf.DEFAULT_INIT_STATE_NAME].interaction.id
-        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
-            interaction_id]['algorithm_id']
-        job = classifier_services.get_classifier_training_job(
-            self.EXP_0_ID, exp.version, feconf.DEFAULT_INIT_STATE_NAME,
-            algorithm_id)
+        job = classifier_services.get_classifier_training_jobs(
+            self.EXP_0_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
         self.assertIsNotNone(job)
 
         change_list = [exp_domain.ExplorationChange({
@@ -180,9 +175,9 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                         self.owner_id, self.EXP_0_ID, exp.version,
                         exp.version - 1)
 
-        new_job = classifier_services.get_classifier_training_job(
-            self.EXP_0_ID, exp.version, feconf.DEFAULT_INIT_STATE_NAME,
-            algorithm_id)
+        exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        new_job = classifier_services.get_classifier_training_jobs(
+            self.EXP_0_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
         self.assertIsNotNone(new_job)
         self.assertEqual(job.job_id, new_job.job_id)
 
@@ -1068,6 +1063,30 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(explorations['exp_id_2'].category, 'category 2')
         self.assertEqual(
             explorations['exp_id_2'].objective, 'objective 2')
+
+    def test_get_state_classifier_mapping(self):
+        yaml_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        with python_utils.open_file(
+            yaml_path, 'rb', encoding=None) as yaml_file:
+            yaml_content = yaml_file.read()
+
+        exploration = exp_fetchers.get_exploration_by_id('exp_id', strict=False)
+        self.assertIsNone(exploration)
+
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, 'exp_id', [])
+
+        state_classifier_mapping = exp_services.get_user_exploration_data(
+            'user_id', 'exp_id')['state_classifier_mapping']
+
+        self.assertEqual(len(state_classifier_mapping), 1)
+
+        self.assertEqual(
+            state_classifier_mapping['Home']['data_schema_version'], 1)
+        self.assertEqual(
+            state_classifier_mapping['Home']['algorithm_id'], 'TextClassifier')
 
     def test_cannot_get_multiple_explorations_by_version_with_invalid_handler(
             self):
@@ -3791,6 +3810,13 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
 
+    def setUp(self):
+        super(ExplorationSummaryTests, self).setUp()
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+
     def test_is_exp_summary_editable(self):
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
 
@@ -3824,29 +3850,24 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         """Test that a user who only makes a revert on an exploration
         is not counted in the list of that exploration's contributors.
         """
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-
         # Have Albert create a new exploration.
-        self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         # Have Albert update that exploration.
         exp_services.update_exploration(
-            albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
         # Have Bob revert Albert's update.
-        exp_services.revert_exploration(bob_id, self.EXP_ID_1, 2, 1)
+        exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 2, 1)
 
         # Verify that only Albert (and not Bob, who has not made any non-
         # revert changes) appears in the contributors list for this
         # exploration.
         exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_1)
-        self.assertEqual([albert_id], exploration_summary.contributor_ids)
+        self.assertEqual([self.albert_id], exploration_summary.contributor_ids)
 
     def _check_contributors_summary(self, exp_id, expected):
         """Check if contributors summary of the given exp is same as expected.
@@ -3864,54 +3885,74 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertEqual(expected, contributors_summary)
 
     def test_contributors_summary(self):
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-
         # Have Albert create a new exploration. Version 1.
-        self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
-        self._check_contributors_summary(self.EXP_ID_1, {albert_id: 1})
+        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
+        self._check_contributors_summary(self.EXP_ID_1, {self.albert_id: 1})
 
         # Have Bob update that exploration. Version 2.
         exp_services.update_exploration(
-            bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
         self._check_contributors_summary(
-            self.EXP_ID_1, {albert_id: 1, bob_id: 1})
+            self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 1})
         # Have Bob update that exploration. Version 3.
         exp_services.update_exploration(
-            bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
         self._check_contributors_summary(
-            self.EXP_ID_1, {albert_id: 1, bob_id: 2})
+            self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 2})
 
         # Have Albert update that exploration. Version 4.
         exp_services.update_exploration(
-            albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
         self._check_contributors_summary(
-            self.EXP_ID_1, {albert_id: 2, bob_id: 2})
+            self.EXP_ID_1, {self.albert_id: 2, self.bob_id: 2})
 
         # Have Albert revert to version 3. Version 5.
-        exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
+        exp_services.revert_exploration(self.albert_id, self.EXP_ID_1, 4, 3)
         self._check_contributors_summary(
-            self.EXP_ID_1, {albert_id: 1, bob_id: 2})
+            self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 2})
 
     def test_get_exploration_summary_by_id_with_invalid_exploration_id(self):
         exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             'invalid_exploration_id')
 
         self.assertIsNone(exploration_summary)
+
+    def test_create_exploration_summary_with_deleted_contributor(self):
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.albert_id)
+        exp_services.update_exploration(
+            self.bob_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
+            ],
+            'Changed title.')
+        exp_services.regenerate_exploration_summary(self.EXP_ID_1, None)
+
+        self._check_contributors_summary(
+            self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 1})
+
+        user_services.mark_user_for_deletion(self.bob_id)
+        exp_services.regenerate_exploration_summary(self.EXP_ID_1, None)
+
+        self._check_contributors_summary(
+            self.EXP_ID_1, {self.albert_id: 1})
 
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):

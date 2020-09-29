@@ -665,32 +665,30 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
                     language_code]
                 for translation_suggestion in translation_suggestions:
                     if len(heap) == (MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
-                        shortest_review_wait_time = heap[0][0]
-                        if translation_suggestion.last_updated < shortest_review_wait_time:
+                        shortest_review_wait_time = max(heap)
+                        if translation_suggestion.last_updated > shortest_review_wait_time:
                             break
                     elif translation_suggestion.author_id != user_contribution_rights.id:
                         heapq.heappush(heap, (
                             translation_suggestion.last_updated, translation_suggestion)
                         )
-        
 
-            reviewer_reviewable_suggestion_infos = []
-            #raise Exception('{}'.format(len(heap)))
-            for i in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
-                if len(heap) == 0:         
-                    break
-                key, suggestion = heapq.heappop(heap)
-                html_content_strings = suggestion.get_all_html_content_strings()
-                reviewer_reviewable_suggestion_infos.append(
-                    suggestion_registry.ReviewableSuggestionEmailContentInfo(
-                        suggestion.suggestion_type, suggestion.language_code,
-                        html_content_strings[0], suggestion.last_updated
-                    )
+        reviewer_reviewable_suggestion_infos = []
+
+        for i in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+            if len(heap) == 0:         
+                break
+            key, suggestion = heapq.heappop(heap)
+            html_content_strings = suggestion.get_all_html_content_strings()
+            reviewer_reviewable_suggestion_infos.append(
+                suggestion_registry.ReviewableSuggestionEmailContentInfo(
+                    suggestion.suggestion_type, suggestion.language_code,
+                    html_content_strings[0], suggestion.last_updated
                 )
-            reviewer_reviewable_suggestion_infos.reverse()
-            reviewers_reviewable_suggestion_infos.append(
-                reviewer_reviewable_suggestion_infos
             )
+        reviewers_reviewable_suggestion_infos.append(
+            reviewer_reviewable_suggestion_infos
+        )
 
     return reviewers_reviewable_suggestion_infos
 
@@ -902,3 +900,50 @@ def get_voiceover_application(voiceover_application_id):
         voiceover_application_model.filename,
         voiceover_application_model.content,
         voiceover_application_model.rejection_message)
+
+
+def create_community_contribution_stats_from_model(
+        community_contribution_stats_model):
+    """Creates a domain object that represents the community contribution
+    stats from the model given. Note that each call to this function returns
+    a new domain object, but the data copied into the domain object comes from
+    a single, shared source.
+
+    Args:
+        community_contribution_stats_model: CommunityContributionStatsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        CommunityContributionStats. The corresponding
+        CommunityContributionStats domain object.
+    """
+    return suggestion_registry.CommunityContributionStats(
+        (
+            community_contribution_stats_model
+            .translation_reviewer_counts_by_lang_code
+        ),
+        (
+            community_contribution_stats_model
+            .translation_suggestion_counts_by_lang_code
+        ),
+        community_contribution_stats_model.question_reviewer_count,
+        community_contribution_stats_model.question_suggestion_count
+    )
+
+
+def get_community_contribution_stats():
+    """Gets the CommunityContributionStatsModel and converts it into the
+    corresponding domain object that represents the community contribution
+    stats. Note that there is only ever one instance of this model and if the
+    model doesn't exist yet, it will be created.
+
+    Returns:
+        CommunityContributionStats. The corresponding
+        CommunityContributionStats domain object.
+    """
+    community_contribution_stats_model = (
+        suggestion_models.CommunityContributionStatsModel.get()
+    )
+
+    return create_community_contribution_stats_from_model(
+        community_contribution_stats_model)

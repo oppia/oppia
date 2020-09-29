@@ -834,7 +834,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -1470,7 +1470,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -1815,29 +1815,46 @@ class RetrieveEmailInfoUnitTests(
         self.assertEqual(reviewers_reviewable_suggestion_infos[0], [])
         self.assertEqual(reviewers_reviewable_suggestion_infos[1], [])
 
-    def test_get_suggestion_info_to_notify_reviewers_success_for_one_reviewer(
+    def test_get_suggestion_info_to_notify_reviewers_for_one_reviewer_multi_lang(
             self):
         user_services.allow_user_to_review_translation_in_language(
             self.translation_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
             self.translation_reviewer_id, 'en')
-        self._create_translation_suggestion_with_language_code_and_author_id(
-            'hi', self.author_id)
-        self._create_translation_suggestion_with_language_code_and_author_id(
-            'hi', self.author_id)
-        self._create_translation_suggestion_with_language_code_and_author_id(
-            'hi', self.author_id)
-        self._create_translation_suggestion_with_language_code_and_author_id(
-            'en', self.author_id)
-        self._create_translation_suggestion_with_language_code_and_author_id(
-            'hi', self.author_id)
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'en', self.author_id)
+        )
+        translation_suggestion_3 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        translation_suggestions = [
+            translation_suggestion_1, translation_suggestion_2,
+            translation_suggestion_3
+        ]
 
         reviewers_reviewable_suggestion_infos = (
             suggestion_services
             .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
-                [self.question_reviewer_id, self.translation_reviewer_id]
+                [self.translation_reviewer_id]
             )
         )
-        blah = reviewers_reviewable_suggestion_infos[0]
 
-        raise Exception('{}'.format(blah[3].language_code))
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self.assertEqual(
+            len(reviewers_reviewable_suggestion_infos[0]),
+            len(translation_suggestions))
+        self.assertListEqual(
+            reviewers_reviewable_suggestion_infos[0], translation_suggestions)
+        for i in python_utils.RANGE(
+                len(reviewers_reviewable_suggestion_infos[0]) - 1):
+            self.assertLess(
+                reviewers_reviewable_suggestion_infos[0][i].last_updated,
+                reviewers_reviewable_suggestion_infos[0][i + 1].last_updated)
+
+        raise Exception('{}'.format(' '.join(blah[x].language_code for x in range(len(blah)))))
