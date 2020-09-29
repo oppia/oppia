@@ -1152,7 +1152,7 @@ tags: []
         gae_id = self.get_gae_id_from_email(email)
         user_services.create_new_user(gae_id, email)
         # We mock out all HTTP requests while trying to signup to avoid calling
-        # out to gravatar in the backend tests.
+        # out to real backend services.
         with requests_mock.Mocker() as requests_mocker:
             requests_mocker.request(requests_mock.ANY, requests_mock.ANY)
             response = self.get_html_response(feconf.SIGNUP_URL)
