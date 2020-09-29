@@ -25,6 +25,7 @@ import os
 import re
 
 from core.domain import event_services
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -33,8 +34,6 @@ import feconf
     models.NAMES.statistics, models.NAMES.feedback])
 
 datastore_services = models.Registry.import_datastore_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
-
 
 class MockNumbersModel(datastore_services.Model):
     number = datastore_services.IntegerProperty()
@@ -208,19 +207,22 @@ class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
 
     def test_events_go_into_the_events_queue(self):
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EVENTS),
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EVENTS),
             0)
 
         event_services.CompleteExplorationEventHandler.record(
             'eid1', 1, 'sid1', 'session1', 100, {}, feconf.PLAY_TYPE_NORMAL)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EVENTS),
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EVENTS),
             1)
 
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EVENTS),
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EVENTS),
             0)
 
 

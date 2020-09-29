@@ -41,12 +41,12 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -441,13 +441,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         SampleMapReduceJobManager.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         response = self.get_json('/adminjoboutput', params={'job_id': job_id})
         self.assertIsNone(response['output'])
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         response = self.get_json('/adminjoboutput', params={'job_id': job_id})
         self.assertEqual(
@@ -489,7 +489,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         with self.swap(
@@ -504,7 +504,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         self.logout()
@@ -515,7 +515,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(job_id)
 
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         status = SampleMapReduceJobManager.get_status_code(job_id)
 
         self.assertEqual(status, job_models.STATUS_CODE_STARTED)
@@ -584,7 +584,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
 
         jobs_test.StartExplorationEventCounter.start_computation()
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         status = jobs_test.StartExplorationEventCounter.get_status_code()
 
         self.assertEqual(
@@ -621,7 +621,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         jobs_test.StartExplorationEventCounter.start_computation()
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         status = jobs_test.StartExplorationEventCounter.get_status_code()
 
         self.assertEqual(
@@ -657,7 +657,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
 
         jobs_test.StartExplorationEventCounter.start_computation()
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         status = jobs_test.StartExplorationEventCounter.get_status_code()
 
         self.assertEqual(
