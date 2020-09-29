@@ -291,7 +291,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question = question_domain.Question(
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
-            ['skillId-123'])
+            ['skillId12345-123'])
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -307,7 +307,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'version': 1,
             'linked_skill_ids': ['skill1'],
-            'inapplicable_misconception_ids': ['skill1-123']
+            'inapplicable_skill_misconception_ids': ['skill1-123']
         }
 
         observed_object = question_domain.Question.from_dict(question_dict)
@@ -370,31 +370,47 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
 
-    def test_validate_invalid_list_of_inapplicable_misconception_ids(self):
+    def test_validate_invalid_list_of_inapplicable_skill_misconception_ids(
+            self):
         """Test to verify that the validation fails when
-        inapplicable_misconception_ids value is an invalid list.
+        inapplicable_skill_misconception_ids value is an invalid list.
         """
-        self.question.inapplicable_misconception_ids = ['Test', 1]
+        self.question.inapplicable_skill_misconception_ids = ['Test', 1]
         self._assert_validation_error(
-            r'Expected inapplicable_misconception_ids to be a list of strings,'
-            r' received \[u\'Test\', 1\]')
+            r'Expected inapplicable_skill_misconception_ids to be a list of '
+            r'strings, received \[u\'Test\', 1\]')
 
-    def test_validate_invalid_type_of_inapplicable_misconception_ids(self):
+    def test_validate_invalid_type_of_inapplicable_skill_misconception_ids(
+            self):
         """Test to verify that the validation fails when
-        inapplicable_misconception_ids value is an invalid type.
+        inapplicable_skill_misconception_ids value is an invalid type.
         """
-        self.question.inapplicable_misconception_ids = 123
+        self.question.inapplicable_skill_misconception_ids = 123
         self._assert_validation_error(
-            'Expected inapplicable_misconception_ids to be a list of strings, '
-            'received 123')
+            'Expected inapplicable_skill_misconception_ids to be a list of '
+            'strings, received 123')
 
-    def test_validate_duplicate_inapplicable_misconception_ids_list(self):
+    def test_validate_invalid_format_of_inapplicable_skill_misconception_ids(
+            self):
         """Test to verify that the validation fails when
-        inapplicable_misconception_ids list is has duplicate values.
+        inapplicable_skill_misconception_ids value is an invalid format i.e.
+        it is not of the form <skill-id>-<misconception-id>.
         """
-        self.question.inapplicable_misconception_ids = ['skill-1', 'skill-1']
+        self.question.inapplicable_skill_misconception_ids = ['abc', 'def']
         self._assert_validation_error(
-            'inapplicable_misconception_ids has duplicate values')
+            r'Expected inapplicable_skill_misconception_ids to be a list '
+            r'of strings of the format <skill_id>-<misconception_id>, '
+            r'received \[u\'abc\', u\'def\'\]')
+
+    def test_validate_duplicate_inapplicable_skill_misconception_ids_list(
+            self):
+        """Test to verify that the validation fails when
+        inapplicable_skill_misconception_ids list is has duplicate values.
+        """
+        self.question.inapplicable_skill_misconception_ids = [
+            'skillid12345-1', 'skillid12345-1']
+        self._assert_validation_error(
+            'inapplicable_skill_misconception_ids has duplicate values')
 
     def test_strict_validation_passes(self):
         """Test to verify validate method of a finalized Question domain object
@@ -480,18 +496,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(['skill_id1'], self.question.linked_skill_ids)
 
-    def test_update_inapplicable_misconception_ids(self):
-        """Test to verify update_inapplicable_misconception_ids method of the
-        Question domain object.
+    def test_update_inapplicable_skill_misconception_ids(self):
+        """Test to verify update_inapplicable_skill_misconception_ids method
+        of the Question domain object.
         """
         self.assertEqual(
-            ['skillId-123'],
-            self.question.inapplicable_misconception_ids)
-        self.question.update_inapplicable_misconception_ids(
+            ['skillId12345-123'],
+            self.question.inapplicable_skill_misconception_ids)
+        self.question.update_inapplicable_skill_misconception_ids(
             ['skillid-misconceptionid'])
         self.assertEqual(
             ['skillid-misconceptionid'],
-            self.question.inapplicable_misconception_ids)
+            self.question.inapplicable_skill_misconception_ids)
 
     def test_update_question_state_data(self):
         """Test to verify update_question_state_data method of the Question

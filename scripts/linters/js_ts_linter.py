@@ -854,21 +854,27 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             # *.constants.ajs.ts file are in sync.
             if filepath.endswith('.constants.ts') and (
                     is_corresponding_angularjs_filepath):
-                # Ignore if file contains only type definitions for
-                # constants.
                 for node in parsed_nodes:
-                    if 'declarations' in node.keys():
-                        try:
-                            angular_constants_nodes = (
-                                node.declarations[0].init.callee.body.body)
-                        except Exception:
-                            continue
-                for angular_constant_node in angular_constants_nodes:
-                    if not angular_constant_node.expression:
+                    try:
+                        # Here we are treating 'app.constants.ts' differently
+                        # because it has a different structure than rest of the
+                        # '*constants.ts' files because it inherits constants
+                        # from 'assets/constants.ts'.
+                        angular_constants_nodes = (
+                            node.expression.right.arguments[1].properties
+                            if filepath.endswith('app.constants.ts') else
+                            node.expression.right.properties)
+                    # We need a try-except block here beacuse we need a node
+                    # that has properties exactly as we have defined above.
+                    # And some nodes may not have those properties and may
+                    # raise the following errors. So, we need to ignore
+                    # those nodes.
+                    except (AttributeError, IndexError, TypeError):
                         continue
-                    angular_constant_name = (
-                        angular_constant_node.expression.left.property.name)
-                    angular_constants_list.append(angular_constant_name)
+
+                for angular_constant_node in angular_constants_nodes:
+                    angular_constants_list.append(
+                        angular_constant_node.key.name)
 
                 angular_constants_set = set(angular_constants_list)
                 if len(angular_constants_set) != len(
@@ -878,6 +884,19 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         '%s --> Duplicate constant declaration found.'
                         % filepath)
                     error_messages.append(error_message)
+
+            # Check that the *constants.ts files have a 'as const' at the end.
+            if filepath.endswith('.constants.ts'):
+                file_content = self.file_cache.read(filepath)
+                if not file_content.endswith('} as const;\n'):
+                    failed = True
+                    error_message = (
+                        '%s --> This constants file doesn\'t have \'as const\' '
+                        'at the end. A constants file should have the '
+                        'following structure.\nexport const SomeConstants = '
+                        '{ ... } as const;' % filepath)
+                    error_messages.append(error_message)
+
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 

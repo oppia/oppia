@@ -505,7 +505,7 @@ describe('Topic update service', function() {
   }
   );
 
-  it('should not create a backend change dict for changing subtopic  ' +
+  it('should not create a backend change dict for changing subtopic ' +
     'thumbnail filename when the subtopic does not exist', function() {
     expect(function() {
       TopicUpdateService

@@ -22,34 +22,36 @@ module.exports = {
       'numberOfRuns': 3,
       'puppeteerScript': 'puppeteer-login-script.js',
       'url': [
-        'http://127.0.0.1:8181/admin',
-        `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
-        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
-        `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
-        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
+        'http://127.0.0.1:8181/',
         'http://127.0.0.1:8181/about',
+        'http://127.0.0.1:8181/admin',
         'http://127.0.0.1:8181/community-library',
         'http://127.0.0.1:8181/contact',
         'http://127.0.0.1:8181/contributor-dashboard',
         'http://127.0.0.1:8181/creator-dashboard',
         'http://127.0.0.1:8181/delete-account',
         'http://127.0.0.1:8181/donate',
-        "http://127.0.0.1:8181/emaildashboard",
+        'http://127.0.0.1:8181/emaildashboard',
         'http://127.0.0.1:8181/get-started',
         'http://127.0.0.1:8181/learner-dashboard',
         'http://127.0.0.1:8181/nonprofits',
-        "http://127.0.0.1:8181/moderator",
+        'http://127.0.0.1:8181/moderator',
         'http://127.0.0.1:8181/parents',
         'http://127.0.0.1:8181/partners',
         'http://127.0.0.1:8181/preferences',
         'http://127.0.0.1:8181/privacy-policy',
         'http://127.0.0.1:8181/profile/username1',
+        'http://127.0.0.1:8181/signup?return_url=%2F',
         'http://127.0.0.1:8181/teach',
         'http://127.0.0.1:8181/teachers',
         'http://127.0.0.1:8181/topics-and-skills-dashboard',
         'http://127.0.0.1:8181/terms',
         'http://127.0.0.1:8181/thanks',
-        'http://127.0.0.1:8181/volunteers'
+        'http://127.0.0.1:8181/volunteers',
+        `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
+        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
+        `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
+        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
       ]
     },
     'assert': {
@@ -57,7 +59,7 @@ module.exports = {
         {
           'matchingUrlPattern': '.*',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}],
+            // Performance category.
             'first-contentful-paint': [ 'warn', {'maxNumericValue': 1230000}],
             'first-meaningful-paint': ['warn', {'maxNumericValue': 1280000}],
             'first-cpu-idle': ['warn', {'maxNumericValue': 1460000}],
@@ -70,6 +72,9 @@ module.exports = {
             'redirects': ['error', {'minScore': 1}],
             'uses-rel-preload': ['error', {'minScore': 1}],
             'efficient-animated-content': ['error',{'minScore': 1}],
+            'offscreen-images': ['error', {'minScore': 0.45}],
+            'time-to-first-byte': ['off', {}],
+            // Best practices category.
             'appcache-manifest': ['error', {'minScore': 1}],
             'errors-in-console': ['error', {'minScore': 1}],
             'no-document-write': ['error', {'minScore': 1}],
@@ -81,19 +86,8 @@ module.exports = {
             'notification-on-start': ['error', {'minScore': 1}],
             'password-inputs-can-be-pasted-into': ['error', {'minScore': 1}],
             'image-aspect-ratio': ['error', {'minScore': 1}],
-            'offscreen-images': ['error', {'minScore': 0.45}],
             'is-on-https': ['off', {}],
-            'time-to-first-byte': ['off', {}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/signup?return_url=%2F$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}      
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
+            'uses-http2': ['off', {}],
           }
         },
         {
@@ -102,8 +96,8 @@ module.exports = {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
-          'uses-passive-event-listeners': ['error', {'minScore': 1}],
-          'deprecations': ['error', {'minScore': 1}]
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -189,6 +183,16 @@ module.exports = {
           }
         },
         {
+          'matchingUrlPattern': 'http://[^/]+/emaildashboard$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
           'matchingUrlPattern': 'http://[^/]+/get-started$',
           'assertions': {
             'uses-webp-images': [
@@ -204,12 +208,24 @@ module.exports = {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            // We need to use passive event listeners on this page so that
+            // the page works correctly.
+            'uses-passive-event-listeners': ['error', {'minScore': 0}],
             'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/nonprofits$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/moderator$',
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
@@ -269,6 +285,16 @@ module.exports = {
           }
         },
         {
+          'matchingUrlPattern': 'http://[^/]+/signup?return_url=%2F$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
           'matchingUrlPattern': 'http://[^/]+/teach$',
           'assertions': {
             'uses-webp-images': [
@@ -319,12 +345,25 @@ module.exports = {
           }
         },
         {
+          'matchingUrlPattern': 'http://[^/]+/topics-and-skills-dashboard$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
           'matchingUrlPattern': 'http://[^/]+/create/.*$',
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
+            // We need to use passive event listeners on this page so that
+            // the page works correctly.
             'uses-passive-event-listeners': ['error', {'minScore': 0}],
+            // MIDI library uses some deprecated API.
             'deprecations': ['error', {'minScore': 0}]
           }
         },
@@ -358,36 +397,6 @@ module.exports = {
             'deprecations': ['error', {'minScore': 1}]
           }
         },
-        {
-          'matchingUrlPattern': 'http://[^/]+/topics-and-skills-dashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/emaildashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/moderator$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        }
       ]
     },
     'upload': {

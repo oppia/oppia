@@ -20,10 +20,7 @@ import { AppConstants } from 'app.constants';
 
 angular.module('oppia').filter('isUrlFragment', [function() {
   const VALID_URL_FRAGMENT_REGEX = new RegExp(
-    // TODO(#7434): Use dot notation after we find a way to get
-    // rid of the TS2339 error on AppConstants.
-    // eslint-disable-next-line dot-notation
-    AppConstants['VALID_URL_FRAGMENT_REGEX']);
+    AppConstants.VALID_URL_FRAGMENT_REGEX);
   return function(input, args) {
     return (
       VALID_URL_FRAGMENT_REGEX.test(input) &&

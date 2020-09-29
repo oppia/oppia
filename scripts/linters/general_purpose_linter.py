@@ -24,7 +24,6 @@ import re
 
 import python_utils
 
-from . import ignored_style_tag_files
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
 from .. import common
@@ -232,7 +231,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts'),
+            'ck-editor-copy-content-service.spec.ts',
+            'core/templates/tests/unit-test-utils.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
@@ -267,6 +267,14 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'audio-translation-bar/audio-translation-bar.directive.spec.ts',
             'core/templates/pages/library-page/search-bar/'
             'search-bar.component.spec.ts'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'import \{.*\} from \'lodash\''),
+        'message': (
+            'Please do not use "import { someFunction } from \'lodash\'". '
+            'Use "import someFunction from \'lodash/someFunction\'" instead.'),
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]
@@ -332,7 +340,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': re.compile(r'\s+style\s*=\s*'),
         'message': 'Please do not use inline styling.',
-        'excluded_files': ignored_style_tag_files.EXCLUDED_FILES,
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]

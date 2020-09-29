@@ -28,22 +28,17 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
-import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { TopicViewerDomainConstants } from
-  'domain/topic_viewer/topic-viewer-domain.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
@@ -80,13 +75,15 @@ import { TopicViewerPageComponent } from
     TopicViewerPageComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    TopicViewerDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]

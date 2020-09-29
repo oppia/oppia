@@ -759,6 +759,21 @@ def get_supported_audio_language_description(language_code):
     raise Exception('Unsupported audio language code: %s' % language_code)
 
 
+def is_pseudonymous_id(user_id):
+    """Check that the ID is a pseudonymous one.
+
+    Args:
+        user_id: str. The ID to be checked.
+
+    Returns:
+        bool. Whether the ID represents a pseudonymous user.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('pid_'),
+        len(user_id) == feconf.USER_ID_LENGTH))
+
+
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent.
 
@@ -839,6 +854,55 @@ def compute_list_difference(list_a, list_b):
         list. List of the set difference of list_a - list_b.
     """
     return list(set(list_a) - set(list_b))
+
+
+def is_local_server_environment():
+    """Returns wheter the app is being run locally in a development server.
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    This is necessary because the DEV_MODE constant only differentiates between
+    local development and operations on the production server. However,
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
+
+    Returns:
+        bool. Whether the current instance is running locally on a developer's
+        computer.
+    """
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Development/' in os.environ['SERVER_SOFTWARE'])
+
+
+def is_appengine_cloud_environment():
+    """Returns whether the app is being run in production in the Google App
+    Engine Cloud.
+
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    This is necessary because the DEV_MODE constant only differentiates between
+    local development and operations on the production server. However,
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
+
+    Returns:
+        bool. Whether the current instance is running in production.
+    """
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Google App Engine/' in os.environ['SERVER_SOFTWARE'])
 
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):

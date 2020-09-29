@@ -81,5 +81,6 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 '--target', '../oppia_tools/pyyaml-5.1.2',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
-                'future==0.17.1', '--target', 'third_party/future-0.17.1',
+                'future==0.18.2', '--target',
+                'third_party/python_libs',
                 '--user', '--prefix=', '--system'])
