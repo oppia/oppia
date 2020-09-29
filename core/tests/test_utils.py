@@ -2463,6 +2463,7 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_blobstore_stub()
+        self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
         self.testbed.init_search_stub()
 
