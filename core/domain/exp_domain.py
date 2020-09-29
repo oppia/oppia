@@ -2946,7 +2946,7 @@ class Exploration(python_utils.OBJECT):
                 customization_args.update({
                     'placeholder': {
                         'value': {
-                            'content_id': None,
+                            'content_id': 'content',
                             'unicode_str': (
                                 'Type an expression here, using only numbers.')
                         }
