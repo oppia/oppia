@@ -28,7 +28,6 @@ import inspect
 import itertools
 import json
 import os
-import re
 import unittest
 
 from constants import constants
