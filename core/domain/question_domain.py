@@ -745,18 +745,22 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
+        print('INSIDE QUESTION DOMAIN')
+        print('interaction id:', question_state_dict['interaction']['id'])
         if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
             customization_args = question_state_dict[
                 'interaction']['customization_args']
+            print('before: ', customization_args)
             customization_args.update({
                 'placeholder': {
                     'value': {
-                        'content_id': 'content',
+                        'content_id': None,
                         'unicode_str': (
                             'Type an expression here, using only numbers.')
                     }
                 }
             })
+            print('after: ', customization_args)
 
         return question_state_dict
 
