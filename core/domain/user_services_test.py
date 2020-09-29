@@ -38,7 +38,6 @@ import feconf
 import python_utils
 import utils
 
-import requests
 import requests_mock
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -392,7 +391,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
 
         error_messages = []
-        mock_log_function = lambda message: error_messages.append(message)
+        def mock_log_function(message):
+            error_messages.append(message)
 
         gravatar_url = user_services.get_gravatar_url(user_email)
         expected_error_message = (
@@ -409,7 +409,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
 
         error_messages = []
-        mock_log_function = lambda message: error_messages.append(message)
+        def mock_log_function(message):
+            error_messages.append(message)
 
         gravatar_url = user_services.get_gravatar_url(user_email)
         expected_error_message = (
