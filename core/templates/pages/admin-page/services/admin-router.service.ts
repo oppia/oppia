@@ -32,9 +32,9 @@ export class AdminRouterService {
   /**
    * Iterates through the ADMIN_TAB_URLS map and returns the
    * tab name corresponding to the hash.
-   * @param {string} tabHash Represents hash name of a tab URL.
-   * @returns {string|null} Tab name of the hash value
-   * if found else null.
+   * @param {string} tabHash The string after the '#' character in the URL.
+   * @returns {string|null} The corresponding tab name, or null
+   *  if the URL hash does not correspond to a valid tab.
    */
   getTabNameByHash(tabHash: string): string | null {
     for (const [tabName, tabUrl] of Object.entries(
@@ -48,7 +48,7 @@ export class AdminRouterService {
 
   /**
    * Navigates the page to the specified tab based on its HTML hash.
-   * @param {string} tabHash Represents hash name of a tab URL.
+   * @param {string} tabHash The string after the '#' character in the URL.
    */
   showTab(tabHash: string): void {
     if (this.getTabNameByHash(tabHash)) {
