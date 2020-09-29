@@ -161,6 +161,7 @@ angular.module('oppia').config([
       'ThreadMessageSummaryObjectFactory', 'ThreadStatusDisplayService',
       'TopicObjectFactory', 'TopicRightsObjectFactory',
       'TopicViewerBackendApiService', 'TranslationLanguageService',
+      'TranslationTabActiveModeService',
       'UrlInterpolationService', 'UrlService',
       'UserExplorationPermissionsService', 'UserInfoObjectFactory',
       'UtilsService', 'ValidatorsService', 'WindowDimensionsService',

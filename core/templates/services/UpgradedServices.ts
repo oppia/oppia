@@ -642,6 +642,8 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
+import { TranslationTabActiveModeService } from 
+  'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import { TranslationsBackendApiService } from
   'services/translations-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -932,6 +934,8 @@ export class UpgradedServices {
       new TopicRightsObjectFactory();
     upgradedServices['TopicSummaryObjectFactory'] =
       new TopicSummaryObjectFactory();
+    upgradedServices['TranslationTabActiveModeService'] =
+      new TranslationTabActiveModeService();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UserInfoObjectFactory'] = new UserInfoObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
