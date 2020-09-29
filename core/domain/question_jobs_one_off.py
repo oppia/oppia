@@ -161,12 +161,12 @@ class MissingQuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         question = question_services.get_question_by_id(
             item.question_id, strict=False)
         if question is None:
+            yield ('Question Commit Model deleted', item.id)
             item.delete()
-            yield ('Question Commit Model deleted', 1)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, sum(ast.literal_eval(v) for v in values))
+        yield (key, values)
 
 
 class RegenerateQuestionCommitAndSnapshotOneOffJob(

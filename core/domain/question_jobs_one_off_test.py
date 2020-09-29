@@ -358,7 +358,9 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                 question_jobs_one_off
                 .MissingQuestionMigrationOneOffJob.get_output(job_id))
             self.assertEqual(
-                output, ['[u\'Question Commit Model deleted\', 1]'])
+                output, [
+                    '[u\'Question Commit Model deleted\', '
+                    '[u\'question-question_id-1\']]'])
             self.model_instance = (
                 question_models.QuestionCommitLogEntryModel.get_by_id(
                     'question-question_id-1'))
