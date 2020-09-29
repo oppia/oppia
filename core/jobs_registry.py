@@ -66,9 +66,9 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
-    feedback_jobs_one_off.CleanupFeedbackAnalyticsModelModelOneOffJob,
-    feedback_jobs_one_off.CleanupGeneralFeedbackThreadModelOneOffJob,
-    feedback_jobs_one_off.CleanupGeneralFeedbackMessageModelOneOffJob,
+    feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
+    feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
+    feedback_jobs_one_off.CleanUpGeneralFeedbackMessageModelOneOffJob,
     (
         interaction_jobs_one_off
         .DragAndDropSortInputInteractionOneOffJob),

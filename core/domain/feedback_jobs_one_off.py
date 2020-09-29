@@ -104,7 +104,7 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return False
 
 
-class CleanupFeedbackAnalyticsModelModelOneOffJob(
+class CleanUpFeedbackAnalyticsModelModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to remove feedback analytics models for
     deleted explorations.
@@ -128,7 +128,7 @@ class CleanupFeedbackAnalyticsModelModelOneOffJob(
         yield (key, values)
 
 
-class CleanupGeneralFeedbackThreadModelOneOffJob(
+class CleanUpGeneralFeedbackThreadModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to clean up GeneralFeedbackThreadModel by:
     1. Removing the model if the target model for which feedback was created is
@@ -162,7 +162,7 @@ class CleanupGeneralFeedbackThreadModelOneOffJob(
         yield (key, values)
 
 
-class CleanupGeneralFeedbackMessageModelOneOffJob(
+class CleanUpGeneralFeedbackMessageModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to clean up GeneralFeedbackMessageModel by updating
     the last updated date time if it less than the creation time.

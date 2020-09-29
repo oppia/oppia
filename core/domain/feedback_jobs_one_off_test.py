@@ -378,12 +378,12 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self.assertIsNone(model.last_nonempty_message_author_id)
 
 
-class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
+class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
         test_utils.GenericTestBase):
     """Tests for one-off job to clean up feedback analytics model."""
 
     def setUp(self):
-        super(CleanupFeedbackAnalyticsModelModelOneOffJobTest, self).setUp()
+        super(CleanUpFeedbackAnalyticsModelModelOneOffJobTest, self).setUp()
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
 
@@ -399,15 +399,15 @@ class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
     def test_standard_operation(self):
         job_id = (
             feedback_jobs_one_off
-            .CleanupFeedbackAnalyticsModelModelOneOffJob.create_new())
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.create_new())
         (
             feedback_jobs_one_off
-            .CleanupFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
-            .CleanupFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
         self.assertEqual(output, [])
 
         model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
@@ -421,15 +421,15 @@ class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
             self.user_id, 'Delete')
         job_id = (
             feedback_jobs_one_off
-            .CleanupFeedbackAnalyticsModelModelOneOffJob.create_new())
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.create_new())
         (
             feedback_jobs_one_off
-            .CleanupFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
-            .CleanupFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
+            .CleanUpFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
         self.assertEqual(
             output, ['[u\'Deleted Feedback Analytics Model\', [u\'0\']]'])
 
@@ -437,12 +437,12 @@ class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
         self.assertIsNone(model_instance)
 
 
-class CleanupGeneralFeedbackThreadModelOneOffJobTest(
+class CleanUpGeneralFeedbackThreadModelOneOffJobTest(
         test_utils.GenericTestBase):
     """Tests for one-off job to clean up general feedback thread model."""
 
     def setUp(self):
-        super(CleanupGeneralFeedbackThreadModelOneOffJobTest, self).setUp()
+        super(CleanUpGeneralFeedbackThreadModelOneOffJobTest, self).setUp()
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
 
@@ -465,15 +465,15 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
     def test_standard_operation(self):
         job_id = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.create_new())
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.create_new())
         (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
         self.assertEqual(output, [])
 
         model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -490,15 +490,15 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
             self.user_id, 'Delete')
         job_id = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.create_new())
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.create_new())
         (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
         self.assertEqual(
             output, [
                 '[u\'Deleted GeneralFeedbackThreadModel\', [u\'%s\']]' % (
@@ -519,15 +519,15 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
 
         job_id = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.create_new())
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.create_new())
         (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
+            .CleanUpGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
         self.assertEqual(
             output, [
                 '[u\'Updated last_updated field for '
@@ -538,12 +538,12 @@ class CleanupGeneralFeedbackThreadModelOneOffJobTest(
         self.assertTrue(model_instance.created_on < model_instance.last_updated)
 
 
-class CleanupGeneralFeedbackMessageModelOneOffJobTest(
+class CleanUpGeneralFeedbackMessageModelOneOffJobTest(
         test_utils.GenericTestBase):
     """Tests for one-off job to clean up general feedback message model."""
 
     def setUp(self):
-        super(CleanupGeneralFeedbackMessageModelOneOffJobTest, self).setUp()
+        super(CleanUpGeneralFeedbackMessageModelOneOffJobTest, self).setUp()
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
 
@@ -566,15 +566,15 @@ class CleanupGeneralFeedbackMessageModelOneOffJobTest(
     def test_standard_operation(self):
         job_id = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackMessageModelOneOffJob.create_new())
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.create_new())
         (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackMessageModelOneOffJob.get_output(job_id))
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.get_output(job_id))
         self.assertEqual(output, [])
 
         model_instance = feedback_models.GeneralFeedbackMessageModel.get_by_id(
@@ -593,15 +593,15 @@ class CleanupGeneralFeedbackMessageModelOneOffJobTest(
 
         job_id = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackMessageModelOneOffJob.create_new())
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.create_new())
         (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             feedback_jobs_one_off
-            .CleanupGeneralFeedbackMessageModelOneOffJob.get_output(job_id))
+            .CleanUpGeneralFeedbackMessageModelOneOffJob.get_output(job_id))
         self.assertEqual(
             output, [
                 '[u\'Updated last_updated field for '
