@@ -269,7 +269,10 @@ class UserSettingsModel(base_models.BaseModel):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
                 for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
-            if not cls.get_by_id(new_id):
+            if (
+                    not cls.get_by_id(new_id) and
+                    not DeletedUserModel.get_by_id(new_id)
+            ):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -2354,6 +2357,32 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether PendingDeletionRequestModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+
+class DeletedUserModel(base_models.BaseModel):
+    """Model for storing deleted user IDs."""
+
+    @staticmethod
+    def get_deletion_policy():
+        """DeletedUserModel contains only IDs that were deleted."""
+        return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def get_export_policy(cls):
+        """DeletedUserModel contains only IDs that were deleted."""
+        return dict(super(cls, cls).get_export_policy(), **{})
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether DeletedUserModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.

@@ -29,8 +29,8 @@ from core.tests import test_utils
 
 import feconf
 
-(base_models, topic_models, ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.topic])
+(base_models, subtopic_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.subtopic])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
@@ -63,7 +63,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
 
     def test_get_subtopic_page_from_model(self):
-        subtopic_page_model = topic_models.SubtopicPageModel.get(
+        subtopic_page_model = subtopic_models.SubtopicPageModel.get(
             self.subtopic_page_id)
         subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
             subtopic_page_model)
@@ -176,7 +176,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page_id_1 = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 'topic_id_1', 1))
-        subtopic_page_model_1 = topic_models.SubtopicPageModel.get(
+        subtopic_page_model_1 = subtopic_models.SubtopicPageModel.get(
             subtopic_page_id_1)
         subtopic_page_1.version = 2
         subtopic_page_model_1.version = 3
@@ -202,7 +202,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_commit_log_entry(self):
         subtopic_page_commit_log_entry = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_commit(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_commit(
                 self.subtopic_page_id, 1)
         )
         self.assertEqual(subtopic_page_commit_log_entry.commit_type, 'create')
@@ -221,7 +221,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.EntityNotFoundError,
             r'Entity for class SubtopicPageModel with id %s not found' % (
                 subtopic_page_id)):
-            topic_models.SubtopicPageModel.get(subtopic_page_id)
+            subtopic_models.SubtopicPageModel.get(subtopic_page_id)
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
             r'Entity for class SubtopicPageModel with id %s not found' % (
@@ -323,8 +323,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             'written_translations': written_translations_dict_math
         }
 
-        subtopic_page_id = topic_models.SubtopicPageModel.get_new_id('')
-        subtopic_page_model = topic_models.SubtopicPageModel(
+        subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
+        subtopic_page_model = subtopic_models.SubtopicPageModel(
             id=subtopic_page_id,
             topic_id=self.TOPIC_ID,
             page_contents=page_contents_dict,
@@ -349,7 +349,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v1-v2 page schemas at present.')
 
-        subtopic_page_model = topic_models.SubtopicPageModel.get(
+        subtopic_page_model = subtopic_models.SubtopicPageModel.get(
             self.subtopic_page_id)
         subtopic_page_model.page_contents_schema_version = 0
         subtopic_page_model.commit(self.user_id, '', [])
