@@ -267,7 +267,8 @@ class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
         output = (
             recommendations_jobs_one_off
             .CleanupExplorationRecommendationsOneOffJob.get_output(job_id))
-        self.assertEqual(output, ['[u\'Removed recommendation model\', 1]'])
+        self.assertEqual(
+            output, ['[u\'Removed recommendation model\', [u\'0\']]'])
 
         self.assertIsNone(
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
@@ -294,7 +295,8 @@ class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
             recommendations_jobs_one_off
             .CleanupExplorationRecommendationsOneOffJob.get_output(job_id))
         self.assertEqual(
-            output, ['[u\'Removed deleted exp ids from recommendations\', 1]'])
+            output,
+            ['[u\'Removed deleted exp ids from recommendations\', [u\'0\']]'])
 
         recommendation_model = (
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
