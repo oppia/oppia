@@ -356,7 +356,8 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
             job_id)
-        self.assertEqual(output, ['[u\'Commit Commands Updated\', 1]'])
+        self.assertEqual(
+            output, ['[u\'Commit Commands Updated\', [u\'skill-skill_id-2\']]'])
         self.assertEqual(
             self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
         self.model_instance_1 = (
@@ -448,7 +449,9 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             output = (
                 skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
                     job_id))
-            self.assertEqual(output, ['[u\'Skill Commit Model deleted\', 1]'])
+            self.assertEqual(
+                output,
+                ['[u\'Skill Commit Model deleted\', [u\'skill-skill_id-1\']]'])
             self.model_instance = (
                 skill_models.SkillCommitLogEntryModel.get_by_id(
                     'skill-skill_id-1'))

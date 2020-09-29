@@ -147,11 +147,11 @@ class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if update_required:
             item.commit_cmds = updated_commit_cmds
             item.put(update_last_updated_time=False)
-            yield ('Commit Commands Updated', 1)
+            yield ('Commit Commands Updated', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, sum(ast.literal_eval(v) for v in values))
+        yield (key, values)
 
 
 class MissingSkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -170,9 +170,9 @@ class MissingSkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         skill = skill_fetchers.get_skill_by_id(item.skill_id, strict=False)
         if skill is None:
+            yield ('Skill Commit Model deleted', item.id)
             item.delete()
-            yield ('Skill Commit Model deleted', 1)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, sum(ast.literal_eval(v) for v in values))
+        yield (key, values)
