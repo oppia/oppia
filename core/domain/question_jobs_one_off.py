@@ -22,13 +22,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import question_domain
 from core.domain import question_services
 from core.platform import models
 import feconf
-import python_utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
