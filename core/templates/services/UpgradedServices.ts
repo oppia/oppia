@@ -642,8 +642,9 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { TranslationTabActiveModeService } from 
-  'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
+import { TranslationTabActiveModeService } from
+  // eslint-disable-next-line max-len 
+ 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import { TranslationsBackendApiService } from
   'services/translations-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
