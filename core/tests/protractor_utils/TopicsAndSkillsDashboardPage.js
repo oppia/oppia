@@ -141,7 +141,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.mergeSkills = async function(oldSkillName, newSkillName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(oldSkillName);
-    debugger;
+    expect(await skillEditOptions.count()).toEqual(1);
     await action.click(
       'Skill edit options', skillEditOptions.first());
     await action.click(
@@ -168,6 +168,7 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
+    expect(await assignSkillToTopicButtons.count()).toEqual(1);
     await waitFor.visibilityOf(
       assignSkillToTopicButtons.first(),
       'Assign button taking too long to appear.');
@@ -270,6 +271,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.deleteTopicWithName = async function(topicName) {
     await this.waitForTopicsToLoad();
     await this.filterTopicsByKeyword(topicName);
+    expect(await topicEditOptions.count()).toEqual(1);
     await action.click(
       'Topic edit option', topicEditOptions.first());
     await action.click('Delete topic button', deleteTopicButton);
@@ -281,6 +283,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.deleteSkillWithName = async function(skillName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
+    expect(await skillEditOptions.count()).toEqual(1);
     await action.click(
       'Skill edit option', skillEditOptions.first());
     await action.click(
@@ -349,8 +352,9 @@ var TopicsAndSkillsDashboardPage = function() {
   this.unassignSkillFromTopic = async function(skillDescription, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillDescription);
+    expect(await skillEditOptions.count()).toEqual(1);
     var skillEditOptionBox = skillEditOptions.first();
-    await skillEditOptionBox.click();
+    await action.click('Skill edit option', skillEditOptionBox);
     await waitFor.elementToBeClickable(
       unassignSkillButon,
       'Unassign Skill button takes too long to be clickable');
@@ -373,7 +377,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.elementToBeClickable(
       confirmUnassignSkillButton,
       'Confirm Unassign skill button takes too long to be clickable');
-    await confirmUnassignSkillButton.click();
+    await action.click('Confirm Unassign Skill', confirmUnassignSkillButton);
     await waitFor.invisibilityOf(
       confirmUnassignSkillButton,
       'Unassign skill modal takes too long to close.');
@@ -393,6 +397,10 @@ var TopicsAndSkillsDashboardPage = function() {
   this.expectTopicNameToBe = async function(topicName, index) {
     await this.waitForTopicsToLoad();
     expect(await topicNames.get(index).getText()).toEqual(topicName);
+  };
+
+  this.getTopicsCount = async function() {
+    return await topicsListItems.count();
   };
 
   this.editTopic = async function(topicName) {
