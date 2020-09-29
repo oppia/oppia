@@ -128,7 +128,7 @@ class DeleteAllExplorationRecommendationsOneOffJob(
         yield (key, len(values))
 
 
-class CleanupExplorationRecommendationsOneOffJob(
+class CleanUpExplorationRecommendationsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Cleans up ExplorationRecommendationsModel by:
     1. Removing exploration ids from recommendation list of model if exploration

@@ -206,11 +206,11 @@ class DeleteAllExplorationRecommendationsOneOffJobTests(
                 self.RECOMMENDATION_3_ID))
 
 
-class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
+class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
     """Test clean up exploration recommendations one-off job."""
 
     def setUp(self):
-        super(CleanupExplorationRecommendationsOneOffJob, self).setUp()
+        super(CleanUpExplorationRecommendationsOneOffJob, self).setUp()
 
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
@@ -230,15 +230,15 @@ class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
     def test_standard_operation(self):
         job_id = (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.create_new())
+            .CleanUpExplorationRecommendationsOneOffJob.create_new())
         (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.enqueue(job_id))
+            .CleanUpExplorationRecommendationsOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.get_output(job_id))
+            .CleanUpExplorationRecommendationsOneOffJob.get_output(job_id))
         self.assertEqual(output, [])
 
         recommendation_model = (
@@ -258,15 +258,15 @@ class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
             self.user_id, 'Delete')
         job_id = (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.create_new())
+            .CleanUpExplorationRecommendationsOneOffJob.create_new())
         (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.enqueue(job_id))
+            .CleanUpExplorationRecommendationsOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.get_output(job_id))
+            .CleanUpExplorationRecommendationsOneOffJob.get_output(job_id))
         self.assertEqual(
             output, ['[u\'Removed recommendation model\', [u\'0\']]'])
 
@@ -285,15 +285,15 @@ class CleanupExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
             self.user_id, 'Delete')
         job_id = (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.create_new())
+            .CleanUpExplorationRecommendationsOneOffJob.create_new())
         (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.enqueue(job_id))
+            .CleanUpExplorationRecommendationsOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             recommendations_jobs_one_off
-            .CleanupExplorationRecommendationsOneOffJob.get_output(job_id))
+            .CleanUpExplorationRecommendationsOneOffJob.get_output(job_id))
         self.assertEqual(
             output,
             ['[u\'Removed deleted exp ids from recommendations\', [u\'0\']]'])
