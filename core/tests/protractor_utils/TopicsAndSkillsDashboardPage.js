@@ -92,8 +92,6 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-confirm-skill-selection-button'));
   var openConceptCardExplanationButton = element(
     by.css('.protractor-test-open-concept-card'));
-  var topicNamesInTopicSelectModal = element.all(
-    by.css('.protractor-test-topic-name-in-topic-select-modal'));
   var topicThumbnailButton = element(
     by.css('.protractor-test-photo-button'));
   var thumbnailContainer = element(
