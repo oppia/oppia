@@ -110,13 +110,13 @@ export class CollectionRights {
   // redefined as copies from the specified collection rights.
   static copyFromCollectionRights(
       therCollectionRights: CollectionRights): CollectionRights {
-        return new CollectionRights({
-          collection_id: otherCollectionRights.getCollectionId(),
-          can_edit: otherCollectionRights.canEdit(),
-          can_unpublish: otherCollectionRights.canUnpublish(),
-          is_private: otherCollectionRights.isPrivate(),
-          owner_names: otherCollectionRights.getOwnerNames()
-        });
+    return new CollectionRights({
+      collection_id: otherCollectionRights.getCollectionId(),
+      can_edit: otherCollectionRights.canEdit(),
+      can_unpublish: otherCollectionRights.canUnpublish(),
+      is_private: otherCollectionRights.isPrivate(),
+      owner_names: otherCollectionRights.getOwnerNames()
+    });
   }
 }
 
