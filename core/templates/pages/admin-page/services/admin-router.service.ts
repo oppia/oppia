@@ -25,7 +25,6 @@ import { AdminPageConstants } from
 @Injectable({
   providedIn: 'root'
 })
-
 export class AdminRouterService {
   currentTabHash: string = (
     AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
@@ -34,8 +33,8 @@ export class AdminRouterService {
    * Iterates through the ADMIN_TAB_URLS map and returns the
    * tab name corresponding to the hash.
    * @param {string} tabHash Represents hash name of a tab URL.
-   * @returns {string|null} Tab name of the hash value.
-   * If no match then null.
+   * @returns {string|null} Tab name of the hash value
+   * if found else null.
    */
   getTabNameByHash(tabHash: string): string | null {
     for (const [tabName, tabUrl] of Object.entries(
@@ -58,7 +57,7 @@ export class AdminRouterService {
   }
 
   /**
-   * @returns {boolean} Returns whether the activities tab is open.
+   * @returns {boolean} Whether the activities tab is open.
    */
   isActivitiesTabOpen(): boolean {
     return this.currentTabHash === (
@@ -66,28 +65,28 @@ export class AdminRouterService {
   }
 
   /**
-   * @returns {boolean} Returns whether the jobs tab is open.
+   * @returns {boolean} Whether the jobs tab is open.
    */
   isJobsTabOpen(): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.JOBS;
   }
 
   /**
-   * @returns {boolean} Returns whether the config tab is open.
+   * @returns {boolean} Whether the config tab is open.
    */
   isConfigTabOpen(): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.CONFIG;
   }
 
   /**
-   * @returns {boolean} Returns whether the roles tab is open.
+   * @returns {boolean} Whether the roles tab is open.
    */
   isRolesTabOpen(): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.ROLES;
   }
 
   /**
-   * @returns {boolean} Returns whether the miscellaneous tab is open.
+   * @returns {boolean} Whether the miscellaneous tab is open.
    */
   isMiscTabOpen(): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.MISC;
