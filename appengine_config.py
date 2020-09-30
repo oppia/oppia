@@ -68,7 +68,7 @@ reload(six) # pylint: disable=reload-builtin
 # prod env. We need to monkeypatch this function so that prod deployments
 # work. Otherwise, pkg_resources.get_distribution('google-api-core').version in
 # google/api_core/__init__.py throws a DistributionNotFound error, and
-# similarly for pkg_resources.get_distribution("google-cloud-tasks").version in
+# similarly for pkg_resources.get_distribution('google-cloud-tasks').version in
 # google/cloud/tasks_v2/gapic/cloud_tasks_client.py, which results in the
 # entire application being broken on production.
 import requests_toolbelt.adapters.appengine # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -83,12 +83,16 @@ class MockDistribution(python_utils.OBJECT):
         self.version = version
 
 
-def monkeypatched_get_distribution(distribution_tuple):
+def monkeypatched_get_distribution(distribution_name):
     """Monkeypatched version of pkg_resources.get_distribution.
 
+    This approach is inspired by the discussion at:
+
+        https://github.com/googleapis/google-cloud-python/issues/1893#issuecomment-396983379
+
     Args:
-        distribution_tuple: tuple(str). A 1-tuple with the name of the
-            distribution to get the Distribution object for.
+        distribution_name: str. The name of the distribution to get the
+            Distribution object for.
 
     Returns:
         *. An object that contains the version attribute needed for App Engine
@@ -100,11 +104,11 @@ def monkeypatched_get_distribution(distribution_tuple):
             and google-cloud-tasks initializations.
     """
     try:
-        return old_get_distribution(distribution_tuple)
+        return old_get_distribution(distribution_name)
     except pkg_resources.DistributionNotFound:
-        if distribution_tuple == ('google-api-core',):
+        if distribution_name == 'google-api-core':
             return MockDistribution('1.22.2')
-        elif distribution_tuple == ('google-cloud-tasks',):
+        elif distribution_name == 'google-cloud-tasks':
             return MockDistribution('1.5.0')
         else:
             raise
