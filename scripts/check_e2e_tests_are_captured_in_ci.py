@@ -34,7 +34,8 @@ TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'fileUploadExtensions', 'fileUploadFeatures', 'library', 'navigation',
     'playVoiceovers', 'preferences', 'profileFeatures', 'profileMenu',
     'publication', 'subscriptions', 'topicsAndSkillsDashboard',
-    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users']
+    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users',
+    'wipeout']
 
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')

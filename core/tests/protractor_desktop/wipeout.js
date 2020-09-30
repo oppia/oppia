@@ -20,7 +20,6 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('When account is deleted it', function() {
@@ -82,9 +81,7 @@ describe('When account is deleted it', function() {
     await workflow.isExplorationCommunityOwned();
   });
 
-    it(
-      'should\'t modify published exploration with other owner',
-      async function() {
+  it('should keep published exploration with other owner', async function() {
     await users.createUser('secondOwner@check.com', 'secondOwner');
     await users.createAndLoginUser('user4@delete.com', 'userToDelete4');
     await workflow.createExploration();

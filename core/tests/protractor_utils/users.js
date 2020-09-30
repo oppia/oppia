@@ -106,11 +106,6 @@ var createAndLoginAdminUserMobile = async function(email, username) {
   await _completeSignup(username);
 };
 
-var deleteUser = async function(email) {
-  await createAndLoginUser(email, username);
-  await logout();
-};
-
 var isAdmin = async function() {
   return await element(by.css('.protractor-test-admin-text')).isPresent();
 };

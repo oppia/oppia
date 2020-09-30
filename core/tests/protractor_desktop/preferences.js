@@ -15,18 +15,11 @@
 /**
  * @fileoverview End-to-end tests for user preferences.
  */
-var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-describe('Wipeout', function() {
-  var deleteAccountPage = null;
-
-  beforeEach(function() {
-    deleteAccountPage = new DeleteAccountPage.DeleteAccountPage();
-  });
-
+describe('Preferences', function() {
   it('should let a user upload a profile photo', async function() {
     await users.createUser('eve@preferences.com', 'evePreferences');
     await users.login('eve@preferences.com');

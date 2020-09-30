@@ -42,7 +42,7 @@ var isExplorationCommunityOwned = async function() {
   return await element(
     by.css('.protractor-test-is-community-owned')
   ).isPresent();
-}
+};
 
 
 // Check if the warning message is visible when the title is ''.

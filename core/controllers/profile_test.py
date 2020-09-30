@@ -803,6 +803,7 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
 
 class DeleteAccountTests(test_utils.GenericTestBase):
+    """Integration tests for the account deletion."""
 
     def setUp(self):
         super(DeleteAccountTests, self).setUp()
@@ -818,6 +819,7 @@ class DeleteAccountTests(test_utils.GenericTestBase):
             self, 'testapp', webtest.TestApp(main_cron.app))
 
     def _run_account_deletion(self):
+        """Execute complete deletion for the user that is logged in."""
         with self.enable_deletion_swap:
             data = self.delete_json('/delete-account-handler')
             self.assertEqual(data, {'success': True})

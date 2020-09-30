@@ -36,7 +36,7 @@ var DeleteAccountPage = function() {
     await action.click('Delete Account button', deleteMyAccountButton);
     await waitFor.modalPopupToAppear();
     await action.click('Confirm deletion button', confirmDeletionButton);
-  }
+  };
 };
 
 exports.DeleteAccountPage = DeleteAccountPage;
