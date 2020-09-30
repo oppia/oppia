@@ -17,9 +17,6 @@
  * skill rights domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface SkillRightsBackendDict {
   'can_edit_skill_description': boolean,
   'skill_id': string
@@ -33,6 +30,17 @@ export class SkillRights {
       skillId: string, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._canEditSkillDescription = canEditSkillDescription;
+  }
+
+  static createFromBackendDict(
+      skillRightsBackendDict: SkillRightsBackendDict): SkillRights {
+    return new SkillRights(
+      skillRightsBackendDict.skill_id,
+      skillRightsBackendDict.can_edit_skill_description);
+  }
+
+  static createInterstitialSkillRights(): SkillRights {
+    return new SkillRights(null, false);
   }
 
   getSkillId(): string {
@@ -49,22 +57,3 @@ export class SkillRights {
       otherSkillRights.canEditSkillDescription();
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SkillRightsObjectFactory {
-  createFromBackendDict(
-      skillRightsBackendDict: SkillRightsBackendDict): SkillRights {
-    return new SkillRights(
-      skillRightsBackendDict.skill_id,
-      skillRightsBackendDict.can_edit_skill_description);
-  }
-  createInterstitialSkillRights(): SkillRights {
-    return new SkillRights(null, false);
-  }
-}
-
-angular.module('oppia').factory(
-  'SkillRightsObjectFactory',
-  downgradeInjectable(SkillRightsObjectFactory));

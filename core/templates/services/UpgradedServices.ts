@@ -490,8 +490,6 @@ import { SkillMasteryBackendApiService } from
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
-import { SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/skill-summary-object.factory';
 import { SolutionObjectFactory } from
@@ -868,8 +866,6 @@ export class UpgradedServices {
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
     upgradedServices['ShortSkillSummaryObjectFactory'] =
       new ShortSkillSummaryObjectFactory();
-    upgradedServices['SkillRightsObjectFactory'] =
-      new SkillRightsObjectFactory();
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
@@ -1473,7 +1469,6 @@ export class UpgradedServices {
     upgradedServices['SkillRightsBackendApiService'] =
       new SkillRightsBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['SkillRightsObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StateCardObjectFactory'] =
       new StateCardObjectFactory(

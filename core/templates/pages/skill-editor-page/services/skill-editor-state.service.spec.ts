@@ -28,8 +28,8 @@ import { QuestionSummaryForOneSkillObjectFactory } from
   'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory';
+import { SkillRights } from
+  'domain/skill/skill-rights.model';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -40,8 +40,7 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 describe('Skill editor state service', function() {
   var SkillEditorStateService = null, $q, $rootScope,
-    SkillObjectFactory = null, SkillUpdateService = null,
-    skillRightsObjectFactory = null;
+    SkillObjectFactory = null, SkillUpdateService = null;
   var fakeSkillBackendApiService = null;
   var fakeSkillRightsBackendApiService = null;
   var skillRightsObject = null;
@@ -143,7 +142,6 @@ describe('Skill editor state service', function() {
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('SkillRightsObjectFactory', new SkillRightsObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'SkillBackendApiService',
@@ -161,13 +159,12 @@ describe('Skill editor state service', function() {
       'SkillEditorStateService');
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     // The injector is required because this service is directly used in this
-    // spec, therefore even though SkillRightsObjectFactory is upgraded to
+    // spec, therefore even though SkillRightsModel is upgraded to
     // Angular, it cannot be used just by instantiating it by its class but
-    // instead needs to be injected. Note that 'skillRightsObjectFactory' is
-    // the injected service instance whereas 'SkillRightsObjectFactory' is the
+    // instead needs to be injected. Note that 'skillRightsModel' is
+    // the injected service instance whereas 'SkillRightsModel`' is the
     // service class itself. Therefore, use the instance instead of the class in
     // the specs.
-    skillRightsObjectFactory = $injector.get('SkillRightsObjectFactory');
     SkillUpdateService = $injector.get('SkillUpdateService');
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
     $q = $injector.get('$q');
@@ -398,7 +395,7 @@ describe('Skill editor state service', function() {
   it('should be able to set a new skill rights with an in-place copy',
     function() {
       var previousSkillRights = SkillEditorStateService.getSkillRights();
-      var expectedSkillRights = skillRightsObjectFactory.createFromBackendDict(
+      var expectedSkillRights = SkillRights.createFromBackendDict(
         skillRightsObject);
       expect(previousSkillRights).not.toEqual(expectedSkillRights);
 

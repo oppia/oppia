@@ -479,8 +479,6 @@ import { SkillMasteryBackendApiService } from
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
-import { SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/skill-summary-object.factory';
 import { SolutionObjectFactory } from
@@ -909,7 +907,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static skillMasteryBackendApiService: SkillMasteryBackendApiService;
   static skillObjectFactory: SkillObjectFactory;
   static skillRightsBackendApiService: SkillRightsBackendApiService;
-  static skillRightsObjectFactory: SkillRightsObjectFactory;
   static skillSummaryObjectFactory: SkillSummaryObjectFactory;
   static solutionObjectFactory: SolutionObjectFactory;
   static solutionValidityService: SolutionValidityService;
@@ -1286,7 +1283,6 @@ private skillCreationBackendApiService: SkillCreationBackendApiService,
 private skillMasteryBackendApiService: SkillMasteryBackendApiService,
 private skillObjectFactory: SkillObjectFactory,
 private skillRightsBackendApiService: SkillRightsBackendApiService,
-private skillRightsObjectFactory: SkillRightsObjectFactory,
 private skillSummaryObjectFactory: SkillSummaryObjectFactory,
 private solutionObjectFactory: SolutionObjectFactory,
 private solutionValidityService: SolutionValidityService,
@@ -1833,8 +1829,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.skillObjectFactory = this.skillObjectFactory;
     OppiaAngularRootComponent.skillRightsBackendApiService = (
       this.skillRightsBackendApiService);
-    OppiaAngularRootComponent.skillRightsObjectFactory = (
-      this.skillRightsObjectFactory);
     OppiaAngularRootComponent.skillSummaryObjectFactory = (
       this.skillSummaryObjectFactory);
     OppiaAngularRootComponent.solutionObjectFactory = (
