@@ -27,24 +27,25 @@ import { ExplorationEditorPageConstants } from
   providedIn: 'root'
 })
 export class TranslationTabActiveModeService {
-  constructor() {}
-  activeMode:string = null;
+  private activeMode: string = null;
 
   activateVoiceoverMode(): void {
     this.activeMode = ExplorationEditorPageConstants.VOICEOVER_MODE;
   }
+
   activateTranslationMode(): void {
     this.activeMode = ExplorationEditorPageConstants.TRANSLATION_MODE;
   }
+
   isTranslationModeActive(): boolean {
-    return this.activeMode ===
-      ExplorationEditorPageConstants.TRANSLATION_MODE;
+    return this.activeMode === ExplorationEditorPageConstants.TRANSLATION_MODE;
   }
+
   isVoiceoverModeActive(): boolean {
-    return this.activeMode ===
-      ExplorationEditorPageConstants.VOICEOVER_MODE;
+    return this.activeMode === ExplorationEditorPageConstants.VOICEOVER_MODE;
   }
 }
+
 angular.module('oppia').factory(
   'TranslationTabActiveModeService',
   downgradeInjectable(TranslationTabActiveModeService));
