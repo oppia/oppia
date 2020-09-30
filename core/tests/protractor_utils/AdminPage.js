@@ -245,7 +245,7 @@ var AdminPage = function() {
     // Change values for "update role" form, and submit it.
     await waitFor.visibilityOf(
       updateFormName, 'Update Form Name is not visible');
-    await updateFormName.sendKeys(name);
+    await action.sendKeys('Update For Name',updateFormName,name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
     await waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
@@ -261,10 +261,10 @@ var AdminPage = function() {
   this.getUsersAsssignedToRole = async function(role) {
     await waitFor.visibilityOf(
       roleDropdown, 'View role dropdown taking too long to be visible');
-    await roleDropdown.sendKeys('By Role');
+    await action.sendKeys('Role Drop Down',roleDropdown,'By Role');
 
     await action.click(roleValueOption);
-    await roleValueOption.sendKeys(role);
+    await action.sendKeys('Role Value Option',roleValueOption,role);
 
     await action.click(viewRoleButton);
   };
@@ -272,10 +272,10 @@ var AdminPage = function() {
   this.viewRolesbyUsername = async function(username) {
     await waitFor.visibilityOf(
       roleDropdown, 'View role dropdown taking too long to be visible');
-    await roleDropdown.sendKeys('By Username');
+    await action.sendKeys('Role Drop Down',roleDropdown,'By Username');
 
     await action.click(roleUsernameOption);
-    await roleUsernameOption.sendKeys(username);
+    await action.sendKeys('Role Username Option',roleUsernameOption,username);
 
     await action.click(viewRoleButton);
   };
