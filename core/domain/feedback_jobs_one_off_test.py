@@ -491,11 +491,6 @@ class CleanUpGeneralFeedbackThreadModelOneOffJobTest(
             .CleanUpGeneralFeedbackThreadModelOneOffJob.get_output(job_id))
         self.assertEqual(output, [])
 
-        model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id)
-        self.assertEqual(model_instance.created_on, self.created_time)
-        self.assertEqual(model_instance.last_updated, self.last_updated_time)
-
     def test_migration_job_skips_deleted_model(self):
         model_instance = feedback_models.GeneralFeedbackThreadModel.get_by_id(
             self.thread_id)
