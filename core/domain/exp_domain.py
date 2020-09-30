@@ -2946,12 +2946,16 @@ class Exploration(python_utils.OBJECT):
                 customization_args.update({
                     'placeholder': {
                         'value': {
-                            'content_id': 'content',
+                            'content_id': 'ca_placeholder_0',
                             'unicode_str': (
                                 'Type an expression here, using only numbers.')
                         }
                     }
                 })
+                state_dict['written_translations']['translations_mapping'][
+                    'ca_placeholder_0'] = {}
+                state_dict['recorded_voiceovers']['voiceovers_mapping'][
+                    'ca_placeholder_0'] = {}
 
         return states_dict
 
