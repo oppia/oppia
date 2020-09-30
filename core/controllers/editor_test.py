@@ -1019,13 +1019,21 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                     exp_id, 'invalid_state_name'),
                 expected_status_int=404)
 
+        self.assertEqual(len(observed_log_messages), 3)
         self.assertEqual(
-            observed_log_messages,
+            observed_log_messages[:2],
             [
                 'Could not find state: invalid_state_name',
                 'Available states: [u\'Introduction\']'
             ]
         )
+        # The last log message is the traceback for an Exception. It cannot be
+        # exactly compared to a static string because the traceback includes
+        # filepaths which will vary depending on the machine that runs the
+        # test. So the starting portion of the traceback that will remain
+        # constant is matched instead.
+        self.assertTrue(
+            'Traceback (most recent call last):' in observed_log_messages[2])
 
         self.logout()
 
