@@ -148,7 +148,7 @@ jobs:
       - run:
           name: Run e2e navigation test
           command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"+
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
       - run:
           name: Run e2e wipeout test
           command: |
