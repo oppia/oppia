@@ -376,8 +376,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with python_utils.open_file(expected_gravatar_filepath, 'rb',
-                                    encoding=None) as f:
+        with python_utils.open_file(
+            expected_gravatar_filepath, 'rb', encoding=None) as f:
             expected_gravatar = f.read()
 
         with requests_mock.Mocker() as requests_mocker:
@@ -392,8 +392,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages = []
-        logging_mocker = self.swap(
-            logging, 'error', lambda msg: error_messages.append(msg))
+        logging_mocker = self.swap(logging, 'error', error_messages.append)
 
         with logging_mocker, requests_mock.Mocker() as requests_mocker:
             requests_mocker.get(gravatar_url, status_code=404)
@@ -409,8 +408,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages = []
-        logging_mocker = self.swap(
-            logging, 'exception', lambda msg: error_messages.append(msg))
+        logging_mocker = self.swap(logging, 'exception', error_messages.append)
 
         with logging_mocker, requests_mock.Mocker() as requests_mocker:
             requests_mocker.get(gravatar_url, exc=Exception)
