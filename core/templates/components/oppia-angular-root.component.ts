@@ -347,8 +347,6 @@ import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/d
 import { MusicPhrasePlayerService } from 'interactions/MusicNotesInput/directives/music-phrase-player.service';
 import { NeedsGuidingResponsesTaskObjectFactory } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { NewlyCreatedStoryObjectFactory } from
-  'domain/topic/NewlyCreatedStoryObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NonExistentActivitiesObjectFactory } from
@@ -817,7 +815,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static musicPhrasePlayerService: MusicPhrasePlayerService;
   static needsGuidingResponsesTaskObjectFactory:
     NeedsGuidingResponsesTaskObjectFactory;
-  static newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory;
   static newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory;
   static nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
@@ -1187,7 +1184,6 @@ private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
 private needsGuidingResponsesTaskObjectFactory:
   NeedsGuidingResponsesTaskObjectFactory,
-private newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory,
 private newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory,
 private nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
@@ -1672,8 +1668,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.musicNotesInputValidationService);
     OppiaAngularRootComponent.musicPhrasePlayerService = (
       this.musicPhrasePlayerService);
-    OppiaAngularRootComponent.newlyCreatedStoryObjectFactory = (
-      this.newlyCreatedStoryObjectFactory);
     OppiaAngularRootComponent.newlyCreatedTopicObjectFactory = (
       this.newlyCreatedTopicObjectFactory);
     OppiaAngularRootComponent.needsGuidingResponsesTaskObjectFactory = (

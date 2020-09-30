@@ -171,7 +171,6 @@ import { SuggestionObjectFactory } from 'domain/suggestion/SuggestionObjectFacto
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { CreatorExplorationSummaryObjectFactory } from 'domain/summary/creator-exploration-summary-object.factory';
 import { LearnerExplorationSummaryObjectFactory } from 'domain/summary/learner-exploration-summary-object.factory';
-import { NewlyCreatedStoryObjectFactory } from 'domain/topic/NewlyCreatedStoryObjectFactory';
 import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageContentsObjectFactory';
@@ -548,7 +547,6 @@ export const angularServices: [string, unknown][] = [
   ['MusicPhrasePlayerService', MusicPhrasePlayerService],
   ['NeedsGuidingResponsesTaskObjectFactory',
     NeedsGuidingResponsesTaskObjectFactory],
-  ['NewlyCreatedStoryObjectFactory', NewlyCreatedStoryObjectFactory],
   ['NewlyCreatedTopicObjectFactory', NewlyCreatedTopicObjectFactory],
   ['NonExistentActivitiesObjectFactory', NonExistentActivitiesObjectFactory],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],

@@ -16,10 +16,6 @@
  * @fileoverview Factory for creating domain object that represents a newly
  * create Story Object used in the topic editor.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 const constants = require('constants.ts');
 
 export class NewlyCreatedStory {
@@ -36,6 +32,11 @@ export class NewlyCreatedStory {
     this.description = description;
     this.urlFragment = urlFragment;
   }
+
+  static createDefault(): NewlyCreatedStory {
+    return new NewlyCreatedStory('', '', '');
+  }
+
   /**
    * @returns {Boolean} - A boolean indicating if the story is valid.
    */
@@ -49,19 +50,3 @@ export class NewlyCreatedStory {
       VALID_URL_FRAGMENT_REGEX.test(this.urlFragment));
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class NewlyCreatedStoryObjectFactory {
-  /**
-   * @returns {NewlyCreatedStory} - A new NewlyCreatedStory instance.
-   */
-  createDefault(): NewlyCreatedStory {
-    return new NewlyCreatedStory('', '', '');
-  }
-}
-
-angular.module('oppia').factory(
-  'NewlyCreatedStoryObjectFactory',
-  downgradeInjectable(NewlyCreatedStoryObjectFactory));

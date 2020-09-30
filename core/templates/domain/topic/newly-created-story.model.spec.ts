@@ -16,16 +16,13 @@
  * @fileoverview Unit tests for NewlyCreatedStoryObjectFactory.
  */
 
-import { NewlyCreatedStory, NewlyCreatedStoryObjectFactory } from
-  'domain/topic/NewlyCreatedStoryObjectFactory';
+import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 
 describe('Newly Created Story Object Factory', () => {
-  let newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory = null;
   let story: NewlyCreatedStory = null;
 
   beforeEach(() => {
-    newlyCreatedStoryObjectFactory = new NewlyCreatedStoryObjectFactory();
-    story = newlyCreatedStoryObjectFactory.createDefault();
+    story = NewlyCreatedStory.createDefault();
   });
 
   it('should create a new default story', () => {
