@@ -138,7 +138,7 @@ class CleanUpExplorationRecommendationsOneOffJob(
         2. Deleting the recommendations model if the exploration for which it
         was created is deleted.
 
-    NOTE TO DEVELOPERS:  This job cannot be deleted until issue #10809 is fixed.
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
     """
 
     @classmethod
