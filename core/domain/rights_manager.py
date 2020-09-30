@@ -760,7 +760,7 @@ def _assign_role(
     else:
         raise Exception('Invalid role: %s' % new_role)
 
-    commit_message = 'Changed role of %s from %s to %s' % (
+    commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role)
     commit_cmds = [{
         'cmd': rights_domain.CMD_CHANGE_ROLE,
