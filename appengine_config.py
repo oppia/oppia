@@ -21,7 +21,7 @@ import os
 import sys
 
 import pkg_resources
-import requests_toolbelt.adapters.appengine
+import python_utils
 from google.appengine.ext import vendor
 
 # Root path of the app.
@@ -64,33 +64,50 @@ import six # isort:skip  pylint: disable=wrong-import-position, wrong-import-ord
 reload(six) # pylint: disable=reload-builtin
 
 
-# For some reason, get_distribution returns an empty list in the prod
-# environment. We need to monkeypatch this function so that prod deployments
+# For some reason, pkg_resources.get_distribution returns an empty list in the
+# prod env. We need to monkeypatch this function so that prod deployments
 # work. Otherwise, pkg_resources.get_distribution('google-api-core').version in
 # google/api_core/__init__.py throws a DistributionNotFound error, and
 # similarly for pkg_resources.get_distribution("google-cloud-tasks").version in
 # google/cloud/tasks_v2/gapic/cloud_tasks_client.py, which results in the
 # entire application being broken on production.
+import requests_toolbelt.adapters.appengine # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 requests_toolbelt.adapters.appengine.monkeypatch()
-old_get_distribution = pkg_resources.get_distribution
+old_get_distribution = pkg_resources.get_distribution # pylint: disable=invalid-name
 
 
-def monkeypatched_get_distribution(*args, **kwargs):
+class MockDistribution(python_utils.OBJECT):
+    """Mock distribution object for the monkeypatching function."""
+
+    def __init__(self, version):
+        self.version = version
+
+
+def monkeypatched_get_distribution(distribution_tuple):
+    """Monkeypatched version of pkg_resources.get_distribution.
+
+    Args:
+        distribution_tuple: tuple(str). A 1-tuple with the name of the
+            distribution to get the Distribution object for.
+
+    Returns:
+        *. An object that contains the version attribute needed for App Engine
+        third-party libs to successfully initialize. This is a hack to get the
+        new Python 3 libs working in a Python 2 environment.
+
+    Raises:
+        Exception. The mock is used in a context apart from the google-api-core
+            and google-cloud-tasks initializations.
+    """
     try:
-        return old_get_distribution(*args, **kwargs)
-    except:
-        class Mock(object):
-            pass
-
-        if args == ('google-api-core',):
-            mock = Mock()
-            mock.version = '1.22.2'
-            return mock
-        elif args == ('google-cloud-tasks',):
-            mock = Mock()
-            mock.version = '1.5.0'
-            return mock
+        return old_get_distribution(distribution_tuple)
+    except pkg_resources.DistributionNotFound:
+        if distribution_tuple == ('google-api-core',):
+            return MockDistribution('1.22.2')
+        elif distribution_tuple == ('google-cloud-tasks',):
+            return MockDistribution('1.5.0')
         else:
             raise
+
 
 pkg_resources.get_distribution = monkeypatched_get_distribution
