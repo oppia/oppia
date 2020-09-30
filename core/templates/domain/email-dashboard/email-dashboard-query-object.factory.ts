@@ -22,9 +22,9 @@ import { Injectable } from '@angular/core';
 export interface EmailDashboardQueryDict {
   'id': string;
   'status': string;
-  'num_qualified_users'?: number;
-  'submitter_username'?: string;
-  'created_on'?: string;
+  'num_qualified_users': number;
+  'submitter_username': string;
+  'created_on': string;
 }
 
 export interface EmailDashboardQueryBackendDict {
@@ -34,13 +34,13 @@ export interface EmailDashboardQueryBackendDict {
 export class EmailDashboardQuery {
   id: string;
   status: string;
-  numQualifiedUsers?: number;
-  submitterUsername?: string;
-  createdOn?: string;
+  numQualifiedUsers: number;
+  submitterUsername: string;
+  createdOn: string;
 
   constructor(
-      id: string, status: string, numQualifiedUsers?: number,
-      submitterUsername?: string, createdOn?: string) {
+      id: string, status: string, numQualifiedUsers: number,
+      submitterUsername: string, createdOn: string) {
     this.id = id;
     this.status = status;
     this.numQualifiedUsers = numQualifiedUsers;
