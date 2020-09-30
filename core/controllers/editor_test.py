@@ -1030,7 +1030,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
         # The last log message is the traceback for an Exception. It cannot be
         # exactly compared to a static string because the traceback includes
         # filepaths which will vary depending on the machine that runs the
-        # test. So the starting portion of traceback that will remain
+        # test. So the starting portion of the traceback that will remain
         # constant is matched instead.
         self.assertTrue(
             'Traceback (most recent call last):' in observed_log_messages[2])
