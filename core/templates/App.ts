@@ -119,7 +119,7 @@ angular.module('oppia').config([
       'ExplorationRecommendationsService', 'ExpressionEvaluatorService',
       'ExpressionParserService', 'ExpressionSyntaxTreeService',
       'ExtensionTagAssemblerService', 'ExtractImageFilenamesFromStateService',
-      'FeedbackMessageSummaryObjectFactory', 'FeedbackThreadObjectFactory',
+      'FeedbackThreadObjectFactory',
       'FeedbackThreadSummaryObjectFactory', 'FileDownloadRequestObjectFactory',
       'FocusManagerService', 'GuestCollectionProgressService',
       'HtmlEscaperService', 'I18nLanguageCodeService', 'IdGenerationService',

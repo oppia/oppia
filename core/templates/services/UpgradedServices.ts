@@ -228,8 +228,6 @@ import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
-import { FeedbackMessageSummaryObjectFactory } from
-  'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FeedbackThreadSummaryObjectFactory } from
@@ -767,8 +765,6 @@ export class UpgradedServices {
       new FeaturedTranslationLanguageObjectFactory();
     upgradedServices['FeatureStatusSummaryObjectFactory'] =
       new FeatureStatusSummaryObjectFactory();
-    upgradedServices['FeedbackMessageSummaryObjectFactory'] =
-      new FeedbackMessageSummaryObjectFactory();
     upgradedServices['FeedbackThreadSummaryObjectFactory'] =
       new FeedbackThreadSummaryObjectFactory();
     upgradedServices['FileDownloadRequestObjectFactory'] =

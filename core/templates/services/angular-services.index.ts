@@ -98,7 +98,6 @@ import { ExplorationPermissionsObjectFactory } from 'domain/exploration/explorat
 import { StateInteractionStatsBackendApiService } from 'domain/exploration/state-interaction-stats-backend-api.service';
 import { StatsReportingBackendApiService } from 'domain/exploration/stats-reporting-backend-api.service';
 import { VisualizationInfoObjectFactory } from 'domain/exploration/visualization-info-object.factory';
-import { FeedbackMessageSummaryObjectFactory } from 'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummaryObjectFactory } from 'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
@@ -477,7 +476,6 @@ export const angularServices: [string, unknown][] = [
   ['FeatureStatusSummaryObjectFactory', FeatureStatusSummaryObjectFactory],
   ['FeaturedTranslationLanguageObjectFactory',
     FeaturedTranslationLanguageObjectFactory],
-  ['FeedbackMessageSummaryObjectFactory', FeedbackMessageSummaryObjectFactory],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FeedbackThreadSummaryObjectFactory', FeedbackThreadSummaryObjectFactory],
   ['FileDownloadRequestObjectFactory', FileDownloadRequestObjectFactory],
