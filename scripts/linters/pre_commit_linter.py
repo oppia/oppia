@@ -110,6 +110,9 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION),
     os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'setuptools-%s' % common.SETUPTOOLS_VERSION),
+    os.path.join(
         _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
@@ -117,6 +120,7 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
+
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
@@ -465,6 +469,7 @@ def main(args=None):
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
     install_third_party_libs.main()
+    common.fix_third_party_imports()
 
     python_utils.PRINT('Starting Linter....')
 

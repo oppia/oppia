@@ -34,6 +34,109 @@ Model = ndb.Model
 DateTimeProperty = ndb.DateTimeProperty
 
 
+Model = ndb.Model
+Key = ndb.Key
+
+BooleanProperty = ndb.BooleanProperty
+DateTimeProperty = ndb.DateTimeProperty
+FloatProperty = ndb.FloatProperty
+IntegerProperty = ndb.IntegerProperty
+JsonProperty = ndb.JsonProperty
+StringProperty = ndb.StringProperty
+TextProperty = ndb.TextProperty
+UserProperty = ndb.UserProperty
+
+
+def put_multi(models):
+    """Stores a sequence of Model instances.
+
+    Args:
+        models: datastore_services.Model. A sequence of Model instances.
+
+    Returns:
+        list(str). A list with the stored keys.
+    """
+    return ndb.put_multi(models)
+
+
+def put_multi_async(models, update_last_updated_time=True):
+    """Stores a sequence of Model instances asynchronously.
+
+    Args:
+        models: datastore_services.Model. A sequence of Model instances.
+        update_last_updated_time: bool. Whether to update the last_updated field
+            of the entities.
+
+    Returns:
+        list(future). A list of futures.
+    """
+    return ndb.put_multi_async(
+        models, update_last_updated_time=update_last_updated_time)
+
+
+def delete_multi(keys):
+    """Deletes a sequence of keys.
+
+    Args:
+        keys: list(str). A sequence of keys.
+
+    Returns:
+        list(None). A list of Nones, one per deleted model.
+    """
+    return ndb.delete_multi(keys)
+
+
+def transaction(callback):
+    """Run a callback in a transaction.
+
+    To pass arguments to a callback function, use a lambda, for example:
+
+    def my_callback(key, inc): do_something()
+    transaction(lambda: my_callback(Key(...), 1))
+
+    Args:
+        callback: callable. A function or tasklet to be called.
+
+    Returns:
+        *. Whatever callback() returns.
+
+    Raises:
+        Exception. Whatever callback() raises, or
+            datastore_errors.TransactionFailedError when the transaction failed.
+    """
+    return ndb.transaction(
+        callback, xg=True, propagation=ndb.TransactionOptions.ALLOWED)
+
+
+def query_everything():
+    """Returns a query that targets every single entity in the datastore."""
+    return ndb.Query()
+
+
+def all_of(*nodes):
+    """Returns a query node which performs a boolean AND on their conditions.
+
+    Args:
+        *nodes: ndb.Node. The nodes to combine.
+
+    Returns:
+        ndb.Node. A node combining the conditions using boolean AND.
+    """
+    return ndb.AND(*nodes)
+
+
+def any_of(*nodes):
+    """Returns a query node which performs a boolean OR on their conditions.
+
+    Args:
+        *nodes: ndb.Node. The nodes to combine.
+
+    Returns:
+        ndb.Node. A node combining the conditions using boolean OR.
+    """
+    return ndb.OR(*nodes)
+
+
 def make_cursor(urlsafe_cursor=None):
     """Makes an immutable cursor that points to a relative position in a query.
 

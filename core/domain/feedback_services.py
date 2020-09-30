@@ -27,18 +27,17 @@ from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (feedback_models, email_models, suggestion_models) = (
     models.Registry.import_models(
         [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
+
 datastore_services = models.Registry.import_datastore_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
@@ -333,7 +332,8 @@ def _get_threads_user_info_keys(thread_ids):
         thread_ids: list(str). The ids of the threads.
 
     Returns:
-        list(ndb.Keys). The keys of the feedback thread user model.
+        list(datastore_services.Key). The keys of the feedback thread user
+        model.
     """
     if thread_ids:
         return feedback_models.GeneralFeedbackThreadUserModel.query(
@@ -361,14 +361,17 @@ def delete_threads_for_multiple_entities(entity_type, entity_ids):
     for thread in threads:
         for message in get_messages(thread.id):
             model_keys.append(
-                ndb.Key(feedback_models.GeneralFeedbackMessageModel, message.id)
+                datastore_services.Key(
+                    feedback_models.GeneralFeedbackMessageModel, message.id)
             )
         model_keys.append(
-            ndb.Key(feedback_models.GeneralFeedbackThreadModel, thread.id)
+            datastore_services.Key(
+                feedback_models.GeneralFeedbackThreadModel, thread.id)
         )
         if thread.has_suggestion:
             model_keys.append(
-                ndb.Key(suggestion_models.GeneralSuggestionModel, thread.id)
+                datastore_services.Key(
+                    suggestion_models.GeneralSuggestionModel, thread.id)
             )
 
     model_keys += _get_threads_user_info_keys([thread.id for thread in threads])
@@ -376,10 +379,11 @@ def delete_threads_for_multiple_entities(entity_type, entity_ids):
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         for entity_id in entity_ids:
             model_keys.append(
-                ndb.Key(feedback_models.FeedbackAnalyticsModel, entity_id)
+                datastore_services.Key(
+                    feedback_models.FeedbackAnalyticsModel, entity_id)
             )
 
-    ndb.delete_multi(model_keys)
+    datastore_services.delete_multi(model_keys)
 
 
 def update_messages_read_by_the_user(user_id, thread_id, message_ids):
@@ -800,7 +804,7 @@ def enqueue_feedback_message_batch_email_task(user_id):
     Args:
         user_id: str. The user to be notified.
     """
-    taskqueue_services.enqueue_email_task(
+    taskqueue_services.enqueue_task(
         feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, {'user_id': user_id},
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
@@ -817,7 +821,7 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
         'user_id': user_id,
         'reference_dict': reference.to_dict()
     }
-    taskqueue_services.enqueue_email_task(
+    taskqueue_services.enqueue_task(
         feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS, payload, 0)
 
 
@@ -838,7 +842,7 @@ def _enqueue_feedback_thread_status_change_email_task(
         'old_status': old_status,
         'new_status': new_status
     }
-    taskqueue_services.enqueue_email_task(
+    taskqueue_services.enqueue_task(
         feconf.TASK_URL_FEEDBACK_STATUS_EMAILS, payload, 0)
 
 

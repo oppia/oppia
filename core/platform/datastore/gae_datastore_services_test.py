@@ -114,3 +114,33 @@ class MockDatetimeForDatastoreTests(test_utils.GenericTestBase):
             test_model.put()
 
         self.assertEqual(test_model.datetime_property, mocked_now)
+
+
+class TransactionTests(test_utils.GenericTestBase):
+    """Tests for running callbacks in a transaction."""
+
+    def test_returns_value_of_callback(self):
+        self.assertEqual(gae_datastore_services.transaction(lambda: 1), 1)
+
+    def test_returns_none_from_void_callback(self):
+        def do_nothing():
+            """Does nothing."""
+
+            pass
+
+        self.assertIsNone(gae_datastore_services.transaction(do_nothing))
+
+    def test_raises_exception_from_callback(self):
+        def raise_exception():
+            """Raises an Exception."""
+
+            raise Exception('uh-oh!')
+
+        with self.assertRaisesRegexp(Exception, 'uh-oh!'):
+            gae_datastore_services.transaction(raise_exception)
+
+    def test_returns_value_of_nested_transaction(self):
+        self.assertEqual(
+            gae_datastore_services.transaction(
+                lambda: gae_datastore_services.transaction(lambda: 1)),
+            1)
