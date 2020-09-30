@@ -4,6 +4,8 @@ threadsafe: true
 service: cloud-datastore-admin
 
 libraries:
+- name: requests
+  version: '2.24.0'
 - name: webapp2
   version: '2.5.2'
 
