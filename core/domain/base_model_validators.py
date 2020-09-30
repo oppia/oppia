@@ -308,14 +308,14 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
         """
         if item.created_on > (
-                item.last_updated - datetime.timedelta(seconds=2)):
+                item.last_updated + datetime.timedelta(seconds=2)):
             cls._add_error(
                 ERROR_CATEGORY_TIME_FIELD_CHECK,
                 'Entity id %s: The created_on field has a value %s which '
                 'is greater than the value %s of last_updated field'
                 % (item.id, item.created_on, item.last_updated))
 
-        current_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+        current_datetime = datetime.datetime.utcnow() + datetime.timedelta(
             seconds=2)
         if item.last_updated > current_datetime:
             cls._add_error(
