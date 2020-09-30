@@ -108,7 +108,8 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to remove feedback analytics models for
     deleted explorations.
-    Note: This job cannot be deleted until issue #10809 is fixed.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
     """
 
     @classmethod
@@ -135,7 +136,8 @@ class CleanUpGeneralFeedbackThreadModelOneOffJob(
     """One-off job to clean up GeneralFeedbackThreadModel by removing
     the model if the target model for which feedback was created is
     deleted. Target model can be exploration, question, skill or topic.
-    Note: This job cannot be deleted until issue #10809 is fixed.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
     """
 
     @classmethod
