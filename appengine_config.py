@@ -21,12 +21,16 @@ import os
 import sys
 
 import pkg_resources
+import requests_toolbelt.adapters.appengine
 from google.appengine.ext import vendor
+
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
 THIRD_PARTY_PATH = os.path.join(ROOT_PATH, 'third_party')
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 OPPIA_TOOLS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools')
+THIRD_PARTY_PYTHON_LIBS_PATH = os.path.join(THIRD_PARTY_PATH, 'python_libs')
+
 
 # oppia_tools/ is available locally (in both dev and prod mode). However,
 # on the GAE production server, oppia_tools/ is not available, and the default
@@ -42,14 +46,14 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
 
+
 # Google App Engine (GAE) uses its own virtual environment that sets up the
 # python library system path using their third party python library, vendor. In
 # order to inform GAE of the packages that are required for Oppia, we need to
 # add it using the vendor library. More information can be found here:
 # https://cloud.google.com/appengine/docs/standard/python/tools/using-libraries-python-27
-vendor.add(os.path.join(THIRD_PARTY_PATH, 'python_libs'))
-pkg_resources.working_set.add_entry(
-    os.path.join(THIRD_PARTY_PATH, 'python_libs'))
+vendor.add(THIRD_PARTY_PYTHON_LIBS_PATH)
+pkg_resources.working_set.add_entry(THIRD_PARTY_PYTHON_LIBS_PATH)
 
 # It is necessary to reload the six module because of a bug in the google cloud
 # ndb imports. More details can be found here:
@@ -58,3 +62,35 @@ pkg_resources.working_set.add_entry(
 # six python path to the app engine vendor first.
 import six # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 reload(six) # pylint: disable=reload-builtin
+
+
+# For some reason, get_distribution returns an empty list in the prod
+# environment. We need to monkeypatch this function so that prod deployments
+# work. Otherwise, pkg_resources.get_distribution('google-api-core').version in
+# google/api_core/__init__.py throws a DistributionNotFound error, and
+# similarly for pkg_resources.get_distribution("google-cloud-tasks").version in
+# google/cloud/tasks_v2/gapic/cloud_tasks_client.py, which results in the
+# entire application being broken on production.
+requests_toolbelt.adapters.appengine.monkeypatch()
+old_get_distribution = pkg_resources.get_distribution
+
+
+def monkeypatched_get_distribution(*args, **kwargs):
+    try:
+        return old_get_distribution(*args, **kwargs)
+    except:
+        class Mock(object):
+            pass
+
+        if args == ('google-api-core',):
+            mock = Mock()
+            mock.version = '1.22.2'
+            return mock
+        elif args == ('google-cloud-tasks',):
+            mock = Mock()
+            mock.version = '1.5.0'
+            return mock
+        else:
+            raise
+
+pkg_resources.get_distribution = monkeypatched_get_distribution
