@@ -146,11 +146,11 @@ export class ThreadDataService {
             target_type: 'exploration',
             target_id: this.contextService.getExplorationId()
           }
-        });
+        }).toPromise();
       // TODO(#8016): Move this
       // this.http call to a backend-api.service with unit
       // tests.
-      let threadsPromise = this.http.get(this.getThreadListHandlerUrl());
+      let threadsPromise = this.http.get(this.getThreadListHandlerUrl()).toPromise();
 
       return Promise.all([suggestionsPromise, threadsPromise])
         .then(response => {
@@ -178,6 +178,10 @@ export class ThreadDataService {
         }, (err) => {
           throw ('Error on retrieving feedback threads.');
         });
+    }
+
+    errorCallback(error):void{
+      throw (error)
     }
 
     getMessagesAsync(
@@ -249,7 +253,11 @@ export class ThreadDataService {
       // tests.
       return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
         thread_id: threadId
-      });
+      }).toPromise().then((response) => {
+        
+        }, (errorResponse) => {
+        this.errorCallback(errorResponse.error.error);
+      })
     }
 
     addNewMessageAsync(
