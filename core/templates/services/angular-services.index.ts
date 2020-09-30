@@ -329,6 +329,7 @@ import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { HttpService } from 'services/http.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementsService } from 'services/improvements.service';
@@ -506,6 +507,7 @@ export const angularServices: [string, unknown][] = [
   ['HighBounceRateTaskObjectFactory', HighBounceRateTaskObjectFactory],
   ['HintObjectFactory', HintObjectFactory],
   ['HtmlEscaperService', HtmlEscaperService],
+  ['HttpService', HttpService],
   ['I18nLanguageCodeService', I18nLanguageCodeService],
   ['IdGenerationService', IdGenerationService],
   ['ImageClickInputRulesService', ImageClickInputRulesService],
