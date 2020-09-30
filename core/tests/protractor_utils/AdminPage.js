@@ -94,9 +94,8 @@ var AdminPage = function() {
 
     this.reloadCollection = async function(collectionId) {
       this.get();
-      await (
-        await reloadCollectionButtons.get(collectionId)
-      ).click();
+      var ReloadCollectionButtons = await reloadCollectionButtons.get(collectionId);
+      await action.click('reloadCollectionButtons',ReloadCollectionButtons);
       await general.acceptAlert();
       // Time is needed for the reloading to complete.
       await waitFor.textToBePresentInElement(
@@ -115,7 +114,8 @@ var AdminPage = function() {
 
         // We use match here in case there is whitespace around the name.
         if (title.match(name)) {
-          await getExplorationElementReloadButton(explorationElement).click();
+          var getExplorationElementReloadButton = getExplorationElementReloadButton(explorationElement);
+          await action.click("GetExplorationElementReloadButton",getExplorationElementReloadButton);
           await general.acceptAlert();
           // Time is needed for the reloading to complete.
           await waitFor.textToBePresentInElement(
