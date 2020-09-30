@@ -6,12 +6,11 @@
 </div>
 <form ng-submit="save()">
   <div class="modal-body create-new-topic-form">
-    <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
-      <div><span class="create-new-topic-input-label">Name</span></div>
-      <input class="protractor-test-new-topic-name-field"
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Name*</span></div>
+      <input class="protractor-test-new-topic-name-field required"
              ng-model="newlyCreatedTopic.name"
              maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>"
-             ng-class="{'is-invalid': topicNameExists}"
              ng-change="onTopicNameChange()" autofocus>
       <div class="oppia-input-box-subtitle">
         <em>
@@ -25,11 +24,11 @@
       </div>
     </div>
     <div class="create-new-topic-input-field">
-      <div><span class="create-new-topic-input-label">Topic URL Fragment</span></div>
-      <input class="protractor-test-new-topic-url-fragment-field"
+      <div><span class="create-new-topic-input-label">Topic URL Fragment*</span></div>
+      <input class="protractor-test-new-topic-url-fragment-field required"
              ng-model="newlyCreatedTopic.urlFragment"
              maxlength="<[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]>"
-             ng-class="{'is-invalid': topicUrlFragmentExists}"
+             ng-class="{'invalid-field': topicUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)}"
              ng-change="onTopicUrlFragmentChange()">
       <div>
         <span class="oppia-input-box-subtitle">
@@ -47,8 +46,8 @@
       </div>
     </div>
     <div class="create-new-topic-input-field">
-      <div><span class="create-new-topic-input-label">Description</span></div>
-      <textarea class="protractor-test-new-topic-description-field"
+      <div><span class="create-new-topic-input-label">Description*</span></div>
+      <textarea class="protractor-test-new-topic-description-field required"
                 rows="4" cols="50" placeholder="Enter description"
                 maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                 ng-model="newlyCreatedTopic.description">
@@ -60,7 +59,7 @@
       </div>
     </div>
     <div class="create-new-topic-input-field">
-      <label class="create-new-topic-input-label">Topic Thumbnail</label>
+      <label class="create-new-topic-input-label">Topic Thumbnail*</label>
       <thumbnail-uploader preview-title="newlyCreatedTopic.name"
                           aspect-ratio="'4:3'"
                           disabled="false"
@@ -79,6 +78,10 @@
   </div>
 </form>
 <style>
+  .create-new-topic-form .ng-touched.invalid-field,
+  .create-new-topic-form .ng-touched.ng-empty.required {
+     outline: 1px solid #F00;
+  }
   .create-new-topic-form .create-new-topic-input-field {
      margin: 10px 0;
   }
@@ -104,7 +107,8 @@
     .create-new-topic .modal-content {
       border: 0;
       border-radius: 0;
-      height: 100vh;
+      display: block;
+      min-height: 100vh;
     }
     .create-new-topic .modal-header {
       align-items: center;

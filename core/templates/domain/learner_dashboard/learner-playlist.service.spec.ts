@@ -194,7 +194,7 @@ describe('Learner playlist service factory', function() {
       ['1', '2']);
   });
 
-  it('should remove a collection from learner playlist ', function() {
+  it('should remove a collection from learner playlist', function() {
     spyOn($uibModal, 'open').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve();

@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 
 from core.domain import takeout_domain_jobs_one_off
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -30,8 +31,6 @@ from google.appengine.ext import ndb
 
 (base_models, config_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config])
-
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
@@ -48,11 +47,11 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
             .SnapshotMetadataCommitMsgMigrationOneOffJob.enqueue(job_id))
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
         stringified_output = (
             takeout_domain_jobs_one_off

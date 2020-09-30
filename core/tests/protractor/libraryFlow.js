@@ -68,17 +68,17 @@ describe('Library pages tour', function() {
     await users.logout();
   };
 
-  it('visits the search page', async function() {
+  it('should visit the search page', async function() {
     await libraryPage.get();
     await libraryPage.findExploration(SEARCH_TERM);
     expect(await browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 
-  it('visits the library index page', async function() {
+  it('should visit the library index page', async function() {
     await libraryPage.get();
   });
 
-  it('visits the top rated page', async function() {
+  it('should visit the top rated page', async function() {
     // To visit the top rated page, at least one
     // exploration has to be rated by the user.
     await rateExploration();
@@ -89,7 +89,7 @@ describe('Library pages tour', function() {
       'community-library/top-rated');
   });
 
-  it('visits the recent explorations page', async function() {
+  it('should visit the recent explorations page', async function() {
     await visitRecentlyPublishedPage();
     expect(await browser.getCurrentUrl()).toContain(
       'community-library/recently-published');
