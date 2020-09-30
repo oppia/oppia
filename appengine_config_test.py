@@ -36,8 +36,8 @@ class AppengineConfigTests(test_utils.GenericTestBase):
 
         Raises:
             DistributionNotFound. This is always raised, in order to simulate
-            the case where the distribution does not exist (which is what
-            currently happens in a prod environment).
+                the case where the distribution does not exist (which is what
+                currently happens in a prod environment).
         """
         raise pkg_resources.DistributionNotFound(distribution_name, 'tests')
 
