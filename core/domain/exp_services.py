@@ -54,6 +54,7 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -61,7 +62,6 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -780,9 +780,8 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        delete_explorations_from_subscribed_users,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        exploration_ids)
+        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):
@@ -1579,6 +1578,16 @@ def get_user_exploration_data(
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
 
+    # Retrieve all classifiers for the exploration.
+    state_classifier_mapping = {}
+    classifier_training_jobs = (
+        classifier_services.get_classifier_training_jobs(
+            exploration_id, exploration.version, exploration.states))
+    for index, state_name in enumerate(exploration.states):
+        if classifier_training_jobs[index] is not None:
+            state_classifier_mapping[state_name] = (
+                classifier_training_jobs[index].to_player_dict())
+
     editor_dict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
         'category': exploration.category,
@@ -1602,6 +1611,7 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
+        'state_classifier_mapping': state_classifier_mapping
     }
 
     return editor_dict

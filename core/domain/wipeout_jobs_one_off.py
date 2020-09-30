@@ -38,10 +38,10 @@ class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function for this job."""
         pending_deletion_request = wipeout_service.get_pending_deletion_request(
             pending_deletion_request_model.id)
-        yield (
-            wipeout_service.run_user_deletion(pending_deletion_request),
-            pending_deletion_request.user_id
-        )
+        # The final status of the deletion. Either 'SUCCESS' or 'ALREADY DONE'.
+        deletion_status = wipeout_service.run_user_deletion(
+            pending_deletion_request)
+        yield (deletion_status, pending_deletion_request.user_id)
 
     @staticmethod
     def reduce(key, values):
@@ -71,10 +71,11 @@ class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # FullyCompleteUserDeletionOneOffJob.
         pending_deletion_request = wipeout_service.get_pending_deletion_request(
             pending_deletion_request_model.id)
-        yield (
-            wipeout_service.run_user_verification(pending_deletion_request),
-            pending_deletion_request.user_id
-        )
+        # The final status of the completion. Either 'NOT DELETED', 'SUCCESS',
+        # or 'FAILURE'.
+        completion_status = wipeout_service.run_user_deletion_completion(
+            pending_deletion_request)
+        yield (completion_status, pending_deletion_request.user_id)
 
     @staticmethod
     def reduce(key, values):

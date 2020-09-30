@@ -49,10 +49,7 @@ angular.module('oppia').directive('adminMiscTab', [
         const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
         const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
         const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
-          '/numberofpendingdeletionrequests');
-        const DELETE_ACCOUNT_HANDLER_URL = '/deleteaccounthandler';
-        const VERIFY_ACCOUNT_DELETED_HANDLER_URL = (
-          '/verifyaccountdeletedhandler');
+          '/numberofdeletionrequestshandler');
         const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
@@ -212,42 +209,12 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.getNumberOfPendingDeletionRequestModels = function() {
           ctrl.setStatusMessage(
-            'Getting the number of PendingDeletionRequestModels...');
-          $http.get(
-            NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {email: ctrl.email}).then(
+            'Getting the number of users that are being deleted...');
+          $http.get(NUMBER_OF_DELETION_REQUEST_HANDLER_URL).then(
             function(response) {
               ctrl.setStatusMessage(
-                'The number of PendingDeletionRequestModels is:' +
+                'The number of users that are being deleted is: ' +
                 response.data.number_of_pending_deletion_models);
-            },
-            function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            }
-          );
-        };
-
-        ctrl.deleteAccount = function() {
-          ctrl.setStatusMessage('Running the deletion...');
-          $http.post(DELETE_ACCOUNT_HANDLER_URL, {email: ctrl.email}).then(
-            function(response) {
-              ctrl.setStatusMessage(
-                'Deletion run with result:' + response.data.result);
-            },
-            function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            }
-          );
-        };
-
-        ctrl.verifyAccountDeleted = function() {
-          ctrl.setStatusMessage('Running the verification...');
-          $http.post(
-            VERIFY_ACCOUNT_DELETED_HANDLER_URL, {email: ctrl.email}).then(
-            function(response) {
-              ctrl.setStatusMessage(
-                'Verification run with result:' + response.data.result);
             },
             function(errorResponse) {
               ctrl.setStatusMessage(

@@ -49,9 +49,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
-    activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    activity_jobs_one_off.RemoveCommitUsernamesOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
@@ -80,6 +78,7 @@ ONE_OFF_JOB_MANAGERS = [
     question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    recommendations_jobs_one_off.CleanUpExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
@@ -94,6 +93,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
+    suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgMigrationOneOffJob,
@@ -145,6 +145,7 @@ AUDIT_JOB_MANAGERS = [
         .ConfigPropertySnapshotMetadataModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
@@ -176,6 +177,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralVoiceoverApplicationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CommunityContributionStatsModelAuditOneOffJob,
     prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
@@ -228,7 +230,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .StateTrainingJobsMappingModelAuditOneOffJob
+        .TrainingJobExplorationMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,

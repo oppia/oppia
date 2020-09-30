@@ -1012,7 +1012,11 @@ class UpdateUsernameHandler(base.BaseHandler):
 
 
 class NumberOfDeletionRequestsHandler(base.BaseHandler):
-    """Handler for deleting account via admin page."""
+    """Handler for getting the number of pending deletion requests via admin
+    page.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -1020,55 +1024,3 @@ class NumberOfDeletionRequestsHandler(base.BaseHandler):
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
         })
-
-
-class DeleteAccountHandler(base.BaseHandler):
-    """Handler for deleting account via admin page."""
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        email = self.payload.get('email', None)
-
-        if email is None:
-            raise self.InvalidInputException(
-                'Invalid request: email must be specified')
-
-        if not isinstance(email, python_utils.UNICODE):
-            raise self.InvalidInputException(
-                'Expected email to be a unicode string, received %s' % email)
-
-        pending_deletion_request = (
-            wipeout_service.get_pending_deletion_request_by_email(email))
-        if pending_deletion_request is None:
-            raise self.InvalidInputException(
-                'There is no pending deletion request for email: %s' % email)
-
-        result = wipeout_service.run_user_deletion(pending_deletion_request)
-
-        self.render_json({'result': result})
-
-
-class VerifyAccountDeletedHandler(base.BaseHandler):
-    """Handler for verifying that account was deleted via admin page."""
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        email = self.payload.get('email', None)
-
-        if email is None:
-            raise self.InvalidInputException(
-                'Invalid request: email must be specified')
-
-        if not isinstance(email, python_utils.UNICODE):
-            raise self.InvalidInputException(
-                'Expected email to be a unicode string, received %s' % email)
-
-        pending_deletion_request = (
-            wipeout_service.get_pending_deletion_request_by_email(email))
-        if pending_deletion_request is None:
-            raise self.InvalidInputException(
-                'There is no pending deletion request for email: %s' % email)
-
-        result = wipeout_service.run_user_verification(pending_deletion_request)
-
-        self.render_json({'result': result})

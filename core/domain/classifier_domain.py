@@ -69,18 +69,16 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                     'answers': ['a2', 'a3']
                 }
             ]
-        algorithm_version: int. The version of the classifier algorithm to be
-            trained. The algorithm version determines the training algorithm,
-            format in which trained parameters are stored along with the
-            prediction algorithm to be used. We expect this to change only when
-            the classifier algorithm is updated. This depends on the
-            algorithm ID.
+        classifier_data: dict. The actual classifier model used for
+            classification purpose.
+        data_schema_version: int. Schema version of the data used by the
+            classifier. This depends on the algorithm ID.
     """
 
     def __init__(
             self, job_id, algorithm_id, interaction_id, exp_id,
             exp_version, next_scheduled_check_time, state_name, status,
-            training_data, algorithm_version):
+            training_data, classifier_data, data_schema_version):
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
@@ -97,13 +95,14 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                 time to check the job.
             state_name: str. The name of the state for which the classifier
                 will be generated.
-            status: str. The status of the training job request. This can be
-                either NEW (default), PENDING (when a job has been picked up)
-                or COMPLETE.
-            training_data: list(dict). The training data that is used for
-                training the classifier. This is populated lazily when the job
-                request is picked up by the VM. The list contains dicts where
-                each dict represents a single training data group, for example:
+            status: str. The status of the training job request. This can
+                be either NEW (default), PENDING (when a job has been
+                picked up) or COMPLETE.
+            training_data: list(dict). The training data that is used
+                for training the classifier. This is populated lazily
+                when the job request is picked up by the VM. The list
+                contains dicts where each dict represents a single
+                training data group, for example:
                 training_data = [
                     {
                         'answer_group_index': 1,
@@ -114,8 +113,10 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                         'answers': ['a2', 'a3']
                     }
                 ]
-            algorithm_version: int. Schema version of the classifier model to
-                be trained. This depends on the algorithm ID.
+            classifier_data: dict. The actual classifier model used for
+                classification purpose.
+            data_schema_version: int. Schema version of the data used by the
+                classifier. This depends on the algorithm ID.
         """
         self._job_id = job_id
         self._algorithm_id = algorithm_id
@@ -126,7 +127,8 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         self._state_name = state_name
         self._status = status
         self._training_data = copy.deepcopy(training_data)
-        self._algorithm_version = algorithm_version
+        self._classifier_data = classifier_data
+        self._data_schema_version = data_schema_version
 
     @property
     def job_id(self):
@@ -230,24 +232,24 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         return self._training_data
 
     @property
-    def classifier_data_filename(self):
-        """Returns file name of the GCS file which stores classifier data
-        for this training job.
+    def classifier_data(self):
+        """Returns the classifier data.
 
         Returns:
-            str. The GCS file name of the classifier data.
+            dict. The actual classifier model used for
+            classification purpose.
         """
-        return '%s-classifier-data.pb.xz' % (self.job_id)
+        return self._classifier_data
 
     @property
-    def algorithm_version(self):
-        """Returns the algorithm version of the classifier.
+    def data_schema_version(self):
+        """Returns the schema version of the data used by the classifier.
 
         Returns:
-            int. Version of the classifier algorithm. This depends on the
-            algorithm ID.
+            int. Schema version of the data used by the
+            classifier. This depends on the algorithm ID.
         """
-        return self._algorithm_version
+        return self._data_schema_version
 
     def update_status(self, status):
         """Updates the status attribute of the ClassifierTrainingJob domain
@@ -263,6 +265,16 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                 'The status change %s to %s is not valid.' % (
                     initial_status, status))
         self._status = status
+
+    def update_classifier_data(self, classifier_data):
+        """Updates the classifier_data attribute of the ClassifierTrainingJob
+        domain object.
+
+        Args:
+            classifier_data: dict. The classifier model used for classification.
+        """
+
+        self._classifier_data = classifier_data
 
     def to_dict(self):
         """Constructs a dict representation of training job domain object.
@@ -281,7 +293,23 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             'state_name': self._state_name,
             'status': self._status,
             'training_data': self._training_data,
-            'algorithm_version': self._algorithm_version
+            'classifier_data': self._classifier_data,
+            'data_schema_version': self._data_schema_version
+        }
+
+    def to_player_dict(self):
+        """Constructs a dict containing a training job domain object's
+        algorithm_id, classifier_data and data_schema_version.
+
+        Returns:
+            dict. A dict containing training job domain object's algorithm_id,
+            classifier_data and data_schema_version.
+        """
+
+        return {
+            'algorithm_id': self._algorithm_id,
+            'classifier_data': self._classifier_data,
+            'data_schema_version': self._data_schema_version
         }
 
     def validate(self):
@@ -359,24 +387,25 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                     'Expected answers to be a list, received %s' %
                     grouped_answers['answers'])
 
-        if not isinstance(self.algorithm_version, int):
+        # Classifier data can be either None (before its stored) or a dict.
+        if not isinstance(self.classifier_data, dict) and self.classifier_data:
             raise utils.ValidationError(
-                'Expected algorithm_version to be an int, received %s' %
-                self.algorithm_version)
+                'Expected classifier_data to be a dict|None, received %s' % (
+                    self.classifier_data))
+
+        if not isinstance(self.data_schema_version, int):
+            raise utils.ValidationError(
+                'Expected data_schema_version to be an int, received %s' %
+                self.data_schema_version)
 
 
-class StateTrainingJobsMapping(python_utils.OBJECT):
-    """Domain object for a state-to-training job mapping model.
+class TrainingJobExplorationMapping(python_utils.OBJECT):
+    """Domain object for a job-exploration mapping model.
 
-    This object represents a one-to-many relation between a particular state
-    of the particular version of the particular exploration and a set of
-    classifier training jobs. Each <exp_id, exp_version, state_name> is mapped
-    to an algorithm_id_to_job_id dict which maps all the valid algorithm_ids for
-    the given state to their training jobs. A state may have multiple
-    algorithm_ids valid for it: for example, one algorithm would serve Oppia
-    web users while another might support Oppia mobile or Android user. The
-    number of algorithm_ids that are valid for a given state depends upon the
-    interaction_id of that state.
+    A job-exploration mapping is a one-to-one relation between the
+    attributes in an exploration to the training job model for the classifier it
+    needs to use. The mapping is from <exp_id, exp_version, state_name> to the
+    job_id.
 
     Attributes:
         exp_id: str. ID of the exploration.
@@ -384,13 +413,12 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
             classifier's training job was created.
         state_name: str. The name of the state to which the classifier
             belongs.
-        algorithm_ids_to_job_ids: dict(str, str). Mapping of algorithm IDs to
-            corresponding unique training job IDs.
+        job_id. str. The unique ID of the training job in the
+            job-exploration mapping.
     """
 
-    def __init__(
-            self, exp_id, exp_version, state_name, algorithm_ids_to_job_ids):
-        """Constructs a StateTrainingJobsMapping domain object.
+    def __init__(self, exp_id, exp_version, state_name, job_id):
+        """Constructs a TrainingJobExplorationMapping domain object.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -398,14 +426,12 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
                 corresponding classifier's training job was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            algorithm_ids_to_job_ids: dict(str, str). The mapping from
-                algorithm IDs to the IDs of their corresponding classifier
-                training jobs.
+            job_id: str. The unique ID of the training job.
         """
         self._exp_id = exp_id
         self._exp_version = exp_version
         self._state_name = state_name
-        self._algorithm_ids_to_job_ids = algorithm_ids_to_job_ids
+        self._job_id = job_id
 
     @property
     def exp_id(self):
@@ -436,21 +462,21 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
         return self._state_name
 
     @property
-    def algorithm_ids_to_job_ids(self):
-        """Returns the algorithm_ids_to_job_ids of the training jobs.
+    def job_id(self):
+        """Returns the job_id of the training job.
 
         Returns:
-            dict(str, str). Mapping of algorithm IDs to corresponding unique
-            training job IDs.
+            str. The unique ID of the training job in the
+            job-exploration mapping.
         """
-        return self._algorithm_ids_to_job_ids
+        return self._job_id
 
     def to_dict(self):
-        """Constructs a dict representation of StateTrainingJobsMapping
+        """Constructs a dict representation of TrainingJobExplorationMapping
         domain object.
 
         Returns:
-            dict. A dict representation of StateTrainingJobsMapping domain
+            dict. A dict representation of TrainingJobExplorationMapping domain
             object.
         """
 
@@ -458,7 +484,7 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
             'exp_id': self._exp_id,
             'exp_version': self._exp_version,
             'state_name': self.state_name,
-            'algorithm_ids_to_job_ids': self._algorithm_ids_to_job_ids
+            'job_id': self._job_id
         }
 
     def validate(self):
@@ -478,21 +504,7 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
                 'Expected state_name to be a string, received %s' % (
                     self.state_name))
 
-        if not isinstance(self.algorithm_ids_to_job_ids, dict):
+        if not isinstance(self.job_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected algorithm_ids_to_job_ids to be a dict, '
-                'received %s' % (
-                    self.algorithm_ids_to_job_ids))
-
-        for algorithm_id in self.algorithm_ids_to_job_ids:
-            if not isinstance(algorithm_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected algorithm_id to be str, received %s' % (
-                        algorithm_id))
-
-            if not isinstance(
-                    self.algorithm_ids_to_job_ids[algorithm_id],
-                    python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected job_id to be str, received %s' % (
-                        self.algorithm_ids_to_job_ids[algorithm_id]))
+                'Expected job_id to be a string, received %s' % (
+                    self.job_id))

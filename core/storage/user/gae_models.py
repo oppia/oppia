@@ -28,10 +28,10 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -269,7 +269,10 @@ class UserSettingsModel(base_models.BaseModel):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
                 for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
-            if not cls.get_by_id(new_id):
+            if (
+                    not cls.get_by_id(new_id) and
+                    not DeletedUserModel.get_by_id(new_id)
+            ):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -1839,7 +1842,7 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=cursor)
+        cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
@@ -2300,7 +2303,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     email = ndb.StringProperty(required=True, indexed=True)
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
-    role = ndb.StringProperty(required=True)
+    role = ndb.StringProperty(required=True, indexed=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
 
@@ -2354,6 +2357,32 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether PendingDeletionRequestModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+
+class DeletedUserModel(base_models.BaseModel):
+    """Model for storing deleted user IDs."""
+
+    @staticmethod
+    def get_deletion_policy():
+        """DeletedUserModel contains only IDs that were deleted."""
+        return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def get_export_policy(cls):
+        """DeletedUserModel contains only IDs that were deleted."""
+        return dict(super(cls, cls).get_export_policy(), **{})
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether DeletedUserModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
