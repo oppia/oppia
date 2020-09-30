@@ -114,7 +114,6 @@ import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/l
 import { NonExistentActivitiesObjectFactory } from 'domain/learner_dashboard/non-existent-activities-object.factory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { FeaturedTranslationLanguageObjectFactory } from 'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
@@ -607,7 +606,6 @@ export const angularServices: [string, unknown][] = [
   ['RatioExpressionInputRulesService', RatioExpressionInputRulesService],
   ['RatioExpressionInputValidationService',
     RatioExpressionInputValidationService],
-  ['RatioObjectFactory', RatioObjectFactory],
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
   ['ReadOnlyStoryNodeObjectFactory', ReadOnlyStoryNodeObjectFactory],
   ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],

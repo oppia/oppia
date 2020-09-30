@@ -433,7 +433,6 @@ import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -877,7 +876,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ratioExpressionInputRulesService: RatioExpressionInputRulesService;
   static ratioExpressionInputValidationService:
     RatioExpressionInputValidationService;
-  static ratioObjectFactory: RatioObjectFactory;
   static ratingComputationService: RatingComputationService;
   static readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory;
   static readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory;
@@ -1251,7 +1249,6 @@ private readOnlyCollectionBackendApiService:
 private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
 private ratioExpressionInputValidationService:
   RatioExpressionInputValidationService,
-private ratioObjectFactory: RatioObjectFactory,
 private ratingComputationService: RatingComputationService,
 private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory,
 private readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory,
@@ -1778,7 +1775,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.ratioExpressionInputRulesService);
     OppiaAngularRootComponent.ratioExpressionInputValidationService = (
       this.ratioExpressionInputValidationService);
-    OppiaAngularRootComponent.ratioObjectFactory = this.ratioObjectFactory;
     OppiaAngularRootComponent.ratingComputationService = (
       this.ratingComputationService);
     OppiaAngularRootComponent.readOnlyStoryNodeObjectFactory = (

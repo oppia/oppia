@@ -13,27 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview unit tests for the ratio object type factory service
+ * @fileoverview unit tests for the Ratio Model
  */
 
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { Ratio, RatioObjectFactory } from
-  'domain/objects/RatioObjectFactory';
+import { Ratio } from
+  'domain/objects/ratio.model';
 
 describe('Ratio Object Factory', () => {
   let errors = null;
-  let ratio: RatioObjectFactory = null;
 
   beforeEach(() => {
     errors = ObjectsDomainConstants.RATIO_PARSING_ERRORS;
-    ratio = new RatioObjectFactory();
   });
 
   describe('.fromList()', () => {
     it('should create a new object from list', () => {
       const ratioObject = [1, 2, 3];
-      const createdRatio = ratio.fromList(ratioObject);
+      const createdRatio = Ratio.fromList(ratioObject);
 
       expect(createdRatio.components).toEqual(ratioObject);
     });
@@ -60,85 +58,85 @@ describe('Ratio Object Factory', () => {
 
   describe('.fromRawInputString()', () => {
     it('should parse valid strings', () => {
-      expect(ratio.fromRawInputString('1:2')).toEqual(
+      expect(Ratio.fromRawInputString('1:2')).toEqual(
         new Ratio([1, 2]));
-      expect(ratio.fromRawInputString('2:3:5')).toEqual(
+      expect(Ratio.fromRawInputString('2:3:5')).toEqual(
         new Ratio([2, 3, 5]));
-      expect(ratio.fromRawInputString('2:3:5:7:11')).toEqual(
+      expect(Ratio.fromRawInputString('2:3:5:7:11')).toEqual(
         new Ratio([2, 3, 5, 7, 11]));
-      expect(ratio.fromRawInputString('2 : 3 : 5 : 7 : 11')).toEqual(
+      expect(Ratio.fromRawInputString('2 : 3 : 5 : 7 : 11')).toEqual(
         new Ratio([2, 3, 5, 7, 11]));
-      expect(ratio.fromRawInputString('  2 :3:   5')).toEqual(
+      expect(Ratio.fromRawInputString('  2 :3:   5')).toEqual(
         new Ratio([2, 3, 5]));
     });
 
     it('should throw errors for invalid character', () => {
       expect(() => {
-        ratio.fromRawInputString('3:b');
+        Ratio.fromRawInputString('3:b');
       }).toThrowError(errors.INVALID_CHARS);
       expect(() => {
-        ratio.fromRawInputString('a:3');
+        Ratio.fromRawInputString('a:3');
       }).toThrowError(errors.INVALID_CHARS);
       expect(() => {
-        ratio.fromRawInputString('-1:3');
+        Ratio.fromRawInputString('-1:3');
       }).toThrowError(errors.INVALID_CHARS);
     });
 
     it('should throw errors for invalid format', () => {
       expect(() => {
-        ratio.fromRawInputString(':1:3');
+        Ratio.fromRawInputString(':1:3');
       }).toThrowError(errors.INVALID_FORMAT);
       expect(() => {
-        ratio.fromRawInputString('1:2:3:4:5:');
+        Ratio.fromRawInputString('1:2:3:4:5:');
       }).toThrowError(errors.INVALID_FORMAT);
       expect(() => {
-        ratio.fromRawInputString('1:');
+        Ratio.fromRawInputString('1:');
       }).toThrowError(errors.INVALID_FORMAT);
       expect(() => {
-        ratio.fromRawInputString('1');
+        Ratio.fromRawInputString('1');
       }).toThrowError(errors.INVALID_FORMAT);
     });
 
-    it('should throw errors for invalid ratio', () => {
-    // Invalid Ratio.
+    it('should throw errors for invalid Ratio', () => {
+    // Invalid ratio.
       expect(() => {
-        ratio.fromRawInputString('1:3/2');
+        Ratio.fromRawInputString('1:3/2');
       }).toThrowError(errors.NON_INTEGER_ELEMENTS);
       expect(() => {
-        ratio.fromRawInputString('1:1/2:3/2');
+        Ratio.fromRawInputString('1:1/2:3/2');
       }).toThrowError(errors.NON_INTEGER_ELEMENTS);
       expect(() => {
-        ratio.fromRawInputString('1/2:2:3:4:5');
+        Ratio.fromRawInputString('1/2:2:3:4:5');
       }).toThrowError(errors.NON_INTEGER_ELEMENTS);
       expect(() => {
-        ratio.fromRawInputString('1:2.2');
+        Ratio.fromRawInputString('1:2.2');
       }).toThrowError(errors.NON_INTEGER_ELEMENTS);
       expect(() => {
-        ratio.fromRawInputString('1.2:2');
+        Ratio.fromRawInputString('1.2:2');
       }).toThrowError(errors.NON_INTEGER_ELEMENTS);
     });
 
     it('should throw errors for invalid colons', () => {
       expect(() => {
-        ratio.fromRawInputString('1::2::3');
+        Ratio.fromRawInputString('1::2::3');
       }).toThrowError(errors.INVALID_COLONS);
       expect(() => {
-        ratio.fromRawInputString('1:2::3');
+        Ratio.fromRawInputString('1:2::3');
       }).toThrowError(errors.INVALID_COLONS);
       expect(() => {
-        ratio.fromRawInputString('1:2:::3');
+        Ratio.fromRawInputString('1:2:::3');
       }).toThrowError(errors.INVALID_COLONS);
     });
 
     it('should throw errors for ratio containing zero term', () => {
       expect(() => {
-        ratio.fromRawInputString('1:0');
+        Ratio.fromRawInputString('1:0');
       }).toThrowError(errors.INCLUDES_ZERO);
       expect(() => {
-        ratio.fromRawInputString('0:0');
+        Ratio.fromRawInputString('0:0');
       }).toThrowError(errors.INCLUDES_ZERO);
       expect(() => {
-        ratio.fromRawInputString('0:1');
+        Ratio.fromRawInputString('0:1');
       }).toThrowError(errors.INCLUDES_ZERO);
     });
   });

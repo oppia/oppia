@@ -15,22 +15,21 @@
 /**
  * @fileoverview Component for ratio editor.
  */
-
-require('domain/objects/RatioObjectFactory.ts');
+import { Ratio } from 'domain/objects/ratio.model';
 
 angular.module('oppia').component('ratioExpressionEditor', {
   bindings: {
     value: '='
   },
   template: require('./ratio-expression-editor.component.html'),
-  controller: ['RatioObjectFactory',
-    function(RatioObjectFactory) {
+  controller: ['Ratio',
+    function() {
       const ctrl = this;
       ctrl.warningText = '';
 
       ctrl.isValidRatio = function(value) {
         try {
-          ctrl.value = RatioObjectFactory.fromRawInputString(value).components;
+          ctrl.value = Ratio.fromRawInputString(value).components;
           ctrl.warningText = '';
           return true;
         } catch (parsingError) {
@@ -44,7 +43,7 @@ angular.module('oppia').component('ratioExpressionEditor', {
           ctrl.value = [1, 1];
         }
         ctrl.localValue = {
-          label: RatioObjectFactory.fromList(ctrl.value).toAnswerString()
+          label: Ratio.fromList(ctrl.value).toAnswerString()
         };
       };
     }

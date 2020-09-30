@@ -16,17 +16,9 @@
  * @fileoverview Unit tests for the ratio expression component.
  */
 
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
-
-
 describe('RatioExpression', function() {
   var RationExpressionCtrl = null;
-  var ratioObjectFactory = null;
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    ratioObjectFactory = new RatioObjectFactory();
-    $provide.value('RatioObjectFactory', ratioObjectFactory);
-  }));
   beforeEach(angular.mock.inject(function($componentController) {
     RationExpressionCtrl = $componentController('ratioExpressionEditor');
   }));
