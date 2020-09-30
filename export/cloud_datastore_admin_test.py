@@ -22,7 +22,6 @@ from export import cloud_datastore_admin
 import requests_mock
 
 from google.appengine.api import app_identity
-import requests
 import webtest
 
 
