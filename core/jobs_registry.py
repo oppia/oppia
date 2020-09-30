@@ -64,6 +64,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     exp_jobs_one_off.RegenerateMissingExpCommitLogModels,
+    exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     (
         interaction_jobs_one_off
