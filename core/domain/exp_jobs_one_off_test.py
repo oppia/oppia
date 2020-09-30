@@ -2393,31 +2393,3 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             output, [
                 '[u\'Regenerated Exploration Commit Log Model\', [u\'0\']]'])
-
-    def test_migration_job_reverts_deleted_status_for_commit_log_model(
-            self):
-        commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
-        commit_log_model.deleted = True
-        commit_log_model.put()
-
-        job_id = (
-            exp_jobs_one_off
-            .RegenerateMissingExpCommitLogModels.create_new())
-        (
-            exp_jobs_one_off
-            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            exp_jobs_one_off
-            .RegenerateMissingExpCommitLogModels.get_output(job_id))
-        commit_log_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
-        self.assertFalse(commit_log_model.deleted)
-        self.assertEqual(
-            output, [
-                '[u\'Reverted deleted status for Exploration '
-                'Commit Log Model\', [u\'0\']]'])
