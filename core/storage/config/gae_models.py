@@ -19,9 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from google.appengine.ext import ndb
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ConfigPropertySnapshotMetadataModel(
@@ -47,7 +48,7 @@ class ConfigPropertyModel(base_models.VersionedModel):
     SNAPSHOT_CONTENT_CLASS = ConfigPropertySnapshotContentModel
 
     # The property value.
-    value = ndb.JsonProperty(indexed=False)
+    value = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -89,8 +90,9 @@ class PlatformParameterModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
-    rules = ndb.JsonProperty(repeated=True)
-    rule_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    rules = datastore_services.JsonProperty(repeated=True)
+    rule_schema_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
