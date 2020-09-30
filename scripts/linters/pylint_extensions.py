@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0033.
+presubmit checks. Next message id would be C0030.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1822,129 +1822,42 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
 
 class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that there is a single space
-    between a keyword and a bracket `(` if a bracket is used. Nodes
-    tested are `If`, `IfExp`, `While`, and `Yield`.
+    between a keyword and a bracket `(` if a bracket is used. Keywords
+    tested are `if`, `elif`, `while`, and `yield`.
     """
 
-    __implements__ = interfaces.IAstroidChecker
+    __implements__ = interfaces.ITokenChecker
 
-    name = 'single-space-after-if'
+    name = 'single-space-after-keyword'
     priority = -1
     msgs = {
         'C0029': (
-            'Not using a single space after `if` statement.',
-            'single-space-after-if',
-            'Add a single space after the `if` statement.',
-        ),
-    }
-    name = 'single-space-after-elif'
-    priority = -1
-    msgs = {
-        'C0030': (
-            'Not using a single space after `elif` statement.',
-            'single-space-after-elif',
-            'Add a single space after the `elif` statement.',
-        ),
-    }
-    name = 'single-space-after-while'
-    priority = -1
-    msgs = {
-        'C0031': (
-            'Not using a single space after `while` statement.',
-            'single-space-after-while',
-            'Add a single space after the `while` statement.',
-        ),
-    }
-    name = 'single-space-after-yield'
-    priority = -1
-    msgs = {
-        'C0032': (
-            'Not using \'yield\' or a single space after `yield` statement.',
-            'single-space-after-yield',
-            'Add a single space after the `yield` statement.',
+            'Please add a single space after `%s` statement.',
+            'single-space-after-keyword',
+            'A single space should be added after a keyword.',
         ),
     }
 
-    def visit_if(self, node):
-        """Visit every `if`, and `elif` statement to make sure they are
-        followed by a single space.
+    def process_tokens(self, tokens):
+        """Custom pylint checker which makes sure that every `if`, `elif`,
+        `while`, and `yield` statement is followed by a single space.
 
         Args:
-            node: astroid.nodes.If. Node to access `If` content.
+            tokens: Token. Object to access all tokens of a module.
         """
-
-        # Check the `if` statement only if it has a parenthesis.
-        line_number = node.fromlineno
-        line = linecache.getline(node.root().file, line_number).strip()
-        if re.search(br'^if\s*\(', line):
-            parenthesis_index = line.find('(')
-            first_space_index = line.find(' ')
-            # There should be exactly one space between these indices.
-            if parenthesis_index - first_space_index != 1:
-                self.add_message('single-space-after-if', line=line_number)
-
-        # Check each `elif` that has a parenthesis.
-        for line_number in python_utils.RANGE(line_number, node.tolineno + 1):
-            line = linecache.getline(node.root().file, line_number).strip()
-            if re.search(br'^elif\s*\(', line):
-                parenthesis_index = line.find('(')
-                first_space_index = line.find(' ')
-                # There should be exactly one space between these indices.
-                if parenthesis_index - first_space_index != 1:
-                    self.add_message(
-                        'single-space-after-elif', line=line_number)
-
-    def visit_if_exp(self, node):
-        """Visit every `if` in a `value if condition else other` statement
-        to make sure they are followed by a single space.
-
-        Args:
-            node: astroid.nodes.IfExp. Node to access `IfExp` content.
-        """
-
-        # Check the `if` statement only if it has a parenthesis.
-        line_number = node.fromlineno
-        line = linecache.getline(node.root().file, line_number).strip()
-        idx = re.search(br'\sif\s*\(', line).start()
-        if idx:
-            parenthesis_index = line.find('(', idx + 1)
-            first_space_index = line.find(' ', idx + 1)
-            # There should be exactly one space between these indices.
-            if parenthesis_index - first_space_index != 1:
-                self.add_message('single-space-after-if', line=line_number)
-
-    def visit_while(self, node):
-        """Visit every `while` statement to make sure they are followed
-        by a single space.
-
-        Args:
-            node: astroid.nodes.While. Node to access `While` content.
-        """
-        line_number = node.fromlineno
-        line = linecache.getline(node.root().file, line_number).lstrip()
-        if re.search(br'^while\s*\(', line):
-            parenthesis_index = line.find('(')
-            first_space_index = line.find(' ')
-            # There should be exactly one space between these indices.
-            if parenthesis_index - first_space_index != 1:
-                self.add_message(
-                    'single-space-after-while', node=node)
-
-    def visit_yield(self, node):
-        """Visit every yield statement to ensure that yield keywords are
-        followed by exactly one space, so matching 'yield *' where * is not a
-        whitespace character. Note that 'yield' is also acceptable in
-        cases where the user wants to yield nothing.
-
-        Args:
-            node: astroid.nodes.Yield. Nodes to access yield statements.
-                content.
-        """
-        line_number = node.fromlineno
-        line = linecache.getline(node.root().file, line_number).lstrip()
-        if (line.startswith(b'yield') and
-                not re.search(br'^(yield)( \S|$|\w)', line)):
-            self.add_message('single-space-after-yield', node=node)
+        keywords = set(['if', 'elif', 'while', 'yield'])
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.NAME and token in keywords:
+                line = line.strip()
+                if re.search(br'^' + token + br'\s*\(', line):
+                    parenthesis_index = line.find('(')
+                    first_space_index = line.find(' ')
+                    # There should be exactly one space between these indices.
+                    if parenthesis_index - first_space_index != 1:
+                        self.add_message(
+                            'single-space-after-keyword',
+                            args=(token),
+                            line=line_num)
 
 
 def register(linter):
