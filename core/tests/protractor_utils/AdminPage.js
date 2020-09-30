@@ -69,6 +69,12 @@ var AdminPage = function() {
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
 
+  var adminMiscTab = element(by.css('.protractor-test-admin-misc-tab'));
+  var deleteAccountEmailInputField = element(by.css(
+    '.protractor-test-form-delete-account-email-field'));
+  var deleteAccountButton = element(by.css(
+  '.protractor-test-form-delete-account-button'));
+
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
@@ -405,6 +411,17 @@ var AdminPage = function() {
       username, REVIEW_CATEGORY_QUESTION);
     expect(await reviewRight.getText()).toBe('Allowed');
   };
+
+  this.deleteAccount = async function(email) {
+    await action.click('Admin misc tab button', adminMiscTab);
+    await waitFor.pageToFullyLoad();
+
+    await action.sendKeys(
+      'Delete account input field', deleteAccountEmailInputField, email);
+    await action.click('Delete account button', deleteAccountButton);
+
+    await waitFor.pageToFullyLoad();
+  }
 };
 
 exports.AdminPage = AdminPage;

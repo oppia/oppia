@@ -15,16 +15,16 @@
 /**
  * @fileoverview End-to-end tests for user preferences.
  */
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-describe('Preferences', function() {
-  var preferencesPage = null;
+describe('Wipeout', function() {
+  var deleteAccountPage = null;
 
   beforeEach(function() {
-    preferencesPage = new PreferencesPage.PreferencesPage();
+    deleteAccountPage = new DeleteAccountPage.DeleteAccountPage();
   });
 
   it('should let a user upload a profile photo', async function() {
@@ -153,6 +153,16 @@ describe('Preferences', function() {
       await general.goToHomePage();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/learner-dashboard');
+    });
+
+  it('should navigate to account deletion page',
+    async function() {
+      await users.createUser('lorem@preferences.com', 'loremPreferences');
+      await users.login('lorem@preferences.com');
+      await preferencesPage.get();
+      await preferencesPage.clickDeleteAccountButton();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/delete-account');
     });
 
   afterEach(async function() {

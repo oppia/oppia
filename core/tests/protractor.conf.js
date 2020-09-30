@@ -148,6 +148,10 @@ var suites = {
     users: [
       'protractor_desktop/userJourneys.js',
     ],
+
+    wipeout: [
+      'protractor_desktop/wipeout.js',
+    ]
   };
 
 // A reference configuration file.
