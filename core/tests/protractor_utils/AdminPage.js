@@ -404,6 +404,8 @@ var AdminPage = function() {
   this.expectUserToBeQuestionReviewer = async function(username) {
     var reviewRight = await _getUserReviewRightsElement(
       username, REVIEW_CATEGORY_QUESTION);
+      await waitFor.visibilityOf(reviewRight,
+        'Allowed taking too long to appear');
     expect(await reviewRight.getText()).toBe('Allowed');
   };
 };
