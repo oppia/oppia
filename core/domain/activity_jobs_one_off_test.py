@@ -47,11 +47,11 @@ gae_search_services = models.Registry.import_search_services()
 (
     base_models, collection_models,
     exp_models, question_models, skill_models,
-    story_models, topic_models
+    story_models, topic_models, subtopic_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection,
     models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.topic
+    models.NAMES.story, models.NAMES.topic, models.NAMES.subtopic
 ])
 
 
@@ -1925,7 +1925,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_correct_subtopic_models(self):
-        subtopic_page = topic_models.SubtopicPageModel(
+        subtopic_page = subtopic_models.SubtopicPageModel(
             id=self.SUBTOPIC_ID,
             topic_id=self.TOPIC_ID,
             page_contents={},
@@ -2077,7 +2077,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_missing_subtopic_commit_logs(self):
-        topic_models.SubtopicPageSnapshotMetadataModel(
+        subtopic_models.SubtopicPageSnapshotMetadataModel(
             id='%s-1' % self.SUBTOPIC_ID,
             committer_id=self.albert_id,
             commit_type='edit',

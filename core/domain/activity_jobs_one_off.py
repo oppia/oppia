@@ -30,8 +30,15 @@ from core.domain import user_services
 from core.platform import models
 import python_utils
 
-(collection_models, exp_models, topic_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration, models.NAMES.topic])
+(
+    collection_models, exp_models, question_models,
+    skill_models, story_models, topic_models,
+    subtopic_models
+) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.topic,
+    models.NAMES.subtopic
+])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -487,7 +494,7 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
         skill_models.SkillSnapshotMetadataModel,
         story_models.StorySnapshotMetadataModel,
         topic_models.TopicSnapshotMetadataModel,
-        topic_models.SubtopicPageSnapshotMetadataModel,
+        subtopic_models.SubtopicPageSnapshotMetadataModel,
         topic_models.TopicRightsSnapshotMetadataModel
     ]
 
@@ -546,10 +553,10 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
                 'id_string_format': 'topic-%s-%s'
             },
             {
-                'model': topic_models.SubtopicPageSnapshotMetadataModel,
-                'parent_model': topic_models.SubtopicPageModel,
+                'model': subtopic_models.SubtopicPageSnapshotMetadataModel,
+                'parent_model': subtopic_models.SubtopicPageModel,
                 'commit_log_model': (
-                    topic_models.SubtopicPageCommitLogEntryModel),
+                    subtopic_models.SubtopicPageCommitLogEntryModel),
                 'id_string_format': 'subtopicpage-%s-%s'
             },
             {
