@@ -52,6 +52,7 @@ interface SuggestionAndFeedbackThreads {
 @Injectable({
   providedIn: 'root'
 })
+
 export class ThreadDataService {
   constructor(
     private http: HttpClient,
