@@ -1,6 +1,7 @@
 // We are using eslint disable here for multilines because we have used quotes
 // around properties at a lot of places so it is not possible to use
 // "eslint disable next line" for each of them.
+/* eslint-disable oppia/no-multiline-disable */
 /* eslint-disable quote-props */
 /* eslint-disable quotes */
 /* Don't modify anything outside the {} brackets.
