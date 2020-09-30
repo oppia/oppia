@@ -40,12 +40,12 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
-
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
+
+datastore_services = models.Registry.import_datastore_services()
 search_services = models.Registry.import_search_services()
 
 
@@ -2224,7 +2224,7 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
 class MockExpSummaryModel(exp_models.ExpSummaryModel):
     """Mock ExpSummaryModel so that it allows to set `translator_ids`."""
 
-    translator_ids = ndb.StringProperty(
+    translator_ids = datastore_services.StringProperty(
         indexed=True, repeated=True, required=False)
 
 
