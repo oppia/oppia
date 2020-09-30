@@ -108,6 +108,7 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to remove feedback analytics models for
     deleted explorations.
+    Note: This job cannot be deleted until issue #10809 is fixed.
     """
 
     @classmethod
@@ -131,10 +132,10 @@ class CleanUpFeedbackAnalyticsModelModelOneOffJob(
 
 class CleanUpGeneralFeedbackThreadModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to clean up GeneralFeedbackThreadModel by:
-    1. Removing the model if the target model for which feedback was created is
+    """One-off job to clean up GeneralFeedbackThreadModel by removing
+    the model if the target model for which feedback was created is
     deleted. Target model can be exploration, question, skill or topic.
-    2. Update the last updated date time if it less than the creation time.
+    Note: This job cannot be deleted until issue #10809 is fixed.
     """
 
     @classmethod
@@ -152,37 +153,6 @@ class CleanUpGeneralFeedbackThreadModelOneOffJob(
             yield ('Deleted GeneralFeedbackThreadModel', item.id)
             item.delete()
             return
-
-        if item.created_on > item.last_updated:
-            item.put()
-            yield (
-                'Updated last_updated field for '
-                'GeneralFeedbackThreadModel', item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
-class CleanUpGeneralFeedbackMessageModelOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to clean up GeneralFeedbackMessageModel by updating
-    the last updated date time if it less than the creation time.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [feedback_models.GeneralFeedbackMessageModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-        if item.created_on > item.last_updated:
-            item.put()
-            yield (
-                'Updated last_updated field for '
-                'GeneralFeedbackMessageModel', item.id)
 
     @staticmethod
     def reduce(key, values):

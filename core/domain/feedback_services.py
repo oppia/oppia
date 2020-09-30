@@ -1137,3 +1137,21 @@ def _add_message_to_email_buffer(
         _send_instant_emails(
             other_recipient_ids, feedback_message_reference, exploration_id,
             has_suggestion)
+
+
+def delete_exploration_feedback_analytics(exp_ids):
+    """Deletes the FeedbackAnalyticsModel models corresponding to
+    the given exp_ids.
+
+    Args:
+        exp_ids: list(str). A list of exploration IDs whose feedback analytics
+            models are to be deleted.
+    """
+    feedback_analytics_models = (
+        feedback_models.FeedbackAnalyticsModel.get_multi(
+            exp_ids))
+    feedback_analytics_models_to_be_deleted = [
+        model for model in feedback_analytics_models
+        if model is not None]
+    feedback_models.FeedbackAnalyticsModel.delete_multi(
+        feedback_analytics_models_to_be_deleted)
