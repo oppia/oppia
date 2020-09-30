@@ -30,8 +30,11 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import main_cron
 import python_utils
 import utils
+
+import webtest
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -797,6 +800,73 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
     def test_delete_delete_account_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             self.delete_json('/delete-account-handler', expected_status_int=404)
+
+
+class DeleteAccountTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(DeleteAccountTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+        self.enable_deletion_swap = (
+            self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True))
+        self.testapp_swap_1 = self.swap(
+            self, 'testapp', webtest.TestApp(main_cron.app))
+        self.testapp_swap_2 = self.swap(
+            self, 'testapp', webtest.TestApp(main_cron.app))
+
+    def _run_account_deletion(self):
+        with self.enable_deletion_swap:
+            data = self.delete_json('/delete-account-handler')
+            self.assertEqual(data, {'success': True})
+
+        self.logout()
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        with self.testapp_swap_1:
+            self.get_html_response('/cron/users/user_deletion')
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        with self.testapp_swap_2:
+            self.get_html_response('/cron/users/fully_complete_user_deletion')
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.logout()
+
+    def test_delete_account_without_activities(self):
+        self._run_account_deletion()
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.editor_id))
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.editor_id))
+        self.assertIsNotNone(
+            user_models.DeletedUserModel.get_by_id(self.editor_id))
+
+    def test_new_signup_after_deleting_account(self):
+        self._run_account_deletion()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        self.assertNotEqual(
+            self.editor_id, self.get_user_id_from_email(self.EDITOR_EMAIL))
+
+    def test_delete_account_with_activities(self):
+        self.save_new_valid_collection('col_id', self.editor_id)
+        self.save_new_valid_exploration('exp_id', self.editor_id)
+        self.save_new_topic('topic_id', self.editor_id)
+        self.save_new_skill('skill_id', self.editor_id)
+        self.save_new_story('story_id', self.editor_id, 'topic_id')
+        self.save_new_subtopic('subtopic_id', self.editor_id, 'topic_id')
+
+        self._run_account_deletion()
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.editor_id))
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.editor_id))
+        self.assertIsNotNone(
+            user_models.DeletedUserModel.get_by_id(self.editor_id))
 
 
 class ExportAccountHandlerTests(test_utils.GenericTestBase):

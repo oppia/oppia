@@ -53,16 +53,17 @@ transaction_services = models.Registry.import_transaction_services()
 MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 
 
-def _transform_pending_deletion_request(pending_deletion_request_model):
-    """Transform PendingDeletionRequestModel to its domain object.
+def get_pending_deletion_request(user_id):
+    """Return the pending deletion request.
 
     Args:
-        pending_deletion_request_model: PendingDeletionRequestModel.
-            The model to transform.
+        user_id: str. The unique ID of the user.
 
     Returns:
-        PendingDeletionRequest. The final domain object.
+        PendingDeletionRequest. The pending deletion request domain object.
     """
+    pending_deletion_request_model = (
+        user_models.PendingDeletionRequestModel.get_by_id(user_id))
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
@@ -283,7 +284,9 @@ def run_user_deletion_completion(pending_deletion_request):
     Returns:
         str. The outcome of the verification.
     """
-
+    # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
+    # for the user. The verification will be done in the next run of
+    # FullyCompleteUserDeletionOneOffJob.
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):

@@ -66,9 +66,6 @@ class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(pending_deletion_request_model):
         """Implements the map function for this job."""
-        # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
-        # for the user. The verification will be done in the next run of
-        # FullyCompleteUserDeletionOneOffJob.
         pending_deletion_request = wipeout_service.get_pending_deletion_request(
             pending_deletion_request_model.id)
         # The final status of the completion. Either 'NOT DELETED', 'SUCCESS',
