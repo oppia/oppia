@@ -15,11 +15,18 @@
 /**
  * @fileoverview End-to-end tests for user preferences.
  */
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
 describe('Preferences', function() {
+  var preferencesPage = null;
+
+  beforeEach(function() {
+    preferencesPage = new PreferencesPage.PreferencesPage();
+  });
+
   it('should let a user upload a profile photo', async function() {
     await users.createUser('eve@preferences.com', 'evePreferences');
     await users.login('eve@preferences.com');
