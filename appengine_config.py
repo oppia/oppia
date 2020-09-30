@@ -40,8 +40,7 @@ THIRD_PARTY_PYTHON_LIBS_PATH = os.path.join(THIRD_PARTY_PATH, 'python_libs')
 # Oppia in production mode locally, where a built-in PIL won't be available.
 # Hence the check for oppia_tools instead.
 if os.path.isdir(OPPIA_TOOLS_PATH):
-    PIL_PATH = os.path.join(
-        OPPIA_TOOLS_PATH, 'Pillow-6.2.2')
+    PIL_PATH = os.path.join(OPPIA_TOOLS_PATH, 'Pillow-6.2.2')
     if not os.path.isdir(PIL_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
