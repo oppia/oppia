@@ -31,8 +31,8 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -1974,11 +1974,11 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
         """Runs the MockInteractionAnswerSummariesAggregator."""
         MockInteractionAnswerSummariesAggregator.start_computation()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
     def _rerun_answer_summaries_aggregator(self):
@@ -2357,11 +2357,11 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         """Runs the MockInteractionAnswerSummariesAggregator."""
         MockInteractionAnswerSummariesAggregator.start_computation()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         MockInteractionAnswerSummariesAggregator.stop_computation(
             feconf.SYSTEM_COMMITTER_ID)
