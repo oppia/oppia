@@ -487,8 +487,6 @@ import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
-import { SkillMasteryObjectFactory } from
-  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
@@ -870,8 +868,6 @@ export class UpgradedServices {
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
     upgradedServices['ShortSkillSummaryObjectFactory'] =
       new ShortSkillSummaryObjectFactory();
-    upgradedServices['SkillMasteryObjectFactory'] =
-      new SkillMasteryObjectFactory();
     upgradedServices['SkillRightsObjectFactory'] =
       new SkillRightsObjectFactory();
     upgradedServices['SkillSummaryObjectFactory'] =
@@ -1467,8 +1463,7 @@ export class UpgradedServices {
         upgradedServices['HttpClient']);
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['SkillMasteryObjectFactory']);
+        upgradedServices['HttpClient']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
         upgradedServices['ConceptCardObjectFactory'],

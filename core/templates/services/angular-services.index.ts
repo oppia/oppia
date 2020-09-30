@@ -139,7 +139,6 @@ import { ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory'
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
 import { ShortSkillSummaryObjectFactory } from 'domain/skill/ShortSkillSummaryObjectFactory';
-import { SkillMasteryObjectFactory } from 'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsObjectFactory } from 'domain/skill/SkillRightsObjectFactory';
 import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
@@ -637,7 +636,6 @@ export const angularServices: [string, unknown][] = [
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
-  ['SkillMasteryObjectFactory', SkillMasteryObjectFactory],
   ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
   ['SkillRightsObjectFactory', SkillRightsObjectFactory],

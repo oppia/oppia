@@ -476,8 +476,6 @@ import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
-import { SkillMasteryObjectFactory } from
-  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
@@ -909,7 +907,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static siteAnalyticsService: SiteAnalyticsService;
   static skillCreationBackendApiService: SkillCreationBackendApiService;
   static skillMasteryBackendApiService: SkillMasteryBackendApiService;
-  static skillMasteryObjectFactory: SkillMasteryObjectFactory;
   static skillObjectFactory: SkillObjectFactory;
   static skillRightsBackendApiService: SkillRightsBackendApiService;
   static skillRightsObjectFactory: SkillRightsObjectFactory;
@@ -1287,7 +1284,6 @@ private sidebarStatusService: SidebarStatusService,
 private siteAnalyticsService: SiteAnalyticsService,
 private skillCreationBackendApiService: SkillCreationBackendApiService,
 private skillMasteryBackendApiService: SkillMasteryBackendApiService,
-private skillMasteryObjectFactory: SkillMasteryObjectFactory,
 private skillObjectFactory: SkillObjectFactory,
 private skillRightsBackendApiService: SkillRightsBackendApiService,
 private skillRightsObjectFactory: SkillRightsObjectFactory,
@@ -1834,8 +1830,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.skillCreationBackendApiService);
     OppiaAngularRootComponent.skillMasteryBackendApiService = (
       this.skillMasteryBackendApiService);
-    OppiaAngularRootComponent.skillMasteryObjectFactory = (
-      this.skillMasteryObjectFactory);
     OppiaAngularRootComponent.skillObjectFactory = this.skillObjectFactory;
     OppiaAngularRootComponent.skillRightsBackendApiService = (
       this.skillRightsBackendApiService);
