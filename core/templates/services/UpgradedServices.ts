@@ -485,8 +485,6 @@ import { ShortSkillSummaryObjectFactory } from
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
-import { SkillDifficultyObjectFactory } from
-  'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
 import { SkillMasteryObjectFactory } from
@@ -872,8 +870,6 @@ export class UpgradedServices {
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
     upgradedServices['ShortSkillSummaryObjectFactory'] =
       new ShortSkillSummaryObjectFactory();
-    upgradedServices['SkillDifficultyObjectFactory'] =
-      new SkillDifficultyObjectFactory();
     upgradedServices['SkillMasteryObjectFactory'] =
       new SkillMasteryObjectFactory();
     upgradedServices['SkillRightsObjectFactory'] =

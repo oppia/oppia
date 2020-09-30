@@ -326,6 +326,7 @@ import { LearnerParamsService } from
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { GraphUtilsService } from 'interactions/GraphInput/directives/graph-utils.service';
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
 import { LogicProofValidationService } from
@@ -473,8 +474,6 @@ import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
-import { SkillDifficultyObjectFactory } from
-  'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
 import { SkillMasteryObjectFactory } from
@@ -909,7 +908,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static sidebarStatusService: SidebarStatusService;
   static siteAnalyticsService: SiteAnalyticsService;
   static skillCreationBackendApiService: SkillCreationBackendApiService;
-  static skillDifficultyObjectFactory: SkillDifficultyObjectFactory;
   static skillMasteryBackendApiService: SkillMasteryBackendApiService;
   static skillMasteryObjectFactory: SkillMasteryObjectFactory;
   static skillObjectFactory: SkillObjectFactory;
@@ -1288,7 +1286,6 @@ private sVMPredictionService: SVMPredictionService,
 private sidebarStatusService: SidebarStatusService,
 private siteAnalyticsService: SiteAnalyticsService,
 private skillCreationBackendApiService: SkillCreationBackendApiService,
-private skillDifficultyObjectFactory: SkillDifficultyObjectFactory,
 private skillMasteryBackendApiService: SkillMasteryBackendApiService,
 private skillMasteryObjectFactory: SkillMasteryObjectFactory,
 private skillObjectFactory: SkillObjectFactory,
@@ -1835,8 +1832,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.siteAnalyticsService = this.siteAnalyticsService;
     OppiaAngularRootComponent.skillCreationBackendApiService = (
       this.skillCreationBackendApiService);
-    OppiaAngularRootComponent.skillDifficultyObjectFactory = (
-      this.skillDifficultyObjectFactory);
     OppiaAngularRootComponent.skillMasteryBackendApiService = (
       this.skillMasteryBackendApiService);
     OppiaAngularRootComponent.skillMasteryObjectFactory = (

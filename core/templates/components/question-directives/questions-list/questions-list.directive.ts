@@ -51,7 +51,6 @@ require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
-require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
@@ -64,6 +63,7 @@ require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('questionsList', [
@@ -96,9 +96,8 @@ angular.module('oppia').directive('questionsList', [
         'QuestionCreationService', 'QuestionObjectFactory',
         'QuestionUndoRedoService', 'QuestionValidationService',
         'QuestionsListService', 'ShortSkillSummaryObjectFactory',
-        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-        'UtilsService', 'WindowDimensionsService', 'INTERACTION_SPECS',
-        'NUM_QUESTIONS_PER_PAGE',
+        'SkillBackendApiService', 'UtilsService', 'WindowDimensionsService',
+        'INTERACTION_SPECS', 'NUM_QUESTIONS_PER_PAGE',
         function(
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
@@ -106,9 +105,8 @@ angular.module('oppia').directive('questionsList', [
             QuestionCreationService, QuestionObjectFactory,
             QuestionUndoRedoService, QuestionValidationService,
             QuestionsListService, ShortSkillSummaryObjectFactory,
-            SkillBackendApiService, SkillDifficultyObjectFactory,
-            UtilsService, WindowDimensionsService, INTERACTION_SPECS,
-            NUM_QUESTIONS_PER_PAGE) {
+            SkillBackendApiService, UtilsService, WindowDimensionsService,
+            INTERACTION_SPECS, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
@@ -290,7 +288,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.linkedSkillsWithDifficulty = [];
             ctrl.newQuestionSkillIds.forEach(function(skillId) {
               ctrl.linkedSkillsWithDifficulty.push(
-                SkillDifficultyObjectFactory.create(
+                SkillDifficulty.create(
                   skillId, '', null));
             });
             ctrl.showDifficultyChoices = true;
@@ -374,7 +372,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.linkedSkillsWithDifficulty = [];
             ctrl.newQuestionSkillIds.forEach(function(skillId) {
               ctrl.linkedSkillsWithDifficulty.push(
-                SkillDifficultyObjectFactory.create(
+                SkillDifficulty.create(
                   skillId, skillDescription, difficulty));
             });
             ctrl.difficulty = difficulty;
@@ -463,7 +461,7 @@ angular.module('oppia').directive('questionsList', [
             var linkedSkillsWithDifficulty = [];
             if (ctrl.getAllSkillSummaries().length === 0) {
               linkedSkillsWithDifficulty.push(
-                SkillDifficultyObjectFactory.create(
+                SkillDifficulty.create(
                   ctrl.selectedSkillId, skillDescription,
                   skillDifficulty)
               );
@@ -474,7 +472,7 @@ angular.module('oppia').directive('questionsList', [
                 });
               for (var idx in allSkillSummaries) {
                 linkedSkillsWithDifficulty.push(
-                  SkillDifficultyObjectFactory.create(
+                  SkillDifficulty.create(
                     allSkillSummaries[idx].getId(),
                     allSkillSummaries[idx].getDescription(),
                     skillDifficulty));

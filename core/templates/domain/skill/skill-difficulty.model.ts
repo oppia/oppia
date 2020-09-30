@@ -17,9 +17,6 @@
  * skills with their difficulty for a question.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface SkillDifficultyBackendDict {
   id: string;
   description: string;
@@ -35,6 +32,11 @@ export class SkillDifficulty {
     this._id = id;
     this._description = description;
     this._difficulty = difficulty;
+  }
+
+  static create(
+      id: string, description: string, difficulty: number): SkillDifficulty {
+    return new SkillDifficulty(id, description, difficulty);
   }
 
   toBackendDict(): SkillDifficultyBackendDict {
@@ -65,16 +67,3 @@ export class SkillDifficulty {
     this._difficulty = newDifficulty;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SkillDifficultyObjectFactory {
-  create(id: string, description: string, difficulty: number): SkillDifficulty {
-    return new SkillDifficulty(id, description, difficulty);
-  }
-}
-
-angular.module('oppia').factory(
-  'SkillDifficultyObjectFactory',
-  downgradeInjectable(SkillDifficultyObjectFactory));
