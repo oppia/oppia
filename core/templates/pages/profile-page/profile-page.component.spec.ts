@@ -171,7 +171,7 @@ describe('Profile page', function() {
     beforeEach(function() {
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(
+        'fetchProfileDataAsync').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
@@ -266,7 +266,7 @@ describe('Profile page', function() {
 
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(
+        'fetchProfileDataAsync').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
@@ -311,7 +311,7 @@ describe('Profile page', function() {
     beforeEach(function() {
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(
+        'fetchProfileDataAsync').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
@@ -368,7 +368,7 @@ describe('Profile page', function() {
     beforeEach(function() {
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(
+        'fetchProfileDataAsync').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
@@ -378,7 +378,7 @@ describe('Profile page', function() {
       expect(ctrl.isAlreadySubscribed).toBe(false);
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
-        'subscribe').and.returnValue($q.resolve());
+        'subscribeAsync').and.returnValue($q.resolve());
       ctrl.changeSubscriptionStatus();
       $scope.$apply();
 
@@ -390,7 +390,7 @@ describe('Profile page', function() {
 
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
-        'unsubscribe').and.returnValue($q.resolve());
+        'unsubscribeAsync').and.returnValue($q.resolve());
       ctrl.changeSubscriptionStatus();
       $scope.$apply();
 

@@ -55,7 +55,7 @@ describe('Profile test backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.subscribe('testUsername').then(
+    profilePageBackendApiService.subscribeAsync('testUsername').then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/subscribehandler');
@@ -75,7 +75,7 @@ describe('Profile test backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.subscribe('testUsername').then(
+    profilePageBackendApiService.subscribeAsync('testUsername').then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/subscribehandler');
@@ -96,7 +96,7 @@ describe('Profile test backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.unsubscribe('testUsername').then(
+    profilePageBackendApiService.unsubscribeAsync('testUsername').then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/unsubscribehandler');
@@ -116,7 +116,7 @@ describe('Profile test backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.unsubscribe('testUsername').then(
+    profilePageBackendApiService.unsubscribeAsync('testUsername').then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/unsubscribehandler');
@@ -137,7 +137,7 @@ describe('Profile test backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.fetchProfileData().then(
+    profilePageBackendApiService.fetchProfileDataAsync().then(
       successHandler, failHandler);
 
     let req = httpTestingController
@@ -216,7 +216,7 @@ describe('Profile test backend API service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.fetchProfileData().then(
+    profilePageBackendApiService.fetchProfileDataAsync().then(
       successHandler, failHandler);
 
     let req = httpTestingController

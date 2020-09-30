@@ -40,7 +40,7 @@ export class ProfilePageBackendApiService {
     private userProfileObjectFactory: UserProfileObjectFactory
   ) {}
 
-  _postSubscribe(creatorUsername: string): Promise<void> {
+  async _postSubscribeAsync(creatorUsername: string): Promise<void> {
     return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_SUBSCRIBE_URL,
       { creator_username: creatorUsername }
@@ -50,7 +50,7 @@ export class ProfilePageBackendApiService {
     });
   }
 
-  _postUnsubscribe(creatorUsername: string): Promise<void> {
+  async _postUnsubscribeAsync(creatorUsername: string): Promise<void> {
     return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_UNSUBSCRIBE_URL,
       { creator_username: creatorUsername }
@@ -59,7 +59,7 @@ export class ProfilePageBackendApiService {
     });
   }
 
-  _fetchProfileData(): Promise<UserProfile> {
+  async _fetchProfileDataAsync(): Promise<UserProfile> {
     return this.http.get<UserProfileBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ProfilePageDomainConstants.PROFILE_DATA_URL,
@@ -76,23 +76,23 @@ export class ProfilePageBackendApiService {
    * Subscribes to a profile for the given username.
    * @param {String} creatorUsername - username of profile to be subscribed.
    */
-  subscribe(creatorUsername: string): Promise<void> {
-    return this._postSubscribe(creatorUsername);
+  async subscribeAsync(creatorUsername: string): Promise<void> {
+    return this._postSubscribeAsync(creatorUsername);
   }
 
   /**
    * Unsubscribes from a profile for the given username.
    * @param {String} creatorUsername - username of profile to be unsubscribed.
    */
-  unsubscribe(creatorUsername: string): Promise<void> {
-    return this._postUnsubscribe(creatorUsername);
+  async unsubscribeAsync(creatorUsername: string): Promise<void> {
+    return this._postUnsubscribeAsync(creatorUsername);
   }
 
   /**
    * Fetches the profile for username in URL.
    */
-  fetchProfileData(): Promise<UserProfile> {
-    return this._fetchProfileData();
+  async fetchProfileDataAsync(): Promise<UserProfile> {
+    return this._fetchProfileDataAsync();
   }
 }
 
