@@ -31,7 +31,6 @@ from core.platform import models
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
 from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
@@ -44,6 +43,7 @@ from pipeline import pipeline
     models.NAMES.base_model, models.NAMES.job])
 
 app_identity_services = models.Registry.import_app_identity_services()
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
@@ -1061,7 +1061,8 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     relevant layer prefix gets appended.
     """
 
-    realtime_layer = ndb.IntegerProperty(required=True, choices=[0, 1])
+    realtime_layer = (
+        datastore_services.IntegerProperty(required=True, choices=[0, 1]))
 
     @classmethod
     def get_realtime_id(cls, layer_index, raw_entity_id):
@@ -1090,7 +1091,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         """
         query = cls.query().filter(cls.realtime_layer == layer_index).filter(
             cls.created_on < latest_created_on_datetime)
-        ndb.delete_multi(query.iter(keys_only=True))
+        datastore_services.delete_multi(query.iter(keys_only=True))
 
     @classmethod
     def _is_valid_realtime_id(cls, realtime_id):
@@ -1571,10 +1572,10 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
 
 def _get_job_dict_from_job_model(model):
-    """Converts an ndb.Model representing a job to a dict.
+    """Converts a Model representing a job to a dict.
 
     Args:
-        model: ndb.Model. The model to extract job info from.
+        model: datastore_services.Model. The model to extract job info from.
 
     Returns:
         dict. The dict contains the following keys:
