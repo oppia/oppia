@@ -51,6 +51,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -58,7 +59,6 @@ from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -71,23 +71,22 @@ USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    audit_models,
-    classifier_models, collection_models,
+    audit_models, classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models, stats_models,
-    story_models, suggestion_models, topic_models,
-    user_models,) = (
-        models.Registry.import_models([
-            models.NAMES.audit,
-            models.NAMES.classifier, models.NAMES.collection,
-            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.question,
-            models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.statistics, models.NAMES.story,
-            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
+    story_models, subtopic_models, suggestion_models,
+    topic_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
+    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
+    models.NAMES.opportunity, models.NAMES.question,
+    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
+])
 
 
 class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -6822,6 +6821,8 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillModel\', 5]']
+
+        self.process_and_flush_pending_mapreduce_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -6914,7 +6915,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'New description',
                 'old_value': 'description 0'
             })], 'Changes.')
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-0-1').delete()
 
@@ -7063,7 +7064,7 @@ class SkillSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotMetadataModel\', 4]']
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7268,7 +7269,7 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotContentModel\', 4]']
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7425,7 +7426,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7670,7 +7671,7 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSummaryModel\', 3]']
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -9477,7 +9478,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -11155,9 +11156,12 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
 
-        self.model_instance_0 = topic_models.SubtopicPageModel.get_by_id('0-1')
-        self.model_instance_1 = topic_models.SubtopicPageModel.get_by_id('1-1')
-        self.model_instance_2 = topic_models.SubtopicPageModel.get_by_id('2-1')
+        self.model_instance_0 = (
+            subtopic_models.SubtopicPageModel.get_by_id('0-1'))
+        self.model_instance_1 = (
+            subtopic_models.SubtopicPageModel.get_by_id('1-1'))
+        self.model_instance_2 = (
+            subtopic_models.SubtopicPageModel.get_by_id('2-1'))
 
         self.job_class = (
             prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob)
@@ -11259,7 +11263,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 },
                 'old_value': {}
             })], 'Changes.')
-        topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+        subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
             'subtopicpage-0-1-1').delete()
 
         expected_output = [
@@ -11277,7 +11281,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+        subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
             '0-1-1').delete()
         expected_output = [
             (
@@ -11291,7 +11295,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+        subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
             '0-1-1').delete()
         expected_output = [
             (
@@ -11382,13 +11386,13 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '2-1-1'))
 
         self.job_class = (
@@ -11448,7 +11452,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -11482,7 +11486,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageSnapshotMetadataModel(
+            subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='0-1-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
         model_with_invalid_version_in_id.put()
@@ -11593,13 +11597,13 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '2-1-1'))
 
         self.job_class = (
@@ -11659,7 +11663,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -11678,7 +11682,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageSnapshotContentModel(id='0-1-3'))
+            subtopic_models.SubtopicPageSnapshotContentModel(id='0-1-3'))
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -11772,13 +11776,13 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-2-1-1'))
 
         self.job_class = (
@@ -11836,7 +11840,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -11854,7 +11858,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageCommitLogEntryModel.create(
+            subtopic_models.SubtopicPageCommitLogEntryModel.create(
                 '0-1', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.subtopic_page_id = '0-1'
@@ -11873,7 +11877,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
-            topic_models.SubtopicPageCommitLogEntryModel(
+            subtopic_models.SubtopicPageCommitLogEntryModel(
                 id='invalid-0-1-1',
                 user_id=self.owner_id,
                 commit_type='edit',
@@ -13267,7 +13271,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
         for collection in collections:
             subscription_services.subscribe_to_collection(
                 self.user_id, collection.id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.model_instance = user_models.UserSubscriptionsModel.get_by_id(
             self.user_id)
@@ -14845,7 +14849,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_actions = user_services.UserActionsInfo(self.user_id)
 
         wipeout_service.pre_delete_user(self.user_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.model_instance = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_id))
@@ -14980,6 +14984,87 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
+class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(DeletedUserModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        wipeout_service.pre_delete_user(self.user_id)
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+
+        user_models.DeletedUserModel(id=self.user_id).put()
+
+        self.model_instance = (
+            user_models.DeletedUserModel.get_by_id(self.user_id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated DeletedUserModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of DeletedUserModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'DeletedUserModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_existing_user_settings_model_failure(self):
+        user_models.UserSettingsModel(
+            id=self.user_id, email='email@email.com', gae_id='gae_id').put()
+        expected_output = [
+            (
+                '[u\'failed validation check for '
+                'user properly deleted of DeletedUserModel\', '
+                '[u\'Entity id %s: The deletion verification fails\']]'
+            ) % (self.model_instance.id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_existing_feedback_email_reply_to_id_model_failure(self):
+        email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='id', user_id=self.user_id, reply_to_id='id').put()
+        expected_output = [
+            (
+                '[u\'failed validation check for '
+                'user properly deleted of DeletedUserModel\', '
+                '[u\'Entity id %s: The deletion verification fails\']]'
+            ) % (self.model_instance.id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+
 class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -14998,13 +15083,13 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         """
         job_id = self.job_class.create_new()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
         self.job_class.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         return [ast.literal_eval(o) for o in self.job_class.get_output(job_id)]
 
     def run_job_and_check_output(self, *expected_outputs):
