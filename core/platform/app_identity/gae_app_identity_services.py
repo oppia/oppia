@@ -38,29 +38,6 @@ def get_application_id():
     return app_identity.get_application_id()
 
 
-def get_access_token(scope):
-    """The OAuth 2.0 access token to act on behalf of the application.
-
-    This token will be cached.
-
-    A token will be generated and cached for the service account for the App
-    Engine application.
-
-    Each application has an associated Google account. This function returns an
-    OAuth 2.0 access token that corresponds to the running app. Access tokens
-    are safe to cache and reuse until their expiry time as returned. This method
-    caches access tokens using both an in-process cache and memcache.
-
-    Args:
-        scope: str. The requested API scope as a string.
-
-    Returns:
-        str. The token as a string.
-    """
-    token, unused_expiration_time = app_identity.get_access_token(scope)
-    return token
-
-
 def get_gcs_resource_bucket_name():
     """Returns the application's bucket name for GCS resources, which depends
     on the application ID in production mode, or default bucket name in
