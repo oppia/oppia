@@ -130,12 +130,15 @@ class DeleteAllExplorationRecommendationsOneOffJob(
 
 class CleanUpExplorationRecommendationsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """Cleans up ExplorationRecommendationsModel by:
-    1. Removing exploration ids from recommendation list of model if exploration
-    model is deleted.
-    2. Deleting the recommendations model if the exploration for which it was
-    created is deleted.
-    Note: This job cannot be deleted until issue #10809 is fixed.
+    """Cleans up ExplorationRecommendationsModel.
+
+    This is done by:
+        1. Removing exploration ids from recommendation list of model if
+        exploration model is deleted.
+        2. Deleting the recommendations model if the exploration for which it
+        was created is deleted.
+
+    NOTE TO DEVELOPERS:  This job cannot be deleted until issue #10809 is fixed.
     """
 
     @classmethod
