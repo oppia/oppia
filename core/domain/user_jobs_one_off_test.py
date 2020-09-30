@@ -1872,41 +1872,6 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1'])
 
-    def test_job_reverts_delete_status_for_completed_activities_model(self):
-        completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
-        self.assertEqual(
-            completed_activities_model.exploration_ids, ['0', '1'])
-        completed_activities_model.deleted = True
-        completed_activities_model.put()
-
-        self.assertEqual(
-            self.model_instance.completed_explorations, ['0', '1'])
-
-        job_id = (
-            user_jobs_one_off
-            .CleanUpCollectionProgressModelOneOffJob.create_new())
-        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            user_jobs_one_off
-            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
-        self.assertEqual(
-            output, [
-                '[u\'Reverted delete status for CompletedActivitiesModel\', '
-                '[u\'%s.col\']]' % self.user_id])
-
-        self.assertEqual(
-            self.model_instance.completed_explorations, ['0', '1'])
-
-        completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
-        self.assertFalse(completed_activities_model.deleted)
-        self.assertEqual(
-            completed_activities_model.exploration_ids, ['0', '1'])
-
 
 class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
 

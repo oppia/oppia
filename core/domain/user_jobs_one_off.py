@@ -476,6 +476,7 @@ class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that cleans up UserSubscribersModel by removing user id if it is
     present in subscriber ids.
+    Note: This job can be deleted after it is run in October 2020 release.
     """
 
     @classmethod
@@ -503,6 +504,7 @@ class CleanUpCollectionProgressModelOneOffJob(
     1. Removing exploration ids which are not a part of the collection.
     2. Creating CompletedActivitiesModel for completed explorations if it is
     missing.
+    Note: This job cannot be deleted until issue #10809 is fixed.
     """
 
     @classmethod
@@ -524,13 +526,6 @@ class CleanUpCollectionProgressModelOneOffJob(
                 item.completed_explorations)
             completed_activities_model.put()
             yield ('Regenerated Missing CompletedActivitiesModel', item.id)
-
-        if completed_activities_model.deleted:
-            completed_activities_model.deleted = False
-            completed_activities_model.put()
-            yield (
-                'Reverted delete status for CompletedActivitiesModel',
-                item.id)
 
         col_model = collection_models.CollectionModel.get_by_id(
             item.collection_id)
@@ -565,6 +560,7 @@ class CleanUpUserContributionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that cleans up UserContributionsModel by removing deleted
     explorations from user contribution.
+    Note: This job cannot be deleted until issue #10809 is fixed.
     """
 
     @classmethod
