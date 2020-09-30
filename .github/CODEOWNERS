@@ -147,37 +147,28 @@
 # Dev workflow team.
 /.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/.eslintignore @DubeySandeep
+/.eslintignore @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/.eslintrc @DubeySandeep
+/.eslintrc @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/.htmllintrc @DubeySandeep
+/.htmllintrc @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/.coveragerc @DubeySandeep
+/.coveragerc @DubeySandeep @Hudda
 /.gitattributes @DubeySandeep
 /.gitignore @DubeySandeep
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/.isort.cfg @DubeySandeep
+/.isort.cfg @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/.pylintrc @DubeySandeep
+/.pylintrc @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/.stylelintrc @DubeySandeep
+/.stylelintrc @DubeySandeep @Hudda
 /.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/core/templates/css/.stylelintrc @DubeySandeep
+/core/templates/css/.stylelintrc @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-09-26
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/tox.ini @DubeySandeep
+/tox.ini @DubeySandeep @Hudda
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @Showtim3 @DubeySandeep
 /scripts/check_frontend_coverage*.py @nithusha21 @DubeySandeep
@@ -185,8 +176,7 @@
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @nishantwrp @DubeySandeep
-# TODO(#10709): Add @Hudda as owner after 2020-09-26
-/scripts/linters/ @DubeySandeep
+/scripts/linters/ @DubeySandeep @Hudda
 /scripts/linters/ts_ignore_exceptions.json @nishantwrp
 /ubuntu_dockerfile @DubeySandeep
 
