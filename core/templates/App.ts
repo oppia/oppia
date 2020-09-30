@@ -44,7 +44,6 @@ require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
 
-require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 require('pages/Base.ts');
@@ -160,7 +159,7 @@ angular.module('oppia').config([
       'ThreadStatusDisplayService', 'TopicObjectFactory',
       'TopicRightsObjectFactory', 'TopicViewerBackendApiService',
       'TranslationLanguageService', 'UrlInterpolationService', 'UrlService',
-      'UserExplorationPermissionsService', 'UserInfoObjectFactory',
+      'UserExplorationPermissionsService',
       'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
       'WindowRef',
     ];

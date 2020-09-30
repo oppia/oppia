@@ -16,11 +16,9 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
+import { UserInfo } from 'domain/user/user-info.model';
 
 describe('User info factory', () => {
-  let userInfoObjectFactory: UserInfoObjectFactory;
-
   var sampleUserInfoBackendObject = {
     is_moderator: true,
     is_admin: false,
@@ -33,12 +31,8 @@ describe('User info factory', () => {
     user_is_logged_in: true
   };
 
-  beforeEach(() => {
-    userInfoObjectFactory = new UserInfoObjectFactory();
-  });
-
   it('should create correct UserInfo obeject from backend dict', () => {
-    var userInfo = userInfoObjectFactory.createFromBackendDict(
+    var userInfo = UserInfo.createFromBackendDict(
       sampleUserInfoBackendObject);
 
     expect(userInfo.isModerator()).toBe(true);
@@ -53,7 +47,7 @@ describe('User info factory', () => {
   });
 
   it('should create correct default UserInfo object', () => {
-    var userInfo = userInfoObjectFactory.createDefault();
+    var userInfo = UserInfo.createDefault();
     expect(userInfo.isModerator()).toBe(false);
     expect(userInfo.isAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);

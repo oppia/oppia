@@ -633,7 +633,6 @@ import { UrlInterpolationService } from
 import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UserProfileObjectFactory } from
   'domain/user/user-profile-object.factory';
 import { UtilsService } from 'services/utils.service';
@@ -901,7 +900,6 @@ export class UpgradedServices {
     upgradedServices['TopicSummaryObjectFactory'] =
       new TopicSummaryObjectFactory();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
-    upgradedServices['UserInfoObjectFactory'] = new UserInfoObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['VoiceoverObjectFactory'] = new VoiceoverObjectFactory();

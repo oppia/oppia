@@ -185,7 +185,6 @@ import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-b
 import { NewlyCreatedTopicObjectFactory } from 'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { TopicsAndSkillsDashboardFilterObjectFactory } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { ProfileSummaryObjectFactory } from 'domain/user/profile-summary-object.factory';
 import { UserProfileObjectFactory } from 'domain/user/user-profile-object.factory';
 import { AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
@@ -709,7 +708,6 @@ export const angularServices: [string, unknown][] = [
   ['UrlInterpolationService', UrlInterpolationService],
   ['UrlService', UrlService],
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
-  ['UserInfoObjectFactory', UserInfoObjectFactory],
   ['UserProfileObjectFactory', UserProfileObjectFactory],
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],

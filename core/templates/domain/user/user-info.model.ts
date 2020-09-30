@@ -17,10 +17,7 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
-interface UserInfoBackendDict {
+export interface UserInfoBackendDict {
   'is_moderator': boolean;
   'is_admin': boolean;
   'is_super_admin': boolean;
@@ -59,6 +56,19 @@ export class UserInfo {
     this._isLoggedIn = isLoggedIn;
   }
 
+  static createFromBackendDict(
+      data: UserInfoBackendDict): UserInfo {
+    return new UserInfo(
+      data.is_moderator, data.is_admin, data.is_super_admin,
+      data.is_topic_manager, data.can_create_collections,
+      data.preferred_site_language_code, data.username,
+      data.email, data.user_is_logged_in);
+  }
+  static createDefault(): UserInfo {
+    return new UserInfo(
+      false, false, false, false, false, null, null, null, false);
+  }
+
   isModerator(): boolean {
     return this._isModerator;
   }
@@ -95,25 +105,3 @@ export class UserInfo {
     return this._isLoggedIn;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class UserInfoObjectFactory {
-  createFromBackendDict(
-      data: UserInfoBackendDict): UserInfo {
-    return new UserInfo(
-      data.is_moderator, data.is_admin, data.is_super_admin,
-      data.is_topic_manager, data.can_create_collections,
-      data.preferred_site_language_code, data.username,
-      data.email, data.user_is_logged_in);
-  }
-  createDefault(): UserInfo {
-    return new UserInfo(
-      false, false, false, false, false, null, null, null, false);
-  }
-}
-
-angular.module('oppia').factory(
-  'UserInfoObjectFactory',
-  downgradeInjectable(UserInfoObjectFactory));
