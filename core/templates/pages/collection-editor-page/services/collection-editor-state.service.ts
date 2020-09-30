@@ -20,7 +20,6 @@
 
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/collection-rights-backend-api.service.ts');
-require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/editable-collection-backend-api.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('services/alerts.service.ts');
@@ -28,18 +27,19 @@ require('services/alerts.service.ts');
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
+import { CollectionRights } from 'domain/collection/collection-rights.model';
 
 angular.module('oppia').factory('CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
-  'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
-  'EditableCollectionBackendApiService', 'UndoRedoService',
+  'CollectionRightsBackendApiService', 'EditableCollectionBackendApiService',
+  'UndoRedoService',
   function(
       $rootScope, AlertsService, CollectionObjectFactory,
-      CollectionRightsBackendApiService, CollectionRightsObjectFactory,
-      EditableCollectionBackendApiService, UndoRedoService) {
+      CollectionRightsBackendApiService, EditableCollectionBackendApiService,
+      UndoRedoService) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionRights = (
-      CollectionRightsObjectFactory.createEmptyCollectionRights());
+      CollectionRights.createEmptyCollectionRights());
     var _collectionIsInitialized = false;
     var _collectionIsLoading = false;
     var _collectionIsBeingSaved = false;

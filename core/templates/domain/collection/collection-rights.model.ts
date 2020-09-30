@@ -19,9 +19,6 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface CollectionRightsBackendDict {
   'collection_id': number;
   'can_edit': boolean;
@@ -43,6 +40,24 @@ export class CollectionRights {
     this._canUnpublish = collectionRightsObject.can_unpublish;
     this._isPrivate = collectionRightsObject.is_private;
     this._ownerNames = collectionRightsObject.owner_names;
+  }
+
+  static create(
+      collectionRightsBackendObject: CollectionRightsBackendDict):
+      CollectionRights {
+    return new CollectionRights(cloneDeep(collectionRightsBackendObject));
+  }
+
+  // Create a new, empty collection rights object. This is not guaranteed to
+  // pass validation tests.
+  static createEmptyCollectionRights(): CollectionRights {
+    return new CollectionRights({
+      owner_names: [],
+      collection_id: null,
+      can_edit: null,
+      can_unpublish: null,
+      is_private: null
+    });
   }
 
   getCollectionId(): number {
@@ -117,33 +132,3 @@ export class CollectionRights {
     this._ownerNames = otherCollectionRights.getOwnerNames();
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class CollectionRightsObjectFactory {
-  // Static class methods. Note that "this" is not available in static
-  // contexts. This function takes a JSON object which represents a backend
-  // collection python dict.
-  create(
-      collectionRightsBackendObject: CollectionRightsBackendDict):
-      CollectionRights {
-    return new CollectionRights(cloneDeep(collectionRightsBackendObject));
-  }
-
-  // Create a new, empty collection rights object. This is not guaranteed to
-  // pass validation tests.
-  createEmptyCollectionRights(): CollectionRights {
-    return new CollectionRights({
-      owner_names: [],
-      collection_id: null,
-      can_edit: null,
-      can_unpublish: null,
-      is_private: null
-    });
-  }
-}
-
-angular.module('oppia').factory(
-  'CollectionRightsObjectFactory',
-  downgradeInjectable(CollectionRightsObjectFactory));

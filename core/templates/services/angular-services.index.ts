@@ -55,7 +55,6 @@ import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObject
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionObjectFactory } from 'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from 'domain/collection/CollectionPlaythroughObjectFactory';
-import { CollectionRightsObjectFactory } from 'domain/collection/CollectionRightsObjectFactory';
 import { GuestCollectionProgressObjectFactory } from 'domain/collection/GuestCollectionProgressObjectFactory';
 import { CollectionNodeObjectFactory } from 'domain/collection/collection-node-object.factory';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
@@ -407,7 +406,6 @@ export const angularServices: [string, unknown][] = [
   ['CollectionObjectFactory', CollectionObjectFactory],
   ['CollectionPlaythroughObjectFactory', CollectionPlaythroughObjectFactory],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
-  ['CollectionRightsObjectFactory', CollectionRightsObjectFactory],
   ['CollectionSummaryObjectFactory', CollectionSummaryObjectFactory],
   ['CollectionValidationService', CollectionValidationService],
   ['ComputationDataObjectFactory', ComputationDataObjectFactory],

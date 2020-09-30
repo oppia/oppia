@@ -116,8 +116,6 @@ import { CollectionPlaythroughObjectFactory } from
   'domain/collection/CollectionPlaythroughObjectFactory';
 import { CollectionRightsBackendApiService } from
   'domain/collection/collection-rights-backend-api.service';
-import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
 import { CollectionSummaryObjectFactory } from
   'domain/collection/collection-summary-object.factory';
 import { CollectionValidationService } from
@@ -731,8 +729,6 @@ export class UpgradedServices {
       new CollectionNodeObjectFactory();
     upgradedServices['CollectionPlaythroughObjectFactory'] =
       new CollectionPlaythroughObjectFactory();
-    upgradedServices['CollectionRightsObjectFactory'] =
-      new CollectionRightsObjectFactory();
     upgradedServices['CollectionSummaryObjectFactory'] =
       new CollectionSummaryObjectFactory();
     upgradedServices['CollectionValidationService'] =

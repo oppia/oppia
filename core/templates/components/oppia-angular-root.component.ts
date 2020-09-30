@@ -144,8 +144,6 @@ import { CollectionPlaythroughObjectFactory } from
   'domain/collection/CollectionPlaythroughObjectFactory';
 import { CollectionRightsBackendApiService } from
   'domain/collection/collection-rights-backend-api.service';
-import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
 import { CollectionSummaryObjectFactory } from
   'domain/collection/collection-summary-object.factory';
 import { CollectionValidationService } from
@@ -685,7 +683,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static collectionObjectFactory: CollectionObjectFactory;
   static collectionPlaythroughObjectFactory: CollectionPlaythroughObjectFactory;
   static collectionRightsBackendApiService: CollectionRightsBackendApiService;
-  static collectionRightsObjectFactory: CollectionRightsObjectFactory;
   static collectionSummaryObjectFactory: CollectionSummaryObjectFactory;
   static collectionValidationService: CollectionValidationService;
   static computationDataObjectFactory: ComputationDataObjectFactory;
@@ -1065,7 +1062,6 @@ private collectionNodeObjectFactory: CollectionNodeObjectFactory,
 private collectionObjectFactory: CollectionObjectFactory,
 private collectionPlaythroughObjectFactory: CollectionPlaythroughObjectFactory,
 private collectionRightsBackendApiService: CollectionRightsBackendApiService,
-private collectionRightsObjectFactory: CollectionRightsObjectFactory,
 private collectionSummaryObjectFactory: CollectionSummaryObjectFactory,
 private collectionValidationService: CollectionValidationService,
 private computationDataObjectFactory: ComputationDataObjectFactory,
@@ -1485,8 +1481,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.collectionPlaythroughObjectFactory);
     OppiaAngularRootComponent.collectionRightsBackendApiService = (
       this.collectionRightsBackendApiService);
-    OppiaAngularRootComponent.collectionRightsObjectFactory = (
-      this.collectionRightsObjectFactory);
     OppiaAngularRootComponent.collectionSummaryObjectFactory = (
       this.collectionSummaryObjectFactory);
     OppiaAngularRootComponent.collectionValidationService = (

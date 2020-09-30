@@ -13,19 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for CollectionRightsObjectFactory.
+ * @fileoverview Tests for Collection Rights Model.
  */
 
-import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
+import { CollectionRights } from
+  'domain/collection/collection-rights.model';
 
 describe('Collection rights object factory', () => {
-  let collectionRightsObjectFactory: CollectionRightsObjectFactory = null;
-
-  beforeEach(() => {
-    collectionRightsObjectFactory = new CollectionRightsObjectFactory();
-  });
-
   it('should not be able to modify owner names', () => {
     var initialCollectionRightsBackendObject = {
       collection_id: 0,
@@ -35,7 +29,7 @@ describe('Collection rights object factory', () => {
       owner_names: ['A']
     };
 
-    var sampleCollectionRights = collectionRightsObjectFactory.create(
+    var sampleCollectionRights = CollectionRights.create(
       initialCollectionRightsBackendObject);
     var ownerNames = sampleCollectionRights.getOwnerNames();
     ownerNames.push('B');
@@ -53,7 +47,7 @@ describe('Collection rights object factory', () => {
         owner_names: ['A']
       };
 
-      var sampleCollectionRights = collectionRightsObjectFactory.create(
+      var sampleCollectionRights = CollectionRights.create(
         initialCollectionRightsBackendObject);
       var ownerNames = sampleCollectionRights.getBindableOwnerNames();
       ownerNames.push('B');
@@ -71,7 +65,7 @@ describe('Collection rights object factory', () => {
       owner_names: ['A']
     };
 
-    var sampleCollectionRights = collectionRightsObjectFactory.create(
+    var sampleCollectionRights = CollectionRights.create(
       initialCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(true);
     expect(sampleCollectionRights.isPublic()).toBe(false);
@@ -91,7 +85,7 @@ describe('Collection rights object factory', () => {
         owner_names: ['A']
       };
 
-      var sampleCollectionRights = collectionRightsObjectFactory.create(
+      var sampleCollectionRights = CollectionRights.create(
         initialCollectionRightsBackendObject);
       expect(sampleCollectionRights.isPrivate()).toBe(true);
       expect(sampleCollectionRights.isPublic()).toBe(false);
@@ -113,7 +107,7 @@ describe('Collection rights object factory', () => {
       owner_names: ['A']
     };
 
-    var sampleCollectionRights = collectionRightsObjectFactory.create(
+    var sampleCollectionRights = CollectionRights.create(
       initialCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(false);
     expect(sampleCollectionRights.isPublic()).toBe(true);
@@ -133,7 +127,7 @@ describe('Collection rights object factory', () => {
         owner_names: ['A']
       };
 
-      var sampleCollectionRights = collectionRightsObjectFactory.create(
+      var sampleCollectionRights = CollectionRights.create(
         noUnpublishCollectionRightsBackendObject);
       expect(sampleCollectionRights.isPrivate()).toBe(false);
       expect(sampleCollectionRights.isPublic()).toBe(true);
@@ -149,7 +143,7 @@ describe('Collection rights object factory', () => {
 
   it('should create an empty collection rights object', () => {
     var emptyCollectionRightsBackendObject = (
-      collectionRightsObjectFactory.createEmptyCollectionRights());
+      CollectionRights.createEmptyCollectionRights());
 
     expect(
       emptyCollectionRightsBackendObject.getCollectionId()).toBeNull();
@@ -168,11 +162,11 @@ describe('Collection rights object factory', () => {
       owner_names: ['A']
     };
 
-    var sampleCollectionRights = collectionRightsObjectFactory.create(
+    var sampleCollectionRights = CollectionRights.create(
       noUnpublishCollectionRightsBackendObject);
 
     var emptyCollectionRightsBackendObject = (
-      collectionRightsObjectFactory.createEmptyCollectionRights());
+      CollectionRights.createEmptyCollectionRights());
 
     emptyCollectionRightsBackendObject.copyFromCollectionRights(
       sampleCollectionRights);
