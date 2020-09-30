@@ -19,8 +19,10 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeInteraction = function() {
-  // There are no customizations.
+var customizeInteraction = async function(elem, placeholderText) {
+  await objects.UnicodeStringEditor(
+    elem.element(by.tagName('schema-based-unicode-editor'))
+  ).setValue(placeholderText);
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {
@@ -46,19 +48,19 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'NumericExpression';
 
 var testSuite = [{
-  interactionArguments: [],
+  interactionArguments: ['Type an expression here, using only numbers.'],
   ruleArguments: ['MatchesExactlyWith', '6-(-4)'],
   expectedInteractionDetails: [],
   wrongAnswers: ['10', '3*2-(-4)'],
   correctAnswers: ['6-(-4)', '-(-4)+6', '6+4']
 }, {
-  interactionArguments: [],
+  interactionArguments: ['Type an expression here, using only numbers.'],
   ruleArguments: ['IsEquivalentTo', '3*10^(-5)'],
   expectedInteractionDetails: [],
   wrongAnswers: ['3*10^5', '2*10^(-5)', '5*10^(-3)'],
   correctAnswers: ['3*10^(-5)', '0.00003']
 }, {
-  interactionArguments: [],
+  interactionArguments: ['Type an expression here, using only numbers.'],
   ruleArguments: ['ContainsSomeOf', '1000 + 200 + 30 + 4 + 0.5 + 0.06'],
   expectedInteractionDetails: [],
   wrongAnswers: ['1234.56', '123456/100'],
@@ -68,7 +70,7 @@ var testSuite = [{
     '1000 + 234.56',
     '0.06']
 }, {
-  interactionArguments: [],
+  interactionArguments: ['Type an expression here, using only numbers.'],
   ruleArguments: ['OmitsSomeOf', '1000 + 200 + 30 + 4 + 0.5 + 0.06'],
   expectedInteractionDetails: [],
   wrongAnswers: [
