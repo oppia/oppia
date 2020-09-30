@@ -40,7 +40,7 @@ describe('When account is deleted it', function() {
   it('should request account deletion', async function() {
     await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
-    await deleteAccountPage.deleteAccount();
+    await deleteAccountPage.requestAccountDeletion();
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
   });
@@ -99,12 +99,13 @@ describe('When account is deleted it', function() {
     await users.logout();
     await users.login('secondOwner@check.com');
     await general.openEditor(explorationId);
+    await explorationEditorPage.navigateToSettingsTab();
     expect(await workflow.getExplorationManagers()).toEqual(['secondOwner']);
   });
 
   afterEach(async function() {
     await general.checkForConsoleErrors(
-      ['http://localhost:9001/create/.* - Failed to load resource: the server responded with a status of 404 (Not Found)']);
+      ['Failed to load resource: the server responded with a status of 404']);
     await users.logout();
   });
 });

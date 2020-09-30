@@ -1,6 +1,6 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
-var glob = require('glob')
-var path = require('path')
+var glob = require('glob');
+var path = require('path');
 
 var suites = {
     // The tests on Travis are run individually to parallelize
