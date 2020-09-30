@@ -73,11 +73,11 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         Export data described in request parameters.
 
         Raises:
-            UnauthorizedUserException. The user does not have credentials to
-                access the page.
-            InternalErrorException. The request was not made in the correct
-                environment.
-            InvalidInputException. The bucket parameter is malformed or missing.
+            Exception. One of the following ocurred:
+                -   The user does not have credentials to access the page.
+                -   The request was not made in the correct environment.
+                -   The bucket parameter is malformed or missing.
+                -   The export request failed to respond.
         """
 
         if not (self.is_cron_job or self.is_super_admin):
