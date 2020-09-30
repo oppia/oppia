@@ -371,55 +371,54 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
+        gravatar_url = user_services.get_gravatar_url(user_email)
+
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        gravatar_url = user_services.get_gravatar_url(user_email)
-        with python_utils.open_file(
-            expected_gravatar_filepath, 'rb', encoding=None) as f:
-            gravatar = f.read()
-        with requests_mock.Mocker() as m:
-            m.get(gravatar_url, content=gravatar)
-            profile_picture = user_services.fetch_gravatar(user_email)
-            gravatar_data_url = utils.convert_png_to_data_url(
-                expected_gravatar_filepath)
-            self.assertEqual(profile_picture, gravatar_data_url)
+        with python_utils.open_file(expected_gravatar_filepath, 'rb',
+                                    encoding=None) as f:
+            expected_gravatar = f.read()
+
+        with requests_mock.Mocker() as requests_mocker:
+            requests_mocker.get(gravatar_url, content=expected_gravatar)
+            gravatar = user_services.fetch_gravatar(user_email)
+
+        self.assertEqual(
+            gravatar, utils.convert_png_to_data_url(expected_gravatar_filepath))
 
     def test_fetch_gravatar_failure_404(self):
         user_email = 'user@example.com'
+        gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages = []
-        def mock_log_function(message):
-            error_messages.append(message)
+        logging_mocker = self.swap(
+            logging, 'error', lambda msg: error_messages.append(msg))
 
-        gravatar_url = user_services.get_gravatar_url(user_email)
-        expected_error_message = (
-            '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
-        mocked_logging_ctx = self.swap(logging, 'error', mock_log_function)
-        with mocked_logging_ctx, requests_mock.Mocker() as m:
-            m.get(gravatar_url, status_code=404)
-            profile_picture = user_services.fetch_gravatar(user_email)
-            self.assertEqual(error_messages, [expected_error_message])
-            self.assertEqual(
-                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+        with logging_mocker, requests_mock.Mocker() as requests_mocker:
+            requests_mocker.get(gravatar_url, status_code=404)
+            gravatar = user_services.fetch_gravatar(user_email)
+
+        self.assertEqual(
+            error_messages,
+            ['[Status 404] Failed to fetch Gravatar from %s' % gravatar_url])
+        self.assertEqual(gravatar, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_fetch_gravatar_failure_exception(self):
         user_email = 'user@example.com'
+        gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages = []
-        def mock_log_function(message):
-            error_messages.append(message)
+        logging_mocker = self.swap(
+            logging, 'exception', lambda msg: error_messages.append(msg))
 
-        gravatar_url = user_services.get_gravatar_url(user_email)
-        expected_error_message = (
-            'Failed to fetch Gravatar from %s' % gravatar_url)
-        mocked_logging_ctx = self.swap(logging, 'exception', mock_log_function)
-        with mocked_logging_ctx, requests_mock.Mocker() as m:
-            m.get(gravatar_url, exc=Exception)
-            profile_picture = user_services.fetch_gravatar(user_email)
-            self.assertEqual(error_messages, [expected_error_message])
-            self.assertEqual(
-                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+        with logging_mocker, requests_mock.Mocker() as requests_mocker:
+            requests_mocker.get(gravatar_url, exc=Exception)
+            gravatar = user_services.fetch_gravatar(user_email)
+
+        self.assertEqual(
+            error_messages, ['Failed to fetch Gravatar from %s' % gravatar_url])
+        self.assertEqual(gravatar, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(
