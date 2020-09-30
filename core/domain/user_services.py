@@ -33,7 +33,7 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.api import urlfetch
+import requests
 
 current_user_services = models.Registry.import_current_user_services()
 (user_models, audit_models) = models.Registry.import_models(
@@ -664,20 +664,19 @@ def fetch_gravatar(email):
     """
     gravatar_url = get_gravatar_url(email)
     try:
-        result = urlfetch.fetch(
-            gravatar_url,
-            headers={'Content-Type': 'image/png'},
-            follow_redirects=False)
-    except (urlfetch.InvalidURLError, urlfetch.DownloadError):
-        logging.error('Failed to fetch Gravatar from %s' % gravatar_url)
+        response = requests.get(
+            gravatar_url, headers={b'Content-Type': b'image/png'},
+            allow_redirects=False)
+    except Exception:
+        logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
-        if result.status_code == 200:
-            if imghdr.what(None, h=result.content) == 'png':
-                return utils.convert_png_binary_to_data_url(result.content)
+        if response.ok:
+            if imghdr.what(None, h=response.content) == 'png':
+                return utils.convert_png_binary_to_data_url(response.content)
         else:
             logging.error(
                 '[Status %s] Failed to fetch Gravatar from %s' %
-                (result.status_code, gravatar_url))
+                (response.status_code, gravatar_url))
 
     return DEFAULT_IDENTICON_DATA_URL
 
