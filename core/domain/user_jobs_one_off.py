@@ -602,7 +602,7 @@ class CleanUpUserContributionsModelOneOffJob(
         if exp_ids_removed:
             item.put()
             yield (
-                'Removed deleted exp ids UserContributionsModel',
+                'Removed deleted exp ids from UserContributionsModel',
                 'Model id: %s, Removed exploration ids: %s' % (
                     item.id, exp_ids_removed))
 

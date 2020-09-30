@@ -33,9 +33,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 USER_ID_REGEX = 'uid_[a-z]{32}'
 
-# These are model ids used for oppia bots like suggestion bot and migration
+# These are model ids used for bots like suggestion bot and migration
 # bot. We do not need to perform any validation checks for such models.
-IDS_FOR_BOTS = ['OppiaSuggestionBot', 'OppiaMigrationBot']
+BOT_IDS = ['OppiaSuggestionBot', 'OppiaMigrationBot']
 
 ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
 ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
@@ -362,7 +362,7 @@ class BaseModelValidator(python_utils.OBJECT):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        if item.id in IDS_FOR_BOTS:
+        if item.id in BOT_IDS:
             return
 
         cls.errors.clear()
@@ -480,7 +480,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
             item: ndb.Model. Entity to validate.
         """
         super(BaseSummaryModelValidator, cls).validate(item)
-        if item.id in IDS_FOR_BOTS:
+        if item.id in BOT_IDS:
             return
 
         cls._validate_external_model_properties(
@@ -580,7 +580,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
             item: ndb.Model. Entity to validate.
         """
         super(BaseSnapshotContentModelValidator, cls).validate(item)
-        if item.id in IDS_FOR_BOTS:
+        if item.id in BOT_IDS:
             return
 
         cls._validate_base_model_version_from_item_id(
@@ -667,7 +667,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             item: ndb.Model. Entity to validate.
         """
         super(BaseSnapshotMetadataModelValidator, cls).validate(item)
-        if item.id in IDS_FOR_BOTS:
+        if item.id in BOT_IDS:
             return
 
         cls._validate_commit_type(item)
@@ -738,7 +738,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
             item: ndb.Model. Entity to validate.
         """
         super(BaseCommitLogEntryModelValidator, cls).validate(item)
-        if item.id in IDS_FOR_BOTS:
+        if item.id in BOT_IDS:
             return
 
         cls._validate_post_commit_status(item)

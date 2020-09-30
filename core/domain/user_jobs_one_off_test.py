@@ -2003,7 +2003,7 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         self.assertEqual(
             output, [
-                '[u\'Removed deleted exp ids UserContributionsModel\', '
+                '[u\'Removed deleted exp ids from UserContributionsModel\', '
                 '[u"Model id: %s, Removed exploration ids: [u\'exp0\', '
                 'u\'exp0\']"]]' % self.user_id])
 
@@ -2049,7 +2049,7 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
         removed_exp_list.sort()
         self.assertEqual(
             output, [
-                '[u\'Removed deleted exp ids UserContributionsModel\', '
+                '[u\'Removed deleted exp ids from UserContributionsModel\', '
                 '[u"%s", u"%s"]]' % (removed_exp_list[0], removed_exp_list[1])])
 
         model_instance_1 = user_models.UserContributionsModel.get_by_id(
