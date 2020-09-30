@@ -145,7 +145,8 @@ class RegenerateQuestionSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class MissingQuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """This job is used to delete question commit log models for which question
     models are missing.
-    Note: This job cannot be deleted until issue #10808 is fixed.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10808 is fixed.
     """
 
     @classmethod
