@@ -25,8 +25,8 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import { SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
+import { SkillOpportunity } from
+  'domain/opportunity/skill-opportunity.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { FeaturedTranslationLanguageObjectFactory} from
@@ -38,8 +38,6 @@ describe('Contribution Opportunities backend API service', function() {
   let httpTestingController: HttpTestingController;
   let explorationOpportunitySummaryObjectFactory:
     ExplorationOpportunitySummaryObjectFactory = null;
-  let skillOpportunityObjectFactory:
-    SkillOpportunityObjectFactory = null;
   let urlInterpolationService:
     UrlInterpolationService = null;
   const skillOpportunityResponse = {
@@ -79,10 +77,9 @@ describe('Contribution Opportunities backend API service', function() {
     explorationOpportunitySummaryObjectFactory =
       TestBed.get(ExplorationOpportunitySummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
-    skillOpportunityObjectFactory = TestBed.get(SkillOpportunityObjectFactory);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     sampleSkillOpportunitiesResponse = [
-      skillOpportunityObjectFactory.createFromBackendDict(
+      SkillOpportunity.createFromBackendDict(
         skillOpportunityResponse.opportunities[0])
     ];
     sampleTranslationOpportunitiesResponse = [
@@ -192,7 +189,6 @@ describe('Contribution Opportunities backend API service', function() {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-
       const featuredTranslationLanguageObjectFactory = TestBed.get(
         FeaturedTranslationLanguageObjectFactory);
 

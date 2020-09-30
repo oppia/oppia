@@ -486,8 +486,6 @@ import { SkillMasteryBackendApiService } from
 import { SkillMasteryObjectFactory } from
   'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 import { SkillRightsObjectFactory } from
@@ -924,7 +922,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static skillMasteryBackendApiService: SkillMasteryBackendApiService;
   static skillMasteryObjectFactory: SkillMasteryObjectFactory;
   static skillObjectFactory: SkillObjectFactory;
-  static skillOpportunityObjectFactory: SkillOpportunityObjectFactory;
   static skillRightsBackendApiService: SkillRightsBackendApiService;
   static skillRightsObjectFactory: SkillRightsObjectFactory;
   static skillSummaryObjectFactory: SkillSummaryObjectFactory;
@@ -1307,7 +1304,6 @@ private skillDifficultyObjectFactory: SkillDifficultyObjectFactory,
 private skillMasteryBackendApiService: SkillMasteryBackendApiService,
 private skillMasteryObjectFactory: SkillMasteryObjectFactory,
 private skillObjectFactory: SkillObjectFactory,
-private skillOpportunityObjectFactory: SkillOpportunityObjectFactory,
 private skillRightsBackendApiService: SkillRightsBackendApiService,
 private skillRightsObjectFactory: SkillRightsObjectFactory,
 private skillSummaryObjectFactory: SkillSummaryObjectFactory,
@@ -1862,8 +1858,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.skillMasteryObjectFactory = (
       this.skillMasteryObjectFactory);
     OppiaAngularRootComponent.skillObjectFactory = this.skillObjectFactory;
-    OppiaAngularRootComponent.skillOpportunityObjectFactory = (
-      this.skillOpportunityObjectFactory);
     OppiaAngularRootComponent.skillRightsBackendApiService = (
       this.skillRightsBackendApiService);
     OppiaAngularRootComponent.skillRightsObjectFactory = (

@@ -496,8 +496,6 @@ import { SkillMasteryBackendApiService } from
 import { SkillMasteryObjectFactory } from
   'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 import { SkillRightsObjectFactory } from
@@ -886,8 +884,6 @@ export class UpgradedServices {
       new SkillDifficultyObjectFactory();
     upgradedServices['SkillMasteryObjectFactory'] =
       new SkillMasteryObjectFactory();
-    upgradedServices['SkillOpportunityObjectFactory'] =
-      new SkillOpportunityObjectFactory();
     upgradedServices['SkillRightsObjectFactory'] =
       new SkillRightsObjectFactory();
     upgradedServices['SkillSummaryObjectFactory'] =

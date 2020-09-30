@@ -26,7 +26,7 @@ import {
   ExplorationOpportunitySummaryBackendDict
 } from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { SkillOpportunity, SkillOpportunityBackendDict } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
+  'domain/opportunity/skill-opportunity.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
