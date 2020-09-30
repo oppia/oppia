@@ -18,29 +18,54 @@ from __future__ import absolute_import # pylint: disable=import-only-modules
 from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 import datetime
+import json
 import logging
 
-from core.controllers import base
-
 from google.appengine.api import app_identity
+from google.appengine.api import users
 import requests
 import webapp2
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 GCS_BUCKET_URL_PREFIX = 'gs://'
+XSSI_PREFIX = ')]}\'\n'
 
 
-class ExportToCloudDatastoreHandler(base.BaseHandler):
+class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
     """Request handler which supports triggering automatic exports of the
     entities that application stores in Google Cloud Datastore.
     """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
 
     @property
     def is_cron_job(self):
         """Returns whether the request came from a cron job."""
         return self.request.headers.get('X-AppEngine-Cron') is not None
+
+    @property
+    def is_super_admin(self):
+        """Returns whether the request came from an admin."""
+        return users.is_current_user_admin()
+
+    def handle_exception(self, exception, unused_debug_mode):
+        """Overwrites the default exception handler.
+
+        Args:
+            exception: Exception. The exception that was thrown.
+            unused_debug_mode: bool. True if the web application is running
+                in debug mode.
+        """
+        logging.error(exception)
+        self.response.content_type = b'application/json; charset=utf-8'
+        self.response.headers.update({
+            b'Content-Disposition': (
+                b'attachment; filename="oppia-attachment.txt"'),
+            b'Strict-Transport-Security': (
+                b'max-age=31536000; includeSubDomains'),
+            b'X-Content-Type-Options': b'nosniff',
+            b'X-Xss-Protection': b'1; mode=block',
+        })
+        json_output = json.dumps({'error': repr(exception)})
+        self.response.write('%s%s' % (XSSI_PREFIX, json_output))
 
     def get(self):
         """Triggers an export of Google Cloud Datastore.
@@ -56,25 +81,22 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
         """
 
         if not (self.is_cron_job or self.is_super_admin):
-            e = self.UnauthorizedUserException(
+            self.response.status_code = 401
+            raise Exception(
                 'You do not have the credentials to access this page.')
-            logging.error(e)
-            raise e
 
         app_id = app_identity.get_application_id()
         if app_id != APP_NAME_OPPIASERVER:
-            e = self.InternalErrorException(
+            self.response.status_code = 500
+            raise Exception(
                 'Export service has been pinged from a non-production '
                 'or non-Oppia environment, so the request has been ignored.')
-            logging.error(e)
-            raise e
 
         bucket = self.request.get('bucket')
         if not bucket.startswith(GCS_BUCKET_URL_PREFIX):
-            e = self.InvalidInputException(
+            self.response.status_code = 400
+            raise Exception(
                 'bucket must begin with %s' % GCS_BUCKET_URL_PREFIX)
-            logging.error(e)
-            raise e
 
         access_token, unused_expiration_time = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
@@ -96,14 +118,13 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
         }
 
         try:
-            response = (
-                requests.post(url, json=payload, headers=headers, timeout=60))
-            response.raise_for_status()
+            resp = requests.post(url, json=payload, headers=headers, timeout=60)
+            resp.raise_for_status()
         except Exception:
-            logging.exception('Failed to initiate export')
+            self.response.status_code = 500
             raise
         else:
-            logging.info(response.content)
+            logging.info(resp.content)
 
 
 app = webapp2.WSGIApplication( # pylint: disable=invalid-name
