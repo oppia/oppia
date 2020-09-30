@@ -26,7 +26,7 @@ import { ImprovementsConstants } from
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { TaskEntryBackendDict, TaskEntry } from
-  'domain/improvements/TaskEntryObjectFactory';
+  'domain/improvements/task-entry.model';
 
 export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
   constructor(backendDict: TaskEntryBackendDict<'high_bounce_rate'>) {

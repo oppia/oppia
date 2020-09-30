@@ -15,10 +15,6 @@
 /**
  * @fileoverview Domain object for holding details about an improvements task.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
@@ -99,6 +95,10 @@ export class TaskEntry<TaskType = string> {
     this.taskStatus = backendDict.status;
   }
 
+  static createFromBackendDict(backendDict: TaskEntryBackendDict): TaskEntry {
+    return new TaskEntry(backendDict);
+  }
+
   public toBackendDict(): TaskEntryBackendDict<TaskType> {
     return {
       entity_type: this.entityType,
@@ -157,15 +157,3 @@ export class TaskEntry<TaskType = string> {
     this.taskStatus = ImprovementsConstants.TASK_STATUS_RESOLVED;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class TaskEntryObjectFactory {
-  createFromBackendDict(backendDict: TaskEntryBackendDict): TaskEntry {
-    return new TaskEntry(backendDict);
-  }
-}
-
-angular.module('oppia').factory(
-  'TaskEntryObjectFactory', downgradeInjectable(TaskEntryObjectFactory));

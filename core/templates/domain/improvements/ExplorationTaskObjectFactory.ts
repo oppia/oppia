@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { HighBounceRateTask, HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { TaskEntryBackendDict } from
-  'domain/improvements/TaskEntryObjectFactory';
+  'domain/improvements/task-entry.model';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import {

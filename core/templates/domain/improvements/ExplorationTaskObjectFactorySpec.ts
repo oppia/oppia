@@ -23,7 +23,7 @@ import { ExplorationTaskObjectFactory } from
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { TaskEntryBackendDict } from
-  'domain/improvements/TaskEntryObjectFactory';
+  'domain/improvements/task-entry.model';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from

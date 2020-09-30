@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { TaskEntryBackendDict, TaskEntry } from
-  'domain/improvements/TaskEntryObjectFactory';
+  'domain/improvements/task-entry.model';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 

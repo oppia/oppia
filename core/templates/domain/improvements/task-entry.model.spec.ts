@@ -17,18 +17,10 @@
  *    object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { TaskEntryBackendDict, TaskEntry, TaskEntryObjectFactory } from
-  'domain/improvements/TaskEntryObjectFactory';
+import { TaskEntryBackendDict, TaskEntry } from
+  'domain/improvements/task-entry.model';
 
 describe('Task entry', function() {
-  let taskEntryObjectFactory: TaskEntryObjectFactory;
-
-  beforeEach(() => {
-    taskEntryObjectFactory = TestBed.get(TaskEntryObjectFactory);
-  });
-
   it('should use same values from backend dict', () => {
     const taskBackendDict: TaskEntryBackendDict = {
       entity_type: 'exploration',
@@ -44,7 +36,7 @@ describe('Task entry', function() {
       resolved_on_msecs: 123456789,
     };
     const task: TaskEntry = (
-      taskEntryObjectFactory.createFromBackendDict(taskBackendDict));
+      TaskEntry.createFromBackendDict(taskBackendDict));
 
     expect(task.entityType).toEqual('exploration');
     expect(task.entityId).toEqual('eid');
@@ -66,7 +58,7 @@ describe('Task entry', function() {
   });
 
   it('should only return relevant values to backend payload dict', () => {
-    const task = taskEntryObjectFactory.createFromBackendDict({
+    const task = TaskEntry.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
       entity_version: 1,
@@ -90,7 +82,7 @@ describe('Task entry', function() {
   });
 
   it('should be able to become obsolete', () => {
-    const task = taskEntryObjectFactory.createFromBackendDict({
+    const task = TaskEntry.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
       entity_version: 1,
