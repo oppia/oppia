@@ -143,7 +143,7 @@ var AdminPage = function() {
     if (title.match(propertyName)) {
       await editingInstructions(
         await forms.getEditor(objectType)(configProperty));
-      await saveAllConfigs.click();
+      await action.click(saveAllConfigs);
       await general.acceptAlert();
       // Waiting for success message.
       await waitFor.textToBePresentInElement(
@@ -166,7 +166,7 @@ var AdminPage = function() {
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();
-    await configTab.click();
+    await action.click(configTab);
     await waitFor.elementToBeClickable(saveAllConfigs);
 
     const results = [];
@@ -195,8 +195,8 @@ var AdminPage = function() {
       'Starting one off jobs taking too long to appear.');
     var text = await (await oneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-      await (await oneOffJobRows.get(i)).element(
-        by.css('.protractor-test-one-off-jobs-start-btn')).click();
+      var oneOffJobRowsButton = (await oneOffJobRows.get(i)).element(by.css('.protractor-test-one-off-jobs-start-btn'));
+      await action.click('OneOffJobRowsButton',oneOffJobRowsButton);
     } else {
       await this._startOneOffJob(jobName, ++i);
     }
@@ -209,8 +209,9 @@ var AdminPage = function() {
   this._stopOneOffJob = async function(jobName, i) {
     var text = await (await unfinishedOneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-      await (await unfinishedOneOffJobRows.get(i)).element(
-        by.css('.protractor-test-one-off-jobs-stop-btn')).click();
+      var unfinishedOffJobRowsButton = (await unfinishedOneOffJobRows.get(i)).element(
+        by.css('.protractor-test-one-off-jobs-stop-btn'));
+      await action.click('UnfinishedOffJobRowsButton',unfinishedOffJobRowsButton);
     } else {
       await this._stopOneOffJob(jobName, ++i);
     }
@@ -239,7 +240,7 @@ var AdminPage = function() {
   this.updateRole = async function(name, newRole) {
     await waitFor.elementToBeClickable(
       adminRolesTab, 'Admin Roles tab is not clickable');
-    await adminRolesTab.click();
+    await action.click(adminRolesTab);
 
     // Change values for "update role" form, and submit it.
     await waitFor.visibilityOf(
@@ -248,8 +249,8 @@ var AdminPage = function() {
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
     await waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
-    await roleOption.click();
-    await updateFormSubmit.click();
+    await action.click(roleOption);
+    await action.click(updateFormSubmit)
     await waitFor.visibilityOf(
       statusMessage, 'Confirmation message not visible');
     await waitFor.textToBePresentInElement(
@@ -262,10 +263,10 @@ var AdminPage = function() {
       roleDropdown, 'View role dropdown taking too long to be visible');
     await roleDropdown.sendKeys('By Role');
 
-    await roleValueOption.click();
+    await action.click(roleValueOption);
     await roleValueOption.sendKeys(role);
 
-    await viewRoleButton.click();
+    await action.click(viewRoleButton);
   };
 
   this.viewRolesbyUsername = async function(username) {
@@ -273,10 +274,10 @@ var AdminPage = function() {
       roleDropdown, 'View role dropdown taking too long to be visible');
     await roleDropdown.sendKeys('By Username');
 
-    await roleUsernameOption.click();
+    await action.click(roleUsernameOption);
     await roleUsernameOption.sendKeys(username);
 
-    await viewRoleButton.click();
+    await action.click(viewRoleButton);
   };
 
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
