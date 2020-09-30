@@ -510,7 +510,8 @@ class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
     """Job that regenerates missing commit log models for an exploration.
-    Note: This job cannot be deleted until issue #10808 is fixed.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10808 is fixed.
     """
 
     @classmethod
@@ -519,8 +520,6 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        rights_model = exp_models.ExplorationRightsModel.get_by_id(item.id)
-
         for version in python_utils.RANGE(1, item.version + 1):
             commit_log_model = (
                 exp_models.ExplorationCommitLogEntryModel.get_by_id(
@@ -529,6 +528,8 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
                 metadata_model = (
                     exp_models.ExplorationSnapshotMetadataModel.get_by_id(
                         '%s-%s' % (item.id, version)))
+                rights_model = exp_models.ExplorationRightsModel.get(
+                    item.id, strict=True, version=version)
                 commit_log_model = (
                     exp_models.ExplorationCommitLogEntryModel.create(
                         item.id, version, metadata_model.committer_id,
@@ -537,7 +538,9 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
                         metadata_model.commit_cmds,
                         rights_model.status, rights_model.community_owned))
                 commit_log_model.exploration_id = item.id
-                commit_log_model.put()
+                commit_log_model.created_on = metadata_model.created_on
+                commit_log_model.last_updated = metadata_model.last_updated
+                commit_log_model.put(update_last_updated_time=False)
                 yield ('Regenerated Exploration Commit Log Model', item.id)
 
     @staticmethod
