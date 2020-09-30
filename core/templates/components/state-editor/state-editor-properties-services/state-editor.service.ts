@@ -79,6 +79,8 @@ export class StateEditorService {
   stateHintsEditorInitialised: boolean = false;
   stateSolutionEditorInitialised: boolean = false;
   stateEditorDirectiveInitialised: boolean = false;
+  currentRuleInputIsValid: boolean = false;
+  inapplicableSkillMisconceptionIds: string[] = [];
 
   updateStateContentEditorInitialised(): void {
     this.stateContentEditorInitialised = true;
@@ -102,6 +104,14 @@ export class StateEditorService {
 
   updateStateEditorDirectiveInitialised(): void {
     this.stateEditorDirectiveInitialised = true;
+  }
+
+  updateCurrentRuleInputIsValid(value: boolean): void {
+    this.currentRuleInputIsValid = value;
+  }
+
+  checkCurrentRuleInputIsValid(): boolean {
+    return this.currentRuleInputIsValid;
   }
 
   checkEventListenerRegistrationStatus(): boolean {
@@ -242,6 +252,16 @@ export class StateEditorService {
 
   getStateNames(): string[] {
     return this.stateNames;
+  }
+
+  setInapplicableSkillMisconceptionIds(
+      newInapplicableSkillMisconceptionIds: string[]): void {
+    this.inapplicableSkillMisconceptionIds = (
+      newInapplicableSkillMisconceptionIds);
+  }
+
+  getInapplicableSkillMisconceptionIds(): string[] {
+    return this.inapplicableSkillMisconceptionIds;
   }
 
   isCurrentSolutionValid(): boolean {

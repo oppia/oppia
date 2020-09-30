@@ -18,6 +18,19 @@
  * @param {puppeteer.Browser} browser
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
  */
+const ADMIN_URL = 'http://127.0.0.1:8181/admin';
+const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
+const networkIdle = 'networkidle0';
+
+var usernameInput = '.protractor-test-username-input';
+var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
+var registerUser = '.protractor-test-register-user';
+var navbarToggle = '.oppia-navbar-dropdown-toggle';
+
+var updateFormName = '.protractor-update-form-name';
+var updateFormSubmit = '.protractor-update-form-submit';
+var roleSelect = '.protractor-update-form-role-select';
+var statusMessage = '.protractor-test-status-message';
 
 module.exports = async(browser, context) => {
   const page = await browser.newPage();
@@ -26,7 +39,7 @@ module.exports = async(browser, context) => {
   if (context.url.includes('admin')) {
     await login(context, page);
   } else if (context.url.includes('emaildashboard')) {
-    await setRoleAdmin(context, page);
+    await setRole(page, 'string:ADMIN');
   } else if (context.url.includes('collection/0')) {
     await createCollections(context, page);
   } else if (context.url.includes('explore/0')) {
@@ -35,55 +48,51 @@ module.exports = async(browser, context) => {
   await page.close();
 };
 
-
+// Needed to relogin after lighthouse_setup.js.
 const login = async function(context, page) {
   try {
-    // eslint-disable-next-line no-console
-    console.log('Logging into Oppia...');
     // eslint-disable-next-line dot-notation
-    await page.goto(context.url, { waitUntil: 'networkidle0' });
-    await page.waitForSelector('#admin');
+    await page.goto(
+      ADMIN_URL, { waitUntil: networkIdle});
+    await page.waitForSelector('#admin', {visible: true});
     await page.click('#admin');
     await page.click('#submit-login');
-    await page.waitForSelector('#username');
-    await page.type('#username', 'username1');
-    await page.click('#terms-checkbox');
-    await page.waitForSelector('#signup-submit');
-    await page.click('#signup-submit');
-    await page.waitForSelector('.oppia-navbar-dropdown-toggle');
-    // eslint-disable-next-line no-console
-    console.log('Successfully Logged in');
+    // Checks if the user's account was already made.
+    try {
+      await page.waitForSelector(usernameInput, {visible: true});
+      await page.type(usernameInput, 'username1');
+      await page.click(agreeToTermsCheckBox);
+      await page.waitForSelector(registerUser);
+      await page.click(registerUser);
+      await page.waitForSelector(navbarToggle);
+    } catch (error) {
+      // Already Signed in.
+    }
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Login Failed');
     // eslint-disable-next-line no-console
     console.log(e);
   }
 };
 
-
-const setRoleAdmin = async function(context, page) {
+const setRole = async function(page, role) {
   try {
-    // eslint-disable-next-line no-console
-    console.log('Changing role to admin...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
-    await page.waitForSelector('#update-role-username-input');
-    await page.type('#update-role-username-input', 'username1');
-    await page.select('#update-role-input', 'string:ADMIN');
-    await page.waitForSelector('#update-button-id');
-    await page.click('#update-button-id');
-    await page.waitForSelector('.protractor-test-status-message');
+    await page.goto(
+      'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
+    await page.waitForSelector(updateFormName);
+    await page.type(updateFormName, 'username1');
+    await page.select(roleSelect, role);
+    await page.waitForSelector(updateFormSubmit);
+    await page.click(updateFormSubmit);
+    await page.waitForSelector(statusMessage);
     await page.waitForFunction(
       'document.querySelector(' +
         '".protractor-test-status-message").innerText.includes(' +
         '"successfully updated to")'
     );
-    // eslint-disable-next-line no-console
-    console.log('Role changed to admin');
+    // eslint-disable-next-line dot-notation
+    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Changing role to admin failed');
     // eslint-disable-next-line no-console
     console.log(e);
   }
@@ -94,14 +103,7 @@ const createCollections = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
-    // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
-    await page.waitFor(2000);
-    await page.type('#update-role-username-textbook', 'username1');
-    await page.select('#update-role-input', 'string:COLLECTION_EDITOR');
-    await page.waitFor(5000);
-    await page.click('#update-button-id');
-    await page.waitFor(2000);
+    await setRole(page, 'string:COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin');
@@ -111,8 +113,6 @@ const createCollections = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Collections Created');
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Creating Collections Failed');
     // eslint-disable-next-line no-console
     console.log(e);
   }
@@ -132,8 +132,6 @@ const createExplorations = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Exploration Created');
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Creating Exploration Failed');
     // eslint-disable-next-line no-console
     console.log(e);
   }

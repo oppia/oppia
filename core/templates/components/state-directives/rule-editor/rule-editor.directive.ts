@@ -28,11 +28,7 @@ require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/validators.service.ts');
 
 var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 // This directive controls an editor for selecting the type and input parameters
@@ -55,13 +51,11 @@ angular.module('oppia').directive('ruleEditor', [
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'StateEditorService',
-        'ValidatorsService', 'INTERACTION_SPECS',
-        'ResponsesService', 'StateInteractionIdService',
+        '$scope', '$timeout', 'ResponsesService', 'StateEditorService',
+        'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
-            $scope, $timeout, StateEditorService,
-            ValidatorsService, INTERACTION_SPECS,
-            ResponsesService, StateInteractionIdService) {
+            $scope, $timeout, ResponsesService, StateEditorService,
+            StateInteractionIdService, INTERACTION_SPECS) {
           var ctrl = this;
           // This returns the rule description string.
           var computeRuleDescriptionFragments = function() {
@@ -265,6 +259,12 @@ angular.module('oppia').directive('ruleEditor', [
               ctrl.onSelectNewRuleType(ctrl.rule.type);
             }
             computeRuleDescriptionFragments();
+
+            $scope.$watch(
+              '$ctrl.ruleEditForm.form.$invalid', function(newValue) {
+                StateEditorService.updateCurrentRuleInputIsValid(!newValue);
+              }
+            );
           };
         }
       ]

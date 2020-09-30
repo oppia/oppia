@@ -31,7 +31,6 @@ require(
 
 require('directives/angular-html-bind.directive.ts');
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
-require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/learner_dashboard/learner-dashboard-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
@@ -49,29 +48,29 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$scope', '$uibModal', '$window', 'AlertsService',
-    'LoaderService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+    '$http', '$q', '$scope', '$uibModal', 'AlertsService',
+    'DateTimeFormatService', 'DeviceInfoService',
+    'FeedbackMessageSummaryObjectFactory', 'LearnerDashboardBackendApiService',
+    'LoaderService', 'SuggestionModalForLearnerDashboardService',
+    'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
     'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
-    'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
-    'LearnerDashboardBackendApiService', 'UrlInterpolationService',
+    'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
+    'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
     'LEARNER_DASHBOARD_SECTION_I18N_IDS',
-    'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
-    'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
-    'FeedbackThreadSummaryObjectFactory',
-    'FeedbackMessageSummaryObjectFactory',
-    'SuggestionModalForLearnerDashboardService', 'UserService',
+    'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
+    'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
-        $http, $q, $scope, $uibModal, $window, AlertsService,
-        LoaderService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+        $http, $q, $scope, $uibModal, AlertsService,
+        DateTimeFormatService, DeviceInfoService,
+        FeedbackMessageSummaryObjectFactory, LearnerDashboardBackendApiService,
+        LoaderService, SuggestionModalForLearnerDashboardService,
+        ThreadStatusDisplayService, UrlInterpolationService, UserService,
         ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
-        SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
-        LearnerDashboardBackendApiService, UrlInterpolationService,
+        EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
+        FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         LEARNER_DASHBOARD_SECTION_I18N_IDS,
-        LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
-        DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
-        FeedbackThreadSummaryObjectFactory,
-        FeedbackMessageSummaryObjectFactory,
-        SuggestionModalForLearnerDashboardService, UserService) {
+        LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
+        SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS) {
       var ctrl = this;
       var threadIndex = null;
 
@@ -97,7 +96,7 @@ angular.module('oppia').component('learnerDashboardPage', {
       };
 
       ctrl.checkMobileView = function() {
-        return ($window.innerWidth < 500);
+        return DeviceInfoService.isMobileDevice();
       };
 
       ctrl.getVisibleExplorationList = function(startCompletedExpIndex) {
@@ -240,11 +239,13 @@ angular.module('oppia').component('learnerDashboardPage', {
             $scope.$apply();
           },
           sort: function(e, ui) {
-            /* eslint-disable quote-props */
             // Making top : 0px to avoid irregular change in position.
             ui.helper.css(
+              // This throws "Unnecessarily quoted property 'top' found". We
+              // need to manually suppress this warning as the 'top' is a css
+              // property and we cannot pass it without using quotes around it.
+              /* eslint-disable-next-line quote-props */
               {'top': '0 px'});
-            /* eslint-enable quote-props */
           },
           update: function(e, ui) {
             var insertExpInLearnerPlaylistUrl = (
@@ -352,7 +353,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/learner-dashboard-page/modal-templates/' +
             'remove-activity-from-learner-dashboard-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           resolve: {
             sectionNameI18nId: function() {
               return sectionNameI18nId;

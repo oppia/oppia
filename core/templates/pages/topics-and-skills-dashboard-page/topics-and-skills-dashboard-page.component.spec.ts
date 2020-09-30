@@ -43,13 +43,10 @@ describe('Topics and Skills Dashboard Page', function() {
   var $rootScope = null;
   var $q = null;
   var $timeout = null;
-  var TopicsAndSkillsDashboardBackendApiService = null;
-  var WindowDimensionsService = null;
   var TopicsAndSkillsDashboardFilterObjectFactory = null;
   var TopicSummaryObjectFactory = null;
   var SkillSummaryObjectFactory = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
-  var AlertsService = null;
 
   var mocktasdReinitalizedEventEmitter = null;
 
@@ -87,13 +84,9 @@ describe('Topics and Skills Dashboard Page', function() {
       $scope = $rootScope.$new();
       $timeout = $injector.get('$timeout');
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
-      WindowDimensionsService = $injector.get('WindowDimensionsService');
       $q = $injector.get('$q');
       TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
         'TopicsAndSkillsDashboardFilterObjectFactory');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       TopicSummaryObjectFactory = $injector.get(
         'TopicSummaryObjectFactory');
       SkillSummaryObjectFactory = $injector.get(
@@ -370,12 +363,9 @@ describe('Topics and Skills Dashboard Page', function() {
     beforeEach(angular.mock.inject(function($injector) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
       TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
         'TopicsAndSkillsDashboardFilterObjectFactory');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       TopicSummaryObjectFactory = $injector.get(
         'TopicSummaryObjectFactory');
       SkillSummaryObjectFactory = $injector.get(
@@ -501,7 +491,7 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should navigate skill page forward', function() {
-      var skillSpy = spyOn(ctrl, 'fetchSkills');
+      var skillSpy = spyOn(ctrl, 'fetchSkillsDebounced');
       ctrl.navigateSkillPage('next_page');
       expect(skillSpy).toHaveBeenCalled();
     });
@@ -519,10 +509,7 @@ describe('Topics and Skills Dashboard Page', function() {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       mockAlertsService = {
         addWarning: function() {}
       };
@@ -575,10 +562,7 @@ describe('Topics and Skills Dashboard Page', function() {
         addWarning: function() {}
       };
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
 
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 

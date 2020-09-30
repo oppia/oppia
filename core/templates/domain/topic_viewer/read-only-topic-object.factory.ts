@@ -45,7 +45,8 @@ export interface ReadOnlyTopicBackendDict {
   'topic_name': string;
   'topic_id': string;
   'topic_description': string;
-  'train_tab_should_be_displayed': boolean;
+  'practice_tab_is_displayed': boolean;
+  'meta_tag_content': string;
 }
 
 export class ReadOnlyTopic {
@@ -58,7 +59,8 @@ export class ReadOnlyTopic {
   _subtopics: Subtopic[];
   _degreesOfMastery: DegreesOfMastery;
   _skillDescriptions: SkillIdToDescriptionMap;
-  _trainTabShouldBeDisplayed: boolean;
+  _practiceTabIsDisplayed: boolean;
+  _metaTagContent: string;
 
   constructor(
       topicName: string, topicId: string, topicDescription: string,
@@ -68,7 +70,8 @@ export class ReadOnlyTopic {
       subtopics: Subtopic[],
       degreesOfMastery: DegreesOfMastery,
       skillDescriptions: SkillIdToDescriptionMap,
-      trainTabShouldBeDisplayed: boolean) {
+      practiceTabIsDisplayed: boolean,
+      metaTagContent: string) {
     this._topicName = topicName;
     this._topicId = topicId;
     this._topicDescription = topicDescription;
@@ -78,7 +81,8 @@ export class ReadOnlyTopic {
     this._subtopics = subtopics;
     this._degreesOfMastery = degreesOfMastery;
     this._skillDescriptions = skillDescriptions;
-    this._trainTabShouldBeDisplayed = trainTabShouldBeDisplayed;
+    this._practiceTabIsDisplayed = practiceTabIsDisplayed;
+    this._metaTagContent = metaTagContent;
   }
 
   getTopicName(): string {
@@ -117,8 +121,12 @@ export class ReadOnlyTopic {
     return this._skillDescriptions;
   }
 
-  getTrainTabShouldBeDisplayed(): boolean {
-    return this._trainTabShouldBeDisplayed;
+  getPracticeTabIsDisplayed(): boolean {
+    return this._practiceTabIsDisplayed;
+  }
+
+  getMetaTagContent(): string {
+    return this._metaTagContent;
   }
 }
 
@@ -164,7 +172,8 @@ export class ReadOnlyTopicObjectFactory {
       topicDataDict.topic_name, topicDataDict.topic_id,
       topicDataDict.topic_description, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
-      skillDescriptions, topicDataDict.train_tab_should_be_displayed);
+      skillDescriptions, topicDataDict.practice_tab_is_displayed,
+      topicDataDict.meta_tag_content);
   }
 }
 

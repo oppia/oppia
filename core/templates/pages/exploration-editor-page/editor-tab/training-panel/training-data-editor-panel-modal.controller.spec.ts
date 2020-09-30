@@ -75,8 +75,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -124,15 +123,13 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            '': [
-              {
-                x: ['c', 'd', 'e'],
-                y: ['a', 'b', 'c']
-              }
-            ]
-          },
+          rule_specs: [{
+            rule_type: '',
+            inputs: {
+              x: ['c', 'd', 'e'],
+              y: ['a', 'b', 'c']
+            }
+          }],
           training_data: ['Answer1', 'Answer2']
         }],
         default_outcome: {
@@ -233,7 +230,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'The answer Answer1 has been successfully trained.', 1000);
     });
 
-    it('open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function() {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
@@ -280,8 +277,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -329,8 +325,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {},
+          rule_specs: [],
           training_data: ['Answer1', 'Answer2']
         }],
         default_outcome: {
@@ -371,7 +366,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         });
     }));
 
-    it('open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function() {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
@@ -412,8 +407,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -461,8 +455,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {},
+          rule_specs: [],
           training_data: ['Answer1']
         }],
         default_outcome: {
@@ -501,7 +494,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         });
     }));
 
-    it('open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function() {
       var openTrainUnresolvedAnswerModalSpy = spyOn(
         TrainingModalService, 'openTrainUnresolvedAnswerModal').and
         .callThrough();

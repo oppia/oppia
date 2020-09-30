@@ -26,7 +26,6 @@ describe('Collection Creation backend service', () => {
   let collectionCreationBackendService: CollectionCreationBackendService = null;
   let httpTestingController: HttpTestingController;
   let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
-  let SUCCESS_STATUS_CODE = 200;
   let ERROR_STATUS_CODE = 500;
 
   beforeEach(() => {
@@ -48,7 +47,7 @@ describe('Collection Creation backend service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      collectionCreationBackendService.createCollection().then(
+      collectionCreationBackendService.createCollectionAsync().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -68,7 +67,7 @@ describe('Collection Creation backend service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      collectionCreationBackendService.createCollection().then(
+      collectionCreationBackendService.createCollectionAsync().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(

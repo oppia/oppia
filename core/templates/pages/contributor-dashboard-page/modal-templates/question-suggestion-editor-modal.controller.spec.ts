@@ -102,8 +102,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
             }],
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -148,6 +147,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
             translations_mapping: {}
           },
         },
+        inapplicable_skill_misconception_ids: ['1-2']
       });
       questionId = question.getId();
       questionStateData = question.getStateData();

@@ -28,9 +28,11 @@ from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
@@ -43,7 +45,6 @@ import python_utils
     models.Registry.import_models(
         [models.NAMES.user, models.NAMES.statistics, models.NAMES.suggestion,
          models.NAMES.feedback]))
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class OldNotificationsDashboardRedirectPageTest(test_utils.GenericTestBase):
@@ -186,6 +187,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
                 'num_completions': 0,
                 'state_stats_mapping': {}
             })
+        self.process_and_flush_pending_tasks()
 
     def _rate_exploration(self, exp_id, ratings):
         """Create num_ratings ratings for exploration with exp_id,
@@ -204,25 +206,24 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         """Runs the User Stats Aggregator job."""
         MockUserStatsAggregator.start_computation()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-        self.process_and_flush_pending_tasks()
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
         job_id = user_jobs_one_off.DashboardStatsOneOffJob.create_new()
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_stats_no_explorations(self):
         self.login(self.OWNER_EMAIL_1)
@@ -433,7 +434,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.owner_1, self.EXP_ID_1, self.owner_id_2,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_1)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -482,10 +483,10 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.owner_1, self.EXP_ID_1, self.owner_id_2,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
         rights_manager.assign_role_for_exploration(
             self.owner_1, self.EXP_ID_2, self.owner_id_2,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_2)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -647,14 +648,14 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
+            rights_domain.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
+            rights_domain.ACTIVITY_STATUS_PUBLIC)
 
         self.logout()
 
@@ -663,7 +664,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_ID, self.collaborator_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.COLLABORATOR_EMAIL)
@@ -671,14 +672,14 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
+            rights_domain.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
+            rights_domain.ACTIVITY_STATUS_PUBLIC)
 
         self.logout()
 
@@ -687,7 +688,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.VIEWER_EMAIL)
@@ -863,7 +864,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         }
         self.save_new_default_exploration('exp1', self.owner_id)
 
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.owner_id, 'category1', 15)
         model1 = feedback_models.GeneralFeedbackThreadModel.create(
             'exploration.exp1.thread_1')
@@ -877,7 +878,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
             self.owner_id_2, change_dict, 'category1',
-            'exploration.exp1.thread_1')
+            'exploration.exp1.thread_1', None)
 
         change_dict['old_value'] = {
             'content_id': 'content',

@@ -74,19 +74,22 @@ describe('Read only topic object Factory', () => {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
       },
-      train_tab_should_be_displayed: false
+      practice_tab_is_displayed: false,
+      meta_tag_content: 'Topic meta tag content'
     };
 
     _sampleReadOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
       sampleTopicDataDict);
   });
 
-  it('should return correct values of topic name, description and id', () => {
+  it('should return correct values for read-only topic object', () => {
     expect(_sampleReadOnlyTopic.getTopicName()).toEqual('topic_name');
     expect(
       _sampleReadOnlyTopic.getTopicDescription()).toEqual('Topic description');
     expect(_sampleReadOnlyTopic.getTopicId()).toEqual('topic_id');
-    expect(_sampleReadOnlyTopic.getTrainTabShouldBeDisplayed()).toEqual(false);
+    expect(_sampleReadOnlyTopic.getPracticeTabIsDisplayed()).toEqual(false);
+    expect(_sampleReadOnlyTopic.getMetaTagContent()).toEqual(
+      'Topic meta tag content');
   });
 
   it('should return correct value of uncategorized skill summary object',

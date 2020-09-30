@@ -22,13 +22,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import html_validation_service
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models, user_models,) = models.Registry.import_models(
+    [models.NAMES.suggestion, models.NAMES.user])
 
 
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -179,3 +181,158 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 no_of_suggestions_migrated)])
         else:
             yield (key, values)
+
+
+class PopulateSuggestionLanguageCodeMigrationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that may be used to add the language_code field
+    to suggestions that do not have that field yet. The language_code field
+    allows question and translation suggestions to be queried by language.
+    This job will load all existing suggestions from the data store, update
+    them, if needed, and immediately store them back into the data store.
+    """
+
+    _VALIDATION_ERROR_KEY = 'validation_error'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        # Exit early if the suggestion has been marked deleted, or if the
+        # suggestion has already set the language code property, or if the
+        # suggestion type is not queryable by language, since ndb automatically
+        # sets properties that aren't intialized to None.
+        if item.deleted or item.language_code or item.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+            return
+
+        suggestion = suggestion_services.get_suggestion_from_model(item)
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            # Set the language code to be the language of the question.
+            suggestion.language_code = suggestion.change.question_dict[
+                'language_code']
+        elif suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            # Set the language code to be the language of the translation.
+            suggestion.language_code = suggestion.change.language_code
+        # Validate the suggestion before updating the storage model.
+        try:
+            suggestion.validate()
+        except Exception as e:
+            logging.error(
+                'Suggestion %s failed validation: %s' % (
+                    item.id, e))
+            yield (
+                PopulateSuggestionLanguageCodeMigrationOneOffJob
+                ._VALIDATION_ERROR_KEY,
+                'Suggestion %s failed validation: %s' % (
+                    item.id, e))
+            return
+        item.language_code = suggestion.language_code
+        item.put()
+        yield ('%s_suggestion_migrated' % item.suggestion_type, item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class PopulateContributionStatsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that may be used to initialize, or regenerate,
+    the reviewer and suggestion counts in the CommunityContributionStatsModel.
+    """
+
+    _VALIDATION_ERROR_KEY = 'community_contribution_stats_validation_error'
+    ITEM_TYPE_REVIEWER = 'reviewer'
+    ITEM_TYPE_SUGGESTION = 'suggestion'
+    ITEM_CATEGORY_QUESTION = 'question'
+    ITEM_CATEGORY_TRANSLATION = 'translation'
+    KEY_DELIMITER = '.'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            suggestion_models.GeneralSuggestionModel,
+            user_models.UserContributionRightsModel
+        ]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        if isinstance(item, suggestion_models.GeneralSuggestionModel):
+            # Exit early if the suggestion type is not a part of the
+            # Contributor Dashboard or if the suggestion is not currently in
+            # review.
+            if item.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
+                        item.status != suggestion_models.STATUS_IN_REVIEW):
+                return
+            suggestion = suggestion_services.get_suggestion_from_model(item)
+            yield ('%s%s%s%s%s' % (
+                PopulateContributionStatsOneOffJob.ITEM_TYPE_SUGGESTION,
+                PopulateContributionStatsOneOffJob.KEY_DELIMITER,
+                suggestion.suggestion_type,
+                PopulateContributionStatsOneOffJob.KEY_DELIMITER,
+                suggestion.language_code), 1)
+
+        else:
+            if item.can_review_translation_for_language_codes:
+                for language_code in (
+                        item.can_review_translation_for_language_codes):
+                    yield ('%s%s%s%s%s' % (
+                        PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER,
+                        PopulateContributionStatsOneOffJob.KEY_DELIMITER,
+                        (
+                            PopulateContributionStatsOneOffJob
+                            .ITEM_CATEGORY_TRANSLATION
+                        ),
+                        PopulateContributionStatsOneOffJob.KEY_DELIMITER,
+                        language_code), 1)
+            if item.can_review_questions:
+                yield ('%s%s%s%s%s' % (
+                    PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER,
+                    PopulateContributionStatsOneOffJob.KEY_DELIMITER,
+                    PopulateContributionStatsOneOffJob.ITEM_CATEGORY_QUESTION,
+                    PopulateContributionStatsOneOffJob.KEY_DELIMITER,
+                    constants.DEFAULT_LANGUAGE_CODE), 1)
+
+    @staticmethod
+    def reduce(key, values):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        item_type, item_category, language_code = key.split(
+            PopulateContributionStatsOneOffJob.KEY_DELIMITER)
+
+        # Update the reviewer counts.
+        if item_type == PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER:
+            if item_category == (
+                    PopulateContributionStatsOneOffJob
+                    .ITEM_CATEGORY_QUESTION):
+                stats_model.question_reviewer_count = len(values)
+            elif item_category == (
+                    PopulateContributionStatsOneOffJob
+                    .ITEM_CATEGORY_TRANSLATION):
+                (
+                    stats_model
+                    .translation_reviewer_counts_by_lang_code[language_code]
+                ) = len(values)
+        # Update the suggestion counts.
+        else:
+            if item_category == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+                stats_model.question_suggestion_count = len(values)
+            elif item_category == (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                (
+                    stats_model
+                    .translation_suggestion_counts_by_lang_code[language_code]
+                ) = len(values)
+
+        stats_model.put()
+
+        yield (key, len(values))

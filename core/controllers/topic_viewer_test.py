@@ -79,6 +79,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.additional_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
                 self.story_id_2))
+        self.topic.meta_tag_content = 'topic meta content'
 
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story_1)
@@ -170,7 +171,7 @@ class TopicPageDataHandlerTests(
                 self.skill_id_1: 'Skill Description 1',
                 self.skill_id_2: 'Skill Description 2'
             },
-            'train_tab_should_be_displayed': False
+            'practice_tab_is_displayed': False
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -234,11 +235,24 @@ class TopicPageDataHandlerTests(
                     self.skill_id_1: None,
                     self.skill_id_2: 'Skill Description 2'
                 },
-                'train_tab_should_be_displayed': False
+                'practice_tab_is_displayed': False
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
         self.logout()
+
+    def test_get_with_meta_tag_content(self):
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'topic_with_meta',
+            'topic-with-meta', 'description')
+        self.topic.meta_tag_content = 'meta content'
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        json_response = self.get_json(
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic-with-meta'))
+        expected_meta_tag_content = 'meta content'
+        self.assertEqual(
+            expected_meta_tag_content, json_response['meta_tag_content'])
 
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(
@@ -258,7 +272,7 @@ class TopicPageDataHandlerTests(
             'subtopics': [],
             'degrees_of_mastery': {},
             'skill_descriptions': {},
-            'train_tab_should_be_displayed': False
+            'practice_tab_is_displayed': False
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -273,6 +287,7 @@ class TopicPageDataHandlerTests(
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1')
         subtopic_1.skill_ids = [self.skill_id_2]
@@ -307,7 +322,7 @@ class TopicPageDataHandlerTests(
                 self.skill_id_1: 'Skill Description 1',
                 self.skill_id_2: None
             },
-            'train_tab_should_be_displayed': True
+            'practice_tab_is_displayed': True
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -323,6 +338,7 @@ class TopicPageDataHandlerTests(
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1')
         subtopic_1.skill_ids = [self.skill_id_2]
@@ -357,7 +373,7 @@ class TopicPageDataHandlerTests(
                 self.skill_id_1: 'Skill Description 1',
                 self.skill_id_2: None
             },
-            'train_tab_should_be_displayed': True
+            'practice_tab_is_displayed': True
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -376,6 +392,7 @@ class TopicPageDataHandlerTests(
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1')
         subtopic_1.skill_ids = ['skill_id_1']
@@ -404,7 +421,7 @@ class TopicPageDataHandlerTests(
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
-            'train_tab_should_be_displayed': True
+            'practice_tab_is_displayed': True
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -424,6 +441,7 @@ class TopicPageDataHandlerTests(
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.practice_tab_is_displayed = False
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1')
         subtopic_1.skill_ids = ['skill_id_1']
@@ -452,7 +470,7 @@ class TopicPageDataHandlerTests(
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
-            'train_tab_should_be_displayed': False
+            'practice_tab_is_displayed': False
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -474,6 +492,7 @@ class TopicPageDataHandlerTests(
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1')
         subtopic_1.skill_ids = ['skill_id_1']
@@ -502,7 +521,7 @@ class TopicPageDataHandlerTests(
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
-            'train_tab_should_be_displayed': True
+            'practice_tab_is_displayed': True
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()

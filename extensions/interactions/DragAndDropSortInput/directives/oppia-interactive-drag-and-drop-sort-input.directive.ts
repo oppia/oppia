@@ -24,7 +24,6 @@ require(
 
 require(
   'interactions/interaction-attributes-extractor.service.ts');
-require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
   'DragAndDropSortInputRulesService',
@@ -40,9 +39,9 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
         './drag-and-drop-sort-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'UrlService', 'CurrentInteractionService',
+        '$attrs', 'CurrentInteractionService',
         function(
-            $attrs, UrlService, CurrentInteractionService) {
+            $attrs, CurrentInteractionService) {
           var ctrl = this;
           var answers = [];
           ctrl.submitAnswer = function() {

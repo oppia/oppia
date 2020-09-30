@@ -81,13 +81,15 @@
                 Gives learner an overview of how to perform a skill. Go to the preview tab to preview.
               </em>
             </span>
-            <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
+            <div ng-if="$ctrl.schemaEditorIsShown">
               <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
                                    class="protractor-test-edit-subtopic-page-contents"
                                    local-value="$ctrl.htmlData">
               </schema-based-editor>
-              <button class="btn btn-default" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
-              <button class="btn btn-success protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
+              <div class="text-right pt-3">
+                <button class="btn btn-outline-dark" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
+                <button class="btn btn-success protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
+              </div>
             </div>
             <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="subtopic-html-content protractor-test-edit-html-content">
               <angular-html-bind html-data="$ctrl.htmlData" class="protractor-test-subtopic-html-content">
@@ -194,10 +196,6 @@
           <div class="question-count">
             <span class="question-count-value"><[$ctrl.questionCount]></span>
             <span class="question-count-text">Questions</span>
-          </div>
-          <div class="create-skill-container" ng-click="$ctrl.createSkill()">
-            <i class="fa fa-plus-circle"></i>
-            <span class="create-skill-text">Create New Skill</span>
           </div>
         </div>
       </md-card>
@@ -324,22 +322,20 @@
     height: 110px;
     justify-content: center;
     position: fixed;
-    width: 26%;
+    width: 24%;
   }
   .subtopic-content .skill-count,
-  .subtopic-content .question-count,
-  .subtopic-content .create-skill-container {
+  .subtopic-content .question-count {
     border-right: 2px solid #aaaac1;
     display: inline-block;
     text-align: center;
-    width: 33%;
+    width: 50%;
   }
   .subtopic-content .edit-icon {
     color: #595959;
   }
-  .subtopic-content .create-skill-container {
+  .subtopic-content .question-count {
     border-right: none;
-    cursor: pointer;
   }
   .subtopic-content .skill-count-value,
   .subtopic-content .question-count-value,

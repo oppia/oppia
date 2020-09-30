@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 // Code - third_party/static/guppy-7509f3/src/guppy.js
 // This guppy version corresponds to the commit on Aug 19 2020.
 // For reference, visit:
@@ -48,7 +47,7 @@ interface GuppySymbols {
   add_blanks: Function;
 }
 
-class Guppy {
+declare class Guppy {
   activate: () => void;
   asciimath: () => void;
   configure: () => void;
@@ -77,14 +76,14 @@ class Guppy {
   constructor(id: string, config: GuppyConfig);
 }
 
-class GuppyOSK {
+declare class GuppyOSK {
   attach: (guppy?: Guppy) => void;
   detach: () => void;
 
   constructor(config: Object);
 }
 
-namespace Guppy {
+declare namespace Guppy {
   export function init(config: GuppyInitConfig): void;
   export let instances: Object;
   export let active_guppy: Object;

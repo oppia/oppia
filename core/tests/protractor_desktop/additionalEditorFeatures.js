@@ -25,12 +25,6 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
-var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
@@ -38,24 +32,18 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
-  var adminPage = null;
-  var collectionEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
-  var creatorDashboardPage = null;
   var libraryPage = null;
 
   beforeAll(function() {
-    adminPage = new AdminPage.AdminPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
@@ -71,7 +59,7 @@ describe('Full exploration editor', function() {
     }
   );
 
-  it('should generate warning message if card height limit is exceeded ',
+  it('should generate warning message if card height limit is exceeded',
     async function() {
       await users.createUser('user@heightWarning.com', 'userHeightWarning');
       await users.login('user@heightWarning.com');

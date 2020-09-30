@@ -29,6 +29,7 @@ import zipfile
 import python_utils
 
 from . import common
+from . import install_backend_python_libs
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -44,7 +45,6 @@ common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
 TARGET_DOWNLOAD_DIRS = {
     'frontend': THIRD_PARTY_STATIC_DIR,
-    'backend': THIRD_PARTY_DIR,
     'oppiaTools': TOOLS_DIR
 }
 
@@ -409,8 +409,8 @@ def main(args=None):
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
+    install_backend_python_libs.main()
     download_manifest_files(MANIFEST_FILE_PATH)
-
     install_redis_cli()
 
 
