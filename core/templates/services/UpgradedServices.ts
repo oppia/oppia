@@ -251,8 +251,6 @@ import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
-import { GuestCollectionProgressObjectFactory } from
-  'domain/collection/GuestCollectionProgressObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { HighBounceRateTaskObjectFactory } from
@@ -784,8 +782,6 @@ export class UpgradedServices {
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
-    upgradedServices['GuestCollectionProgressObjectFactory'] =
-      new GuestCollectionProgressObjectFactory();
     upgradedServices['HighBounceRateTaskObjectFactory'] =
       new HighBounceRateTaskObjectFactory();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
@@ -1008,7 +1004,6 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['GuestCollectionProgressService'] =
       new GuestCollectionProgressService(
-        upgradedServices['GuestCollectionProgressObjectFactory'],
         upgradedServices['WindowRef']);
     upgradedServices['HintObjectFactory'] = new HintObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory']);

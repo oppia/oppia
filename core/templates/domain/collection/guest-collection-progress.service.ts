@@ -30,18 +30,15 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Collection } from
   'domain/collection/CollectionObjectFactory';
-import { GuestCollectionProgress, GuestCollectionProgressObjectFactory } from
-  'domain/collection/GuestCollectionProgressObjectFactory';
+import { GuestCollectionProgress } from
+  'domain/collection/guest-collection-progress.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GuestCollectionProgressService {
-  constructor(
-      private guestCollectionProgressObjectFactory:
-        GuestCollectionProgressObjectFactory,
-      private windowRef: WindowRef) {}
+  constructor(private windowRef: WindowRef) {}
 
   COLLECTION_STORAGE_KEY = 'collectionProgressStore_v1';
 
@@ -52,7 +49,7 @@ export class GuestCollectionProgressService {
   }
 
   loadGuestCollectionProgress(): GuestCollectionProgress {
-    return this.guestCollectionProgressObjectFactory.createFromJson(
+    return GuestCollectionProgress.createFromJson(
       this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY]);
   }
 

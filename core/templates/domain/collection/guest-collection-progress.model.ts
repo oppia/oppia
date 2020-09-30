@@ -13,20 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating a domain object which
+ * @fileoverview Model for creating and mutating a domain object which
  * represents the progress of a guest playing through a collection.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export class GuestCollectionProgress {
   _completedExplorationsMap: Object;
 
   constructor(completedExplorationsMap: Object) {
     this._completedExplorationsMap = completedExplorationsMap;
+  }
+
+  static createFromJson(
+      collectionProgressJson: string): GuestCollectionProgress {
+    if (collectionProgressJson) {
+      return new GuestCollectionProgress(JSON.parse(collectionProgressJson));
+    } else {
+      return new GuestCollectionProgress({});
+    }
   }
 
   // Returns whether the guest has made any progress towards completing the
@@ -65,24 +71,3 @@ export class GuestCollectionProgress {
     return JSON.stringify(this._completedExplorationsMap);
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class GuestCollectionProgressObjectFactory {
-  // This function takes a JSON string which represents a raw collection
-  // object and returns a new GuestCollectionProgress domain object. A null or
-  // undefined string indicates that an empty progress object should be
-  // created.
-  createFromJson(collectionProgressJson: string): GuestCollectionProgress {
-    if (collectionProgressJson) {
-      return new GuestCollectionProgress(JSON.parse(collectionProgressJson));
-    } else {
-      return new GuestCollectionProgress({});
-    }
-  }
-}
-
-angular.module('oppia').factory(
-  'GuestCollectionProgressObjectFactory',
-  downgradeInjectable(GuestCollectionProgressObjectFactory));

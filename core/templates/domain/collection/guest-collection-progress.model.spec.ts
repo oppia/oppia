@@ -13,24 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for GuestCollectionProgressObjectFactory.
+ * @fileoverview Tests for GuestCollectionProgressModel.
  */
 
-import { GuestCollectionProgressObjectFactory } from
-  'domain/collection/GuestCollectionProgressObjectFactory';
+import { GuestCollectionProgress } from
+  'domain/collection/guest-collection-progress.model';
 
 describe('Guest collection progress object factory', () => {
-  let guestCollectionProgressObjectFactory:
-    GuestCollectionProgressObjectFactory = null;
   var _collectionId0 = null;
   var _collectionId1 = null;
   var _expId0 = null;
   var _expId1 = null;
 
   beforeEach(() => {
-    guestCollectionProgressObjectFactory = (
-      new GuestCollectionProgressObjectFactory());
-
     _collectionId0 = 'collection_id0';
     _collectionId1 = 'collection_id1';
     _expId0 = 'exploration_id0';
@@ -38,7 +33,7 @@ describe('Guest collection progress object factory', () => {
   });
 
   var _createEmptyProgressObject = () => {
-    return guestCollectionProgressObjectFactory.createFromJson(null);
+    return GuestCollectionProgress.createFromJson(null);
   };
 
   describe('hasCompletionProgress', () => {
@@ -157,7 +152,7 @@ describe('Guest collection progress object factory', () => {
   describe('createFromJson', () => {
     it('should create a new empty progress object from JSON', () => {
       var guestCollectionProgress = (
-        guestCollectionProgressObjectFactory.createFromJson('{}'));
+        GuestCollectionProgress.createFromJson('{}'));
       expect(guestCollectionProgress).toEqual(_createEmptyProgressObject());
     });
 
@@ -167,7 +162,7 @@ describe('Guest collection progress object factory', () => {
         _collectionId0, _expId0);
 
       var guestCollectionProgress = (
-        guestCollectionProgressObjectFactory.createFromJson(
+        GuestCollectionProgress.createFromJson(
           '{"collection_id0": ["exploration_id0"]}'));
 
       expect(guestCollectionProgress).toEqual(expectedCollectionProgress);
@@ -183,7 +178,7 @@ describe('Guest collection progress object factory', () => {
         _collectionId1, _expId0);
 
       var guestCollectionProgress = (
-        guestCollectionProgressObjectFactory.createFromJson(
+        GuestCollectionProgress.createFromJson(
           '{"collection_id1": ["exploration_id1", "exploration_id0"], ' +
           '"collection_id0": ["exploration_id1"]}'));
 

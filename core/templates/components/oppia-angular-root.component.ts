@@ -266,10 +266,6 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
-import { GraphUtilsService } from
-  'interactions/GraphInput/directives/graph-utils.service';
-import { GuestCollectionProgressObjectFactory } from
-  'domain/collection/GuestCollectionProgressObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
@@ -771,8 +767,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static graphInputRulesService: GraphInputRulesService;
   static graphInputValidationService: GraphInputValidationService;
   static graphUtilsService: GraphUtilsService;
-  static guestCollectionProgressObjectFactory:
-    GuestCollectionProgressObjectFactory;
   static guestCollectionProgressService: GuestCollectionProgressService;
   static guppyConfigurationService: GuppyConfigurationService;
   static guppyInitializationService: GuppyInitializationService;
@@ -1150,8 +1144,6 @@ private graphDetailService: GraphDetailService,
 private graphInputRulesService: GraphInputRulesService,
 private graphInputValidationService: GraphInputValidationService,
 private graphUtilsService: GraphUtilsService,
-private guestCollectionProgressObjectFactory:
-  GuestCollectionProgressObjectFactory,
 private guppyConfigurationService: GuppyConfigurationService,
 private guppyInitializationService: GuppyInitializationService,
 private guestCollectionProgressService: GuestCollectionProgressService,
@@ -1614,8 +1606,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.graphInputValidationService = (
       this.graphInputValidationService);
     OppiaAngularRootComponent.graphUtilsService = this.graphUtilsService;
-    OppiaAngularRootComponent.guestCollectionProgressObjectFactory = (
-      this.guestCollectionProgressObjectFactory);
     OppiaAngularRootComponent.guppyConfigurationService = (
       this.guppyConfigurationService);
     OppiaAngularRootComponent.guppyInitializationService = (

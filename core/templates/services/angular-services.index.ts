@@ -55,7 +55,6 @@ import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObject
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionObjectFactory } from 'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from 'domain/collection/CollectionPlaythroughObjectFactory';
-import { GuestCollectionProgressObjectFactory } from 'domain/collection/GuestCollectionProgressObjectFactory';
 import { CollectionNodeObjectFactory } from 'domain/collection/collection-node-object.factory';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionSummaryObjectFactory } from 'domain/collection/collection-summary-object.factory';
@@ -495,8 +494,6 @@ export const angularServices: [string, unknown][] = [
   ['GraphInputRulesService', GraphInputRulesService],
   ['GraphInputValidationService', GraphInputValidationService],
   ['GraphUtilsService', GraphUtilsService],
-  ['GuestCollectionProgressObjectFactory',
-    GuestCollectionProgressObjectFactory],
   ['GuestCollectionProgressService', GuestCollectionProgressService],
   ['GuppyConfigurationService', GuppyConfigurationService],
   ['GuppyInitializationService', GuppyInitializationService],
