@@ -3455,6 +3455,21 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_missing_cloned_from_exploration_model_failure(self):
+        self.model_instance_0.cloned_from = 'invalid'
+        self.model_instance_0.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'cloned_from_exploration_ids '
+                'field check of ExplorationRightsModel\', '
+                '[u"Entity id 0: based on field cloned_from_exploration_ids '
+                'having value invalid, expect model ExplorationModel with id '
+                'invalid but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationRightsModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
             self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)

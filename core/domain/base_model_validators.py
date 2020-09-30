@@ -307,16 +307,19 @@ class BaseModelValidator(python_utils.OBJECT):
         Args:
             item: ndb.Model. Entity to validate.
         """
+        # We add a tolerance of 1 second because, for some models, created_on
+        # and last_updated are the same time, and occur within milliseconds of
+        # each other. In such cases, created_on might end up being very slightly
+        # greater than last_updated.
         if item.created_on > (
-                item.last_updated + datetime.timedelta(seconds=2)):
+                item.last_updated + datetime.timedelta(seconds=1)):
             cls._add_error(
                 ERROR_CATEGORY_TIME_FIELD_CHECK,
                 'Entity id %s: The created_on field has a value %s which '
                 'is greater than the value %s of last_updated field'
                 % (item.id, item.created_on, item.last_updated))
 
-        current_datetime = datetime.datetime.utcnow() + datetime.timedelta(
-            seconds=2)
+        current_datetime = datetime.datetime.utcnow()
         if item.last_updated > current_datetime:
             cls._add_error(
                 ERROR_CATEGORY_CURRENT_TIME_CHECK,

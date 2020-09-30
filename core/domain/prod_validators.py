@@ -1136,17 +1136,23 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
+        cloned_from_exploration_id = []
+        if item.cloned_from:
+            cloned_from_exploration_id.append(item.cloned_from)
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
         return [
-            # Note: There can be a cloned from exploration id in the rights
-            # model which denotes the exploration from which the model
-            # was cloned. But we do not check it here since it isn't
-            # required for that exploration to still be present.
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
+            # TODO (#10828): Remove validation for cloned_from
+            # exp ids after the field is entirely removed from
+            # all models.
+            base_model_validators.ExternalModelFetcherDetails(
+                'cloned_from_exploration_ids',
+                exp_models.ExplorationModel,
+                cloned_from_exploration_id),
             base_model_validators.ExternalModelFetcherDetails(
                 'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),

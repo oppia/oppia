@@ -509,7 +509,9 @@ class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
-    """Job that regenerates missing commit log models for an exploration."""
+    """Job that regenerates missing commit log models for an exploration.
+    Note: This job cannot be deleted until issue #10808 is fixed.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -537,13 +539,6 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
                 commit_log_model.exploration_id = item.id
                 commit_log_model.put()
                 yield ('Regenerated Exploration Commit Log Model', item.id)
-
-            if commit_log_model.deleted:
-                commit_log_model.deleted = False
-                commit_log_model.put()
-                yield (
-                    'Reverted deleted status for Exploration Commit '
-                    'Log Model', item.id)
 
     @staticmethod
     def reduce(key, values):
