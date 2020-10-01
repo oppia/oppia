@@ -16,20 +16,13 @@
  * @fileoverview Unit tests for the StateStats domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { StateStats } from
+  'domain/statistics/state-stats-model';
 
-import { StateStatsObjectFactory } from
-  'domain/statistics/StateStatsObjectFactory';
-
-describe('State stats', function() {
-  let stateStatsObjectFactory: StateStatsObjectFactory;
-
-  beforeEach(() => {
-    stateStatsObjectFactory = TestBed.get(StateStatsObjectFactory);
-  });
+describe('State-stats model', function() {
 
   it('should derive values from the backend dict', () => {
-    const stateStats = stateStatsObjectFactory.createFromBackendDict({
+    const stateStats = StateStats.createFromBackendDict({
       total_answers_count: 1,
       useful_feedback_count: 10,
       total_hit_count: 100,
