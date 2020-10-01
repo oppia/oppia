@@ -231,7 +231,7 @@
 
 
 # Google-app-engine configurations
-/appengine_config.py @nithusha21
+/appengine_config*.py @nithusha21
 /cron.yaml @nithusha21
 /index.yaml @seanlip
 /queue.yaml @seanlip
