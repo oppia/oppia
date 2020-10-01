@@ -22,7 +22,7 @@ describe('RatioExpression', function() {
   var RationExpressionCtrl = null;
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('Ratio', Ratio);
+    $provide.value('Ratio', (Ratio));
   }));
   beforeEach(angular.mock.inject(function($componentController) {
     RationExpressionCtrl = $componentController('ratioExpressionEditor');
