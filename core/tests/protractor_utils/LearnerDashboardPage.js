@@ -18,6 +18,7 @@
  */
 
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
@@ -54,47 +55,47 @@ var LearnerDashboardPage = function() {
   };
 
   this.navigateToPlayLaterExplorationSection = async function() {
-    await action.click('Play Later Explorations Tab', playLaterSection);
+    await action.click('Play Later Explorations tab', playLaterSection);
   };
 
   this.navigateToCompletedSection = async function() {
-    await action.click('Completed Tab', completedSection);
+    await action.click('Completed tab', completedSection);
   };
 
   this.navigateToInCompleteSection = async function() {
-    await action.click('In Progress Tab', incompleteSection);
+    await action.click('In Progress tab', incompleteSection);
   };
 
   this.navigateToIncompleteCollectionsSection = async function() {
     await action.click(
-      'In Progress Collections Tab', incompleteCollectionsSection);
+      'In Progress Collections tab', incompleteCollectionsSection);
   };
 
   this.navigateToIncompleteExplorationsSection = async function() {
     await action.click(
-      'In Progress Explorations Tab', incompleteExplorationsSection);
+      'In Progress Explorations tab', incompleteExplorationsSection);
   };
 
   this.navigateToCompletedCollectionsSection = async function() {
     await action.click(
-      'Completed Collections Tab', completedCollectionsSection);
+      'Completed Collections tab', completedCollectionsSection);
   };
 
   this.navigateToCompletedExplorationsSection = async function() {
     await action.click(
-      'Completed Explorations Tab', completedExplorationsSection);
+      'Completed Explorations tab', completedExplorationsSection);
   };
 
   this.navigateToFeedbackSection = async function() {
-    await action.click('Feedback Tab', feedbackSection);
+    await action.click('Feedback tab', feedbackSection);
   };
 
   this.navigateToFeedbackThread = async function() {
-    await action.click('Feedback Thread Tab', feedbackThread);
+    await action.click('Feedback Thread tab', feedbackThread);
   };
 
   this.navigateToSubscriptionsSection = async function() {
-    await action.click('Subscriptions Tab', subscriptionsSection);
+    await action.click('Subscriptions tab', subscriptionsSection);
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
