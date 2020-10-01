@@ -64,6 +64,7 @@ import feconf
 import python_utils
 import utils
 
+datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
 
 USER_EMAIL = 'useremail@example.com'
@@ -145,7 +146,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -237,7 +238,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -350,7 +351,7 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -478,7 +479,7 @@ class TrainingJobExplorationMappingModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -616,7 +617,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -858,7 +859,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1033,7 +1034,7 @@ class CollectionSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1170,7 +1171,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1372,7 +1373,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1546,7 +1547,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1687,7 +1688,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1971,7 +1972,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -2177,7 +2178,7 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -2278,7 +2279,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -2423,7 +2424,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -2540,7 +2541,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -2685,7 +2686,7 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -2814,7 +2815,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -2935,7 +2936,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3136,7 +3137,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3299,7 +3300,7 @@ class ExplorationSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3420,7 +3421,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3622,7 +3623,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3783,7 +3784,7 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3913,7 +3914,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4188,7 +4189,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4450,7 +4451,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
         ) % (self.model_instance.id, self.model_instance.last_updated)]
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4594,7 +4595,7 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4705,7 +4706,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4791,7 +4792,7 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4876,7 +4877,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5048,7 +5049,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5195,7 +5196,7 @@ class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -5355,7 +5356,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5591,7 +5592,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5714,7 +5715,7 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5848,7 +5849,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6030,7 +6031,7 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6163,7 +6164,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6391,7 +6392,7 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6511,7 +6512,7 @@ class ExplorationRecommendationsModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -6599,7 +6600,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -6863,7 +6864,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -7102,7 +7103,7 @@ class SkillSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -7307,7 +7308,7 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -7463,7 +7464,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -7707,7 +7708,7 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -7896,7 +7897,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8087,7 +8088,7 @@ class StorySnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8258,7 +8259,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8381,7 +8382,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8614,7 +8615,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8739,7 +8740,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         ) % (self.model_instance.id, self.model_instance.last_updated)]
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -9025,7 +9026,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         ) % (self.model_instance.id, self.model_instance.last_updated)]
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -9658,7 +9659,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -9989,7 +9990,7 @@ class TopicSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10187,7 +10188,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10361,7 +10362,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10552,7 +10553,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10763,7 +10764,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10933,7 +10934,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -11229,7 +11230,7 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -11471,7 +11472,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -11703,7 +11704,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -11914,7 +11915,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -12091,7 +12092,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -12297,7 +12298,7 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -12511,7 +12512,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -12711,7 +12712,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -12898,7 +12899,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13084,7 +13085,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13288,7 +13289,7 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13396,7 +13397,7 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13464,7 +13465,7 @@ class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13567,7 +13568,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13690,7 +13691,7 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13802,7 +13803,7 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13901,7 +13902,7 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14082,7 +14083,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14286,7 +14287,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14489,7 +14490,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14644,7 +14645,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14781,7 +14782,7 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14891,7 +14892,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14987,7 +14988,7 @@ class UserContributionProficiencyModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -15147,7 +15148,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -15293,7 +15294,7 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -15918,7 +15919,7 @@ class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -15993,7 +15994,7 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -16094,7 +16095,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -16239,7 +16240,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 

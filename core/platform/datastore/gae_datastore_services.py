@@ -19,8 +19,19 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import contextlib
+import datetime
+
+import python_utils
+
+from google.appengine.api import datastore_types
 from google.appengine.datastore import datastore_query
+from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
+
+Model = ndb.Model
+
+DateTimeProperty = ndb.DateTimeProperty
 
 
 Model = ndb.Model
@@ -181,3 +192,78 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
         start_index = start_index + len(entity_ids)
 
     return all_models_grouped_by_model_type
+
+
+def make_pseudo_random_hr_consistency_policy():
+    """Returns a policy that always gives the same sequence of consistency
+    decisions.
+
+    Returns:
+        datastore_stub_util.PseudoRandomHRConsistencyPolicy. The policy.
+    """
+    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+
+
+@contextlib.contextmanager
+def mock_datetime_for_datastore(mocked_now):
+    """Mocks parts of the datastore to accept a fake datetime type that always
+    returns the same value for utcnow.
+
+    Example:
+        import datetime
+        mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        with mock_datetime_for_datastore(mocked_now):
+            self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+        not_now = datetime.datetime.utcnow() # Returns actual time.
+
+    Args:
+        mocked_now: datetime.datetime. The datetime which will be used
+            instead of the current UTC datetime.
+
+    Yields:
+        None. Empty yield statement.
+    """
+
+    if not isinstance(mocked_now, datetime.datetime):
+        raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
+
+    old_datetime_type = datetime.datetime
+
+    class MockDatetimeType(type):
+        """Pretends to be a datetime.datetime object."""
+
+        def __instancecheck__(cls, other):
+            """Validates whether the given instance is a datetime instance."""
+            return isinstance(other, old_datetime_type)
+
+    class MockDatetime( # pylint: disable=inherit-non-class
+            python_utils.with_metaclass(MockDatetimeType, old_datetime_type)):
+        """Always returns mocked_now as the current time."""
+
+        @classmethod
+        def utcnow(cls):
+            """Returns the mocked datetime."""
+
+            return mocked_now
+
+    setattr(datetime, 'datetime', MockDatetime)
+    setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
+
+    # Updates datastore types for MockDatetime to ensure that validation of ndb
+    # datetime properties does not fail.
+    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = ( # pylint: disable=protected-access
+        datastore_types.ValidatePropertyNothing)
+    datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = ( # pylint: disable=protected-access
+        datastore_types.PackDatetime)
+    datastore_types._PROPERTY_MEANINGS[MockDatetime] = ( # pylint: disable=protected-access
+        datastore_types.entity_pb.Property.GD_WHEN)
+
+    try:
+        yield
+    finally:
+        # Resets the datastore types to forget the mocked types.
+        del datastore_types._PROPERTY_MEANINGS[MockDatetime] # pylint: disable=protected-access
+        del datastore_types._PACK_PROPERTY_VALUES[MockDatetime] # pylint: disable=protected-access
+        del datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] # pylint: disable=protected-access
+        setattr(ndb.DateTimeProperty, 'data_type', datetime.datetime)
+        setattr(datetime, 'datetime', old_datetime_type)
