@@ -31,7 +31,6 @@ from core.platform import models
 import python_utils
 import utils
 
-from google.appengine.api import app_identity
 from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
@@ -43,6 +42,7 @@ from pipeline import pipeline
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])
 
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -773,7 +773,8 @@ class BaseMapReduceJobManager(BaseJobManager):
             },
             'reducer_params': {
                 'output_writer': {
-                    'bucket_name': app_identity.get_default_gcs_bucket_name(),
+                    'bucket_name': (
+                        app_identity_services.get_default_gcs_bucket_name()),
                     'content_type': 'text/plain',
                     'naming_format': 'mrdata/$name/$id/output-$num',
                 }
