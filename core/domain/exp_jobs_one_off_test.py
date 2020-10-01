@@ -2478,7 +2478,8 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-0-1'))
-        commit_log_model.created_on = datetime.datetime.utcnow()
+        commit_log_model.created_on = commit_log_model.created_on + (
+            datetime.timedelta(days=1))
         commit_log_model.put()
 
         job_id = (
