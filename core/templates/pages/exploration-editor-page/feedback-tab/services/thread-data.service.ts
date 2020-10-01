@@ -18,7 +18,6 @@
  */
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-// Import cloneDeep from 'lodash/cloneDeep';
 import {FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory }
   from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionThread, SuggestionThreadObjectFactory } from
@@ -37,7 +36,7 @@ import { ExplorationEditorPageConstants } from
   'pages/exploration-editor-page/exploration-editor-page.constants';
 
 const ACTION_ACCEPT_SUGGESTION =
-ExplorationEditorPageConstants.ACTION_ACCEPT_SUGGESTION;
+  ExplorationEditorPageConstants.ACTION_ACCEPT_SUGGESTION;
 const STATUS_FIXED = ExplorationEditorPageConstants.STATUS_FIXED;
 const STATUS_IGNORED = ExplorationEditorPageConstants.STATUS_IGNORED;
 const STATUS_OPEN = ExplorationEditorPageConstants.STATUS_OPEN;
@@ -52,7 +51,6 @@ interface SuggestionAndFeedbackThreads {
 @Injectable({
   providedIn: 'root'
 })
-
 export class ThreadDataService {
   constructor(
     private http: HttpClient,
