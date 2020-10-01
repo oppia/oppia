@@ -52,6 +52,10 @@
     "core/templates/services/stateful/background-mask.service.spec.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.spec.ts",
+    "core/templates/services/csrf-token.service.ts",
+    "core/templates/services/csrf-token.service.spec.ts",
+    "core/templates/services/date-time-format.service.ts",
+    "core/templates/services/date-time-format.service.spec.ts",
   ],
   "include": ["typings/*.ts"]
 }

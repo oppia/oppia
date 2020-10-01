@@ -90,7 +90,7 @@ describe('datetimeformatter', () => {
       df.getLocaleDateString(NOW_MILLIS));
     expect((new Date(NaN).toLocaleDateString())).toBe(
       df.getLocaleDateString(NaN));
-    expect((new Date(null)).toLocaleDateString()).toBe(
+    expect((new Date()).toLocaleDateString()).toBe(
       df.getLocaleDateString(null));
   });
 });
