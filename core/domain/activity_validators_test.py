@@ -33,6 +33,7 @@ from core.tests import test_utils
 import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -101,7 +102,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
