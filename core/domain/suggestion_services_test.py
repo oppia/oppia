@@ -1643,8 +1643,11 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
                 self.voiceover_application_model.id)
 
 
-class RetrieveEmailInfoUnitTests(
-        test_utils.GenericTestBase):
+class GetSuggestionInfoToNotifyReviewersUnitTests(test_utils.GenericTestBase):
+    """Test the ability of the get_suggestion_info_to_notify_reviewers method
+    in suggestion services, which is used to retrieve the information required
+    to notify reviewers that there are suggestions that need review.
+    """
 
     target_id = 'exp1'
     target_version_at_submission = 1
@@ -1776,13 +1779,24 @@ class RetrieveEmailInfoUnitTests(
         return question_suggestion
 
     def _assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            self, reviewable_suggestion_infos, suggestions):
-        self.assertEqual(len(reviewable_suggestion_infos), len(suggestions))
+            self, reviewable_suggestion_infos, expected_suggestion_order):
+        """Asserts that the reviewable suggestion infos are sorted in
+        descending order according to review wait time.
+
+        Args:
+            reviewable_suggestion_infos:
+                list(ReviewableSuggestionEmailContentInfo). A list of containing
+                the information of the reviewable suggestions that will be used to
+                notify reviewers that there are suggestions that need to be
+                reviewed.
+        """
+        self.assertEqual(
+            len(reviewable_suggestion_infos), len(expected_suggestion_order))
         for index, reviewable_suggestion_info in enumerate(
                 reviewable_suggestion_infos):
             self.assertEqual(
                 reviewable_suggestion_info.out_for_review_on,
-                suggestions[index].last_updated)
+                expected_suggestion_order[index].last_updated)
         for index in python_utils.RANGE(len(reviewable_suggestion_infos) - 1):
             self.assertLess(
                 reviewable_suggestion_infos[index].out_for_review_on,

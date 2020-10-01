@@ -619,7 +619,8 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
         content info object contains the type of the suggestion, the language
         of the suggestion, the suggestion content (question/translation) and
         the date that the suggestion was submitted for review. For each user
-        the objects are sorted in descending order based on review wait time.
+        the suggestion email content info objects are sorted in descending order
+        based on review wait time.
     """
 
     # Get each reviewer's review permissions.
@@ -639,14 +640,23 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
     reviewers_reviewable_suggestion_infos = []
 
     for user_contribution_rights in users_contribution_rights:
-        heap = []
+        # Use a min heap because then the suggestions that have been waiting the
+        # longest for review (earliest review submission date) are automatically
+        # efficiently sorted.
+        suggestions_waiting_longest_heap = []
         if user_contribution_rights.can_review_questions:
             for question_suggestion in question_suggestions:
-                if len(heap) == (
+                # Break early because we only want the top
+                # MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER number of suggestions.
+                if len(suggestions_waiting_longest_heap) == (
                         MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
                     break
-                elif question_suggestion.author_id != user_contribution_rights.id:
-                    heapq.heappush(heap, (
+                # We can't include suggestions that were authored by the
+                # reviewer because reviewers aren't allowed to review their own
+                # suggestions.
+                elif question_suggestion.author_id != (
+                        user_contribution_rights.id):
+                    heapq.heappush(suggestions_waiting_longest_heap, (
                         question_suggestion.last_updated, question_suggestion)
                     )
 
@@ -654,31 +664,46 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
             for language_code in (
                     user_contribution_rights
                     .can_review_translation_for_language_codes):
+                # Get a list of the translation suggestions in the language code
+                # from the datastore if we haven't already gotten them.
                 if language_code not in (
                         translation_suggestions_by_lang_code_dict):
                     translation_suggestions_by_lang_code_dict[language_code] = (
-                        get_translation_suggestions_waiting_longest_for_review_per_lang(
+                        get_translation_suggestions_waiting_longest_for_review_per_lang( # pylint: disable=line-too-long
                             language_code
                         )
                     )
                 translation_suggestions = translation_suggestions_by_lang_code_dict[
                     language_code]
                 for translation_suggestion in translation_suggestions:
-                    if len(heap) == MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER:
-                        shortest_review_wait_time, suggestion_with_shortest_wait_time = max(heap)
-                        if translation_suggestion.last_updated > shortest_review_wait_time:
+                    if len(suggestions_waiting_longest_heap) == (
+                            MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+                        # The shortest review wait time corresponds to the most
+                        # recent review submission date, which is the max of
+                        # the heap.
+                        most_recent_review_submission = max(
+                            suggestions_waiting_longest_heap)[0]
+                        # If the review submission date for the translation
+                        # suggestion is more recent than the most recent
+                        # submission date so far, we can exit early.
+                        if translation_suggestion.last_updated > (
+                                most_recent_review_submission):
                             break
-                    elif translation_suggestion.author_id != user_contribution_rights.id:
-                        heapq.heappush(heap, (
-                            translation_suggestion.last_updated, translation_suggestion)
+                    # Reviewers can never review their own suggestions.
+                    elif translation_suggestion.author_id != (
+                            user_contribution_rights.id):
+                        heapq.heappush(suggestions_waiting_longest_heap, (
+                            translation_suggestion.last_updated,
+                            translation_suggestion)
                         )
 
+        # Get the key information from each suggestion that will be used to
+        # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-
         for i in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
-            if len(heap) == 0:         
+            if len(suggestions_waiting_longest_heap) == 0:         
                 break
-            key, suggestion = heapq.heappop(heap)
+            key, suggestion = heapq.heappop(suggestions_waiting_longest_heap)
             html_content_strings = suggestion.get_all_html_content_strings()
             reviewer_reviewable_suggestion_infos.append(
                 suggestion_registry.ReviewableSuggestionEmailContentInfo(
