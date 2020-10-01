@@ -23,9 +23,7 @@ require('domain/collection/collection-rights-backend-api.service.ts');
 require('domain/collection/editable-collection-backend-api.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('services/alerts.service.ts');
-
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
-
 import { EventEmitter } from '@angular/core';
 import { CollectionRights } from 'domain/collection/CollectionRightsObjectFactory';
 angular.module('oppia').factory('CollectionEditorStateService', [
