@@ -60,4 +60,3 @@ class UsernameChangeAuditModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
-                
