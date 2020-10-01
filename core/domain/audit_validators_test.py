@@ -24,14 +24,14 @@ import math
 import random
 import time
 
-# user_models, audit_models, prod_validation_jobs_one_off, utils
 from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
 
-(audit_models, user_models) = models.Registry.import_models([models.NAMES.audit, models.NAMES.user])
+(audit_models, user_models) = models.Registry.import_models([
+    models.NAMES.audit, models.NAMES.user])
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
