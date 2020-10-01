@@ -24,7 +24,6 @@ import datetime
 import math
 import random
 import time
-import types
 
 from constants import constants
 from core.domain import collection_domain
@@ -55,7 +54,6 @@ from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
