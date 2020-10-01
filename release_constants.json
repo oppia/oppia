@@ -9,6 +9,7 @@
     "CHANGELOG_HEADER": "### Changelog:\n",
     "COMMIT_HISTORY_HEADER": "### Commit History:\n",
     "CONSTANTS_PATH": "assets/constants.ts",
+    "CRON_YAML_PATH": "cron.yaml",
     "CUT_BRANCH_MODULE_TARGET": "scripts.release_scripts.cut_release_or_hotfix_branch",
     "EMAIL_HEADER": "### Email C&P Blurbs about authors:\n",
     "EXISTING_AUTHORS_HEADER": "### Existing Authors:\n",
