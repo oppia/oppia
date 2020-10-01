@@ -489,6 +489,7 @@ class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if item.deleted:
             return
+
         if item.id in item.subscriber_ids:
             item.subscriber_ids.remove(item.id)
             item.put()
