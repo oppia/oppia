@@ -273,8 +273,6 @@ def deploy_application_and_write_log_entry(
         version_to_deploy_to: str. The version to deploy to.
         current_git_revision: str. The current git revision.
     """
-    # Deploy export service to GAE.
-    gcloud_adapter.deploy_application('export/app.yaml', app_name)
     # Deploy app to GAE.
     gcloud_adapter.deploy_application(
         './app.yaml', app_name, version=version_to_deploy_to)
