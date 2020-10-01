@@ -23,6 +23,7 @@ import datetime
 import itertools
 import re
 
+from constants import constants
 from core.domain import base_model_validators
 from core.domain import classifier_domain
 from core.domain import classifier_services
@@ -200,7 +201,7 @@ class ClassifierTrainingJobModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -246,7 +247,7 @@ class ClassifierTrainingJobModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -319,7 +320,7 @@ class TrainingJobExplorationMappingModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -365,7 +366,7 @@ class TrainingJobExplorationMappingModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -688,7 +689,7 @@ class CollectionSummaryModelValidator(
                     'collection_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field collection_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -890,7 +891,7 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
                     'recipient_id %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field recipient_id having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -972,7 +973,7 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
                     'sender_id %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sender_id having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -1319,7 +1320,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -1748,7 +1749,7 @@ class QuestionSummaryModelValidator(
                     'question_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field question_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2029,7 +2030,7 @@ class SkillSummaryModelValidator(
                     'skill_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2074,7 +2075,7 @@ class SkillSummaryModelValidator(
                     'skill_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2262,7 +2263,7 @@ class StorySummaryModelValidator(
                     'story_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2393,7 +2394,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                         item.target_type,
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field %s_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, item.target_type,
                         model_id, model_class.__name__, model_id))
@@ -2478,8 +2479,8 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                             item.target_type,
                             base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s_ids having'
-                        ' value %s, expect model %s with id %s but it doesn\'t'
-                        ' exist' % (
+                        ' value %s, expected model %s with id %s but it '
+                        'doesn\'t exist' % (
                             item.id, item.target_type,
                             model_id, model_class.__name__, model_id))
                     continue
@@ -2569,6 +2570,182 @@ class CommunityContributionStatsModelValidator(
             suggestion_services
             .create_community_contribution_stats_from_model(item)
         )
+
+    @classmethod
+    def _validate_translation_reviewer_counts(cls, item):
+        """For each language code, validate that the translation reviewer
+        count matches the number of translation reviewers in the datastore.
+
+        Args:
+            item: ndb.Model. CommunityContributionStatsModel to validate.
+        """
+        supported_language_codes = [
+            language_code['id'] for language_code in
+            constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        all_user_contribution_rights_models = (
+            user_models.UserContributionRightsModel.get_all()
+        )
+        for language_code in supported_language_codes:
+            expected_translation_reviewer_count = (
+                all_user_contribution_rights_models.filter(
+                    (
+                        user_models.UserContributionRightsModel
+                        .can_review_translation_for_language_codes
+                    ) == language_code)
+                .count()
+            )
+            if language_code in item.translation_reviewer_counts_by_lang_code:
+                model_translation_reviewer_count = (
+                    item.translation_reviewer_counts_by_lang_code[
+                        language_code]
+                )
+                if model_translation_reviewer_count != (
+                        expected_translation_reviewer_count):
+                    cls._add_error(
+                        'translation reviewer %s' % (
+                            base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                        'Entity id %s: Translation reviewer count for language'
+                        ' code %s: %s does not match the expected translation '
+                        'reviewer count for language code %s: %s' % (
+                            item.id, language_code,
+                            model_translation_reviewer_count, language_code,
+                            expected_translation_reviewer_count)
+                        )
+            elif expected_translation_reviewer_count != 0:
+                cls._add_error(
+                    'translation reviewer count %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: The translation reviewer count for '
+                    'language code %s is %s, expected model '
+                    'CommunityContributionStatsModel to have the language code '
+                    '%s in its translation reviewer counts but it doesn\'t '
+                    'exist.' % (
+                        item.id, language_code,
+                        expected_translation_reviewer_count, language_code)
+                )
+
+    @classmethod
+    def _validate_translation_suggestion_counts(cls, item):
+        """For each language code, validate that the translation suggestion
+        count matches the number of translation suggestions in the datastore
+        that are currently in review.
+
+        Args:
+            item: ndb.Model. CommunityContributionStatsModel to validate.
+        """
+        supported_language_codes = [
+            language_code['id'] for language_code in
+            constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        all_translation_suggestion_models_in_review = (
+            suggestion_models.GeneralSuggestionModel.get_all()
+            .filter(suggestion_models.GeneralSuggestionModel.status == (
+                suggestion_models.STATUS_IN_REVIEW))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT))
+        )
+        for language_code in supported_language_codes:
+            expected_translation_suggestion_count = (
+                all_translation_suggestion_models_in_review.filter(
+                    suggestion_models.GeneralSuggestionModel.language_code == (
+                        language_code))
+                .count()
+            )
+            if language_code in item.translation_suggestion_counts_by_lang_code:
+                model_translation_suggestion_count = (
+                    item.translation_suggestion_counts_by_lang_code[
+                        language_code]
+                )
+                if model_translation_suggestion_count != (
+                        expected_translation_suggestion_count):
+                    cls._add_error(
+                        'translation suggestion %s' % (
+                            base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                        'Entity id %s: Translation suggestion count for '
+                        'language code %s: %s does not match the expected '
+                        'translation suggestion count for language code %s: '
+                        '%s' % (
+                            item.id, language_code,
+                            model_translation_suggestion_count, language_code,
+                            expected_translation_suggestion_count)
+                        )
+            elif expected_translation_suggestion_count != 0:
+                cls._add_error(
+                    'translation suggestion count %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: The translation suggestion count for '
+                    'language code %s is %s, expected model '
+                    'CommunityContributionStatsModel to have the language code '
+                    '%s in its translation suggestion counts but it doesn\'t '
+                    'exist.' % (
+                        item.id, language_code,
+                        expected_translation_suggestion_count, language_code)
+                )
+
+    @classmethod
+    def _validate_question_reviewer_count(cls, item):
+        """Validate that the question reviewer count matches the number of
+        question reviewers in the datastore.
+
+        Args:
+            item: ndb.Model. CommunityContributionStatsModel to validate.
+        """
+        expected_question_reviewer_count = (
+            user_models.UserContributionRightsModel.query(
+                ( # pylint: disable=singleton-comparison
+                    user_models.UserContributionRightsModel
+                    .can_review_questions
+                ) == True)
+            .count()
+        )
+        if item.question_reviewer_count != expected_question_reviewer_count:
+            cls._add_error(
+                'question reviewer %s' % (
+                    base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                'Entity id %s: Question reviewer count: %s does not '
+                'match the expected question reviewer count: %s.' % (
+                    item.id, item.question_reviewer_count,
+                    expected_question_reviewer_count)
+            )
+
+    @classmethod
+    def _validate_question_suggestion_count(cls, item):
+        """Validate that the question suggestion count matches the number of
+        question suggestions in the datastore that are currently in review.
+
+        Args:
+            item: ndb.Model. CommunityContributionStatsModel to validate.
+        """
+        expected_question_suggestion_count = (
+            suggestion_models.GeneralSuggestionModel.get_all()
+            .filter(
+                suggestion_models.GeneralSuggestionModel.status == (
+                    suggestion_models.STATUS_IN_REVIEW))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION))
+            .count()
+        )
+        if item.question_suggestion_count != expected_question_suggestion_count:
+            cls._add_error(
+                'question suggestion %s' % (
+                    base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                'Entity id %s: Question suggestion count: %s does not '
+                'match the expected question suggestion count: %s.' % (
+                    item.id, item.question_suggestion_count,
+                    expected_question_suggestion_count)
+            )
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_translation_reviewer_counts,
+            cls._validate_translation_suggestion_counts,
+            cls._validate_question_reviewer_count,
+            cls._validate_question_suggestion_count
+        ]
 
 
 class TopicModelValidator(base_model_validators.BaseModelValidator):
@@ -2879,7 +3056,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2929,7 +3106,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2981,7 +3158,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3029,7 +3206,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3081,7 +3258,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3450,7 +3627,7 @@ class ExpUserLastPlaythroughModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3494,7 +3671,7 @@ class ExpUserLastPlaythroughModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3682,7 +3859,7 @@ class UserSubscriptionsModelValidator(
                     'subscriber_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field subscriber_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3766,7 +3943,7 @@ class UserSubscribersModelValidator(
                     'subscription_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field subscription_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4007,7 +4184,7 @@ class ExplorationUserDataModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4095,7 +4272,7 @@ class CollectionProgressModelValidator(
                     'completed_activities_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field completed_activities_ids '
-                    'having value %s, expect model %s with id %s but it '
+                    'having value %s, expected model %s with id %s but it '
                     'doesn\'t exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4122,7 +4299,7 @@ class CollectionProgressModelValidator(
                     'collection_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field collection_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4197,7 +4374,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
                     'story_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4250,7 +4427,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
                     'story_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4371,7 +4548,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
                     'sent_email_model_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sent_email_model_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4462,7 +4639,7 @@ class UserBulkEmailsModelValidator(
                     'sent_email_model_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sent_email_model_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4884,7 +5061,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
                     'exp_issues_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exp_issues_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
