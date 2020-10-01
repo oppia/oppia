@@ -22,7 +22,7 @@ angular.module('oppia').component('ratioExpressionEditor', {
     value: '='
   },
   template: require('./ratio-expression-editor.component.html'),
-  controller: [Ratio, function() {
+  controller: [function() {
     const ctrl = this;
     ctrl.warningText = '';
 
