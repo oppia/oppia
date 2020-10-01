@@ -26,6 +26,7 @@ from core.platform import models
 
 user_models = models.Registry.import_models([models.NAMES.user])
 
+
 class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating RoleQueryAuditModels."""
 
@@ -59,4 +60,3 @@ class UsernameChangeAuditModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
-

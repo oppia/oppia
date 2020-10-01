@@ -37,6 +37,7 @@ USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
+
 class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -218,4 +219,3 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
         ) % model_invalid_id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-

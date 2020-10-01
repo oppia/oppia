@@ -88,6 +88,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     models.NAMES.topic, models.NAMES.user
 ])
 
+
 class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):

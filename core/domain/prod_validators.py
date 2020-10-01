@@ -112,6 +112,7 @@ VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
 
+
 class ClassifierTrainingJobModelValidator(
         base_model_validators.BaseModelValidator):
     """Class for validating ClassifierTrainingJobModels."""
