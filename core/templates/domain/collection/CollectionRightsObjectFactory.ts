@@ -132,8 +132,6 @@ export class CollectionRightsObjectFactory {
       CollectionRights {
     return new CollectionRights(cloneDeep(collectionRightsBackendObject));
   }
-  // Create a new, empty collection rights object. This is not guaranteed to
-  // pass validation tests.
 }
 
 angular.module('oppia').factory(
