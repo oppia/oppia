@@ -145,7 +145,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for exploration_ids field check of '
             'ActivityReferencesModel\', '
             '[u"Entity id %s: based on field exploration_ids having '
-            'value 1col, expect model ExplorationModel with id 1col but '
+            'value 1col, expected model ExplorationModel with id 1col but '
             'it doesn\'t exist"]]' % feconf.ACTIVITY_REFERENCE_LIST_FEATURED)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
