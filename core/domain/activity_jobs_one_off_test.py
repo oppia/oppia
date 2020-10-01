@@ -1718,6 +1718,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             'different_field': 'test'
         }
     ]
+    # This list consists of the snapshot metadat models that are not
+    # associated with a commit log entry model.
     EXCLUDED_CLASS_NAMES = [
         'ConfigPropertySnapshotMetadataModel',
         'PlatformParameterSnapshotMetadataModel'
