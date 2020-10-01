@@ -22,29 +22,30 @@ angular.module('oppia').component('ratioExpressionEditor', {
     value: '='
   },
   template: require('./ratio-expression-editor.component.html'),
-  controller: ['Ratio', function() {
-    const ctrl = this;
-    ctrl.warningText = '';
+  controller: ['Ratio', (
+    function() {
+      const ctrl = this;
+      ctrl.warningText = '';
 
-    ctrl.isValidRatio = function(value) {
-      try {
-        ctrl.value = Ratio.fromRawInputString(value).components;
-        ctrl.warningText = '';
-        return true;
-      } catch (parsingError) {
-        ctrl.warningText = parsingError.message;
-        return false;
-      }
-    };
-
-    ctrl.$onInit = function() {
-      if (ctrl.value === null) {
-        ctrl.value = [1, 1];
-      }
-      ctrl.localValue = {
-        label: Ratio.fromList(ctrl.value).toAnswerString()
+      ctrl.isValidRatio = function(value) {
+        try {
+          ctrl.value = Ratio.fromRawInputString(value).components;
+          ctrl.warningText = '';
+          return true;
+        } catch (parsingError) {
+          ctrl.warningText = parsingError.message;
+          return false;
+        }
       };
-    };
-  }
+
+      ctrl.$onInit = function() {
+        if (ctrl.value === null) {
+          ctrl.value = [1, 1];
+        }
+        ctrl.localValue = {
+          label: Ratio.fromList(ctrl.value).toAnswerString()
+        };
+      };
+    })
   ]
 });
