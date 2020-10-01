@@ -87,7 +87,7 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicCreationBackendApiService.createTopic(
+      topicCreationBackendApiService.createTopicAsync(
         topic, imagesData, thumbnailBgColor).then(
         successHandler);
       let req = httpTestingController.expectOne(
@@ -109,7 +109,7 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicCreationBackendApiService.createTopic(
+      topicCreationBackendApiService.createTopicAsync(
         topic, imagesData, thumbnailBgColor).then(
         successHandler, failHandler);
       const errorResponse = new HttpErrorResponse({
