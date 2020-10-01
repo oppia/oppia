@@ -37,7 +37,6 @@ import utils
 ])
 
 
-
 class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
