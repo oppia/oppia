@@ -650,7 +650,7 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
                         question_suggestion.last_updated, question_suggestion)
                     )
 
-        elif user_contribution_rights.can_review_translation_for_language_codes:
+        if user_contribution_rights.can_review_translation_for_language_codes:
             for language_code in (
                     user_contribution_rights
                     .can_review_translation_for_language_codes):
@@ -664,8 +664,8 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
                 translation_suggestions = translation_suggestions_by_lang_code_dict[
                     language_code]
                 for translation_suggestion in translation_suggestions:
-                    if len(heap) == (MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
-                        shortest_review_wait_time = max(heap)
+                    if len(heap) == MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER:
+                        shortest_review_wait_time, suggestion_with_shortest_wait_time = max(heap)
                         if translation_suggestion.last_updated > shortest_review_wait_time:
                             break
                     elif translation_suggestion.author_id != user_contribution_rights.id:

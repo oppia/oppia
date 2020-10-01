@@ -1652,8 +1652,8 @@ class RetrieveEmailInfoUnitTests(
     EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
     SKILL_THREAD_ID = 'skill1.thread1'
     AUTHOR_EMAIL = 'author1@example.com'
-    TRANSLATION_REVIEWER_EMAIL = 'translator@community.org'
-    QUESTION_REVIEWER_EMAIL = 'question@community.org'
+    REVIEWER_1_EMAIL = 'reviewer1@community.org'
+    REVIEWER_2_EMAIL = 'reviewer2@community.org'
     COMMIT_MESSAGE = 'commit message'
 
     class MockExploration(python_utils.OBJECT):
@@ -1760,24 +1760,33 @@ class RetrieveEmailInfoUnitTests(
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
     
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
-            question_suggestion = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
-                skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-                author_id, add_question_change_dict,
-                'test description')
+        question_suggestion = suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_question_change_dict,
+            'test description')
 
         return question_suggestion
 
+    def _assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            self, reviewable_suggestion_infos, suggestions):
+        self.assertEqual(len(reviewable_suggestion_infos), len(suggestions))
+        for index, reviewable_suggestion_info in enumerate(
+                reviewable_suggestion_infos):
+            self.assertEqual(
+                reviewable_suggestion_info.out_for_review_on,
+                suggestions[index].last_updated)
+        for index in python_utils.RANGE(len(reviewable_suggestion_infos) - 1):
+            self.assertLess(
+                reviewable_suggestion_infos[index].out_for_review_on,
+                reviewable_suggestion_infos[index + 1].out_for_review_on)
 
     def setUp(self):
         super(
@@ -1785,42 +1794,121 @@ class RetrieveEmailInfoUnitTests(
             self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translationReviewer')
-        self.translation_reviewer_id = self.get_user_id_from_email(
-            self.TRANSLATION_REVIEWER_EMAIL)
-        self.signup(self.QUESTION_REVIEWER_EMAIL, 'questionReviewer')
-        self.question_reviewer_id = self.get_user_id_from_email(
-            self.QUESTION_REVIEWER_EMAIL)
+        self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
+        self.reviewer_1_id = self.get_user_id_from_email(
+            self.REVIEWER_1_EMAIL)
+        self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
+        self.reviewer_2_id = self.get_user_id_from_email(
+            self.REVIEWER_2_EMAIL)
 
     def test_get_suggestion_info_to_notify_reviewers_returns_empty_for_authors(
             self):
-        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
         user_services.allow_user_to_review_translation_in_language(
-            self.translation_reviewer_id, 'hi')
-        user_services.allow_user_to_review_translation_in_language(
-            self.translation_reviewer_id, 'en')
+            self.reviewer_1_id, 'hi')
         self._create_question_suggestion_with_skill_id_and_author_id(
-            'skill_1', self.question_reviewer_id)
+            'skill_1', self.reviewer_1_id)
         self._create_translation_suggestion_with_language_code_and_author_id(
-            'hi', self.translation_reviewer_id)
+            'hi', self.reviewer_1_id)
 
         reviewers_reviewable_suggestion_infos = (
             suggestion_services
             .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
-                [self.question_reviewer_id, self.translation_reviewer_id]
+                [self.reviewer_1_id]
             )
         )
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 2)
-        self.assertEqual(reviewers_reviewable_suggestion_infos[0], [])
-        self.assertEqual(reviewers_reviewable_suggestion_infos[1], [])
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self.assertEqual(reviewers_reviewable_suggestion_infos, [[]])
 
-    def test_get_suggestion_info_to_notify_reviewers_for_one_reviewer_multi_lang(
+    def test_get_suggestion_info_to_notify_reviewers_returns_empty_for_wrong_reviewing_permissions(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        self._create_translation_suggestion_with_language_code_and_author_id(
+            'hi', self.author_id)
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self.assertEqual(reviewers_reviewable_suggestion_infos, [[]])
+
+    def test_get_suggestion_info_to_notify_reviewers_returns_empty_for_wrong_reviewing_permissions_again(
             self):
         user_services.allow_user_to_review_translation_in_language(
-            self.translation_reviewer_id, 'hi')
+            self.reviewer_1_id, 'hi')
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.reviewer_1_id)
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self.assertEqual(reviewers_reviewable_suggestion_infos, [[]])
+
+    def test_get_suggestion_info_to_notify_reviewers_for_a_translation_reviewer_same_lang(
+            self):
         user_services.allow_user_to_review_translation_in_language(
-            self.translation_reviewer_id, 'en')
+            self.reviewer_1_id, 'hi')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        translation_suggestions = [
+            translation_suggestion_1, translation_suggestion_2
+        ]
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self.assertEqual(
+            len(reviewers_reviewable_suggestion_infos[0]),
+            len(translation_suggestions))
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[0], translation_suggestions)
+
+    def test_get_suggestion_info_to_notify_reviewers_for_a_translation_reviewer_diff_lang(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        translation_suggestion = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self.assertEqual(reviewers_reviewable_suggestion_infos, [[]])
+
+    def test_get_suggestion_info_to_notify_reviewers_for_a_translation_reviewer_multi_lang(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
         translation_suggestion_1 = (
             self._create_translation_suggestion_with_language_code_and_author_id(
                 'hi', self.author_id)
@@ -1841,20 +1929,265 @@ class RetrieveEmailInfoUnitTests(
         reviewers_reviewable_suggestion_infos = (
             suggestion_services
             .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
-                [self.translation_reviewer_id]
+                [self.reviewer_1_id]
             )
         )
 
         self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self.assertEqual(
-            len(reviewers_reviewable_suggestion_infos[0]),
-            len(translation_suggestions))
-        self.assertListEqual(
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
             reviewers_reviewable_suggestion_infos[0], translation_suggestions)
-        for i in python_utils.RANGE(
-                len(reviewers_reviewable_suggestion_infos[0]) - 1):
-            self.assertLess(
-                reviewers_reviewable_suggestion_infos[0][i].last_updated,
-                reviewers_reviewable_suggestion_infos[0][i + 1].last_updated)
 
-        raise Exception('{}'.format(' '.join(blah[x].language_code for x in range(len(blah)))))
+    def test_get_suggestion_info_to_notify_reviewers_for_a_translation_reviewer_past_limit(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+
+        with self.swap(
+            suggestion_services, 'MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewers_reviewable_suggestion_infos = (
+                suggestion_services
+                .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                    [self.reviewer_1_id]
+                )
+            )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos[0]), 1)
+        self.assertEqual(
+            reviewers_reviewable_suggestion_infos[0][0].out_for_review_on,
+            translation_suggestion_1.last_updated)
+
+    def test_get_suggestion_info_to_notify_reviewers_for_translation_reviewers(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'hi')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'en', self.author_id)
+        )
+        translation_suggestion_3 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        translation_suggestions_expected_order_for_reviewer_1 = [
+            translation_suggestion_1, translation_suggestion_2,
+            translation_suggestion_3
+        ]
+        translation_suggestions_expected_order_for_reviewer_2 = [
+            translation_suggestion_1, translation_suggestion_3
+        ]
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id, self.reviewer_2_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 2)
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[0],
+            translation_suggestions_expected_order_for_reviewer_1)
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[1],
+            translation_suggestions_expected_order_for_reviewer_2)
+
+    def test_get_suggestion_info_to_notify_reviewers_for_reviewer_with_multiple_reviewing_permissions(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id)
+        )
+        suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        suggestion_3 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id)
+        )
+        suggestion_4 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        suggestion_5 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'en', self.author_id)
+        )
+        suggestion_order = [
+            suggestion_1, suggestion_2, suggestion_3, suggestion_4, suggestion_5
+        ]
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[0], suggestion_order)
+
+    def test_get_suggestion_info_to_notify_reviewers_for_a_question_reviewer(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id)
+        )
+        question_suggestion_2 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id)
+        )
+        question_suggestions = [
+            question_suggestion_1, question_suggestion_2
+        ]
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[0], question_suggestions)
+
+    def test_get_suggestion_info_to_notify_reviewers_for_multi_question_reviewers(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_question(self.reviewer_2_id)
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id)
+        )
+        question_suggestion_2 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id)
+        )
+        question_suggestions = [
+            question_suggestion_1, question_suggestion_2
+        ]
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id, self.reviewer_2_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 2)
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[0], question_suggestions)
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[1], question_suggestions)
+
+    def test_get_suggestion_info_to_notify_reviewers_for_a_question_reviewer_past_limit(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id)
+        )
+        question_suggestion_2 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id)
+        )
+
+        with self.swap(
+            suggestion_services, 'MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewers_reviewable_suggestion_infos = (
+                suggestion_services
+                .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                    [self.reviewer_1_id]
+                )
+            )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos[0]), 1)
+        self.assertEqual(
+            reviewers_reviewable_suggestion_infos[0][0].out_for_review_on,
+            question_suggestion_1.last_updated)
+
+    def test_get_suggestion_info_to_notify_reviewers_for_reviewers_with_multiple_reviewing_permissions(
+            self):
+        # Reviewer 1's permissions.
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        # Reviewer 2's permissions.
+        user_services.allow_user_to_review_question(self.reviewer_2_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'fr')
+        suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id)
+        )
+        suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        suggestion_3 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'fr', self.author_id)
+        )
+        suggestion_4 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id)
+        )
+        suggestion_5 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'hi', self.author_id)
+        )
+        suggestion_6 = (
+            self._create_translation_suggestion_with_language_code_and_author_id(
+                'en', self.author_id)
+        )
+        suggestion_order_for_reviewer_1 = [
+            suggestion_1, suggestion_2, suggestion_4, suggestion_5, suggestion_6
+        ]
+        suggestion_order_for_reviewer_2 = [
+            suggestion_1, suggestion_2, suggestion_3, suggestion_4, suggestion_5
+        ]
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id, self.reviewer_2_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 2)
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[0],
+            suggestion_order_for_reviewer_1)
+        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
+            reviewers_reviewable_suggestion_infos[1],
+            suggestion_order_for_reviewer_2)
