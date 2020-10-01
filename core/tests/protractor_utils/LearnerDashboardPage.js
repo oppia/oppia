@@ -76,11 +76,13 @@ var LearnerDashboardPage = function() {
   };
 
   this.navigateToCompletedCollectionsSection = async function() {
-    await action.click('Completed Collections Tab', completedCollectionsSection);
+    await action.click(
+      'Completed Collections Tab', completedCollectionsSection);
   };
 
   this.navigateToCompletedExplorationsSection = async function() {
-    await action.click('Completed Explorations Tab', completedExplorationsSection);
+    await action.click(
+      'Completed Explorations Tab', completedExplorationsSection);
   };
 
   this.navigateToFeedbackSection = async function() {
