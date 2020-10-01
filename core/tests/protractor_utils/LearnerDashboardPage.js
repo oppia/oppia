@@ -57,34 +57,38 @@ var LearnerDashboardPage = function() {
     await waitFor.elementToBeClickable(
       playLaterSection,
       'Play Later Exploration Section tab takes too long to be clickable');
-    await action.click('Play Later Explorations Tab', playLaterSection);
+    await action.click(
+      'Play Later Explorations Tab', playLaterSection);
   };
 
   this.navigateToCompletedSection = async function() {
     await waitFor.elementToBeClickable(
       completedSection, 'Completed tab takes too long to be clickable');
-    await action.click('Completed Tab', completedSection);
+    await action.click(
+      'Completed Tab', completedSection);
   };
 
   this.navigateToInCompleteSection = async function() {
     await waitFor.elementToBeClickable(
       incompleteSection, 'In Progress tab takes too long to be clickable');
-    await action.click('In Progress Tab', incompleteSection);
+    await action.click(
+      'In Progress Tab', incompleteSection);
   };
 
   this.navigateToIncompleteCollectionsSection = async function() {
     await waitFor.elementToBeClickable(
       incompleteCollectionsSection,
-      'In Progress Collections Section tab takes too long to be clickable');
-    await action.click('In Progress Collections Tab', 
-      incompleteCollectionsSection);
+      'In Progress Collections tab takes too long to be clickable');
+    await action.click(
+      'In Progress Collections Tab', incompleteCollectionsSection);
   };
 
   this.navigateToIncompleteExplorationsSection = async function() {
     await waitFor.elementToBeClickable(
       incompleteExplorationsSection,
-      'In Progress Explorations Section tab takes too long to be clickable');
-    await action.click('In Progress Explorations Tab', 
+      'In Progress Explorations tab takes too long to be clickable');
+    await action.click(
+      'In Progress Explorations Tab', 
       incompleteExplorationsSection);
   };
 
@@ -92,33 +96,38 @@ var LearnerDashboardPage = function() {
     await waitFor.elementToBeClickable(
       completedCollectionsSection,
       'Completed Collection tab takes too long to be clickable');
-    await action.click('Completed Collections Tab', completedCollectionsSection);
+    await action.click(
+      'Completed Collections Tab', completedCollectionsSection);
   };
 
   this.navigateToCompletedExplorationsSection = async function() {
     await waitFor.elementToBeClickable(
       completedExplorationsSection,
       'Completed Exploration tab takes too long to be clickable');
-    await action.click('Completed Explorations Tab', completedExplorationsSection);
+    await action.click(
+      'Completed Explorations Tab', completedExplorationsSection);
   };
 
   this.navigateToFeedbackSection = async function() {
     await waitFor.elementToBeClickable(
       feedbackSection, 'Feedback Section tab takes too long to be clickable');
-    await action.click('Feedback Tab', feedbackSection);
+    await action.click(
+      'Feedback Tab', feedbackSection);
   };
 
   this.navigateToFeedbackThread = async function() {
     await waitFor.elementToBeClickable(
       feedbackThread, 'Feedback Thread tab takes too long to be clickable');
-    await action.click('Feedback Thread Tab', feedbackThread);
+    await action.click(
+      'Feedback Thread Tab', feedbackThread);
   };
 
   this.navigateToSubscriptionsSection = async function() {
     await waitFor.elementToBeClickable(
       subscriptionsSection,
-      'Subscriptions Section tab takes too long to be clickable');
-    await action.click('Subscriptions Tab', subscriptionsSection);
+      'Subscriptions tab takes too long to be clickable');
+    await action.click(
+      'Subscriptions Tab', subscriptionsSection);
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
