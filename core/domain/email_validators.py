@@ -20,13 +20,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import itertools
-import re
 
-from constants import constants
 from core.domain import base_model_validators
 from core.platform import models
-import feconf
 
 (
     base_models, email_models, feedback_models, suggestion_models, user_models
@@ -34,6 +30,8 @@ import feconf
     models.NAMES.base_model, models.NAMES.email, models.NAMES.feedback,
     models.NAMES.suggestion, models.NAMES.user
 ])
+
+USER_ID_REGEX = 'uid_[a-z]{32}'
 
 
 class SentEmailModelValidator(base_model_validators.BaseModelValidator):
@@ -257,6 +255,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
     def _get_custom_validation_functions(cls):
         return [cls._validate_reply_to_id_length]
 
+
 class UnsentFeedbackEmailModelValidator(
         base_model_validators.BaseModelValidator):
     """Class for validating UnsentFeedbackEmailModels."""
@@ -314,6 +313,7 @@ class UnsentFeedbackEmailModelValidator(
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_entity_type_and_entity_id_feedback_reference]
+
 
 class UserEmailPreferencesModelValidator(
         base_model_validators.BaseUserModelValidator):
@@ -484,42 +484,3 @@ class UserBulkEmailsModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_user_id_in_recipient_id_for_emails]
-
-
-class UserSkillMasteryModelValidator(
-        base_model_validators.BaseUserModelValidator):
-    """Class for validating UserSkillMasteryModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '^%s\\.%s$' % (item.user_id, item.skill_id)
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'skill_ids', skill_models.SkillModel, [item.skill_id])]
-
-    @classmethod
-    def _validate_skill_mastery(cls, item):
-        """Validates that skill mastery is in range [0.0, 1.0].
-
-        Args:
-            item: ndb.Model. UserSkillMasteryModel to validate.
-        """
-        if item.degree_of_mastery < 0 or item.degree_of_mastery > 1:
-            cls._add_error(
-                'skill mastery check',
-                'Entity id %s: Expected degree of mastery to be in '
-                'range [0.0, 1.0], received %s' % (
-                    item.id, item.degree_of_mastery))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_skill_mastery]
-
-
