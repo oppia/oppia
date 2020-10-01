@@ -155,7 +155,7 @@
             <col class="oppia-colgroup-col-6">
           </colgroup>
           <tr>
-            <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
+            <th ng-repeat="(key, value) in $ctrl.EXPLORATIONS_SORT_BY_KEYS"
                 class="oppia-dashboard-table-headings"
                 ng-click="$ctrl.setExplorationsSortingOptions(value)">
               <p ng-if="key === 'TITLE'" translate="I18N_DASHBOARD_TABLE_HEADING_EXPLORATION"></p>
