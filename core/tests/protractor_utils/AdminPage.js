@@ -96,11 +96,11 @@ var AdminPage = function() {
       this.get();
       var ReloadCollectionButtons = await 
           reloadCollectionButtons.get(collectionId);
-      await action.click('reloadCollectionButtons',ReloadCollectionButtons);
+      await action.click('reloadCollectionButtons', ReloadCollectionButtons);
       await general.acceptAlert();
       // Time is needed for the reloading to complete.
       await waitFor.textToBePresentInElement(
-        statusMessage, 'Data reloaded successfully.',
+        statusMessage, 'Data reloaded successfully.', 
         'Collection could not be reloaded');
       return true;
     };
@@ -117,11 +117,11 @@ var AdminPage = function() {
         if (title.match(name)) {
           var getExplorationElementReloadButton = 
             getExplorationElementReloadButton(explorationElement);
-          await action.click("GetExplorationElementReloadButton",getExplorationElementReloadButton);
+          await action.click("GetExplorationElementReloadButton", getExplorationElementReloadButton);
           await general.acceptAlert();
           // Time is needed for the reloading to complete.
           await waitFor.textToBePresentInElement(
-            statusMessage, 'Data reloaded successfully.',
+            statusMessage, 'Data reloaded successfully.', 
             'Exploration could not be reloaded');
           return true;
         }
@@ -198,7 +198,7 @@ var AdminPage = function() {
     var text = await (await oneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var oneOffJobRowsButton = (await oneOffJobRows.get(i)).element(by.css('.protractor-test-one-off-jobs-start-btn'));
-      await action.click('OneOffJobRowsButton',oneOffJobRowsButton);
+      await action.click('OneOffJobRowsButton', oneOffJobRowsButton);
     } else {
       await this._startOneOffJob(jobName, ++i);
     }
@@ -213,7 +213,7 @@ var AdminPage = function() {
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var unfinishedOffJobRowsButton = (await unfinishedOneOffJobRows.get(i)).element(
         by.css('.protractor-test-one-off-jobs-stop-btn'));
-      await action.click('UnfinishedOffJobRowsButton',unfinishedOffJobRowsButton);
+      await action.click('UnfinishedOffJobRowsButton', unfinishedOffJobRowsButton);
     } else {
       await this._stopOneOffJob(jobName, ++i);
     }
@@ -247,7 +247,7 @@ var AdminPage = function() {
     // Change values for "update role" form, and submit it.
     await waitFor.visibilityOf(
       updateFormName, 'Update Form Name is not visible');
-    await action.sendKeys('Update For Name',updateFormName,name);
+    await action.sendKeys('Update For Name', updateFormName,name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
     await waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
@@ -263,10 +263,10 @@ var AdminPage = function() {
   this.getUsersAsssignedToRole = async function(role) {
     await waitFor.visibilityOf(
       roleDropdown, 'View role dropdown taking too long to be visible');
-    await action.sendKeys('Role Drop Down',roleDropdown,'By Role');
+    await action.sendKeys('Role Drop Down', roleDropdown, 'By Role');
 
     await action.click(roleValueOption);
-    await action.sendKeys('Role Value Option',roleValueOption,role);
+    await action.sendKeys('Role Value Option', roleValueOption, role);
 
     await action.click(viewRoleButton);
   };
@@ -274,10 +274,10 @@ var AdminPage = function() {
   this.viewRolesbyUsername = async function(username) {
     await waitFor.visibilityOf(
       roleDropdown, 'View role dropdown taking too long to be visible');
-    await action.sendKeys('Role Drop Down',roleDropdown,'By Username');
+    await action.sendKeys('Role Drop Down', roleDropdown, 'By Username');
 
     await action.click(roleUsernameOption);
-    await action.sendKeys('Role Username Option',roleUsernameOption,username);
+    await action.sendKeys('Role Username Option', roleUsernameOption, username);
 
     await action.click(viewRoleButton);
   };
