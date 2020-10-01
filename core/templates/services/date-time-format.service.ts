@@ -53,7 +53,7 @@ export class DateTimeFormatService {
   // Returns just the date.
   getLocaleDateString(millisSinceEpoch: number | null): string {
     let date = new Date();
-    if(millisSinceEpoch != null){
+    if (millisSinceEpoch !== null) {
       date = new Date(millisSinceEpoch);
     }
     return date.toLocaleDateString();

@@ -27,7 +27,7 @@ import $ from 'jquery';
 @Injectable({
   providedIn: 'root'
 })
-export class CsrfTokenService { 
+export class CsrfTokenService {
   tokenPromise: PromiseLike<string> | null = null;
 
   initializeToken(): void {
