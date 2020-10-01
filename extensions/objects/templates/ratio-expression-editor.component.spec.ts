@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Unit tests for the ratio expression component.
  */
+import { Ratio } from 'domain/objects/ratio.model';
 
 describe('RatioExpression', function() {
   var RationExpressionCtrl = null;
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('Ratio', Ratio);
+  }));
   beforeEach(angular.mock.inject(function($componentController) {
     RationExpressionCtrl = $componentController('ratioExpressionEditor');
   }));
