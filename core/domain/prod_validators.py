@@ -112,42 +112,6 @@ VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
 
-
-class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating RoleQueryAuditModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        # Valid id: [user_id].[timestamp_in_sec].[intent].[random_number]
-        regex_string = '^%s\\.\\d+\\.%s\\.\\d+$' % (item.user_id, item.intent)
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_ids', user_models.UserSettingsModel, [item.user_id])]
-
-
-class UsernameChangeAuditModelValidator(
-        base_model_validators.BaseModelValidator):
-    """Class for validating UsernameChangeAuditModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        # Valid id: [committer_id].[timestamp_in_sec]
-        # committer_id refers to the user that is making the change.
-        regex_string = '^%s\\.\\d+$' % item.committer_id
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
-
-
 class ClassifierTrainingJobModelValidator(
         base_model_validators.BaseModelValidator):
     """Class for validating ClassifierTrainingJobModels."""
