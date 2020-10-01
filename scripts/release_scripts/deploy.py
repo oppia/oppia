@@ -278,6 +278,8 @@ def deploy_application_and_write_log_entry(
     # Deploy app to GAE.
     gcloud_adapter.deploy_application(
         './app.yaml', app_name, version=version_to_deploy_to)
+    # Deploy cron yaml to GAE.
+    gcloud_adapter.deploy_application('cron.yaml', app_name)
     # Writing log entry.
     common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
     with python_utils.open_file(LOG_FILE_PATH, 'a') as log_file:
