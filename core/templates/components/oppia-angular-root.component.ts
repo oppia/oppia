@@ -890,7 +890,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static profileSummaryObjectFactory: ProfileSummaryObjectFactory;
-  static promoBarBackendService: PromoBarBackendService;
+  static promoBarBackendApiService: PromoBarBackendApiService;
   static promoBarService: PromoBarService;
   static pythonProgramTokenizer: PythonProgramTokenizer;
   static questionBackendApiService: QuestionBackendApiService;
@@ -1275,7 +1275,7 @@ private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
 private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
-private promoBarBackendService: PromoBarBackendService,
+private promoBarBackendApiService: PromoBarBackendApiService,
 private promoBarService: PromoBarService,
 private pythonProgramTokenizer: PythonProgramTokenizer,
 private questionBackendApiService: QuestionBackendApiService,
