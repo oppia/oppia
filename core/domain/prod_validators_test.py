@@ -155,7 +155,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for user_ids field check of '
             'RoleQueryAuditModel\', '
             '[u"Entity id %s: based on field user_ids having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.admin_id, self.admin_id)]
 
@@ -247,7 +247,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for committer_ids field check of '
             'UsernameChangeAuditModel\', '
             '[u"Entity id %s: based on field committer_ids having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.admin_id, self.admin_id)]
 
@@ -362,7 +362,7 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of ClassifierTrainingJobModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
             u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
         self.run_job_and_check_output(
@@ -490,7 +490,7 @@ class TrainingJobExplorationMappingModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids field '
                 'check of TrainingJobExplorationMappingModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
             u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
         self.run_job_and_check_output(
@@ -675,7 +675,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for '
                 'exploration_ids field check of CollectionModel\', '
                 '[u"Entity id 0: based on field exploration_ids having value '
-                '1, expect model ExplorationModel '
+                '1, expected model ExplorationModel '
                 'with id 1 but it doesn\'t exist"]]'
             ),
             u'[u\'fully-validated CollectionModel\', 2]']
@@ -699,7 +699,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'CollectionModel\', '
                 '[u"Entity id 0: based on field '
                 'collection_commit_log_entry_ids having value '
-                'collection-0-1, expect model CollectionCommitLogEntryModel '
+                'collection-0-1, expected model CollectionCommitLogEntryModel '
                 'with id collection-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -713,7 +713,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_summary_ids '
                 'field check of CollectionModel\', '
                 '[u"Entity id 0: based on field collection_summary_ids '
-                'having value 0, expect model CollectionSummaryModel with '
+                'having value 0, expected model CollectionSummaryModel with '
                 'id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -728,7 +728,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionModel\', '
                 '[u"Entity id 0: based on field collection_rights_ids having '
-                'value 0, expect model CollectionRightsModel with id 0 but '
+                'value 0, expected model CollectionRightsModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -742,7 +742,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of CollectionModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model CollectionSnapshotMetadataModel '
+                'value 0-1, expected model CollectionSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -756,7 +756,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of CollectionModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model CollectionSnapshotContentModel '
+                'value 0-1, expected model CollectionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -870,9 +870,9 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field collection_ids '
-                'having value 0, expect model CollectionModel with '
+                'having value 0, expected model CollectionModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'collection_ids having value 0, expect model '
+                'collection_ids having value 0, expected model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -887,7 +887,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of CollectionSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -1045,9 +1045,9 @@ class CollectionSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field collection_ids '
-                'having value 0, expect model CollectionModel with '
+                'having value 0, expected model CollectionModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'collection_ids having value 0, expect model '
+                'collection_ids having value 0, expected model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -1201,7 +1201,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field collection_ids having '
-                'value 0, expect model CollectionModel with id 0 but '
+                'value 0, expected model CollectionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -1216,7 +1216,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for owner_user_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field owner_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -1229,7 +1229,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for editor_user_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field editor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
@@ -1243,7 +1243,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for viewer_user_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 2: based on field viewer_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
@@ -1258,7 +1258,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model '
+                'value 0-1, expected model '
                 'CollectionRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
@@ -1274,8 +1274,9 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model CollectionRightsSnapshotContentModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
+                'value 0-1, expected model '
+                'CollectionRightsSnapshotContentModel with id 0-1 but it '
+                'doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -1383,9 +1384,9 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field collection_rights_ids '
-                'having value 0, expect model CollectionRightsModel with '
+                'having value 0, expected model CollectionRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'collection_rights_ids having value 0, expect model '
+                'collection_rights_ids having value 0, expected model '
                 'CollectionRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -1400,7 +1401,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of CollectionRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -1557,9 +1558,9 @@ class CollectionRightsSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionRightsSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field collection_rights_ids '
-                'having value 0, expect model CollectionRightsModel with '
+                'having value 0, expected model CollectionRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'collection_rights_ids having value 0, expect model '
+                'collection_rights_ids having value 0, expected model '
                 'CollectionRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -1698,9 +1699,9 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionCommitLogEntryModel\', '
                 '[u"Entity id collection-0-1: based on field collection_ids '
-                'having value 0, expect model CollectionModel with id 0 '
+                'having value 0, expected model CollectionModel with id 0 '
                 'but it doesn\'t exist", u"Entity id collection-0-2: based '
-                'on field collection_ids having value 0, expect model '
+                'on field collection_ids having value 0, expected model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
@@ -1714,7 +1715,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionCommitLogEntryModel\', '
                 '[u"Entity id rights-1-1: based on field '
-                'collection_rights_ids having value 1, expect model '
+                'collection_rights_ids having value 1, expected model '
                 'CollectionRightsModel with id 1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
@@ -1985,7 +1986,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 0: based on field collection_ids having '
-                'value 0, expect model CollectionModel with id 0 but '
+                'value 0, expected model CollectionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -2000,7 +2001,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for owner_user_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 0: based on field owner_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -2013,7 +2014,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for editor_user_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 0: based on field editor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -2027,7 +2028,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for viewer_user_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 2: based on field viewer_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -2041,7 +2042,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for contributor_user_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 0: based on field contributor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.contributor_id, self.contributor_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -2189,7 +2190,7 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of ConfigPropertyModel\', '
                 '[u"Entity id config_model: based on field '
                 'snapshot_metadata_ids having '
-                'value config_model-1, expect model '
+                'value config_model-1, expected model '
                 'ConfigPropertySnapshotMetadataModel '
                 'with id config_model-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ConfigPropertyModel\', 1]']
@@ -2205,7 +2206,7 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of ConfigPropertyModel\', '
                 '[u"Entity id config_model: based on field '
                 'snapshot_content_ids having '
-                'value config_model-1, expect model '
+                'value config_model-1, expected model '
                 'ConfigPropertySnapshotContentModel '
                 'with id config_model-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ConfigPropertyModel\', 1]']
@@ -2289,10 +2290,10 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 'field check of ConfigPropertySnapshotMetadataModel\', '
                 '[u"Entity id config_model-1: based on field '
                 'config_property_ids having value config_model, '
-                'expect model ConfigPropertyModel with '
+                'expected model ConfigPropertyModel with '
                 'id config_model but it doesn\'t exist", '
                 'u"Entity id config_model-2: based on field '
-                'config_property_ids having value config_model, expect model '
+                'config_property_ids having value config_model, expected model '
                 'ConfigPropertyModel with id config_model but it doesn\'t '
                 'exist"]]'
             ),
@@ -2307,7 +2308,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of ConfigPropertySnapshotMetadataModel\', '
                 '[u"Entity id config_model-1: based on field committer_ids '
-                'having value %s, expect model UserSettingsModel with id %s '
+                'having value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.admin_id, self.admin_id),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
@@ -2434,10 +2435,10 @@ class ConfigPropertySnapshotContentModelValidatorTests(
                 'field check of ConfigPropertySnapshotContentModel\', '
                 '[u"Entity id config_model-1: based on field '
                 'config_property_ids having value config_model, '
-                'expect model ConfigPropertyModel with '
+                'expected model ConfigPropertyModel with '
                 'id config_model but it doesn\'t exist", '
                 'u"Entity id config_model-2: based on field '
-                'config_property_ids having value config_model, expect model '
+                'config_property_ids having value config_model, expected model '
                 'ConfigPropertyModel with id config_model but it '
                 'doesn\'t exist"]]'
             ),
@@ -2549,7 +2550,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for sender_id field check of '
             'SentEmailModel\', '
             '[u"Entity id %s: based on field sender_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.sender_id, self.sender_id)]
 
@@ -2562,7 +2563,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for recipient_id field check of '
             'SentEmailModel\', '
             '[u"Entity id %s: based on field recipient_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.recipient_id, self.recipient_id)]
 
@@ -2694,7 +2695,7 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for sender_id field check of '
             'BulkEmailModel\', '
             '[u"Entity id %s: based on field sender_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.sender_id, self.sender_id)]
 
@@ -2707,7 +2708,7 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for recipient_id field check of '
             'BulkEmailModel\', '
             '[u"Entity id %s: based on field recipient_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.recipient_ids[0],
                 self.recipient_ids[0])]
@@ -2823,7 +2824,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             u'[u\'failed validation check for item.id.user_id field check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
             '[u"Entity id %s: based on field item.id.user_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.user_id, self.user_id)]
 
@@ -2837,7 +2838,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             u'[u\'failed validation check for item.id.thread_id field check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
             '[u"Entity id %s: based on field item.id.thread_id having value '
-            '%s, expect model GeneralFeedbackThreadModel with '
+            '%s, expected model GeneralFeedbackThreadModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.thread_id, self.thread_id)]
 
@@ -2990,8 +2991,9 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 'ExplorationModel\', '
                 '[u"Entity id 0: based on field '
                 'exploration_commit_log_entry_ids having value '
-                'exploration-0-1, expect model ExplorationCommitLogEntryModel '
-                'with id exploration-0-1 but it doesn\'t exist"]]'),
+                'exploration-0-1, expected model '
+                'ExplorationCommitLogEntryModel with id exploration-0-1 but it '
+                'doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -3004,7 +3006,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exp_summary_ids '
                 'field check of ExplorationModel\', '
                 '[u"Entity id 0: based on field exp_summary_ids having '
-                'value 0, expect model ExpSummaryModel with id 0 '
+                'value 0, expected model ExpSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
@@ -3019,7 +3021,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationModel\', '
                 '[u"Entity id 0: based on field exploration_rights_ids '
-                'having value 0, expect model ExplorationRightsModel '
+                'having value 0, expected model ExplorationRightsModel '
                 'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
@@ -3033,7 +3035,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of ExplorationModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model ExplorationSnapshotMetadataModel '
+                'value 0-1, expected model ExplorationSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
@@ -3047,7 +3049,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of ExplorationModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model ExplorationSnapshotContentModel '
+                'value 0-1, expected model ExplorationSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
@@ -3146,9 +3148,9 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field exploration_ids '
-                'having value 0, expect model ExplorationModel with '
+                'having value 0, expected model ExplorationModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_ids having value 0, expect model '
+                'exploration_ids having value 0, expected model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -3163,7 +3165,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of ExplorationSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -3308,9 +3310,9 @@ class ExplorationSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field exploration_ids '
-                'having value 0, expect model ExplorationModel with '
+                'having value 0, expected model ExplorationModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_ids having value 0, expect model '
+                'exploration_ids having value 0, expected model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -3449,7 +3451,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field exploration_ids having '
-                'value 0, expect model ExplorationModel with id 0 but '
+                'value 0, expected model ExplorationModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -3464,7 +3466,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'cloned_from_exploration_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field cloned_from_exploration_ids '
-                'having value invalid, expect model ExplorationModel with id '
+                'having value invalid, expected model ExplorationModel with id '
                 'invalid but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -3479,7 +3481,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for owner_user_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field owner_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -3492,7 +3494,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for editor_user_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field editor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
@@ -3506,7 +3508,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for viewer_user_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 2: based on field viewer_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
@@ -3521,7 +3523,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model '
+                'value 0-1, expected model '
                 'ExplorationRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
@@ -3537,8 +3539,9 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model ExplorationRightsSnapshotContentModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
+                'value 0-1, expected model '
+                'ExplorationRightsSnapshotContentModel with id 0-1 but it '
+                'doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -3631,9 +3634,9 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field exploration_rights_ids '
-                'having value 0, expect model ExplorationRightsModel with '
+                'having value 0, expected model ExplorationRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_rights_ids having value 0, expect model '
+                'exploration_rights_ids having value 0, expected model '
                 'ExplorationRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -3648,7 +3651,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of ExplorationRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -3792,9 +3795,9 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationRightsSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field exploration_rights_ids '
-                'having value 0, expect model ExplorationRightsModel with '
+                'having value 0, expected model ExplorationRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_rights_ids having value 0, expect model '
+                'exploration_rights_ids having value 0, expected model '
                 'ExplorationRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -3922,10 +3925,10 @@ class ExplorationCommitLogEntryModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationCommitLogEntryModel\', '
                 '[u"Entity id exploration-0-1: based on field '
-                'exploration_ids having value 0, expect model '
+                'exploration_ids having value 0, expected model '
                 'ExplorationModel with id 0 '
                 'but it doesn\'t exist", u"Entity id exploration-0-2: based '
-                'on field exploration_ids having value 0, expect model '
+                'on field exploration_ids having value 0, expected model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
@@ -3939,7 +3942,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationCommitLogEntryModel\', '
                 '[u"Entity id rights-1-1: based on field '
-                'exploration_rights_ids having value 1, expect model '
+                'exploration_rights_ids having value 1, expected model '
                 'ExplorationRightsModel with id 1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
@@ -4221,7 +4224,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 0: based on field exploration_ids having '
-                'value 0, expect model ExplorationModel with id 0 but '
+                'value 0, expected model ExplorationModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -4236,7 +4239,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for owner_user_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 0: based on field owner_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -4249,7 +4252,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for editor_user_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 0: based on field editor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -4263,7 +4266,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for viewer_user_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 2: based on field viewer_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -4277,7 +4280,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for contributor_user_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 0: based on field contributor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.contributor_id, self.contributor_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -4459,7 +4462,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -4472,7 +4475,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for suggestion_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field suggestion_ids having '
-                'value %s, expect model GeneralSuggestionModel with id %s '
+                'value %s, expected model GeneralSuggestionModel with id %s '
                 'but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -4485,8 +4488,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for author_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -4499,7 +4502,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for message_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field message_ids having value '
-                '%s.0, expect model GeneralFeedbackMessageModel with '
+                '%s.0, expected model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -4602,8 +4605,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for author_ids field '
                 'check of GeneralFeedbackMessageModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -4616,7 +4619,7 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for feedback_thread_ids field '
                 'check of GeneralFeedbackMessageModel\', '
                 '[u"Entity id %s: based on field feedback_thread_ids having '
-                'value %s, expect model GeneralFeedbackThreadModel with '
+                'value %s, expected model GeneralFeedbackThreadModel with '
                 'id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -4713,8 +4716,8 @@ class GeneralFeedbackThreadUserModelValidatorTests(
                 u'[u\'failed validation check for user_ids field '
                 'check of GeneralFeedbackThreadUserModel\', '
                 '[u"Entity id %s: based on field user_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -4727,7 +4730,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(
                 u'[u\'failed validation check for message_ids field '
                 'check of GeneralFeedbackThreadUserModel\', '
                 '[u"Entity id %s: based on field message_ids having '
-                'value %s.0, expect model GeneralFeedbackMessageModel with '
+                'value %s.0, expected model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -4800,7 +4803,7 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of FeedbackAnalyticsModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -4884,8 +4887,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for user_ids field '
                 'check of UnsentFeedbackEmailModel\', '
                 '[u"Entity id %s: based on field user_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -4898,7 +4901,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for message_ids field '
                 'check of UnsentFeedbackEmailModel\', '
                 '[u"Entity id %s: based on field message_ids having value '
-                '%s.0, expect model GeneralFeedbackMessageModel with '
+                '%s.0, expected model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -5379,7 +5382,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for linked_skill_ids field '
                 'check of QuestionModel\', '
                 '[u"Entity id 0: based on field linked_skill_ids '
-                'having value 111111111111, expect model SkillModel with id '
+                'having value 111111111111, expected model SkillModel with id '
                 '111111111111 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5403,7 +5406,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'QuestionModel\', '
                 '[u"Entity id 0: based on field '
                 'question_commit_log_entry_ids having value '
-                'question-0-1, expect model QuestionCommitLogEntryModel '
+                'question-0-1, expected model QuestionCommitLogEntryModel '
                 'with id question-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5417,7 +5420,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for question_summary_ids '
                 'field check of QuestionModel\', '
                 '[u"Entity id 0: based on field question_summary_ids having '
-                'value 0, expect model QuestionSummaryModel with id 0 '
+                'value 0, expected model QuestionSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5431,7 +5434,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of QuestionModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model QuestionSnapshotMetadataModel '
+                'value 0-1, expected model QuestionSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5445,7 +5448,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of QuestionModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model QuestionSnapshotContentModel '
+                'value 0-1, expected model QuestionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5600,7 +5603,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_ids field '
                 'check of QuestionSkillLinkModel\', '
                 '[u"Entity id 0:2: based on field skill_ids '
-                'having value 2, expect model SkillModel with id 2 but it '
+                'having value 2, expected model SkillModel with id 2 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
         self.run_job_and_check_output(
@@ -5614,7 +5617,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for '
                 'question_ids field check of QuestionSkillLinkModel\', '
                 '[u"Entity id 0:2: based on field '
-                'question_ids having value 0, expect model QuestionModel '
+                'question_ids having value 0, expected model QuestionModel '
                 'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
         self.run_job_and_check_output(
@@ -5723,7 +5726,7 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids field '
                 'check of ExplorationContextModel\', '
                 '[u"Entity id 2: based on field story_ids '
-                'having value 1, expect model StoryModel with id 1 but it '
+                'having value 1, expected model StoryModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationContextModel\', 2]']
         self.run_job_and_check_output(
@@ -5737,7 +5740,7 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for '
                 'exp_ids field check of ExplorationContextModel\', '
                 '[u"Entity id 2: based on field '
-                'exp_ids having value 2, expect model ExplorationModel '
+                'exp_ids having value 2, expected model ExplorationModel '
                 'with id 2 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationContextModel\', 2]']
         self.run_job_and_check_output(
@@ -5857,9 +5860,9 @@ class QuestionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for question_ids '
                 'field check of QuestionSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field question_ids '
-                'having value 0, expect model QuestionModel with '
+                'having value 0, expected model QuestionModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'question_ids having value 0, expect model '
+                'question_ids having value 0, expected model '
                 'QuestionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -5874,7 +5877,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of QuestionSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -6039,9 +6042,9 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for question_ids '
                 'field check of QuestionSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field question_ids '
-                'having value 0, expect model QuestionModel with '
+                'having value 0, expected model QuestionModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'question_ids having value 0, expect model '
+                'question_ids having value 0, expected model '
                 'QuestionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -6172,9 +6175,9 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for question_ids field '
                 'check of QuestionCommitLogEntryModel\', '
                 '[u"Entity id question-0-1: based on field question_ids '
-                'having value 0, expect model QuestionModel with id '
+                'having value 0, expected model QuestionModel with id '
                 '0 but it doesn\'t exist", u"Entity id question-0-2: '
-                'based on field question_ids having value 0, expect '
+                'based on field question_ids having value 0, expected '
                 'model QuestionModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -6403,7 +6406,7 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for question_ids '
                 'field check of QuestionSummaryModel\', '
                 '[u"Entity id 0: based on field question_ids having '
-                'value 0, expect model QuestionModel with id 0 but '
+                'value 0, expected model QuestionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -6520,7 +6523,7 @@ class ExplorationRecommendationsModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids field '
                 'check of ExplorationRecommendationsModel\', '
                 '[u"Entity id 0: based on field exploration_ids having value '
-                '3, expect model ExplorationModel with '
+                '3, expected model ExplorationModel with '
                 'id 3 but it doesn\'t exist"]]'
             ),
             u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
@@ -6901,7 +6904,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for superseding_skill_ids field '
                 'check of SkillModel\', '
                 '[u"Entity id 0: based on field superseding_skill_ids '
-                'having value 3, expect model SkillModel with id 3 but it '
+                'having value 3, expected model SkillModel with id 3 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 3]']
         self.run_job_and_check_output(
@@ -6926,7 +6929,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'SkillModel\', '
                 '[u"Entity id 0: based on field '
                 'skill_commit_log_entry_ids having value '
-                'skill-0-1, expect model SkillCommitLogEntryModel '
+                'skill-0-1, expected model SkillCommitLogEntryModel '
                 'with id skill-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 4]']
         self.run_job_and_check_output(
@@ -6940,7 +6943,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_summary_ids '
                 'field check of SkillModel\', '
                 '[u"Entity id 0: based on field skill_summary_ids having '
-                'value 0, expect model SkillSummaryModel with id 0 '
+                'value 0, expected model SkillSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 4]']
         self.run_job_and_check_output(
@@ -6954,7 +6957,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of SkillModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model SkillSnapshotMetadataModel '
+                'value 0-1, expected model SkillSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 4]']
         self.run_job_and_check_output(
@@ -6968,7 +6971,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of SkillModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model SkillSnapshotContentModel '
+                'value 0-1, expected model SkillSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 4]']
         self.run_job_and_check_output(
@@ -7111,9 +7114,9 @@ class SkillSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for skill_ids '
                 'field check of SkillSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field skill_ids '
-                'having value 0, expect model SkillModel with '
+                'having value 0, expected model SkillModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'skill_ids having value 0, expect model '
+                'skill_ids having value 0, expected model '
                 'SkillModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -7128,7 +7131,7 @@ class SkillSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of SkillSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -7315,9 +7318,9 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_ids '
                 'field check of SkillSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field skill_ids '
-                'having value 0, expect model SkillModel with '
+                'having value 0, expected model SkillModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'skill_ids having value 0, expect model '
+                'skill_ids having value 0, expected model '
                 'SkillModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -7472,9 +7475,9 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_ids field '
                 'check of SkillCommitLogEntryModel\', '
                 '[u"Entity id skill-0-1: based on field skill_ids '
-                'having value 0, expect model SkillModel with id '
+                'having value 0, expected model SkillModel with id '
                 '0 but it doesn\'t exist", u"Entity id skill-0-2: '
-                'based on field skill_ids having value 0, expect '
+                'based on field skill_ids having value 0, expected '
                 'model SkillModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -7719,7 +7722,7 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_ids '
                 'field check of SkillSummaryModel\', '
                 '[u"Entity id 0: based on field skill_ids having '
-                'value 0, expect model SkillModel with id 0 but '
+                'value 0, expected model SkillModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -7921,7 +7924,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of StoryModel\', '
                 '[u"Entity id 0: based on field exploration_ids having value '
-                '1, expect model ExplorationModel with id 1 but it '
+                '1, expected model ExplorationModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -7945,7 +7948,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'StoryModel\', '
                 '[u"Entity id 0: based on field '
                 'story_commit_log_entry_ids having value '
-                'story-0-1, expect model StoryCommitLogEntryModel '
+                'story-0-1, expected model StoryCommitLogEntryModel '
                 'with id story-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -7959,7 +7962,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_summary_ids '
                 'field check of StoryModel\', '
                 '[u"Entity id 0: based on field story_summary_ids having '
-                'value 0, expect model StorySummaryModel with id 0 '
+                'value 0, expected model StorySummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -7973,7 +7976,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of StoryModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model StorySnapshotMetadataModel '
+                'value 0-1, expected model StorySnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -7987,7 +7990,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of StoryModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model StorySnapshotContentModel '
+                'value 0-1, expected model StorySnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -8096,9 +8099,9 @@ class StorySnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for story_ids '
                 'field check of StorySnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field story_ids '
-                'having value 0, expect model StoryModel with '
+                'having value 0, expected model StoryModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'story_ids having value 0, expect model '
+                'story_ids having value 0, expected model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -8113,7 +8116,7 @@ class StorySnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of StorySnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -8266,9 +8269,9 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids '
                 'field check of StorySnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field story_ids '
-                'having value 0, expect model StoryModel with '
+                'having value 0, expected model StoryModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'story_ids having value 0, expect model '
+                'story_ids having value 0, expected model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -8390,9 +8393,9 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids '
                 'field check of StoryCommitLogEntryModel\', '
                 '[u"Entity id story-0-1: based on field story_ids '
-                'having value 0, expect model StoryModel with id 0 '
+                'having value 0, expected model StoryModel with id 0 '
                 'but it doesn\'t exist", u"Entity id story-0-2: based '
-                'on field story_ids having value 0, expect model '
+                'on field story_ids having value 0, expected model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -8626,7 +8629,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids '
                 'field check of StorySummaryModel\', '
                 '[u"Entity id 0: based on field story_ids having '
-                'value 0, expect model StoryModel with id 0 but '
+                'value 0, expected model StoryModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated StorySummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -8748,7 +8751,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of GeneralSuggestionModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -8761,8 +8764,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for feedback_thread_ids field '
                 'check of GeneralSuggestionModel\', '
                 '[u"Entity id %s: based on field feedback_thread_ids having '
-                'value %s, expect model GeneralFeedbackThreadModel with id %s '
-                'but it doesn\'t exist"]]') % (
+                'value %s, expected model GeneralFeedbackThreadModel with id '
+                '%s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -8774,8 +8777,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for author_ids field '
                 'check of GeneralSuggestionModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -8787,8 +8790,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for reviewer_ids field '
                 'check of GeneralSuggestionModel\', '
                 '[u"Entity id %s: based on field reviewer_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.admin_id, self.admin_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9034,7 +9037,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids field '
                 'check of GeneralVoiceoverApplicationModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9046,8 +9049,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 u'[u\'failed validation check for author_ids field '
                 'check of GeneralVoiceoverApplicationModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9059,7 +9062,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 u'[u\'failed validation check for final_reviewer_ids field '
                 'check of GeneralVoiceoverApplicationModel\', '
                 '[u"Entity id %s: based on field final_reviewer_ids having '
-                'value %s, expect model UserSettingsModel with id %s but it '
+                'value %s, expected model UserSettingsModel with id %s but it '
                 'doesn\'t exist"]]') % (
                     self.model_instance.id, self.admin_id, self.admin_id)]
         self.run_job_and_check_output(
@@ -9086,25 +9089,64 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 class CommunityContributionStatsModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    translation_reviewer_counts_by_lang_code = {
-        'hi': 0,
-        'en': 1
-    }
-
-    translation_suggestion_counts_by_lang_code = {
-        'fr': 6,
-        'en': 5
-    }
-
-    question_reviewer_count = 1
-    question_suggestion_count = 4
+    target_id = 'exp1'
+    skill_id = 'skill1'
+    target_version_at_submission = 1
+    exploration_category = 'Algebra'
+    AUTHOR_EMAIL = 'author@example.com'
+    AUTHOR_USERNAME = 'author'
+    REVIEWER_EMAIL = 'reviewer@community.org'
+    REVIEWER_USERNAME = 'reviewer'
+    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
+    SKILL_THREAD_ID = 'skill1.thread1'
+    change_cmd = {}
 
     negative_count = -1
-    sample_language_code = 'en'
+    non_integer_count = 'non_integer_count'
+    sample_language_code = 'hi'
     invalid_language_code = 'invalid'
+
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.exploration_category
+        )
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            self.reviewer_id, self.change_cmd, score_category,
+            self.EXPLORATION_THREAD_ID, language_code)
+
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.target_id
+        )
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            self.reviewer_id, self.change_cmd, score_category,
+            self.SKILL_THREAD_ID, 'en')
 
     def setUp(self):
         super(CommunityContributionStatsModelValidatorTests, self).setUp()
+
+        self.signup(
+            self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(
+            self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -9118,14 +9160,28 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        user_services.allow_user_to_review_question(self.reviewer_id)
+        self._create_question_suggestion()
+        translation_reviewer_counts_by_lang_code = {
+            'hi': 1
+        }
+        translation_suggestion_counts_by_lang_code = {
+            'hi': 1
+        }
+        question_reviewer_count = 1
+        question_suggestion_count = 1
+
         suggestion_models.CommunityContributionStatsModel(
             id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
             translation_reviewer_counts_by_lang_code=(
-                self.translation_reviewer_counts_by_lang_code),
+                translation_reviewer_counts_by_lang_code),
             translation_suggestion_counts_by_lang_code=(
-                self.translation_suggestion_counts_by_lang_code),
-            question_reviewer_count=self.question_reviewer_count,
-            question_suggestion_count=self.question_suggestion_count
+                translation_suggestion_counts_by_lang_code),
+            question_reviewer_count=question_reviewer_count,
+            question_suggestion_count=question_suggestion_count
         ).put()
         expected_output = [(
             u'[u\'fully-validated CommunityContributionStatsModel\', 1]')]
@@ -9151,12 +9207,10 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_with_invalid_model_id(self):
         suggestion_models.CommunityContributionStatsModel(
             id='invalid_id',
-            translation_reviewer_counts_by_lang_code=(
-                self.translation_reviewer_counts_by_lang_code),
-            translation_suggestion_counts_by_lang_code=(
-                self.translation_suggestion_counts_by_lang_code),
-            question_reviewer_count=self.question_reviewer_count,
-            question_suggestion_count=self.question_suggestion_count
+            translation_reviewer_counts_by_lang_code={},
+            translation_suggestion_counts_by_lang_code={},
+            question_reviewer_count=0,
+            question_suggestion_count=0
         ).put()
 
         expected_output = [
@@ -9176,11 +9230,20 @@ class CommunityContributionStatsModelValidatorTests(
             self.sample_language_code: self.negative_count}
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for translation reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'reviewer count to be non-negative for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_reviewer_counts_by_lang_code[
@@ -9197,11 +9260,20 @@ class CommunityContributionStatsModelValidatorTests(
             self.sample_language_code: self.negative_count}
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'suggestion count to be non-negative for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_suggestion_counts_by_lang_code[
@@ -9217,10 +9289,16 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model.question_reviewer_count = self.negative_count
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
-            'question reviewer count to be non-negative, recieved: %s.\']]' % (
+            'question reviewer count to be non-negative, received: %s.\']]' % (
                 stats_model.id, stats_model.question_reviewer_count)
         ]
 
@@ -9233,12 +9311,190 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model.question_suggestion_count = self.negative_count
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
-            'question suggestion count to be non-negative, recieved: '
+            'question suggestion count to be non-negative, received: '
             '%s.\']]' % (
                 stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_non_integer_translation_reviewer_counts(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: self.non_integer_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'reviewer count to be an integer for %s language code, '
+            'received: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_non_integer_translation_suggestion_count(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: self.non_integer_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'suggestion count to be an integer for %s language code, '
+            'received: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_suggestion_counts_dont_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_reviewer_counts_dont_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_question_reviewer_count_does_not_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_reviewer_count = 1
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_question_suggestion_count_does_not_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_suggestion_count = 1
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_suggestion_lang_not_in_dict(
+            self):
+        missing_language_code = 'hi'
+        self._create_translation_suggestion_with_language_code(
+            missing_language_code)
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'field check of CommunityContributionStatsModel\', [u"Entity id '
+            '%s: The translation suggestion count for language code %s is 1, '
+            'expected model CommunityContributionStatsModel to have the '
+            'language code %s in its translation suggestion counts but it '
+            'doesn\'t exist."]]' % (
+                stats_model.id, missing_language_code, missing_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_reviewer_lang_not_in_dict(
+            self):
+        missing_language_code = 'hi'
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, missing_language_code)
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count '
+            'field check of CommunityContributionStatsModel\', [u"Entity id '
+            '%s: The translation reviewer count for language code %s is 1, '
+            'expected model CommunityContributionStatsModel to have the '
+            'language code %s in its translation reviewer counts but it '
+            'doesn\'t exist."]]' % (
+                stats_model.id, missing_language_code, missing_language_code)
         ]
 
         self.run_job_and_check_output(
@@ -9456,7 +9712,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids field '
                 'check of TopicModel\', '
                 '[u"Entity id 0: based on field story_ids having value '
-                '1, expect model StoryModel with id 1 but it '
+                '1, expected model StoryModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9471,7 +9727,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_ids field '
                 'check of TopicModel\', '
                 '[u"Entity id 0: based on field skill_ids having value '
-                '1, expect model SkillModel with id 1 but it '
+                '1, expected model SkillModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9486,7 +9742,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for subtopic_page_ids field '
                 'check of TopicModel\', '
                 '[u"Entity id 0: based on field subtopic_page_ids having value '
-                '0-1, expect model SubtopicPageModel with id 0-1 but it '
+                '0-1, expected model SubtopicPageModel with id 0-1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9510,7 +9766,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 'TopicModel\', '
                 '[u"Entity id 0: based on field '
                 'topic_commit_log_entry_ids having value '
-                'topic-0-1, expect model TopicCommitLogEntryModel '
+                'topic-0-1, expected model TopicCommitLogEntryModel '
                 'with id topic-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9524,7 +9780,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_summary_ids '
                 'field check of TopicModel\', '
                 '[u"Entity id 0: based on field topic_summary_ids having '
-                'value 0, expect model TopicSummaryModel with id 0 '
+                'value 0, expected model TopicSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9539,7 +9795,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_rights_ids '
                 'field check of TopicModel\', '
                 '[u"Entity id 0: based on field topic_rights_ids having '
-                'value 0, expect model TopicRightsModel with id 0 but '
+                'value 0, expected model TopicRightsModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9553,7 +9809,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of TopicModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model TopicSnapshotMetadataModel '
+                'value 0-1, expected model TopicSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9567,7 +9823,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of TopicModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model TopicSnapshotContentModel '
+                'value 0-1, expected model TopicSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9745,9 +10001,9 @@ class TopicSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for topic_ids '
                 'field check of TopicSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field topic_ids '
-                'having value 0, expect model TopicModel with '
+                'having value 0, expected model TopicModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'topic_ids having value 0, expect model '
+                'topic_ids having value 0, expected model '
                 'TopicModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -9762,7 +10018,7 @@ class TopicSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of TopicSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -9942,9 +10198,9 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids '
                 'field check of TopicSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field topic_ids '
-                'having value 0, expect model TopicModel with '
+                'having value 0, expected model TopicModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'topic_ids having value 0, expect model '
+                'topic_ids having value 0, expected model '
                 'TopicModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -10117,7 +10373,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids '
                 'field check of TopicRightsModel\', '
                 '[u"Entity id 0: based on field topic_ids having '
-                'value 0, expect model TopicModel with id 0 but '
+                'value 0, expected model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -10130,7 +10386,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for manager_user_ids '
                 'field check of TopicRightsModel\', '
                 '[u"Entity id 0: based on field manager_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (
                     self.manager1_id, self.manager1_id),
             u'[u\'fully-validated TopicRightsModel\', 2]']
@@ -10145,7 +10401,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of TopicRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model '
+                'value 0-1, expected model '
                 'TopicRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
@@ -10161,7 +10417,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of TopicRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model TopicRightsSnapshotContentModel '
+                'value 0-1, expected model TopicRightsSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -10308,9 +10564,9 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for topic_rights_ids '
                 'field check of TopicRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field topic_rights_ids '
-                'having value 0, expect model TopicRightsModel with '
+                'having value 0, expected model TopicRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'topic_rights_ids having value 0, expect model '
+                'topic_rights_ids having value 0, expected model '
                 'TopicRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -10325,7 +10581,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of TopicRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -10519,9 +10775,9 @@ class TopicRightsSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for topic_rights_ids '
                 'field check of TopicRightsSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field topic_rights_ids '
-                'having value 0, expect model TopicRightsModel with '
+                'having value 0, expected model TopicRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'topic_rights_ids having value 0, expect model '
+                'topic_rights_ids having value 0, expected model '
                 'TopicRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -10689,12 +10945,12 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids field check '
                 'of TopicCommitLogEntryModel\', '
                 '[u"Entity id rights-0-1: based on field topic_ids '
-                'having value 0, expect model TopicModel with id 0 '
+                'having value 0, expected model TopicModel with id 0 '
                 'but it doesn\'t exist", u"Entity id topic-0-1: '
-                'based on field topic_ids having value 0, expect model '
+                'based on field topic_ids having value 0, expected model '
                 'TopicModel with id 0 but it doesn\'t exist", '
                 'u"Entity id topic-0-2: based on field topic_ids having '
-                'value 0, expect model TopicModel with id 0 but '
+                'value 0, expected model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 4]']
         self.run_job_and_check_output(
@@ -10708,9 +10964,9 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_rights_ids field '
                 'check of TopicCommitLogEntryModel\', '
                 '[u"Entity id rights-0-1: based on field topic_rights_ids '
-                'having value 0, expect model TopicRightsModel with id 0 '
+                'having value 0, expected model TopicRightsModel with id 0 '
                 'but it doesn\'t exist", u"Entity id rights-0-2: based '
-                'on field topic_rights_ids having value 0, expect '
+                'on field topic_rights_ids having value 0, expected '
                 'model TopicRightsModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
         self.run_job_and_check_output(
@@ -10988,7 +11244,7 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids '
                 'field check of TopicSummaryModel\', '
                 '[u"Entity id 0: based on field topic_ids having '
-                'value 0, expect model TopicModel with id 0 but '
+                'value 0, expected model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -11245,7 +11501,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids field '
                 'check of SubtopicPageModel\', '
                 '[u"Entity id 0-1: based on field topic_ids having value '
-                '0, expect model TopicModel with id 0 but it '
+                '0, expected model TopicModel with id 0 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
         self.run_job_and_check_output(
@@ -11273,7 +11529,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 'SubtopicPageModel\', '
                 '[u"Entity id 0-1: based on field '
                 'subtopic_page_commit_log_entry_ids having value '
-                'subtopicpage-0-1-1, expect model '
+                'subtopicpage-0-1-1, expected model '
                 'SubtopicPageCommitLogEntryModel '
                 'with id subtopicpage-0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
@@ -11288,7 +11544,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of SubtopicPageModel\', '
                 '[u"Entity id 0-1: based on field snapshot_metadata_ids having '
-                'value 0-1-1, expect model SubtopicPageSnapshotMetadataModel '
+                'value 0-1-1, expected model SubtopicPageSnapshotMetadataModel '
                 'with id 0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
         self.run_job_and_check_output(
@@ -11302,7 +11558,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of SubtopicPageModel\', '
                 '[u"Entity id 0-1: based on field snapshot_content_ids having '
-                'value 0-1-1, expect model SubtopicPageSnapshotContentModel '
+                'value 0-1-1, expected model SubtopicPageSnapshotContentModel '
                 'with id 0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
         self.run_job_and_check_output(
@@ -11459,9 +11715,9 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for subtopic_page_ids '
                 'field check of SubtopicPageSnapshotMetadataModel\', '
                 '[u"Entity id 0-1-1: based on field subtopic_page_ids '
-                'having value 0-1, expect model SubtopicPageModel with '
+                'having value 0-1, expected model SubtopicPageModel with '
                 'id 0-1 but it doesn\'t exist", u"Entity id 0-1-2: based '
-                'on field subtopic_page_ids having value 0-1, expect model '
+                'on field subtopic_page_ids having value 0-1, expected model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -11476,7 +11732,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of SubtopicPageSnapshotMetadataModel\', '
                 '[u"Entity id 0-1-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -11670,9 +11926,9 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for subtopic_page_ids '
                 'field check of SubtopicPageSnapshotContentModel\', '
                 '[u"Entity id 0-1-1: based on field subtopic_page_ids '
-                'having value 0-1, expect model SubtopicPageModel with '
+                'having value 0-1, expected model SubtopicPageModel with '
                 'id 0-1 but it doesn\'t exist", u"Entity id 0-1-2: based '
-                'on field subtopic_page_ids having value 0-1, expect model '
+                'on field subtopic_page_ids having value 0-1, expected model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -11847,10 +12103,10 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 u'[u\'failed validation check for subtopic_page_ids '
                 'field check of SubtopicPageCommitLogEntryModel\', '
                 '[u"Entity id subtopicpage-0-1-1: based on field '
-                'subtopic_page_ids having value 0-1, expect model '
+                'subtopic_page_ids having value 0-1, expected model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist", '
                 'u"Entity id subtopicpage-0-1-2: based on field '
-                'subtopic_page_ids having value 0-1, expect model '
+                'subtopic_page_ids having value 0-1, expected model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -12252,7 +12508,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of CompletedActivitiesModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -12268,7 +12524,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of CompletedActivitiesModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '2, expect model ExplorationModel with id 2 but it '
+                '2, expected model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12283,7 +12539,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CompletedActivitiesModel\', '
                 '[u"Entity id %s: based on field collection_ids having value '
-                '4, expect model CollectionModel with id 4 but it '
+                '4, expected model CollectionModel with id 4 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12452,7 +12708,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of IncompleteActivitiesModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -12468,7 +12724,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of IncompleteActivitiesModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '2, expect model ExplorationModel with id 2 but it '
+                '2, expected model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12483,7 +12739,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of IncompleteActivitiesModel\', '
                 '[u"Entity id %s: based on field collection_ids having value '
-                '4, expect model CollectionModel with id 4 but it '
+                '4, expected model CollectionModel with id 4 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12639,7 +12895,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 'field check of ExpUserLastPlaythroughModel\', '
                 '[u"Entity id %s.0: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -12655,7 +12911,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExpUserLastPlaythroughModel\', '
                 '[u"Entity id %s.0: based on field exploration_ids having '
-                'value 0, expect model ExplorationModel with id 0 but it '
+                'value 0, expected model ExplorationModel with id 0 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12825,7 +13081,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of LearnerPlaylistModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -12841,7 +13097,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of LearnerPlaylistModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '2, expect model ExplorationModel with id 2 but it '
+                '2, expected model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12856,7 +13112,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of LearnerPlaylistModel\', '
                 '[u"Entity id %s: based on field collection_ids having value '
-                '6, expect model CollectionModel with id 6 but it '
+                '6, expected model CollectionModel with id 6 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -13029,7 +13285,7 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserContributionsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id),
             u'[u\'fully-validated UserContributionsModel\', 2]']
@@ -13044,13 +13300,13 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for created_exploration_ids '
                 'field check of UserContributionsModel\', '
                 '[u"Entity id %s: based on field created_exploration_ids '
-                'having value exp1, expect model ExplorationModel with id '
+                'having value exp1, expected model ExplorationModel with id '
                 'exp1 but it doesn\'t exist"]]' % self.owner_id
             ), (
                 u'[u\'failed validation check for edited_exploration_ids '
                 'field check of UserContributionsModel\', '
                 '[u"Entity id %s: based on field edited_exploration_ids '
-                'having value exp1, expect model ExplorationModel with '
+                'having value exp1, expected model ExplorationModel with '
                 'id exp1 but it doesn\'t exist"]]' % self.owner_id
             ), u'[u\'fully-validated UserContributionsModel\', 2]']
 
@@ -13066,7 +13322,7 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for edited_exploration_ids '
                 'field check of UserContributionsModel\', '
                 '[u"Entity id %s: based on field edited_exploration_ids '
-                'having value exp0, expect model ExplorationModel with '
+                'having value exp0, expected model ExplorationModel with '
                 'id exp0 but it doesn\'t exist"]]' % self.user_id
             ), u'[u\'fully-validated UserContributionsModel\', 1]']
         self.run_job_and_check_output(
@@ -13137,7 +13393,7 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserAuthDetailsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id),
             u'[u\'fully-validated UserAuthDetailsModel\', 1]']
@@ -13205,7 +13461,7 @@ class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserEmailPreferencesModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13339,7 +13595,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSubscriptionsModel\', '
                 '[u"Entity id %s: based on '
                 'field subscriber_ids having value '
-                '%s, expect model UserSubscribersModel '
+                '%s, expected model UserSubscribersModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.owner_id, self.owner_id),
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
@@ -13357,7 +13613,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSubscriptionsModel\', '
                 '[u"Entity id %s: based on '
                 'field general_feedback_thread_ids having value '
-                'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
+                'nonexist_thread_id, expected model GeneralFeedbackThreadModel '
                 'with id nonexist_thread_id but it doesn\'t '
                 'exist"]]') % self.user_id,
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
@@ -13434,8 +13690,9 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
             ), (
                 u'[u\'failed validation check for subscription_ids field '
                 'check of UserSubscribersModel\', [u"Entity id %s: '
-                'based on field subscription_ids having value %s, expect model '
-                'UserSubscriptionsModel with id %s but it doesn\'t exist"]]'
+                'based on field subscription_ids having value %s, expected '
+                'model UserSubscriptionsModel with id %s but it doesn\'t '
+                'exist"]]'
             ) % (self.owner_id, self.owner_id, self.owner_id)]
 
         self.run_job_and_check_output(
@@ -13462,7 +13719,7 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSubscribersModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.owner_id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
@@ -13476,7 +13733,7 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSubscribersModel\', '
                 '[u"Entity id %s: based on '
                 'field subscription_ids having value '
-                '%s, expect model UserSubscriptionsModel '
+                '%s, expected model UserSubscriptionsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.owner_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13555,7 +13812,7 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserRecentChangesBatchModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13739,7 +13996,7 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserStatsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13822,7 +14079,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of ExplorationUserDataModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13836,7 +14093,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationUserDataModel\', '
                 '[u"Entity id %s: based on field exploration_ids '
-                'having value exp0, expect model ExplorationModel with id '
+                'having value exp0, expected model ExplorationModel with id '
                 'exp0 but it doesn\'t exist"]]' % self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -14026,7 +14283,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of CollectionProgressModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14042,7 +14299,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of CollectionProgressModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '1, expect model ExplorationModel with id 1 but it '
+                '1, expected model ExplorationModel with id 1 but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -14057,7 +14314,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionProgressModel\', '
                 '[u"Entity id %s: based on field collection_ids having value '
-                'col, expect model CollectionModel with id col but it '
+                'col, expected model CollectionModel with id col but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -14069,7 +14326,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for completed_activities_ids '
                 'field check of CollectionProgressModel\', '
                 '[u"Entity id %s: based on field completed_activities_ids '
-                'having value %s, expect model CompletedActivitiesModel '
+                'having value %s, expected model CompletedActivitiesModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14229,7 +14486,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of StoryProgressModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14243,7 +14500,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids '
                 'field check of StoryProgressModel\', '
                 '[u"Entity id %s: based on field story_ids having value '
-                'story, expect model StoryModel with id story but it '
+                'story, expected model StoryModel with id story but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -14384,7 +14641,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserQueryModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.query_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14398,7 +14655,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserQueryModel\', '
                 '[u"Entity id %s: based on '
                 'field sent_email_model_ids having value '
-                '%s, expect model BulkEmailModel '
+                '%s, expected model BulkEmailModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.query_id, self.sent_mail_id, self.sent_mail_id)]
         self.run_job_and_check_output(
@@ -14521,7 +14778,7 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserBulkEmailsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]' % (
                     self.user_id, self.user_id, self.user_id)
             ), u'[u\'fully-validated UserBulkEmailsModel\', 1]']
@@ -14533,10 +14790,10 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             u'[u\'failed validation check for sent_email_model_ids field '
             'check of UserBulkEmailsModel\', [u"Entity id %s: based on '
-            'field sent_email_model_ids having value %s, expect model '
+            'field sent_email_model_ids having value %s, expected model '
             'BulkEmailModel with id %s but it doesn\'t exist", '
             'u"Entity id %s: based on field sent_email_model_ids having '
-            'value %s, expect model BulkEmailModel with id %s but it '
+            'value %s, expected model BulkEmailModel with id %s but it '
             'doesn\'t exist"]]') % (
                 self.user_id, self.sent_mail_id, self.sent_mail_id,
                 self.owner_id, self.sent_mail_id, self.sent_mail_id)]
@@ -14631,7 +14888,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSkillMasteryModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14646,7 +14903,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSkillMasteryModel\', '
                 '[u"Entity id %s: based on '
                 'field skill_ids having value '
-                'skill, expect model SkillModel '
+                'skill, expected model SkillModel '
                 'with id skill but it doesn\'t exist"]]') % (
                     self.model_instance.id)]
         self.run_job_and_check_output(
@@ -14727,7 +14984,7 @@ class UserContributionProficiencyModelValidatorTests(
                 'field check of UserContributionProficiencyModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14791,7 +15048,7 @@ class UserContributionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for user_settings_ids field '
                 'check of UserContributionRightsModel\', [u"Entity id %s: '
-                'based on field user_settings_ids having value %s, expect '
+                'based on field user_settings_ids having value %s, expected '
                 'model UserSettingsModel with id %s but it doesn\'t exist"]]'
             ) % (self.translator_id, self.translator_id, self.translator_id),
             u'[u\'fully-validated UserContributionRightsModel\', 1]']
@@ -15112,7 +15369,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             ['failed validation check for entity_ids field check of '
              'TaskEntryModel',
              ['Entity id %s: based on field entity_ids having value '
-              'invalid_exp_id, expect model ExplorationModel with id '
+              'invalid_exp_id, expected model ExplorationModel with id '
               'invalid_exp_id but it doesn\'t exist' % (task_id,)]],
             ['failed validation check for target_id field check of '
              'TaskEntryModel',
@@ -15149,7 +15406,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             ['failed validation check for resolver_ids field check of '
              'TaskEntryModel',
              ['Entity id %s: based on field resolver_ids having value '
-              'invalid_user_id, expect model UserSettingsModel with id '
+              'invalid_user_id, expected model UserSettingsModel with id '
               'invalid_user_id but it doesn\'t exist' % (task_id,)]])
 
     def test_invalid_id(self):
@@ -15591,7 +15848,7 @@ class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of PlaythroughModel\', '
                 '[u"Entity id %s: based on '
                 'field exp_issues_ids having value '
-                '%s, expect model ExplorationIssuesModel '
+                '%s, expected model ExplorationIssuesModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     playthrough.id, exp_issues_id, exp_issues_id)]
         self.run_job_and_check_output(
@@ -15732,7 +15989,7 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for snapshot_metadata_ids field'
                 ' check of PlatformParameterModel\', [u"Entity id %s: based on '
-                'field snapshot_metadata_ids having value %s-1, expect model '
+                'field snapshot_metadata_ids having value %s-1, expected model '
                 'PlatformParameterSnapshotMetadataModel '
                 'with id %s-1 but it doesn\'t exist"]]' % (
                     (self.parameter_model.id,) * 3))
@@ -15747,7 +16004,7 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for snapshot_content_ids field'
                 ' check of PlatformParameterModel\', [u"Entity id %s: based on '
-                'field snapshot_content_ids having value %s-1, expect model '
+                'field snapshot_content_ids having value %s-1, expected model '
                 'PlatformParameterSnapshotContentModel '
                 'with id %s-1 but it doesn\'t exist"]]' % (
                     (self.parameter_model.id,) * 3))
@@ -15834,10 +16091,10 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                 'field check of PlatformParameterSnapshotMetadataModel\', '
                 '[u"Entity id %s-1: based on field '
                 'platform_parameter_ids having value %s, '
-                'expect model PlatformParameterModel with '
+                'expected model PlatformParameterModel with '
                 'id %s but it doesn\'t exist", '
                 'u"Entity id %s-2: based on field '
-                'platform_parameter_ids having value %s, expect model '
+                'platform_parameter_ids having value %s, expected model '
                 'PlatformParameterModel with id %s but it doesn\'t '
                 'exist"]]' % ((self.parameter_model.id,) * 6)
             )]
@@ -15851,7 +16108,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of PlatformParameterSnapshotMetadataModel\', '
                 '[u"Entity id %s-1: based on field committer_ids '
-                'having value %s, expect model UserSettingsModel with id %s '
+                'having value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.parameter_model.id, self.admin_id, self.admin_id)
         ]
@@ -15978,9 +16235,9 @@ class PlatformParameterSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for platform_parameter_ids '
                 'field check of PlatformParameterSnapshotContentModel\', '
                 '[u"Entity id %s-1: based on field platform_parameter_ids '
-                'having value %s, expect model PlatformParameterModel with '
+                'having value %s, expected model PlatformParameterModel with '
                 'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field platform_parameter_ids having value %s, expect model '
+                'field platform_parameter_ids having value %s, expected model '
                 'PlatformParameterModel with id %s but it doesn\'t exist"]]' % (
                     (self.parameter_model.id,) * 6)
             ),
