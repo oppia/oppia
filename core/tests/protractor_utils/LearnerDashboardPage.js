@@ -88,7 +88,7 @@ var LearnerDashboardPage = function() {
       incompleteExplorationsSection,
       'In Progress Explorations tab takes too long to be clickable');
     await action.click(
-      'In Progress Explorations Tab', 
+      'In Progress Explorations Tab',
       incompleteExplorationsSection);
   };
 
