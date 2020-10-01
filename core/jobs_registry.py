@@ -49,9 +49,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
-    activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    activity_jobs_one_off.RemoveCommitUsernamesOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
@@ -66,6 +64,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
+    feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
+    feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
     (
         interaction_jobs_one_off
         .DragAndDropSortInputInteractionOneOffJob),
@@ -80,7 +80,10 @@ ONE_OFF_JOB_MANAGERS = [
     question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    recommendations_jobs_one_off.CleanUpExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
+    skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
+    skill_jobs_one_off.MissingSkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
@@ -146,6 +149,7 @@ AUDIT_JOB_MANAGERS = [
         .ConfigPropertySnapshotMetadataModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,

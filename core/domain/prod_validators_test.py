@@ -71,23 +71,22 @@ USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    audit_models,
-    classifier_models, collection_models,
+    audit_models, classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models, stats_models,
-    story_models, suggestion_models, topic_models,
-    user_models,) = (
-        models.Registry.import_models([
-            models.NAMES.audit,
-            models.NAMES.classifier, models.NAMES.collection,
-            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.question,
-            models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.statistics, models.NAMES.story,
-            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
+    story_models, subtopic_models, suggestion_models,
+    topic_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
+    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
+    models.NAMES.opportunity, models.NAMES.question,
+    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
+])
 
 
 class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -9087,25 +9086,64 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 class CommunityContributionStatsModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    translation_reviewer_counts_by_lang_code = {
-        'hi': 0,
-        'en': 1
-    }
-
-    translation_suggestion_counts_by_lang_code = {
-        'fr': 6,
-        'en': 5
-    }
-
-    question_reviewer_count = 1
-    question_suggestion_count = 4
+    target_id = 'exp1'
+    skill_id = 'skill1'
+    target_version_at_submission = 1
+    exploration_category = 'Algebra'
+    AUTHOR_EMAIL = 'author@example.com'
+    AUTHOR_USERNAME = 'author'
+    REVIEWER_EMAIL = 'reviewer@community.org'
+    REVIEWER_USERNAME = 'reviewer'
+    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
+    SKILL_THREAD_ID = 'skill1.thread1'
+    change_cmd = {}
 
     negative_count = -1
-    sample_language_code = 'en'
+    non_integer_count = 'non_integer_count'
+    sample_language_code = 'hi'
     invalid_language_code = 'invalid'
+
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.exploration_category
+        )
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            self.reviewer_id, self.change_cmd, score_category,
+            self.EXPLORATION_THREAD_ID, language_code)
+
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.target_id
+        )
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            self.reviewer_id, self.change_cmd, score_category,
+            self.SKILL_THREAD_ID, 'en')
 
     def setUp(self):
         super(CommunityContributionStatsModelValidatorTests, self).setUp()
+
+        self.signup(
+            self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(
+            self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -9119,14 +9157,28 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        user_services.allow_user_to_review_question(self.reviewer_id)
+        self._create_question_suggestion()
+        translation_reviewer_counts_by_lang_code = {
+            'hi': 1
+        }
+        translation_suggestion_counts_by_lang_code = {
+            'hi': 1
+        }
+        question_reviewer_count = 1
+        question_suggestion_count = 1
+
         suggestion_models.CommunityContributionStatsModel(
             id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
             translation_reviewer_counts_by_lang_code=(
-                self.translation_reviewer_counts_by_lang_code),
+                translation_reviewer_counts_by_lang_code),
             translation_suggestion_counts_by_lang_code=(
-                self.translation_suggestion_counts_by_lang_code),
-            question_reviewer_count=self.question_reviewer_count,
-            question_suggestion_count=self.question_suggestion_count
+                translation_suggestion_counts_by_lang_code),
+            question_reviewer_count=question_reviewer_count,
+            question_suggestion_count=question_suggestion_count
         ).put()
         expected_output = [(
             u'[u\'fully-validated CommunityContributionStatsModel\', 1]')]
@@ -9152,12 +9204,10 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_with_invalid_model_id(self):
         suggestion_models.CommunityContributionStatsModel(
             id='invalid_id',
-            translation_reviewer_counts_by_lang_code=(
-                self.translation_reviewer_counts_by_lang_code),
-            translation_suggestion_counts_by_lang_code=(
-                self.translation_suggestion_counts_by_lang_code),
-            question_reviewer_count=self.question_reviewer_count,
-            question_suggestion_count=self.question_suggestion_count
+            translation_reviewer_counts_by_lang_code={},
+            translation_suggestion_counts_by_lang_code={},
+            question_reviewer_count=0,
+            question_suggestion_count=0
         ).put()
 
         expected_output = [
@@ -9177,11 +9227,20 @@ class CommunityContributionStatsModelValidatorTests(
             self.sample_language_code: self.negative_count}
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for translation reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'reviewer count to be non-negative for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_reviewer_counts_by_lang_code[
@@ -9198,11 +9257,20 @@ class CommunityContributionStatsModelValidatorTests(
             self.sample_language_code: self.negative_count}
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'suggestion count to be non-negative for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_suggestion_counts_by_lang_code[
@@ -9218,10 +9286,16 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model.question_reviewer_count = self.negative_count
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
-            'question reviewer count to be non-negative, recieved: %s.\']]' % (
+            'question reviewer count to be non-negative, received: %s.\']]' % (
                 stats_model.id, stats_model.question_reviewer_count)
         ]
 
@@ -9234,12 +9308,190 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model.question_suggestion_count = self.negative_count
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
-            'question suggestion count to be non-negative, recieved: '
+            'question suggestion count to be non-negative, received: '
             '%s.\']]' % (
                 stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_non_integer_translation_reviewer_counts(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: self.non_integer_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'reviewer count to be an integer for %s language code, '
+            'received: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_non_integer_translation_suggestion_count(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: self.non_integer_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'suggestion count to be an integer for %s language code, '
+            'received: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_suggestion_counts_dont_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_reviewer_counts_dont_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_question_reviewer_count_does_not_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_reviewer_count = 1
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_question_suggestion_count_does_not_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_suggestion_count = 1
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_suggestion_lang_not_in_dict(
+            self):
+        missing_language_code = 'hi'
+        self._create_translation_suggestion_with_language_code(
+            missing_language_code)
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'field check of CommunityContributionStatsModel\', [u"Entity id '
+            '%s: The translation suggestion count for language code %s is 1, '
+            'expected model CommunityContributionStatsModel to have the '
+            'language code %s in its translation suggestion counts but it '
+            'doesn\'t exist."]]' % (
+                stats_model.id, missing_language_code, missing_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_reviewer_lang_not_in_dict(
+            self):
+        missing_language_code = 'hi'
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, missing_language_code)
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count '
+            'field check of CommunityContributionStatsModel\', [u"Entity id '
+            '%s: The translation reviewer count for language code %s is 1, '
+            'expected model CommunityContributionStatsModel to have the '
+            'language code %s in its translation reviewer counts but it '
+            'doesn\'t exist."]]' % (
+                stats_model.id, missing_language_code, missing_language_code)
         ]
 
         self.run_job_and_check_output(
@@ -9479,7 +9731,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -11157,9 +11409,12 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
 
-        self.model_instance_0 = topic_models.SubtopicPageModel.get_by_id('0-1')
-        self.model_instance_1 = topic_models.SubtopicPageModel.get_by_id('1-1')
-        self.model_instance_2 = topic_models.SubtopicPageModel.get_by_id('2-1')
+        self.model_instance_0 = (
+            subtopic_models.SubtopicPageModel.get_by_id('0-1'))
+        self.model_instance_1 = (
+            subtopic_models.SubtopicPageModel.get_by_id('1-1'))
+        self.model_instance_2 = (
+            subtopic_models.SubtopicPageModel.get_by_id('2-1'))
 
         self.job_class = (
             prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob)
@@ -11261,7 +11516,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 },
                 'old_value': {}
             })], 'Changes.')
-        topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+        subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
             'subtopicpage-0-1-1').delete()
 
         expected_output = [
@@ -11279,7 +11534,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+        subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
             '0-1-1').delete()
         expected_output = [
             (
@@ -11293,7 +11548,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+        subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
             '0-1-1').delete()
         expected_output = [
             (
@@ -11384,13 +11639,13 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '2-1-1'))
 
         self.job_class = (
@@ -11450,7 +11705,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -11484,7 +11739,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageSnapshotMetadataModel(
+            subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='0-1-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
         model_with_invalid_version_in_id.put()
@@ -11595,13 +11850,13 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '2-1-1'))
 
         self.job_class = (
@@ -11661,7 +11916,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             self.user_id, '', [])
         expected_output = [
             (
@@ -11680,7 +11935,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageSnapshotContentModel(id='0-1-3'))
+            subtopic_models.SubtopicPageSnapshotContentModel(id='0-1-3'))
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -11774,13 +12029,13 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-2-1-1'))
 
         self.job_class = (
@@ -11838,7 +12093,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -11856,7 +12111,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageCommitLogEntryModel.create(
+            subtopic_models.SubtopicPageCommitLogEntryModel.create(
                 '0-1', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.subtopic_page_id = '0-1'
@@ -11875,7 +12130,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
-            topic_models.SubtopicPageCommitLogEntryModel(
+            subtopic_models.SubtopicPageCommitLogEntryModel(
                 id='invalid-0-1-1',
                 user_id=self.owner_id,
                 commit_type='edit',
@@ -14978,6 +15233,87 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
                 'PendingDeletionRequestModel\', [u"Entity id %s: '
                 'pseudonymizable_entity_mappings contains keys '
                 '[u\'audit\'] that are not allowed"]]') % self.user_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+
+class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(DeletedUserModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        wipeout_service.pre_delete_user(self.user_id)
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+
+        user_models.DeletedUserModel(id=self.user_id).put()
+
+        self.model_instance = (
+            user_models.DeletedUserModel.get_by_id(self.user_id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated DeletedUserModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of DeletedUserModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'DeletedUserModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_existing_user_settings_model_failure(self):
+        user_models.UserSettingsModel(
+            id=self.user_id, email='email@email.com', gae_id='gae_id').put()
+        expected_output = [
+            (
+                '[u\'failed validation check for '
+                'user properly deleted of DeletedUserModel\', '
+                '[u\'Entity id %s: The deletion verification fails\']]'
+            ) % (self.model_instance.id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_existing_feedback_email_reply_to_id_model_failure(self):
+        email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='id', user_id=self.user_id, reply_to_id='id').put()
+        expected_output = [
+            (
+                '[u\'failed validation check for '
+                'user properly deleted of DeletedUserModel\', '
+                '[u\'Entity id %s: The deletion verification fails\']]'
+            ) % (self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

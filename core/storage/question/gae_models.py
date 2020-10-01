@@ -26,11 +26,10 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
-
 (base_models, skill_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
 ])
+
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -57,14 +56,16 @@ class QuestionModel(base_models.VersionedModel):
     ALLOW_REVERT = True
 
     # An object representing the question state data.
-    question_state_data = ndb.JsonProperty(indexed=False, required=True)
+    question_state_data = (
+        datastore_services.JsonProperty(indexed=False, required=True))
     # The schema version for the question state data.
-    question_state_data_schema_version = ndb.IntegerProperty(
+    question_state_data_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The skill ids linked to this question.
-    linked_skill_ids = ndb.StringProperty(
+    linked_skill_ids = datastore_services.StringProperty(
         indexed=True, repeated=True)
     # The optional skill misconception ids marked as not relevant to the
     # question.
@@ -74,7 +75,7 @@ class QuestionModel(base_models.VersionedModel):
     # misconception id, this is because questions can have multiple skills
     # attached to it. Hence, the format for this field will be
     # <skill-id>-<misconceptionid>.
-    inapplicable_skill_misconception_ids = ndb.StringProperty(
+    inapplicable_skill_misconception_ids = datastore_services.StringProperty(
         indexed=True, repeated=True)
 
     @staticmethod
@@ -214,11 +215,13 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     """
 
     # The ID of the question.
-    question_id = ndb.StringProperty(required=True, indexed=True)
+    question_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The ID of the skill to which the question is linked.
-    skill_id = ndb.StringProperty(required=True, indexed=True)
+    skill_id = datastore_services.StringProperty(required=True, indexed=True)
     # The difficulty of the skill.
-    skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
+    skill_difficulty = (
+        datastore_services.FloatProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -642,7 +645,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the question being edited.
-    question_id = ndb.StringProperty(indexed=True, required=True)
+    question_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -692,21 +695,24 @@ class QuestionSummaryModel(base_models.BaseModel):
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
-    question_model_last_updated = ndb.DateTimeProperty(
+    question_model_last_updated = datastore_services.DateTimeProperty(
         indexed=True, required=True)
     # Time when the question model was created (not to be confused
     # with created_on, which is the time when the question *summary*
     # model was created).
-    question_model_created_on = ndb.DateTimeProperty(
+    question_model_created_on = datastore_services.DateTimeProperty(
         indexed=True, required=True)
     # The html content for the question.
-    question_content = ndb.TextProperty(indexed=False, required=True)
+    question_content = (
+        datastore_services.TextProperty(indexed=False, required=True))
     # The ID of the interaction.
-    interaction_id = ndb.StringProperty(indexed=True, required=True)
+    interaction_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # The misconception ids addressed in the question. This includes
     # tagged misconceptions ids as well as inapplicable misconception
     # ids in the question.
-    misconception_ids = ndb.StringProperty(indexed=True, repeated=True)
+    misconception_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():

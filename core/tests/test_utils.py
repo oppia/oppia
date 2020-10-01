@@ -47,6 +47,8 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -58,11 +60,10 @@ import main
 import main_mail
 import main_taskqueue
 import python_utils
+import requests_mock
 import schema_utils
 import utils
 
-from google.appengine.api import apiproxy_stub
-from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import datastore_types
 from google.appengine.api import mail
 import webtest
@@ -71,7 +72,9 @@ import webtest
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
+
 current_user_services = models.Registry.import_current_user_services()
+datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
@@ -348,53 +351,6 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
                 del self.cache_dict[key]
                 number_of_deleted_keys += 1
         return number_of_deleted_keys
-
-
-class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
-    """Mock for google.appengine.api.urlfetch."""
-
-    def __init__(self, service_name='urlfetch'):
-        super(URLFetchServiceMock, self).__init__(service_name)
-        self.return_values = {}
-        self.response = None
-        self.request = None
-
-    def set_return_values(self, content='', status_code=200, headers=None):
-        """Set the content, status_code and headers to return in subsequent
-        calls to the urlfetch mock.
-
-        Args:
-            content: str. The content to return in subsequent calls to the
-                urlfetch mock.
-            status_code: int. The status_code to return in subsequent calls to
-                the urlfetch mock.
-            headers: dict. The headers to return in subsequent calls to the
-                urlfetch mock. The keys of this dict are strings that represent
-                the header name and each value represents the corresponding
-                value of that header.
-        """
-        self.return_values['content'] = content
-        self.return_values['status_code'] = status_code
-        self.return_values['headers'] = headers
-
-    def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
-        """Simulates urlfetch mock by setting request & response object.
-
-        Args:
-            request: dict. Request object for the URLMock.
-            response: dict. Response object for the URLMock.
-        """
-        return_values = self.return_values
-        response.set_content(return_values.get('content', ''))
-        response.set_statuscode(return_values.get('status_code', 200))
-        for header_key, header_value in return_values.get(
-                'headers', {}).items():
-            new_header = response.add_header()
-            new_header.set_key(header_key)
-            new_header.set_value(header_value)
-
-        self.request = request
-        self.response = response
 
 
 class TestBase(unittest.TestCase):
@@ -1195,14 +1151,12 @@ tags: []
             username: str. Username of the given user.
         """
         self.login(email)
-        # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
-        # of the stub provided by testbed. This custom mock is disabled
-        # immediately once the signup is complete. This is done to avoid
-        # external calls being made to Gravatar when running the backend
-        # tests.
         gae_id = self.get_gae_id_from_email(email)
         user_services.create_new_user(gae_id, email)
-        with self.urlfetch_mock():
+        # We mock out all HTTP requests while trying to signup to avoid calling
+        # out to real backend services.
+        with requests_mock.Mocker() as requests_mocker:
+            requests_mocker.request(requests_mock.ANY, requests_mock.ANY)
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_new_csrf_token()
@@ -1863,6 +1817,31 @@ tags: []
                 'title': title
             }])
 
+    def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
+        """Creates an Oppia subtopic and saves it.
+
+        Args:
+            subtopic_id: str. ID for the subtopic to be created.
+            owner_id: str. The user_id of the creator of the topic.
+            topic_id: str. ID for the topic that the subtopic belongs to.
+
+        Returns:
+            SubtopicPage. A newly-created subtopic.
+        """
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id, topic_id))
+        subtopic_changes = [
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+                'topic_id': topic_id,
+                'subtopic_id': subtopic_id
+            })
+        ]
+        subtopic_page_services.save_subtopic_page(
+            owner_id, subtopic_page, 'Create new subtopic', subtopic_changes)
+        return subtopic_page
+
     def save_new_topic(
             self, topic_id, owner_id, name='topic', abbreviated_name='topic',
             url_fragment='topic',
@@ -2462,8 +2441,8 @@ class AppEngineTestBase(TestBase):
 
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
-        from google.appengine.ext import ndb
-        ndb.delete_multi(ndb.Query().iter(keys_only=True))
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
 
     def setUp(self):
         empty_environ()
@@ -2549,44 +2528,6 @@ class AppEngineTestBase(TestBase):
             list(str). All the queue names.
         """
         return [q['name'] for q in self.mapreduce_taskqueue_stub.GetQueues()]
-
-    @contextlib.contextmanager
-    def urlfetch_mock(
-            self, content='', status_code=200, headers=None):
-        """Enables the custom urlfetch mock (URLFetchServiceMock) within the
-        context of a 'with' statement.
-
-        This mock is currently used for signup to prevent external HTTP
-        requests to fetch the Gravatar profile picture for new users while the
-        backend tests are being run.
-
-        Args:
-            content: str. Response content or body.
-            status_code: int. Response status code.
-            headers: dict. The headers in subsequent calls to the
-                urlfetch mock. The keys of this dict are strings that represent
-                the header name and the value represents corresponding value of
-                that header.
-
-        Yields:
-            None. Yields nothing.
-        """
-        if headers is None:
-            response_headers = {}
-        else:
-            response_headers = headers
-        self.testbed.init_urlfetch_stub(enable=False)
-        urlfetch_mock = URLFetchServiceMock()
-        apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', urlfetch_mock)
-        urlfetch_mock.set_return_values(
-            content=content, status_code=status_code, headers=response_headers)
-        try:
-            yield
-        finally:
-            # Disables the custom mock.
-            self.testbed.init_urlfetch_stub(enable=False)
-            # Enables the testbed urlfetch mock.
-            self.testbed.init_urlfetch_stub()
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name
