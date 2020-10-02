@@ -121,6 +121,8 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """This job is used to migrate the old commit cmds in skill commit log
     model to the latest cmd format.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10807 is fixed.
     """
 
     @classmethod
@@ -157,6 +159,8 @@ class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class MissingSkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """This job is used to delete skill commit log models for which skill models
     are missing.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10808 is fixed.
     """
 
     @classmethod
