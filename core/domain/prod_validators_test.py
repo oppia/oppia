@@ -74,7 +74,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 (
     audit_models, classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, improvements_models, job_models,
+    feedback_models, improvements_models,
     opportunity_models, question_models,
     recommendations_models, skill_models, stats_models,
     story_models, subtopic_models, suggestion_models,
@@ -82,7 +82,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 ) = models.Registry.import_models([
     models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
     models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
+    models.NAMES.feedback, models.NAMES.improvements,
     models.NAMES.opportunity, models.NAMES.question,
     models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
     models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
@@ -4992,158 +4992,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
                 'u\'%s\', u\'entity_id\': u\'invalid\', u\'message_id\': 0, '
                 'u\'entity_type\': u\'exploration\'}"]]'
             ) % (self.model_instance.id, self.thread_id)]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class JobModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(JobModelValidatorTests, self).setUp()
-
-        current_time_str = python_utils.UNICODE(
-            int(utils.get_current_time_in_millisecs()))
-        random_int = random.randint(0, 1000)
-        self.model_instance = job_models.JobModel(
-            id='test-%s-%s' % (current_time_str, random_int),
-            status_code=job_models.STATUS_CODE_NEW, job_type='test',
-            time_queued_msec=1, time_started_msec=10, time_finished_msec=20)
-        self.model_instance.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off.JobModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated JobModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of JobModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id,
-                self.model_instance.created_on,
-                self.model_instance.last_updated
-            ), u'[u\'fully-validated JobModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [
-            (
-                u'[u\'failed validation check for current time check of '
-                'JobModel\', '
-                '[u\'Entity id %s: The last_updated field has a '
-                'value %s which is greater than the time when the job '
-                'was run\']]'
-            ) % (self.model_instance.id, self.model_instance.last_updated),
-            u'[u\'fully-validated JobModel\', 1]']
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_empty_error(self):
-        self.model_instance.status_code = job_models.STATUS_CODE_FAILED
-        self.model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for error check '
-                'of JobModel\', [u\'Entity id %s: '
-                'error for job is empty but job status is %s\']]'
-            ) % (self.model_instance.id, self.model_instance.status_code),
-            u'[u\'fully-validated JobModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_non_empty_error(self):
-        self.model_instance.error = 'invalid'
-        self.model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for error check '
-                'of JobModel\', [u\'Entity id %s: '
-                'error: invalid for job is not empty but job status is %s\']]'
-            ) % (self.model_instance.id, self.model_instance.status_code),
-            u'[u\'fully-validated JobModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_empty_output(self):
-        self.model_instance.status_code = job_models.STATUS_CODE_COMPLETED
-        self.model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for output check '
-                'of JobModel\', [u\'Entity id %s: '
-                'output for job is empty but job status is %s\']]'
-            ) % (self.model_instance.id, self.model_instance.status_code),
-            u'[u\'fully-validated JobModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_non_empty_output(self):
-        self.model_instance.output = 'invalid'
-        self.model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for output check '
-                'of JobModel\', [u\'Entity id %s: '
-                'output: invalid for job is not empty but job status is %s\']]'
-            ) % (self.model_instance.id, self.model_instance.status_code),
-            u'[u\'fully-validated JobModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_time_queued_msec(self):
-        self.model_instance.time_queued_msec = 15
-        self.model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for time queued check '
-                'of JobModel\', [u\'Entity id %s: '
-                'time queued 15.0 is greater than time started 10.0\']]'
-            ) % self.model_instance.id,
-            u'[u\'fully-validated JobModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_time_started_msec(self):
-        self.model_instance.time_started_msec = 25
-        self.model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for time started check '
-                'of JobModel\', [u\'Entity id %s: '
-                'time started 25.0 is greater than time finished 20.0\']]'
-            ) % self.model_instance.id,
-            u'[u\'fully-validated JobModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_time_finished_msec(self):
-        current_time_msec = utils.get_current_time_in_millisecs()
-        self.model_instance.time_finished_msec = current_time_msec * 10.0
-        self.model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for time finished '
-                'check of JobModel\', [u\'Entity id %s: time '
-                'finished %s is greater than the current time\']]'
-            ) % (
-                self.model_instance.id,
-                self.model_instance.time_finished_msec),
-            u'[u\'fully-validated JobModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
