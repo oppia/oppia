@@ -89,7 +89,7 @@ var AdminPage = function() {
     this.reloadCollection = async function(collectionId) {
       this.get();
       var ReloadCollectionButtons = await
-        reloadCollectionButtons.get(collectionId);
+      reloadCollectionButtons.get(collectionId);
       await action.click('reloadCollectionButtons', ReloadCollectionButtons);
       await general.acceptAlert();
       // Time is needed for the reloading to complete.
@@ -111,8 +111,9 @@ var AdminPage = function() {
         if (title.match(name)) {
           var getExplorationElementReloadButton =
             getExplorationElementReloadButton(explorationElement);
-          await action.click('GetExplorationElementReloadButton',
-           getExplorationElementReloadButton);
+          await action.click(
+            'GetExplorationElementReloadButton',
+          getExplorationElementReloadButton);
           await general.acceptAlert();
           // Time is needed for the reloading to complete.
           await waitFor.textToBePresentInElement(
@@ -207,11 +208,11 @@ var AdminPage = function() {
   this._stopOneOffJob = async function(jobName, i) {
     var text = await (await unfinishedOneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-      var unfinishedOffJobRowsButton = (await
-         unfinishedOneOffJobRows.get(i)).element(
+      var unfinishedOffJobRowsButton = (
+        await unfinishedOneOffJobRows.get(i)).element(
         by.css('.protractor-test-one-off-jobs-stop-btn'));
-      await action.click('UnfinishedOffJobRowsButton',
-       unfinishedOffJobRowsButton);
+      await action.click(
+        'UnfinishedOffJobRowsButton', unfinishedOffJobRowsButton);
     } else {
       await this._stopOneOffJob(jobName, ++i);
     }
