@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.platform.datastore import gae_datastore_services
@@ -81,6 +83,37 @@ class FetchMultipleEntitiesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_summaries[1].title, 'Sillat Suomi')
         self.assertEqual(collection_summaries[0].title, 'Bridges')
         self.assertEqual(collection_summaries[1].title, 'Introduce Oppia')
+
+
+class MockDatetimeForDatastoreTests(test_utils.GenericTestBase):
+    """Tests for mocking the datetime of an ndb.Model."""
+
+    def test_exception_is_raised_when_passed_wrong_type(self):
+        with self.assertRaisesRegexp(Exception, 'mocked_now must be datetime'):
+            with gae_datastore_services.mock_datetime_for_datastore(2020):
+                pass
+
+    def test_utcnow_always_returns_provided_datetime(self):
+        mocked_now = datetime.datetime(2000, 1, 1)
+        with gae_datastore_services.mock_datetime_for_datastore(mocked_now):
+            self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+            # Run twice to ensure it doesn't change with the passage of time.
+            self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+        self.assertNotEqual(datetime.datetime.utcnow(), mocked_now)
+
+    def test_model_accepts_mocked_datetime(self):
+        mocked_now = datetime.datetime(2000, 1, 1)
+
+        class TestModel(gae_datastore_services.Model):
+            """Simple model for testing."""
+
+            datetime_property = gae_datastore_services.DateTimeProperty()
+
+        with gae_datastore_services.mock_datetime_for_datastore(mocked_now):
+            test_model = TestModel(datetime_property=mocked_now)
+            test_model.put()
+
+        self.assertEqual(test_model.datetime_property, mocked_now)
 
 
 class TransactionTests(test_utils.GenericTestBase):
