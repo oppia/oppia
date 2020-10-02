@@ -60,16 +60,19 @@ def get_multi(keys):
     return ndb.get_multi(keys)
 
 
-def put_multi(models):
+def put_multi(models, update_last_updated_time=True):
     """Stores a sequence of Model instances.
 
     Args:
         models: datastore_services.Model. A sequence of Model instances.
+        update_last_updated_time: bool. Whether to update the last_updated field
+            of the entities.
 
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(models)
+    return ndb.put_multi(
+        models, update_last_updated_time=update_last_updated_time)
 
 
 def put_multi_async(models, update_last_updated_time=True):
