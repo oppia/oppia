@@ -29,7 +29,7 @@ import { NeedsGuidingResponsesTask } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+import { StateStats } from 'domain/statistics/state-stats-model';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from

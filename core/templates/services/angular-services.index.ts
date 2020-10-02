@@ -163,7 +163,6 @@ import { LearnerAnswerDetailsObjectFactory } from 'domain/statistics/LearnerAnsw
 import { LearnerAnswerInfoObjectFactory } from 'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { PlaythroughIssueObjectFactory } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
-import { StateStatsObjectFactory } from 'domain/statistics/StateStatsObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
@@ -674,7 +673,6 @@ export const angularServices: [string, unknown][] = [
   ['StateRecordedVoiceoversService', StateRecordedVoiceoversService],
   ['StateSolicitAnswerDetailsService', StateSolicitAnswerDetailsService],
   ['StateSolutionService', StateSolutionService],
-  ['StateStatsObjectFactory', StateStatsObjectFactory],
   ['StateTopAnswersStatsBackendApiService',
     StateTopAnswersStatsBackendApiService],
   ['StateTopAnswersStatsObjectFactory', StateTopAnswersStatsObjectFactory],

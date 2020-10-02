@@ -29,7 +29,7 @@ import {
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { StateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
+  'domain/statistics/state-stats-model';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from

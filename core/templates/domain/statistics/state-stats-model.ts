@@ -13,11 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object holding the statistics of a state.
+ * @fileoverview Model class for holding the statistics of a state.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export interface StateStatsBackendDict {
   'total_answers_count': number;
@@ -36,19 +33,11 @@ export class StateStats {
       public readonly firstHitCount: number,
       public readonly numTimesSolutionViewed: number,
       public readonly numCompletions: number) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StateStatsObjectFactory {
-  createFromBackendDict(backendDict: StateStatsBackendDict): StateStats {
+  static createFromBackendDict(backendDict: StateStatsBackendDict): StateStats {
     return new StateStats(
       backendDict.total_answers_count, backendDict.useful_feedback_count,
       backendDict.total_hit_count, backendDict.first_hit_count,
       backendDict.num_times_solution_viewed, backendDict.num_completions);
   }
 }
-
-angular.module('oppia').factory(
-  'StateStatsObjectFactory', downgradeInjectable(StateStatsObjectFactory));
