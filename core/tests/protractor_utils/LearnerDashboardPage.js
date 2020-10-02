@@ -117,7 +117,8 @@ var LearnerDashboardPage = function() {
     // that is the exploration with the title passed as a parameter.
     var explorationTitle = element(
       by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
-    waitFor.visibilityOf(explorationTitle, 'Exploration title takes too long to appear');
+    waitFor.visibilityOf(explorationTitle,
+      'Exploration title takes too long to appear');
     expect(await explorationTitle.getText()).toMatch(title);
   };
 
