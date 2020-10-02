@@ -427,6 +427,103 @@ class DeployTests(test_utils.GenericTestBase):
                                     deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
+    def test_function_calls_with_custom_release_dir_path(self):
+        check_function_calls = {
+            'getcwd_gets_called': False,
+            'preprocess_release_gets_called': False,
+            'update_and_check_indexes_gets_called': False,
+            'build_scripts_gets_called': False,
+            'deploy_application_and_write_log_entry_gets_called': False,
+            'switch_version_gets_called': False,
+            'flush_memcache_gets_called': False,
+            'check_breakage_gets_called': False,
+            'update_configs_in_deploy_data_gets_called': False,
+            'copyfile_gets_called': False
+        }
+        expected_check_function_calls = {
+            'getcwd_gets_called': True,
+            'preprocess_release_gets_called': True,
+            'update_and_check_indexes_gets_called': True,
+            'build_scripts_gets_called': True,
+            'deploy_application_and_write_log_entry_gets_called': True,
+            'switch_version_gets_called': True,
+            'flush_memcache_gets_called': True,
+            'check_breakage_gets_called': True,
+            'update_configs_in_deploy_data_gets_called': True,
+            'copyfile_gets_called': True
+        }
+        release_dir_path = 'deploy-oppiatestserver-release-1.2.3-%s' % (
+            deploy.CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+        def mock_getcwd():
+            if not check_function_calls['getcwd_gets_called']:
+                check_function_calls['getcwd_gets_called'] = True
+                return 'oppia'
+            return release_dir_path
+        def mock_preprocess_release(
+                unused_app_name, unused_deploy_data_path):
+            check_function_calls['preprocess_release_gets_called'] = True
+        def mock_update_and_check_indexes(unused_app_name):
+            check_function_calls['update_and_check_indexes_gets_called'] = True
+        def mock_build_scripts(unused_maintenance_mode):
+            check_function_calls['build_scripts_gets_called'] = True
+        def mock_deploy_application_and_write_log_entry(
+                unused_app_name, version_to_deploy_to,
+                unused_current_git_revision):
+            if version_to_deploy_to == '1-2-3':
+                check_function_calls[
+                    'deploy_application_and_write_log_entry_gets_called'] = True
+        def mock_switch_version(
+                unused_app_name, current_release_version):
+            if current_release_version == '1-2-3':
+                check_function_calls['switch_version_gets_called'] = True
+        def mock_flush_memcache(unused_app_name):
+            check_function_calls['flush_memcache_gets_called'] = True
+        def mock_check_breakage(
+                unused_app_name, current_release_version):
+            if current_release_version == '1-2-3':
+                check_function_calls['check_breakage_gets_called'] = True
+        def mock_update_configs_in_deploy_data(
+                unused_app_name, unused_release_dir_path,
+                unused_deploy_data_path, unused_personal_access_token):
+            check_function_calls[
+                'update_configs_in_deploy_data_gets_called'] = True
+        def mock_copyfile(unused_src, unused_dest):
+            check_function_calls['copyfile_gets_called'] = True
+
+        cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+        preprocess_swap = self.swap(
+            deploy, 'preprocess_release', mock_preprocess_release)
+        update_swap = self.swap(
+            deploy, 'update_and_check_indexes', mock_update_and_check_indexes)
+        build_swap = self.swap(deploy, 'build_scripts', mock_build_scripts)
+        deploy_swap = self.swap(
+            deploy, 'deploy_application_and_write_log_entry',
+            mock_deploy_application_and_write_log_entry)
+        switch_swap = self.swap(
+            deploy, 'switch_version', mock_switch_version)
+        memcache_swap = self.swap(
+            deploy, 'flush_memcache', mock_flush_memcache)
+        check_breakage_swap = self.swap(
+            deploy, 'check_breakage', mock_check_breakage)
+        uc_swap = self.swap(
+            deploy, 'update_configs_in_deploy_data',
+            mock_update_configs_in_deploy_data)
+        copy_swap = self.swap(shutil, 'copyfile', mock_copyfile)
+        args_swap = self.swap(
+            sys, 'argv', [
+                'deploy.py', '--app_name=oppiatestserver',
+                '--release_dir_path=%s' % release_dir_path])
+
+        with self.get_branch_swap, self.install_swap:
+            with self.release_script_exist_swap, self.gcloud_available_swap:
+                with args_swap, self.exists_swap, self.check_output_swap:
+                    with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
+                        with cwd_swap, preprocess_swap, update_swap, build_swap:
+                            with uc_swap, deploy_swap, switch_swap, copy_swap:
+                                with memcache_swap, check_breakage_swap:
+                                    deploy.execute_deployment()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_function_calls_with_custom_version(self):
         check_function_calls = {
             'preprocess_release_gets_called': False,
