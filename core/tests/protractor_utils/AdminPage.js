@@ -113,7 +113,7 @@ var AdminPage = function() {
             getExplorationElementReloadButton(explorationElement);
           await action.click(
             'GetExplorationElementReloadButton',
-          getExplorationElementReloadButton);
+            getExplorationElementReloadButton);
           await general.acceptAlert();
           // Time is needed for the reloading to complete.
           await waitFor.textToBePresentInElement(
