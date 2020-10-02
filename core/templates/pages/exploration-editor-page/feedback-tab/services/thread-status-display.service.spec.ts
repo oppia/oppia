@@ -18,10 +18,7 @@
  * feedback tab of the exploration editor.
  */
 
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-/* eslint-enable max-len */
+import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 
 describe('Thread Status Display Service', () => {
   var threadStatusDisplayService;

@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import datetime
+import re
 
 from constants import constants
 from core.domain import change_domain
@@ -794,6 +795,15 @@ class Question(python_utils.OBJECT):
                 'of strings, received %s'
                 % self.inapplicable_skill_misconception_ids)
 
+        if not (all(
+                re.match(
+                    constants.VALID_SKILL_MISCONCEPTION_ID_REGEX, elem
+                ) for elem in self.inapplicable_skill_misconception_ids)):
+            raise utils.ValidationError(
+                'Expected inapplicable_skill_misconception_ids to be a list '
+                'of strings of the format <skill_id>-<misconception_id>, '
+                'received %s' % self.inapplicable_skill_misconception_ids)
+
         if len(set(self.inapplicable_skill_misconception_ids)) != len(
                 self.inapplicable_skill_misconception_ids):
             raise utils.ValidationError(
@@ -925,7 +935,8 @@ class Question(python_utils.OBJECT):
 
         Args:
             inapplicable_skill_misconception_ids: list(str). The optional
-                misconception ids marked as not applicable to the question.
+                skill misconception ids marked as not applicable to the
+                question.
         """
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))

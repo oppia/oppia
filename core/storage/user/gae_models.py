@@ -28,14 +28,10 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
-transaction_services = models.Registry.import_transaction_services()
 
-USER_ID_RANDOM_PART_LENGTH = 32
-USER_ID_LENGTH = 36
+datastore_services = models.Registry.import_datastore_services()
+transaction_services = models.Registry.import_transaction_services()
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -49,82 +45,85 @@ class UserSettingsModel(base_models.BaseModel):
     # need to perform migration to fill this for existing users.
     # TODO(#10178): Deprecate gae_id for UserSettingsModel once we have verified
     # that UserAuthDetailsModels exists for every user.
-    gae_id = ndb.StringProperty(required=True, indexed=True)
+    gae_id = datastore_services.StringProperty(required=True, indexed=True)
     # Email address of the user.
-    email = ndb.StringProperty(required=True, indexed=True)
+    email = datastore_services.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
     # exploration editor.
     # TODO(1995YogeshSharma): Remove the default value once the one-off
     # migration (to give role to all users) is run.
-    role = ndb.StringProperty(
+    role = datastore_services.StringProperty(
         required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
     # When the user last agreed to the terms of the site. May be None.
-    last_agreed_to_terms = ndb.DateTimeProperty(default=None)
+    last_agreed_to_terms = datastore_services.DateTimeProperty(default=None)
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
-    last_logged_in = ndb.DateTimeProperty(default=None)
+    last_logged_in = datastore_services.DateTimeProperty(default=None)
     # A code associated with profile and full user on Android to provide a PIN
     # based authentication within the account.
-    pin = ndb.StringProperty(default=None)
+    pin = datastore_services.StringProperty(default=None)
     # Name of a user displayed in Android UI. Unlike username, it can be
     # edited and is unique only among the profiles of the corresponding
     # regular user account.
-    display_alias = ndb.StringProperty(default=None)
+    display_alias = datastore_services.StringProperty(default=None)
     # User specified biography (to be shown on their profile page).
-    user_bio = ndb.TextProperty(indexed=False)
+    user_bio = datastore_services.TextProperty(indexed=False)
     # User uploaded profile picture as a dataURI string. May be None.
-    profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
+    profile_picture_data_url = (
+        datastore_services.TextProperty(default=None, indexed=False))
     # Subject interests specified by the user.
-    subject_interests = ndb.StringProperty(repeated=True, indexed=True)
+    subject_interests = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # When the user last edited an exploration.
     # Exploration language preferences specified by the user.
     # These language preferences are mainly for the purpose
     # of figuring out what to show by default in the library index page.
-    preferred_language_codes = ndb.StringProperty(
+    preferred_language_codes = datastore_services.StringProperty(
         repeated=True,
         indexed=True,
         choices=[lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES])
     # System language preference (for I18N).
-    preferred_site_language_code = ndb.StringProperty(
+    preferred_site_language_code = datastore_services.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES])
     # Audio language preference used for audio translations.
-    preferred_audio_language_code = ndb.StringProperty(
+    preferred_audio_language_code = datastore_services.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
     # Attributes used for full users only.
 
     # Identifiable username to display in the UI. May be None.
-    username = ndb.StringProperty(indexed=True)
+    username = datastore_services.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
-    normalized_username = ndb.StringProperty(indexed=True)
+    normalized_username = datastore_services.StringProperty(indexed=True)
     # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    last_started_state_editor_tutorial = (
+        datastore_services.DateTimeProperty(default=None))
     # When the user last started the state translation tutorial. May be None.
-    last_started_state_translation_tutorial = ndb.DateTimeProperty(default=None)
-    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
+    last_started_state_translation_tutorial = (
+        datastore_services.DateTimeProperty(default=None))
+    last_edited_an_exploration = (
+        datastore_services.DateTimeProperty(default=None))
     # When the user last created an exploration.
-    last_created_an_exploration = ndb.DateTimeProperty(default=None)
+    last_created_an_exploration = (
+        datastore_services.DateTimeProperty(default=None))
     # The preferred dashboard of the user.
-    default_dashboard = ndb.StringProperty(
+    default_dashboard = datastore_services.StringProperty(
         default=constants.DASHBOARD_TYPE_LEARNER,
         indexed=True,
         choices=[
             constants.DASHBOARD_TYPE_LEARNER,
             constants.DASHBOARD_TYPE_CREATOR])
     # The preferred dashboard display preference.
-    creator_dashboard_display_pref = ndb.StringProperty(
+    creator_dashboard_display_pref = datastore_services.StringProperty(
         default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
         indexed=True,
         choices=list(
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
-    first_contribution_msec = ndb.FloatProperty(default=None)
-
-    # DEPRECATED in 2.8.7. Do not use.
-    gae_user_id = ndb.StringProperty(required=False, indexed=False)
+    first_contribution_msec = datastore_services.FloatProperty(default=None)
 
     @staticmethod
     def get_lowest_supported_role():
@@ -173,7 +172,6 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -275,8 +273,11 @@ class UserSettingsModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
-            if not cls.get_by_id(new_id):
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
+            if (
+                    not cls.get_by_id(new_id) and
+                    not DeletedUserModel.get_by_id(new_id)
+            ):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -330,9 +331,11 @@ class CompletedActivitiesModel(base_models.BaseModel):
     """
 
     # IDs of all the explorations completed by the user.
-    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    exploration_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of all the collections completed by the user.
-    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+    collection_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_lowest_supported_role():
@@ -407,9 +410,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     """
 
     # The ids of the explorations partially completed by the user.
-    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    exploration_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # The ids of the collections partially completed by the user.
-    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+    collection_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_lowest_supported_role():
@@ -484,14 +489,15 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     """
 
     # The user id.
-    user_id = ndb.StringProperty(required=True, indexed=True)
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration id.
-    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    exploration_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The version of the exploration last played by the user.
-    last_played_exp_version = ndb.IntegerProperty(default=None)
+    last_played_exp_version = datastore_services.IntegerProperty(default=None)
     # The name of the state at which the learner left the exploration when
     # he/she last played it.
-    last_played_state_name = ndb.StringProperty(default=None)
+    last_played_state_name = datastore_services.StringProperty(default=None)
 
     @staticmethod
     def get_lowest_supported_role():
@@ -523,7 +529,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -620,9 +626,11 @@ class LearnerPlaylistModel(base_models.BaseModel):
     """
 
     # IDs of all the explorations in the playlist of the user.
-    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    exploration_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of all the collections in the playlist of the user.
-    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+    collection_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_lowest_supported_role():
@@ -697,12 +705,12 @@ class UserContributionsModel(base_models.BaseModel):
 
     # IDs of explorations that this user has created
     # Includes subsequently deleted and private explorations.
-    created_exploration_ids = ndb.StringProperty(
+    created_exploration_ids = datastore_services.StringProperty(
         repeated=True, indexed=True, default=None)
     # IDs of explorations that this user has made a positive
     # (i.e. non-revert) commit to.
     # Includes subsequently deleted and private explorations.
-    edited_exploration_ids = ndb.StringProperty(
+    edited_exploration_ids = datastore_services.StringProperty(
         repeated=True, indexed=True, default=None)
 
     @staticmethod
@@ -773,18 +781,18 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     # The user's preference for receiving general site updates. This is set to
     # None if the user has never set a preference.
-    site_updates = ndb.BooleanProperty(indexed=True)
+    site_updates = datastore_services.BooleanProperty(indexed=True)
     # The user's preference for receiving email when user is added as a member
     # in exploration. This is set to True when user has never set a preference.
-    editor_role_notifications = ndb.BooleanProperty(
+    editor_role_notifications = datastore_services.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
     # The user's preference for receiving email when user receives feedback
     # message for his/her exploration.
-    feedback_message_notifications = ndb.BooleanProperty(
+    feedback_message_notifications = datastore_services.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
     # The user's preference for receiving email when a creator, to which this
     # user has subscribed, publishes an exploration.
-    subscription_notifications = ndb.BooleanProperty(
+    subscription_notifications = datastore_services.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
     @staticmethod
@@ -836,20 +844,23 @@ class UserSubscriptionsModel(base_models.BaseModel):
     """
 
     # IDs of activities (e.g., explorations) that this user subscribes to.
-    # TODO(bhenning): Rename this to exploration_ids and perform a migration.
-    activity_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # TODO(#10727): Rename this to exploration_ids and perform a migration.
+    activity_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of collections that this user subscribes to.
-    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+    collection_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of feedback thread ids that this user subscribes to.
-    general_feedback_thread_ids = ndb.StringProperty(
+    general_feedback_thread_ids = datastore_services.StringProperty(
         repeated=True, indexed=True)
     # IDs of the creators to whom this learner has subscribed.
-    creator_ids = ndb.StringProperty(repeated=True, indexed=True)
+    creator_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
-    last_checked = ndb.DateTimeProperty(default=None)
+    last_checked = datastore_services.DateTimeProperty(default=None)
 
     # DEPRECATED in v2.6.8. Do not use. Use general_feedback_thread_ids instead.
-    feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+    feedback_thread_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -878,7 +889,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
@@ -939,7 +950,8 @@ class UserSubscribersModel(base_models.BaseModel):
     """
 
     # IDs of the learners who have subscribed to this user.
-    subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
+    subscriber_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -955,7 +967,7 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
@@ -994,10 +1006,10 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     """
 
     # The output of the batch job.
-    output = ndb.JsonProperty(indexed=False)
+    output = datastore_services.JsonProperty(indexed=False)
     # The time, in milliseconds since the epoch, when the job that computed
     # this batch model was queued.
-    job_queued_msec = ndb.FloatProperty(indexed=False)
+    job_queued_msec = datastore_services.FloatProperty(indexed=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -1055,13 +1067,13 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     """
 
     # The impact score.
-    impact_score = ndb.FloatProperty(indexed=True)
+    impact_score = datastore_services.FloatProperty(indexed=True)
     # The total plays of all the explorations.
-    total_plays = ndb.IntegerProperty(indexed=True, default=0)
+    total_plays = datastore_services.IntegerProperty(indexed=True, default=0)
     # The average of average ratings of all explorations.
-    average_ratings = ndb.FloatProperty(indexed=True)
+    average_ratings = datastore_services.FloatProperty(indexed=True)
     # The number of ratings of all explorations.
-    num_ratings = ndb.IntegerProperty(indexed=True, default=0)
+    num_ratings = datastore_services.IntegerProperty(indexed=True, default=0)
     # A list which stores history of creator stats.
     # Each item in the list is a Json object keyed by a datetime string and
     # value as another Json object containing key-value pairs to be stored.
@@ -1079,10 +1091,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #   }
     #  },
     # ]
-    weekly_creator_stats_list = ndb.JsonProperty(repeated=True)
+    weekly_creator_stats_list = datastore_services.JsonProperty(repeated=True)
     # The version of dashboard stats schema.
     schema_version = (
-        ndb.IntegerProperty(
+        datastore_services.IntegerProperty(
             required=True,
             default=feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
             indexed=True))
@@ -1191,31 +1203,34 @@ class ExplorationUserDataModel(base_models.BaseModel):
     """
 
     # The user id.
-    user_id = ndb.StringProperty(required=True, indexed=True)
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration id.
-    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    exploration_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The rating (1-5) the user assigned to the exploration. Note that this
     # represents a rating given on completion of the exploration.
-    rating = ndb.IntegerProperty(default=None, indexed=True)
+    rating = datastore_services.IntegerProperty(default=None, indexed=True)
     # When the most recent rating was awarded, or None if not rated.
-    rated_on = ndb.DateTimeProperty(default=None, indexed=False)
+    rated_on = datastore_services.DateTimeProperty(default=None, indexed=False)
     # List of uncommitted changes made by the user to the exploration.
-    draft_change_list = ndb.JsonProperty(default=None)
+    draft_change_list = datastore_services.JsonProperty(default=None)
     # Timestamp of when the change list was last updated.
-    draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
+    draft_change_list_last_updated = (
+        datastore_services.DateTimeProperty(default=None))
     # The exploration version that this change list applied to.
-    draft_change_list_exp_version = ndb.IntegerProperty(default=None)
+    draft_change_list_exp_version = (
+        datastore_services.IntegerProperty(default=None))
     # The version of the draft change list which was last saved by the user.
     # Can be zero if the draft is None or if the user has not committed
     # draft changes to this exploration since the draft_change_list_id property
     # was introduced.
-    draft_change_list_id = ndb.IntegerProperty(default=0)
+    draft_change_list_id = datastore_services.IntegerProperty(default=0)
     # The user's preference for receiving suggestion emails for this
     # exploration.
-    mute_suggestion_notifications = ndb.BooleanProperty(
+    mute_suggestion_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
     # The user's preference for receiving feedback emails for this exploration.
-    mute_feedback_notifications = ndb.BooleanProperty(
+    mute_feedback_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
 
     @staticmethod
@@ -1232,7 +1247,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1392,12 +1407,13 @@ class CollectionProgressModel(base_models.BaseModel):
     """
 
     # The user id.
-    user_id = ndb.StringProperty(required=True, indexed=True)
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The collection id.
-    collection_id = ndb.StringProperty(required=True, indexed=True)
+    collection_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The list of IDs of explorations which have been completed within the
     # context of the collection represented by collection_id.
-    completed_explorations = ndb.StringProperty(repeated=True)
+    completed_explorations = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
     def get_lowest_supported_role():
@@ -1427,7 +1443,7 @@ class CollectionProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1566,12 +1582,12 @@ class StoryProgressModel(base_models.BaseModel):
     """
 
     # The user id.
-    user_id = ndb.StringProperty(required=True, indexed=True)
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The story id.
-    story_id = ndb.StringProperty(required=True, indexed=True)
+    story_id = datastore_services.StringProperty(required=True, indexed=True)
     # The list of node ids which have been completed within the context of
     # the story represented by story_id.
-    completed_node_ids = ndb.StringProperty(repeated=True)
+    completed_node_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
     def get_lowest_supported_role():
@@ -1601,7 +1617,7 @@ class StoryProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1740,31 +1756,34 @@ class UserQueryModel(base_models.BaseModel):
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days. This only returns users who have ever
     # created or edited at least one exploration.
-    inactive_in_last_n_days = ndb.IntegerProperty(default=None)
+    inactive_in_last_n_days = datastore_services.IntegerProperty(default=None)
     # Query option to check whether given user has logged in
     # since last n days.
-    has_not_logged_in_for_n_days = ndb.IntegerProperty(default=None)
+    has_not_logged_in_for_n_days = (
+        datastore_services.IntegerProperty(default=None))
     # Query option to check whether user has created at least
     # n explorations.
-    created_at_least_n_exps = ndb.IntegerProperty(default=None)
+    created_at_least_n_exps = datastore_services.IntegerProperty(default=None)
     # Query option to check whether user has created fewer than
     # n explorations.
-    created_fewer_than_n_exps = ndb.IntegerProperty(default=None)
+    created_fewer_than_n_exps = datastore_services.IntegerProperty(default=None)
     # Query option to check if user has edited at least n explorations.
-    edited_at_least_n_exps = ndb.IntegerProperty(default=None)
+    edited_at_least_n_exps = datastore_services.IntegerProperty(default=None)
     # Query option to check if user has edited fewer than n explorations.
-    edited_fewer_than_n_exps = ndb.IntegerProperty(default=None)
+    edited_fewer_than_n_exps = datastore_services.IntegerProperty(default=None)
     # List of all user_ids who satisfy all parameters given in above query.
     # This list will be empty initially. Once query has completed its execution
     # this list will be populated with all qualifying user ids.
-    user_ids = ndb.JsonProperty(default=[], compressed=True)
+    user_ids = datastore_services.JsonProperty(default=[], compressed=True)
     # ID of the user who submitted the query.
-    submitter_id = ndb.StringProperty(indexed=True, required=True)
+    submitter_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # ID of the instance of BulkEmailModel which stores information
     # about sent emails.
-    sent_email_model_id = ndb.StringProperty(default=None, indexed=True)
+    sent_email_model_id = (
+        datastore_services.StringProperty(default=None, indexed=True))
     # Current status of the query.
-    query_status = ndb.StringProperty(
+    query_status = datastore_services.StringProperty(
         indexed=True,
         choices=[
             feconf.USER_QUERY_STATUS_PROCESSING,
@@ -1808,7 +1827,7 @@ class UserQueryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.submitter_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1846,7 +1865,7 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=cursor)
+        cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
@@ -1862,7 +1881,8 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     # IDs of all BulkEmailModels that correspond to bulk emails sent to this
     # user.
-    sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)
+    sent_email_model_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -1898,11 +1918,12 @@ class UserSkillMasteryModel(base_models.BaseModel):
     """
 
     # The user id of the user.
-    user_id = ndb.StringProperty(required=True, indexed=True)
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The skill id for which the degree of mastery is stored.
-    skill_id = ndb.StringProperty(required=True, indexed=True)
+    skill_id = datastore_services.StringProperty(required=True, indexed=True)
     # The degree of mastery of the user in the skill.
-    degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
+    degree_of_mastery = (
+        datastore_services.FloatProperty(required=True, indexed=True))
 
     @staticmethod
     def get_lowest_supported_role():
@@ -1932,7 +1953,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1991,13 +2012,15 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     """
 
     # The user id of the user.
-    user_id = ndb.StringProperty(required=True, indexed=True)
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The category of suggestion to score the user on.
-    score_category = ndb.StringProperty(required=True, indexed=True)
+    score_category = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The score of the user for the above category of suggestions.
-    score = ndb.FloatProperty(required=True, indexed=True)
+    score = datastore_services.FloatProperty(required=True, indexed=True)
     # Flag to check if email to onboard reviewer has been sent for the category.
-    onboarding_email_sent = ndb.BooleanProperty(required=True, default=False)
+    onboarding_email_sent = (
+        datastore_services.BooleanProperty(required=True, default=False))
 
     @staticmethod
     def get_deletion_policy():
@@ -2043,7 +2066,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        ndb.delete_multi(
+        datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -2176,11 +2199,11 @@ class UserContributionRightsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    can_review_translation_for_language_codes = ndb.StringProperty(
-        repeated=True, indexed=True)
-    can_review_voiceover_for_language_codes = ndb.StringProperty(
-        repeated=True, indexed=True)
-    can_review_questions = ndb.BooleanProperty(indexed=True)
+    can_review_translation_for_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    can_review_voiceover_for_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    can_review_questions = datastore_services.BooleanProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -2304,35 +2327,40 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     """
 
     # The email of the user.
-    email = ndb.StringProperty(required=True)
+    email = datastore_services.StringProperty(required=True, indexed=True)
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
-    role = ndb.StringProperty(required=True)
+    role = datastore_services.StringProperty(required=True, indexed=True)
     # Whether the deletion is completed.
-    deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
+    deletion_complete = (
+        datastore_services.BooleanProperty(default=False, indexed=True))
 
     # IDs of all the private explorations created by this user.
-    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    exploration_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of all the private collections created by this user.
-    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+    collection_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
-    # A dict mapping model IDs to pseudonymous user IDs. Each type of activity
-    # is grouped under different key (story, skill, question), the keys need to
-    # be from the core.platform.models.NAMES enum. For each activity, we use
-    # a different pseudonymous user ID. Note that all these pseudonymous
-    # user IDs originate from the same about-to-be-deleted user. If a key is
-    # absent from the activity_mappings dict, this means that for this activity
-    # type the mappings are not yet generated.
+    # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
+    # is grouped under different key (e.g. config, feedback, story, skill,
+    # question), the keys need to be from the core.platform.models.NAMES enum.
+    # For each entity, we use a different pseudonymous user ID. Note that all
+    # these pseudonymous user IDs originate from the same about-to-be-deleted
+    # user. If a key is absent from the pseudonymizable_entity_mappings dict,
+    # this means that for this activity type the mappings are not yet generated.
     # Example structure: {
-    #     'skill': {'skill_id': 'pseudo_user_id_1'},
+    #     'config': {'some_config': 'pseudo_user_id_1'},
+    #     'skill': {'skill_id': 'pseudo_user_id_2'},
     #     'story': {
-    #         'story_1_id': 'pseudo_user_id_2',
-    #         'story_2_id': 'pseudo_user_id_3',
-    #         'story_3_id': 'pseudo_user_id_4'
+    #         'story_1_id': 'pseudo_user_id_3',
+    #         'story_2_id': 'pseudo_user_id_4',
+    #         'story_3_id': 'pseudo_user_id_5'
     #     },
     #     'question': {}
     # }
-    activity_mappings = ndb.JsonProperty(default={})
+    pseudonymizable_entity_mappings = (
+        datastore_services.JsonProperty(default={}))
 
     @staticmethod
     def get_deletion_policy():
@@ -2352,13 +2380,40 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'activity_mappings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'pseudonymizable_entity_mappings': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether PendingDeletionRequestModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+
+class DeletedUserModel(base_models.BaseModel):
+    """Model for storing deleted user IDs."""
+
+    @staticmethod
+    def get_deletion_policy():
+        """DeletedUserModel contains only IDs that were deleted."""
+        return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def get_export_policy(cls):
+        """DeletedUserModel contains only IDs that were deleted."""
+        return dict(super(cls, cls).get_export_policy(), **{})
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether DeletedUserModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -2403,7 +2458,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'pid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
 
             if not cls.get_by_id(new_id):
                 return new_id
@@ -2419,12 +2474,13 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     # Authentication detail for sign-in using google id (GAE). Exists only
     # for full users. None for profile users.
-    gae_id = ndb.StringProperty(indexed=True)
+    gae_id = datastore_services.StringProperty(indexed=True)
     # For profile users, the user ID of the full user associated with that
     # profile. None for full users. Required for profiles because gae_id
     # attribute is None for them, hence this attribute stores their association
     # with a full user who do have a gae_id.
-    parent_user_id = ndb.StringProperty(indexed=True, default=None)
+    parent_user_id = (
+        datastore_services.StringProperty(indexed=True, default=None))
 
     @staticmethod
     def get_lowest_supported_role():

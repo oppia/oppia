@@ -590,6 +590,84 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b, 'invalid_role')
 
+    def test_deassign_without_rights_fails(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Could not deassign role'):
+            rights_manager.deassign_role_for_exploration(
+                self.user_b, self.EXP_ID, self.user_id_a)
+
+    def test_deassign_viewer_is_successful(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_VIEWER)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_viewer(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(exp_rights.is_viewer(self.user_id_b))
+
+    def test_deassign_voice_artist_is_successful(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a,
+            self.EXP_ID,
+            self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
+
+    def test_deassign_editor_is_successful(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_EDITOR)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_editor(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(exp_rights.is_editor(self.user_id_b))
+
+    def test_deassign_owner_is_successful(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_OWNER)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_owner(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(exp_rights.is_owner(self.user_id_b))
+
+    def test_deassign_non_existent_fails(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user does not have any role in'):
+            rights_manager.deassign_role_for_exploration(
+                self.user_a, self.EXP_ID, self.user_id_b)
+
 
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""
@@ -903,6 +981,91 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, collection_rights))
+
+    def test_deassign_without_rights_fails(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Could not deassign role'):
+            rights_manager.deassign_role_for_collection(
+                self.user_b, self.COLLECTION_ID, self.user_id_a)
+
+    def test_deassign_viewer_is_successful(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a,
+            self.COLLECTION_ID,
+            self.user_id_b,
+            rights_domain.ROLE_VIEWER
+        )
+        col_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+        self.assertTrue(col_rights.is_viewer(self.user_id_b))
+
+        rights_manager.deassign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b)
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertFalse(col_rights.is_viewer(self.user_id_b))
+
+    def test_deassign_voice_artist_is_successful(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a,
+            self.COLLECTION_ID,
+            self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertTrue(col_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.deassign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b)
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertFalse(col_rights.is_voice_artist(self.user_id_b))
+
+    def test_deassign_editor_is_successful(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a,
+            self.COLLECTION_ID,
+            self.user_id_b,
+            rights_domain.ROLE_EDITOR
+        )
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertTrue(col_rights.is_editor(self.user_id_b))
+
+        rights_manager.deassign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b)
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertFalse(col_rights.is_editor(self.user_id_b))
+
+    def test_deassign_owner_is_successful(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a,
+            self.COLLECTION_ID,
+            self.user_id_b,
+            rights_domain.ROLE_OWNER
+        )
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertTrue(col_rights.is_owner(self.user_id_b))
+
+        rights_manager.deassign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b)
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertFalse(col_rights.is_owner(self.user_id_b))
+
+    def test_deassign_non_existent_fails(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user does not have any role in'):
+            rights_manager.deassign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b)
 
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):

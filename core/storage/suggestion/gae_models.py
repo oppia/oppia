@@ -22,10 +22,10 @@ import datetime
 from core.platform import models
 import feconf
 
-from google.appengine.ext import ndb
-
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
+
+datastore_services = models.Registry.import_datastore_services()
 
 # Constants defining types of entities to which suggestions can be created.
 TARGET_TYPE_EXPLORATION = 'exploration'
@@ -126,6 +126,9 @@ INCREMENT_SCORE_OF_AUTHOR_BY = 1
 ACTION_TYPE_ACCEPT = 'accept'
 ACTION_TYPE_REJECT = 'reject'
 
+# The unique ID for the CommunityContributionStatsModel.
+COMMUNITY_CONTRIBUTION_STATS_MODEL_ID = 'community_contribution_stats'
+
 
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
@@ -135,34 +138,35 @@ class GeneralSuggestionModel(base_models.BaseModel):
     """
 
     # The type of suggestion.
-    suggestion_type = ndb.StringProperty(
+    suggestion_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=SUGGESTION_TYPE_CHOICES)
     # The type of the target entity which the suggestion is linked to.
-    target_type = ndb.StringProperty(
+    target_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=TARGET_TYPE_CHOICES)
     # The ID of the target entity being suggested to.
-    target_id = ndb.StringProperty(required=True, indexed=True)
+    target_id = datastore_services.StringProperty(required=True, indexed=True)
     # The version number of the target entity at the time of creation of the
     # suggestion.
-    target_version_at_submission = ndb.IntegerProperty(
+    target_version_at_submission = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # Status of the suggestion.
-    status = ndb.StringProperty(
+    status = datastore_services.StringProperty(
         required=True, indexed=True, choices=STATUS_CHOICES)
     # The ID of the author of the suggestion.
-    author_id = ndb.StringProperty(required=True, indexed=True)
+    author_id = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the reviewer who accepted/rejected the suggestion.
-    final_reviewer_id = ndb.StringProperty(indexed=True)
+    final_reviewer_id = datastore_services.StringProperty(indexed=True)
     # The change command linked to the suggestion. Contains the details of the
     # change.
-    change_cmd = ndb.JsonProperty(required=True)
+    change_cmd = datastore_services.JsonProperty(required=True)
     # The category to score the suggestor in. This field will contain 2 values
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
-    score_category = ndb.StringProperty(required=True, indexed=True)
+    score_category = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The ISO 639-1 code used to query suggestions by language, or None if the
     # suggestion type is not queryable by language.
-    language_code = ndb.StringProperty(indexed=True)
+    language_code = datastore_services.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -196,9 +200,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get(keys_only=True) is not None
+        return cls.query(datastore_services.any_of(
+            cls.author_id == user_id, cls.final_reviewer_id == user_id
+        )).get(keys_only=True) is not None
 
     @classmethod
     def create(
@@ -466,28 +470,29 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
-    target_type = ndb.StringProperty(required=True, indexed=True)
+    target_type = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the entity to which the application belongs.
-    target_id = ndb.StringProperty(required=True, indexed=True)
+    target_id = datastore_services.StringProperty(required=True, indexed=True)
     # The language code for the voiceover audio.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The status of the application. One of: accepted, rejected, in-review.
-    status = ndb.StringProperty(
+    status = datastore_services.StringProperty(
         required=True, indexed=True, choices=STATUS_CHOICES)
     # The HTML content written in the given language_code.
     # This will typically be a snapshot of the content of the initial card of
     # the target.
-    content = ndb.TextProperty(required=True)
+    content = datastore_services.TextProperty(required=True)
     # The filename of the voiceover audio. The filename will have
     # datetime-randomId(length 6)-language_code.mp3 pattern.
-    filename = ndb.StringProperty(required=True, indexed=True)
+    filename = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the author of the voiceover application.
-    author_id = ndb.StringProperty(required=True, indexed=True)
+    author_id = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the reviewer who accepted/rejected the voiceover application.
-    final_reviewer_id = ndb.StringProperty(indexed=True)
+    final_reviewer_id = datastore_services.StringProperty(indexed=True)
     # The plain text message submitted by the reviewer while rejecting the
     # application.
-    rejection_message = ndb.TextProperty()
+    rejection_message = datastore_services.TextProperty()
 
     @staticmethod
     def get_deletion_policy():
@@ -506,9 +511,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get(keys_only=True) is not None
+        return cls.query(datastore_services.any_of(
+            cls.author_id == user_id, cls.final_reviewer_id == user_id
+        )).get(keys_only=True) is not None
 
     @classmethod
     def get_user_voiceover_applications(cls, author_id, status=None):
@@ -526,7 +531,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             applications submitted by the given user.
         """
         if status in STATUS_CHOICES:
-            return cls.query(ndb.AND(
+            return cls.query(datastore_services.all_of(
                 cls.author_id == author_id, cls.status == status)).fetch()
         else:
             return cls.query(cls.author_id == author_id).fetch()
@@ -545,7 +550,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             list(GeneralVoiceoverApplicationModel). The list of voiceover
             applications which the given user can review.
         """
-        return cls.query(ndb.AND(
+        return cls.query(datastore_services.all_of(
             cls.author_id != user_id,
             cls.status == STATUS_IN_REVIEW)).fetch()
 
@@ -564,7 +569,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             list(GeneralVoiceoverApplicationModel). The list of voiceover
             application which is submitted to a give entity in a given language.
         """
-        return cls.query(ndb.AND(
+        return cls.query(datastore_services.all_of(
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
 
@@ -610,3 +615,82 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 'rejection_message': voiceover_model.rejection_message
             }
         return user_data
+
+
+class CommunityContributionStatsModel(base_models.BaseModel):
+    """Records the contributor dashboard contribution stats. This includes the
+    total number of reviewers for each suggestion type and the total number of
+    suggestions in review for each suggestion type. There is only ever one
+    instance of this model, and its ID is COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
+    """
+
+    # A dictionary where the keys represent the language codes that translation
+    # suggestions are offered in and the values correspond to the total number
+    # of reviewers who have permission to review translation suggestions in
+    # that language.
+    translation_reviewer_counts_by_lang_code = (
+        datastore_services.JsonProperty(required=True))
+    # A dictionary where the keys represent the language codes that translation
+    # suggestions are offered in and the values correspond to the total number
+    # of translation suggestions that are currently in review in that language.
+    translation_suggestion_counts_by_lang_code = (
+        datastore_services.JsonProperty(required=True))
+    # The total number of reviewers who have permission to review question
+    # suggestions.
+    question_reviewer_count = datastore_services.IntegerProperty(required=True)
+    # The total number of question suggestions that are currently in review.
+    question_suggestion_count = (
+        datastore_services.IntegerProperty(required=True))
+
+    @classmethod
+    def get(cls):
+        """Gets the CommunityContributionStatsModel instance. If the
+        CommunityContributionStatsModel does not exist yet, it is created.
+        This method helps enforce that there should only ever be one instance
+        of this model.
+
+        Returns:
+            CommunityContributionStatsModel. The single model instance.
+        """
+        community_contribution_stats_model = cls.get_by_id(
+            COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
+        )
+
+        if community_contribution_stats_model is None:
+            community_contribution_stats_model = cls(
+                id=COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
+                translation_reviewer_counts_by_lang_code={},
+                translation_suggestion_counts_by_lang_code={},
+                question_reviewer_count=0,
+                question_suggestion_count=0
+            )
+            community_contribution_stats_model.put()
+            return community_contribution_stats_model
+
+        else:
+            return super(
+                CommunityContributionStatsModel, cls).get(
+                    COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
+
+    @classmethod
+    def get_deletion_policy(cls):
+        """NOT_APPLICABLE - this model does not directly contain user
+        information because the data is aggregated.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_export_policy(cls):
+        """NOT_APPLICABLE - this model does not directly contain user
+        information because the data is aggregated.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'translation_reviewer_counts_by_lang_code':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translation_suggestion_counts_by_lang_code':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_reviewer_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_suggestion_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
