@@ -18,6 +18,8 @@
  */
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = async function(elem, placeholderText) {
   await objects.UnicodeStringEditor(
@@ -26,10 +28,9 @@ var customizeInteraction = async function(elem, placeholderText) {
 };
 
 var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
-  expect(
-    await elem.element(by.tagName(
-      'oppia-interactive-numeric-expression-input')).isPresent()
-  ).toBe(true);
+  await waitFor.presenceOf(elem.element(by.tagName(
+    'oppia-interactive-numeric-expression-input')),
+  'The numeric expression input editor took too long to load.');
   if (placeholderText) {
     expect(
       await objects.MathEditor(elem.element(by.tagName(
