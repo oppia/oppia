@@ -19,15 +19,17 @@ suggestions.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import heapq
+
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
+from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
-import heapq
 import feconf
 import python_utils
 
@@ -604,8 +606,7 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
     ]
 
 
-def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
-        reviewer_ids):
+def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
     """For each user, returns information that will be used to notify reviewers
     about the suggestions waiting longest for review that the reviewer has
     permissions to review.
@@ -657,8 +658,7 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
                 elif question_suggestion.author_id != (
                         user_contribution_rights.id):
                     heapq.heappush(suggestions_waiting_longest_heap, (
-                        question_suggestion.last_updated, question_suggestion)
-                    )
+                        question_suggestion.last_updated, question_suggestion))
 
         if user_contribution_rights.can_review_translation_for_language_codes:
             for language_code in (
@@ -673,8 +673,10 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
                             language_code
                         )
                     )
-                translation_suggestions = translation_suggestions_by_lang_code_dict[
-                    language_code]
+
+                translation_suggestions = (
+                    translation_suggestions_by_lang_code_dict[language_code]
+                )
                 for translation_suggestion in translation_suggestions:
                     if len(suggestions_waiting_longest_heap) == (
                             MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
@@ -694,21 +696,26 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
                             user_contribution_rights.id):
                         heapq.heappush(suggestions_waiting_longest_heap, (
                             translation_suggestion.last_updated,
-                            translation_suggestion)
-                        )
+                            translation_suggestion))
 
         # Get the key information from each suggestion that will be used to
         # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-        for i in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
-            if len(suggestions_waiting_longest_heap) == 0:         
+        for unused_index in python_utils.RANGE(
+                MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+            if len(suggestions_waiting_longest_heap) == 0:
                 break
-            key, suggestion = heapq.heappop(suggestions_waiting_longest_heap)
+            unused_key, suggestion = heapq.heappop(
+                suggestions_waiting_longest_heap)
             html_content_strings = suggestion.get_all_html_content_strings()
+            # The first element in the html_content_strings list is the
+            # question or translation content.
+            content_without_html_tags = html_cleaner.strip_html_tags(
+                html_content_strings[0])
             reviewer_reviewable_suggestion_infos.append(
                 suggestion_registry.ReviewableSuggestionEmailContentInfo(
                     suggestion.suggestion_type, suggestion.language_code,
-                    html_content_strings[0], suggestion.last_updated
+                    content_without_html_tags, suggestion.last_updated
                 )
             )
         reviewers_reviewable_suggestion_infos.append(
