@@ -829,7 +829,12 @@ class UserRecentChangesBatchModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
 
 class UserStatsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates UserStatsModel."""
+    """Job that audits and validates UserStatsModel.
+
+    NOTE TO DEVELOPERS: This job is expected to take a very long time to
+    run since it iterates over weekly creator stats for validation which
+    is a very large list.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
