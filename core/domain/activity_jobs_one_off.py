@@ -485,7 +485,8 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
     corresponding CommitLog model pair and the corresponding parent model.
     """
 
-    SnapshotMetadataModels = [
+    FAILURE_PREFIX = 'VALIDATION FAILURE'
+    SNAPSHOT_METADATA_MODELS = [
         collection_models.CollectionSnapshotMetadataModel,
         collection_models.CollectionRightsSnapshotMetadataModel,
         exp_models.ExplorationSnapshotMetadataModel,
@@ -497,110 +498,126 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
         subtopic_models.SubtopicPageSnapshotMetadataModel,
         topic_models.TopicRightsSnapshotMetadataModel
     ]
+    MODEL_NAMES_TO_PROPERTIES = {
+        'CollectionSnapshotMetadataModel': {
+            'parent_model_class': collection_models.CollectionModel,
+            'commit_log_model_class': (
+                collection_models.CollectionCommitLogEntryModel),
+            'id_string_format': 'collection-%s-%s'
+        },
+        'ExplorationSnapshotMetadataModel': {
+            'parent_model_class': exp_models.ExplorationModel,
+            'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
+            'id_string_format': 'exploration-%s-%s'
+        },
+        'QuestionSnapshotMetadataModel': {
+            'parent_model_class': question_models.QuestionModel,
+            'commit_log_model_class': (
+                question_models.QuestionCommitLogEntryModel),
+            'id_string_format': 'question-%s-%s'
+        },
+        'SkillSnapshotMetadataModel': {
+            'parent_model_class': skill_models.SkillModel,
+            'commit_log_model_class': skill_models.SkillCommitLogEntryModel,
+            'id_string_format': 'skill-%s-%s'
+        },
+        'StorySnapshotMetadataModel': {
+            'parent_model_class': story_models.StoryModel,
+            'commit_log_model_class': story_models.StoryCommitLogEntryModel,
+            'id_string_format': 'story-%s-%s'
+        },
+        'TopicSnapshotMetadataModel': {
+            'parent_model_class': topic_models.TopicModel,
+            'commit_log_model_class': topic_models.TopicCommitLogEntryModel,
+            'id_string_format': 'topic-%s-%s'
+        },
+        'SubtopicPageSnapshotMetadataModel': {
+            'parent_model_class': subtopic_models.SubtopicPageModel,
+            'commit_log_model_class': (
+                subtopic_models.SubtopicPageCommitLogEntryModel),
+            'id_string_format': 'subtopicpage-%s-%s'
+        },
+        'TopicRightsSnapshotMetadataModel': {
+            'parent_model_class': topic_models.TopicRightsModel,
+            'commit_log_model_class': topic_models.TopicCommitLogEntryModel,
+            'id_string_format': 'rights-%s-%s'
+        },
+        'CollectionRightsSnapshotMetadataModel': {
+            'parent_model_class': collection_models.CollectionRightsModel,
+            'commit_log_model_class': (
+                collection_models.CollectionCommitLogEntryModel),
+            'id_string_format': 'rights-%s-%s'
+        },
+        'ExplorationRightsSnapshotMetadataModel': {
+            'parent_model_class': exp_models.ExplorationRightsModel,
+            'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
+            'id_string_format': 'rights-%s-%s'
+        },
+    }
+    # This list consists of the rights snapshot metadata models for which
+    # the commit log model is not created when the commit cmd is "create"
+    # or "delete".
+    MODEL_NAMES_WITH_PARTIAL_COMMIT_LOGS = [
+        'CollectionRightsSnapshotMetadataModel',
+        'ExplorationRightsSnapshotMetadataModel'
+    ]
 
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of SnapshotMetadata models that is associated
         with a CommitLogEntry model.
         """
-        return ValidateSnapshotMetadataModelsJob.SnapshotMetadataModels
+        return ValidateSnapshotMetadataModelsJob.SNAPSHOT_METADATA_MODELS
 
     @staticmethod
     def map(snapshot_model):
         """Implements the map function for this job."""
+        job_class = ValidateSnapshotMetadataModelsJob
         class_name = snapshot_model.__class__.__name__
-        missing_commit_log_msg = 'MISSING COMMIT LOGS'
-        # This list consists of the rights snapshot metadata models for which
-        # the commit log model is not created when the commit cmd is create
-        # or delete.
-        rights_model = [
-            'CollectionRightsSnapshotMetadataModel',
-            'ExplorationRightsSnapshotMetadataModel'
-        ]
+        missing_commit_log_msg = (
+            '%s - MISSING COMMIT LOGS' % job_class.FAILURE_PREFIX)
+        found_commit_log_msg = 'FOUND COMMIT LOGS'
 
         # Note: The subtopic snapshot ID is in the format
         # '<topicId>-<subtopicNum>-<version>'.
         model_id, version = snapshot_model.id.rsplit('-', 1)
-        model_dict = {
-            'CollectionSnapshotMetadataModel': {
-                'parent_model': collection_models.CollectionModel,
-                'commit_log_model': (
-                    collection_models.CollectionCommitLogEntryModel),
-                'id_string_format': 'collection-%s-%s'
-            },
-            'ExplorationSnapshotMetadataModel': {
-                'parent_model': exp_models.ExplorationModel,
-                'commit_log_model': exp_models.ExplorationCommitLogEntryModel,
-                'id_string_format': 'exploration-%s-%s'
-            },
-            'QuestionSnapshotMetadataModel': {
-                'parent_model': question_models.QuestionModel,
-                'commit_log_model': question_models.QuestionCommitLogEntryModel,
-                'id_string_format': 'question-%s-%s'
-            },
-            'SkillSnapshotMetadataModel': {
-                'parent_model': skill_models.SkillModel,
-                'commit_log_model': skill_models.SkillCommitLogEntryModel,
-                'id_string_format': 'skill-%s-%s'
-            },
-            'StorySnapshotMetadataModel': {
-                'parent_model': story_models.StoryModel,
-                'commit_log_model': story_models.StoryCommitLogEntryModel,
-                'id_string_format': 'story-%s-%s'
-            },
-            'TopicSnapshotMetadataModel': {
-                'parent_model': topic_models.TopicModel,
-                'commit_log_model': topic_models.TopicCommitLogEntryModel,
-                'id_string_format': 'topic-%s-%s'
-            },
-            'SubtopicPageSnapshotMetadataModel': {
-                'parent_model': subtopic_models.SubtopicPageModel,
-                'commit_log_model': (
-                    subtopic_models.SubtopicPageCommitLogEntryModel),
-                'id_string_format': 'subtopicpage-%s-%s'
-            },
-            'TopicRightsSnapshotMetadataModel': {
-                'parent_model': topic_models.TopicRightsModel,
-                'commit_log_model': topic_models.TopicCommitLogEntryModel,
-                'id_string_format': 'rights-%s-%s'
-            },
-            'CollectionRightsSnapshotMetadataModel': {
-                'parent_model': collection_models.CollectionRightsModel,
-                'commit_log_model': (
-                    collection_models.CollectionCommitLogEntryModel),
-                'id_string_format': 'rights-%s-%s'
-            },
-            'ExplorationRightsSnapshotMetadataModel': {
-                'parent_model': exp_models.ExplorationRightsModel,
-                'commit_log_model': exp_models.ExplorationCommitLogEntryModel,
-                'id_string_format': 'rights-%s-%s'
-            },
-        }
-
-        val = model_dict[class_name]
-        commit_log_id = val['id_string_format'] % (model_id, version)
-        parent_model = val['parent_model'].get_by_id(model_id)
-        commit_log_model = val['commit_log_model'].get_by_id(commit_log_id)
-        if class_name in rights_model:
+        model_properties = job_class.MODEL_NAMES_TO_PROPERTIES[class_name]
+        commit_log_id = (
+            model_properties['id_string_format'] % (model_id, version))
+        parent_model_class = (
+            model_properties['parent_model_class'].get_by_id(model_id))
+        commit_log_model_class = (
+            model_properties['commit_log_model_class'].get_by_id(
+                commit_log_id))
+        if class_name in job_class.MODEL_NAMES_WITH_PARTIAL_COMMIT_LOGS:
             if snapshot_model.commit_type in ['create', 'delete']:
-                missing_commit_log_msg = 'COMMIT LOGS SHOULD NOT EXIST'
+                missing_commit_log_msg = (
+                    'COMMIT LOGS SHOULD NOT EXIST AND DOESNOT EXIST')
+                found_commit_log_msg = (
+                    '%s - COMMIT LOGS SHOULD NOT EXIST BUT EXISTS' % (
+                        job_class.FAILURE_PREFIX))
 
-        if commit_log_model is None:
+        if commit_log_model_class is None:
             yield (
                 '%s - %s' % (missing_commit_log_msg, class_name),
                 snapshot_model.id)
         else:
-            yield ('FOUND COMMIT LOGS - %s' % class_name, snapshot_model.id)
+            yield (
+                '%s - %s' % (found_commit_log_msg, class_name),
+                snapshot_model.id)
 
-        if parent_model is None:
-            yield ('MISSING PARENT MODEL - %s' % class_name, snapshot_model.id)
+        if parent_model_class is None:
+            yield (
+                '%s - MISSING PARENT MODEL - %s' % (
+                    job_class.FAILURE_PREFIX, class_name),
+                snapshot_model.id)
         else:
-            yield ('FOUND PARENT MODEL - %s' % class_name, snapshot_model.id)
+            yield ('FOUND PARENT MODEL - %s' % class_name, 1)
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        if key.startswith('MISSING'):
+        if key.startswith(ValidateSnapshotMetadataModelsJob.FAILURE_PREFIX):
             yield (key, values)
         else:
             yield (key, len(values))
