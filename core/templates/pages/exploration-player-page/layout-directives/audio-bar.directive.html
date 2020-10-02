@@ -1,4 +1,4 @@
-<div class="audio-header" ng-if="isAudioBarAvailable()">
+<div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}">
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div class="oppia-audio-header-control-buttons">
       <div class="audio-header-control-icons">
@@ -246,11 +246,11 @@
     width: 100%;
     z-index: 100;
   }
-  @media screen and (max-width: 768px) {
-    .audio-header {
-      top: 56px;
-    }
+
+  .audio-header-margin {
+    top: 3.5em;
   }
+
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;

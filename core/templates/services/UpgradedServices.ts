@@ -558,8 +558,6 @@ import { StateSolicitAnswerDetailsService } from
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateStatsObjectFactory } from
-  'domain/statistics/StateStatsObjectFactory';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from
@@ -897,7 +895,6 @@ export class UpgradedServices {
       new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
-    upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
     upgradedServices['StoryNodeObjectFactory'] = new StoryNodeObjectFactory();
     upgradedServices['StoryContentsObjectFactory'] =
@@ -908,7 +905,8 @@ export class UpgradedServices {
     upgradedServices['StoryReferenceObjectFactory'] =
       new StoryReferenceObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
-      new StorySummaryObjectFactory();
+      new StorySummaryObjectFactory(
+        upgradedServices['StoryNodeObjectFactory']);
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
@@ -984,8 +982,7 @@ export class UpgradedServices {
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['ExplorationStatsObjectFactory'] =
-      new ExplorationStatsObjectFactory(
-        upgradedServices['StateStatsObjectFactory']);
+      new ExplorationStatsObjectFactory();
     upgradedServices['ExplorationTaskObjectFactory'] =
       new ExplorationTaskObjectFactory(
         upgradedServices['HighBounceRateTaskObjectFactory'],
@@ -1465,6 +1462,7 @@ export class UpgradedServices {
         upgradedServices['SubtopicObjectFactory']);
     upgradedServices['ReadOnlyTopicObjectFactory'] =
       new ReadOnlyTopicObjectFactory(
+        upgradedServices['StoryNodeObjectFactory'],
         upgradedServices['SubtopicObjectFactory'],
         upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['ReviewTestBackendApiService'] =
