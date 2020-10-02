@@ -1227,12 +1227,12 @@ class CommunityContributionStats(python_utils.OBJECT):
         self.translation_suggestion_counts_by_lang_code[language_code] = count
 
 
-class ReviewableSuggestionEmailContentInfo(python_utils.OBJECT):
+class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
     """Stores key information that is used to create the email content for
     notifying admins and reviewers that there are suggestions that need to be
     reviewed.
 
-    Attributes: 
+    Attributes:
         suggestion_type: str. The type of the suggestion.
         language_code: str. The language code of the suggestion.
         suggestion_content: str. The question or translation of the suggestion.

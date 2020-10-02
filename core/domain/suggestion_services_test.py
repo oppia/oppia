@@ -1653,9 +1653,6 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
 
     target_id = 'exp1'
     target_version_at_submission = 1
-    exploration_category = 'Algebra'
-    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
-    SKILL_THREAD_ID = 'skill1.thread1'
     AUTHOR_EMAIL = 'author1@example.com'
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
     REVIEWER_2_EMAIL = 'reviewer2@community.org'
@@ -1677,14 +1674,6 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
     explorations = [
         MockExploration('exp1', {'state_1': {}, 'state_2': {}})
     ]
-
-    def mock_generate_new_exploration_thread_id(
-            self, unused_entity_type, unused_entity_id):
-        return self.EXPLORATION_THREAD_ID
-
-    def mock_generate_new_skill_thread_id(
-            self, unused_entity_type, unused_entity_id):
-        return self.SKILL_THREAD_ID
 
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
@@ -1725,7 +1714,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
     def _create_translation_suggestion_with_language_code_and_author(
             self, language_code, author_id):
         """Creates a translation suggestion in the given language_code with the
-        given author id."""
+        given author id.
+        """
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': 'state_1',
@@ -1781,29 +1771,57 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
 
         return question_suggestion
 
-    def _assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            self, reviewable_suggestion_infos, expected_suggestions_in_order):
-        """Asserts that the reviewable suggestion infos are sorted in
-        descending order according to review wait time.
+    def _create_reviewable_suggestion_email_infos_from_suggestions(
+            self, suggestions):
+        """Creates a list of ReviewableSuggestionEmailInfo objects from
+        the given suggestions.
+        """
 
-        Args:
-            reviewable_suggestion_infos:
-                list(ReviewableSuggestionEmailContentInfo). A list of containing
-                    the information of suggestions that need to be reviewed.
-            expected_suggestions_in_order: list(Suggestions). The list of
-                suggestions where the i.
+        return [
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion)
+            ) for suggestion in suggestions
+        ]
+
+    def _assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            self, reviewable_suggestion_email_infos,
+            expected_reviewable_suggestion_email_infos):
+        """Asserts that the reviewable suggestion email infos are equal to the
+        expected reviewable suggestion email infos and that the reviewable
+        suggestion email infos are sorted in descending order according to
+        review wait time.
         """
         self.assertEqual(
-            len(reviewable_suggestion_infos), len(expected_suggestion_order))
-        for index, reviewable_suggestion_info in enumerate(
-                reviewable_suggestion_infos):
+            len(reviewable_suggestion_email_infos),
+            len(expected_reviewable_suggestion_email_infos)
+        )
+        for index, reviewable_suggestion_email_info in enumerate(
+                reviewable_suggestion_email_infos):
             self.assertEqual(
-                reviewable_suggestion_info.submission_datetime,
-                expected_suggestion_order[index].last_updated)
-        for index in python_utils.RANGE(len(reviewable_suggestion_infos) - 1):
+                reviewable_suggestion_email_info.suggestion_type,
+                expected_reviewable_suggestion_email_infos[
+                    index].suggestion_type)
+            self.assertEqual(
+                reviewable_suggestion_email_info.language_code,
+                expected_reviewable_suggestion_email_infos[
+                    index].language_code)
+            self.assertEqual(
+                reviewable_suggestion_email_info.suggestion_content,
+                expected_reviewable_suggestion_email_infos[
+                    index].suggestion_content)
+            self.assertEqual(
+                reviewable_suggestion_email_info.submission_datetime,
+                expected_reviewable_suggestion_email_infos[
+                    index].submission_datetime)
+        for index in python_utils.RANGE(
+                len(reviewable_suggestion_email_infos) - 1):
             self.assertLess(
-                reviewable_suggestion_infos[index].submission_datetime,
-                reviewable_suggestion_infos[index + 1].submission_datetime)
+                reviewable_suggestion_email_infos[index].submission_datetime,
+                reviewable_suggestion_email_infos[
+                    index + 1].submission_datetime
+            )
 
     def setUp(self):
         super(
@@ -1827,15 +1845,13 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self._create_translation_suggestion_with_language_code_and_author(
             'hi', self.reviewer_1_id)
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                [self.reviewer_1_id]
-            )
-        )
+                [self.reviewer_1_id]))
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self.assertEqual(reviewers_reviewable_suggestion_infos, [[]])
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
 
     def test_get_returns_empty_for_question_reviewers_if_only_translation_exist(
             self):
@@ -1843,15 +1859,13 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self._create_translation_suggestion_with_language_code_and_author(
             'hi', self.author_id)
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                [self.reviewer_1_id]
-            )
-        )
+                [self.reviewer_1_id]))
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self.assertEqual(reviewers_reviewable_suggestion_infos, [[]])
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
 
     def test_get_returns_empty_for_translation_reviewers_if_only_question_exist(
             self):
@@ -1860,15 +1874,13 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self._create_question_suggestion_with_skill_id_and_author_id(
             'skill_1', self.reviewer_1_id)
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                [self.reviewer_1_id]
-            )
-        )
+                [self.reviewer_1_id]))
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self.assertEqual(reviewers_reviewable_suggestion_infos, [[]])
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
 
     def test_get_returns_suggestion_infos_for_a_translation_reviewer_same_lang(
             self):
@@ -1876,29 +1888,23 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             self.reviewer_1_id, 'hi')
         translation_suggestion_1 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
+                'hi', self.author_id))
         translation_suggestion_2 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
-        translation_suggestions = [
-            translation_suggestion_1, translation_suggestion_2
-        ]
+                'hi', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1, translation_suggestion_2]))
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                [self.reviewer_1_id]
-            )
-        )
+                [self.reviewer_1_id]))
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self.assertEqual(
-            len(reviewers_reviewable_suggestion_infos[0]),
-            len(translation_suggestions))
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[0], translation_suggestions)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
 
     def test_get_returns_empty_for_a_translation_reviewer_with_diff_lang_rights(
             self):
@@ -1907,15 +1913,13 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self._create_translation_suggestion_with_language_code_and_author(
             'hi', self.author_id)
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                [self.reviewer_1_id]
-            )
-        )
+                [self.reviewer_1_id]))
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self.assertEqual(reviewers_reviewable_suggestion_infos, [[]])
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
 
     def test_get_returns_suggestion_infos_for_translation_reviewer_multi_lang(
             self):
@@ -1925,31 +1929,30 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             self.reviewer_1_id, 'en')
         translation_suggestion_1 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
+                'hi', self.author_id))
         translation_suggestion_2 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'en', self.author_id)
-        )
+                'en', self.author_id))
         translation_suggestion_3 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
-        translation_suggestions = [
-            translation_suggestion_1, translation_suggestion_2,
-            translation_suggestion_3
-        ]
+                'hi', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    translation_suggestion_1, translation_suggestion_2,
+                    translation_suggestion_3]))
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 [self.reviewer_1_id]
             )
         )
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[0], translation_suggestions)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
 
     def test_get_returns_suggestion_infos_for_translation_reviewer_past_limit(
             self):
@@ -1957,27 +1960,27 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             self.reviewer_1_id, 'hi')
         translation_suggestion_1 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
+                'hi', self.author_id))
         # Create another translation suggestion so that we pass the
         # MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER limit.
         self._create_translation_suggestion_with_language_code_and_author(
             'hi', self.author_id)
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1]))
 
         with self.swap(
             suggestion_services, 'MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_reviewable_suggestion_infos = (
+            reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                    [self.reviewer_1_id]
-                )
-            )
+                    [self.reviewer_1_id]))
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos[0]), 1)
-        self.assertEqual(
-            reviewers_reviewable_suggestion_infos[0][0].submission_datetime,
-            translation_suggestion_1.last_updated)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(len(reviewable_suggestion_email_infos[0]), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
 
     def test_get_returns_suggestion_infos_for_multiple_translation_reviewers(
             self):
@@ -1989,38 +1992,36 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             self.reviewer_2_id, 'hi')
         translation_suggestion_1 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
+                'hi', self.author_id))
         translation_suggestion_2 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'en', self.author_id)
-        )
+                'en', self.author_id))
         translation_suggestion_3 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
-        translation_suggestions_expected_order_for_reviewer_1 = [
-            translation_suggestion_1, translation_suggestion_2,
-            translation_suggestion_3
-        ]
-        translation_suggestions_expected_order_for_reviewer_2 = [
-            translation_suggestion_1, translation_suggestion_3
-        ]
+                'hi', self.author_id))
+        expected_reviewable_suggestion_email_infos_reviewer_1 = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    translation_suggestion_1, translation_suggestion_2,
+                    translation_suggestion_3]))
+        expected_reviewable_suggestion_email_infos_reviewer_2 = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1, translation_suggestion_3]))
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 [self.reviewer_1_id, self.reviewer_2_id]
             )
         )
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 2)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[0],
-            translation_suggestions_expected_order_for_reviewer_1)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[1],
-            translation_suggestions_expected_order_for_reviewer_2)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 2)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos_reviewer_1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[1],
+            expected_reviewable_suggestion_email_infos_reviewer_2)
 
     def test_get_returns_suggestion_infos_for_reviewer_with_multi_review_rights(
             self):
@@ -2031,118 +2032,114 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             self.reviewer_1_id, 'en')
         suggestion_1 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_1', self.author_id)
-        )
+                'skill_1', self.author_id))
         suggestion_2 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
+                'hi', self.author_id))
         suggestion_3 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_2', self.author_id)
-        )
+                'skill_2', self.author_id))
         suggestion_4 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
+                'hi', self.author_id))
         suggestion_5 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'en', self.author_id)
-        )
-        suggestion_order = [
-            suggestion_1, suggestion_2, suggestion_3, suggestion_4, suggestion_5
-        ]
+                'en', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    suggestion_1, suggestion_2, suggestion_3, suggestion_4,
+                    suggestion_5]))
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 [self.reviewer_1_id]
             )
         )
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[0], suggestion_order)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
 
     def test_get_returns_suggestion_infos_for_a_question_reviewer(self):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         question_suggestion_1 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_1', self.author_id)
-        )
+                'skill_1', self.author_id))
         question_suggestion_2 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_2', self.author_id)
-        )
-        question_suggestions = [
-            question_suggestion_1, question_suggestion_2
-        ]
+                'skill_2', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_1, question_suggestion_2]))
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 [self.reviewer_1_id]
             )
         )
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[0], question_suggestions)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
 
     def test_get_returns_suggestion_infos_for_multi_question_reviewers(self):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         user_services.allow_user_to_review_question(self.reviewer_2_id)
         question_suggestion_1 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_1', self.author_id)
-        )
+                'skill_1', self.author_id))
         question_suggestion_2 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_2', self.author_id)
-        )
-        question_suggestions = [
-            question_suggestion_1, question_suggestion_2
-        ]
+                'skill_2', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_1, question_suggestion_2]))
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 [self.reviewer_1_id, self.reviewer_2_id]
             )
         )
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 2)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[0], question_suggestions)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[1], question_suggestions)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 2)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[1],
+            expected_reviewable_suggestion_email_infos)
 
     def test_get_returns_suggestion_infos_for_question_reviewer_past_limit(
             self):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         question_suggestion_1 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_1', self.author_id)
-        )
-        question_suggestion_2 = (
-            self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_2', self.author_id)
-        )
+                'skill_1', self.author_id))
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_2', self.author_id)
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_1]))
 
         with self.swap(
             suggestion_services, 'MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_reviewable_suggestion_infos = (
+            reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                     [self.reviewer_1_id]
                 )
             )
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 1)
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos[0]), 1)
-        self.assertEqual(
-            reviewers_reviewable_suggestion_infos[0][0].submission_datetime,
-            question_suggestion_1.last_updated)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
 
     def test_get_returns_suggestion_infos_for_multi_reviewers_with_multi_rights(
             self):
@@ -2160,46 +2157,44 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             self.reviewer_2_id, 'fr')
         suggestion_1 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_1', self.author_id)
-        )
+                'skill_1', self.author_id))
         suggestion_2 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
+                'hi', self.author_id))
         suggestion_3 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'fr', self.author_id)
-        )
+                'fr', self.author_id))
         suggestion_4 = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_2', self.author_id)
-        )
+                'skill_2', self.author_id))
         suggestion_5 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id)
-        )
+                'hi', self.author_id))
         suggestion_6 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'en', self.author_id)
-        )
-        suggestion_order_for_reviewer_1 = [
-            suggestion_1, suggestion_2, suggestion_4, suggestion_5, suggestion_6
-        ]
-        suggestion_order_for_reviewer_2 = [
-            suggestion_1, suggestion_2, suggestion_3, suggestion_4, suggestion_5
-        ]
+                'en', self.author_id))
+        expected_reviewable_suggestion_email_infos_reviewer_1 = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    suggestion_1, suggestion_2, suggestion_4, suggestion_5,
+                    suggestion_6]))
+        expected_reviewable_suggestion_email_infos_reviewer_2 = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    suggestion_1, suggestion_2, suggestion_3, suggestion_4,
+                    suggestion_5]))
 
-        reviewers_reviewable_suggestion_infos = (
+        reviewable_suggestion_email_infos = (
             suggestion_services
             .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                 [self.reviewer_1_id, self.reviewer_2_id]
             )
         )
 
-        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 2)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[0],
-            suggestion_order_for_reviewer_1)
-        self._assert_reviewable_suggestion_infos_are_in_the_correct_order(
-            reviewers_reviewable_suggestion_infos[1],
-            suggestion_order_for_reviewer_2)
+        self.assertEqual(len(reviewable_suggestion_email_infos), 2)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos_reviewer_1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[1],
+            expected_reviewable_suggestion_email_infos_reviewer_2)

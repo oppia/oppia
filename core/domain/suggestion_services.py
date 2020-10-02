@@ -606,6 +606,28 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
     ]
 
 
+def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
+    """Creates a ReviewableSuggestionEmailInfo object from the given suggestion.
+
+    Args:
+        suggestion: Suggestion. The suggestion used to create the
+            ReviewableSuggestionEmailInfo object.
+
+    Returns:
+        ReviewableSuggestionEmailInfo. The corresponding reviewable suggestion
+        email info.
+    """
+    html_content_strings = suggestion.get_all_html_content_strings()
+    # The first element in the html_content_strings list is the
+    # question or translation content.
+    content_without_html_tags = html_cleaner.strip_html_tags(
+        html_content_strings[0])
+    return suggestion_registry.ReviewableSuggestionEmailInfo(
+        suggestion.suggestion_type, suggestion.language_code,
+        content_without_html_tags, suggestion.last_updated
+    )
+
+
 def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
     """For each user, returns information that will be used to notify reviewers
     about the suggestions waiting longest for review that the reviewer has
@@ -615,7 +637,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         reviewer_ids: list(str). A list of the reviewer user ids to notify.
 
     Returns:
-        list(list(ReviewableSuggestionEmailContentInfo)). A list of suggestion
+        list(list(ReviewableSuggestionEmailInfo)). A list of suggestion
         email content info objects for each reviewer. Each suggestion email
         content info object contains the type of the suggestion, the language
         of the suggestion, the suggestion content (question/translation) and
@@ -707,16 +729,9 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                 break
             unused_key, suggestion = heapq.heappop(
                 suggestions_waiting_longest_heap)
-            html_content_strings = suggestion.get_all_html_content_strings()
-            # The first element in the html_content_strings list is the
-            # question or translation content.
-            content_without_html_tags = html_cleaner.strip_html_tags(
-                html_content_strings[0])
             reviewer_reviewable_suggestion_infos.append(
-                suggestion_registry.ReviewableSuggestionEmailContentInfo(
-                    suggestion.suggestion_type, suggestion.language_code,
-                    content_without_html_tags, suggestion.last_updated
-                )
+                create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion)
             )
         reviewers_reviewable_suggestion_infos.append(
             reviewer_reviewable_suggestion_infos
