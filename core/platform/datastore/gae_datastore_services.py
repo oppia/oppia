@@ -47,6 +47,19 @@ TextProperty = ndb.TextProperty
 UserProperty = ndb.UserProperty
 
 
+def get_multi(keys):
+    """Fetches a sequence of keys.
+
+    Args:
+        keys: list(str). The keys to look up.
+
+    Returns:
+        list(ndb.Model). List whose items are either a Model instance or None if
+        the key wasn't found.
+    """
+    return ndb.get_multi(keys)
+
+
 def put_multi(models):
     """Stores a sequence of Model instances.
 
