@@ -60,6 +60,10 @@ ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_TYPE_CHECK = 'type check'
 ERROR_CATEGORY_VERSION_CHECK = 'version check'
 
+VALIDATION_MODE_NEUTRAL = 'neutral'
+VALIDATION_MODE_STRICT = 'strict'
+VALIDATION_MODE_NON_STRICT = 'non-strict'
+
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
     """Value object providing the class and ids to fetch an external model."""
@@ -168,6 +172,26 @@ class BaseModelValidator(python_utils.OBJECT):
         return None
 
     @classmethod
+    def _get_domain_object_validation_type(cls, unused_item):
+        """Returns the type of domain object validation to be performed.
+
+        Some of the storage models support a strict/non strict mode depending
+        on whether the model is published or not. Currently the models which
+        provide this feature are collection, exploration and topic models.
+
+        Other models do not support any strict/non strict validation. So,
+        this function returns neutral mode in the base class. It can be
+        overridden by subclasses to enable strict/non strict mode, if needed.
+
+        Args:
+            unused_item: ndb.Model. Entity to validate.
+
+        Returns:
+            str. The type of validation mode: neutral, strict or non strict.
+        """
+        return VALIDATION_MODE_NEUTRAL
+
+    @classmethod
     def _validate_model_domain_object_instances(cls, item):
         """Checks that model instance passes the validation of the domain
         object for model.
@@ -176,12 +200,22 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
         """
         try:
-            model_domain_object_instance = (
+            domain_object = (
                 cls._get_model_domain_object_instance(item))
-            if model_domain_object_instance is None:
+            if domain_object is None:
                 # No domain object exists for this storage model class.
                 return
-            model_domain_object_instance.validate()
+            validation_type = cls._get_domain_object_validation_type(item)
+            if validation_type == VALIDATION_MODE_NEUTRAL:
+                domain_object.validate()
+            elif validation_type == VALIDATION_MODE_STRICT:
+                domain_object.validate(strict=True)
+            elif validation_type == VALIDATION_MODE_NON_STRICT:
+                domain_object.validate(strict=False)
+            else:
+                raise Exception(
+                    'Invalid validation type for domain object: %s' % (
+                        validation_type))
         except Exception as e:
             cls._add_error(
                 ERROR_CATEGORY_DOMAIN_OBJECT_CHECK,
@@ -228,8 +262,8 @@ class BaseModelValidator(python_utils.OBJECT):
                     cls._add_error(
                         '%s %s' % (field_name, ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having'
-                        ' value %s, expect model %s with id %s but it doesn\'t'
-                        ' exist' % (
+                        ' value %s, expected model %s with id %s but it '
+                        'doesn\'t exist' % (
                             item.id, field_name, model_id,
                             model_class.__name__, model_id))
 
@@ -407,7 +441,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
                             external_model_field_key,
                             ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having value %s, '
-                        'expect model %s with id %s but it doesn\'t'
+                        'expected model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, external_model_field_key,
                             model_id, model_class.__name__, model_id))
@@ -511,7 +545,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
                 cls._add_error(
                     '%s_ids %s' % (key_to_fetch, ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field %s_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, key_to_fetch, model_id,
                         model_class.__name__, model_id))
@@ -742,7 +776,7 @@ class BaseUserModelValidator(BaseModelValidator):
                 cls._add_error(
                     'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -792,7 +826,7 @@ class BaseUserModelValidator(BaseModelValidator):
                 cls._add_error(
                     'collection_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field collection_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue

@@ -1,15 +1,22 @@
 {
+    "APP_DEV_YAML_PATH": "app_dev.yaml",
+    "APP_YAML_PATH_TO_VERSION_USAGE_DICT": {
+        "app.yaml": "given",
+    },
     "BLOCKING_BUG_MILESTONE_NUMBER": 39,
+    "BUILD_MODULE_TARGET": "scripts.build",
     "CHANGELOG_HEADER": "### Changelog:\n",
     "COMMIT_HISTORY_HEADER": "### Commit History:\n",
     "CONSTANTS_PATH": "assets/constants.ts",
-    "CUT_BRANCH_MODULE_PATH": "scripts.release_scripts.cut_release_or_hotfix_branch",
+    "CRON_YAML_PATH": "cron.yaml",
+    "CUT_BRANCH_MODULE_TARGET": "scripts.release_scripts.cut_release_or_hotfix_branch",
     "EMAIL_HEADER": "### Email C&P Blurbs about authors:\n",
     "EXISTING_AUTHORS_HEADER": "### Existing Authors:\n",
     "GAE_DIR": "../oppia_tools/google-cloud-sdk-304.0.0/google-cloud-sdk/platform/google_appengine",
     "GCLOUD_PATH": "../oppia_tools/google-cloud-sdk-304.0.0/google-cloud-sdk/bin/gcloud",
     "GITHUB_RELEASE_TAB_URL": "https://github.com/oppia/oppia/releases",
     "INDEX_YAML_PATH": "index.yaml",
+    "INSTALL_THIRD_PARTY_MODULE_TARGET": "scripts.install_third_party_libs",
     "ISSUE_FILING_URL": "https://github.com/oppia/oppia/milestone/39",
     "ISSUE_URL_FORMAT_STRING": "https://github.com/oppia/oppia/issues/%s",
     "ISSUES_HEADER": "### Issues mentioned in commits:\n",
@@ -29,7 +36,7 @@
     "RELEASE_ROTA_URL": "https://github.com/oppia/oppia/wiki/Release-Schedule#release-coordinators-and-qa-coordinators-for-upcoming-releases",
     "RELEASE_SUMMARY_FILEPATH": "../release_summary.md",
     "REMOTE_URL": "git@github.com:oppia/oppia.git",
-    "REPO_SPECIFIC_CHANGE_MODULE_PATH": "scripts.release_scripts.repo_specific_changes_fetcher",
+    "REPO_SPECIFIC_CHANGE_MODULE_TARGET": "scripts.release_scripts.repo_specific_changes_fetcher",
     "SCHEMA_CONFIG_PATH": "feconf.py",
     "SCHEMA_VERSIONS_TO_JOBS_MAPPING": {
         "CURRENT_COLLECTION_SCHEMA_VERSION": "CollectionMigrationOneOffJob",
@@ -40,5 +47,7 @@
         "CURRENT_STORY_CONTENTS_SCHEMA_VERSION": "StoryMigrationOneOffJob",
         "CURRENT_SUBTOPIC_SCHEMA_VERSION": "TopicMigrationOneOffJob",
         "CURRENT_STORY_REFERENCE_SCHEMA_VERSION": "TopicMigrationOneOffJob"
-    }
+    },
+    "THIRD_PARTY_DIR": "third_party",
+    "UPDATE_CONFIGS_MODULE_TARGET": "scripts.release_scripts.update_configs"
 }
