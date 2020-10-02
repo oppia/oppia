@@ -29,6 +29,7 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
+datastore_services = models.Registry.import_datastore_services()
 
 (
     exp_models, skill_models, story_models,
@@ -106,7 +107,7 @@ class ExplorationRecommendationsModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -118,7 +119,7 @@ class ExplorationRecommendationsModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids field '
                 'check of ExplorationRecommendationsModel\', '
                 '[u"Entity id 0: based on field exploration_ids having value '
-                '3, expect model ExplorationModel with '
+                '3, expected model ExplorationModel with '
                 'id 3 but it doesn\'t exist"]]'
             ),
             u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
@@ -194,7 +195,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
