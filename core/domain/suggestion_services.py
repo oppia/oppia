@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import heapq
+import re
 
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -31,7 +32,6 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
-import re
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -628,8 +628,9 @@ def _get_plain_text_from_html_content_string(html_content_string):
     html_content_string = re.sub('&amp;', '&', html_content_string)
     # Replace all html tags other than <oppia-noninteractive-**> ones to ''.
     html_content_string = re.sub(
-        '<(?!oppia-noninteractive\s*?)[^>]+>', '', html_content_string)
+        r'<(?!oppia-noninteractive\s*?)[^>]+>', '', html_content_string)
     def _replace_rte_tag(rte_tag):
+        """Replaces all of the <oppia-noninteractive-**> tags."""
         # Convert the MatchObject to a string.
         rte_tag_string = rte_tag.group(0)
         # Get the name of the noninteractive tag (ex. math).
@@ -646,7 +647,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
     resulting_plain_text = html_content_string.strip()
     return resulting_plain_text
 
-    
+
 def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     """Creates a ReviewableSuggestionEmailInfo object from the given suggestion.
     Note: the suggestions must be suggestions that are available for review on
@@ -671,9 +672,9 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
             'ReviewableSuggestionEmailInfo object creation, recieved '
             'suggestion status: %s' % suggestion.status)
     if suggestion.suggestion_type != (
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT) and (
-            suggestion.suggestion_type != (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)):
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT) and (
+                suggestion.suggestion_type != (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)):
         raise Exception(
             'Expected suggestion type to be offered on the Contributor '
             'Dashboard for ReviewableSuggestionEmailInfo object creation, '

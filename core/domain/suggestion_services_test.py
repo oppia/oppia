@@ -1820,7 +1820,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
 
     def setUp(self):
         super(
-            ReviewableSuggestionEmailInfoUnitTests,self).setUp()
+            ReviewableSuggestionEmailInfoUnitTests, self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(
             self.AUTHOR_EMAIL)
@@ -1922,7 +1922,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 '<p>default translation content</p>'))
         suggestion_services.reject_suggestion(
             translation_suggestion.suggestion_id, self.reviewer_id,
-           'review message ')
+            'review message ')
         rejected_translation_suggestion = (
             suggestion_services.get_suggestion_by_id(
                 translation_suggestion.suggestion_id))
@@ -2039,7 +2039,8 @@ class ReviewableSuggestionEmailInfoUnitTests(
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
                 '<p>translation with rte'
-                '<oppia-noninteractive-image></oppia-noninteractive-image></p>'))
+                '<oppia-noninteractive-image></oppia-noninteractive-image>'
+                '</p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
@@ -2084,7 +2085,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def create_returns_info_for_translation_suggestion_if_html_has_repeated_rte(
+    def test_create_returns_info_for_translation_suggestion_if_html_rte_repeats(
             self):
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
@@ -2095,7 +2096,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [LINK] [LINK]',
+                'translation with rte [LINK]  [LINK]',
                 translation_suggestion.last_updated
             ))
 
@@ -2109,8 +2110,8 @@ class ReviewableSuggestionEmailInfoUnitTests(
             reviewable_suggestion_email_info,
             expected_reviewable_suggestion_email_info
         )
-        
-    def create_returns_info_for_translation_suggestion_if_html_has_multi_rte(
+
+    def test_create_returns_info_for_translation_suggestion_if_html_multi_rte(
             self):
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
@@ -2121,7 +2122,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [LINK] [MATH]',
+                'translation with rte [LINK]  [MATH]',
                 translation_suggestion.last_updated
             ))
 
@@ -2136,7 +2137,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def create_returns_info_for_translation_suggestion_if_html_has_nested_rte(
+    def test_create_returns_info_for_translation_suggestion_if_html_nested_rte(
             self):
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
@@ -2163,7 +2164,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def create_returns_info_for_translation_suggestion_if_html_has_rte_value(
+    def test_create_returns_info_for_translation_suggestion_if_html_rte_value(
             self):
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
@@ -2263,7 +2264,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def create_returns_info_for_question_suggestion_if_html_has_repeated_rte(
+    def test_create_returns_info_for_question_suggestion_if_html_has_repeat_rte(
             self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
@@ -2274,7 +2275,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [LINK] [LINK]',
+                'question with rte [LINK]  [LINK]',
                 question_suggestion.last_updated
             ))
 
@@ -2288,8 +2289,8 @@ class ReviewableSuggestionEmailInfoUnitTests(
             reviewable_suggestion_email_info,
             expected_reviewable_suggestion_email_info
         )
-        
-    def create_returns_info_for_question_suggestion_if_html_has_multi_rte(
+
+    def test_create_returns_info_for_question_suggestion_if_html_has_multi_rte(
             self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
@@ -2300,7 +2301,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [LINK] [MATH]',
+                'question with rte [LINK]  [MATH]',
                 question_suggestion.last_updated
             ))
 
@@ -2315,7 +2316,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def create_returns_info_for_question_suggestion_if_html_has_nested_rte(
+    def test_create_returns_info_for_question_suggestion_if_html_has_nested_rte(
             self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
@@ -2342,7 +2343,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def create_returns_info_for_question_suggestion_if_html_has_rte_value(
+    def test_create_returns_info_for_question_suggestion_if_html_has_rte_value(
             self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
@@ -2367,6 +2368,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             reviewable_suggestion_email_info,
             expected_reviewable_suggestion_email_info
         )
+
 
 class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         test_utils.GenericTestBase):
