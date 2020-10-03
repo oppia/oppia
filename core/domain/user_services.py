@@ -33,7 +33,7 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.api import urlfetch
+import requests
 
 current_user_services = models.Registry.import_current_user_services()
 (user_models, audit_models) = models.Registry.import_models(
@@ -192,7 +192,7 @@ class UserSettings(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_correct(self.user_id):
+        if not is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if not isinstance(self.role, python_utils.BASESTRING):
@@ -453,7 +453,7 @@ class UserAuthDetails(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_correct(self.user_id):
+        if not is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
@@ -464,7 +464,7 @@ class UserAuthDetails(python_utils.OBJECT):
             )
 
         if (self.parent_user_id is not None and
-                not is_user_id_correct(self.parent_user_id)):
+                not is_user_id_valid(self.parent_user_id)):
             raise utils.ValidationError(
                 'The parent user ID is in a wrong format.')
 
@@ -479,7 +479,7 @@ class UserAuthDetails(python_utils.OBJECT):
                 'for a user.')
 
 
-def is_user_id_correct(user_id):
+def is_user_id_valid(user_id):
     """Verify that the user ID is in a correct format or that it belongs to
     a system user.
 
@@ -496,22 +496,7 @@ def is_user_id_correct(user_id):
     return all((
         user_id.islower(),
         user_id.startswith('uid_'),
-        len(user_id) == user_models.USER_ID_LENGTH))
-
-
-def is_pseudonymous_id(user_id):
-    """Check that the ID is a pseudonymous one.
-
-    Args:
-        user_id: str. The ID to be checked.
-
-    Returns:
-        bool. Whether the ID represents a pseudonymous user.
-    """
-    return all((
-        user_id.islower(),
-        user_id.startswith('pid_'),
-        len(user_id) == user_models.USER_ID_LENGTH))
+        len(user_id) == feconf.USER_ID_LENGTH))
 
 
 def is_username_taken(username):
@@ -679,20 +664,19 @@ def fetch_gravatar(email):
     """
     gravatar_url = get_gravatar_url(email)
     try:
-        result = urlfetch.fetch(
-            gravatar_url,
-            headers={'Content-Type': 'image/png'},
-            follow_redirects=False)
-    except (urlfetch.InvalidURLError, urlfetch.DownloadError):
-        logging.error('Failed to fetch Gravatar from %s' % gravatar_url)
+        response = requests.get(
+            gravatar_url, headers={b'Content-Type': b'image/png'},
+            allow_redirects=False)
+    except Exception:
+        logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
-        if result.status_code == 200:
-            if imghdr.what(None, h=result.content) == 'png':
-                return utils.convert_png_binary_to_data_url(result.content)
+        if response.ok:
+            if imghdr.what(None, h=response.content) == 'png':
+                return utils.convert_png_binary_to_data_url(response.content)
         else:
             logging.error(
                 '[Status %s] Failed to fetch Gravatar from %s' %
-                (result.status_code, gravatar_url))
+                (response.status_code, gravatar_url))
 
     return DEFAULT_IDENTICON_DATA_URL
 
@@ -765,6 +749,35 @@ def get_user_role_from_id(user_id):
     return user_settings.role
 
 
+def _create_user_contribution_rights_from_model(user_contribution_rights_model):
+    """Creates a UserContributionRights object from the given model. If the
+    model is None, an empty UserContributionRights object is returned.
+
+    Args:
+        user_contribution_rights_model: UserContributionRightsModel. The model
+            used to create the UserContributionRights domain object.
+
+    Returns:
+        UserContributionRights. The UserContributionRights domain object
+        associated with the model, or an empty UserContributionRights domain
+        object if the model is None.
+    """
+    if user_contribution_rights_model is not None:
+        return user_domain.UserContributionRights(
+            user_contribution_rights_model.id,
+            (
+                user_contribution_rights_model
+                .can_review_translation_for_language_codes
+            ),
+            (
+                user_contribution_rights_model
+                .can_review_voiceover_for_language_codes
+            ),
+            user_contribution_rights_model.can_review_questions)
+    else:
+        return user_domain.UserContributionRights('', [], [], False)
+
+
 def get_user_contribution_rights(user_id):
     """Returns the UserContributionRights domain object for the given user_id.
 
@@ -775,30 +788,78 @@ def get_user_contribution_rights(user_id):
         UserContributionRights. The UserContributionRights domain object for the
         corresponding user.
     """
-    user_model = (
-        user_models.UserContributionRightsModel.get_by_id(user_id))
-    if user_model is not None:
-        return user_domain.UserContributionRights(
-            user_id,
-            user_model.can_review_translation_for_language_codes,
-            user_model.can_review_voiceover_for_language_codes,
-            user_model.can_review_questions)
-    else:
-        return user_domain.UserContributionRights(user_id, [], [], False)
+    return get_users_contribution_rights([user_id])[0]
 
 
-def get_all_contribution_reviewers():
+def get_users_contribution_rights(user_ids):
+    """Returns the UserContributionRights domain object for each user_id in
+    user_ids.
+
+    Args:
+        user_ids: list(str). A list of user ids.
+
+    Returns:
+        list(UserContributionRights). A list containing the
+        UserContributionRights domain object for each user.
+    """
+    user_contribution_rights_models = (
+        user_models.UserContributionRightsModel.get_multi(user_ids)
+    )
+
+    users_contribution_rights = []
+    for index, user_contribution_rights_model in enumerate(
+            user_contribution_rights_models):
+        user_contribution_rights = _create_user_contribution_rights_from_model(
+            user_contribution_rights_model
+        )
+        if user_contribution_rights_model is None:
+            # Need to initalize the user id.
+            user_contribution_rights.id = user_ids[index]
+        users_contribution_rights.append(user_contribution_rights)
+
+    return users_contribution_rights
+
+
+def get_reviewer_user_ids_to_notify():
+    """Gets a list of the reviewer user_ids who want to be notified of
+    Contributor Dashboard reviewer updates.
+
+    Returns:
+        list(str). A list of reviewer user_ids who want to be notified of
+        Contributor Dashboard reviewer updates.
+    """
+    # Get the user ids of the Contributor Dashboard reviewers.
+    users_contribution_rights = get_all_reviewers_contribution_rights()
+    reviewer_ids = [
+        user_contribution_rights.id for user_contribution_rights in
+        users_contribution_rights
+    ]
+
+    users_global_prefs = get_users_email_preferences(reviewer_ids)
+    reviewer_ids_to_notify = []
+    for index, user_global_pref in enumerate(users_global_prefs):
+        if user_global_pref.can_receive_email_updates:
+            reviewer_ids_to_notify.append(reviewer_ids[index])
+
+    return reviewer_ids_to_notify
+
+
+def get_all_reviewers_contribution_rights():
     """Returns a list of UserContributionRights objects corresponding to each
     UserContributionRightsModel.
 
     Returns:
         list(UserContributionRights). A list of UserContributionRights objects.
     """
-    reviewer_models = user_models.UserContributionRightsModel.get_all()
-    return [user_domain.UserContributionRights(
-        model.id, model.can_review_translation_for_language_codes,
-        model.can_review_voiceover_for_language_codes,
-        model.can_review_questions) for model in reviewer_models]
+    user_contribution_rights_models = (
+        user_models.UserContributionRightsModel.get_all()
+    )
+
+    return [
+        _create_user_contribution_rights_from_model(
+            user_contribution_rights_model) for user_contribution_rights_model
+        in user_contribution_rights_models
+    ]
 
 
 def _save_user_contribution_rights(user_contribution_rights):
@@ -1331,7 +1392,7 @@ def _get_user_auth_details_from_model(user_auth_details_model):
     )
 
 
-def _get_pseudonymous_username(pseudonymous_id):
+def get_pseudonymous_username(pseudonymous_id):
     """Get the username from pseudonymous ID.
 
     Args:
@@ -1377,8 +1438,8 @@ def get_usernames(user_ids, strict=False):
     for index, user_id in enumerate(user_ids):
         if user_id in feconf.SYSTEM_USERS:
             usernames[index] = feconf.SYSTEM_USERS[user_id]
-        elif is_pseudonymous_id(user_id):
-            usernames[index] = _get_pseudonymous_username(user_id)
+        elif utils.is_pseudonymous_id(user_id):
+            usernames[index] = get_pseudonymous_username(user_id)
         else:
             non_system_user_indices.append(index)
             non_system_user_ids.append(user_id)
@@ -1643,8 +1704,6 @@ def get_human_readable_user_ids(user_ids):
             logging.error('User id %s not known in list of user_ids %s' % (
                 user_ids[ind], user_ids))
             raise Exception('User not found.')
-        elif user_settings.user_id == feconf.SYSTEM_COMMITTER_ID:
-            usernames.append('admin')
         elif user_settings.username:
             usernames.append(user_settings.username)
         else:

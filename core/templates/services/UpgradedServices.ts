@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import {
   HttpClient,
   HttpXhrBackend,
@@ -425,7 +425,6 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
-import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -559,8 +558,6 @@ import { StateSolicitAnswerDetailsService } from
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateStatsObjectFactory } from
-  'domain/statistics/StateStatsObjectFactory';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from
@@ -573,8 +570,6 @@ import { StateWrittenTranslationsService } from
 import { StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { StatsReportingService } from
-  'pages/exploration-player-page/services/stats-reporting.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
@@ -686,6 +681,12 @@ interface UpgradedServicesDict {
 export class UpgradedServices {
   getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
+    // We are using eslint disable here for multilines because we have not used
+    // dot notation at a lot of places so it does not seem practical to use
+    // "eslint disable next line" for each of them. Also, we can't use dot
+    // notation either because then "Property 'AdminRouterService' does not
+    // exist on type '{}'" lint error will be raised by the linter.
+    /* eslint-disable-next-line oppia/no-multiline-disable */
     /* eslint-disable dot-notation */
 
     // Topological level: 0.
@@ -827,6 +828,7 @@ export class UpgradedServices {
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
       new MathEquationInputRulesService();
+    upgradedServices['Meta'] = new Meta({});
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['MultipleChoiceInputRulesService'] =
@@ -893,7 +895,6 @@ export class UpgradedServices {
       new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
-    upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
     upgradedServices['StoryNodeObjectFactory'] = new StoryNodeObjectFactory();
     upgradedServices['StoryContentsObjectFactory'] =
@@ -904,7 +905,8 @@ export class UpgradedServices {
     upgradedServices['StoryReferenceObjectFactory'] =
       new StoryReferenceObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
-      new StorySummaryObjectFactory();
+      new StorySummaryObjectFactory(
+        upgradedServices['StoryNodeObjectFactory']);
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
@@ -980,8 +982,7 @@ export class UpgradedServices {
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['ExplorationStatsObjectFactory'] =
-      new ExplorationStatsObjectFactory(
-        upgradedServices['StateStatsObjectFactory']);
+      new ExplorationStatsObjectFactory();
     upgradedServices['ExplorationTaskObjectFactory'] =
       new ExplorationTaskObjectFactory(
         upgradedServices['HighBounceRateTaskObjectFactory'],
@@ -1069,7 +1070,7 @@ export class UpgradedServices {
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['PageTitleService'] = new PageTitleService(
-      upgradedServices['Title']);
+      upgradedServices['Meta'], upgradedServices['Title']);
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
@@ -1461,6 +1462,7 @@ export class UpgradedServices {
         upgradedServices['SubtopicObjectFactory']);
     upgradedServices['ReadOnlyTopicObjectFactory'] =
       new ReadOnlyTopicObjectFactory(
+        upgradedServices['StoryNodeObjectFactory'],
         upgradedServices['SubtopicObjectFactory'],
         upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['ReviewTestBackendApiService'] =
@@ -1639,13 +1641,6 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
 
     // Topological level: 6.
-    upgradedServices['PlaythroughService'] =
-      new PlaythroughService(
-        upgradedServices['ExplorationFeaturesService'],
-        upgradedServices['LearnerActionObjectFactory'],
-        upgradedServices['PlaythroughBackendApiService'],
-        upgradedServices['PlaythroughObjectFactory'],
-        upgradedServices['StopwatchObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
@@ -1660,13 +1655,6 @@ export class UpgradedServices {
         upgradedServices['AnswerClassificationService'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateTopAnswersStatsBackendApiService']);
-    upgradedServices['StatsReportingService'] = new StatsReportingService(
-      upgradedServices['ContextService'],
-      upgradedServices['MessengerService'],
-      upgradedServices['PlaythroughService'],
-      upgradedServices['SiteAnalyticsService'],
-      upgradedServices['StatsReportingBackendApiService'],
-      upgradedServices['StopwatchObjectFactory']);
 
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(

@@ -44,7 +44,8 @@ describe('Topic preview tab', function() {
       thumbnail_bg_color: '#F8BF74',
       description: 'Description',
       story_is_published: true,
-      completed_node_titles: ['Chapter 1']
+      completed_node_titles: ['Chapter 1'],
+      pending_node_dicts: []
     };
     var story = storySummaryObjectFactory.createFromBackendDict(
       sampleStorySummaryBackendDict);

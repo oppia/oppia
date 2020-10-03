@@ -34,7 +34,7 @@ export class ProfileLinkImageBackendApiService {
     private http: HttpClient
   ) {}
 
-  fetchProfilePictureData(profileImageUrl: string): Promise<string> {
+  async fetchProfilePictureDataAsync(profileImageUrl: string): Promise<string> {
     return this.http.get<ProfileDict>(profileImageUrl).pipe(
       // A URL encoded base64 image is treated as unsafe by Angular. This is
       // because angular's security doesn't allow anything outside the following

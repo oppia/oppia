@@ -150,6 +150,7 @@ import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFact
 import { AssignedSkillObjectFactory } from 'domain/skill/assigned-skill-object.factory';
 import { AugmentedSkillSummaryObjectFactory } from 'domain/skill/augmented-skill-summary-object.factory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
 import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service.ts';
@@ -162,7 +163,6 @@ import { LearnerAnswerDetailsObjectFactory } from 'domain/statistics/LearnerAnsw
 import { LearnerAnswerInfoObjectFactory } from 'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { PlaythroughIssueObjectFactory } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
-import { StateStatsObjectFactory } from 'domain/statistics/StateStatsObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
@@ -649,6 +649,7 @@ export const angularServices: [string, unknown][] = [
   ['ShortSkillSummaryObjectFactory', ShortSkillSummaryObjectFactory],
   ['SidebarStatusService', SidebarStatusService],
   ['SiteAnalyticsService', SiteAnalyticsService],
+  ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
   ['SkillDifficultyObjectFactory', SkillDifficultyObjectFactory],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
@@ -681,7 +682,6 @@ export const angularServices: [string, unknown][] = [
   ['StateRecordedVoiceoversService', StateRecordedVoiceoversService],
   ['StateSolicitAnswerDetailsService', StateSolicitAnswerDetailsService],
   ['StateSolutionService', StateSolutionService],
-  ['StateStatsObjectFactory', StateStatsObjectFactory],
   ['StateTopAnswersStatsBackendApiService',
     StateTopAnswersStatsBackendApiService],
   ['StateTopAnswersStatsObjectFactory', StateTopAnswersStatsObjectFactory],
