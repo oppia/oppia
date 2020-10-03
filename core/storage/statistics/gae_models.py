@@ -1626,7 +1626,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     # ID of exploration.
     exploration_id = datastore_services.StringProperty(indexed=True)
     # Version of exploration.
-    version = datastore_services.StringProperty(indexed=False)
+    version = datastore_services.StringProperty(indexed=True)
     # Number of students who started the exploration.
     num_starts = datastore_services.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration.

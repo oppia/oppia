@@ -40,10 +40,12 @@ import feconf
 import python_utils
 import utils
 
-(job_models, exp_models, base_models, classifier_models) = (
-    models.Registry.import_models([
-        models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
-        models.NAMES.classifier]))
+(
+    job_models, exp_models, base_models, classifier_models, improvements_models,
+) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
+    models.NAMES.classifier, models.NAMES.improvements
+])
 
 datastore_services = models.Registry.import_datastore_services()
 search_services = models.Registry.import_search_services()
@@ -2310,3 +2312,32 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_summary_model.last_updated,
             migrated_summary_model.last_updated)
+
+
+class RegenerateStringPropertyIndexOneOffJobTests(test_utils.GenericTestBase):
+
+    def test_outputs_successful_writes(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+        self.save_new_valid_exploration('exp2', 'owner2')
+
+        improvements_models.TaskEntryModel.create(
+            'exploration', 'eid', 1, 'high_bounce_rate', 'state',
+            'Introduction')
+
+        job_id = (
+            exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
+            .create_new())
+        exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
+            .get_output(job_id))
+        output = [ast.literal_eval(s) for s in stringified_output]
+
+        self.assertItemsEqual(output, [
+            ['ExplorationModel', 2],
+            ['TaskEntryModel', 1],
+        ])
