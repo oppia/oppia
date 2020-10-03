@@ -64,13 +64,15 @@ def put_multi(models, update_last_updated_time=True):
     """Stores a sequence of Model instances.
 
     Args:
-        models: datastore_services.Model. A sequence of Model instances.
+        models: list(datastore_services.Model). A list of Model instances.
         update_last_updated_time: bool. Whether to update the last_updated field
             of the entities.
 
     Returns:
         list(str). A list with the stored keys.
     """
+    # TODO(#10863): Stop passing in update_last_updated_time through these
+    # top-level functions.
     return ndb.put_multi(
         models, update_last_updated_time=update_last_updated_time)
 
@@ -79,13 +81,15 @@ def put_multi_async(models, update_last_updated_time=True):
     """Stores a sequence of Model instances asynchronously.
 
     Args:
-        models: datastore_services.Model. A sequence of Model instances.
+        models: list(datastore_services.Model). A list of Model instances.
         update_last_updated_time: bool. Whether to update the last_updated field
             of the entities.
 
     Returns:
         list(future). A list of futures.
     """
+    # TODO(#10863): Stop passing in update_last_updated_time through these
+    # top-level functions.
     return ndb.put_multi_async(
         models, update_last_updated_time=update_last_updated_time)
 
@@ -94,7 +98,7 @@ def delete_multi(keys):
     """Deletes a sequence of keys.
 
     Args:
-        keys: list(str). A sequence of keys.
+        keys: list(str). A list of keys.
 
     Returns:
         list(None). A list of Nones, one per deleted model.
