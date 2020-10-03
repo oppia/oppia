@@ -20,7 +20,6 @@ import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
-import { StoryNode } from 'domain/story/story-node.model';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Create New Chapter Modal Controller', function() {

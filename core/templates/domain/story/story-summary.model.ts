@@ -17,9 +17,6 @@
  * story summary domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   StoryNode, StoryNodeBackendDict
 } from './story-node.model';

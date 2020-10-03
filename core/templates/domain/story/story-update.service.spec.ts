@@ -20,8 +20,6 @@
 // story-update.service.ts is upgraded to Angular 8.
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
-import { StoryNode } from
-  'domain/story/story-node.model';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
