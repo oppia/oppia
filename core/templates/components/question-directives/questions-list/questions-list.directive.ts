@@ -75,8 +75,6 @@ angular.module('oppia').directive('questionsList', [
         skillDescriptionsAreShown: '&skillDescriptionsAreShown',
         selectSkillModalIsShown: '&selectSkillModalIsShown',
         getSkillIds: '&skillIds',
-        getQuestionSummariesAsync: '=',
-        isLastPage: '=isLastQuestionBatch',
         getAllSkillSummaries: '&allSkillSummaries',
         canEditQuestion: '&',
         getSkillIdToRubricsObject: '&skillIdToRubricsObject',
@@ -90,7 +88,7 @@ angular.module('oppia').directive('questionsList', [
         'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$timeout', '$uibModal', 'AlertsService',
+        '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
         'ContextService', 'EditableQuestionBackendApiService',
         'ImageLocalStorageService', 'MisconceptionObjectFactory',
         'QuestionCreationService', 'QuestionObjectFactory',
@@ -99,7 +97,7 @@ angular.module('oppia').directive('questionsList', [
         'SkillBackendApiService', 'SkillDifficultyObjectFactory',
         'WindowDimensionsService', 'NUM_QUESTIONS_PER_PAGE',
         function(
-            $location, $timeout, $uibModal, AlertsService,
+            $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
             ImageLocalStorageService, MisconceptionObjectFactory,
             QuestionCreationService, QuestionObjectFactory,
@@ -118,7 +116,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionEditorIsShown = false;
             ctrl.question = null;
             _reInitializeSelectedSkillIds();
-            ctrl.getQuestionSummariesAsync(
+            QuestionsListService.getQuestionSummariesAsync(
               ctrl.selectedSkillId, resetHistoryAndFetch,
               resetHistoryAndFetch
             );
@@ -135,7 +133,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.goToNextPage = function() {
             _reInitializeSelectedSkillIds();
             QuestionsListService.incrementPageNumber();
-            ctrl.getQuestionSummariesAsync(
+            QuestionsListService.getQuestionSummariesAsync(
               ctrl.selectedSkillId, true, false
             );
           };
@@ -143,7 +141,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.goToPreviousPage = function() {
             _reInitializeSelectedSkillIds();
             QuestionsListService.decrementPageNumber();
-            ctrl.getQuestionSummariesAsync(
+            QuestionsListService.getQuestionSummariesAsync(
               ctrl.selectedSkillId, false, false
             );
           };
@@ -174,7 +172,7 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.question.toBackendDict(true), imagesData
               ).then(function() {
                 QuestionsListService.resetPageNumber();
-                ctrl.getQuestionSummariesAsync(
+                QuestionsListService.getQuestionSummariesAsync(
                   ctrl.selectedSkillId, true, true
                 );
                 ctrl.questionIsBeingSaved = false;
@@ -194,7 +192,7 @@ angular.module('oppia').directive('questionsList', [
                       QuestionUndoRedoService.clearChanges();
                       ctrl.editorIsOpen = false;
                       ctrl.questionIsBeingSaved = false;
-                      ctrl.getQuestionSummariesAsync(
+                      QuestionsListService.getQuestionSummariesAsync(
                         ctrl.selectedSkillId, true, true
                       );
                     }, function(error) {
@@ -215,6 +213,10 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.getSkillEditorUrl = function(skillId) {
             return `/skill_editor/${skillId}`;
+          };
+
+          ctrl.isLastPage = function() {
+            return QuestionsListService.isLastQuestionBatch();
           };
 
           ctrl.cancel = function() {
@@ -401,7 +403,7 @@ angular.module('oppia').directive('questionsList', [
                 questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
               ).then(function() {
                 QuestionsListService.resetPageNumber();
-                ctrl.getQuestionSummariesAsync(
+                QuestionsListService.getQuestionSummariesAsync(
                   ctrl.selectedSkillId, true, true
                 );
                 AlertsService.addSuccessMessage('Deleted Question');
@@ -413,7 +415,7 @@ angular.module('oppia').directive('questionsList', [
                     questionId, [{id: summary.getId(), task: 'remove'}]
                   ).then(function() {
                     QuestionsListService.resetPageNumber();
-                    ctrl.getQuestionSummariesAsync(
+                    QuestionsListService.getQuestionSummariesAsync(
                       ctrl.selectedSkillId, true, true
                     );
                     AlertsService.addSuccessMessage('Deleted Question');
@@ -486,7 +488,7 @@ angular.module('oppia').directive('questionsList', [
                       if (count === changedDifficultyCount) {
                         $timeout(function() {
                           QuestionsListService.resetPageNumber();
-                          ctrl.getQuestionSummariesAsync(
+                          QuestionsListService.getQuestionSummariesAsync(
                             ctrl.selectedSkillId, true, true
                           );
                           AlertsService.addSuccessMessage('Updated Difficulty');
@@ -579,7 +581,7 @@ angular.module('oppia').directive('questionsList', [
                 $timeout(function() {
                   QuestionsListService.resetPageNumber();
                   _reInitializeSelectedSkillIds();
-                  ctrl.getQuestionSummariesAsync(
+                  QuestionsListService.getQuestionSummariesAsync(
                     ctrl.selectedSkillId, true, true
                   );
                   ctrl.editorIsOpen = false;
@@ -636,7 +638,10 @@ angular.module('oppia').directive('questionsList', [
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               QuestionsListService.onQuestionSummariesInitialized.subscribe(
-                () => _initTab(false)));
+                () => {
+                  _initTab(false);
+                  $rootScope.$apply();
+                }));
             ctrl.showDifficultyChoices = false;
             ctrl.difficultyCardIsShown = (
               !WindowDimensionsService.isWindowNarrow());

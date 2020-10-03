@@ -45,13 +45,9 @@ angular.module('oppia').directive('questionsTab', [
             TopicsAndSkillsDashboardBackendApiService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          $scope.getQuestionSummariesAsync =
-            QuestionsListService.getQuestionSummariesAsync;
           $scope.getGroupedSkillSummaries =
             TopicEditorStateService.getGroupedSkillSummaries;
           $scope.getSkillsCategorizedByTopics = null;
-          $scope.isLastQuestionBatch =
-            QuestionsListService.isLastQuestionBatch;
           var _initTab = function() {
             $scope.question = null;
             $scope.skillId = null;
@@ -84,7 +80,7 @@ angular.module('oppia').directive('questionsTab', [
           $scope.reinitializeQuestionsList = function(skillId) {
             $scope.selectedSkillId = skillId;
             QuestionsListService.resetPageNumber();
-            $scope.getQuestionSummariesAsync(
+            QuestionsListService.getQuestionSummariesAsync(
               skillId, true, true
             );
           };

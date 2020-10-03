@@ -80,7 +80,7 @@ export class QuestionsListService {
       this._nextCursorForQuestions = '';
     }
 
-    let num = AppConstants.NUM_QUESTIONS_PER_PAGE;
+    const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
 
     if (!skillId) {
       return;
@@ -98,19 +98,19 @@ export class QuestionsListService {
               createFromBackendDict(summary));
         });
 
+        this._setNextQuestionsCursor(response.nextCursor);
         this._setQuestionSummariesForOneSkill(
           questionSummaries, resetHistory);
-        this._setNextQuestionsCursor(response.nextCursor);
       });
     }
   }
 
   getCachedQuestionSummaries(): QuestionSummaryForOneSkill[] {
-    let num = AppConstants.NUM_QUESTIONS_PER_PAGE;
+    const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
 
     return this._questionSummariesForOneSkill.slice(
       this._currentPage * num, (this._currentPage + 1) * num).map(question => {
-      let summary = this.formatRtePreviewPipe.transform(
+      const summary = this.formatRtePreviewPipe.transform(
         question.getQuestionSummary().getQuestionContent());
 
       question.getQuestionSummary().setQuestionContent(
