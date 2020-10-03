@@ -17,6 +17,13 @@
  * story summary domain objects.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import {
+  StoryNode, StoryNodeBackendDict, StoryNodeObjectFactory
+} from './StoryNodeObjectFactory';
+
 export interface StorySummaryBackendDict {
   'id': string;
   'title': string;
@@ -26,7 +33,8 @@ export interface StorySummaryBackendDict {
   'description': string;
   'story_is_published': boolean;
   'completed_node_titles': string[],
-  'url_fragment': string
+  'url_fragment': string,
+  'pending_node_dicts': StoryNodeBackendDict[]
 }
 
 export class StorySummary {
@@ -40,6 +48,7 @@ export class StorySummary {
     private _storyIsPublished: boolean,
     private _completedNodeTitles: string[],
     private _urlFragment: string,
+    private _pendingNodes: StoryNode[]
   ) {}
 
   getId(): string {
@@ -78,8 +87,26 @@ export class StorySummary {
     return this._urlFragment;
   }
 
-  static createFromBackendDict(
+  getPendingNodes(): StoryNode[] {
+    return this._pendingNodes;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StorySummaryObjectFactory {
+  constructor(
+    private storyNodeObjectFactory: StoryNodeObjectFactory
+  ) {}
+
+  createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
+    let pendingNodes = (
+      storySummaryBackendDict.pending_node_dicts.map(storyNodeDict => {
+        return this.storyNodeObjectFactory.createFromBackendDict(
+          storyNodeDict);
+      }));
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
@@ -89,7 +116,8 @@ export class StorySummary {
       storySummaryBackendDict.description,
       storySummaryBackendDict.story_is_published,
       storySummaryBackendDict.completed_node_titles,
-      storySummaryBackendDict.url_fragment
+      storySummaryBackendDict.url_fragment,
+      pendingNodes
     );
   }
 }
