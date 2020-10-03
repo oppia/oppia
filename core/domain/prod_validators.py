@@ -1451,7 +1451,10 @@ class GeneralFeedbackThreadModelValidator(
                 ['%s.%s' % (item.id, i) for i in python_utils.RANGE(
                     item.message_count)])
         ]
-        if item.original_author_id:
+        if (
+                item.original_author_id and
+                user_services.is_user_id_valid(item.original_author_id)
+        ):
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids', user_models.UserSettingsModel,
@@ -1467,6 +1470,16 @@ class GeneralFeedbackThreadModelValidator(
                     '%s_ids' % item.entity_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.entity_type],
                     [item.entity_id]))
+        if (
+                item.last_nonempty_message_author_id and
+                user_services.is_user_id_valid(
+                    item.last_nonempty_message_author_id)
+        ):
+            field_name_to_external_model_references.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    'last_nonempty_message_author_ids',
+                    user_models.UserSettingsModel,
+                    [item.last_nonempty_message_author_id]))
         return field_name_to_external_model_references
 
     @classmethod
@@ -1501,10 +1514,51 @@ class GeneralFeedbackThreadModelValidator(
                         item.id))
 
     @classmethod
+    def _validate_original_author_id(cls, item):
+        """Validate that original author ID is in correct format.
+
+        Args:
+            item: GeneralFeedbackThreadModel. The model to validate.
+        """
+        if (
+                item.original_author_id and
+                not user_services.is_user_or_pseudonymous_id(
+                    item.original_author_id)
+        ):
+            cls._add_error(
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
+                'Entity id %s: Original author ID %s is in a wrong format '
+                'should be either pid_<32 chars> or uid_<32 chars>' % (
+                    item.id, item.original_author_id))
+
+    @classmethod
+    def _validate_last_nonempty_message_author_id(cls, item):
+        """Validate that last nonempty message author ID is in correct format.
+
+        Args:
+            item: GeneralFeedbackThreadModel. The model to validate.
+        """
+        if (
+                item.last_nonempty_message_author_id and
+                not user_services.is_user_or_pseudonymous_id(
+                    item.last_nonempty_message_author_id)
+        ):
+            cls._add_error(
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
+                'Entity id %s: Last non-empty message author ID %s is in a '
+                'wrong format should be either pid_<32 chars> or '
+                'uid_<32 chars>' % (
+                    item.id, item.last_nonempty_message_author_id))
+
+    @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_entity_type,
-            cls._validate_has_suggestion]
+            cls._validate_has_suggestion,
+            cls._validate_original_author_id,
+            cls._validate_last_nonempty_message_author_id]
 
 
 class GeneralFeedbackMessageModelValidator(
@@ -1519,15 +1573,43 @@ class GeneralFeedbackMessageModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        author_ids = []
-        if item.author_id:
-            author_ids = [item.author_id]
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'author_ids', user_models.UserSettingsModel, author_ids),
+        field_name_to_external_model_references = [
             base_model_validators.ExternalModelFetcherDetails(
                 'feedback_thread_ids',
-                feedback_models.GeneralFeedbackThreadModel, [item.thread_id])]
+                feedback_models.GeneralFeedbackThreadModel,
+                [item.thread_id]
+            )
+        ]
+        if (
+                item.author_id and
+                user_services.is_user_id_valid(item.author_id)
+        ):
+            field_name_to_external_model_references.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    'author_ids',
+                    user_models.UserSettingsModel,
+                    [item.author_id]
+                )
+            )
+        return field_name_to_external_model_references
+
+    @classmethod
+    def _validate_author_id(cls, item):
+        """Validate that author ID is in correct format.
+
+        Args:
+            item: GeneralFeedbackMessageModel. The model to validate.
+        """
+        if (
+                item.author_id and
+                not user_services.is_user_or_pseudonymous_id(item.author_id)
+        ):
+            cls._add_error(
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
+                'Entity id %s: Author ID %s is in a wrong format should be '
+                'either pid_<32 chars> or uid_<32 chars>' % (
+                    item.id, item.author_id))
 
     @classmethod
     def _validate_message_id(
@@ -1580,6 +1662,10 @@ class GeneralFeedbackMessageModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_message_id]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_author_id]
 
 
 class GeneralFeedbackThreadUserModelValidator(
@@ -2626,16 +2712,24 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         field_name_to_external_model_references = [
             base_model_validators.ExternalModelFetcherDetails(
                 'feedback_thread_ids',
-                feedback_models.GeneralFeedbackThreadModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'author_ids', user_models.UserSettingsModel, [item.author_id])]
+                feedback_models.GeneralFeedbackThreadModel, [item.id])
+        ]
+        if user_services.is_user_id_valid(item.author_id):
+            field_name_to_external_model_references.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    'author_ids',
+                    user_models.UserSettingsModel,
+                    [item.author_id]
+                )
+            )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
-        if item.final_reviewer_id:
+        if item.final_reviewer_id and user_services.is_user_id_valid(
+                item.final_reviewer_id):
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'reviewer_ids', user_models.UserSettingsModel,
@@ -2711,7 +2805,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                         target_model.version, item.target_type, item.target_id))
 
     @classmethod
-    def _validate_final_reveiwer_id(cls, item):
+    def _validate_final_reviewer_id(cls, item):
         """Validate that final reviewer id is None if suggestion is
         under review.
 
@@ -2726,13 +2820,14 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 'Entity id %s: Final reviewer id is empty but '
                 'suggestion is %s' % (item.id, item.status))
 
-        if item.final_reviewer_id and (
-                item.status == suggestion_models.STATUS_IN_REVIEW):
-            cls._add_error(
-                'final %s' % (
-                    base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
-                'Entity id %s: Final reviewer id %s is not empty but '
-                'suggestion is in review' % (item.id, item.final_reviewer_id))
+        if item.final_reviewer_id:
+            if item.status == suggestion_models.STATUS_IN_REVIEW:
+                cls._add_error(
+                    'final %s' % (
+                        base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
+                    'Entity id %s: Final reviewer id %s is not empty but '
+                    'suggestion is in review' % (
+                        item.id, item.final_reviewer_id))
 
     @classmethod
     def _validate_score_category(
@@ -2807,7 +2902,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_target_type,
-            cls._validate_final_reveiwer_id]
+            cls._validate_final_reviewer_id]
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
@@ -2834,21 +2929,64 @@ class GeneralVoiceoverApplicationModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        field_name_to_external_model_references = [
-            base_model_validators.ExternalModelFetcherDetails(
-                'author_ids', user_models.UserSettingsModel, [item.author_id])]
+        field_name_to_external_model_references = []
+        if user_services.is_user_id_valid(item.author_id):
+            field_name_to_external_model_references.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    'author_ids',
+                    user_models.UserSettingsModel,
+                    [item.author_id]
+                )
+            )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
-        if item.final_reviewer_id is not None:
+        if (
+                item.final_reviewer_id and
+                user_services.is_user_id_valid(item.final_reviewer_id)
+        ):
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'final_reviewer_ids', user_models.UserSettingsModel,
                     [item.final_reviewer_id]))
         return field_name_to_external_model_references
+
+    @classmethod
+    def _validate_final_reviewer_id(cls, item):
+        """Validate that final reviewer ID is in correct format.
+
+        Args:
+            item: GeneralSuggestionModel. The model to validate.
+        """
+        if not user_services.is_user_or_pseudonymous_id(item.final_reviewer_id):
+            cls._add_error(
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
+                'Entity id %s: Final reviewer ID %s is in a wrong format '
+                'should be either pid_<32 chars> or uid_<32 chars>'
+                % (item.id, item.final_reviewer_id))
+
+    @classmethod
+    def _validate_author_id(cls, item):
+        """Validate that author ID is in correct format.
+
+        Args:
+            item: GeneralSuggestionModel. The model to validate.
+        """
+        if not user_services.is_user_or_pseudonymous_id(item.author_id):
+            cls._add_error(
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
+                'Entity id %s: Author ID %s is in a wrong format should be '
+                'either pid_<32 chars> or uid_<32 chars>' % (
+                    item.id, item.author_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_final_reviewer_id, cls._validate_author_id]
 
 
 class CommunityContributionStatsModelValidator(

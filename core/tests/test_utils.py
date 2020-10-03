@@ -389,6 +389,8 @@ class TestBase(unittest.TestCase):
     NEW_USER_USERNAME = 'newuser'
     DEFAULT_END_STATE_NAME = 'End'
 
+    PSEUDONYMOUS_ID = 'pid_%s' % (32 * 'a')
+
     VERSION_0_STATES_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: {
             'content': [{'type': 'text', 'value': ''}],

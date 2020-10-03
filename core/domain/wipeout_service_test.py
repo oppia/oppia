@@ -4012,6 +4012,64 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertIsNone(
             exp_models.ExplorationModel.get_by_id(self.EXPLORATION_2_ID))
 
+    def test_delete_user_with_collection_and_exploration_repeated_is_successful(
+            self):
+        self.save_new_valid_exploration(
+            self.EXPLORATION_1_ID,
+            self.user_1_id)
+        self.save_new_valid_collection(
+            self.COLLECTION_1_ID,
+            self.user_1_id,
+            exploration_id=self.EXPLORATION_1_ID)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            collection_models.CollectionModel.get_by_id(self.COLLECTION_1_ID))
+        self.assertIsNotNone(
+            exp_models.ExplorationModel.get_by_id(self.EXPLORATION_1_ID))
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            collection_models.CollectionModel.get_by_id(self.COLLECTION_1_ID))
+        self.assertIsNone(
+            exp_models.ExplorationModel.get_by_id(self.EXPLORATION_1_ID))
+
+        self.save_new_valid_exploration(
+            self.EXPLORATION_1_ID,
+            self.user_1_id)
+        self.save_new_valid_collection(
+            self.COLLECTION_1_ID,
+            self.user_1_id,
+            exploration_id=self.EXPLORATION_1_ID)
+
+        self.assertIsNotNone(
+            collection_models.CollectionModel.get_by_id(self.COLLECTION_1_ID))
+        self.assertIsNotNone(
+            exp_models.ExplorationModel.get_by_id(self.EXPLORATION_1_ID))
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            collection_models.CollectionModel.get_by_id(self.COLLECTION_1_ID))
+        self.assertIsNone(
+            exp_models.ExplorationModel.get_by_id(self.EXPLORATION_1_ID))
+
     def test_delete_user_with_multiple_users_is_successful(self):
         wipeout_service.pre_delete_user(self.user_2_id)
 

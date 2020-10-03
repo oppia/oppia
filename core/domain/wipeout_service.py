@@ -415,14 +415,10 @@ def _hard_delete_explorations_and_collections(pending_deletion_request):
         pending_deletion_request.user_id,
         pending_deletion_request.exploration_ids,
         force_deletion=True)
-    pending_deletion_request.exploration_ids = []
-    save_pending_deletion_requests([pending_deletion_request])
     collection_services.delete_collections(
         pending_deletion_request.user_id,
         pending_deletion_request.collection_ids,
         force_deletion=True)
-    pending_deletion_request.collection_ids = []
-    save_pending_deletion_requests([pending_deletion_request])
 
 
 def _generate_entity_to_pseudonymized_ids_mapping(entity_ids):
