@@ -49,6 +49,8 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
           // TODO(bhenning): The order of choices should be meaningful. E.g.,
           // having "is equal to" for most interactions first makes sense. They
           // should ideally be ordered based on likelihood of being used.
+          // Currently, they are shown in the same order as defined in
+          // interaction_specs.json.
           for (var ruleType in ruleTypesToDescriptions) {
             choices.push({
               id: ruleType,
