@@ -1710,7 +1710,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
     def _create_question_suggestion_with_question_html_content(
             self, question_html_content):
         """Creates a question suggestion with the html content used for the
-        question in the suggestion suggestion.
+        question in the question suggestion.
         """
         with self.swap(
             feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html_content):
@@ -1830,7 +1830,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
     def test_create_from_suggestion_returns_info_for_question_suggestion(self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
-                '<p> default question content </p>'))
+                '<p>default question content</p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -1937,8 +1937,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                     rejected_translation_suggestion)
             )
 
-    def test_create_from_suggestion_returns_info_with_plain_text_for_empty_html(
-            self):
+    def test_create_from_suggestion_returns_info_for_empty_html(self):
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
                 ''))
@@ -2590,6 +2589,21 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self.assertEqual(len(reviewable_suggestion_email_infos), 1)
         self.assertEqual(reviewable_suggestion_email_infos, [[]])
 
+    def test_get_returns_empty_for_translation_reviewers_if_only_question_exist(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.reviewer_1_id)
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
+
     def test_get_returns_empty_for_accepted_suggestions(self):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'hi')
@@ -2616,21 +2630,6 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         suggestion_services.reject_suggestion(
             translation_suggestion.suggestion_id, self.reviewer_1_id,
             'review message')
-
-        reviewable_suggestion_email_infos = (
-            suggestion_services
-            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                [self.reviewer_1_id]))
-
-        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
-        self.assertEqual(reviewable_suggestion_email_infos, [[]])
-
-    def test_get_returns_empty_for_translation_reviewers_if_only_question_exist(
-            self):
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_1_id, 'hi')
-        self._create_question_suggestion_with_skill_id_and_author_id(
-            'skill_1', self.reviewer_1_id)
 
         reviewable_suggestion_email_infos = (
             suggestion_services
@@ -2735,7 +2734,6 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                     [self.reviewer_1_id]))
 
         self.assertEqual(len(reviewable_suggestion_email_infos), 1)
-        self.assertEqual(len(reviewable_suggestion_email_infos[0]), 1)
         self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
             reviewable_suggestion_email_infos[0],
             expected_reviewable_suggestion_email_infos)

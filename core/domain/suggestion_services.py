@@ -608,8 +608,8 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
 
 def _get_plain_text_from_html_content_string(html_content_string):
     """Retrieves the plain text from the given html content string. RTE element
-    occurrences in the html are replaced by its corresponding name in square
-    brackets.
+    occurrences in the html are replaced by its corresponding name capitalized
+    in square brackets.
     eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
         Sample2 </p> will give as output: Sample1 [MATH] Sample2.
     Note: similar logic exists in the frontend in format-rte-preview.filter.ts.
@@ -649,7 +649,8 @@ def _get_plain_text_from_html_content_string(html_content_string):
 
 
 def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
-    """Creates a ReviewableSuggestionEmailInfo object from the given suggestion.
+    """Creates an object with the key information needed to notify reviewers or
+    admins that the given suggestion needs review.
     Note: the suggestions must be suggestions that are available for review on
     the Contributor Dashboard.
 
@@ -680,18 +681,16 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
             'Dashboard for ReviewableSuggestionEmailInfo object creation, '
             'recieved suggestion type: %s' % suggestion.suggestion_type)
     html_content_strings = suggestion.get_all_html_content_strings()
-    # The first element in the html_content_strings list is the
-    # question or translation content.
     html_content_string = ''
     if suggestion.suggestion_type == (
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-        # The translation html is always the first in the list of translation
-        # suggestion html content strings.
+        # The translation html is always the first element in the list of
+        # translation suggestion html content strings.
         html_content_string = html_content_strings[0]
     elif suggestion.suggestion_type == (
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-        # The question content html is always the last in the list of question
-        # suggestion html content strings.
+        # The question content html is always the last element in the list of
+        # question suggestion html content strings.
         html_content_string = html_content_strings[-1]
     plain_text_content = _get_plain_text_from_html_content_string(
         html_content_string)
@@ -703,7 +702,7 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
 
 def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
     """For each user, returns information that will be used to notify reviewers
-    about the suggestions waiting longest for review that the reviewer has
+    about the suggestions waiting longest for review, that the reviewer has
     permissions to review.
 
     Args:
@@ -718,7 +717,6 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         the suggestion email content info objects are sorted in descending order
         based on review wait time.
     """
-
     # Get each reviewer's review permissions.
     users_contribution_rights = user_services.get_users_contribution_rights(
         reviewer_ids
@@ -730,7 +728,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
     )
 
     # Create a dictionary to keep track of the translation suggestions that
-    # have been waiting longest for review in each language code.
+    # have been waiting longest for review for each language code.
     translation_suggestions_by_lang_code_dict = {}
 
     reviewers_reviewable_suggestion_infos = []
