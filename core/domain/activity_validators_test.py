@@ -33,6 +33,7 @@ from core.tests import test_utils
 import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -101,7 +102,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -145,7 +146,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for exploration_ids field check of '
             'ActivityReferencesModel\', '
             '[u"Entity id %s: based on field exploration_ids having '
-            'value 1col, expect model ExplorationModel with id 1col but '
+            'value 1col, expected model ExplorationModel with id 1col but '
             'it doesn\'t exist"]]' % feconf.ACTIVITY_REFERENCE_LIST_FEATURED)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
