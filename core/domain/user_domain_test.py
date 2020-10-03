@@ -37,11 +37,11 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
     def __init__(
             self, display_alias, pin, preferred_language_codes,
             preferred_site_language_code, preferred_audio_language_code,
-            version, user_id=None, fake_field=None):
+            user_id=None, fake_field=None):
         super(MockModifiableUserData, self).__init__(
             display_alias, pin, preferred_language_codes,
             preferred_site_language_code, preferred_audio_language_code,
-            version, user_id=None)
+            user_id=None)
         self.fake_field = fake_field
 
     CURRENT_SCHEMA_VERSION = 2
@@ -55,7 +55,6 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
             modifiable_user_data_dict['preferred_language_codes'],
             modifiable_user_data_dict['preferred_site_language_code'],
             modifiable_user_data_dict['preferred_audio_language_code'],
-            modifiable_user_data_dict['schema_version'],
             modifiable_user_data_dict['user_id'],
             modifiable_user_data_dict['fake_field']
         )
@@ -72,14 +71,16 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
     # then returning a ModifiableUserData domain object.
     @classmethod
     def from_raw_dict(cls, raw_user_data_dict):
-        intial_schema_version = raw_user_data_dict['schema_version']
-        data_schema_version = intial_schema_version
+        data_schema_version = raw_user_data_dict.get('schema_version')
         user_data_dict = raw_user_data_dict
 
         if data_schema_version == 1:
             user_data_dict = cls._convert_v1_dict_to_v2_dict(user_data_dict)
+            data_schema_version = 2
 
-        return MockModifiableUserData.from_dict(user_data_dict)
+        return (
+            MockModifiableUserData.from_dict(user_data_dict),
+            data_schema_version)
 
 
 class UserGlobalPrefsTests(test_utils.GenericTestBase):
@@ -583,7 +584,6 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
 
     def test_initialization_with_none_user_id_is_successful(self):
         """Testing init method user id set None."""
-        schema_version = 1
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -593,7 +593,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': 'preferred_audio_language_code',
             'user_id': None,
         }
-        modifiable_user_data = (
+        (modifiable_user_data, final_schema_version) = (
             user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
         )
 
@@ -613,11 +613,10 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_audio_language_code'
         )
         self.assertIsNone(modifiable_user_data.user_id)
-        self.assertEqual(modifiable_user_data.version, schema_version)
+        self.assertEqual(final_schema_version, 1)
 
     def test_initialization_with_valid_user_id_is_successful(self):
         """Testing init method with a valid user id set."""
-        schema_version = 1
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -627,7 +626,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': 'preferred_audio_language_code',
             'user_id': 'user_id',
         }
-        modifiable_user_data = (
+        (modifiable_user_data, final_schema_version) = (
             user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
         )
 
@@ -647,7 +646,41 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_audio_language_code'
         )
         self.assertEqual(modifiable_user_data.user_id, 'user_id')
-        self.assertEqual(modifiable_user_data.version, schema_version)
+        self.assertEqual(final_schema_version, 1)
+
+    def test_from_raw_dict_with_none_schema_version_raises_error(self):
+        user_data_dict = {
+            'schema_version': None,
+            'display_alias': 'display_alias',
+            'pin': '123',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'user_id': 'user_id',
+        }
+        error_msg = 'Invalid modifiable user data: no schema version specified.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
+
+    def test_from_raw_dict_with_invalid_schema_version_raises_error(self):
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '123',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'user_id': 'user_id',
+        }
+        invalid_schema_versions = [
+            -1, 0, user_domain.ModifiableUserData.CURRENT_SCHEMA_VERSION + 1,
+            '', 'abc', '-1', '1'
+        ]
+        for version in invalid_schema_versions:
+            error_msg = 'Invalid version %s received.' % version
+            user_data_dict['schema_version'] = version
+            with self.assertRaisesRegexp(Exception, error_msg):
+                user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     # This test should be modified to use the original class ModifiableUserData
     # itself when the CURRENT_SCHEMA_VERSION has been updated to 2 or higher.
@@ -662,7 +695,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'user_id': None,
             'fake_field': 'set_value'
         }
-        modifiable_user_data = (
+        (modifiable_user_data, final_schema_version) = (
             MockModifiableUserData.from_raw_dict(user_data_dict))
         self.assertEqual(modifiable_user_data.display_alias, 'name')
         self.assertEqual(modifiable_user_data.pin, '123')
@@ -674,7 +707,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             modifiable_user_data.preferred_audio_language_code, 'en')
         self.assertEqual(modifiable_user_data.fake_field, 'set_value')
         self.assertEqual(modifiable_user_data.user_id, None)
-        self.assertEqual(modifiable_user_data.version, 2)
+        self.assertEqual(final_schema_version, 2)
 
     # This test should be modified to use the original class ModifiableUserData
     # itself when the CURRENT_SCHEMA_VERSION has been updated to 2 or higher.
@@ -688,8 +721,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': 'en',
             'user_id': None
         }
-        modifiable_user_data = MockModifiableUserData.from_raw_dict(
-            user_data_dict)
+        (modifiable_user_data, final_schema_version) = (
+            MockModifiableUserData.from_raw_dict(user_data_dict))
         self.assertEqual(modifiable_user_data.display_alias, 'name')
         self.assertEqual(modifiable_user_data.pin, '123')
         self.assertEqual(
@@ -700,4 +733,4 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             modifiable_user_data.preferred_audio_language_code, 'en')
         self.assertEqual(modifiable_user_data.fake_field, 'default_value')
         self.assertEqual(modifiable_user_data.user_id, None)
-        self.assertEqual(modifiable_user_data.version, 2)
+        self.assertEqual(final_schema_version, 2)
