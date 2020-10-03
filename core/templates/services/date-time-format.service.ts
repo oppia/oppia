@@ -51,11 +51,8 @@ export class DateTimeFormatService {
     return dayjs(date).format('MMM D hh:mm A');
   }
   // Returns just the date.
-  getLocaleDateString(millisSinceEpoch: number | null): string {
-    let date = new Date();
-    if (millisSinceEpoch !== null) {
-      date = new Date(millisSinceEpoch);
-    }
+  getLocaleDateString(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
     return date.toLocaleDateString();
   }
   // Returns whether the date is at most one week before the current date.
