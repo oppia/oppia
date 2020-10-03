@@ -28,10 +28,11 @@ angular.module('oppia').component('oppiaShortResponseRatioExpressionInput', {
   controller: [
     '$attrs', 'HtmlEscaperService', 'RatioObjectFactory',
     function($attrs, HtmlEscaperService, RatioObjectFactory) {
-    var ctrl = this;
-    ctrl.$onInit = function() {
-      var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      ctrl.answer = RatioObjectFactory.fromList(answer).toAnswerString();
-    };
-  }]
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.answer = RatioObjectFactory.fromList(answer).toAnswerString();
+      };
+    }
+  ]
 });
