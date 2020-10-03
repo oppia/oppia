@@ -1680,8 +1680,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
 
     def _create_translation_suggestion_with_translation_html(
             self, translation_html):
-        """Creates a translation suggestion with the given translation_html.
-        """
+        """Creates a translation suggestion with the given translation_html."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': 'state_1',
@@ -2220,7 +2219,8 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-image></oppia-noninteractive-image> </p>'))
+                '<oppia-noninteractive-image></oppia-noninteractive-image>'
+                '</p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,

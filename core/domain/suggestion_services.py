@@ -684,12 +684,12 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     # question or translation content.
     html_content_string = ''
     if suggestion.suggestion_type == (
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
         # The translation html is always the first in the list of translation
         # suggestion html content strings.
         html_content_string = html_content_strings[0]
     elif suggestion.suggestion_type == (
-        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
         # The question content html is always the last in the list of question
         # suggestion html content strings.
         html_content_string = html_content_strings[-1]
