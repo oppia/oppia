@@ -49,8 +49,8 @@ def get_multi(keys):
         keys: list(str). The keys to look up.
 
     Returns:
-        list(datastore_services.Model). List whose items are either a Model
-        instance or None if the key wasn't found.
+        list(datastore_services.Model | None). List whose items are either a
+        Model instance or None if the key wasn't found.
     """
     return ndb.get_multi(keys)
 
@@ -135,7 +135,8 @@ def all_of(*nodes):
         *nodes: datastore_services.Node. The nodes to combine.
 
     Returns:
-        datastore_services.Node. A node combining the conditions using boolean AND.
+        datastore_services.Node. A node combining the conditions using boolean
+        AND.
     """
     return ndb.AND(*nodes)
 
@@ -147,7 +148,8 @@ def any_of(*nodes):
         *nodes: datastore_services.Node. The nodes to combine.
 
     Returns:
-        datastore_services.Node. A node combining the conditions using boolean OR.
+        datastore_services.Node. A node combining the conditions using boolean
+        OR.
     """
     return ndb.OR(*nodes)
 
@@ -186,9 +188,9 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
             corresponding model names for which we have to fetch entities.
 
     Returns:
-        list(list(datastore_services.Model)). The model instances corresponding to the ids and
-        models. The models corresponding to the same tuple in the input are
-        grouped together.
+        list(list(datastore_services.Model)). The model instances corresponding
+        to the ids and models. The models corresponding to the same tuple in the
+        input are grouped together.
     """
     entity_keys = []
     for (model_name, entity_ids) in ids_and_models:
