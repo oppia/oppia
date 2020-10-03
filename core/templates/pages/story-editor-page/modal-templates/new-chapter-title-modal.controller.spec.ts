@@ -20,7 +20,7 @@ import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
-import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
+import { StoryNode } from 'domain/story/story-node.model';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Create New Chapter Modal Controller', function() {
@@ -39,7 +39,7 @@ describe('Create New Chapter Modal Controller', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'StoryObjectFactory', new StoryObjectFactory(
-        new StoryContentsObjectFactory(new StoryNodeObjectFactory())));
+        new StoryContentsObjectFactory()));
     $provide.value('AlertsService', new AlertsService(new LoggerService()));
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {

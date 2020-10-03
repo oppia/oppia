@@ -27,7 +27,7 @@ import {
 } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
-import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
+import { StoryNode } from 'domain/story/story-node.model';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
@@ -54,7 +54,6 @@ export class TopicViewerBackendApiService {
         classroom_url_fragment: classroomUrlFragment,
       });
     var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new StoryNodeObjectFactory(),
       new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
       new ShortSkillSummaryObjectFactory());
     this.http.get<ReadOnlyTopicBackendDict>(topicDataUrl).toPromise().then(

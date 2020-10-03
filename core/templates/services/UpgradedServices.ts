@@ -542,8 +542,6 @@ import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
@@ -825,10 +823,8 @@ export class UpgradedServices {
       new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
-    upgradedServices['StoryNodeObjectFactory'] = new StoryNodeObjectFactory();
     upgradedServices['StoryContentsObjectFactory'] =
-      new StoryContentsObjectFactory(
-        upgradedServices['StoryNodeObjectFactory']);
+      new StoryContentsObjectFactory();
     upgradedServices['StoryObjectFactory'] = new StoryObjectFactory(
       upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['StoryReferenceObjectFactory'] =
@@ -1046,8 +1042,7 @@ export class UpgradedServices {
     upgradedServices['StateEditorService'] = new StateEditorService(
       upgradedServices['SolutionValidityService']);
     upgradedServices['StoryContentsObjectFactory'] =
-      new StoryContentsObjectFactory(
-        upgradedServices['StoryNodeObjectFactory']);
+      new StoryContentsObjectFactory();
     upgradedServices['StoryPlaythroughObjectFactory'] =
       new StoryPlaythroughObjectFactory(
         upgradedServices['ReadOnlyStoryNodeObjectFactory']);
@@ -1374,7 +1369,6 @@ export class UpgradedServices {
         upgradedServices['SubtopicObjectFactory']);
     upgradedServices['ReadOnlyTopicObjectFactory'] =
       new ReadOnlyTopicObjectFactory(
-        upgradedServices['StoryNodeObjectFactory'],
         upgradedServices['SubtopicObjectFactory'],
         upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['ReviewTestBackendApiService'] =

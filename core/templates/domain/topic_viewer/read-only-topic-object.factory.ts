@@ -30,7 +30,7 @@ import {
   Subtopic,
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
-import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
+import { StoryNode } from 'domain/story/story-node.model';
 
 export interface DegreesOfMastery {
   [skillId: string]: number | null;
@@ -136,7 +136,6 @@ export class ReadOnlyTopic {
 })
 export class ReadOnlyTopicObjectFactory {
   constructor(
-    private storyNodeObjectFactory: StoryNodeObjectFactory,
     private subtopicObjectFactory: SubtopicObjectFactory,
     private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
 
@@ -158,7 +157,7 @@ export class ReadOnlyTopicObjectFactory {
         topicDataDict.canonical_story_dicts.map(storyDict => {
           let pendingNodes = (
             storyDict.pending_node_dicts.map(storyNodeDict => {
-              return this.storyNodeObjectFactory.createFromBackendDict(
+              return StoryNode.createFromBackendDict(
                 storyNodeDict);
             }));
           return new StorySummary(
@@ -171,7 +170,7 @@ export class ReadOnlyTopicObjectFactory {
         topicDataDict.additional_story_dicts.map(storyDict => {
           let pendingNodes = (
             storyDict.pending_node_dicts.map(storyNodeDict => {
-              return this.storyNodeObjectFactory.createFromBackendDict(
+              return StoryNode.createFromBackendDict(
                 storyNodeDict);
             }));
           return new StorySummary(

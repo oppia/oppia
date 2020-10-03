@@ -20,8 +20,7 @@
 // story-editor-state.service.ts is upgraded to Angular 8.
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
-import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
+import { StoryNode } from 'domain/story/story-node.model';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
@@ -103,12 +102,10 @@ describe('Story editor state service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'StoryContentsObjectFactory', new StoryContentsObjectFactory(
-        new StoryNodeObjectFactory()));
-    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
+      'StoryContentsObjectFactory', new StoryContentsObjectFactory());
     $provide.value(
       'StoryObjectFactory', new StoryObjectFactory(
-        new StoryContentsObjectFactory(new StoryNodeObjectFactory())));
+        new StoryContentsObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

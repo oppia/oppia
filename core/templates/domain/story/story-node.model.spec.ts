@@ -13,19 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StoryNodeObjectFactory.
+ * @fileoverview Tests for StoryNode model.
  */
 
-import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
+import { StoryNode } from 'domain/story/story-node.model';
 
-describe('Story node object factory', () => {
-  let storyNodeObjectFactory: StoryNodeObjectFactory = null;
+describe('Story node model', () => {
   var _sampleStoryNode = null;
 
   beforeEach(() => {
-    storyNodeObjectFactory = new StoryNodeObjectFactory();
-
     var sampleStoryNodeBackendDict = {
       id: 'node_1',
       thumbnail_filename: 'image.png',
@@ -39,12 +35,12 @@ describe('Story node object factory', () => {
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
     };
-    _sampleStoryNode = storyNodeObjectFactory.createFromBackendDict(
+    _sampleStoryNode = StoryNode.createFromBackendDict(
       sampleStoryNodeBackendDict);
   });
 
   it('should correctly create a node from node id alone', () => {
-    var storyNode = storyNodeObjectFactory.createFromIdAndTitle(
+    var storyNode = StoryNode.createFromIdAndTitle(
       'node_1', 'Title 1');
     expect(storyNode.getId()).toEqual('node_1');
     expect(storyNode.getThumbnailFilename()).toEqual(null);

@@ -16,26 +16,13 @@
  * @fileoverview Tests for StorySummary model.
  */
 
+import { StoryNode } from './story-node.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 
-<<<<<<< HEAD:core/templates/domain/story/story-summary.model.spec.ts
 describe('Story summary model', () => {
-=======
-import { StorySummary, StorySummaryObjectFactory } from
-  'domain/story/StorySummaryObjectFactory';
-import { StoryNodeObjectFactory } from './StoryNodeObjectFactory';
-
-describe('Story summary object factory', () => {
-  let factory: StorySummaryObjectFactory;
->>>>>>> upstream/develop:core/templates/domain/story/StorySummaryObjectFactorySpec.ts
   let _sampleStorySummary: StorySummary;
-  let storyNodeObjectFactory: StoryNodeObjectFactory;
 
   beforeEach(() => {
-<<<<<<< HEAD:core/templates/domain/story/story-summary.model.spec.ts
-=======
-    factory = TestBed.get(StorySummaryObjectFactory);
-
     let nodeDict = {
       id: 'node_1',
       thumbnail_filename: 'image.png',
@@ -50,7 +37,6 @@ describe('Story summary object factory', () => {
       thumbnail_bg_color: '#a33f40'
     };
 
->>>>>>> upstream/develop:core/templates/domain/story/StorySummaryObjectFactorySpec.ts
     const sampleStorySummaryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
@@ -66,7 +52,6 @@ describe('Story summary object factory', () => {
     _sampleStorySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
     );
-    storyNodeObjectFactory = new StoryNodeObjectFactory();
   });
 
   it('should be able to get all the values', () => {
@@ -82,7 +67,7 @@ describe('Story summary object factory', () => {
     expect(_sampleStorySummary.isNodeCompleted('Chapter 1')).toBe(true);
     expect(_sampleStorySummary.isNodeCompleted('Chapter 2')).toBe(false);
     expect(_sampleStorySummary.getPendingNodes()).toEqual([
-      storyNodeObjectFactory.createFromBackendDict({
+      StoryNode.createFromBackendDict({
         id: 'node_1',
         thumbnail_filename: 'image.png',
         title: 'Title 1',

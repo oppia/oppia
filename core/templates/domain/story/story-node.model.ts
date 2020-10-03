@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model class for creating and mutating instances of frontend
  * story node domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
@@ -273,13 +270,8 @@ export class StoryNode {
     }
     this._prerequisiteSkillIds.splice(index, 1);
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StoryNodeObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       storyNodeBackendObject: StoryNodeBackendDict): StoryNode {
     return new StoryNode(
       storyNodeBackendObject.id, storyNodeBackendObject.title,
@@ -295,12 +287,9 @@ export class StoryNodeObjectFactory {
     );
   }
 
-  createFromIdAndTitle(nodeId: string, title: string): StoryNode {
+  static createFromIdAndTitle(nodeId: string, title: string): StoryNode {
     return new StoryNode(
       nodeId, title, '', [], [], [], '', false, null,
       null, null);
   }
 }
-
-angular.module('oppia').factory(
-  'StoryNodeObjectFactory', downgradeInjectable(StoryNodeObjectFactory));

@@ -511,8 +511,6 @@ import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
@@ -906,7 +904,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static statsReportingService: StatsReportingService;
   static storyContentsObjectFactory: StoryContentsObjectFactory;
   static storyEditorNavigationService: StoryEditorNavigationService;
-  static storyNodeObjectFactory: StoryNodeObjectFactory;
   static storyObjectFactory: StoryObjectFactory;
   static storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory;
   static storyReferenceObjectFactory: StoryReferenceObjectFactory;
@@ -1264,7 +1261,6 @@ private statsReportingBackendApiService: StatsReportingBackendApiService,
 private statsReportingService: StatsReportingService,
 private storyContentsObjectFactory: StoryContentsObjectFactory,
 private storyEditorNavigationService: StoryEditorNavigationService,
-private storyNodeObjectFactory: StoryNodeObjectFactory,
 private storyObjectFactory: StoryObjectFactory,
 private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
 private storyReferenceObjectFactory: StoryReferenceObjectFactory,
@@ -1804,8 +1800,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.storyContentsObjectFactory);
     OppiaAngularRootComponent.storyEditorNavigationService = (
       this.storyEditorNavigationService);
-    OppiaAngularRootComponent.storyNodeObjectFactory = (
-      this.storyNodeObjectFactory);
     OppiaAngularRootComponent.storyObjectFactory = this.storyObjectFactory;
     OppiaAngularRootComponent.storyPlaythroughObjectFactory = (
       this.storyPlaythroughObjectFactory);

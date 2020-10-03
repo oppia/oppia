@@ -21,8 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  StoryNode, StoryNodeBackendDict, StoryNodeObjectFactory
-} from './StoryNodeObjectFactory';
+  StoryNode, StoryNodeBackendDict
+} from './story-node.model';
 
 export interface StorySummaryBackendDict {
   'id': string;
@@ -90,21 +90,12 @@ export class StorySummary {
   getPendingNodes(): StoryNode[] {
     return this._pendingNodes;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StorySummaryObjectFactory {
-  constructor(
-    private storyNodeObjectFactory: StoryNodeObjectFactory
-  ) {}
-
-  createFromBackendDict(
+  static createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     let pendingNodes = (
       storySummaryBackendDict.pending_node_dicts.map(storyNodeDict => {
-        return this.storyNodeObjectFactory.createFromBackendDict(
+        return StoryNode.createFromBackendDict(
           storyNodeDict);
       }));
     return new StorySummary(
