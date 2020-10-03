@@ -515,7 +515,7 @@ class AndroidProfileHandler(base.BaseHandler):
         for user_auth_detail in (
                 user_services.get_all_profiles_auth_details_by_parent_user_id(
                     self.user_id)
-                ):
+            ):
             user_ids_list.append(user_auth_detail.user_id)
 
         user_settings_list = user_services.get_users_settings(user_ids_list)
@@ -523,7 +523,7 @@ class AndroidProfileHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         for user_settings in user_settings_list:
-            user_settings_dict ={
+            user_settings_dict = {
                 'preferred_language_codes': (
                     user_settings.preferred_language_codes),
                 'preferred_site_language_code': (
