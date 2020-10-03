@@ -417,20 +417,12 @@ class PythonLintTests(test_utils.LinterTestBase):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_NDB_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 31: Please use datastore_services instead of ndb, for '
-            'example:\n\n'
-            'datastore_services = models.Registry.import_datastore_services()\n'
-            '\n'
-            'class SampleModel(datastore_services.Model):\n'
-            '    ...\n',
-            'Line 34: Please use datastore_services instead of ndb, for '
-            'example:\n\n'
-            'datastore_services = models.Registry.import_datastore_services()\n'
-            '\n'
-            'class SampleModel(datastore_services.Model):\n'
-            '    ...\n',
-        ], lint_task_report.trimmed_messages)
+        self.assert_same_list_elements(
+            ['Line 31: Please use datastore_services instead of ndb'],
+            lint_task_report.trimmed_messages)
+        self.assert_same_list_elements(
+            ['Line 34: Please use datastore_services instead of ndb'],
+            lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
