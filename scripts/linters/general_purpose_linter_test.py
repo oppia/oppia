@@ -424,7 +424,7 @@ class PythonLintTests(test_utils.LinterTestBase):
             '\n'
             'class SampleModel(datastore_services.Model):\n'
             '    ...\n',
-            'Line 33: Please use datastore_services instead of ndb, for '
+            'Line 34: Please use datastore_services instead of ndb, for '
             'example:\n\n'
             'datastore_services = models.Registry.import_datastore_services()\n'
             '\n'
