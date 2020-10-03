@@ -162,6 +162,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         # Initializes the return dict for the handlers.
         self.values = {}
+        self.values_list = {}
 
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))

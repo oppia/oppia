@@ -832,6 +832,9 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+
+    get_redirect_route(
+        r'/android_profile_handler', profile.AndroidProfileHandler)
 ]
 
 # Adding redirects for topic landing pages.

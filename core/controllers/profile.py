@@ -500,3 +500,39 @@ class UrlHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Incomplete or empty GET parameters passed'
                 )
+
+
+class AndroidProfileHandler(base.BaseHandler):
+    """Fetches the user data for the Android requests."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_manage_own_account
+    def get(self):
+        """Handles GET requests."""
+
+        user_ids_list = [self.user_id]
+        for user_auth_detail in (
+                user_services.get_all_profiles_auth_details_by_parent_user_id(
+                    self.user_id)
+                ):
+            user_ids_list.append(user_auth_detail.user_id)
+
+        user_settings_list = user_services.get_users_settings(user_ids_list)
+        if any(element is None for element in user_settings_list):
+            raise self.PageNotFoundException
+
+        for user_settings in user_settings_list:
+            user_settings_dict ={
+                'preferred_language_codes': (
+                    user_settings.preferred_language_codes),
+                'preferred_site_language_code': (
+                    user_settings.preferred_site_language_code),
+                'preferred_audio_language_code': (
+                    user_settings.preferred_audio_language_code),
+                'subject_interests': user_settings.subject_interests
+            }
+            self.values_list.update({
+                user_settings.user_id: user_settings_dict
+            })
+        self.render_json(self.values_list)
