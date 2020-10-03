@@ -47,20 +47,20 @@ export class RatioExpressionInputValidationService {
     var isNonNegativeInt = function(number) {
       return angular.isNumber(number) && number % 1 === 0 && number >= 0;
     };
-    var minimumNumberOfTerms = customizationArgs.numberOfTerms.value;
+    var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
     // 0 is allowed as an input, as that corresponds to having no limit.
-    if (minimumNumberOfTerms === undefined ||
-        !isNonNegativeInt(minimumNumberOfTerms)
+    if (expectedNumberOfTerms === undefined ||
+        !isNonNegativeInt(expectedNumberOfTerms)
     ) {
       return [
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'The number of terms should be a non negative integer other than 1.'
+            'The number of terms should be a non-negative integer other than 1.'
           )
         }
       ];
-    } else if (minimumNumberOfTerms === 1) {
+    } else if (expectedNumberOfTerms === 1) {
       return [
         {
           type: AppConstants.WARNING_TYPES.ERROR,
@@ -81,7 +81,7 @@ export class RatioExpressionInputValidationService {
     let warningsList = [];
     let ratioRulesService = (
       new RatioExpressionInputRulesService(this.rof));
-    var minimumNumberOfTerms = customizationArgs.numberOfTerms.value;
+    var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
@@ -138,25 +138,27 @@ export class RatioExpressionInputValidationService {
           currentInput = <number[]> rules[j].inputs.x;
         }
 
-        if (minimumNumberOfTerms > 2) {
+        if (expectedNumberOfTerms >= 2) {
           if (currentRuleType === 'HasNumberOfTermsEqualTo') {
-            if (currentInput < minimumNumberOfTerms) {
+            if (currentInput !== expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                  ' matched because it has fewer number of terms than required.'
+                  ' matched because it has differing number of terms than ' +
+                  'required.'
                 )
               });
             }
           } else {
             ratio = rulesService.rof.fromList(<number[]> currentInput);
-            if (ratio.getNumberOfTerms() < minimumNumberOfTerms) {
+            if (ratio.getNumberOfTerms() !== expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                  ' matched because it has fewer number of terms than required.'
+                  ' matched because it has differing number of terms than ' +
+                  'required.'
                 )
               });
             }

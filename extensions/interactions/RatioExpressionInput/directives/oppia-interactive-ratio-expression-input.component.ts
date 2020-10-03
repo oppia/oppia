@@ -31,14 +31,12 @@ require('domain/objects/objects-domain.constants.ajs.ts');
 angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
   template: require('./ratio-expression-input-interaction.component.html'),
   controller: [
-    '$scope', '$attrs', '$uibModal',
-    'InteractionAttributesExtractorService', 'RatioObjectFactory',
-    'RatioExpressionInputRulesService', 'RATIO_PARSING_ERRORS',
-    'CurrentInteractionService', function(
-        $scope, $attrs, $uibModal,
-        InteractionAttributesExtractorService, RatioObjectFactory,
-        RatioExpressionInputRulesService, RATIO_PARSING_ERRORS,
-        CurrentInteractionService) {
+    '$attrs', '$scope', 'CurrentInteractionService',
+    'InteractionAttributesExtractorService', 'RatioExpressionInputRulesService',
+    'RatioObjectFactory', function(
+        $attrs, $scope, CurrentInteractionService,
+        InteractionAttributesExtractorService, RatioExpressionInputRulesService,
+        RatioObjectFactory) {
       var ctrl = this;
       var errorMessage = '';
       // Label for errors caused whilst parsing ratio expression.
@@ -52,11 +50,13 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
           var ratioExpression =
             RatioObjectFactory.fromRawInputString(answer);
           if (
-            ratioExpression.getNumberOfTerms() < ctrl.minimumNumberOfTerms
+            (
+              ratioExpression.getNumberOfTerms() !==
+              ctrl.expectedNumberOfTerms) && (ctrl.expectedNumberOfTerms !== 0)
           ) {
             throw new Error(
-              'The creator has specified the minimum number of terms in' +
-              ' the answer to be ' + ctrl.minimumNumberOfTerms + '.');
+              'The creator has specified the number of terms in' +
+              ' the answer to be ' + ctrl.expectedNumberOfTerms + '.');
           }
           errorMessage = '';
           ctrl.RatioExpressionInputForm.answer.$setValidity(
@@ -99,7 +99,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
           $attrs
         );
         ctrl.placeholder = placeholder.getUnicode();
-        ctrl.minimumNumberOfTerms = numberOfTerms;
+        ctrl.expectedNumberOfTerms = numberOfTerms;
         ctrl.RATIO_EXPRESSION_INPUT_FORM_SCHEMA = {
           type: 'unicode',
           ui_config: {}

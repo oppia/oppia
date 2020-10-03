@@ -55,7 +55,7 @@ describe('RatioExpressionInputInteractive', function() {
     $provide.value('$attrs', {
       placeholder: {
         getUnicode: function() {
-            return 'Enter ratio here';
+          return 'Enter ratio here';
         }
       },
       numberOfTerms: 3,
@@ -82,7 +82,7 @@ describe('RatioExpressionInputInteractive', function() {
     expect(ctrl.answer).toEqual('');
     expect(ctrl.labelForFocusTarget).toEqual('label');
     expect(ctrl.placeholder).toEqual('Enter ratio here');
-    expect(ctrl.minimumNumberOfTerms).toEqual(3);
+    expect(ctrl.expectedNumberOfTerms).toEqual(3);
     expect(ctrl.RATIO_EXPRESSION_INPUT_FORM_SCHEMA).toEqual({
       type: 'unicode',
       ui_config: {}
@@ -104,8 +104,7 @@ describe('RatioExpressionInputInteractive', function() {
     spyOn(mockCurrentInteractionService, 'onSubmit');
     ctrl.submitAnswer('2:3');
     expect(ctrl.getWarningText()).toEqual(
-      'The creator has specified the minimum number of terms in' +
-      ' the answer to be 3.');
+      'The creator has specified the number of terms in the answer to be 3.');
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
     expect(ctrl.isAnswerValid()).toBe(false);
   });
