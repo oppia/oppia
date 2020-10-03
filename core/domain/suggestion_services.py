@@ -24,7 +24,6 @@ import heapq
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
-from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import suggestion_registry
 from core.domain import user_domain
@@ -32,6 +31,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
+import re
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -606,8 +606,51 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
     ]
 
 
+def _get_plain_text_from_html_content_string(html_content_string):
+    """Retrieves the plain text from the given html content string. RTE element
+    occurrences in the html are replaced by its corresponding name in square
+    brackets.
+    eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
+        Sample2 </p> will give as output: Sample1 [MATH] Sample2.
+    Note: similar logic exists in the frontend in format-rte-preview.filter.ts.
+
+    Args:
+        html_content_string: str. The content html string to convert to plain
+            text.
+
+    Returns:
+        str. The plain text string from the given html content string.
+    """
+    # Replace frequently used HTML character entities.
+    html_content_string = re.sub('&nbsp;', ' ', html_content_string)
+    html_content_string = re.sub('&quot;', '"', html_content_string)
+    html_content_string = re.sub('&apos;', '\'', html_content_string)
+    html_content_string = re.sub('&amp;', '&', html_content_string)
+    # Replace all html tags other than <oppia-noninteractive-**> ones to ''.
+    html_content_string = re.sub(
+        '<(?!oppia-noninteractive\s*?)[^>]+>', '', html_content_string)
+    def _replace_rte_tag(rte_tag):
+        # Convert the MatchObject to a string.
+        rte_tag_string = rte_tag.group(0)
+        # Get the name of the noninteractive tag (ex. math).
+        replace_string = rte_tag_string.split('-')[2].split(' ')[0]
+        if replace_string[-1] == '>':
+            replace_string = replace_string[:-1]
+        replace_string = replace_string.upper()
+        replace_string = '%s%s%s' % (' [', replace_string, '] ')
+        return replace_string
+    # Replace the rte tags by their name in square brackets.
+    html_content_string = re.sub(
+        '<([^>]+)>', _replace_rte_tag, html_content_string)
+    # Remove any leading or trailing whitespace.
+    resulting_plain_text = html_content_string.strip()
+    return resulting_plain_text
+
+    
 def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     """Creates a ReviewableSuggestionEmailInfo object from the given suggestion.
+    Note: the suggestions must be suggestions that are available for review on
+    the Contributor Dashboard.
 
     Args:
         suggestion: Suggestion. The suggestion used to create the
@@ -616,15 +659,44 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     Returns:
         ReviewableSuggestionEmailInfo. The corresponding reviewable suggestion
         email info.
+
+    Raises:
+        Exception. The suggestion must be in review.
+        Exception. The suggestion type must be offered on the Contributor
+            Dashboard.
     """
+    if suggestion.status != suggestion_models.STATUS_IN_REVIEW:
+        raise Exception(
+            'Expected suggestion status to be in review for '
+            'ReviewableSuggestionEmailInfo object creation, recieved '
+            'suggestion status: %s' % suggestion.status)
+    if suggestion.suggestion_type != (
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT) and (
+            suggestion.suggestion_type != (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)):
+        raise Exception(
+            'Expected suggestion type to be offered on the Contributor '
+            'Dashboard for ReviewableSuggestionEmailInfo object creation, '
+            'recieved suggestion type: %s' % suggestion.suggestion_type)
     html_content_strings = suggestion.get_all_html_content_strings()
     # The first element in the html_content_strings list is the
     # question or translation content.
-    content_without_html_tags = html_cleaner.strip_html_tags(
-        html_content_strings[0])
+    html_content_string = ''
+    if suggestion.suggestion_type == (
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+        # The translation html is always the first in the list of translation
+        # suggestion html content strings.
+        html_content_string = html_content_strings[0]
+    elif suggestion.suggestion_type == (
+        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+        # The question content html is always the last in the list of question
+        # suggestion html content strings.
+        html_content_string = html_content_strings[-1]
+    plain_text_content = _get_plain_text_from_html_content_string(
+        html_content_string)
     return suggestion_registry.ReviewableSuggestionEmailInfo(
         suggestion.suggestion_type, suggestion.language_code,
-        content_without_html_tags, suggestion.last_updated
+        plain_text_content, suggestion.last_updated
     )
 
 
