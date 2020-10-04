@@ -34,9 +34,6 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
-current_user_services = models.Registry.import_current_user_services()
 (
     base_models, collection_models, config_models,
     exp_models, feedback_models, question_models,
@@ -48,6 +45,9 @@ current_user_services = models.Registry.import_current_user_services()
     models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
+
+current_user_services = models.Registry.import_current_user_services()
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
@@ -521,15 +521,12 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
 
     snapshot_metadata_models = []
     for snapshot_model_class in snapshot_metadata_model_classes:
-        snapshot_metadata_models.extend(
-            snapshot_model_class.query(
-                ndb.OR(
-                    snapshot_model_class.committer_id == user_id,
-                    snapshot_model_class.commit_cmds_user_ids == user_id,
-                    snapshot_model_class.content_user_ids == user_id,
-                )
-            ).fetch()
-        )
+        snapshot_metadata_models.extend(snapshot_model_class.query(
+            datastore_services.any_of(
+                snapshot_model_class.committer_id == user_id,
+                snapshot_model_class.commit_cmds_user_ids == user_id,
+                snapshot_model_class.content_user_ids == user_id,
+            )).fetch())
     snapshot_metadata_ids = set(
         model.get_unversioned_instance_id()
         for model in snapshot_metadata_models)
@@ -604,7 +601,7 @@ def _pseudonymize_config_models(pending_deletion_request):
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_id
 
-        ndb.put_multi(metadata_models)
+        datastore_services.put_multi(metadata_models)
 
     config_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -689,7 +686,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
             if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_id
-        ndb.put_multi(metadata_models + commit_log_models)
+        datastore_services.put_multi(metadata_models + commit_log_models)
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -851,7 +848,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_id
 
-        ndb.put_multi(
+        datastore_services.put_multi(
             snapshot_metadata_models +
             rights_snapshot_metadata_models +
             rights_snapshot_content_models +
@@ -928,7 +925,7 @@ def _remove_user_id_from_contributors_in_summary_models(
             ]
             del summary_model.contributors_summary[user_id]
 
-        ndb.put_multi(summary_models)
+        datastore_services.put_multi(summary_models)
 
     for i in python_utils.RANGE(
             0, len(related_summary_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
@@ -953,10 +950,12 @@ def _pseudonymize_feedback_models(pending_deletion_request):
     # these models we generate a pseudonymous user ID and replace the user ID
     # with that pseudonymous user ID in all the models.
     feedback_thread_model_class = feedback_models.GeneralFeedbackThreadModel
-    feedback_thread_models = feedback_thread_model_class.query(ndb.OR(
-        feedback_thread_model_class.original_author_id == user_id,
-        feedback_thread_model_class.last_nonempty_message_author_id == user_id
-    )).fetch()
+    feedback_thread_models = feedback_thread_model_class.query(
+        datastore_services.any_of(
+            feedback_thread_model_class.original_author_id == user_id,
+            feedback_thread_model_class.last_nonempty_message_author_id == (
+                user_id)
+        )).fetch()
     feedback_ids = set([model.id for model in feedback_thread_models])
 
     feedback_message_model_class = feedback_models.GeneralFeedbackMessageModel
@@ -966,10 +965,11 @@ def _pseudonymize_feedback_models(pending_deletion_request):
     feedback_ids |= set([model.thread_id for model in feedback_message_models])
 
     suggestion_model_class = suggestion_models.GeneralSuggestionModel
-    general_suggestion_models = suggestion_model_class.query(ndb.OR(
-        suggestion_model_class.author_id == user_id,
-        suggestion_model_class.final_reviewer_id == user_id
-    )).fetch()
+    general_suggestion_models = suggestion_model_class.query(
+        datastore_services.any_of(
+            suggestion_model_class.author_id == user_id,
+            suggestion_model_class.final_reviewer_id == user_id
+        )).fetch()
     feedback_ids |= set([model.id for model in general_suggestion_models])
 
     _save_pseudonymizable_entity_mappings(
@@ -1012,11 +1012,10 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             if general_suggestion_model.final_reviewer_id == user_id:
                 general_suggestion_model.final_reviewer_id = pseudonymized_id
 
-        ndb.put_multi(
+        datastore_services.put_multi(
             feedback_thread_models +
             feedback_message_models +
-            general_suggestion_models
-        )
+            general_suggestion_models)
 
     feedback_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -1053,10 +1052,11 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     voiceover_application_class = (
         suggestion_models.GeneralVoiceoverApplicationModel)
 
-    voiceover_application_models = voiceover_application_class.query(ndb.OR(
-        voiceover_application_class.author_id == user_id,
-        voiceover_application_class.final_reviewer_id == user_id
-    )).fetch()
+    voiceover_application_models = voiceover_application_class.query(
+        datastore_services.any_of(
+            voiceover_application_class.author_id == user_id,
+            voiceover_application_class.final_reviewer_id == user_id
+        )).fetch()
     suggestion_ids = set([model.id for model in voiceover_application_models])
 
     _save_pseudonymizable_entity_mappings(

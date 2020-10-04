@@ -45,6 +45,7 @@ import python_utils
             models.NAMES.exploration, models.NAMES.opportunity,
             models.NAMES.skill, models.NAMES.story,
             models.NAMES.topic]))
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ExplorationOpportunitySummaryModelValidatorTests(
@@ -184,7 +185,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=True)
 
@@ -197,11 +198,12 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 u'[u\'failed validation check for story_ids field check of '
                 'ExplorationOpportunitySummaryModel\', '
                 '[u"Entity id 1: based on field story_ids having value story, '
-                'expect model StoryModel with id story but it doesn\'t exist", '
-                'u"Entity id 2: based on field story_ids having value story, '
-                'expect model StoryModel with id story but it doesn\'t exist", '
-                'u"Entity id 3: based on field story_ids having value story, '
-                'expect model StoryModel with id story but it doesn\'t exist"]]'
+                'expected model StoryModel with id story but it doesn\'t '
+                'exist", u"Entity id 2: based on field story_ids having value '
+                'story, expected model StoryModel with id story but it '
+                'doesn\'t exist", u"Entity id 3: based on field story_ids '
+                'having value story, expected model StoryModel with id story '
+                'but it doesn\'t exist"]]'
             )]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=True)
@@ -215,11 +217,12 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 u'[u\'failed validation check for topic_ids field check of '
                 'ExplorationOpportunitySummaryModel\', '
                 '[u"Entity id 1: based on field topic_ids having value topic, '
-                'expect model TopicModel with id topic but it doesn\'t exist", '
-                'u"Entity id 2: based on field topic_ids having value topic, '
-                'expect model TopicModel with id topic but it doesn\'t exist", '
-                'u"Entity id 3: based on field topic_ids having value topic, '
-                'expect model TopicModel with id topic but it doesn\'t exist"]]'
+                'expected model TopicModel with id topic but it doesn\'t '
+                'exist", u"Entity id 2: based on field topic_ids having value '
+                'topic, expected model TopicModel with id topic but it '
+                'doesn\'t exist", u"Entity id 3: based on field topic_ids '
+                'having value topic, expected model TopicModel with id topic '
+                'but it doesn\'t exist"]]'
             )]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=True)
@@ -232,7 +235,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             u'[u\'failed validation check for exploration_ids field check '
             'of ExplorationOpportunitySummaryModel\', '
             '[u"Entity id 1: based on field exploration_ids having '
-            'value 1, expect model ExplorationModel with id 1 but it '
+            'value 1, expected model ExplorationModel with id 1 but it '
             'doesn\'t exist"]]'), (
                 u'[u\'fully-validated ExplorationOpportunitySummaryModel\','
                 ' 2]')]
@@ -368,7 +371,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=True)
 
@@ -381,7 +384,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_ids field '
                 'check of SkillOpportunityModel\', '
                 '[u"Entity id 0: based on field skill_ids having '
-                'value 0, expect model SkillModel with id 0 but it '
+                'value 0, expected model SkillModel with id 0 but it '
                 'doesn\'t exist"]]'
             ),
             u'[u\'fully-validated SkillOpportunityModel\', 2]']
