@@ -1251,10 +1251,12 @@ tags: []
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            str. ID of the user possessing the given email.
+            str or None. ID of the user possessing the given email, or None if
+            the user does not exist.
         """
-        gae_id = self.get_gae_id_from_email(email)
-        return user_services.get_user_settings_by_gae_id(gae_id).user_id
+        user_settings = user_services.get_user_settings_by_gae_id(
+            self.get_gae_id_from_email(email))
+        return user_settings and user_settings.user_id
 
     def get_gae_id_from_email(self, email):
         """Mocks a GAE user ID corresponding to the given email.

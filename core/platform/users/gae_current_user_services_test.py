@@ -28,58 +28,57 @@ from google.appengine.api import users
 class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
 
     def test_create_login_url(self):
-        login_url = gae_current_user_services.create_login_url('')
         self.assertEqual(
-            login_url,
-            'https://www.google.com/accounts/Login' +
+            gae_current_user_services.create_login_url(''),
+            'https://www.google.com/accounts/Login'
             '?continue=http%3A//localhost/signup%3Freturn_url%3D')
 
     def test_get_current_user(self):
-        self.login(self.OWNER_EMAIL)
-        self.assertEqual(
-            gae_current_user_services.get_current_user(),
-            users.User(email=self.OWNER_EMAIL))
-        self.logout()
+        self.assertIsNone(gae_current_user_services.get_current_user())
+
+        with self.login_context(self.OWNER_EMAIL):
+            self.assertEqual(
+                gae_current_user_services.get_current_user(),
+                users.User(email=self.OWNER_EMAIL))
 
         self.assertIsNone(gae_current_user_services.get_current_user())
 
     def test_is_current_user_super_admin(self):
-        self.login(self.OWNER_EMAIL)
-        is_super_admin = gae_current_user_services.is_current_user_super_admin()
-        self.assertEqual(is_super_admin, False)
-        self.logout()
+        with self.login_context(self.OWNER_EMAIL):
+            self.assertFalse(
+                gae_current_user_services.is_current_user_super_admin())
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        is_super_admin = gae_current_user_services.is_current_user_super_admin()
-        self.assertEqual(is_super_admin, True)
-        self.logout()
+        with self.login_context(self.ADMIN_EMAIL, is_super_admin=True):
+            self.assertTrue(
+                gae_current_user_services.is_current_user_super_admin())
 
-        is_super_admin = gae_current_user_services.is_current_user_super_admin()
-        self.assertEqual(is_super_admin, False)
+        self.assertFalse(
+            gae_current_user_services.is_current_user_super_admin())
 
     def test_get_user_id_from_email(self):
-        # Existing user scenario.
         self.assertEqual(
             gae_current_user_services.get_user_by_email(self.OWNER_EMAIL),
             users.User(self.OWNER_EMAIL))
 
-        # Non-existing user scenario.
+    def test_get_user_id_from_email_which_does_not_exist(self):
         self.assertIsNone(gae_current_user_services.get_user_by_email(''))
 
     def test_get_current_gae_id(self):
-        self.login(self.OWNER_EMAIL)
-        user_id = gae_current_user_services.get_current_gae_id()
-        self.assertEqual(user_id, self.get_gae_id_from_email(self.OWNER_EMAIL))
-        self.logout()
+        self.assertIsNone(gae_current_user_services.get_current_gae_id())
 
-        user_id = gae_current_user_services.get_current_gae_id()
-        self.assertEqual(user_id, None)
+        with self.login_context(self.OWNER_EMAIL):
+            self.assertEqual(
+                gae_current_user_services.get_current_gae_id(),
+                self.get_gae_id_from_email(self.OWNER_EMAIL))
+
+        self.assertIsNone(gae_current_user_services.get_current_gae_id())
 
     def test_get_current_user_email(self):
-        self.login(self.OWNER_EMAIL)
-        email = gae_current_user_services.get_current_user_email()
-        self.assertEqual(email, self.OWNER_EMAIL)
-        self.logout()
+        self.assertIsNone(gae_current_user_services.get_current_user_email())
 
-        email = gae_current_user_services.get_current_user_email()
-        self.assertEqual(email, None)
+        with self.login_context(self.OWNER_EMAIL):
+            self.assertEqual(
+                gae_current_user_services.get_current_user_email(),
+                self.OWNER_EMAIL)
+
+        self.assertIsNone(gae_current_user_services.get_current_user_email())
