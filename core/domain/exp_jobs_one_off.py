@@ -61,8 +61,8 @@ class RegenerateStringPropertyIndexOneOffJob(
 
     Cloud NDB dropped support for StringProperty(indexed=False) and
     TextProperty(indexed=True). Therefore, to prepare for the migration to Cloud
-    NDB, we need to have every model that has been changed to regenerate their
-    index.
+    NDB, we need to regenerate the indexes for every model that has been changed
+    in this way.
 
     https://cloud.google.com/appengine/docs/standard/python/datastore/indexes#unindexed-properties:
     > changing a property from unindexed to indexed does not affect any existing
