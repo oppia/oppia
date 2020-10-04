@@ -459,6 +459,10 @@ def _print_errors_stacktrace(errors_stacktrace):
 def _get_space_separated_linter_name(linter):
     """Returns the space separated name of the linter class.
 
+    Args:
+        linter: object(LintCheckManager). The sub-linter object to get the
+            linter class name.
+
     Returns:
         str. Space separated name of the linter class.
     """

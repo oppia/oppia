@@ -1612,9 +1612,9 @@ class DivisionOperatorChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0015': (
-            'Do not use division operator.',
+            'Please use python_utils.divide() instead of the "/" operator',
             'division-operator-used',
-            'Please use python_utils.divide() instead of the "/" operator'
+            'Do not use division operator.'
         )
     }
 
