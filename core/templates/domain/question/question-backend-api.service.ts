@@ -114,7 +114,7 @@ export class QuestionBackendApiService {
     var questionsDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(','),
-        cursor: cursor ? cursor : ''
+        cursor: cursor
       });
     this.http.get<QuestionSummariesBackendResponse>(
       questionsDataUrl
@@ -198,8 +198,9 @@ export class QuestionBackendApiService {
   }
 
   fetchQuestionSummaries(
-      skillId: string, cursor: string): Promise<QuestionSummariesResponse> {
+      skillId: string, cursor?: string): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
+      cursor = cursor ? cursor : '';
       this._fetchQuestionSummaries(skillId, cursor, resolve, reject);
     });
   }
