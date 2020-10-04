@@ -25,9 +25,9 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Translation tab active mode service', () => {
   let translationTabActiveModeService : TranslationTabActiveModeService;
+  importAllAngularServices();
 
   beforeEach(() => {
-    importAllAngularServices();
     translationTabActiveModeService = TestBed.get(
       TranslationTabActiveModeService);
   });
