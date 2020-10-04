@@ -198,9 +198,9 @@ export class QuestionBackendApiService {
   }
 
   fetchQuestionSummaries(
-      skillId: string, cursor?: string): Promise<QuestionSummariesResponse> {
+      skillId: string,
+      cursor: string = ''): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
-      cursor = cursor ? cursor : '';
       this._fetchQuestionSummaries(skillId, cursor, resolve, reject);
     });
   }

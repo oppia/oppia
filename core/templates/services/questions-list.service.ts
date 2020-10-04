@@ -20,8 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
-
 import { AppConstants } from 'app.constants';
 import { EventEmitter } from '@angular/core';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
@@ -45,7 +43,7 @@ export class QuestionsListService {
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private questionBackendApiService: QuestionBackendApiService,
     private questionSummaryForOneSkillObjectFactory:
-    QuestionSummaryForOneSkillObjectFactory,
+      QuestionSummaryForOneSkillObjectFactory,
     private truncatePipe: TruncatePipe) {}
 
   private _setQuestionSummariesForOneSkill(
@@ -56,8 +54,7 @@ export class QuestionsListService {
     }
 
     this._questionSummariesForOneSkill = (
-      this._questionSummariesForOneSkill.concat(
-        cloneDeep(newQuestionSummaries)));
+      this._questionSummariesForOneSkill.concat(newQuestionSummaries));
 
     this._questionSummartiesInitializedEventEmitter.emit();
   }

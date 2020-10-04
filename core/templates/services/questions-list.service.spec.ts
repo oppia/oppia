@@ -143,7 +143,7 @@ describe('Questions List Service', () => {
 
   it('should get cached question summaries', fakeAsync(() => {
     qls.getQuestionSummariesAsync('1', true, true);
-    let req = httpTestingController.expectOne(
+    const req = httpTestingController.expectOne(
       '/questions_list_handler/1?cursor=');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleResponse);
@@ -153,7 +153,7 @@ describe('Questions List Service', () => {
     expect(qls.isLastQuestionBatch()).toBe(true);
     expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(1);
 
-    let cachedQuestionSummaries = qls.getCachedQuestionSummaries();
+    const cachedQuestionSummaries = qls.getCachedQuestionSummaries();
     expect(cachedQuestionSummaries[0]._questionSummary._questionId).toBe('0');
   }));
 });
