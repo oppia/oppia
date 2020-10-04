@@ -979,12 +979,12 @@ def get_svg_with_xmlns_attribute(svg_string):
     soup = bs4.BeautifulSoup(svg_string, 'html.parser')
     if soup.find(
             name='svg', attrs={'xmlns': 'http://www.w3.org/2000/svg'}) is None:
-        # Editing svg_string with soup will result into an invalid svg strings
-        # which browsers are not able to render. We are adding required
+        # Editing svg_string with soup will result in an invalid svg string
+        # which browsers cannot render. We are adding required
         # attribute using regex search.
         svg_string = re.sub(
             '<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ',
-            svg_string.decode(encoding='utf-8'))
+            svg_string.decode(encoding='utf-8')).encode(encoding='utf-8')
 
     return svg_string
 

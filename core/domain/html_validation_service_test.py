@@ -1558,7 +1558,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 invalid_svg_string))
 
         new_svg = html_validation_service.get_svg_with_xmlns_attribute(
-            invalid_svg_string)
+            invalid_svg_string.encode(encoding='utf-8'))
 
         self.assertTrue(
             html_validation_service.does_svg_tag_contains_xmlns_attribute(
@@ -1574,7 +1574,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             html_validation_service.does_svg_tag_contains_xmlns_attribute(
-                old_svg_string))
+                old_svg_string.encode(encoding='utf-8')))
 
         new_svg_string = html_validation_service.get_svg_with_xmlns_attribute(
             old_svg_string)

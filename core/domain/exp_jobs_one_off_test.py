@@ -2276,7 +2276,7 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
             exp_jobs_one_off
             .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
             .enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -2315,7 +2315,7 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
             exp_jobs_one_off
             .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
             .enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -2357,7 +2357,7 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
             exp_jobs_one_off
             .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
             .enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
