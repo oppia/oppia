@@ -91,7 +91,7 @@ class ExplorationOpportunitySummaryModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -140,7 +140,7 @@ class ExplorationOpportunitySummaryModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -187,7 +187,7 @@ class ExplorationOpportunitySummaryModelValidator(
                     'story_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -280,7 +280,7 @@ class SkillOpportunityModelValidator(
                     'skill_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
