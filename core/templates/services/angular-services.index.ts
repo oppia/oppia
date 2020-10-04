@@ -57,7 +57,6 @@ import { CollectionObjectFactory } from 'domain/collection/CollectionObjectFacto
 import { CollectionPlaythroughObjectFactory } from 'domain/collection/CollectionPlaythroughObjectFactory';
 import { CollectionRightsObjectFactory } from 'domain/collection/CollectionRightsObjectFactory';
 import { GuestCollectionProgressObjectFactory } from 'domain/collection/GuestCollectionProgressObjectFactory';
-import { CollectionNodeObjectFactory } from 'domain/collection/collection-node-object.factory';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionSummaryObjectFactory } from 'domain/collection/collection-summary-object.factory';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
@@ -403,7 +402,6 @@ export const angularServices: [string, unknown][] = [
   ['CodeReplValidationService', CodeReplValidationService],
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
-  ['CollectionNodeObjectFactory', CollectionNodeObjectFactory],
   ['CollectionObjectFactory', CollectionObjectFactory],
   ['CollectionPlaythroughObjectFactory', CollectionPlaythroughObjectFactory],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],

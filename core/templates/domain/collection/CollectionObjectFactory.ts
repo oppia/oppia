@@ -25,8 +25,7 @@ import { Injectable } from '@angular/core';
 import {
   CollectionNode,
   CollectionNodeBackendDict,
-  CollectionNodeObjectFactory
-} from 'domain/collection/collection-node-object.factory';
+} from 'domain/collection/collection-node.model';
 import {
   CollectionPlaythrough,
   CollectionPlaythroughBackendDict,
@@ -293,13 +292,12 @@ export class Collection {
 })
 export class CollectionObjectFactory {
   constructor(
-      private collectionNodeObjectFactory: CollectionNodeObjectFactory,
       private collectionPlaythroughObjectFactory:
       CollectionPlaythroughObjectFactory) { }
 
   create(collectionBackendObject: CollectionBackendDict): Collection {
     let collectionNodes = collectionBackendObject.nodes.map(
-      node => this.collectionNodeObjectFactory.create(node));
+      node => CollectionNode.create(node));
     let collectionPlaythrough = (
       this.collectionPlaythroughObjectFactory.createFromBackendObject(
         collectionBackendObject.playthrough_dict));

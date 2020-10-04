@@ -18,8 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-editor-state.service.ts is upgraded to Angular 8.
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
@@ -114,10 +112,7 @@ describe('Collection editor state service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
-      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
-    $provide.value(
       'CollectionObjectFactory', new CollectionObjectFactory(
-        new CollectionNodeObjectFactory(),
         new CollectionPlaythroughObjectFactory()));
     $provide.value(
       'CollectionRightsObjectFactory', new CollectionRightsObjectFactory());

@@ -13,14 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * collection node domain objects.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummaryBackendDict } from
@@ -39,6 +36,19 @@ export class CollectionNode {
     this._explorationId = collectionNodeBackendObject.exploration_id;
     this._explorationSummaryObject = cloneDeep(
       collectionNodeBackendObject.exploration_summary);
+  }
+
+  static create(
+      collectionNodeBackendObject: CollectionNodeBackendDict):
+      CollectionNode {
+    return new CollectionNode(collectionNodeBackendObject);
+  }
+
+  static createFromExplorationId(explorationId: string): CollectionNode {
+    return this.create({
+      exploration_id: explorationId,
+      exploration_summary: null
+    });
   }
 
   // Returns the ID of the exploration represented by this collection node.
@@ -101,28 +111,3 @@ export class CollectionNode {
       this._explorationSummaryObject.objective.slice(1));
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class CollectionNodeObjectFactory {
-  // Static class methods. Note that "this" is not available in static
-  // contexts. This function takes a JSON object which represents a backend
-  // collection node python dict.
-  create(
-      collectionNodeBackendObject: CollectionNodeBackendDict):
-      CollectionNode {
-    return new CollectionNode(collectionNodeBackendObject);
-  }
-
-  createFromExplorationId(explorationId: string): CollectionNode {
-    return this.create({
-      exploration_id: explorationId,
-      exploration_summary: null
-    });
-  }
-}
-
-angular.module('oppia').factory(
-  'CollectionNodeObjectFactory',
-  downgradeInjectable(CollectionNodeObjectFactory));

@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
+import { CollectionNode } from
+  'domain/collection/collection-node.model';
 import { Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { GuestCollectionProgressService } from
@@ -28,7 +28,6 @@ import { GuestCollectionProgressService } from
 describe('Guest collection progress service', () => {
   let guestCollectionProgressService = null;
   let collectionObjectFactory: CollectionObjectFactory = null;
-  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
   let _collectionId0: string = null;
   let _collectionId1: string = null;
   let _expId0: string = null;
@@ -47,7 +46,6 @@ describe('Guest collection progress service', () => {
     guestCollectionProgressService = TestBed.get(
       GuestCollectionProgressService);
     collectionObjectFactory = TestBed.get(CollectionObjectFactory);
-    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
 
     _collectionId0 = 'sample_collection_id0';
     _collectionId1 = 'sample_collection_id1';
@@ -59,7 +57,7 @@ describe('Guest collection progress service', () => {
     _expTitle2 = 'Exp 2';
     _collection0 = _createCollection(_collectionId0, 'a title');
     _collection0.addCollectionNode(
-      collectionNodeObjectFactory.createFromExplorationId(_expId0));
+      CollectionNode.createFromExplorationId(_expId0));
   });
 
   afterEach(() => {
@@ -114,7 +112,7 @@ describe('Guest collection progress service', () => {
         title: expTitle
       }
     };
-    return collectionNodeObjectFactory.create(collectionNodeBackendObject);
+    return CollectionNode.create(collectionNodeBackendObject);
   };
 
 

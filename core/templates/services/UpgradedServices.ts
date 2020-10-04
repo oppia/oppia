@@ -108,8 +108,6 @@ import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
 import { ComputationDataObjectFactory } from
   'domain/admin/computation-data-object.factory';
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
@@ -727,8 +725,6 @@ export class UpgradedServices {
     upgradedServices['ClientContextObjectFactory'] =
       new ClientContextObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
-    upgradedServices['CollectionNodeObjectFactory'] =
-      new CollectionNodeObjectFactory();
     upgradedServices['CollectionPlaythroughObjectFactory'] =
       new CollectionPlaythroughObjectFactory();
     upgradedServices['CollectionRightsObjectFactory'] =
@@ -963,7 +959,6 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['CollectionObjectFactory'] =
       new CollectionObjectFactory(
-        upgradedServices['CollectionNodeObjectFactory'],
         upgradedServices['CollectionPlaythroughObjectFactory']);
     upgradedServices['ContinueValidationService'] =
       new ContinueValidationService(

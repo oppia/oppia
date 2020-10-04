@@ -136,8 +136,6 @@ import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
 import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
@@ -681,7 +679,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static codeReplValidationService: CodeReplValidationService;
   static collectionCreationBackendService: CollectionCreationBackendService;
   static collectionCreationService: CollectionCreationService;
-  static collectionNodeObjectFactory: CollectionNodeObjectFactory;
   static collectionObjectFactory: CollectionObjectFactory;
   static collectionPlaythroughObjectFactory: CollectionPlaythroughObjectFactory;
   static collectionRightsBackendApiService: CollectionRightsBackendApiService;
@@ -1061,7 +1058,6 @@ private codeReplRulesService: CodeReplRulesService,
 private codeReplValidationService: CodeReplValidationService,
 private collectionCreationBackendService: CollectionCreationBackendService,
 private collectionCreationService: CollectionCreationService,
-private collectionNodeObjectFactory: CollectionNodeObjectFactory,
 private collectionObjectFactory: CollectionObjectFactory,
 private collectionPlaythroughObjectFactory: CollectionPlaythroughObjectFactory,
 private collectionRightsBackendApiService: CollectionRightsBackendApiService,
@@ -1477,8 +1473,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.collectionCreationBackendService);
     OppiaAngularRootComponent.collectionCreationService = (
       this.collectionCreationService);
-    OppiaAngularRootComponent.collectionNodeObjectFactory = (
-      this.collectionNodeObjectFactory);
     OppiaAngularRootComponent.collectionObjectFactory = (
       this.collectionObjectFactory);
     OppiaAngularRootComponent.collectionPlaythroughObjectFactory = (

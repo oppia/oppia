@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
+import { CollectionNode } from
+  'domain/collection/collection-node.model';
 import { CollectionBackendDict, Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionValidationService } from
@@ -28,7 +28,6 @@ import { CollectionValidationService } from
 describe('Collection validation service', function() {
   let collectionValidationService: CollectionValidationService = null;
   let collectionObjectFactory: CollectionObjectFactory = null;
-  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
   let sampleCollectionBackendObject: CollectionBackendDict = null;
   let _sampleCollection: Collection = null;
 
@@ -44,7 +43,6 @@ describe('Collection validation service', function() {
 
     collectionValidationService = TestBed.get(CollectionValidationService);
     collectionObjectFactory = TestBed.get(CollectionObjectFactory);
-    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -67,7 +65,7 @@ describe('Collection validation service', function() {
   });
 
   var _addCollectionNode = (explorationId, exists, isPublic) => {
-    var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
+    var collectionNode = CollectionNode.createFromExplorationId(
       explorationId);
     if (exists) {
       collectionNode.setExplorationSummaryObject({

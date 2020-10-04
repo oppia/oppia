@@ -13,19 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for CollectionNodeObjectFactory.
+ * @fileoverview Tests for collection-node.model.
  */
 
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
+import { CollectionNode } from
+  'domain/collection/collection-node.model';
 
-describe('Collection node object factory', () => {
-  var collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
-
-  beforeEach(() => {
-    collectionNodeObjectFactory = new CollectionNodeObjectFactory();
-  });
-
+describe('Collection node model', () => {
   it('should provide an immutable exploration summary', () => {
     var explorationSummaryBackendObject = {
       last_updated_msec: 1591296737470.528,
@@ -56,7 +50,7 @@ describe('Collection node object factory', () => {
       exploration_summary: explorationSummaryBackendObject
     };
 
-    var collectionNode = collectionNodeObjectFactory.create(
+    var collectionNode = CollectionNode.create(
       collectionNodeBackendObject);
     expect(collectionNode.getExplorationId()).toEqual('exp_id0');
     expect(collectionNode.getExplorationTitle()).toEqual('exp title');
@@ -71,7 +65,7 @@ describe('Collection node object factory', () => {
 
   it('should be able to create a new collection node by exploration ID',
     () => {
-      var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
+      var collectionNode = CollectionNode.createFromExplorationId(
         'exp_id0');
       expect(collectionNode.getExplorationId()).toEqual('exp_id0');
       expect(collectionNode.doesExplorationExist()).toBe(false);
