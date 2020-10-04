@@ -250,9 +250,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'user_id': None,
         }
         self.modifiable_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
         self.modifiable_new_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
         user_services.update_multiple_users_data(
             [self.modifiable_user_data])
@@ -3829,9 +3829,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'user_id': None,
         }
         self.modifiable_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
         self.modifiable_new_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
         user_services.update_multiple_users_data(
             [self.modifiable_user_data])
@@ -4123,9 +4123,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'user_id': None,
         }
         self.modifiable_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
         self.modifiable_new_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
         user_services.update_multiple_users_data(
             [self.modifiable_user_data])

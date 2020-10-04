@@ -89,9 +89,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'user_id': None,
         }
         self.modifiable_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
         self.modifiable_new_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
     def test_is_user_id_valid(self):
         self.assertTrue(
@@ -822,7 +822,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         }
         modifiable_new_user_data_2 = (
             user_domain.ModifiableUserData.from_raw_dict(
-                new_user_data_dict_2)[0])
+                new_user_data_dict_2))
         user_settings_list = user_services.create_new_profiles(
             gae_id, email, [
                 self.modifiable_new_user_data, modifiable_new_user_data_2
@@ -987,7 +987,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         }
         modifiable_new_user_data_2 = (
             user_domain.ModifiableUserData.from_raw_dict(
-                new_user_data_dict_2)[0])
+                new_user_data_dict_2))
         user_settings_list = user_services.create_new_profiles(
             gae_id, email, [
                 self.modifiable_new_user_data, modifiable_new_user_data_2
@@ -1803,7 +1803,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'user_id': 'user_id',
         }
         self.modifiable_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
         new_user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias_3',
@@ -1814,7 +1814,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'user_id': None,
         }
         self.modifiable_new_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)[0])
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
     def test_validate_non_str_user_id_raises_exception(self):
         self.user_settings.user_id = 0
