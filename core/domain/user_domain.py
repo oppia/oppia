@@ -458,5 +458,4 @@ class ModifiableUserData(python_utils.OBJECT):
                     data_schema_version, cls.CURRENT_SCHEMA_VERSION)
             )
 
-        return (
-            cls.from_dict(raw_user_data_dict), data_schema_version)
+        return cls.from_dict(raw_user_data_dict)
