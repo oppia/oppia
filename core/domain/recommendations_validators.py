@@ -52,7 +52,7 @@ class ExplorationRecommendationsModelValidator(
         Args:
             item: ndb.Model. ExplorationRecommendationsModel to validate.
         """
-        
+
         if item.id in item.recommended_exploration_ids:
             cls._add_error(
                 'item exploration %s' % (
