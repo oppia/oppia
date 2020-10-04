@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+  'domain/improvements/high-bounce-rate-task.model';
 import { TaskEntryBackendDict } from
   'domain/improvements/TaskEntryObjectFactory';
 import { IneffectiveFeedbackLoopTask } from

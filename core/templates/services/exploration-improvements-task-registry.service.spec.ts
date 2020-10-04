@@ -27,7 +27,7 @@ import {
   ExplorationTaskObjectFactory
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+  'domain/improvements/high-bounce-rate-task.model';
 import { StateStatsBackendDict } from
   'domain/statistics/state-stats-model';
 import { IneffectiveFeedbackLoopTask } from

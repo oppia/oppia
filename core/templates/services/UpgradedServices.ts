@@ -243,8 +243,6 @@ import { GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
-import { HighBounceRateTaskObjectFactory } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -755,8 +753,6 @@ export class UpgradedServices {
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['GuestCollectionProgressObjectFactory'] =
       new GuestCollectionProgressObjectFactory();
-    upgradedServices['HighBounceRateTaskObjectFactory'] =
-      new HighBounceRateTaskObjectFactory();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageClickInputRulesService'] =
@@ -932,7 +928,6 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['ExplorationTaskObjectFactory'] =
       new ExplorationTaskObjectFactory(
-        upgradedServices['HighBounceRateTaskObjectFactory'],
         upgradedServices['IneffectiveFeedbackLoopTaskObjectFactory'],
         upgradedServices['NeedsGuidingResponsesTaskObjectFactory'],
         upgradedServices['SuccessiveIncorrectAnswersTaskObjectFactory']);

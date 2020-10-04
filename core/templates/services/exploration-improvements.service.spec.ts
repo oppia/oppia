@@ -22,8 +22,7 @@ import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions-object.factory';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
-import { HighBounceRateTaskObjectFactory } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
@@ -62,7 +61,6 @@ describe('ExplorationImprovementsService', function() {
   let explorationImprovementsTaskRegistryService:
     ExplorationImprovementsTaskRegistryService;
   let explorationStatsService: ExplorationStatsService;
-  let highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory;
   let playthroughObjectFactory: PlaythroughObjectFactory;
   let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
   let stateTopAnswersStatsService: StateTopAnswersStatsService;
@@ -168,8 +166,6 @@ describe('ExplorationImprovementsService', function() {
     explorationStatsService = $injector.get('ExplorationStatsService');
     playthroughIssuesBackendApiService = (
       $injector.get('PlaythroughIssuesBackendApiService'));
-    highBounceRateTaskObjectFactory = (
-      $injector.get('HighBounceRateTaskObjectFactory'));
     playthroughObjectFactory = $injector.get('PlaythroughObjectFactory');
     stateTopAnswersStatsService = $injector.get('StateTopAnswersStatsService');
     userExplorationPermissionsService = (
@@ -388,7 +384,7 @@ describe('ExplorationImprovementsService', function() {
       this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
 
       // Mock a preexisting open HBR task provided by the back-end.
-      const hbrTask = highBounceRateTaskObjectFactory.createFromBackendDict({
+      const hbrTask = HighBounceRateTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: expId,
         entity_version: expVersion,

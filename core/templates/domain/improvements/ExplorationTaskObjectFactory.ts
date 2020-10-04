@@ -19,8 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { HighBounceRateTask, HighBounceRateTaskObjectFactory } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
 import { TaskEntryBackendDict } from
   'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
@@ -61,7 +60,6 @@ export type ExplorationTask = (
 })
 export class ExplorationTaskObjectFactory {
   constructor(
-      private hbrTaskObjectFactory: HighBounceRateTaskObjectFactory,
       private iflTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
       private ngrTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory,
       private siaTaskObjectFactory:
@@ -108,7 +106,7 @@ export class ExplorationTaskObjectFactory {
     const taskType = backendDict.task_type;
     switch (backendDict.task_type) {
       case 'high_bounce_rate':
-        return this.hbrTaskObjectFactory.createFromBackendDict(backendDict);
+        return HighBounceRateTask.createFromBackendDict(backendDict);
       case 'ineffective_feedback_loop':
         return this.iflTaskObjectFactory.createFromBackendDict(backendDict);
       case 'needs_guiding_responses':

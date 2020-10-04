@@ -16,9 +16,6 @@
  * @fileoverview Domain object for a high bounce-rate improvements task.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { ImprovementsConstants } from
@@ -49,6 +46,12 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
         `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`);
     }
     super(backendDict);
+  }
+
+  static createFromBackendDict(
+      backendDict: TaskEntryBackendDict<'high_bounce_rate'>
+  ): HighBounceRateTask {
+    return new HighBounceRateTask(backendDict);
   }
 
   public resolve(): void {
@@ -105,22 +108,3 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
       bounceRateAsPercentString + ' of learners had dropped off at this card.');
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class HighBounceRateTaskObjectFactory {
-  /**
-   * Returns a new task from the given backend dict, or null if the dict does
-   * not represent a high bounce rate task.
-   */
-  createFromBackendDict(
-      backendDict: TaskEntryBackendDict<'high_bounce_rate'>
-  ): HighBounceRateTask {
-    return new HighBounceRateTask(backendDict);
-  }
-}
-
-angular.module('oppia').factory(
-  'HighBounceRateTaskObjectFactory',
-  downgradeInjectable(HighBounceRateTaskObjectFactory));

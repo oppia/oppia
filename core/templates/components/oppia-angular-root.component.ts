@@ -262,8 +262,6 @@ import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
-import { HighBounceRateTaskObjectFactory } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -741,7 +739,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static guestCollectionProgressService: GuestCollectionProgressService;
   static guppyConfigurationService: GuppyConfigurationService;
   static guppyInitializationService: GuppyInitializationService;
-  static highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory;
   static hintObjectFactory: HintObjectFactory;
   static htmlEscaperService: HtmlEscaperService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
@@ -1103,7 +1100,6 @@ private guestCollectionProgressObjectFactory:
 private guppyConfigurationService: GuppyConfigurationService,
 private guppyInitializationService: GuppyInitializationService,
 private guestCollectionProgressService: GuestCollectionProgressService,
-private highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory,
 private hintObjectFactory: HintObjectFactory,
 private htmlEscaperService: HtmlEscaperService,
 private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -1548,8 +1544,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.guppyInitializationService);
     OppiaAngularRootComponent.guestCollectionProgressService = (
       this.guestCollectionProgressService);
-    OppiaAngularRootComponent.highBounceRateTaskObjectFactory = (
-      this.highBounceRateTaskObjectFactory);
     OppiaAngularRootComponent.hintObjectFactory = this.hintObjectFactory;
     OppiaAngularRootComponent.htmlEscaperService = this.htmlEscaperService;
     OppiaAngularRootComponent.i18nLanguageCodeService = (

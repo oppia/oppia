@@ -31,7 +31,7 @@ import {
   ExplorationTaskType,
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+  'domain/improvements/high-bounce-rate-task.model';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { IneffectiveFeedbackLoopTask } from

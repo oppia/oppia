@@ -100,7 +100,6 @@ import { ThreadMessageSummaryObjectFactory } from 'domain/feedback_message/Threa
 import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FeedbackThreadSummaryObjectFactory } from 'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { ExplorationTaskObjectFactory } from 'domain/improvements/ExplorationTaskObjectFactory';
-import { HighBounceRateTaskObjectFactory } from 'domain/improvements/HighBounceRateTaskObjectFactory';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from 'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTaskObjectFactory } from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { SuccessiveIncorrectAnswersTaskObjectFactory } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
@@ -479,7 +478,6 @@ export const angularServices: [string, unknown][] = [
   ['GuestCollectionProgressService', GuestCollectionProgressService],
   ['GuppyConfigurationService', GuppyConfigurationService],
   ['GuppyInitializationService', GuppyInitializationService],
-  ['HighBounceRateTaskObjectFactory', HighBounceRateTaskObjectFactory],
   ['HintObjectFactory', HintObjectFactory],
   ['HtmlEscaperService', HtmlEscaperService],
   ['I18nLanguageCodeService', I18nLanguageCodeService],

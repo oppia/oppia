@@ -16,30 +16,20 @@
  * @fileoverview Unit tests for the HighBounceRateTask domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
-import { HighBounceRateTaskObjectFactory } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
 
 describe('High bounce rate task', function() {
-  let highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory;
-
-  beforeEach(() => {
-    highBounceRateTaskObjectFactory = (
-      TestBed.get(HighBounceRateTaskObjectFactory));
-  });
-
   beforeEach(() => {
     this.config = (
       new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.20, 100));
     this.createFromExplorationStats = (
         expStats: ExplorationStats, stateName: string,
         numEqPlaythroughs: number) => {
-      const task = highBounceRateTaskObjectFactory.createFromBackendDict({
+      const task = HighBounceRateTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -109,7 +99,7 @@ describe('High bounce rate task', function() {
   });
 
   it('should create from a high bounce rate backend dict', () => {
-    const task = highBounceRateTaskObjectFactory.createFromBackendDict({
+    const task = HighBounceRateTask.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
       entity_version: 1,
@@ -136,7 +126,7 @@ describe('High bounce rate task', function() {
 
   it('should throw when backend dict entity type is not exploration', () => {
     expect(
-      () => highBounceRateTaskObjectFactory.createFromBackendDict({
+      () => HighBounceRateTask.createFromBackendDict({
         entity_type: '???',
         entity_id: 'eid',
         entity_version: 1,
@@ -155,7 +145,7 @@ describe('High bounce rate task', function() {
 
   it('should throw when backend dict task type is not high bounce rate', () => {
     expect(
-      () => highBounceRateTaskObjectFactory.createFromBackendDict({
+      () => HighBounceRateTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -179,7 +169,7 @@ describe('High bounce rate task', function() {
 
   it('should throw when backend dict target type is not state', () => {
     expect(
-      () => highBounceRateTaskObjectFactory.createFromBackendDict({
+      () => HighBounceRateTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,

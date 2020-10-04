@@ -22,7 +22,7 @@ import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationTaskType } from
   'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+  'domain/improvements/high-bounce-rate-task.model';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from
