@@ -460,6 +460,7 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': False,
             'switch_version_gets_called': False,
             'flush_memcache_gets_called': False,
+            'verify_number_of_pending_deletion_requests_gets_called': False,
             'check_breakage_gets_called': False,
             'update_configs_in_deploy_data_gets_called': False,
             'copyfile_gets_called': False
@@ -472,6 +473,7 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': True,
             'switch_version_gets_called': True,
             'flush_memcache_gets_called': True,
+            'verify_number_of_pending_deletion_requests_gets_called': True,
             'check_breakage_gets_called': True,
             'update_configs_in_deploy_data_gets_called': True,
             'copyfile_gets_called': True
@@ -502,6 +504,10 @@ class DeployTests(test_utils.GenericTestBase):
                 check_function_calls['switch_version_gets_called'] = True
         def mock_flush_memcache(unused_app_name):
             check_function_calls['flush_memcache_gets_called'] = True
+        def mock_verify_number_of_pending_deletion_requests(
+                unused_app_name):
+            check_function_calls[
+                'verify_number_of_pending_deletion_requests_gets_called'] = True
         def mock_check_breakage(
                 unused_app_name, current_release_version):
             if current_release_version == '1-2-3':
@@ -527,6 +533,10 @@ class DeployTests(test_utils.GenericTestBase):
             deploy, 'switch_version', mock_switch_version)
         memcache_swap = self.swap(
             deploy, 'flush_memcache', mock_flush_memcache)
+        verify_number_of_pending_deletion_requests_swap = self.swap(
+            deploy,
+            'verify_number_of_pending_deletion_requests',
+            mock_verify_number_of_pending_deletion_requests)
         check_breakage_swap = self.swap(
             deploy, 'check_breakage', mock_check_breakage)
         uc_swap = self.swap(
@@ -538,14 +548,15 @@ class DeployTests(test_utils.GenericTestBase):
                 'deploy.py', '--app_name=oppiatestserver',
                 '--release_dir_path=%s' % release_dir_path])
 
-        with self.get_branch_swap, self.install_swap:
-            with self.release_script_exist_swap, self.gcloud_available_swap:
-                with args_swap, self.exists_swap, self.check_output_swap:
-                    with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
-                        with cwd_swap, preprocess_swap, update_swap, build_swap:
-                            with uc_swap, deploy_swap, switch_swap, copy_swap:
-                                with memcache_swap, check_breakage_swap:
-                                    deploy.execute_deployment()
+        with contextlib.nested(
+            self.get_branch_swap, self.install_swap, self.exists_swap, cwd_swap,
+            self.release_script_exist_swap, self.gcloud_available_swap, uc_swap,
+            args_swap, self.check_output_swap, self.dir_exists_swap, build_swap,
+            self.cd_swap, self.copytree_swap, update_swap, check_breakage_swap,
+            deploy_swap, switch_swap, copy_swap, memcache_swap, preprocess_swap,
+            verify_number_of_pending_deletion_requests_swap
+        ):
+            deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls_with_custom_version(self):
