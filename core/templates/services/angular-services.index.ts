@@ -51,7 +51,6 @@ import { JobStatusSummaryObjectFactory } from 'domain/admin/job-status-summary-o
 import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
 import { PredictionResultObjectFactory } from 'domain/classifier/PredictionResultObjectFactory';
-import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObjectFactory';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsObjectFactory } from 'domain/collection/CollectionRightsObjectFactory';
 import { GuestCollectionProgressObjectFactory } from 'domain/collection/GuestCollectionProgressObjectFactory';
@@ -174,7 +173,6 @@ import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageCont
 import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsObjectFactory } from 'domain/topic/TopicRightsObjectFactory';
-import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -382,7 +380,6 @@ export const angularServices: [string, unknown][] = [
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['ClassifierObjectFactory', ClassifierObjectFactory],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
-  ['ClassroomDataObjectFactory', ClassroomDataObjectFactory],
   ['ClientContextObjectFactory', ClientContextObjectFactory],
   ['CodeNormalizerService', CodeNormalizerService],
   ['CodeReplPredictionService', CodeReplPredictionService],
@@ -685,7 +682,6 @@ export const angularServices: [string, unknown][] = [
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsObjectFactory', TopicRightsObjectFactory],
-  ['TopicSummaryObjectFactory', TopicSummaryObjectFactory],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
   ['TopicsAndSkillsDashboardBackendApiService',
     TopicsAndSkillsDashboardBackendApiService],

@@ -91,8 +91,6 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { ClassroomDataObjectFactory } from
-  'domain/classroom/ClassroomDataObjectFactory';
 import { ClientContextObjectFactory } from
   'domain/platform_feature/client-context-object.factory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
@@ -606,8 +604,6 @@ import { TopicRightsObjectFactory } from
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
 import { TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
@@ -893,8 +889,6 @@ export class UpgradedServices {
         new TopicsAndSkillsDashboardPageService();
     upgradedServices['TopicRightsObjectFactory'] =
       new TopicRightsObjectFactory();
-    upgradedServices['TopicSummaryObjectFactory'] =
-      new TopicSummaryObjectFactory();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UserInfoObjectFactory'] = new UserInfoObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
@@ -920,9 +914,6 @@ export class UpgradedServices {
       upgradedServices['LoggerService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
-    upgradedServices['ClassroomDataObjectFactory'] =
-      new ClassroomDataObjectFactory(
-        upgradedServices['TopicSummaryObjectFactory']);
     upgradedServices['CodeReplValidationService'] =
       new CodeReplValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1232,8 +1223,7 @@ export class UpgradedServices {
       upgradedServices['HttpClient'],
       upgradedServices['ComputationDataObjectFactory'],
       upgradedServices['JobDataObjectFactory'],
-      upgradedServices['JobStatusSummaryObjectFactory'],
-      upgradedServices['TopicSummaryObjectFactory']);
+      upgradedServices['JobStatusSummaryObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardBackendApiService'] =
@@ -1283,8 +1273,7 @@ export class UpgradedServices {
     upgradedServices['ClassroomBackendApiService'] =
       new ClassroomBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['TopicSummaryObjectFactory']);
+        upgradedServices['HttpClient']);
     upgradedServices['CollectionCreationBackendService'] = (
       new CollectionCreationBackendService(
         upgradedServices['HttpClient']));
@@ -1308,7 +1297,6 @@ export class UpgradedServices {
         upgradedServices['SuggestionObjectFactory'],
         upgradedServices['SuggestionThreadObjectFactory'],
         upgradedServices['SuggestionsService'],
-        upgradedServices['TopicSummaryObjectFactory'],
         upgradedServices['LoggerService']);
     upgradedServices['CurrentInteractionService'] =
       new CurrentInteractionService(
@@ -1475,7 +1463,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['ShortSkillSummaryObjectFactory'],
         upgradedServices['SkillSummaryObjectFactory'],
-        upgradedServices['TopicSummaryObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['TopicViewerBackendApiService'] =
       new TopicViewerBackendApiService(

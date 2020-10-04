@@ -20,6 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 import { EventEmitter } from '@angular/core';
+import { TopicSummary, TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
 
 // ^^^ This block is to be removed.
 
@@ -44,7 +45,6 @@ describe('Topics and Skills Dashboard Page', function() {
   var $q = null;
   var $timeout = null;
   var TopicsAndSkillsDashboardFilterObjectFactory = null;
-  var TopicSummaryObjectFactory = null;
   var SkillSummaryObjectFactory = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
 
@@ -87,8 +87,6 @@ describe('Topics and Skills Dashboard Page', function() {
       $q = $injector.get('$q');
       TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
         'TopicsAndSkillsDashboardFilterObjectFactory');
-      TopicSummaryObjectFactory = $injector.get(
-        'TopicSummaryObjectFactory');
       SkillSummaryObjectFactory = $injector.get(
         'SkillSummaryObjectFactory');
 
@@ -99,8 +97,8 @@ describe('Topics and Skills Dashboard Page', function() {
           var deferred = $q.defer();
           deferred.resolve({
             topicSummaries: sampleDataResults.topic_summary_dicts.map(
-              backendDict => TopicSummaryObjectFactory
-                .createFromBackendDict(backendDict)),
+              backendDict => TopicSummary
+                .createFromBackendDict(backendDict as TopicSummaryBackendDict)),
             untriagedSkillSummaries: (
               sampleDataResults.untriaged_skill_summary_dicts.map(
                 backendDict => SkillSummaryObjectFactory
@@ -165,7 +163,8 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.activeTab).toEqual('topics');
       expect(ctrl.totalTopicSummaries).toEqual(
         sampleDataResults.topic_summary_dicts.map(
-          dict => TopicSummaryObjectFactory.createFromBackendDict(dict)));
+          dict => TopicSummary.createFromBackendDict(
+            dict as TopicSummaryBackendDict)));
       expect(ctrl.untriagedSkillSummaries).toEqual(
         sampleDataResults.untriaged_skill_summary_dicts.map(
           dict => SkillSummaryObjectFactory.createFromBackendDict(dict)));
@@ -304,22 +303,22 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should apply the filters', function() {
-      const topic1 = TopicSummaryObjectFactory.createFromBackendDict({
+      const topic1 = TopicSummary.createFromBackendDict({
         is_published: true, name: 'Alpha', classroom: 'Math',
         description: 'Alpha description',
-      });
-      const topic2 = TopicSummaryObjectFactory.createFromBackendDict({
+      } as TopicSummaryBackendDict);
+      const topic2 = TopicSummary.createFromBackendDict({
         is_published: false, name: 'Alpha2', classroom: 'Math',
         description: 'Alp2 desc',
-      });
-      const topic3 = TopicSummaryObjectFactory.createFromBackendDict({
+      } as TopicSummaryBackendDict);
+      const topic3 = TopicSummary.createFromBackendDict({
         is_published: false, name: 'Beta', classroom: 'Math',
         description: 'Beta description',
-      });
-      const topic4 = TopicSummaryObjectFactory.createFromBackendDict({
+      } as TopicSummaryBackendDict);
+      const topic4 = TopicSummary.createFromBackendDict({
         is_published: true, name: 'Gamma', classroom: 'Math',
         description: 'Gamma description',
-      });
+      } as TopicSummaryBackendDict);
       ctrl.filterObject = (
         TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
       ctrl.totalTopicSummaries = [topic1, topic2, topic3, topic4];
@@ -366,8 +365,6 @@ describe('Topics and Skills Dashboard Page', function() {
       $q = $injector.get('$q');
       TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
         'TopicsAndSkillsDashboardFilterObjectFactory');
-      TopicSummaryObjectFactory = $injector.get(
-        'TopicSummaryObjectFactory');
       SkillSummaryObjectFactory = $injector.get(
         'SkillSummaryObjectFactory');
       var sampleDataResults2 = {

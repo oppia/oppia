@@ -13,19 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for TopicSummaryObjectFactory.
+ * @fileoverview Tests for TopicSummaryModel.
  */
 
-import { TopicSummary, TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+import { TopicSummary } from
+  'domain/topic/topic-summary.model';
 
-describe('Topic summary object factory', () => {
-  let topicSummaryObjectFactory: TopicSummaryObjectFactory = null;
+describe('Topic summary model', () => {
   let _sampleTopicSummary: TopicSummary = null;
 
   beforeEach(() => {
-    topicSummaryObjectFactory = new TopicSummaryObjectFactory();
-
     let sampleTopicSummaryBackendDict = {
       id: 'sample_topic_id',
       name: 'Topic Name',
@@ -44,7 +41,7 @@ describe('Topic summary object factory', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     };
-    _sampleTopicSummary = topicSummaryObjectFactory.createFromBackendDict(
+    _sampleTopicSummary = TopicSummary.createFromBackendDict(
       sampleTopicSummaryBackendDict);
   });
 

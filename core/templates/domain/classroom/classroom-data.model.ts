@@ -13,15 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating frontend instances of
+ * @fileoverview Model for creating frontend instances of
  * classroom objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import {
-  TopicSummary, TopicSummaryObjectFactory, TopicSummaryBackendDict
-} from 'domain/topic/TopicSummaryObjectFactory';
+  TopicSummary,
+  TopicSummaryBackendDict
+} from 'domain/topic/topic-summary.model';
 
 export class ClassroomData {
   _name: string;
@@ -36,6 +35,20 @@ export class ClassroomData {
     this._topicSummaries = topicSummaries;
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
+  }
+
+  static createFromBackendData(
+      name: string, topicSummaryDicts: TopicSummaryBackendDict[],
+      courseDetails: string, topicListIntro: string): ClassroomData {
+    let topicSummaries = topicSummaryDicts.map(
+      (summaryDict) => {
+        return TopicSummary.createFromBackendDict(
+          summaryDict);
+      }
+    );
+    return new ClassroomData(
+      name, topicSummaries, courseDetails, topicListIntro
+    );
   }
 
   getName(): string {
@@ -54,29 +67,3 @@ export class ClassroomData {
     return this._topicListIntro;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ClassroomDataObjectFactory {
-  constructor(
-      private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
-
-  createFromBackendData(
-      name: string, topicSummaryDicts: TopicSummaryBackendDict[],
-      courseDetails: string, topicListIntro: string): ClassroomData {
-    let topicSummaries = topicSummaryDicts.map(
-      (summaryDict) => {
-        return this.topicSummaryObjectFactory.createFromBackendDict(
-          summaryDict);
-      }
-    );
-    return new ClassroomData(
-      name, topicSummaries, courseDetails, topicListIntro
-    );
-  }
-}
-
-angular.module('oppia').factory(
-  'ClassroomDataObjectFactory',
-  downgradeInjectable(ClassroomDataObjectFactory));

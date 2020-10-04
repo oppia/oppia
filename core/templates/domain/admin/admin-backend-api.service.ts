@@ -23,10 +23,9 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
-  TopicSummaryBackendDict,
   TopicSummary,
-  TopicSummaryObjectFactory
-} from 'domain/topic/TopicSummaryObjectFactory';
+  TopicSummaryBackendDict
+} from 'domain/topic/topic-summary.model';
 import {
   ComputationData,
   ComputationDataBackendDict,
@@ -104,8 +103,7 @@ export class AdminBackendApiService {
     private http: HttpClient,
     private computationDataObjectFactory: ComputationDataObjectFactory,
     private jobDataObjectFactory: JobDataObjectFactory,
-    private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
+    private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
@@ -131,7 +129,7 @@ export class AdminBackendApiService {
           continuousComputationsData: response.continuous_computations_data.map(
             this.computationDataObjectFactory.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
-            this.topicSummaryObjectFactory.createFromBackendDict)
+            TopicSummary.createFromBackendDict)
         });
       }, errorResponse => {
         reject(errorResponse.error.error);

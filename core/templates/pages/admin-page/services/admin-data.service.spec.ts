@@ -30,8 +30,8 @@ import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+import { TopicSummary } from
+  'domain/topic/topic-summary.model';
 
 
 describe('Admin Data Service', () => {
@@ -39,7 +39,6 @@ describe('Admin Data Service', () => {
   let cdof: ComputationDataObjectFactory;
   let jdof: JobDataObjectFactory;
   let jsof: JobStatusSummaryObjectFactory;
-  let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   var sampleAdminData = {
     unfinished_job_data: [],
@@ -123,7 +122,6 @@ describe('Admin Data Service', () => {
     cdof = TestBed.get(ComputationDataObjectFactory);
     jdof = TestBed.get(JobDataObjectFactory);
     jsof = TestBed.get(JobStatusSummaryObjectFactory);
-    tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataResponse = {
       demoExplorations: sampleAdminData.demo_explorations,
@@ -149,7 +147,7 @@ describe('Admin Data Service', () => {
         sampleAdminData.continuous_computations_data.map(
           cdof.createFromBackendDict),
       topicSummaries: sampleAdminData.topic_summaries.map(
-        tsof.createFromBackendDict)
+        TopicSummary.createFromBackendDict)
     };
   });
 

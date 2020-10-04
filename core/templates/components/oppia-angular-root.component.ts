@@ -121,8 +121,6 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { ClassroomDataObjectFactory } from
-  'domain/classroom/ClassroomDataObjectFactory';
 import { ClientContextObjectFactory } from
   'domain/platform_feature/client-context-object.factory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
@@ -567,8 +565,6 @@ import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
 import { TopicsAndSkillsDashboardFilterObjectFactory } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
@@ -647,7 +643,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ckEditorCopyContentService: CkEditorCopyContentService;
   static classifierObjectFactory: ClassifierObjectFactory;
   static classroomBackendApiService: ClassroomBackendApiService;
-  static classroomDataObjectFactory: ClassroomDataObjectFactory;
   static clientContextObjectFactory: ClientContextObjectFactory;
   static codeNormalizerService: CodeNormalizerService;
   static codeReplPredictionService: CodeReplPredictionService;
@@ -949,7 +944,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static topicRightsObjectFactory: TopicRightsObjectFactory;
   static topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService;
-  static topicSummaryObjectFactory: TopicSummaryObjectFactory;
   static topicsAndSkillsDashboardFilterObjectFactory:
     TopicsAndSkillsDashboardFilterObjectFactory;
   static topicsAndSkillsDashboardPageService:
@@ -1011,7 +1005,6 @@ private changeObjectFactory: ChangeObjectFactory,
 private ckEditorCopyContentService: CkEditorCopyContentService,
 private classifierObjectFactory: ClassifierObjectFactory,
 private classroomBackendApiService: ClassroomBackendApiService,
-private classroomDataObjectFactory: ClassroomDataObjectFactory,
 private clientContextObjectFactory: ClientContextObjectFactory,
 private codeNormalizerService: CodeNormalizerService,
 private codeReplPredictionService: CodeReplPredictionService,
@@ -1315,7 +1308,6 @@ private topicObjectFactory: TopicObjectFactory,
 private topicRightsObjectFactory: TopicRightsObjectFactory,
 private topicsAndSkillsDashboardBackendApiService:
   TopicsAndSkillsDashboardBackendApiService,
-private topicSummaryObjectFactory: TopicSummaryObjectFactory,
 private topicsAndSkillsDashboardFilterObjectFactory:
   TopicsAndSkillsDashboardFilterObjectFactory,
 private topicsAndSkillsDashboardPageService:
@@ -1403,8 +1395,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.classifierObjectFactory);
     OppiaAngularRootComponent.classroomBackendApiService = (
       this.classroomBackendApiService);
-    OppiaAngularRootComponent.classroomDataObjectFactory = (
-      this.classroomDataObjectFactory);
     OppiaAngularRootComponent.clientContextObjectFactory = (
       this.clientContextObjectFactory);
     OppiaAngularRootComponent.codeNormalizerService = (
@@ -1895,8 +1885,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.topicRightsObjectFactory);
     OppiaAngularRootComponent.topicsAndSkillsDashboardBackendApiService = (
       this.topicsAndSkillsDashboardBackendApiService);
-    OppiaAngularRootComponent.topicSummaryObjectFactory = (
-      this.topicSummaryObjectFactory);
     OppiaAngularRootComponent.topicsAndSkillsDashboardFilterObjectFactory = (
       this.topicsAndSkillsDashboardFilterObjectFactory);
     OppiaAngularRootComponent.topicsAndSkillsDashboardPageService = (

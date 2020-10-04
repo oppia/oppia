@@ -13,25 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ClassroomDataObjectFactory.
+ * @fileoverview Unit tests for ClassroomDataModel.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { ClassroomData} from
+  'domain/classroom/classroom-data.model';
+import { TopicSummary } from
+  'domain/topic/topic-summary.model';
 
-import { ClassroomDataObjectFactory } from
-  'domain/classroom/ClassroomDataObjectFactory';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
-
-describe('Classroom data object factory', () => {
+describe('Classroom data model', () => {
   let topicSummaryDicts;
-  let classroomDataObjectFactory: ClassroomDataObjectFactory;
-  let topicSummaryObjectFactory: TopicSummaryObjectFactory;
 
   beforeEach(() => {
-    classroomDataObjectFactory = TestBed.get(ClassroomDataObjectFactory);
-    topicSummaryObjectFactory = TestBed.get(TopicSummaryObjectFactory);
-
     topicSummaryDicts = [{
       id: 'topic1',
       name: 'Topic name',
@@ -57,14 +50,14 @@ describe('Classroom data object factory', () => {
 
   it('should create a new classroom object from a backend dictionary', () => {
     let classroomData = (
-      classroomDataObjectFactory.createFromBackendData(
+      ClassroomData.createFromBackendData(
         'Math', topicSummaryDicts, 'Course Details', 'Topics Covered'));
     expect(classroomData.getName()).toEqual('Math');
     expect(classroomData.getCourseDetails()).toEqual('Course Details');
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
     expect(classroomData.getTopicSummaries()[0]).toEqual(
-      topicSummaryObjectFactory.createFromBackendDict(topicSummaryDicts[0]));
+      TopicSummary.createFromBackendDict(topicSummaryDicts[0]));
     expect(classroomData.getTopicSummaries()[1]).toEqual(
-      topicSummaryObjectFactory.createFromBackendDict(topicSummaryDicts[1]));
+      TopicSummary.createFromBackendDict(topicSummaryDicts[1]));
   });
 });

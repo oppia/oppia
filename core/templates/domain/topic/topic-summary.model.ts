@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of frontend
+ * @fileoverview Model for creating instances of frontend
  * topic summary domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export interface TopicSummaryBackendDict {
   'id': string;
@@ -63,6 +60,29 @@ export class TopicSummary {
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
       public urlFragment: string) { }
+
+  static createFromBackendDict(
+      topicSummaryBackendDict: TopicSummaryBackendDict): TopicSummary {
+    return new TopicSummary(
+      topicSummaryBackendDict.id,
+      topicSummaryBackendDict.name,
+      topicSummaryBackendDict.canonical_story_count,
+      topicSummaryBackendDict.subtopic_count,
+      topicSummaryBackendDict.total_skill_count,
+      topicSummaryBackendDict.uncategorized_skill_count,
+      topicSummaryBackendDict.language_code,
+      topicSummaryBackendDict.description,
+      topicSummaryBackendDict.version,
+      topicSummaryBackendDict.additional_story_count,
+      topicSummaryBackendDict.topic_model_created_on,
+      topicSummaryBackendDict.topic_model_last_updated,
+      topicSummaryBackendDict.can_edit_topic,
+      topicSummaryBackendDict.is_published,
+      topicSummaryBackendDict.classroom,
+      topicSummaryBackendDict.thumbnail_filename,
+      topicSummaryBackendDict.thumbnail_bg_color,
+      topicSummaryBackendDict.url_fragment);
+  }
 
   getId(): string {
     return this.id;
@@ -128,35 +148,3 @@ export class TopicSummary {
     return this.thumbnailBgColor;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class TopicSummaryObjectFactory {
-  createFromBackendDict(
-      topicSummaryBackendDict: TopicSummaryBackendDict): TopicSummary {
-    return new TopicSummary(
-      topicSummaryBackendDict.id,
-      topicSummaryBackendDict.name,
-      topicSummaryBackendDict.canonical_story_count,
-      topicSummaryBackendDict.subtopic_count,
-      topicSummaryBackendDict.total_skill_count,
-      topicSummaryBackendDict.uncategorized_skill_count,
-      topicSummaryBackendDict.language_code,
-      topicSummaryBackendDict.description,
-      topicSummaryBackendDict.version,
-      topicSummaryBackendDict.additional_story_count,
-      topicSummaryBackendDict.topic_model_created_on,
-      topicSummaryBackendDict.topic_model_last_updated,
-      topicSummaryBackendDict.can_edit_topic,
-      topicSummaryBackendDict.is_published,
-      topicSummaryBackendDict.classroom,
-      topicSummaryBackendDict.thumbnail_filename,
-      topicSummaryBackendDict.thumbnail_bg_color,
-      topicSummaryBackendDict.url_fragment);
-  }
-}
-
-angular.module('oppia').factory(
-  'TopicSummaryObjectFactory',
-  downgradeInjectable(TopicSummaryObjectFactory));
