@@ -161,10 +161,6 @@ import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
-import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
-import { EmailDashboardQueryResultsObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-results-object.factory';
 import { EndExplorationRulesService } from
   'interactions/EndExploration/directives/end-exploration-rules.service';
 import { EndExplorationValidationService } from
@@ -744,8 +740,6 @@ export class UpgradedServices {
     upgradedServices['DragAndDropSortInputRulesService'] =
       new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
-    upgradedServices['EmailDashboardQueryObjectFactory'] =
-      new EmailDashboardQueryObjectFactory();
     upgradedServices['EndExplorationRulesService'] =
       new EndExplorationRulesService();
     upgradedServices['EntityContextObjectFactory'] =
@@ -958,9 +952,6 @@ export class UpgradedServices {
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
-    upgradedServices['EmailDashboardQueryResultsObjectFactory'] =
-      new EmailDashboardQueryResultsObjectFactory(
-        upgradedServices['EmailDashboardQueryObjectFactory']);
     upgradedServices['DragAndDropSortInputValidationService'] =
       new DragAndDropSortInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1283,9 +1274,7 @@ export class UpgradedServices {
       upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardBackendApiService'] =
       new EmailDashboardBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['EmailDashboardQueryResultsObjectFactory'],
-        upgradedServices['EmailDashboardQueryObjectFactory']);
+        upgradedServices['HttpClient']);
     upgradedServices['ExplorationPermissionsBackendApiService'] =
       new ExplorationPermissionsBackendApiService(
         upgradedServices['ContextService'],

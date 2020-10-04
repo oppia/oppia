@@ -13,11 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for email dashboard query.
+ * @fileoverview Frontend domain model for email dashboard query.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export interface EmailDashboardQueryDict {
   'id': string;
@@ -47,19 +44,15 @@ export class EmailDashboardQuery {
     this.submitterUsername = submitterUsername;
     this.createdOn = createdOn;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class EmailDashboardQueryObjectFactory {
-  createFromQueryDict(queryDict: EmailDashboardQueryDict): EmailDashboardQuery {
+  static createFromQueryDict(
+      queryDict: EmailDashboardQueryDict): EmailDashboardQuery {
     return new EmailDashboardQuery(
       queryDict.id, queryDict.status, queryDict.num_qualified_users,
       queryDict.submitter_username, queryDict.created_on);
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: EmailDashboardQueryBackendDict): EmailDashboardQuery {
     return new EmailDashboardQuery(
       backendDict.query.id, backendDict.query.status,
@@ -67,7 +60,3 @@ export class EmailDashboardQueryObjectFactory {
       backendDict.query.submitter_username, backendDict.query.created_on);
   }
 }
-
-angular.module('oppia').factory(
-  'EmailDashboardQueryObjectFactory',
-  downgradeInjectable(EmailDashboardQueryObjectFactory));

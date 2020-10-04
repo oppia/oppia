@@ -17,14 +17,10 @@
  * results.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   EmailDashboardQuery,
   EmailDashboardQueryDict,
-  EmailDashboardQueryObjectFactory
-} from 'domain/email-dashboard/email-dashboard-query-object.factory';
+} from 'domain/email-dashboard/email-dashboard-query.model';
 
 export interface EmailDashboardQueryResultsBackendDict {
   'cursor': string;
@@ -39,31 +35,18 @@ export class EmailDashboardQueryResults {
     this.cursor = cursor;
     this.recentQueries = recentQueries;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class EmailDashboardQueryResultsObjectFactory {
-  constructor(
-    private emailDashboardQueryObjectFactory:
-    EmailDashboardQueryObjectFactory) {}
-
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: EmailDashboardQueryResultsBackendDict):
       EmailDashboardQueryResults {
     let queryObjects: EmailDashboardQuery[] = [];
 
     for (let queryDict of backendDict.recent_queries) {
       queryObjects.push(
-        this.emailDashboardQueryObjectFactory.createFromQueryDict(queryDict));
+        EmailDashboardQuery.createFromQueryDict(queryDict));
     }
 
     return new EmailDashboardQueryResults(
       backendDict.cursor, queryObjects);
   }
 }
-
-angular.module('oppia').factory(
-  'EmailDashboardQueryResultsObjectFactory',
-  downgradeInjectable(EmailDashboardQueryResultsObjectFactory));

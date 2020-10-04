@@ -16,11 +16,10 @@
  * @fileoverview Unit tests for EmailDashboardQueryObjectFactory.
  */
 
-import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
+import { EmailDashboardQuery } from
+  'domain/email-dashboard/email-dashboard-query.model';
 
 describe('Email dashboard query object factory', () => {
-  let edqof: EmailDashboardQueryObjectFactory;
   let queryDict = {
     created_on: '04-06-20 14:34:46',
     status: 'processing',
@@ -32,12 +31,8 @@ describe('Email dashboard query object factory', () => {
     query: queryDict
   };
 
-  beforeEach(() => {
-    edqof = new EmailDashboardQueryObjectFactory();
-  });
-
   it('should correctly convert query dict to query object', () => {
-    let queryObject = edqof.createFromQueryDict(queryDict);
+    let queryObject = EmailDashboardQuery.createFromQueryDict(queryDict);
 
     expect(queryObject.id).toEqual('buQW4Qhoxpjg');
     expect(queryObject.numQualifiedUsers).toEqual(0);
@@ -47,7 +42,7 @@ describe('Email dashboard query object factory', () => {
   });
 
   it('should correctly convert backend dict to query object', () => {
-    let queryObject = edqof.createFromBackendDict(backendDict);
+    let queryObject = EmailDashboardQuery.createFromBackendDict(backendDict);
 
     expect(queryObject.id).toEqual('buQW4Qhoxpjg');
     expect(queryObject.numQualifiedUsers).toEqual(0);

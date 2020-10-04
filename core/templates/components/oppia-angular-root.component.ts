@@ -187,10 +187,6 @@ import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
-import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
-import { EmailDashboardQueryResultsObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-results-object.factory';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
@@ -709,9 +705,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static editorFirstTimeEventsService: EditorFirstTimeEventsService;
   static emailDashboardBackendApiService: EmailDashboardBackendApiService;
   static emailDashboardDataService: EmailDashboardDataService;
-  static emailDashboardQueryObjectFactory: EmailDashboardQueryObjectFactory;
-  static emailDashboardQueryResultsObjectFactory:
-    EmailDashboardQueryResultsObjectFactory;
   static endExplorationRulesService: EndExplorationRulesService;
   static endExplorationValidationService: EndExplorationValidationService;
   static entityContextObjectFactory: EntityContextObjectFactory;
@@ -1086,9 +1079,6 @@ private editabilityService: EditabilityService,
 private editorFirstTimeEventsService: EditorFirstTimeEventsService,
 private emailDashboardBackendApiService: EmailDashboardBackendApiService,
 private emailDashboardDataService: EmailDashboardDataService,
-private emailDashboardQueryObjectFactory: EmailDashboardQueryObjectFactory,
-private emailDashboardQueryResultsObjectFactory:
-  EmailDashboardQueryResultsObjectFactory,
 private endExplorationRulesService: EndExplorationRulesService,
 private endExplorationValidationService: EndExplorationValidationService,
 private entityContextObjectFactory: EntityContextObjectFactory,
@@ -1518,10 +1508,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.emailDashboardBackendApiService);
     OppiaAngularRootComponent.emailDashboardDataService = (
       this.emailDashboardDataService);
-    OppiaAngularRootComponent.emailDashboardQueryObjectFactory = (
-      this.emailDashboardQueryObjectFactory);
-    OppiaAngularRootComponent.emailDashboardQueryResultsObjectFactory = (
-      this.emailDashboardQueryResultsObjectFactory);
     OppiaAngularRootComponent.endExplorationRulesService = (
       this.endExplorationRulesService);
     OppiaAngularRootComponent.endExplorationValidationService = (

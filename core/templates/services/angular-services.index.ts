@@ -66,8 +66,6 @@ import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/crea
 import { CreatorDashboardStatsObjectFactory } from 'domain/creator_dashboard/creator-dashboard-stats-object.factory';
 import { ChangeObjectFactory } from 'domain/editor/undo_redo/ChangeObjectFactory';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
-import { EmailDashboardQueryObjectFactory } from 'domain/email-dashboard/email-dashboard-query-object.factory';
-import { EmailDashboardQueryResultsObjectFactory } from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationDraftObjectFactory } from 'domain/exploration/ExplorationDraftObjectFactory';
@@ -434,9 +432,6 @@ export const angularServices: [string, unknown][] = [
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
-  ['EmailDashboardQueryObjectFactory', EmailDashboardQueryObjectFactory],
-  ['EmailDashboardQueryResultsObjectFactory',
-    EmailDashboardQueryResultsObjectFactory],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['EntityContextObjectFactory', EntityContextObjectFactory],

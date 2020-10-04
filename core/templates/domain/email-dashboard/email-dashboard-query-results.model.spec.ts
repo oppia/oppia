@@ -13,24 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EmailDashboardQueryResultsObjectFactory.
+ * @fileoverview Unit tests for EmailDashboardQueryResultsModel.
  */
 
-import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
-import { EmailDashboardQueryResultsObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-results-object.factory';
+import { EmailDashboardQuery } from
+  'domain/email-dashboard/email-dashboard-query.model';
+import { EmailDashboardQueryResults } from
+  'domain/email-dashboard/email-dashboard-query-results.model';
 
-describe('email dashboard query results object factory', () => {
-  let edqof: EmailDashboardQueryObjectFactory;
-  let edqrof: EmailDashboardQueryResultsObjectFactory;
-
-  beforeEach(() => {
-    edqrof = new EmailDashboardQueryResultsObjectFactory(
-      new EmailDashboardQueryObjectFactory());
-    edqof = new EmailDashboardQueryObjectFactory();
-  });
-
+describe('email dashboard query results model', () => {
   it('should correctly convert backend dict to query results object', () => {
     let backendDict = {
       cursor: 'test',
@@ -45,9 +36,10 @@ describe('email dashboard query results object factory', () => {
       ]
     };
 
-    let queryResultsObject = edqrof.createFromBackendDict(backendDict);
+    let queryResultsObject = EmailDashboardQueryResults.createFromBackendDict(
+      backendDict);
     let recentQueryObjects = backendDict.recent_queries.map(
-      edqof.createFromQueryDict);
+      EmailDashboardQuery.createFromQueryDict);
 
     expect(queryResultsObject.cursor).toEqual('test');
     expect(queryResultsObject.recentQueries).toEqual(recentQueryObjects);
