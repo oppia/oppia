@@ -22,9 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -50,15 +49,16 @@ class SubtopicPageModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The topic id that this subtopic is a part of.
-    topic_id = ndb.StringProperty(required=True, indexed=True)
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
     # The json data of the subtopic consisting of subtitled_html,
     # recorded_voiceovers and written_translations fields.
-    page_contents = ndb.JsonProperty(required=True)
+    page_contents = datastore_services.JsonProperty(required=True)
     # The schema version for the page_contents field.
-    page_contents_schema_version = ndb.IntegerProperty(
+    page_contents_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -129,7 +129,8 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the subtopic page being edited.
-    subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
+    subtopic_page_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
 
     @staticmethod
     def get_deletion_policy():

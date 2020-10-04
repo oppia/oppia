@@ -66,7 +66,8 @@ class ExplorationOpportunitySummaryModelValidator(
         the exploration.
 
         Args:
-            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            item: datastore_services.Model. ExplorationOpportunitySummaryModel
+                to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -115,7 +116,8 @@ class ExplorationOpportunitySummaryModelValidator(
         content available in the corresponding ExplorationModel.
 
         Args:
-            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            item: datastore_services.Model. ExplorationOpportunitySummaryModel
+                to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -162,7 +164,8 @@ class ExplorationOpportunitySummaryModelValidator(
         node of StoryModel.
 
         Args:
-            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            item: datastore_services.Model. ExplorationOpportunitySummaryModel
+                to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -255,7 +258,7 @@ class SkillOpportunityModelValidator(
         to the opportunity's skill.
 
         Args:
-            item: ndb.Model. SkillOpportunityModel to validate.
+            item: datastore_services.Model. SkillOpportunityModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents

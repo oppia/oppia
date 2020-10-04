@@ -30,11 +30,6 @@ from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
 Model = ndb.Model
-
-DateTimeProperty = ndb.DateTimeProperty
-
-
-Model = ndb.Model
 Key = ndb.Key
 
 BooleanProperty = ndb.BooleanProperty
@@ -47,38 +42,58 @@ TextProperty = ndb.TextProperty
 UserProperty = ndb.UserProperty
 
 
-def put_multi(models):
+def get_multi(keys):
+    """Fetches models corresponding to a sequence of keys.
+
+    Args:
+        keys: list(str). The keys to look up.
+
+    Returns:
+        list(datastore_services.Model | None). List whose items are either a
+        Model instance or None if the corresponding key wasn't found.
+    """
+    return ndb.get_multi(keys)
+
+
+def put_multi(models, update_last_updated_time=True):
     """Stores a sequence of Model instances.
 
     Args:
-        models: datastore_services.Model. A sequence of Model instances.
+        models: list(datastore_services.Model). A list of Model instances.
+        update_last_updated_time: bool. Whether to update the last_updated field
+            of the entities.
 
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(models)
+    # TODO(#10863): Stop passing in update_last_updated_time through these
+    # top-level functions.
+    return ndb.put_multi(
+        models, update_last_updated_time=update_last_updated_time)
 
 
 def put_multi_async(models, update_last_updated_time=True):
     """Stores a sequence of Model instances asynchronously.
 
     Args:
-        models: datastore_services.Model. A sequence of Model instances.
+        models: list(datastore_services.Model). A list of Model instances.
         update_last_updated_time: bool. Whether to update the last_updated field
             of the entities.
 
     Returns:
         list(future). A list of futures.
     """
+    # TODO(#10863): Stop passing in update_last_updated_time through these
+    # top-level functions.
     return ndb.put_multi_async(
         models, update_last_updated_time=update_last_updated_time)
 
 
 def delete_multi(keys):
-    """Deletes a sequence of keys.
+    """Deletes models corresponding to a sequence of keys.
 
     Args:
-        keys: list(str). A sequence of keys.
+        keys: list(str). A list of keys.
 
     Returns:
         list(None). A list of Nones, one per deleted model.
@@ -117,10 +132,11 @@ def all_of(*nodes):
     """Returns a query node which performs a boolean AND on their conditions.
 
     Args:
-        *nodes: ndb.Node. The nodes to combine.
+        *nodes: datastore_services.Node. The nodes to combine.
 
     Returns:
-        ndb.Node. A node combining the conditions using boolean AND.
+        datastore_services.Node. A node combining the conditions using boolean
+        AND.
     """
     return ndb.AND(*nodes)
 
@@ -129,10 +145,11 @@ def any_of(*nodes):
     """Returns a query node which performs a boolean OR on their conditions.
 
     Args:
-        *nodes: ndb.Node. The nodes to combine.
+        *nodes: datastore_services.Node. The nodes to combine.
 
     Returns:
-        ndb.Node. A node combining the conditions using boolean OR.
+        datastore_services.Node. A node combining the conditions using boolean
+        OR.
     """
     return ndb.OR(*nodes)
 
@@ -171,9 +188,9 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
             corresponding model names for which we have to fetch entities.
 
     Returns:
-        list(list(ndb.Model)). The model instances corresponding to the ids and
-        models. The models corresponding to the same tuple in the input are
-        grouped together.
+        list(list(datastore_services.Model)). The model instances corresponding
+        to the ids and models. The models corresponding to the same tuple in the
+        input are grouped together.
     """
     entity_keys = []
     for (model_name, entity_ids) in ids_and_models:

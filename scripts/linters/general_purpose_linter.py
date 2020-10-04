@@ -360,6 +360,18 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'ndb\.'),
+        'message': (
+            'Please use datastore_services instead of ndb, for example:\n'
+            '\n'
+            'datastore_services = models.Registry.import_datastore_services()\n'
+            '\n'
+            'class SampleModel(datastore_services.Model):\n'
+            '    ...\n'),
+        'excluded_files': (),
+        'excluded_dirs': ('core/platform',),
+    },
+    {
         'regexp': re.compile(r'\Wprint\('),
         'message': 'Please do not use print statement.',
         'excluded_files': (

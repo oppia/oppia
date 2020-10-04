@@ -22,9 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import feconf
 
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class RoleQueryAuditModel(base_models.BaseModel):
@@ -36,18 +35,18 @@ class RoleQueryAuditModel(base_models.BaseModel):
     """
 
     # The user_id of the user making query.
-    user_id = ndb.StringProperty(required=True, indexed=True)
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The intent of making query (viewing (by role or username)
     # or updating role).
-    intent = ndb.StringProperty(required=True, choices=[
+    intent = datastore_services.StringProperty(required=True, choices=[
         feconf.ROLE_ACTION_UPDATE,
         feconf.ROLE_ACTION_VIEW_BY_ROLE,
         feconf.ROLE_ACTION_VIEW_BY_USERNAME
     ], indexed=True)
     # The role being queried for.
-    role = ndb.StringProperty(default=None, indexed=True)
+    role = datastore_services.StringProperty(default=None, indexed=True)
     # The username in the query.
-    username = ndb.StringProperty(default=None, indexed=True)
+    username = datastore_services.StringProperty(default=None, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -87,11 +86,14 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     # The ID of the user that is making the change.
     # (Note that this is typically an admin user, who would be a different user
     # from the one whose username is being changed.)
-    committer_id = ndb.StringProperty(required=True, indexed=True)
+    committer_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The old username that is being changed.
-    old_username = ndb.StringProperty(required=True, indexed=True)
+    old_username = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The new username that the old one is being changed to.
-    new_username = ndb.StringProperty(required=True, indexed=True)
+    new_username = (
+        datastore_services.StringProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
