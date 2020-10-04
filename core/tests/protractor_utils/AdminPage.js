@@ -87,13 +87,13 @@ var AdminPage = function() {
     };
 
     var getExplorationElementReloadButton = function(explorationElement) {
-      return explorationElement.element(	
-        by.css('.protractor-test-reload-exploration-button')	
-      );	
+      return explorationElement.element(
+        by.css('.protractor-test-reload-exploration-button')
+      );
     };
     this.reloadCollection = async function(collectionId) {
       this.get();
-      var ReloadCollectionButtons = await(
+      var ReloadCollectionButtons = await (
         await reloadCollectionButtons.get(collectionId));
       await action.click('reloadCollectionButtons', ReloadCollectionButtons);
       await general.acceptAlert();
