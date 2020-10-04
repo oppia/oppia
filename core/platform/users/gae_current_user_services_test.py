@@ -68,13 +68,12 @@ class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
 
     def test_get_user_id_from_email(self):
         # Existing user scenario.
-        user_id = gae_current_user_services.get_gae_id_from_email(
-            self.OWNER_EMAIL)
-        self.assertEqual(user_id, self.EXPECTED_OWNER_USER_ID)
+        self.assertEqual(
+            gae_current_user_services.get_user_by_email(self.OWNER_EMAIL),
+            users.User(self.OWNER_EMAIL))
 
         # Non-existing user scenario.
-        user_id = gae_current_user_services.get_gae_id_from_email('')
-        self.assertEqual(user_id, None)
+        self.assertIsNone(gae_current_user_services.get_user_by_email(''))
 
     def test_get_current_gae_id(self):
         self.login(self.OWNER_EMAIL)

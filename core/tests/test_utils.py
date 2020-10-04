@@ -27,6 +27,7 @@ import datetime
 import inspect
 import itertools
 import json
+import logging
 import os
 import unittest
 
@@ -1254,8 +1255,7 @@ tags: []
             str. ID of the user possessing the given email.
         """
         gae_id = self.get_gae_id_from_email(email)
-        return (
-            user_services.get_user_settings_by_gae_id(gae_id).user_id)
+        return user_services.get_user_settings_by_gae_id(gae_id).user_id
 
     def get_gae_id_from_email(self, email):
         """Gets the GAE user ID corresponding to the given email.
@@ -1266,7 +1266,27 @@ tags: []
         Returns:
             str. GAE ID of the user possessing the given email.
         """
-        return current_user_services.get_gae_id_from_email(email)
+
+        class _MockModelWithUser(datastore_services.Model):
+            """A simple model with a user property."""
+
+            _use_memcache = False
+            _use_cache = False
+            user = datastore_services.UserProperty(required=True)
+
+        mock_user = current_user_services.get_user_by_email(email)
+        if mock_user is None:
+            logging.error(
+                'The email address %s does not correspond to a valid user_id'
+                % email)
+            return None
+
+        key = _MockModelWithUser(id=email, user=mock_user).put()
+        mock_model_with_user = _MockModelWithUser.get_by_id(key.id())
+        # GAE uses the naming 'user_id' internally, we call the GAE user_id just
+        # a gae_id in our code.
+        gae_id = mock_model_with_user.user.user_id()
+        return python_utils.convert_to_bytes(gae_id) if gae_id else None
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
