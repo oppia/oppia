@@ -394,12 +394,6 @@ import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
-import { PlatformParameterFilterObjectFactory } from
-  'domain/platform_feature/platform-parameter-filter-object.factory';
-import { PlatformParameterObjectFactory } from
-  'domain/platform_feature/platform-parameter-object.factory';
-import { PlatformParameterRuleObjectFactory } from
-  'domain/platform_feature/platform-parameter-rule-object.factory';
 import { PlayerCorrectnessFeedbackEnabledService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
@@ -837,8 +831,6 @@ export class UpgradedServices {
     upgradedServices['ParamMetadataObjectFactory'] =
       new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
-    upgradedServices['PlatformParameterFilterObjectFactory'] =
-      new PlatformParameterFilterObjectFactory();
     upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
@@ -1058,9 +1050,6 @@ export class UpgradedServices {
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['PlatformParameterRuleObjectFactory'] =
-      new PlatformParameterRuleObjectFactory(
-        upgradedServices['PlatformParameterFilterObjectFactory']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
     upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
@@ -1204,9 +1193,6 @@ export class UpgradedServices {
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
-    upgradedServices['PlatformParameterObjectFactory'] =
-      new PlatformParameterObjectFactory(
-        upgradedServices['PlatformParameterRuleObjectFactory']);
     upgradedServices['SidebarStatusService'] = new SidebarStatusService(
       upgradedServices['WindowDimensionsService']);
     upgradedServices['StateContentService'] = new StateContentService(

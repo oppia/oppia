@@ -13,27 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PlatformParameterFilterObjectFactory.
+ * @fileoverview Unit tests for PlatformParameterFilterModel.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import {
+  PlatformParameterFilter,
   PlatformParameterFilterBackendDict,
-  PlatformParameterFilterObjectFactory,
   PlatformParameterFilterType,
   ServerMode,
-} from 'domain/platform_feature/platform-parameter-filter-object.factory';
+} from 'domain/platform_feature/platform-parameter-filter.model';
 
-describe('PlatformParameterFilterObjectFactory', () => {
-  let factory: PlatformParameterFilterObjectFactory;
-
-  beforeEach(() => {
-    factory = TestBed.get(PlatformParameterFilterObjectFactory);
-  });
-
+describe('PlatformParameterFilterModel', () => {
   it('should create an instance from a backend dict.', () => {
-    const filter = factory.createFromBackendDict({
+    const filter = PlatformParameterFilter.createFromBackendDict({
       type: PlatformParameterFilterType.ServerMode,
       conditions: [['=', ServerMode.Dev.toString()]]
     });
@@ -48,7 +40,7 @@ describe('PlatformParameterFilterObjectFactory', () => {
       conditions: [['=', ServerMode.Dev.toString()]]
     };
 
-    const instance = factory.createFromBackendDict(backendDict);
+    const instance = PlatformParameterFilter.createFromBackendDict(backendDict);
 
     expect(instance.toBackendDict()).toEqual(backendDict);
   });

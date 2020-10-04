@@ -122,9 +122,6 @@ import { ClientContextObjectFactory } from 'domain/platform_feature/client-conte
 import { FeatureStatusSummaryObjectFactory } from 'domain/platform_feature/feature-status-summary-object.factory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
-import { PlatformParameterFilterObjectFactory } from 'domain/platform_feature/platform-parameter-filter-object.factory';
-import { PlatformParameterObjectFactory } from 'domain/platform_feature/platform-parameter-object.factory';
-import { PlatformParameterRuleObjectFactory } from 'domain/platform_feature/platform-parameter-rule-object.factory';
 import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from 'domain/question/QuestionSummaryObjectFactory';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
@@ -579,10 +576,6 @@ export const angularServices: [string, unknown][] = [
     PlatformFeatureAdminBackendApiService],
   ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
-  ['PlatformParameterFilterObjectFactory',
-    PlatformParameterFilterObjectFactory],
-  ['PlatformParameterObjectFactory', PlatformParameterObjectFactory],
-  ['PlatformParameterRuleObjectFactory', PlatformParameterRuleObjectFactory],
   ['PlayerCorrectnessFeedbackEnabledService',
     PlayerCorrectnessFeedbackEnabledService],
   ['PlayerPositionService', PlayerPositionService],

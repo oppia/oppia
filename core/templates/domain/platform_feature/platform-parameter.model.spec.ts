@@ -13,29 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PlatformParameterRuleObjectFactory.
+ * @fileoverview Unit tests for PlatformParameterRuleModel.
  */
-
-import { TestBed } from '@angular/core/testing';
 
 import {
   PlatformParameterFilterType,
   ServerMode
-} from 'domain/platform_feature/platform-parameter-filter-object.factory';
+} from 'domain/platform_feature/platform-parameter-filter.model';
 import {
+  PlatformParameter,
   PlatformParameterBackendDict,
-  PlatformParameterObjectFactory
-} from 'domain/platform_feature/platform-parameter-object.factory';
+} from 'domain/platform_feature/platform-parameter.model';
 
-describe('PlatformParameterObjectFactory', () => {
-  let factory: PlatformParameterObjectFactory;
-
-  beforeEach(() => {
-    factory = TestBed.get(PlatformParameterObjectFactory);
-  });
-
+describe('PlatformParameterModel', () => {
   it('should create an instance from a backend dict.', () => {
-    const param = factory.createFromBackendDict({
+    const param = PlatformParameter.createFromBackendDict({
       name: 'param name',
       description: 'This is a param for test.',
       data_type: 'string',
@@ -86,7 +78,7 @@ describe('PlatformParameterObjectFactory', () => {
       default_value: 'default value'
     };
 
-    const instance = factory.createFromBackendDict(backendDict);
+    const instance = PlatformParameter.createFromBackendDict(backendDict);
 
     expect(instance.createBackendDictsForRules()).toEqual(backendDict.rules);
   });

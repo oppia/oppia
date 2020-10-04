@@ -388,12 +388,6 @@ import { PlatformFeatureAdminBackendApiService } from
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { PlatformParameterFilterObjectFactory } from
-  'domain/platform_feature/platform-parameter-filter-object.factory';
-import { PlatformParameterObjectFactory } from
-  'domain/platform_feature/platform-parameter-object.factory';
-import { PlatformParameterRuleObjectFactory } from
-  'domain/platform_feature/platform-parameter-rule-object.factory';
 import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
@@ -852,10 +846,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     PlatformFeatureAdminBackendApiService;
   static platformFeatureBackendApiService: PlatformFeatureBackendApiService;
   static platformFeatureService: PlatformFeatureService;
-  static platformParameterFilterObjectFactory:
-    PlatformParameterFilterObjectFactory;
-  static platformParameterObjectFactory: PlatformParameterObjectFactory;
-  static platformParameterRuleObjectFactory: PlatformParameterRuleObjectFactory;
   static playerPositionService: PlayerPositionService;
   static playerTranscriptService: PlayerTranscriptService;
   static playthroughBackendApiService: PlaythroughBackendApiService;
@@ -1226,10 +1216,6 @@ private platformFeatureAdminBackendApiService:
   PlatformFeatureAdminBackendApiService,
 private platformFeatureBackendApiService: PlatformFeatureBackendApiService,
 private platformFeatureService: PlatformFeatureService,
-private platformParameterFilterObjectFactory:
-  PlatformParameterFilterObjectFactory,
-private platformParameterObjectFactory: PlatformParameterObjectFactory,
-private platformParameterRuleObjectFactory: PlatformParameterRuleObjectFactory,
 private playerCorrectnessFeedbackEnabledService:
   PlayerCorrectnessFeedbackEnabledService,
 private playerPositionService: PlayerPositionService,
@@ -1734,12 +1720,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.platformFeatureBackendApiService);
     OppiaAngularRootComponent.platformFeatureService = (
       this.platformFeatureService);
-    OppiaAngularRootComponent.platformParameterFilterObjectFactory = (
-      this.platformParameterFilterObjectFactory);
-    OppiaAngularRootComponent.platformParameterObjectFactory = (
-      this.platformParameterObjectFactory);
-    OppiaAngularRootComponent.platformParameterRuleObjectFactory = (
-      this.platformParameterRuleObjectFactory);
     OppiaAngularRootComponent.playerCorrectnessFeedbackEnabledService = (
       this.playerCorrectnessFeedbackEnabledService);
     OppiaAngularRootComponent.playerPositionService = (

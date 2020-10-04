@@ -13,18 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating PlatformParameter domain objects.
+ * @fileoverview Model for creating PlatformParameter domain objects.
  */
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
   PlatformParameterRule,
   PlatformParameterRuleBackendDict,
-  PlatformParameterRuleObjectFactory,
   PlatformParameterValue
-} from 'domain/platform_feature/platform-parameter-rule-object.factory';
+} from 'domain/platform_feature/platform-parameter-rule.model';
 
 export enum FeatureStage {
   DEV = 'dev',
@@ -75,6 +71,24 @@ export class PlatformParameter {
     this.featureStage = featureStage;
   }
 
+  static createFromBackendDict(
+      backendDict: PlatformParameterBackendDict): PlatformParameter {
+    return new PlatformParameter(
+      backendDict.name,
+      backendDict.description,
+      backendDict.data_type,
+      backendDict.rules.map(
+        ruleDict => (
+          PlatformParameterRule.createFromBackendDict(
+            ruleDict)
+        )),
+      backendDict.rule_schema_version,
+      backendDict.default_value,
+      backendDict.is_feature,
+      backendDict.feature_stage
+    );
+  }
+
   /**
    * Creates a list of dict representations of rules in the parameter instance.
    *
@@ -85,34 +99,3 @@ export class PlatformParameter {
     return this.rules.map(rule => rule.toBackendDict());
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class PlatformParameterObjectFactory {
-  constructor(
-    private platformParameterRuleObjectFactory:
-      PlatformParameterRuleObjectFactory) {}
-
-  createFromBackendDict(
-      backendDict: PlatformParameterBackendDict): PlatformParameter {
-    return new PlatformParameter(
-      backendDict.name,
-      backendDict.description,
-      backendDict.data_type,
-      backendDict.rules.map(
-        ruleDict => (
-          this.platformParameterRuleObjectFactory.createFromBackendDict(
-            ruleDict)
-        )),
-      backendDict.rule_schema_version,
-      backendDict.default_value,
-      backendDict.is_feature,
-      backendDict.feature_stage
-    );
-  }
-}
-
-angular.module('oppia').factory(
-  'PlatformParameterObjectFactory',
-  downgradeInjectable(PlatformParameterRuleObjectFactory));

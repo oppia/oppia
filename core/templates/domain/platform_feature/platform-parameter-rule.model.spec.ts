@@ -13,27 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PlatformParameterRuleObjectFactory.
+ * @fileoverview Unit tests for PlatformParameterRuleModel.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { PlatformParameterFilterType, ServerMode } from
-  'domain/platform_feature/platform-parameter-filter-object.factory';
+  'domain/platform_feature/platform-parameter-filter.model';
 import {
+  PlatformParameterRule,
   PlatformParameterRuleBackendDict,
-  PlatformParameterRuleObjectFactory,
-} from 'domain/platform_feature/platform-parameter-rule-object.factory';
+} from 'domain/platform_feature/platform-parameter-rule.model';
 
-describe('PlatformParameterRuleObjectFactory', () => {
-  let factory: PlatformParameterRuleObjectFactory;
-
-  beforeEach(() => {
-    factory = TestBed.get(PlatformParameterRuleObjectFactory);
-  });
-
+describe('PlatformParameterRuleModel', () => {
   it('should create an instance from a backend dict.', () => {
-    const rule = factory.createFromBackendDict({
+    const rule = PlatformParameterRule.createFromBackendDict({
       filters: [
         {
           type: PlatformParameterFilterType.ServerMode,
@@ -66,14 +58,14 @@ describe('PlatformParameterRuleObjectFactory', () => {
       value_when_matched: true
     };
 
-    const instance = factory.createFromBackendDict(backendDict);
+    const instance = PlatformParameterRule.createFromBackendDict(backendDict);
 
     expect(instance.toBackendDict()).toEqual(backendDict);
   });
 
   describe('.hasServerModeFilter', () => {
     it('should be true if the rule has server mode filter', () => {
-      const instance = factory.createFromBackendDict({
+      const instance = PlatformParameterRule.createFromBackendDict({
         filters: [
           {
             type: PlatformParameterFilterType.ServerMode,
@@ -91,7 +83,7 @@ describe('PlatformParameterRuleObjectFactory', () => {
     });
 
     it('should be false if the rule doesn\'t have server mode filter', () => {
-      const instance = factory.createFromBackendDict({
+      const instance = PlatformParameterRule.createFromBackendDict({
         filters: [
           {
             type: PlatformParameterFilterType.BrowserType,

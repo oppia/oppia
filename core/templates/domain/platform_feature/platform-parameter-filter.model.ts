@@ -18,9 +18,6 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export enum PlatformParameterFilterType {
   ServerMode = 'server_mode',
   UserLocale = 'user_locale',
@@ -58,6 +55,14 @@ export class PlatformParameterFilter {
     this.conditions = conditions;
   }
 
+  static createFromBackendDict(
+      platformParameterFiliterBackendDict: PlatformParameterFilterBackendDict):
+      PlatformParameterFilter {
+    return new PlatformParameterFilter(
+      platformParameterFiliterBackendDict.type,
+      platformParameterFiliterBackendDict.conditions);
+  }
+
   /**
    * Creates a dict representation of the instance.
    *
@@ -71,20 +76,3 @@ export class PlatformParameterFilter {
     };
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class PlatformParameterFilterObjectFactory {
-  createFromBackendDict(
-      platformParameterFiliterBackendDict: PlatformParameterFilterBackendDict):
-      PlatformParameterFilter {
-    return new PlatformParameterFilter(
-      platformParameterFiliterBackendDict.type,
-      platformParameterFiliterBackendDict.conditions);
-  }
-}
-
-angular.module('oppia').factory(
-  'PlatformParameterFilterObjectFactory',
-  downgradeInjectable(PlatformParameterFilterObjectFactory));

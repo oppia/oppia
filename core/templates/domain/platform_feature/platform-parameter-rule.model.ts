@@ -16,15 +16,11 @@
  * @fileoverview Factory for creating PlatformParameterRule domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   PlatformParameterFilter,
   PlatformParameterFilterBackendDict,
-  PlatformParameterFilterObjectFactory,
   PlatformParameterFilterType
-} from 'domain/platform_feature/platform-parameter-filter-object.factory';
+} from 'domain/platform_feature/platform-parameter-filter.model';
 
 
 export type PlatformParameterValue = boolean | number | string;
@@ -53,6 +49,17 @@ export class PlatformParameterRule {
     this.valueWhenMatched = valueWhenMatched;
   }
 
+  static createFromBackendDict(
+      backendDict: PlatformParameterRuleBackendDict): PlatformParameterRule {
+    return new PlatformParameterRule(
+      backendDict.filters.map(
+        filterDict => (
+          PlatformParameterFilter.createFromBackendDict(
+            filterDict)
+        )),
+      backendDict.value_when_matched);
+  }
+
   /**
    * Creates a dict representation of the instance.
    *
@@ -76,27 +83,3 @@ export class PlatformParameterRule {
       filter => filter.type === PlatformParameterFilterType.ServerMode);
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class PlatformParameterRuleObjectFactory {
-  constructor(
-    private platformParameterFilterObjectFactory:
-      PlatformParameterFilterObjectFactory) {}
-
-  createFromBackendDict(
-      backendDict: PlatformParameterRuleBackendDict): PlatformParameterRule {
-    return new PlatformParameterRule(
-      backendDict.filters.map(
-        filterDict => (
-          this.platformParameterFilterObjectFactory.createFromBackendDict(
-            filterDict)
-        )),
-      backendDict.value_when_matched);
-  }
-}
-
-angular.module('oppia').factory(
-  'PlatformParameterRuleObjectFactory',
-  downgradeInjectable(PlatformParameterRuleObjectFactory));
