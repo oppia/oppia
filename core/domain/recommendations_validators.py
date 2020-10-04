@@ -51,7 +51,7 @@ class ExplorationRecommendationsModelValidator(
 
         Args:
             item: datastore_services.Model. ExplorationRecommendationsModel
-            to validate.
+                to validate.
         """
 
         if item.id in item.recommended_exploration_ids:
@@ -86,7 +86,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
 
         Args:
             item: datastore_services.Model. TopicSimilaritiesModel
-            to validate.
+                to validate.
         """
 
         topics = list(item.content.keys())
