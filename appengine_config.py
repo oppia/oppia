@@ -73,12 +73,14 @@ reload(six) # pylint: disable=reload-builtin
 import requests_toolbelt.adapters.appengine # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 requests_toolbelt.adapters.appengine.monkeypatch()
 old_get_distribution = pkg_resources.get_distribution # pylint: disable=invalid-name
+
 # Disables "AppEnginePlatformWarning" because it is a "warning" that occurs
 # frequently and tends to bury other important logs.
-import requests
+import requests # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 requests.packages.urllib3.disable_warnings(
     requests.packages.urllib3.contrib.appengine.AppEnginePlatformWarning
 )
+
 
 class MockDistribution(python_utils.OBJECT):
     """Mock distribution object for the monkeypatching function."""
