@@ -233,7 +233,6 @@
 # Google-app-engine configurations
 /appengine_config*.py @nithusha21
 /cron.yaml @nithusha21
-/dispatch.yaml @seanlip
 /index.yaml @seanlip
 /queue.yaml @seanlip
 /main_taskqueue.py @seanlip
@@ -662,7 +661,6 @@
 /core/domain/role_services*.py @seanlip
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
-/export/ @seanlip
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek
