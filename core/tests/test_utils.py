@@ -1265,6 +1265,7 @@ tags: []
         the runtime of each test case/method, it is:
         1.  Pure (same input always returns the same output).
         2.  One-to-one (no two distinct inputs return the same output).
+        3.  An integer string (to match the behavior of actual GAE IDs).
 
         Args:
             email: str. The email address of the user.
