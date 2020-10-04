@@ -592,19 +592,15 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
         if class_name in job_class.MODEL_NAMES_WITH_PARTIAL_COMMIT_LOGS:
             if snapshot_model.commit_type in ['create', 'delete']:
                 missing_commit_log_msg = (
-                    'COMMIT LOGS SHOULD NOT EXIST AND DOESNOT EXIST')
+                    'COMMIT LOGS SHOULD NOT EXIST AND DOES NOT EXIST')
                 found_commit_log_msg = (
                     '%s - COMMIT LOGS SHOULD NOT EXIST BUT EXISTS' % (
                         job_class.FAILURE_PREFIX))
 
-        if commit_log_model_class is None:
-            yield (
-                '%s - %s' % (missing_commit_log_msg, class_name),
-                snapshot_model.id)
-        else:
-            yield (
-                '%s - %s' % (found_commit_log_msg, class_name),
-                snapshot_model.id)
+        message_prefix = (
+            missing_commit_log_msg if (
+                commit_log_model_class is None) else found_commit_log_msg)
+        yield ('%s - %s' % (message_prefix, class_name), snapshot_model.id)
 
         if parent_model_class is None:
             yield (

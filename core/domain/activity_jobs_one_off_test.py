@@ -1718,8 +1718,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             'different_field': 'test'
         }
     ]
-    # This list consists of the snapshot metadata models that are not
-    # associated with a commit log entry model.
+    # ConfigPropertyModel is not associated with a commit log entry model.
+    # PlatformParameterModel is not associated with a commit log entry model.
     EXCLUDED_CLASS_NAMES = [
         'ConfigPropertySnapshotMetadataModel',
         'PlatformParameterSnapshotMetadataModel'
@@ -1786,7 +1786,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             ['FOUND COMMIT LOGS - CollectionSnapshotMetadataModel', 1],
             ['FOUND PARENT MODEL - CollectionSnapshotMetadataModel', 1],
             [
-                'COMMIT LOGS SHOULD NOT EXIST AND DOESNOT EXIST - ' +
+                'COMMIT LOGS SHOULD NOT EXIST AND DOES NOT EXIST - ' +
                 'CollectionRightsSnapshotMetadataModel',
                 1
             ]
@@ -1812,7 +1812,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'COMMIT LOGS SHOULD NOT EXIST AND DOESNOT EXIST - ' +
+                'COMMIT LOGS SHOULD NOT EXIST AND DOES NOT EXIST - ' +
                 'ExplorationRightsSnapshotMetadataModel',
                 1
             ],
