@@ -60,9 +60,8 @@ describe('Email Dashboard Services', () => {
               id: 'q123',
               status: 'processing',
               num_qualified_users: 0,
-              submitter_username: 'testUser',
-              created_on: '04-06-20 14:34:46'
-
+              submitter_username: '',
+              created_on: ''
             }
           },
           {
@@ -70,9 +69,8 @@ describe('Email Dashboard Services', () => {
               id: 'q456',
               status: 'processing',
               num_qualified_users: 0,
-              submitter_username: 'testUser',
-              created_on: '04-06-20 14:34:46'
-
+              submitter_username: '',
+              created_on: ''
             }
           }].map(emailDashboardQueryObjectFactory.createFromBackendDict);
 
@@ -109,8 +107,8 @@ describe('Email Dashboard Services', () => {
           id: 'qnew',
           status: 'processing',
           num_qualified_users: 0,
-          submitter_username: 'testUser',
-          created_on: '04-06-20 14:34:46'
+          submitter_username: '',
+          created_on: ''
         });
         var expectedQueries = [queryData];
 
@@ -135,26 +133,29 @@ describe('Email Dashboard Services', () => {
           id: 'q123',
           status: 'processing',
           num_qualified_users: 0,
-          submitter_username: 'testUser',
-          created_on: '04-06-20 14:34:46'
+          submitter_username: '',
+          created_on: ''
         },
         {
           id: 'q456',
           status: 'processing',
           num_qualified_users: 0,
-          submitter_username: 'testUser',
-          created_on: '04-06-20 14:34:46'
+          submitter_username: '',
+          created_on: ''
         }].map(emailDashboardQueryObjectFactory.createFromQueryDict);
         var expectedQueries = [{
           id: 'q123',
-          status: 'completed'
+          status: 'completed',
+          num_qualified_users: 0,
+          submitter_username: '',
+          created_on: ''
         },
         {
           id: 'q456',
           status: 'processing',
           num_qualified_users: 0,
-          submitter_username: 'testUser',
-          created_on: '04-06-20 14:34:46'
+          submitter_username: '',
+          created_on: ''
         }].map(emailDashboardQueryObjectFactory.createFromQueryDict);
 
         emailDashboardDataService.getNextQueries();
@@ -167,15 +168,15 @@ describe('Email Dashboard Services', () => {
             id: 'q123',
             status: 'processing',
             num_qualified_users: 0,
-            submitter_username: 'testUser',
-            created_on: '04-06-20 14:34:46'
+            submitter_username: '',
+            created_on: ''
           },
           {
             id: 'q456',
             status: 'processing',
             num_qualified_users: 0,
-            submitter_username: 'testUser',
-            created_on: '04-06-20 14:34:46'
+            submitter_username: '',
+            created_on: ''
           }],
           cursor: null
         });
@@ -199,8 +200,8 @@ describe('Email Dashboard Services', () => {
             id: 'q123',
             status: 'completed',
             num_qualified_users: 0,
-            submitter_username: 'testUser',
-            created_on: '04-06-20 14:34:46'
+            submitter_username: '',
+            created_on: ''
           }
         });
 
@@ -246,8 +247,8 @@ describe('Email Dashboard Services', () => {
             id: 'q' + i,
             status: 'processing',
             num_qualified_users: 0,
-            submitter_username: 'testUser',
-            created_on: '04-06-20 14:34:46'
+            submitter_username: '',
+            created_on: ''
           };
 
           emailDashboardDataService.submitQuery(data);
@@ -296,9 +297,8 @@ describe('Email Dashboard Services', () => {
           id: 'q25',
           status: 'processing',
           num_qualified_users: 0,
-          submitter_username: 'testUser',
-          created_on: '04-06-20 14:34:46'
-
+          submitter_username: '',
+          created_on: ''
         };
 
         emailDashboardDataService.submitQuery(data);
