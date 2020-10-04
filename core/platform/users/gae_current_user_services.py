@@ -49,14 +49,6 @@ def is_current_user_super_admin():
     return users.is_current_user_admin()
 
 
-def get_user_by_email(email):
-    """Returns the user corresponding to the provided email, or None."""
-    try:
-        return users.User(email)
-    except users.UserNotFoundError:
-        return None
-
-
 def get_current_gae_id():
     """Gets the user_id of current user.
 
