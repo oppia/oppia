@@ -65,7 +65,7 @@ def get_multi(keys):
 
     Returns:
         list(datastore_services.Model | None). List whose items are either a
-        Model instance or None if the key wasn't found.
+        Model instance or None if the corresponding key wasn't found.
     """
     return ndb.get_multi(keys)
 
