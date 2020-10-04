@@ -50,7 +50,8 @@ class ExplorationRecommendationsModelValidator(
         exploration ids.
 
         Args:
-            item: datastore_services.Model. ExplorationRecommendationsModel to validate.
+            item: datastore_services.Model. ExplorationRecommendationsModel
+            to validate.
         """
 
         if item.id in item.recommended_exploration_ids:
@@ -84,11 +85,12 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
         values between 0.0 and 1.0.
 
         Args:
-            item: datastore_services.Model. TopicSimilaritiesModel to validate.
+            item: datastore_services.Model. TopicSimilaritiesModel
+            to validate.
         """
 
         topics = list(item.content.keys())
-        data = '%s\n' % (',').join(topics)
+        data = '%s\n' % ','.join(topics)
 
         for topic1 in topics:
             similarity_list = []
@@ -96,7 +98,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
                 similarity_list.append(
                     python_utils.UNICODE(item.content[topic1][topic2]))
             if len(similarity_list):
-                data = data + '%s\n' % (',').join(similarity_list)
+                data = data + '%s\n' % ','.join(similarity_list)
 
         try:
             recommendations_services.validate_topic_similarities(data)
