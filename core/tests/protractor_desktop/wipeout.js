@@ -13,14 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for user preferences.
+ * @fileoverview End-to-end tests for wipeout.
  */
-var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
 
 describe('When account is deleted it', function() {
   var EXPLORATION_TITLE = 'Exploration';

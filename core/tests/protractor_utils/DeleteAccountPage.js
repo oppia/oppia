@@ -29,7 +29,6 @@ var DeleteAccountPage = function() {
 
   this.get = async function() {
     await browser.get(DELETE_ACCOUNT_PAGE_URL);
-    await waitFor.pageToFullyLoad();
   };
 
   this.requestAccountDeletion = async function() {
