@@ -36,14 +36,14 @@ angular.module('oppia').factory('QuestionObjectFactory', [
   function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
     var Question = function(
         id, stateData, languageCode, version, linkedSkillIds,
-        inApplicableSkillMisconceptionIds) {
+        inapplicableSkillMisconceptionIds) {
       this._id = id;
       this._stateData = stateData;
       this._languageCode = languageCode;
       this._version = version;
       this._linkedSkillIds = linkedSkillIds;
-      this._inApplicableSkillMisconceptionIds = (
-        inApplicableSkillMisconceptionIds);
+      this._inapplicableSkillMisconceptionIds = (
+        inapplicableSkillMisconceptionIds);
     };
 
     // ---- Instance methods ----
@@ -80,20 +80,19 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       this._linkedSkillIds = linkedSkillIds;
     };
 
-    Question.prototype.getInApplicableSkillMisconceptionIds = function() {
-      return this._inApplicableSkillMisconceptionIds;
+    Question.prototype.getInapplicableSkillMisconceptionIds = function() {
+      return this._inapplicableSkillMisconceptionIds;
     };
 
-    Question.prototype.setInApplicableSkillMisconceptionIds = function(
-        inApplicableSkillMisconceptionIds) {
-      this._inApplicableSkillMisconceptionIds = (
-        inApplicableSkillMisconceptionIds);
+    Question.prototype.setInapplicableSkillMisconceptionIds = function(
+        inapplicableSkillMisconceptionIds) {
+      this._inapplicableSkillMisconceptionIds = (
+        inapplicableSkillMisconceptionIds);
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
+    /* eslint-disable-next-line dot-notation */
     Question['createDefaultQuestion'] = function(skillIds) {
-    /* eslint-enable dot-notation */
       return new Question(
         null, StateObjectFactory.createDefaultState(null),
         DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
@@ -138,9 +137,14 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         }
       }
       var unaddressedMisconceptionNames = [];
+      var self = this;
       Object.keys(misconceptionsBySkill).forEach(function(skillId) {
         for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
-          if (!misconceptionsBySkill[skillId][i].isMandatory()) {
+          var skillMisconceptionIdIsNotApplicable = (
+            self._inapplicableSkillMisconceptionIds.includes(
+              `${skillId}-${misconceptionsBySkill[skillId][i].getId()}`));
+          if (!misconceptionsBySkill[skillId][i].isMandatory() &&
+              skillMisconceptionIdIsNotApplicable) {
             continue;
           }
           var skillMisconceptionId = (
@@ -156,9 +160,8 @@ angular.module('oppia').factory('QuestionObjectFactory', [
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
+    /* eslint-disable-next-line dot-notation */
     Question['createFromBackendDict'] = function(questionBackendDict) {
-    /* eslint-enable dot-notation */
       return new Question(
         questionBackendDict.id,
         StateObjectFactory.createFromBackendDict(
@@ -176,7 +179,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         language_code: this._languageCode,
         linked_skill_ids: this._linkedSkillIds,
         inapplicable_skill_misconception_ids: (
-          this._inApplicableSkillMisconceptionIds),
+          this._inapplicableSkillMisconceptionIds),
         version: 0,
       };
       if (!isNewQuestion) {
