@@ -25,10 +25,9 @@ import {
   LearnerExplorationSummaryBackendDict
 } from 'domain/summary/learner-exploration-summary.model';
 import {
-  StoryPlaythroughBackendDict,
   StoryPlaythrough,
-  StoryPlaythroughObjectFactory
-} from 'domain/story_viewer/StoryPlaythroughObjectFactory';
+  StoryPlaythroughBackendDict
+} from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants';
 import { UrlInterpolationService } from
@@ -57,7 +56,6 @@ interface StoryDataDict {
 export class StoryViewerBackendApiService {
   constructor(
     private http: HttpClient,
-    private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -79,8 +77,7 @@ export class StoryViewerBackendApiService {
     this.http.get<StoryPlaythroughBackendDict>(
       storyDataUrl).toPromise().then(data => {
       if (successCallback) {
-        let storyPlaythrough = this.storyPlaythroughObjectFactory
-          .createFromBackendDict(data);
+        let storyPlaythrough = StoryPlaythrough.createFromBackendDict(data);
         successCallback(storyPlaythrough);
       }
     }, errorResponse => {

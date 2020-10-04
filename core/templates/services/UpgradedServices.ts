@@ -433,8 +433,6 @@ import { RatioExpressionInputValidationService } from
 import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
-import { ReadOnlyStoryNodeObjectFactory } from
-  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { ReadOnlySubtopicPageObjectFactory } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { ReadOnlyTopicObjectFactory } from
@@ -559,8 +557,6 @@ import { StoryEditorNavigationService } from
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { StoryPlaythroughObjectFactory } from
-  'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { StorySummaryObjectFactory } from
@@ -1050,8 +1046,6 @@ export class UpgradedServices {
     upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =
       new QuestionSummaryForOneSkillObjectFactory(
         upgradedServices['QuestionSummaryObjectFactory']);
-    upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
-        new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['RatioObjectFactory'],
@@ -1087,9 +1081,6 @@ export class UpgradedServices {
     upgradedServices['StoryContentsObjectFactory'] =
       new StoryContentsObjectFactory(
         upgradedServices['StoryNodeObjectFactory']);
-    upgradedServices['StoryPlaythroughObjectFactory'] =
-      new StoryPlaythroughObjectFactory(
-        upgradedServices['ReadOnlyStoryNodeObjectFactory']);
     upgradedServices['SubtopicObjectFactory'] = new SubtopicObjectFactory(
       upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory(
@@ -1461,7 +1452,6 @@ export class UpgradedServices {
     upgradedServices['StoryViewerBackendApiService'] =
         new StoryViewerBackendApiService(
           upgradedServices['HttpClient'],
-          upgradedServices['StoryPlaythroughObjectFactory'],
           upgradedServices['UrlInterpolationService']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
       new SubtopicPageContentsObjectFactory(

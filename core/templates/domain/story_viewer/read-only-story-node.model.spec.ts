@@ -13,24 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ReadOnlyStoryNodeObjectFactory.
+ * @fileoverview Tests for ReadOnlyStoryNodeModel.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { ReadOnlyStoryNodeObjectFactory } from
-  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { ReadOnlyStoryNode } from
+  'domain/story_viewer/read-only-story-node.model';
 import { LearnerExplorationSummary } from
   'domain/summary/learner-exploration-summary.model';
 
-describe('Read only story node object factory', () => {
-  let readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory = null;
+describe('Read only story node model', () => {
   var _sampleStoryNode = null;
 
   beforeEach(() => {
-    readOnlyStoryNodeObjectFactory = TestBed.get(
-      ReadOnlyStoryNodeObjectFactory);
-
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
       title: 'Title 1',
@@ -69,7 +63,7 @@ describe('Read only story node object factory', () => {
       thumbnail_bg_color: '#a33f40',
       thumbnail_filename: 'image.png'
     };
-    _sampleStoryNode = readOnlyStoryNodeObjectFactory.createFromBackendDict(
+    _sampleStoryNode = ReadOnlyStoryNode.createFromBackendDict(
       sampleReadOnlyStoryNodeBackendDict);
   });
 

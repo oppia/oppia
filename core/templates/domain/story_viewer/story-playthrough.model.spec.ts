@@ -13,22 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StoryPlaythroughObjectFactory.
+ * @fileoverview Tests for StoryPlaythroughModel.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { StoryPlaythrough } from
+  'domain/story_viewer/story-playthrough.model';
 
-import { StoryPlaythroughObjectFactory } from
-  'domain/story_viewer/StoryPlaythroughObjectFactory';
-
-describe('Story playthrough object factory', () => {
-  let storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory = null;
+describe('Story playthrough model', () => {
   var _samplePlaythroughObject = null;
 
   beforeEach(() => {
-    storyPlaythroughObjectFactory = TestBed.get(
-      StoryPlaythroughObjectFactory);
-
     var firstSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
       description: 'description',
@@ -116,7 +110,7 @@ describe('Story playthrough object factory', () => {
       meta_tag_content: 'Story meta tag content'
     };
     _samplePlaythroughObject =
-      storyPlaythroughObjectFactory.createFromBackendDict(
+      StoryPlaythrough.createFromBackendDict(
         storyPlaythroughBackendObject);
   });
 

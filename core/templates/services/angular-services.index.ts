@@ -161,8 +161,6 @@ import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFact
 import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StorySummaryObjectFactory } from 'domain/story/StorySummaryObjectFactory';
-import { ReadOnlyStoryNodeObjectFactory } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
-import { StoryPlaythroughObjectFactory } from 'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
@@ -596,7 +594,6 @@ export const angularServices: [string, unknown][] = [
     RatioExpressionInputValidationService],
   ['RatioObjectFactory', RatioObjectFactory],
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
-  ['ReadOnlyStoryNodeObjectFactory', ReadOnlyStoryNodeObjectFactory],
   ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RecordedVoiceoversObjectFactory', RecordedVoiceoversObjectFactory],
@@ -662,7 +659,6 @@ export const angularServices: [string, unknown][] = [
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryNodeObjectFactory', StoryNodeObjectFactory],
   ['StoryObjectFactory', StoryObjectFactory],
-  ['StoryPlaythroughObjectFactory', StoryPlaythroughObjectFactory],
   ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
   ['StorySummaryObjectFactory', StorySummaryObjectFactory],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],

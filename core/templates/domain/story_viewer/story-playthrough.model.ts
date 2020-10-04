@@ -13,18 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * story playthrough domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
-  StoryNodeBackendDict,
-  ReadOnlyStoryNodeObjectFactory,
-  ReadOnlyStoryNode
-} from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+  ReadOnlyStoryNode,
+  StoryNodeBackendDict
+} from 'domain/story_viewer/read-only-story-node.model';
 
 export interface StoryPlaythroughBackendDict {
   'story_id': string,
@@ -56,6 +52,21 @@ export class StoryPlaythrough {
     this.description = description;
     this.topicName = topicName;
     this.metaTagContent = metaTagContent;
+  }
+
+  static createFromBackendDict(
+      storyPlaythroughBackendDict:
+      StoryPlaythroughBackendDict): StoryPlaythrough {
+    var nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
+      storyNodeDict => ReadOnlyStoryNode.createFromBackendDict(storyNodeDict));
+
+    return new StoryPlaythrough(
+      storyPlaythroughBackendDict.story_id,
+      nodeObjects,
+      storyPlaythroughBackendDict.story_title,
+      storyPlaythroughBackendDict.story_description,
+      storyPlaythroughBackendDict.topic_name,
+      storyPlaythroughBackendDict.meta_tag_content);
   }
 
   getInitialNode(): ReadOnlyStoryNode {
@@ -94,31 +105,3 @@ export class StoryPlaythrough {
     return this.metaTagContent;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class StoryPlaythroughObjectFactory {
-  constructor(
-    private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory) {}
-
-  createFromBackendDict(
-      storyPlaythroughBackendDict:
-      StoryPlaythroughBackendDict): StoryPlaythrough {
-    var nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
-      storyNodeDict => this.readOnlyStoryNodeObjectFactory
-        .createFromBackendDict(storyNodeDict));
-
-    return new StoryPlaythrough(
-      storyPlaythroughBackendDict.story_id,
-      nodeObjects,
-      storyPlaythroughBackendDict.story_title,
-      storyPlaythroughBackendDict.story_description,
-      storyPlaythroughBackendDict.topic_name,
-      storyPlaythroughBackendDict.meta_tag_content);
-  }
-}
-
-angular.module('oppia').factory(
-  'StoryPlaythroughObjectFactory',
-  downgradeInjectable(StoryPlaythroughObjectFactory));

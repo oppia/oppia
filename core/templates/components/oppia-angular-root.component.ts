@@ -423,8 +423,6 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
-import { ReadOnlyStoryNodeObjectFactory } from
-  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { ReadOnlySubtopicPageObjectFactory } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { ReadOnlyTopicObjectFactory } from
@@ -526,8 +524,6 @@ import { StoryEditorNavigationService } from
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { StoryPlaythroughObjectFactory } from
-  'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { StorySummaryObjectFactory } from
@@ -862,7 +858,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     RatioExpressionInputValidationService;
   static ratioObjectFactory: RatioObjectFactory;
   static ratingComputationService: RatingComputationService;
-  static readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory;
   static readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory;
   static readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
   static recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory;
@@ -927,7 +922,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storyEditorNavigationService: StoryEditorNavigationService;
   static storyNodeObjectFactory: StoryNodeObjectFactory;
   static storyObjectFactory: StoryObjectFactory;
-  static storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory;
   static storyReferenceObjectFactory: StoryReferenceObjectFactory;
   static storySummaryObjectFactory: StorySummaryObjectFactory;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -1230,7 +1224,6 @@ private ratioExpressionInputValidationService:
   RatioExpressionInputValidationService,
 private ratioObjectFactory: RatioObjectFactory,
 private ratingComputationService: RatingComputationService,
-private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory,
 private readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory,
 private readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory,
 private recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory,
@@ -1295,7 +1288,6 @@ private storyContentsObjectFactory: StoryContentsObjectFactory,
 private storyEditorNavigationService: StoryEditorNavigationService,
 private storyNodeObjectFactory: StoryNodeObjectFactory,
 private storyObjectFactory: StoryObjectFactory,
-private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
 private storyReferenceObjectFactory: StoryReferenceObjectFactory,
 private storySummaryObjectFactory: StorySummaryObjectFactory,
 private storyViewerBackendApiService: StoryViewerBackendApiService,
@@ -1746,8 +1738,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.ratioObjectFactory = this.ratioObjectFactory;
     OppiaAngularRootComponent.ratingComputationService = (
       this.ratingComputationService);
-    OppiaAngularRootComponent.readOnlyStoryNodeObjectFactory = (
-      this.readOnlyStoryNodeObjectFactory);
     OppiaAngularRootComponent.readOnlySubtopicPageObjectFactory = (
       this.readOnlySubtopicPageObjectFactory);
     OppiaAngularRootComponent.readOnlyTopicObjectFactory = (
@@ -1856,8 +1846,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.storyNodeObjectFactory = (
       this.storyNodeObjectFactory);
     OppiaAngularRootComponent.storyObjectFactory = this.storyObjectFactory;
-    OppiaAngularRootComponent.storyPlaythroughObjectFactory = (
-      this.storyPlaythroughObjectFactory);
     OppiaAngularRootComponent.storyReferenceObjectFactory = (
       this.storyReferenceObjectFactory);
     OppiaAngularRootComponent.storySummaryObjectFactory = (
@@ -1923,7 +1911,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.userExplorationPermissionsService = (
       this.userExplorationPermissionsService);
     OppiaAngularRootComponent.userInfoObjectFactory = (
-      this.userInfoObjectFactory);  
+      this.userInfoObjectFactory);
     OppiaAngularRootComponent.utilsService = this.utilsService;
     OppiaAngularRootComponent.validatorsService = this.validatorsService;
     OppiaAngularRootComponent.versionTreeService = this.versionTreeService;

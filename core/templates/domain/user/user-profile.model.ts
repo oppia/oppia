@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for users.
+ * @fileoverview Frontend domain object for users.
  */
 
 import {

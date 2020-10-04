@@ -17,9 +17,6 @@
  * story viewer.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict
@@ -78,6 +75,27 @@ export class ReadOnlyStoryNode {
     this.thumbnailFilename = thumbnailFilename;
   }
 
+  static createFromBackendDict(
+      storyNodeBackendDict: StoryNodeBackendDict): ReadOnlyStoryNode {
+    let explorationSummary = LearnerExplorationSummary.createFromBackendDict(
+      storyNodeBackendDict.exp_summary_dict);
+
+    return new ReadOnlyStoryNode(
+      storyNodeBackendDict.id,
+      storyNodeBackendDict.title,
+      storyNodeBackendDict.description,
+      storyNodeBackendDict.destination_node_ids,
+      storyNodeBackendDict.prerequisite_skill_ids,
+      storyNodeBackendDict.acquired_skill_ids,
+      storyNodeBackendDict.outline,
+      storyNodeBackendDict.outline_is_finalized,
+      storyNodeBackendDict.exploration_id,
+      explorationSummary,
+      storyNodeBackendDict.completed,
+      storyNodeBackendDict.thumbnail_bg_color,
+      storyNodeBackendDict.thumbnail_filename);
+  }
+
   getId(): string {
     return this.id;
   }
@@ -118,35 +136,3 @@ export class ReadOnlyStoryNode {
     return this.thumbnailBgColor;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ReadOnlyStoryNodeObjectFactory {
-  constructor() {}
-
-  createFromBackendDict(
-      storyNodeBackendDict: StoryNodeBackendDict): ReadOnlyStoryNode {
-    let explorationSummary = LearnerExplorationSummary.createFromBackendDict(
-      storyNodeBackendDict.exp_summary_dict);
-
-    return new ReadOnlyStoryNode(
-      storyNodeBackendDict.id,
-      storyNodeBackendDict.title,
-      storyNodeBackendDict.description,
-      storyNodeBackendDict.destination_node_ids,
-      storyNodeBackendDict.prerequisite_skill_ids,
-      storyNodeBackendDict.acquired_skill_ids,
-      storyNodeBackendDict.outline,
-      storyNodeBackendDict.outline_is_finalized,
-      storyNodeBackendDict.exploration_id,
-      explorationSummary,
-      storyNodeBackendDict.completed,
-      storyNodeBackendDict.thumbnail_bg_color,
-      storyNodeBackendDict.thumbnail_filename);
-  }
-}
-
-angular.module('oppia').factory(
-  'ReadOnlyStoryNodeObjectFactory',
-  downgradeInjectable(ReadOnlyStoryNodeObjectFactory));

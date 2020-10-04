@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for UserProfileObjectFactory.
+ * @fileoverview Tests for UserProfileModel.
  */
 
 import { LearnerExplorationSummary } from
@@ -21,7 +21,7 @@ import { LearnerExplorationSummary } from
 import { UserProfile } from
   'domain/user/user-profile.model';
 
-describe('User profile object factory', () => {
+describe('User profile model', () => {
   it('should create a user profile object from a backend dict',
     () => {
       var backendDict = {
