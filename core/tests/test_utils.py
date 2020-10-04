@@ -1265,17 +1265,17 @@ tags: []
         the runtime of each test case/method, it is:
         1.  Pure (same input always returns the same output).
         2.  One-to-one (no two distinct inputs return the same output).
-        3.  An integer string (to match the behavior of actual GAE IDs).
+        3.  An integer byte-string (to match the behavior of actual GAE IDs).
 
         Args:
             email: str. The email address of the user.
 
         Returns:
-            str. The mock GAE ID of a user possessing the given email.
+            bytes. The mock GAE ID of a user possessing the given email.
         """
         # Although the hash function doesn't guarantee a one-to-one mapping, in
         # practice it is sufficient for our tests.
-        return python_utils.UNICODE(hash(email))
+        return python_utils.convert_to_bytes(hash(email))
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
