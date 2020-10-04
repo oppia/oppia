@@ -13,27 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for CollectionObjectFactory.
+ * @fileoverview Tests for collection-model.
  */
-
-import { TestBed } from '@angular/core/testing';
 
 import { CollectionNode } from
   'domain/collection/collection-node.model';
-import { Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
+import { Collection } from
+  'domain/collection/collection.model';
 
-describe('Collection object factory', () => {
-  let collectionObjectFactory: CollectionObjectFactory = null;
+describe('Collection model', () => {
   let _sampleCollection: Collection = null;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [CollectionObjectFactory]
-    });
-
-    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
-
     var sampleCollectionBackendObject = {
       id: 'sample_collection_id',
       title: 'a title',
@@ -49,7 +40,7 @@ describe('Collection object factory', () => {
         completed_exploration_ids: ['expId2']
       }
     };
-    _sampleCollection = collectionObjectFactory.create(
+    _sampleCollection = Collection.create(
       sampleCollectionBackendObject);
   });
 
@@ -90,7 +81,7 @@ describe('Collection object factory', () => {
   };
 
   it('should be able to create an empty collection object', () => {
-    var collection = collectionObjectFactory.createEmptyCollection();
+    var collection = Collection.createEmptyCollection();
     expect(collection.getId()).toBeNull();
     expect(collection.getTitle()).toBeNull();
     expect(collection.getCategory()).toBeNull();
@@ -134,7 +125,7 @@ describe('Collection object factory', () => {
           title: 'Test Title'
         }
       };
-      var collection = collectionObjectFactory.create({
+      var collection = Collection.create({
         id: 'collection_id',
         nodes: [collectionNodeBackendObject],
         title: null,
@@ -436,7 +427,7 @@ describe('Collection object factory', () => {
   });
 
   it('should be able to copy from another collection', () => {
-    var secondCollection = collectionObjectFactory.create({
+    var secondCollection = Collection.create({
       id: 'col_id0',
       title: 'Another title',
       objective: 'Another objective',

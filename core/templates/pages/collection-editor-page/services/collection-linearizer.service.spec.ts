@@ -22,19 +22,15 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionNode, CollectionNodeBackendDict } from
   'domain/collection/collection-node.model';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from
-  'domain/collection/CollectionPlaythroughObjectFactory';
+import { Collection } from
+  'domain/collection/collection.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/collection/CollectionObjectFactory.ts');
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
 
 describe('Collection linearizer service', function() {
-  var collectionObjectFactory = null;
   var CollectionLinearizerService = null;
 
   var firstCollectionNode = null;
@@ -44,9 +40,6 @@ describe('Collection linearizer service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
-    $provide.value(
-      'CollectionObjectFactory', new CollectionObjectFactory(
-        new CollectionPlaythroughObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -56,7 +49,6 @@ describe('Collection linearizer service', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
-    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionLinearizerService = $injector.get('CollectionLinearizerService');
 
     var firstCollectionNodeBackendObject = {
@@ -95,7 +87,7 @@ describe('Collection linearizer service', function() {
 
   // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2.
   var createLinearCollection = function() {
-    var collection = collectionObjectFactory.createEmptyCollection();
+    var collection = Collection.createEmptyCollection();
 
     // Add collections in a different order from which they will be displayed
     // by the linearizer for robustness.
@@ -108,7 +100,7 @@ describe('Collection linearizer service', function() {
   describe('removeCollectionNode()', function() {
     it('should not remove a non-existent node from a single node collection',
       function() {
-        var collection = collectionObjectFactory.createEmptyCollection();
+        var collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(collection.containsCollectionNode('exp_id0')).toBe(true);
         expect(
@@ -140,7 +132,7 @@ describe('Collection linearizer service', function() {
 
     it('should correctly remove a node from a single node collection',
       function() {
-        var collection = collectionObjectFactory.createEmptyCollection();
+        var collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(collection.containsCollectionNode('exp_id0')).toBe(true);
         expect(
@@ -204,7 +196,7 @@ describe('Collection linearizer service', function() {
 
   describe('appendCollectionNode()', function() {
     it('should correctly append a node to an empty collection', function() {
-      var collection = collectionObjectFactory.createEmptyCollection();
+      var collection = Collection.createEmptyCollection();
       expect(collection.containsCollectionNode('exp_id0')).toBe(false);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -253,7 +245,7 @@ describe('Collection linearizer service', function() {
   describe('shiftNodeLeft()', function() {
     it('should correctly shift a node in a single node collection',
       function() {
-        var collection = collectionObjectFactory.createEmptyCollection();
+        var collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -330,7 +322,7 @@ describe('Collection linearizer service', function() {
   describe('shiftNodeRight()', function() {
     it('should correctly shift a node in a single node collection',
       function() {
-        var collection = collectionObjectFactory.createEmptyCollection();
+        var collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -428,7 +420,7 @@ describe('Collection linearizer service', function() {
   describe('getCollectionNodesInPlayableOrder()', function() {
     it('should correctly return an empty list for an empty collection',
       function() {
-        var collection = collectionObjectFactory.createEmptyCollection();
+        var collection = Collection.createEmptyCollection();
         expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([]);
@@ -437,7 +429,7 @@ describe('Collection linearizer service', function() {
 
     it('should correctly return a list for a collection with a single node',
       function() {
-        var collection = collectionObjectFactory.createEmptyCollection();
+        var collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(

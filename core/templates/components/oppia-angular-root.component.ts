@@ -136,10 +136,6 @@ import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
 import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from
-  'domain/collection/CollectionPlaythroughObjectFactory';
 import { CollectionRightsBackendApiService } from
   'domain/collection/collection-rights-backend-api.service';
 import { CollectionRightsObjectFactory } from
@@ -679,8 +675,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static codeReplValidationService: CodeReplValidationService;
   static collectionCreationBackendService: CollectionCreationBackendService;
   static collectionCreationService: CollectionCreationService;
-  static collectionObjectFactory: CollectionObjectFactory;
-  static collectionPlaythroughObjectFactory: CollectionPlaythroughObjectFactory;
   static collectionRightsBackendApiService: CollectionRightsBackendApiService;
   static collectionRightsObjectFactory: CollectionRightsObjectFactory;
   static collectionSummaryObjectFactory: CollectionSummaryObjectFactory;
@@ -1058,8 +1052,6 @@ private codeReplRulesService: CodeReplRulesService,
 private codeReplValidationService: CodeReplValidationService,
 private collectionCreationBackendService: CollectionCreationBackendService,
 private collectionCreationService: CollectionCreationService,
-private collectionObjectFactory: CollectionObjectFactory,
-private collectionPlaythroughObjectFactory: CollectionPlaythroughObjectFactory,
 private collectionRightsBackendApiService: CollectionRightsBackendApiService,
 private collectionRightsObjectFactory: CollectionRightsObjectFactory,
 private collectionSummaryObjectFactory: CollectionSummaryObjectFactory,
@@ -1473,10 +1465,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.collectionCreationBackendService);
     OppiaAngularRootComponent.collectionCreationService = (
       this.collectionCreationService);
-    OppiaAngularRootComponent.collectionObjectFactory = (
-      this.collectionObjectFactory);
-    OppiaAngularRootComponent.collectionPlaythroughObjectFactory = (
-      this.collectionPlaythroughObjectFactory);
     OppiaAngularRootComponent.collectionRightsBackendApiService = (
       this.collectionRightsBackendApiService);
     OppiaAngularRootComponent.collectionRightsObjectFactory = (

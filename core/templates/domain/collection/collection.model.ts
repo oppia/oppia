@@ -13,14 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * collection domain objects.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import {
   CollectionNode,
@@ -28,9 +25,8 @@ import {
 } from 'domain/collection/collection-node.model';
 import {
   CollectionPlaythrough,
-  CollectionPlaythroughBackendDict,
-  CollectionPlaythroughObjectFactory
-} from 'domain/collection/CollectionPlaythroughObjectFactory';
+  CollectionPlaythroughBackendDict
+} from 'domain/collection/collection-playthrough.model';
 
 interface ExplorationIdToNodeIndexMap {
   [explorationId: string]: number;
@@ -85,6 +81,35 @@ export class Collection {
       var explorationId = this.nodes[i].getExplorationId();
       this.explorationIdToNodeIndexMap[explorationId] = i;
     }
+  }
+
+  static create(collectionBackendObject: CollectionBackendDict): Collection {
+    let collectionNodes = collectionBackendObject.nodes.map(
+      node => CollectionNode.create(node));
+    let collectionPlaythrough = (
+      CollectionPlaythrough.createFromBackendObject(
+        collectionBackendObject.playthrough_dict));
+
+    return new Collection(
+      collectionBackendObject.id,
+      collectionBackendObject.title,
+      collectionBackendObject.objective,
+      collectionBackendObject.language_code,
+      collectionBackendObject.tags,
+      collectionPlaythrough,
+      collectionBackendObject.category,
+      collectionBackendObject.version,
+      collectionBackendObject.schema_version,
+      collectionNodes);
+  }
+
+  // Create a new, empty collection. This is not guaranteed to pass validation
+  // tests.
+  static createEmptyCollection(): Collection {
+    let emptyCollectionPlaythrough = CollectionPlaythrough.create(null, []);
+    return new Collection(
+      null, null, null, null, null, emptyCollectionPlaythrough,
+      null, null, null, []);
   }
 
   getId(): string {
@@ -286,45 +311,3 @@ export class Collection {
     }
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class CollectionObjectFactory {
-  constructor(
-      private collectionPlaythroughObjectFactory:
-      CollectionPlaythroughObjectFactory) { }
-
-  create(collectionBackendObject: CollectionBackendDict): Collection {
-    let collectionNodes = collectionBackendObject.nodes.map(
-      node => CollectionNode.create(node));
-    let collectionPlaythrough = (
-      this.collectionPlaythroughObjectFactory.createFromBackendObject(
-        collectionBackendObject.playthrough_dict));
-
-    return new Collection(
-      collectionBackendObject.id,
-      collectionBackendObject.title,
-      collectionBackendObject.objective,
-      collectionBackendObject.language_code,
-      collectionBackendObject.tags,
-      collectionPlaythrough,
-      collectionBackendObject.category,
-      collectionBackendObject.version,
-      collectionBackendObject.schema_version,
-      collectionNodes);
-  }
-
-  // Create a new, empty collection. This is not guaranteed to pass validation
-  // tests.
-  createEmptyCollection(): Collection {
-    let emptyCollectionPlaythrough = this.collectionPlaythroughObjectFactory
-      .create(null, []);
-    return new Collection(
-      null, null, null, null, null, emptyCollectionPlaythrough,
-      null, null, null, []);
-  }
-}
-
-angular.module('oppia').factory(
-  'CollectionObjectFactory', downgradeInjectable(CollectionObjectFactory));

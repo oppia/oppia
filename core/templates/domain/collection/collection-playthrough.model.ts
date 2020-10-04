@@ -13,14 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * collection playthrough domain objects.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export interface CollectionPlaythroughBackendDict {
   'next_exploration_id': string;
@@ -36,6 +33,21 @@ export class CollectionPlaythrough {
   constructor(nextExplorationId: string, completedExplorationIds: string[]) {
     this._nextExplorationId = nextExplorationId;
     this._completedExplorationIds = completedExplorationIds;
+  }
+
+  static createFromBackendObject(
+      collectionPlaythroughBackendObject: CollectionPlaythroughBackendDict):
+      CollectionPlaythrough {
+    return new CollectionPlaythrough(
+      collectionPlaythroughBackendObject.next_exploration_id,
+      collectionPlaythroughBackendObject.completed_exploration_ids);
+  }
+
+  static create(
+      nextExplorationId: string,
+      completedExplorationIds: string[]): CollectionPlaythrough {
+    return new CollectionPlaythrough(
+      nextExplorationId, cloneDeep(completedExplorationIds));
   }
 
   // Returns the upcoming exploration ID. Changes to this are not
@@ -73,30 +85,3 @@ export class CollectionPlaythrough {
     return this._nextExplorationId === null;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class CollectionPlaythroughObjectFactory {
-  // Static class methods. Note that "this" is not available in static
-  // contexts. This function takes a JSON object which represents a backend
-  // collection playthrough python dict.
-  createFromBackendObject(
-      collectionPlaythroughBackendObject: CollectionPlaythroughBackendDict):
-      CollectionPlaythrough {
-    return new CollectionPlaythrough(
-      collectionPlaythroughBackendObject.next_exploration_id,
-      collectionPlaythroughBackendObject.completed_exploration_ids);
-  }
-
-  create(
-      nextExplorationId: string,
-      completedExplorationIds: string[]): CollectionPlaythrough {
-    return new CollectionPlaythrough(
-      nextExplorationId, cloneDeep(completedExplorationIds));
-  }
-}
-
-angular.module('oppia').factory(
-  'CollectionPlaythroughObjectFactory',
-  downgradeInjectable(CollectionPlaythroughObjectFactory));

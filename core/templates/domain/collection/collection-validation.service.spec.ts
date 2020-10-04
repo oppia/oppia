@@ -20,14 +20,13 @@ import { TestBed } from '@angular/core/testing';
 
 import { CollectionNode } from
   'domain/collection/collection-node.model';
-import { CollectionBackendDict, Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
+import { CollectionBackendDict, Collection } from
+  'domain/collection/collection.model';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 
 describe('Collection validation service', function() {
   let collectionValidationService: CollectionValidationService = null;
-  let collectionObjectFactory: CollectionObjectFactory = null;
   let sampleCollectionBackendObject: CollectionBackendDict = null;
   let _sampleCollection: Collection = null;
 
@@ -42,7 +41,6 @@ describe('Collection validation service', function() {
     });
 
     collectionValidationService = TestBed.get(CollectionValidationService);
-    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -59,7 +57,7 @@ describe('Collection validation service', function() {
         completed_exploration_ids: ['expId2']
       }
     };
-    _sampleCollection = collectionObjectFactory.create(
+    _sampleCollection = Collection.create(
       sampleCollectionBackendObject);
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
   });

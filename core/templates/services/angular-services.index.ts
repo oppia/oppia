@@ -53,8 +53,6 @@ import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFacto
 import { PredictionResultObjectFactory } from 'domain/classifier/PredictionResultObjectFactory';
 import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObjectFactory';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { CollectionObjectFactory } from 'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from 'domain/collection/CollectionPlaythroughObjectFactory';
 import { CollectionRightsObjectFactory } from 'domain/collection/CollectionRightsObjectFactory';
 import { GuestCollectionProgressObjectFactory } from 'domain/collection/GuestCollectionProgressObjectFactory';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
@@ -402,8 +400,6 @@ export const angularServices: [string, unknown][] = [
   ['CodeReplValidationService', CodeReplValidationService],
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
-  ['CollectionObjectFactory', CollectionObjectFactory],
-  ['CollectionPlaythroughObjectFactory', CollectionPlaythroughObjectFactory],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionRightsObjectFactory', CollectionRightsObjectFactory],
   ['CollectionSummaryObjectFactory', CollectionSummaryObjectFactory],

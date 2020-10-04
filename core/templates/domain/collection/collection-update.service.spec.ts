@@ -20,10 +20,8 @@
 // collection-update.service.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from
-  'domain/collection/CollectionPlaythroughObjectFactory';
+import { Collection, CollectionBackendDict } from
+  'domain/collection/collection.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -32,7 +30,6 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 
 describe('Collection update service', function() {
   var CollectionUpdateService = null;
-  var collectionObjectFactory = null;
   var UndoRedoService = null;
   var _sampleCollection = null;
   var _sampleExplorationSummaryBackendObject = {
@@ -43,9 +40,6 @@ describe('Collection update service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
-    $provide.value(
-      'CollectionObjectFactory', new CollectionObjectFactory(
-        new CollectionPlaythroughObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -56,7 +50,6 @@ describe('Collection update service', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
-    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
     var sampleCollectionBackendObject = {
@@ -76,8 +69,8 @@ describe('Collection update service', function() {
         completed_exploration_ids: ['expId2']
       }
     };
-    _sampleCollection = collectionObjectFactory.create(
-      sampleCollectionBackendObject);
+    _sampleCollection = Collection.create(
+      sampleCollectionBackendObject as unknown as CollectionBackendDict);
   }));
 
   it('should add/remove a new collection node to/from a collection',

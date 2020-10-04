@@ -108,10 +108,6 @@ import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
 import { ComputationDataObjectFactory } from
   'domain/admin/computation-data-object.factory';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from
-  'domain/collection/CollectionPlaythroughObjectFactory';
 import { CollectionRightsBackendApiService } from
   'domain/collection/collection-rights-backend-api.service';
 import { CollectionRightsObjectFactory } from
@@ -725,8 +721,6 @@ export class UpgradedServices {
     upgradedServices['ClientContextObjectFactory'] =
       new ClientContextObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
-    upgradedServices['CollectionPlaythroughObjectFactory'] =
-      new CollectionPlaythroughObjectFactory();
     upgradedServices['CollectionRightsObjectFactory'] =
       new CollectionRightsObjectFactory();
     upgradedServices['CollectionSummaryObjectFactory'] =
@@ -957,9 +951,6 @@ export class UpgradedServices {
     upgradedServices['CodeReplValidationService'] =
       new CodeReplValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['CollectionObjectFactory'] =
-      new CollectionObjectFactory(
-        upgradedServices['CollectionPlaythroughObjectFactory']);
     upgradedServices['ContinueValidationService'] =
       new ContinueValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1449,7 +1440,6 @@ export class UpgradedServices {
     upgradedServices['ReadOnlyCollectionBackendApiService'] =
       new ReadOnlyCollectionBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['CollectionObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
       new ReadOnlySubtopicPageObjectFactory(
@@ -1562,7 +1552,6 @@ export class UpgradedServices {
       new EditableCollectionBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['ReadOnlyCollectionBackendApiService'],
-        upgradedServices['CollectionObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardDataService'] =
         new EmailDashboardDataService(

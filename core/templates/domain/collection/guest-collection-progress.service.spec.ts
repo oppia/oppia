@@ -20,14 +20,13 @@ import { TestBed } from '@angular/core/testing';
 
 import { CollectionNode } from
   'domain/collection/collection-node.model';
-import { Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
+import { Collection } from
+  'domain/collection/collection.model';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 
 describe('Guest collection progress service', () => {
   let guestCollectionProgressService = null;
-  let collectionObjectFactory: CollectionObjectFactory = null;
   let _collectionId0: string = null;
   let _collectionId1: string = null;
   let _expId0: string = null;
@@ -45,7 +44,6 @@ describe('Guest collection progress service', () => {
 
     guestCollectionProgressService = TestBed.get(
       GuestCollectionProgressService);
-    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
 
     _collectionId0 = 'sample_collection_id0';
     _collectionId1 = 'sample_collection_id1';
@@ -81,7 +79,7 @@ describe('Guest collection progress service', () => {
       language_code: null,
       schema_version: null
     };
-    return collectionObjectFactory.create(collectionBackendObject);
+    return Collection.create(collectionBackendObject);
   };
 
   var _createCollectionNode = function(expId, expTitle) {
