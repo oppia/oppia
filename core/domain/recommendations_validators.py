@@ -46,11 +46,13 @@ class ExplorationRecommendationsModelValidator(
 
     @classmethod
     def _validate_item_id_not_in_recommended_exploration_ids(cls, item):
-        """Validate that model id is not present in recommended exploration ids.
+        """Validate that model id is not present in recommended
+        exploration ids.
 
         Args:
             item: ndb.Model. ExplorationRecommendationsModel to validate.
         """
+        
         if item.id in item.recommended_exploration_ids:
             cls._add_error(
                 'item exploration %s' % (
