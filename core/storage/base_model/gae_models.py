@@ -767,6 +767,10 @@ class VersionedModel(BaseModel):
         """
         versioned_models = cls.get_multi(
             entity_ids, include_deleted=force_deletion)
+        versioned_models = [
+            versioned_model for versioned_model in versioned_models
+            if versioned_model is not None
+        ]
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []
