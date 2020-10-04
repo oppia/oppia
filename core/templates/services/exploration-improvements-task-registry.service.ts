@@ -48,7 +48,7 @@ import {
   PlaythroughIssue
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
 import { StateStats } from 'domain/statistics/state-stats-model';
 
 type HbrTask = HighBounceRateTask;

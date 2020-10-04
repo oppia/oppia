@@ -26,7 +26,7 @@ import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { StateStats } from 'domain/statistics/state-stats-model';

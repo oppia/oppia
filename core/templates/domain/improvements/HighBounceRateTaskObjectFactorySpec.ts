@@ -22,15 +22,13 @@ import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { ExplorationStatsObjectFactory, ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStats } from
+  'domain/statistics/exploration-stats.model';
 
 describe('High bounce rate task', function() {
-  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   let highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory;
 
   beforeEach(() => {
-    explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
     highBounceRateTaskObjectFactory = (
       TestBed.get(HighBounceRateTaskObjectFactory));
   });
@@ -59,7 +57,7 @@ describe('High bounce rate task', function() {
     };
     this.newExplorationStatsWithBounceRate = (
       (numExpStarts: number, bounceRate: number) => {
-        return explorationStatsObjectFactory.createFromBackendDict({
+        return ExplorationStats.createFromBackendDict({
           exp_id: 'eid',
           exp_version: 1,
           num_starts: numExpStarts,
@@ -222,7 +220,7 @@ describe('High bounce rate task', function() {
       this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction', 1);
 
     const statsWithWrongId = (
-      explorationStatsObjectFactory.createFromBackendDict({
+      ExplorationStats.createFromBackendDict({
         exp_id: 'eid2',
         exp_version: 1,
         num_starts: 100,
@@ -245,7 +243,7 @@ describe('High bounce rate task', function() {
         'exploration id="eid2" v1');
 
     const statsWithWrongVersion = (
-      explorationStatsObjectFactory.createFromBackendDict({
+      ExplorationStats.createFromBackendDict({
         exp_id: 'eid',
         exp_version: 2,
         num_starts: 100,

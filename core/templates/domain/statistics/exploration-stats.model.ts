@@ -16,9 +16,6 @@
  * @fileoverview Domain object for holding the stats of an exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { StateStatsBackendDict, StateStats } from
   'domain/statistics/state-stats-model';
 
@@ -42,6 +39,21 @@ export class ExplorationStats {
       public readonly numCompletions: number,
       public readonly stateStatsMapping: ReadonlyMap<string, StateStats>) {
     this.stateStatsMapping = new Map(stateStatsMapping);
+  }
+
+  static createFromBackendDict(
+      backendDict: ExplorationStatsBackendDict): ExplorationStats {
+    const stateStatsMapping = (
+      new Map(Object.entries(backendDict.state_stats_mapping).map(
+        ([stateName, stateStatsBackendDict]) => [
+          stateName,
+          StateStats.createFromBackendDict(
+            stateStatsBackendDict)
+        ])));
+    return new ExplorationStats(
+      backendDict.exp_id, backendDict.exp_version, backendDict.num_starts,
+      backendDict.num_actual_starts, backendDict.num_completions,
+      stateStatsMapping);
   }
 
   getBounceRate(stateName: string): number {
@@ -122,27 +134,3 @@ export class ExplorationStats {
       this.numCompletions, newStateStatsMapping);
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationStatsObjectFactory {
-  createFromBackendDict(
-      backendDict: ExplorationStatsBackendDict): ExplorationStats {
-    const stateStatsMapping = (
-      new Map(Object.entries(backendDict.state_stats_mapping).map(
-        ([stateName, stateStatsBackendDict]) => [
-          stateName,
-          StateStats.createFromBackendDict(
-            stateStatsBackendDict)
-        ])));
-    return new ExplorationStats(
-      backendDict.exp_id, backendDict.exp_version, backendDict.num_starts,
-      backendDict.num_actual_starts, backendDict.num_completions,
-      stateStatsMapping);
-  }
-}
-
-angular.module('oppia').factory(
-  'ExplorationStatsObjectFactory',
-  downgradeInjectable(ExplorationStatsObjectFactory));

@@ -222,8 +222,6 @@ import { ExplorationRecommendationsService } from
   'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
-import { ExplorationStatsObjectFactory } from
-  'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
@@ -727,7 +725,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     ExplorationRecommendationsBackendApiService;
   static explorationRecommendationsService: ExplorationRecommendationsService;
   static explorationStatsBackendApiService: ExplorationStatsBackendApiService;
-  static explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   static explorationStatsService: ExplorationStatsService;
   static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
@@ -1097,7 +1094,6 @@ private explorationRecommendationsBackendApiService:
   ExplorationRecommendationsBackendApiService,
 private explorationRecommendationsService: ExplorationRecommendationsService,
 private explorationStatsBackendApiService: ExplorationStatsBackendApiService,
-private explorationStatsObjectFactory: ExplorationStatsObjectFactory,
 private explorationStatsService: ExplorationStatsService,
 private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
@@ -1534,8 +1530,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.explorationRecommendationsService);
     OppiaAngularRootComponent.explorationStatsBackendApiService = (
       this.explorationStatsBackendApiService);
-    OppiaAngularRootComponent.explorationStatsObjectFactory = (
-      this.explorationStatsObjectFactory);
     OppiaAngularRootComponent.explorationStatsService = (
       this.explorationStatsService);
     OppiaAngularRootComponent.explorationTaskObjectFactory = (

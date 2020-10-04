@@ -31,7 +31,7 @@ import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { StateStats } from 'domain/statistics/state-stats-model';
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 

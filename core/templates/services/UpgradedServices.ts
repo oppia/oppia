@@ -197,8 +197,6 @@ import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
-import { ExplorationStatsObjectFactory } from
-  'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
@@ -950,8 +948,6 @@ export class UpgradedServices {
     upgradedServices['EndExplorationValidationService'] =
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['ExplorationStatsObjectFactory'] =
-      new ExplorationStatsObjectFactory();
     upgradedServices['ExplorationTaskObjectFactory'] =
       new ExplorationTaskObjectFactory(
         upgradedServices['HighBounceRateTaskObjectFactory'],
@@ -1357,7 +1353,6 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
       new ExplorationStatsBackendApiService(
-        upgradedServices['ExplorationStatsObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['GenerateContentIdService'] =

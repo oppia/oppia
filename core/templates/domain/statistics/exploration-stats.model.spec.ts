@@ -16,22 +16,13 @@
  * @fileoverview Unit tests for the ExplorationStats domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import {
   ExplorationStats,
-  ExplorationStatsObjectFactory,
   ExplorationStatsBackendDict
-} from 'domain/statistics/ExplorationStatsObjectFactory';
+} from 'domain/statistics/exploration-stats.model';
 import { StateStats } from 'domain/statistics/state-stats-model';
 
 describe('Exploration stats', function() {
-  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
-
-  beforeEach(() => {
-    explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
-  });
-
   it('should derive values from the backend dict', () => {
     const explorationStatsBackendDict: ExplorationStatsBackendDict = {
       exp_id: 'eid',
@@ -43,7 +34,7 @@ describe('Exploration stats', function() {
     };
 
     const explorationStats: ExplorationStats = (
-      explorationStatsObjectFactory.createFromBackendDict(
+      ExplorationStats.createFromBackendDict(
         explorationStatsBackendDict));
 
     expect(explorationStats.expId).toEqual('eid');
@@ -56,7 +47,7 @@ describe('Exploration stats', function() {
   describe('Querying for state stats', () => {
     let explorationStats: ExplorationStats;
     beforeEach(() => {
-      explorationStats = explorationStatsObjectFactory.createFromBackendDict({
+      explorationStats = ExplorationStats.createFromBackendDict({
         exp_id: 'eid',
         exp_version: 100,
         num_starts: 100,
@@ -126,7 +117,7 @@ describe('Exploration stats', function() {
 
     it('should throw an error when trying to calculate bounce rate of an ' +
       'unplayed exploration', () => {
-      explorationStats = explorationStatsObjectFactory.createFromBackendDict({
+      explorationStats = ExplorationStats.createFromBackendDict({
         exp_id: 'eid',
         exp_version: 0,
         num_starts: 0,
@@ -151,7 +142,7 @@ describe('Exploration stats', function() {
   describe('Deriving new exploration stats', () => {
     let original: ExplorationStats;
     beforeEach(() => {
-      original = explorationStatsObjectFactory.createFromBackendDict({
+      original = ExplorationStats.createFromBackendDict({
         exp_id: 'eid',
         exp_version: 100,
         num_starts: 100,

@@ -39,8 +39,8 @@ import { SuccessiveIncorrectAnswersTask } from
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStats, ExplorationStatsBackendDict } from
+  'domain/statistics/exploration-stats.model';
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
@@ -59,7 +59,6 @@ describe('Exploration improvements task registrar service', () => {
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
-  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   let explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
   let statesObjectFactory: StatesObjectFactory;
@@ -86,7 +85,6 @@ describe('Exploration improvements task registrar service', () => {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
 
     answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
-    explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
     explorationTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
@@ -245,7 +243,7 @@ describe('Exploration improvements task registrar service', () => {
     return statesObjectFactory.createFromBackendDict(map);
   };
   const makeExpStats = (dict = expStatsBackendDict) => {
-    return explorationStatsObjectFactory.createFromBackendDict(dict);
+    return ExplorationStats.createFromBackendDict(dict);
   };
   const makeAnswerStats = (dict = answerStatsBackendDict) => {
     return answerStatsObjectFactory.createFromBackendDict(dict);

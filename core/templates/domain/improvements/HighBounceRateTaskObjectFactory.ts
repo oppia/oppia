@@ -24,7 +24,7 @@ import { ExplorationImprovementsConfig } from
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
 import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
 
