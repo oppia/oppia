@@ -108,11 +108,11 @@ export class EditableStoryBackendApiService {
     );
   }
 
-  private _changeStoryPublicationStatus = function(
+  private _changeStoryPublicationStatus(
       storyId: string,
       newStoryStatusIsPublic: boolean,
-      successCallback: (value?: string | PromiseLike<Object>) =>void,
-      errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      successCallback: (value: number) =>void,
+      errorCallback: (reason: string) => void): void {
     const storyPublishUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
         story_id: storyId
@@ -120,10 +120,11 @@ export class EditableStoryBackendApiService {
     var putData = {
       new_story_status_is_public: newStoryStatusIsPublic
     };
-    this.http.put(storyPublishUrl, putData).toPromise().then(
+    // eslint-disable-next-line max-len
+    this.http.put(storyPublishUrl, putData, { observe: 'response'}).toPromise().then(
       response => successCallback(response.status),
       errorResponse => errorCallback(errorResponse.error.error));
-  };
+  }
 
   private _validateExplorations = function(
       storyId: string,
@@ -210,7 +211,7 @@ export class EditableStoryBackendApiService {
   updateStory(
       storyId: string, storyVersion: string,
       commitMessage: string,
-      changeList: string[]):
+      changeList: StoryChange[]):
     Promise<Object> {
     return new Promise((resolve, reject) => {
       this._updateStory(
