@@ -29,35 +29,12 @@ import types
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import fs_services
-from core.domain import learner_playlist_services
-from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
-from core.domain import prod_validators
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import rating_services
-from core.domain import recommendations_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subscription_services
-from core.domain import subtopic_page_domain
-from core.domain import taskqueue_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_query_services
 from core.domain import user_services
-from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -72,21 +49,13 @@ USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    audit_models, classifier_models, collection_models,
-    config_models, email_models, exp_models,
-    feedback_models, improvements_models, job_models,
-    opportunity_models, question_models,
-    recommendations_models, skill_models, stats_models,
-    story_models, subtopic_models, suggestion_models,
-    topic_models, user_models
+    audit_models, collection_models,
+    email_models, exp_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
-    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-    models.NAMES.opportunity, models.NAMES.question,
-    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.audit, models.NAMES.collection,
+    models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.user
 ])
 
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):

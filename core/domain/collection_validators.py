@@ -23,58 +23,24 @@ import datetime
 import itertools
 import re
 
-from constants import constants
 from core.domain import base_model_validators
-from core.domain import classifier_domain
-from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import learner_progress_services
-from core.domain import platform_parameter_domain
-from core.domain import question_domain
-from core.domain import question_fetchers
-from core.domain import question_services
-from core.domain import recommendations_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import skill_services
-from core.domain import stats_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_domain
-from core.domain import user_services
-from core.domain import voiceover_services
-from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import python_utils
 import utils
 
 (
-    base_models, collection_models, config_models,
-    email_models, exp_models, feedback_models,
-    improvements_models, job_models, question_models,
-    recommendations_models, skill_models, stats_models,
-    story_models, subtopic_models, suggestion_models,
+    base_models, collection_models, exp_models,
+    question_models, skill_models, suggestion_models,
     topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.job, models.NAMES.question,
-    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.base_model, models.NAMES.collection,
+    models.NAMES.exploration, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.suggestion,
     models.NAMES.topic, models.NAMES.user
 ])
 
