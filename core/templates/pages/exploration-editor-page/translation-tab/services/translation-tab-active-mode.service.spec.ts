@@ -25,8 +25,9 @@ describe('Translation tab active mode service', () => {
   var translationTabActiveModeService = null;
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector)  {
-    translationTabActiveModeService = $injector.get('TranslationTabActiveModeService');
+  beforeEach(angular.mock.inject(function($injector) {
+    translationTabActiveModeService = $injector.get(
+      'TranslationTabActiveModeService');
   }));
 
   it('should correctly activate translation mode', () => {
