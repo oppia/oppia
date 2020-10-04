@@ -2316,28 +2316,35 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
 
 class RegenerateStringPropertyIndexOneOffJobTests(test_utils.GenericTestBase):
 
-    def test_outputs_successful_writes(self):
-        self.save_new_valid_exploration('exp1', 'owner1')
-        self.save_new_valid_exploration('exp2', 'owner2')
+    JOB = exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
 
-        improvements_models.TaskEntryModel.create(
-            'exploration', 'eid', 1, 'high_bounce_rate', 'state',
-            'Introduction')
-
-        job_id = (
-            exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
-            .create_new())
-        exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob.enqueue(job_id)
+    def run_job(self):
+        """Runs the job and returns its output."""
+        job_id = self.JOB.create_new()
+        self.JOB.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_mapreduce_tasks()
-        stringified_output = (
-            exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
-            .get_output(job_id))
-        output = [ast.literal_eval(s) for s in stringified_output]
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        return [ast.literal_eval(s) for s in self.JOB.get_output(job_id)]
 
-        self.assertItemsEqual(output, [
-            ['ExplorationModel', 2],
-            ['TaskEntryModel', 1],
-        ])
+    def test_outputs_successful_writes(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+        self.save_new_valid_exploration('exp2', 'owner2')
+        improvements_models.TaskEntryModel.create(
+            'exploration', 'eid', 1, 'high_bounce_rate', 'state',
+            'Introduction')
+
+        self.assertItemsEqual(
+            self.run_job(), [['ExplorationModel', 2], ['TaskEntryModel', 1]])
+
+    def test_versioned_models_are_not_changed_to_a_newer_version(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+
+        self.assertItemsEqual(self.run_job(), [['ExplorationModel', 1]])
+
+        exp_model = exp_models.ExplorationModel.get_by_id('exp1')
+        self.assertEqual(exp_model.version, 1)
