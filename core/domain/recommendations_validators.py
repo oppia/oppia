@@ -50,7 +50,7 @@ class ExplorationRecommendationsModelValidator(
         exploration ids.
 
         Args:
-            item: ndb.Model. ExplorationRecommendationsModel to validate.
+            item: datastore_services.Model. ExplorationRecommendationsModel to validate.
         """
 
         if item.id in item.recommended_exploration_ids:
@@ -84,7 +84,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
         values between 0.0 and 1.0.
 
         Args:
-            item: ndb.Model. TopicSimilaritiesModel to validate.
+            item: datastore_services.Model. TopicSimilaritiesModel to validate.
         """
 
         topics = list(item.content.keys())
