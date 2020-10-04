@@ -17,13 +17,8 @@
  *    task.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { TaskEntryBackendDict, TaskEntry } from
-  'domain/improvements/TaskEntryObjectFactory';
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
+import { TaskEntryBackendDict, TaskEntry } from 'domain/improvements/TaskEntryObjectFactory';
+import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
 
 export class IneffectiveFeedbackLoopTask extends TaskEntry<
     'ineffective_feedback_loop'> {
@@ -49,6 +44,39 @@ export class IneffectiveFeedbackLoopTask extends TaskEntry<
     super(backendDict);
   }
 
+  private static createNewObsoleteTask(
+      expId: string, expVersion: number, stateName: string
+  ): IneffectiveFeedbackLoopTask {
+    return new IneffectiveFeedbackLoopTask({
+      entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
+      entity_id: expId,
+      entity_version: expVersion,
+      task_type: ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+      target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
+      target_id: stateName,
+      issue_description: null,
+      status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
+      resolver_username: null,
+      resolver_profile_picture_data_url: null,
+      resolved_on_msecs: null,
+    });
+  }
+
+  static createNew(
+      expId: string, expVersion: number, stateName: string,
+      numCyclicStateTransitionsPlaythroughs: number
+  ): IneffectiveFeedbackLoopTask {
+    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
+    task.refreshStatus(numCyclicStateTransitionsPlaythroughs);
+    return task;
+  }
+
+  static createFromBackendDict(
+      backendDict: TaskEntryBackendDict<'ineffective_feedback_loop'>
+  ): IneffectiveFeedbackLoopTask {
+    return new IneffectiveFeedbackLoopTask(backendDict);
+  }
+
   public resolve(): void {
     this.markAsResolved();
   }
@@ -67,45 +95,3 @@ export class IneffectiveFeedbackLoopTask extends TaskEntry<
       'after revisiting this card several times.');
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class IneffectiveFeedbackLoopTaskObjectFactory {
-  private createNewObsoleteTask(
-      expId: string, expVersion: number, stateName: string
-  ): IneffectiveFeedbackLoopTask {
-    return new IneffectiveFeedbackLoopTask({
-      entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
-      entity_id: expId,
-      entity_version: expVersion,
-      task_type: ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-      target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
-      target_id: stateName,
-      issue_description: null,
-      status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
-      resolver_username: null,
-      resolver_profile_picture_data_url: null,
-      resolved_on_msecs: null,
-    });
-  }
-
-  createNew(
-      expId: string, expVersion: number, stateName: string,
-      numCyclicStateTransitionsPlaythroughs: number
-  ): IneffectiveFeedbackLoopTask {
-    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
-    task.refreshStatus(numCyclicStateTransitionsPlaythroughs);
-    return task;
-  }
-
-  createFromBackendDict(
-      backendDict: TaskEntryBackendDict<'ineffective_feedback_loop'>
-  ): IneffectiveFeedbackLoopTask {
-    return new IneffectiveFeedbackLoopTask(backendDict);
-  }
-}
-
-angular.module('oppia').factory(
-  'IneffectiveFeedbackLoopTaskObjectFactory',
-  downgradeInjectable(IneffectiveFeedbackLoopTaskObjectFactory));

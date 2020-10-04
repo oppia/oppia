@@ -13,11 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for a needs guiding responses improvements task.
+ * @fileoverview Model for a needs guiding responses improvements task.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { TaskEntryBackendDict, TaskEntry } from
@@ -49,6 +46,38 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
     super(backendDict);
   }
 
+  private static createNewObsoleteTask(
+      expId: string, expVersion: number, stateName: string
+  ): NeedsGuidingResponsesTask {
+    return new NeedsGuidingResponsesTask({
+      entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
+      entity_id: expId,
+      entity_version: expVersion,
+      task_type: ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+      target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
+      target_id: stateName,
+      issue_description: null,
+      status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
+      resolver_username: null,
+      resolver_profile_picture_data_url: null,
+      resolved_on_msecs: null,
+    });
+  }
+
+  static createFromAnswerStats(
+      expId: string, expVersion: number, stateName: string,
+      answerStats: AnswerStats[]): NeedsGuidingResponsesTask {
+    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
+    task.refreshStatus(answerStats);
+    return task;
+  }
+
+  static createFromBackendDict(
+      backendDict: TaskEntryBackendDict<'needs_guiding_responses'>
+  ): NeedsGuidingResponsesTask {
+    return new NeedsGuidingResponsesTask(backendDict);
+  }
+
   public refreshStatus(topStateAnswersStats: readonly AnswerStats[]): void {
     const numUnaddressedTopStateAnswers = (
       topStateAnswersStats.filter(a => !a.isAddressed).length);
@@ -71,44 +100,3 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
       'did not have explicit feedback from Oppia.');
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class NeedsGuidingResponsesTaskObjectFactory {
-  private createNewObsoleteTask(
-      expId: string, expVersion: number, stateName: string
-  ): NeedsGuidingResponsesTask {
-    return new NeedsGuidingResponsesTask({
-      entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
-      entity_id: expId,
-      entity_version: expVersion,
-      task_type: ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-      target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
-      target_id: stateName,
-      issue_description: null,
-      status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
-      resolver_username: null,
-      resolver_profile_picture_data_url: null,
-      resolved_on_msecs: null,
-    });
-  }
-
-  createFromAnswerStats(
-      expId: string, expVersion: number, stateName: string,
-      answerStats: AnswerStats[]): NeedsGuidingResponsesTask {
-    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
-    task.refreshStatus(answerStats);
-    return task;
-  }
-
-  createFromBackendDict(
-      backendDict: TaskEntryBackendDict<'needs_guiding_responses'>
-  ): NeedsGuidingResponsesTask {
-    return new NeedsGuidingResponsesTask(backendDict);
-  }
-}
-
-angular.module('oppia').factory(
-  'NeedsGuidingResponsesTaskObjectFactory',
-  downgradeInjectable(NeedsGuidingResponsesTaskObjectFactory));

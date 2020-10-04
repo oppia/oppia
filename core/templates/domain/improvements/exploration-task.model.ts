@@ -13,29 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for exploration improvement tasks.
+ * @fileoverview Model for exploration improvement tasks.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
-import { TaskEntryBackendDict } from
-  'domain/improvements/TaskEntryObjectFactory';
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
+import { TaskEntryBackendDict } from 'domain/improvements/TaskEntryObjectFactory';
+import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
 import {
-  IneffectiveFeedbackLoopTask,
-  IneffectiveFeedbackLoopTaskObjectFactory
-} from 'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+  IneffectiveFeedbackLoopTask
+} from 'domain/improvements/ineffective-feedback-loop-task.model';
 import {
-  NeedsGuidingResponsesTask,
-  NeedsGuidingResponsesTaskObjectFactory
-} from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+  NeedsGuidingResponsesTask
+} from 'domain/improvements/needs-guiding-response-task.model';
 import {
-  SuccessiveIncorrectAnswersTask,
-  SuccessiveIncorrectAnswersTaskObjectFactory
-} from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+  SuccessiveIncorrectAnswersTask
+} from 'domain/improvements/successive-incorrect-answers-task.model';
 
 export type ExplorationTaskType = (
   'high_bounce_rate' |
@@ -55,17 +47,8 @@ export type ExplorationTask = (
   NeedsGuidingResponsesTask |
   SuccessiveIncorrectAnswersTask);
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationTaskObjectFactory {
-  constructor(
-      private iflTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
-      private ngrTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory,
-      private siaTaskObjectFactory:
-        SuccessiveIncorrectAnswersTaskObjectFactory) {}
-
-  createNewObsoleteTask(
+export class ExplorationTaskModel {
+  static createNewObsoleteTask(
       expId: string, expVersion: number, taskType: ExplorationTaskType,
       stateName: string): ExplorationTask {
     return this.createFromBackendDict({
@@ -83,7 +66,7 @@ export class ExplorationTaskObjectFactory {
     });
   }
 
-  createNewResolvedTask(
+  static createNewResolvedTask(
       expId: string, expVersion: number, taskType: ExplorationTaskType,
       stateName: string): ExplorationTask {
     return this.createFromBackendDict({
@@ -101,18 +84,19 @@ export class ExplorationTaskObjectFactory {
     });
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: ExplorationTaskBackendDict): ExplorationTask {
     const taskType = backendDict.task_type;
     switch (backendDict.task_type) {
       case 'high_bounce_rate':
         return HighBounceRateTask.createFromBackendDict(backendDict);
       case 'ineffective_feedback_loop':
-        return this.iflTaskObjectFactory.createFromBackendDict(backendDict);
+        return IneffectiveFeedbackLoopTask.createFromBackendDict(backendDict);
       case 'needs_guiding_responses':
-        return this.ngrTaskObjectFactory.createFromBackendDict(backendDict);
+        return NeedsGuidingResponsesTask.createFromBackendDict(backendDict);
       case 'successive_incorrect_answers':
-        return this.siaTaskObjectFactory.createFromBackendDict(backendDict);
+        return SuccessiveIncorrectAnswersTask.createFromBackendDict(
+          backendDict);
       default: {
         const invalidBackendDict: never = backendDict;
         throw new Error(
@@ -122,7 +106,3 @@ export class ExplorationTaskObjectFactory {
     }
   }
 }
-
-angular.module('oppia').factory(
-  'ExplorationTaskObjectFactory',
-  downgradeInjectable(ExplorationTaskObjectFactory));

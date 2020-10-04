@@ -221,8 +221,6 @@ import { ExplorationRecommendationsService } from
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { ExplorationTaskObjectFactory } from
-  'domain/improvements/ExplorationTaskObjectFactory';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
@@ -272,8 +270,6 @@ import { ImageClickInputValidationService } from 'interactions/ImageClickInput/d
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
-import { IneffectiveFeedbackLoopTaskObjectFactory } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { InteractionAttributesExtractorService } from
   'interactions/interaction-attributes-extractor.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -334,8 +330,6 @@ import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import { MusicPhrasePlayerService } from 'interactions/MusicNotesInput/directives/music-phrase-player.service';
-import { NeedsGuidingResponsesTaskObjectFactory } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { NewlyCreatedStoryObjectFactory } from
   'domain/topic/NewlyCreatedStoryObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
@@ -537,8 +531,6 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { SuccessiveIncorrectAnswersTaskObjectFactory } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -711,7 +703,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationRecommendationsService: ExplorationRecommendationsService;
   static explorationStatsBackendApiService: ExplorationStatsBackendApiService;
   static explorationStatsService: ExplorationStatsService;
-  static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
   static externalSaveService: ExternalSaveService;
@@ -747,8 +738,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageClickInputValidationService: ImageClickInputValidationService;
   static imageFileObjectFactory: ImageFileObjectFactory;
   static improvementsService: ImprovementsService;
-  static ineffectiveFeedbackLoopTaskObjectFactory:
-    IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionAttributesExtractorService:
     InteractionAttributesExtractorService;
   static interactionDetailsCacheService: InteractionDetailsCacheService;
@@ -792,8 +781,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static musicNotesInputRulesService: MusicNotesInputRulesService;
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
-  static needsGuidingResponsesTaskObjectFactory:
-    NeedsGuidingResponsesTaskObjectFactory;
   static newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory;
   static newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory;
   static nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory;
@@ -923,8 +910,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
   static subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
-  static successiveIncorrectAnswersTaskObjectFactory:
-    SuccessiveIncorrectAnswersTaskObjectFactory;
   static suggestionModalService: SuggestionModalService;
   static suggestionObjectFactory: SuggestionObjectFactory;
   static suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
@@ -1072,7 +1057,6 @@ private explorationRecommendationsBackendApiService:
 private explorationRecommendationsService: ExplorationRecommendationsService,
 private explorationStatsBackendApiService: ExplorationStatsBackendApiService,
 private explorationStatsService: ExplorationStatsService,
-private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private externalSaveService: ExternalSaveService,
@@ -1108,8 +1092,6 @@ private imageClickInputRulesService: ImageClickInputRulesService,
 private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
 private improvementsService: ImprovementsService,
-private ineffectiveFeedbackLoopTaskObjectFactory:
-  IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionAttributesExtractorService:
   InteractionAttributesExtractorService,
 private interactionDetailsCacheService: InteractionDetailsCacheService,
@@ -1153,8 +1135,6 @@ private multipleChoiceInputValidationService:
 private musicNotesInputRulesService: MusicNotesInputRulesService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
-private needsGuidingResponsesTaskObjectFactory:
-  NeedsGuidingResponsesTaskObjectFactory,
 private newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory,
 private newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory,
 private nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory,
@@ -1286,8 +1266,6 @@ private subtopicObjectFactory: SubtopicObjectFactory,
 private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
 private subtopicPageObjectFactory: SubtopicPageObjectFactory,
 private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
-private successiveIncorrectAnswersTaskObjectFactory:
-  SuccessiveIncorrectAnswersTaskObjectFactory,
 private suggestionModalService: SuggestionModalService,
 private suggestionObjectFactory: SuggestionObjectFactory,
 private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
@@ -1500,8 +1478,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.explorationStatsBackendApiService);
     OppiaAngularRootComponent.explorationStatsService = (
       this.explorationStatsService);
-    OppiaAngularRootComponent.explorationTaskObjectFactory = (
-      this.explorationTaskObjectFactory);
     OppiaAngularRootComponent.expressionSyntaxTreeService = (
       this.expressionSyntaxTreeService);
     OppiaAngularRootComponent.extensionTagAssemblerService = (
@@ -1556,8 +1532,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.imageFileObjectFactory = (
       this.imageFileObjectFactory);
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
-    OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = (
-      this.ineffectiveFeedbackLoopTaskObjectFactory);
     OppiaAngularRootComponent.interactionAttributesExtractorService = (
       this.interactionAttributesExtractorService);
     OppiaAngularRootComponent.interactionDetailsCacheService = (
@@ -1629,8 +1603,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.newlyCreatedStoryObjectFactory);
     OppiaAngularRootComponent.newlyCreatedTopicObjectFactory = (
       this.newlyCreatedTopicObjectFactory);
-    OppiaAngularRootComponent.needsGuidingResponsesTaskObjectFactory = (
-      this.needsGuidingResponsesTaskObjectFactory);
     OppiaAngularRootComponent.nonExistentActivitiesObjectFactory = (
       this.nonExistentActivitiesObjectFactory);
     OppiaAngularRootComponent.normalizeWhitespacePipe = (
@@ -1848,8 +1820,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.subtopicPageObjectFactory);
     OppiaAngularRootComponent.subtopicViewerBackendApiService = (
       this.subtopicViewerBackendApiService);
-    OppiaAngularRootComponent.successiveIncorrectAnswersTaskObjectFactory = (
-      this.successiveIncorrectAnswersTaskObjectFactory);
     OppiaAngularRootComponent.suggestionModalService = (
       this.suggestionModalService);
     OppiaAngularRootComponent.suggestionObjectFactory = (

@@ -16,21 +16,11 @@
  * @fileoverview Unit tests for the NeedsGuidingResponsesTask domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { NeedsGuidingResponsesTaskObjectFactory } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { NeedsGuidingResponsesTask } from
+  'domain/improvements/needs-guiding-response-task.model';
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 
 describe('Needs guiding responses task', function() {
-  let needsGuidingResponsesTaskObjectFactory:
-    NeedsGuidingResponsesTaskObjectFactory;
-
-  beforeEach(() => {
-    needsGuidingResponsesTaskObjectFactory = (
-      TestBed.get(NeedsGuidingResponsesTaskObjectFactory));
-  });
-
   beforeEach(() => {
     this.newTop10AnswerStats = (numUnaddressedAnswers: number) => {
       const answerStats = [];
@@ -45,7 +35,7 @@ describe('Needs guiding responses task', function() {
   });
 
   it('should return new task if state answer needs a guiding response', () => {
-    const task = needsGuidingResponsesTaskObjectFactory.createFromAnswerStats(
+    const task = NeedsGuidingResponsesTask.createFromAnswerStats(
       'eid', 1, 'Introduction', this.newTop10AnswerStats(3));
 
     expect(task.entityType).toEqual('exploration');
@@ -61,7 +51,7 @@ describe('Needs guiding responses task', function() {
   });
 
   it('should return obsolete task if all answers are addressed', () => {
-    const task = needsGuidingResponsesTaskObjectFactory.createFromAnswerStats(
+    const task = NeedsGuidingResponsesTask.createFromAnswerStats(
       'eid', 1, 'Introduction', this.newTop10AnswerStats(0));
 
     expect(task.entityType).toEqual('exploration');
@@ -75,7 +65,7 @@ describe('Needs guiding responses task', function() {
   });
 
   it('should create from an NGR task backend dict', () => {
-    const task = needsGuidingResponsesTaskObjectFactory.createFromBackendDict({
+    const task = NeedsGuidingResponsesTask.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
       entity_version: 1,
@@ -105,7 +95,7 @@ describe('Needs guiding responses task', function() {
 
   it('should throw when backend dict entity type is not exploration', () => {
     expect(
-      () => needsGuidingResponsesTaskObjectFactory.createFromBackendDict({
+      () => NeedsGuidingResponsesTask.createFromBackendDict({
         entity_type: '???',
         entity_id: 'eid',
         entity_version: 1,
@@ -126,7 +116,7 @@ describe('Needs guiding responses task', function() {
 
   it('should throw when backend dict task type is not NGR', () => {
     expect(
-      () => needsGuidingResponsesTaskObjectFactory.createFromBackendDict({
+      () => NeedsGuidingResponsesTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -153,7 +143,7 @@ describe('Needs guiding responses task', function() {
 
   it('should throw when backend dict target type is not state', () => {
     expect(
-      () => needsGuidingResponsesTaskObjectFactory.createFromBackendDict({
+      () => NeedsGuidingResponsesTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -172,7 +162,7 @@ describe('Needs guiding responses task', function() {
   });
 
   it('should update status based on changes to exploration stats', () => {
-    const task = needsGuidingResponsesTaskObjectFactory.createFromAnswerStats(
+    const task = NeedsGuidingResponsesTask.createFromAnswerStats(
       'eid', 1, 'Introduction', this.newTop10AnswerStats(3));
     expect(task.isOpen()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
@@ -187,7 +177,7 @@ describe('Needs guiding responses task', function() {
   });
 
   it('should not change issue description after it is generated', () => {
-    const task = needsGuidingResponsesTaskObjectFactory.createFromAnswerStats(
+    const task = NeedsGuidingResponsesTask.createFromAnswerStats(
       'eid', 1, 'Introduction', this.newTop10AnswerStats(0));
     expect(task.getIssueDescription()).toBeNull();
 

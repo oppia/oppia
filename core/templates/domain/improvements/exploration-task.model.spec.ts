@@ -13,31 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ExplorationTaskObjectFactory.
+ * @fileoverview Unit tests for the ExplorationTaskModel.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { ExplorationTaskObjectFactory } from
-  'domain/improvements/ExplorationTaskObjectFactory';
+import { ExplorationTaskModel } from
+  'domain/improvements/exploration-task.model';
 import { HighBounceRateTask } from
   'domain/improvements/high-bounce-rate-task.model';
 import { TaskEntryBackendDict } from
   'domain/improvements/TaskEntryObjectFactory';
 import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+  'domain/improvements/ineffective-feedback-loop-task.model';
 import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+  'domain/improvements/needs-guiding-response-task.model';
 import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+  'domain/improvements/successive-incorrect-answers-task.model';
 
 describe('Exploration task object factory', () => {
-  let expTaskObjectFactory: ExplorationTaskObjectFactory;
-
-  beforeEach(() => {
-    expTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
-  });
-
   let newTaskEntryBackendDict;
 
   beforeEach(() => {
@@ -59,34 +51,34 @@ describe('Exploration task object factory', () => {
 
   it('should return a high bounce rate task', () => {
     expect(
-      expTaskObjectFactory.createFromBackendDict(
+      ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict('high_bounce_rate'))
     ).toBeInstanceOf(HighBounceRateTask);
   });
 
   it('should return a ineffective feedback loop task', () => {
     expect(
-      expTaskObjectFactory.createFromBackendDict(
+      ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict('ineffective_feedback_loop'))
     ).toBeInstanceOf(IneffectiveFeedbackLoopTask);
   });
 
   it('should return a needs guiding responses task', () => {
     expect(
-      expTaskObjectFactory.createFromBackendDict(
+      ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict('needs_guiding_responses'))
     ).toBeInstanceOf(NeedsGuidingResponsesTask);
   });
 
   it('should return a successive incorrect answers task', () => {
     expect(
-      expTaskObjectFactory.createFromBackendDict(
+      ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict('successive_incorrect_answers'))
     ).toBeInstanceOf(SuccessiveIncorrectAnswersTask);
   });
 
   it('should build a new resolved exloration task', () => {
-    const task = expTaskObjectFactory.createNewResolvedTask(
+    const task = ExplorationTaskModel.createNewResolvedTask(
       'eid', 1, 'high_bounce_rate', 'Introduction');
     expect(task.entityId).toEqual('eid');
     expect(task.entityVersion).toEqual(1);
@@ -96,7 +88,7 @@ describe('Exploration task object factory', () => {
   });
 
   it('should build a new obsolete exloration task', () => {
-    const task = expTaskObjectFactory.createNewObsoleteTask(
+    const task = ExplorationTaskModel.createNewObsoleteTask(
       'eid', 1, 'high_bounce_rate', 'Introduction');
     expect(task.entityId).toEqual('eid');
     expect(task.entityVersion).toEqual(1);
@@ -107,7 +99,7 @@ describe('Exploration task object factory', () => {
 
   it('should throw an error if task type is unknown', () => {
     expect(
-      () => expTaskObjectFactory.createFromBackendDict(
+      () => ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict('unknown_task_type'))
     ).toThrowError(new RegExp(
       'Unsupported task type "unknown_task_type" for backend dict: ' +

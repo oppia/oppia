@@ -16,23 +16,12 @@
  * @fileoverview Unit tests for the IneffectiveFeedbackLoopTask domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { IneffectiveFeedbackLoopTaskObjectFactory } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+import { IneffectiveFeedbackLoopTask } from 'domain/improvements/ineffective-feedback-loop-task.model';
 
 describe('Ineffective feedback loop task', function() {
-  let ineffectiveFeedbackLoopTaskObjectFactory:
-    IneffectiveFeedbackLoopTaskObjectFactory;
-
-  beforeEach(() => {
-    ineffectiveFeedbackLoopTaskObjectFactory = (
-      TestBed.get(IneffectiveFeedbackLoopTaskObjectFactory));
-  });
-
   it('should return new task if there are playthroughs demonstrating cyclic ' +
     'state transitions', () => {
-    const task = ineffectiveFeedbackLoopTaskObjectFactory.createNew(
+    const task = IneffectiveFeedbackLoopTask.createNew(
       'eid', 1, 'Introduction', 3);
 
     expect(task.entityType).toEqual('exploration');
@@ -47,7 +36,7 @@ describe('Ineffective feedback loop task', function() {
   });
 
   it('should return obsolete task if all answers are addressed', () => {
-    const task = ineffectiveFeedbackLoopTaskObjectFactory.createNew(
+    const task = IneffectiveFeedbackLoopTask.createNew(
       'eid', 1, 'Introduction', 0);
 
     expect(task.entityType).toEqual('exploration');
@@ -61,7 +50,7 @@ describe('Ineffective feedback loop task', function() {
   });
 
   it('should be resolvable', () => {
-    const task = ineffectiveFeedbackLoopTaskObjectFactory.createNew(
+    const task = IneffectiveFeedbackLoopTask.createNew(
       'eid', 1, 'Introduction', 1);
 
     expect(task.isOpen()).toBeTrue();
@@ -74,7 +63,7 @@ describe('Ineffective feedback loop task', function() {
 
   it('should create from an IFL task backend dict', () => {
     const task = (
-      ineffectiveFeedbackLoopTaskObjectFactory.createFromBackendDict({
+      IneffectiveFeedbackLoopTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -103,7 +92,7 @@ describe('Ineffective feedback loop task', function() {
 
   it('should throw when backend dict entity type is not exploration', () => {
     expect(
-      () => ineffectiveFeedbackLoopTaskObjectFactory.createFromBackendDict({
+      () => IneffectiveFeedbackLoopTask.createFromBackendDict({
         entity_type: '???',
         entity_id: 'eid',
         entity_version: 1,
@@ -124,7 +113,7 @@ describe('Ineffective feedback loop task', function() {
 
   it('should throw when backend dict task type is not IFL', () => {
     expect(
-      () => ineffectiveFeedbackLoopTaskObjectFactory.createFromBackendDict({
+      () => IneffectiveFeedbackLoopTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -152,7 +141,7 @@ describe('Ineffective feedback loop task', function() {
 
   it('should throw when backend dict target type is not state', () => {
     expect(
-      () => ineffectiveFeedbackLoopTaskObjectFactory.createFromBackendDict({
+      () => IneffectiveFeedbackLoopTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -171,7 +160,7 @@ describe('Ineffective feedback loop task', function() {
   });
 
   it('should not change issue description after it is generated', () => {
-    const task = ineffectiveFeedbackLoopTaskObjectFactory.createNew(
+    const task = IneffectiveFeedbackLoopTask.createNew(
       'eid', 1, 'Introduction', 0);
     expect(task.getIssueDescription()).toBeNull();
 

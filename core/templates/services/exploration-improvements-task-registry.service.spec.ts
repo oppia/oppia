@@ -24,18 +24,18 @@ import {
   ExplorationTask,
   ExplorationTaskType,
   ExplorationTaskBackendDict,
-  ExplorationTaskObjectFactory
-} from 'domain/improvements/ExplorationTaskObjectFactory';
+  ExplorationTaskModel
+} from 'domain/improvements/exploration-task.model';
 import { HighBounceRateTask } from
   'domain/improvements/high-bounce-rate-task.model';
 import { StateStatsBackendDict } from
   'domain/statistics/state-stats-model';
 import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+  'domain/improvements/ineffective-feedback-loop-task.model';
 import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+  'domain/improvements/needs-guiding-response-task.model';
 import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+  'domain/improvements/successive-incorrect-answers-task.model';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
@@ -59,7 +59,6 @@ describe('Exploration improvements task registrar service', () => {
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
-  let explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
   let statesObjectFactory: StatesObjectFactory;
 
@@ -85,7 +84,6 @@ describe('Exploration improvements task registrar service', () => {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
 
     answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
-    explorationTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
 
@@ -237,7 +235,7 @@ describe('Exploration improvements task registrar service', () => {
 
   const makeTask = (
     <T extends ExplorationTask = ExplorationTask>(dict = taskBackendDict) => {
-      return <T> explorationTaskObjectFactory.createFromBackendDict(dict);
+      return <T> ExplorationTaskModel.createFromBackendDict(dict);
     });
   const makeStates = (map = statesBackendDict) => {
     return statesObjectFactory.createFromBackendDict(map);

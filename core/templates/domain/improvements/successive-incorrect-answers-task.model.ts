@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for a successive incorrect answers improvements
- *    task.
+ * @fileoverview Model for a successive incorrect answers improvements
+ * task.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
@@ -50,6 +47,39 @@ export class SuccessiveIncorrectAnswersTask extends TaskEntry<
     super(backendDict);
   }
 
+  private static createNewObsoleteTask(
+      expId: string, expVersion: number, stateName: string
+  ): SuccessiveIncorrectAnswersTask {
+    return new SuccessiveIncorrectAnswersTask({
+      entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
+      entity_id: expId,
+      entity_version: expVersion,
+      task_type: ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+      target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
+      target_id: stateName,
+      issue_description: null,
+      status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
+      resolver_username: null,
+      resolver_profile_picture_data_url: null,
+      resolved_on_msecs: null,
+    });
+  }
+
+  static createNew(
+      expId: string, expVersion: number, stateName: string,
+      numMultipleIncorrectSubmissionsPlaythroughs: number
+  ): SuccessiveIncorrectAnswersTask {
+    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
+    task.refreshStatus(numMultipleIncorrectSubmissionsPlaythroughs);
+    return task;
+  }
+
+  static createFromBackendDict(
+      backendDict: TaskEntryBackendDict<'successive_incorrect_answers'>
+  ): SuccessiveIncorrectAnswersTask {
+    return new SuccessiveIncorrectAnswersTask(backendDict);
+  }
+
   public resolve(): void {
     this.markAsResolved();
   }
@@ -70,45 +100,3 @@ export class SuccessiveIncorrectAnswersTask extends TaskEntry<
       'quit after entering many incorrect answers at this card.');
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SuccessiveIncorrectAnswersTaskObjectFactory {
-  private createNewObsoleteTask(
-      expId: string, expVersion: number, stateName: string
-  ): SuccessiveIncorrectAnswersTask {
-    return new SuccessiveIncorrectAnswersTask({
-      entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
-      entity_id: expId,
-      entity_version: expVersion,
-      task_type: ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-      target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
-      target_id: stateName,
-      issue_description: null,
-      status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
-      resolver_username: null,
-      resolver_profile_picture_data_url: null,
-      resolved_on_msecs: null,
-    });
-  }
-
-  createNew(
-      expId: string, expVersion: number, stateName: string,
-      numMultipleIncorrectSubmissionsPlaythroughs: number
-  ): SuccessiveIncorrectAnswersTask {
-    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
-    task.refreshStatus(numMultipleIncorrectSubmissionsPlaythroughs);
-    return task;
-  }
-
-  createFromBackendDict(
-      backendDict: TaskEntryBackendDict<'successive_incorrect_answers'>
-  ): SuccessiveIncorrectAnswersTask {
-    return new SuccessiveIncorrectAnswersTask(backendDict);
-  }
-}
-
-angular.module('oppia').factory(
-  'SuccessiveIncorrectAnswersTaskObjectFactory',
-  downgradeInjectable(SuccessiveIncorrectAnswersTaskObjectFactory));

@@ -99,10 +99,6 @@ import { ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessag
 import { ThreadMessageSummaryObjectFactory } from 'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FeedbackThreadSummaryObjectFactory } from 'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
-import { ExplorationTaskObjectFactory } from 'domain/improvements/ExplorationTaskObjectFactory';
-import { IneffectiveFeedbackLoopTaskObjectFactory } from 'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
-import { NeedsGuidingResponsesTaskObjectFactory } from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { SuccessiveIncorrectAnswersTaskObjectFactory } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { TaskEntryObjectFactory } from 'domain/improvements/TaskEntryObjectFactory';
 import { ExplorationImprovementsConfigObjectFactory } from 'domain/improvements/exploration-improvements-config-object.factory';
 import { LearnerDashboardActivityIdsObjectFactory } from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
@@ -447,7 +443,6 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
-  ['ExplorationTaskObjectFactory', ExplorationTaskObjectFactory],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionParserService', ExpressionParserService],
   ['ExpressionSyntaxTreeService', ExpressionSyntaxTreeService],
@@ -486,8 +481,6 @@ export const angularServices: [string, unknown][] = [
   ['ImageClickInputValidationService', ImageClickInputValidationService],
   ['ImageFileObjectFactory', ImageFileObjectFactory],
   ['ImprovementsService', ImprovementsService],
-  ['IneffectiveFeedbackLoopTaskObjectFactory',
-    IneffectiveFeedbackLoopTaskObjectFactory],
   ['InteractionAttributesExtractorService',
     InteractionAttributesExtractorService],
   ['InteractionDetailsCacheService', InteractionDetailsCacheService],
@@ -532,8 +525,6 @@ export const angularServices: [string, unknown][] = [
   ['MusicNotesInputRulesService', MusicNotesInputRulesService],
   ['MusicNotesInputValidationService', MusicNotesInputValidationService],
   ['MusicPhrasePlayerService', MusicPhrasePlayerService],
-  ['NeedsGuidingResponsesTaskObjectFactory',
-    NeedsGuidingResponsesTaskObjectFactory],
   ['NewlyCreatedStoryObjectFactory', NewlyCreatedStoryObjectFactory],
   ['NewlyCreatedTopicObjectFactory', NewlyCreatedTopicObjectFactory],
   ['NonExistentActivitiesObjectFactory', NonExistentActivitiesObjectFactory],
@@ -663,8 +654,6 @@ export const angularServices: [string, unknown][] = [
   ['SubtopicPageContentsObjectFactory', SubtopicPageContentsObjectFactory],
   ['SubtopicPageObjectFactory', SubtopicPageObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
-  ['SuccessiveIncorrectAnswersTaskObjectFactory',
-    SuccessiveIncorrectAnswersTaskObjectFactory],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionObjectFactory', SuggestionObjectFactory],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
