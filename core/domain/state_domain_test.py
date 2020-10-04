@@ -1156,6 +1156,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('TextInput')
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('NumericExpressionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
 
         # Invalid interactions.
         init_state.update_interaction_id('CodeRepl')

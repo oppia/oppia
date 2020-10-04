@@ -30,6 +30,7 @@ import {
   Subtopic,
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
+import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 
 export interface DegreesOfMastery {
   [skillId: string]: number | null;
@@ -135,6 +136,7 @@ export class ReadOnlyTopic {
 })
 export class ReadOnlyTopicObjectFactory {
   constructor(
+    private storyNodeObjectFactory: StoryNodeObjectFactory,
     private subtopicObjectFactory: SubtopicObjectFactory,
     private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
 
@@ -154,19 +156,29 @@ export class ReadOnlyTopicObjectFactory {
         topicDataDict.skill_descriptions;
     let canonicalStories =
         topicDataDict.canonical_story_dicts.map(storyDict => {
+          let pendingNodes = (
+            storyDict.pending_node_dicts.map(storyNodeDict => {
+              return this.storyNodeObjectFactory.createFromBackendDict(
+                storyNodeDict);
+            }));
           return new StorySummary(
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment);
+            storyDict.url_fragment, pendingNodes);
         });
     let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
+          let pendingNodes = (
+            storyDict.pending_node_dicts.map(storyNodeDict => {
+              return this.storyNodeObjectFactory.createFromBackendDict(
+                storyNodeDict);
+            }));
           return new StorySummary(
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment);
+            storyDict.url_fragment, pendingNodes);
         });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,
