@@ -16,16 +16,12 @@
  * @fileoverview Tests for UserProfileObjectFactory.
  */
 
-import { LearnerExplorationSummaryObjectFactory } from
-  'domain/summary/learner-exploration-summary-object.factory';
-import { UserProfileObjectFactory } from
-  'domain/user/user-profile-object.factory';
+import { LearnerExplorationSummary } from
+  'domain/summary/learner-exploration-summary.model';
+import { UserProfile } from
+  'domain/user/user-profile.model';
 
 describe('User profile object factory', () => {
-  var upof = new UserProfileObjectFactory(
-    new LearnerExplorationSummaryObjectFactory());
-  var lesof = new LearnerExplorationSummaryObjectFactory();
-
   it('should create a user profile object from a backend dict',
     () => {
       var backendDict = {
@@ -90,9 +86,9 @@ describe('User profile object factory', () => {
         user_email: 'test@email.com'
       };
 
-      var userProfile = upof.createFromBackendDict(backendDict);
+      var userProfile = UserProfile.createFromBackendDict(backendDict);
 
-      var exploration = lesof.createFromBackendDict(
+      var exploration = LearnerExplorationSummary.createFromBackendDict(
         backendDict.created_exp_summary_dicts[0]);
 
       expect(userProfile.createdExpSummaries).toEqual([exploration]);

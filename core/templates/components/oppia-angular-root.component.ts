@@ -313,8 +313,6 @@ import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { LearnerExplorationSummaryObjectFactory } from
-  'domain/summary/learner-exploration-summary-object.factory';
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -586,8 +584,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { UserProfileObjectFactory } from
-  'domain/user/user-profile-object.factory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
@@ -789,8 +785,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   static learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService;
-  static learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory;
   static learnerParamsService: LearnerParamsService;
   static localStorageService: LocalStorageService;
   static loaderService: LoaderService;
@@ -973,7 +967,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static urlService: UrlService;
   static userExplorationPermissionsService: UserExplorationPermissionsService;
   static userInfoObjectFactory: UserInfoObjectFactory;
-  static userProfileObjectFactory: UserProfileObjectFactory;
   static utilsService: UtilsService;
   static validatorsService: ValidatorsService;
   static versionTreeService: VersionTreeService;
@@ -1158,8 +1151,6 @@ private learnerDashboardActivityIdsObjectFactory:
 private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
 private learnerDashboardIdsBackendApiService:
   LearnerDashboardIdsBackendApiService,
-private learnerExplorationSummaryObjectFactory:
-  LearnerExplorationSummaryObjectFactory,
 private learnerParamsService: LearnerParamsService,
 private localStorageService: LocalStorageService,
 private loaderService: LoaderService,
@@ -1344,7 +1335,6 @@ private urlInterpolationService: UrlInterpolationService,
 private urlService: UrlService,
 private userExplorationPermissionsService: UserExplorationPermissionsService,
 private userInfoObjectFactory: UserInfoObjectFactory,
-private userProfileObjectFactory: UserProfileObjectFactory,
 private utilsService: UtilsService,
 private validatorsService: ValidatorsService,
 private versionTreeService: VersionTreeService,
@@ -1628,8 +1618,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.learnerDashboardBackendApiService);
     OppiaAngularRootComponent.learnerDashboardIdsBackendApiService = (
       this.learnerDashboardIdsBackendApiService);
-    OppiaAngularRootComponent.learnerExplorationSummaryObjectFactory = (
-      this.learnerExplorationSummaryObjectFactory);
     OppiaAngularRootComponent.learnerParamsService = this.learnerParamsService;
     OppiaAngularRootComponent.localStorageService = this.localStorageService;
     OppiaAngularRootComponent.loaderService = this.loaderService;
@@ -1935,9 +1923,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.userExplorationPermissionsService = (
       this.userExplorationPermissionsService);
     OppiaAngularRootComponent.userInfoObjectFactory = (
-      this.userInfoObjectFactory);
-    OppiaAngularRootComponent.userProfileObjectFactory = (
-      this.userProfileObjectFactory);
+      this.userInfoObjectFactory);  
     OppiaAngularRootComponent.utilsService = this.utilsService;
     OppiaAngularRootComponent.validatorsService = this.validatorsService;
     OppiaAngularRootComponent.versionTreeService = this.versionTreeService;

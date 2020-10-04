@@ -21,10 +21,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, EventEmitter } from '@angular/core';
 
 import {
-  LearnerExplorationSummaryBackendDict,
   LearnerExplorationSummary,
-  LearnerExplorationSummaryObjectFactory
-} from 'domain/summary/learner-exploration-summary-object.factory';
+  LearnerExplorationSummaryBackendDict
+} from 'domain/summary/learner-exploration-summary.model';
 import {
   StoryPlaythroughBackendDict,
   StoryPlaythrough,
@@ -57,8 +56,6 @@ interface StoryDataDict {
 })
 export class StoryViewerBackendApiService {
   constructor(
-    private learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory,
     private http: HttpClient,
     private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
     private urlInterpolationService: UrlInterpolationService
@@ -110,8 +107,8 @@ export class StoryViewerBackendApiService {
     ).toPromise().then(data => {
       successCallback({
         summaries: data.summaries.map(
-          expSummary => this.learnerExplorationSummaryObjectFactory
-            .createFromBackendDict(expSummary)),
+          expSummary => LearnerExplorationSummary.createFromBackendDict(
+            expSummary)),
         nextNodeId: data.next_node_id,
         readyForReviewTest: data.ready_for_review_test});
     }, errorResponse => {

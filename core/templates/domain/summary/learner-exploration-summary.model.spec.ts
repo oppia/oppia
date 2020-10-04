@@ -16,16 +16,10 @@
  * @fileoverview Unit tests for Exploration Summary Object Factory.
  */
 
-import { LearnerExplorationSummaryObjectFactory } from
-  'domain/summary/learner-exploration-summary-object.factory';
+import { LearnerExplorationSummary } from
+  'domain/summary/learner-exploration-summary.model';
 
-describe('Exploration summary object factory', () => {
-  let lesof: LearnerExplorationSummaryObjectFactory;
-
-  beforeEach(() => {
-    lesof = new LearnerExplorationSummaryObjectFactory();
-  });
-
+describe('Exploration summary model', () => {
   it('should correctly convert backend dict to exp summary object', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
@@ -52,7 +46,8 @@ describe('Exploration summary object factory', () => {
       title: 'Test Title'
     };
 
-    let expSummaryObject = lesof.createFromBackendDict(backendDict);
+    let expSummaryObject = LearnerExplorationSummary.createFromBackendDict(
+      backendDict);
 
     expect(expSummaryObject.lastUpdatedMsec).toEqual(1591296737470.528);
     expect(expSummaryObject.communityOwned).toEqual(false);

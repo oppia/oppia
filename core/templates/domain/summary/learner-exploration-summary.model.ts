@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for learner exploration summary.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface ExplorationRatings {
   '1': number;
   '2': number;
@@ -71,13 +68,8 @@ export class LearnerExplorationSummary {
       public ratings: ExplorationRatings,
       public humanReadableContributorsSummary:
       HumanReadableContributorsSummary) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerExplorationSummaryObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       expSummaryBacknedDict: LearnerExplorationSummaryBackendDict):
       LearnerExplorationSummary {
     return new LearnerExplorationSummary(
@@ -93,7 +85,3 @@ export class LearnerExplorationSummaryObjectFactory {
       expSummaryBacknedDict.human_readable_contributors_summary);
   }
 }
-
-angular.module('oppia').factory(
-  'LearnerExplorationSummaryObjectFactory',
-  downgradeInjectable(LearnerExplorationSummaryObjectFactory));

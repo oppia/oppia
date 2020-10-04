@@ -300,8 +300,6 @@ import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { LearnerExplorationSummaryObjectFactory } from
-  'domain/summary/learner-exploration-summary-object.factory';
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -631,8 +629,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { UserProfileObjectFactory } from
-  'domain/user/user-profile-object.factory';
+
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
@@ -794,8 +791,6 @@ export class UpgradedServices {
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
-    upgradedServices['LearnerExplorationSummaryObjectFactory'] =
-      new LearnerExplorationSummaryObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
@@ -1056,8 +1051,7 @@ export class UpgradedServices {
       new QuestionSummaryForOneSkillObjectFactory(
         upgradedServices['QuestionSummaryObjectFactory']);
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
-        new ReadOnlyStoryNodeObjectFactory(
-          upgradedServices['LearnerExplorationSummaryObjectFactory']);
+        new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['RatioExpressionInputValidationService'] =
           new RatioExpressionInputValidationService(
             upgradedServices['RatioObjectFactory'],
@@ -1111,9 +1105,6 @@ export class UpgradedServices {
           upgradedServices['HttpClient']);
     upgradedServices['UrlService'] = new UrlService(
       upgradedServices['WindowRef']);
-    upgradedServices['UserProfileObjectFactory'] =
-      new UserProfileObjectFactory(
-        upgradedServices['LearnerExplorationSummaryObjectFactory']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']);
     upgradedServices['WorkedExampleObjectFactory'] =
@@ -1265,8 +1256,7 @@ export class UpgradedServices {
         upgradedServices['ExplorationPermissionsObjectFactory']);
     upgradedServices['ExplorationRecommendationsBackendApiService'] =
       new ExplorationRecommendationsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['LearnerExplorationSummaryObjectFactory']);
+        upgradedServices['HttpClient']);
     upgradedServices['InteractionRulesRegistryService'] =
       new InteractionRulesRegistryService(
         upgradedServices['AlgebraicExpressionInputRulesService'],
@@ -1367,7 +1357,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['CollectionSummaryObjectFactory'],
         upgradedServices['FeedbackThreadSummaryObjectFactory'],
-        upgradedServices['LearnerExplorationSummaryObjectFactory'],
         upgradedServices['NonExistentActivitiesObjectFactory'],
         upgradedServices['ProfileSummaryObjectFactory']);
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
@@ -1401,8 +1390,7 @@ export class UpgradedServices {
       new ProfilePageBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient'],
-        upgradedServices['UrlService'],
-        upgradedServices['UserProfileObjectFactory']);
+        upgradedServices['UrlService']);
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
@@ -1472,7 +1460,6 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StoryViewerBackendApiService'] =
         new StoryViewerBackendApiService(
-          upgradedServices['LearnerExplorationSummaryObjectFactory'],
           upgradedServices['HttpClient'],
           upgradedServices['StoryPlaythroughObjectFactory'],
           upgradedServices['UrlInterpolationService']);

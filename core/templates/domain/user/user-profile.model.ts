@@ -16,14 +16,10 @@
  * @fileoverview Frontend domain object factory for users.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   LearnerExplorationSummary,
-  LearnerExplorationSummaryBackendDict,
-  LearnerExplorationSummaryObjectFactory
-} from 'domain/summary/learner-exploration-summary-object.factory';
+  LearnerExplorationSummaryBackendDict
+} from 'domain/summary/learner-exploration-summary.model';
 
 export interface UserProfileBackendDict {
   'username': string;
@@ -55,17 +51,9 @@ export class UserProfile {
     public createdExpSummaries: LearnerExplorationSummary[],
     public editedExpSummaries: LearnerExplorationSummary[]
   ) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class UserProfileObjectFactory {
-  constructor(
-    private learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory) {}
-
-  createFromBackendDict(backendDict: UserProfileBackendDict): UserProfile {
+  static createFromBackendDict(
+      backendDict: UserProfileBackendDict): UserProfile {
     return new UserProfile(
       backendDict.username,
       backendDict.profile_is_of_current_user,
@@ -78,15 +66,9 @@ export class UserProfileObjectFactory {
       backendDict.is_already_subscribed,
       backendDict.is_user_visiting_own_profile,
       backendDict.created_exp_summary_dicts.map(
-        dict => this.learnerExplorationSummaryObjectFactory
-          .createFromBackendDict(dict)),
+        dict => LearnerExplorationSummary.createFromBackendDict(dict)),
       backendDict.edited_exp_summary_dicts.map(
-        dict => this.learnerExplorationSummaryObjectFactory
-          .createFromBackendDict(dict))
+        dict => LearnerExplorationSummary.createFromBackendDict(dict))
     );
   }
 }
-
-angular.module('oppia').factory(
-  'UserProfileObjectFactory',
-  downgradeInjectable(UserProfileObjectFactory));

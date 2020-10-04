@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
+import { LearnerExplorationSummary, LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -39,7 +40,6 @@ describe('Learner dashboard page', function() {
   var ExplorationObjectFactory = null;
   var feedbackThreadSummaryObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
-  var learnerExplorationSummaryObjectFactory = null;
   var nonExistentActivitiesObjectFactory = null;
   var profileSummaryObjectFactory = null;
   var SuggestionModalForLearnerDashboardService = null;
@@ -73,8 +73,6 @@ describe('Learner dashboard page', function() {
         'FeedbackThreadSummaryObjectFactory');
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
-      learnerExplorationSummaryObjectFactory = $injector.get(
-        'LearnerExplorationSummaryObjectFactory');
       nonExistentActivitiesObjectFactory = $injector.get(
         'NonExistentActivitiesObjectFactory');
       profileSummaryObjectFactory = $injector.get(
@@ -240,16 +238,16 @@ describe('Learner dashboard page', function() {
         .and.returnValue($q.resolve({
           completedExplorationsList: (
             learnerDashboardData.completed_explorations_list.map(
-              expSummary => learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           incompleteExplorationsList: (
             learnerDashboardData.incomplete_explorations_list.map(
-              expSummary => learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           explorationPlaylist: (
             learnerDashboardData.exploration_playlist.map(
-              expSummary => learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           completedCollectionsList: (
             learnerDashboardData.completed_collections_list.map(
               collectionSummary => collectionSummaryObjectFactory
@@ -470,8 +468,8 @@ describe('Learner dashboard page', function() {
 
         var completedExplorations = learnerDashboardData
           .completed_explorations_list.map(
-            expSummary => learnerExplorationSummaryObjectFactory
-              .createFromBackendDict(expSummary));
+            expSummary => LearnerExplorationSummary.createFromBackendDict(
+              expSummary));
 
         expect(ctrl.startCompletedExpIndex).toBe(0);
         expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
@@ -733,9 +731,8 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
       // Get exploration with id 13.
-      var activity = learnerExplorationSummaryObjectFactory
-        .createFromBackendDict(
-          learnerDashboardData.incomplete_explorations_list[2]);
+      var activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.incomplete_explorations_list[2]);
       ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
@@ -752,10 +749,10 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
       // Get exploration with id 13.
-      var activity = learnerExplorationSummaryObjectFactory
-        .createFromBackendDict({
-          id: 100
-        });
+      var activity = LearnerExplorationSummary.createFromBackendDict(
+        {
+          id: '100'
+        } as unknown as LearnerExplorationSummaryBackendDict);
       ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
@@ -796,9 +793,8 @@ describe('Learner dashboard page', function() {
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
 
       // Exploration with id 2.
-      var activity = learnerExplorationSummaryObjectFactory
-        .createFromBackendDict(
-          learnerDashboardData.exploration_playlist[1]);
+      var activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.exploration_playlist[1]);
 
       ctrl.openRemoveActivityModal(
         sectionNameI18nId, subsectionName, activity);

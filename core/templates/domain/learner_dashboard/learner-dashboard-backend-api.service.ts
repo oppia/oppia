@@ -34,8 +34,7 @@ import {
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
-  LearnerExplorationSummaryObjectFactory
-} from 'domain/summary/learner-exploration-summary-object.factory';
+} from 'domain/summary/learner-exploration-summary.model';
 import {
   NonExistentActivities,
   NonExistentActivitiesBackendDict,
@@ -84,8 +83,6 @@ export class LearnerDashboardBackendApiService {
     private collectionSummaryObjectFactory: CollectionSummaryObjectFactory,
     private feedbackThreadSummaryObjectFactory:
     FeedbackThreadSummaryObjectFactory,
-    private learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory,
     private nonExistentActivitiesObjectFactory:
     NonExistentActivitiesObjectFactory,
     private profileSummaryObjectFactory: ProfileSummaryObjectFactory) {}
@@ -97,16 +94,16 @@ export class LearnerDashboardBackendApiService {
         resolve({
           completedExplorationsList: (
             dashboardData.completed_explorations_list.map(
-              expSummary => this.learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           incompleteExplorationsList: (
             dashboardData.incomplete_explorations_list.map(
-              expSummary => this.learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           explorationPlaylist: (
             dashboardData.exploration_playlist.map(
-              expSummary => this.learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           completedCollectionsList: (
             dashboardData.completed_collections_list.map(
               collectionSummary => this.collectionSummaryObjectFactory

@@ -20,18 +20,16 @@ import { TestBed } from '@angular/core/testing';
 
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
-import { LearnerExplorationSummaryObjectFactory } from
-  'domain/summary/learner-exploration-summary-object.factory';
+import { LearnerExplorationSummary } from
+  'domain/summary/learner-exploration-summary.model';
 
 describe('Read only story node object factory', () => {
   let readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory = null;
-  let esof: LearnerExplorationSummaryObjectFactory = null;
   var _sampleStoryNode = null;
 
   beforeEach(() => {
     readOnlyStoryNodeObjectFactory = TestBed.get(
       ReadOnlyStoryNodeObjectFactory);
-    esof = TestBed.get(LearnerExplorationSummaryObjectFactory);
 
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
@@ -82,7 +80,7 @@ describe('Read only story node object factory', () => {
     expect(_sampleStoryNode.getExplorationId()).toEqual('exp_id');
     expect(_sampleStoryNode.isCompleted()).toEqual(true);
     expect(_sampleStoryNode.getExplorationSummaryObject()).toEqual(
-      esof.createFromBackendDict({
+      LearnerExplorationSummary.createFromBackendDict({
         title: 'Title',
         status: 'private',
         last_updated_msec: 1591296737470.528,

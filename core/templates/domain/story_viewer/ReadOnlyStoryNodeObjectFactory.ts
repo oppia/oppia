@@ -21,10 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  LearnerExplorationSummaryBackendDict,
-  LearnerExplorationSummaryObjectFactory,
-  LearnerExplorationSummary
-} from 'domain/summary/learner-exploration-summary-object.factory';
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict
+} from 'domain/summary/learner-exploration-summary.model';
 
 export interface StoryNodeBackendDict {
   'id': string;
@@ -124,14 +123,12 @@ export class ReadOnlyStoryNode {
   providedIn: 'root'
 })
 export class ReadOnlyStoryNodeObjectFactory {
-  constructor(
-    private learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory) {}
+  constructor() {}
 
   createFromBackendDict(
       storyNodeBackendDict: StoryNodeBackendDict): ReadOnlyStoryNode {
-    let explorationSummary = this.learnerExplorationSummaryObjectFactory
-      .createFromBackendDict(storyNodeBackendDict.exp_summary_dict);
+    let explorationSummary = LearnerExplorationSummary.createFromBackendDict(
+      storyNodeBackendDict.exp_summary_dict);
 
     return new ReadOnlyStoryNode(
       storyNodeBackendDict.id,
