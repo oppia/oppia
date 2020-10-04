@@ -1259,7 +1259,7 @@ tags: []
         return user_settings and user_settings.user_id
 
     def get_gae_id_from_email(self, email):
-        """Mocks a GAE user ID corresponding to the given email.
+        """Returns a mock GAE user ID corresponding to the given email.
 
         This method can use any algorithm to produce results as long as, during
         the runtime of each test case/method, it is:
@@ -1270,10 +1270,10 @@ tags: []
             email: str. The email address of the user.
 
         Returns:
-            str. Mocked GAE ID for the user possessing the given email.
+            str. The mock GAE ID of a user possessing the given email.
         """
         # Although the hash function doesn't guarantee a one-to-one mapping, in
-        # practice it is good enough.
+        # practice it is sufficient for our tests.
         return python_utils.UNICODE(hash(email))
 
     def save_new_default_exploration(
