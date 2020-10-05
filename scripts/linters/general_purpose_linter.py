@@ -283,7 +283,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'An instance of HttpClient is found in this file. You are not '
             'allowed to create http requests from files that are not backend '
             'api services.'),
-        'excluded_files': ('backend-api.service.ts',),
+        'excluded_files': (
+            'backend-api.service.ts',
+            'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()
     }
 ]
