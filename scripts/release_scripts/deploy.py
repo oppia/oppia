@@ -328,7 +328,7 @@ def verify_number_of_pending_deletion_requests(app_name):
     common.open_new_tab_in_browser_if_possible(get_admin_misc_tab_url(app_name))
     common.ask_user_to_confirm(
         'Please check that the number of PendingDeletionRequestModels '
-        'models is zero (you need to navigate at the '
+        'models is zero (you need to navigate to the '
         '\'Number of pending deletion requests\' section). '
         'If it is not zero the /cron/users/user_deletion and '
         '/cron/users/fully_complete_user_deletion jobs will need '
