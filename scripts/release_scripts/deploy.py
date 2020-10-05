@@ -70,6 +70,10 @@ _PARSER.add_argument(
     '--version', help='version to deploy', type=str)
 _PARSER.add_argument(
     '--maintenance_mode', action='store_true', default=False)
+_PARSER.add_argument(
+    '--release_dir_path',
+    help='Path to directory which contains all the files to be released',
+    type=str)
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
@@ -81,6 +85,7 @@ APP_DEV_YAML_PATH = os.path.join('.', 'app_dev.yaml')
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
+FECONF_FILE_PATH = os.path.join('.', 'feconf.py')
 
 FILES_AT_ROOT = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
@@ -268,11 +273,11 @@ def deploy_application_and_write_log_entry(
         version_to_deploy_to: str. The version to deploy to.
         current_git_revision: str. The current git revision.
     """
-    # Deploy export service to GAE.
-    gcloud_adapter.deploy_application('export/app.yaml', app_name)
     # Deploy app to GAE.
     gcloud_adapter.deploy_application(
         './app.yaml', app_name, version=version_to_deploy_to)
+    # Deploy cron yaml to GAE.
+    gcloud_adapter.deploy_application('cron.yaml', app_name)
     # Writing log entry.
     common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
     with python_utils.open_file(LOG_FILE_PATH, 'a') as log_file:
@@ -521,15 +526,6 @@ def execute_deployment():
 
     current_branch_name = common.get_current_branch_name()
 
-    release_dir_name = 'deploy-%s-%s-%s' % (
-        '-'.join('-'.join(app_name.split('.')).split(':')),
-        current_branch_name,
-        CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
-    release_dir_path = os.path.join(os.getcwd(), '..', release_dir_name)
-
-    deploy_data_path = os.path.join(
-        os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', app_name)
-
     install_third_party_libs.main()
 
     if not (common.is_current_branch_a_release_branch() or (
@@ -592,15 +588,39 @@ def execute_deployment():
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
 
-    # Create a folder in which to save the release candidate.
-    python_utils.PRINT('Ensuring that the release directory parent exists')
-    common.ensure_directory_exists(os.path.dirname(release_dir_path))
+    if parsed_args.release_dir_path:
+        release_dir_path = parsed_args.release_dir_path
+        release_dir_name = os.path.basename(release_dir_path)
 
-    # Copy files to the release directory. Omits the .git subfolder.
-    python_utils.PRINT('Copying files to the release directory')
-    shutil.copytree(
-        os.getcwd(), release_dir_path,
-        ignore=shutil.ignore_patterns('.git'))
+        # These files are copied even when an existing dir is supplied
+        # since we want to overwrite any previous changes that were made
+        # to the config.
+        config_filepaths = [
+            APP_DEV_YAML_PATH, common.CONSTANTS_FILE_PATH,
+            FECONF_FILE_PATH, INDEX_YAML_PATH,
+        ]
+        for filepath in config_filepaths:
+            shutil.copyfile(
+                filepath, os.path.join(release_dir_path, filepath))
+    else:
+        release_dir_name = 'deploy-%s-%s-%s' % (
+            '-'.join('-'.join(app_name.split('.')).split(':')),
+            current_branch_name,
+            CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+        release_dir_path = os.path.join(os.getcwd(), '..', release_dir_name)
+
+        # Create a folder in which to save the release candidate.
+        python_utils.PRINT('Ensuring that the release directory parent exists')
+        common.ensure_directory_exists(os.path.dirname(release_dir_path))
+
+        # Copy files to the release directory. Omits the .git subfolder.
+        python_utils.PRINT('Copying files to the release directory')
+        shutil.copytree(
+            os.getcwd(), release_dir_path,
+            ignore=shutil.ignore_patterns('.git'))
+
+    deploy_data_path = os.path.join(
+        os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', app_name)
 
     # Change the current directory to the release candidate folder.
     with common.CD(release_dir_path):
