@@ -347,8 +347,7 @@ describe('Collection editor state service', function() {
         CollectionEditorStateService.getCollectionRights());
       expect(actualCollectionRights).toEqual(expectedCollectionRights);
       // Although the actual collection rights equals the expected collection
-      // rights, they are different objects. Ensure that the actual collection
-      // rights is still the same object from before loading it, however.
+      // rights, they are different objects.
       expect(actualCollectionRights).not.toBe(expectedCollectionRights);
     }
   );
@@ -378,10 +377,10 @@ describe('Collection editor state service', function() {
 
       var actualCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
+    
       expect(actualCollectionRights).toEqual(expectedCollectionRights);
       // Although the actual collection rights equals the expected collection
-      // rights, they are different objects. Ensure that the actual collection
-      // rights is still the same object from before loading it, however.
+      // rights, they are different objects.
       expect(actualCollectionRights).not.toBe(expectedCollectionRights);
     }
   );
