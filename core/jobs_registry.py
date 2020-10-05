@@ -64,6 +64,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
+    feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
+    feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
     (
         interaction_jobs_one_off
         .DragAndDropSortInputInteractionOneOffJob),
@@ -76,10 +78,13 @@ ONE_OFF_JOB_MANAGERS = [
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
+    question_jobs_one_off.MissingQuestionMigrationOneOffJob,
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.CleanUpExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
+    skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
+    skill_jobs_one_off.MissingSkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,

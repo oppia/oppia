@@ -49,7 +49,7 @@ import {
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+import { StateStats } from 'domain/statistics/state-stats-model';
 
 type HbrTask = HighBounceRateTask;
 type IflTask = IneffectiveFeedbackLoopTask;

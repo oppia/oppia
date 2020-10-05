@@ -27,9 +27,8 @@ import {
 } from 'domain/collection/collection-summary.model';
 import {
   FeedbackThreadSummary,
-  FeedbackThreadSummaryObjectFactory,
   FeedbackThreadSummaryBackendDict
-} from 'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
+} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
@@ -78,8 +77,6 @@ interface LearnerDashboardData {
 export class LearnerDashboardBackendApiService {
   constructor(
     private http: HttpClient,
-    private feedbackThreadSummaryObjectFactory:
-    FeedbackThreadSummaryObjectFactory,
     private learnerExplorationSummaryObjectFactory:
     LearnerExplorationSummaryObjectFactory) {}
 
@@ -115,7 +112,7 @@ export class LearnerDashboardBackendApiService {
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (
             dashboardData.thread_summaries.map(
-              threadSummary => this.feedbackThreadSummaryObjectFactory
+              threadSummary => FeedbackThreadSummary
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             dashboardData.completed_to_incomplete_collections),

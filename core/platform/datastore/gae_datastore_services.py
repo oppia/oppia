@@ -19,8 +19,139 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import contextlib
+import datetime
+
+import python_utils
+
+from google.appengine.api import datastore_types
 from google.appengine.datastore import datastore_query
+from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
+
+Model = ndb.Model
+Key = ndb.Key
+
+BooleanProperty = ndb.BooleanProperty
+DateTimeProperty = ndb.DateTimeProperty
+FloatProperty = ndb.FloatProperty
+IntegerProperty = ndb.IntegerProperty
+JsonProperty = ndb.JsonProperty
+StringProperty = ndb.StringProperty
+TextProperty = ndb.TextProperty
+UserProperty = ndb.UserProperty
+
+
+def get_multi(keys):
+    """Fetches models corresponding to a sequence of keys.
+
+    Args:
+        keys: list(str). The keys to look up.
+
+    Returns:
+        list(datastore_services.Model | None). List whose items are either a
+        Model instance or None if the corresponding key wasn't found.
+    """
+    return ndb.get_multi(keys)
+
+
+def put_multi(models, update_last_updated_time=True):
+    """Stores a sequence of Model instances.
+
+    Args:
+        models: list(datastore_services.Model). A list of Model instances.
+        update_last_updated_time: bool. Whether to update the last_updated field
+            of the entities.
+
+    Returns:
+        list(str). A list with the stored keys.
+    """
+    # TODO(#10863): Stop passing in update_last_updated_time through these
+    # top-level functions.
+    return ndb.put_multi(
+        models, update_last_updated_time=update_last_updated_time)
+
+
+def put_multi_async(models, update_last_updated_time=True):
+    """Stores a sequence of Model instances asynchronously.
+
+    Args:
+        models: list(datastore_services.Model). A list of Model instances.
+        update_last_updated_time: bool. Whether to update the last_updated field
+            of the entities.
+
+    Returns:
+        list(future). A list of futures.
+    """
+    # TODO(#10863): Stop passing in update_last_updated_time through these
+    # top-level functions.
+    return ndb.put_multi_async(
+        models, update_last_updated_time=update_last_updated_time)
+
+
+def delete_multi(keys):
+    """Deletes models corresponding to a sequence of keys.
+
+    Args:
+        keys: list(str). A list of keys.
+
+    Returns:
+        list(None). A list of Nones, one per deleted model.
+    """
+    return ndb.delete_multi(keys)
+
+
+def transaction(callback):
+    """Run a callback in a transaction.
+
+    To pass arguments to a callback function, use a lambda, for example:
+
+    def my_callback(key, inc): do_something()
+    transaction(lambda: my_callback(Key(...), 1))
+
+    Args:
+        callback: callable. A function or tasklet to be called.
+
+    Returns:
+        *. Whatever callback() returns.
+
+    Raises:
+        Exception. Whatever callback() raises, or
+            datastore_errors.TransactionFailedError when the transaction failed.
+    """
+    return ndb.transaction(
+        callback, xg=True, propagation=ndb.TransactionOptions.ALLOWED)
+
+
+def query_everything():
+    """Returns a query that targets every single entity in the datastore."""
+    return ndb.Query()
+
+
+def all_of(*nodes):
+    """Returns a query node which performs a boolean AND on their conditions.
+
+    Args:
+        *nodes: datastore_services.Node. The nodes to combine.
+
+    Returns:
+        datastore_services.Node. A node combining the conditions using boolean
+        AND.
+    """
+    return ndb.AND(*nodes)
+
+
+def any_of(*nodes):
+    """Returns a query node which performs a boolean OR on their conditions.
+
+    Args:
+        *nodes: datastore_services.Node. The nodes to combine.
+
+    Returns:
+        datastore_services.Node. A node combining the conditions using boolean
+        OR.
+    """
+    return ndb.OR(*nodes)
 
 
 def make_cursor(urlsafe_cursor=None):
@@ -57,9 +188,9 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
             corresponding model names for which we have to fetch entities.
 
     Returns:
-        list(list(ndb.Model)). The model instances corresponding to the ids and
-        models. The models corresponding to the same tuple in the input are
-        grouped together.
+        list(list(datastore_services.Model)). The model instances corresponding
+        to the ids and models. The models corresponding to the same tuple in the
+        input are grouped together.
     """
     entity_keys = []
     for (model_name, entity_ids) in ids_and_models:
@@ -78,3 +209,78 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
         start_index = start_index + len(entity_ids)
 
     return all_models_grouped_by_model_type
+
+
+def make_pseudo_random_hr_consistency_policy():
+    """Returns a policy that always gives the same sequence of consistency
+    decisions.
+
+    Returns:
+        datastore_stub_util.PseudoRandomHRConsistencyPolicy. The policy.
+    """
+    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+
+
+@contextlib.contextmanager
+def mock_datetime_for_datastore(mocked_now):
+    """Mocks parts of the datastore to accept a fake datetime type that always
+    returns the same value for utcnow.
+
+    Example:
+        import datetime
+        mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        with mock_datetime_for_datastore(mocked_now):
+            self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+        not_now = datetime.datetime.utcnow() # Returns actual time.
+
+    Args:
+        mocked_now: datetime.datetime. The datetime which will be used
+            instead of the current UTC datetime.
+
+    Yields:
+        None. Empty yield statement.
+    """
+
+    if not isinstance(mocked_now, datetime.datetime):
+        raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
+
+    old_datetime_type = datetime.datetime
+
+    class MockDatetimeType(type):
+        """Pretends to be a datetime.datetime object."""
+
+        def __instancecheck__(cls, other):
+            """Validates whether the given instance is a datetime instance."""
+            return isinstance(other, old_datetime_type)
+
+    class MockDatetime( # pylint: disable=inherit-non-class
+            python_utils.with_metaclass(MockDatetimeType, old_datetime_type)):
+        """Always returns mocked_now as the current time."""
+
+        @classmethod
+        def utcnow(cls):
+            """Returns the mocked datetime."""
+
+            return mocked_now
+
+    setattr(datetime, 'datetime', MockDatetime)
+    setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
+
+    # Updates datastore types for MockDatetime to ensure that validation of ndb
+    # datetime properties does not fail.
+    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = ( # pylint: disable=protected-access
+        datastore_types.ValidatePropertyNothing)
+    datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = ( # pylint: disable=protected-access
+        datastore_types.PackDatetime)
+    datastore_types._PROPERTY_MEANINGS[MockDatetime] = ( # pylint: disable=protected-access
+        datastore_types.entity_pb.Property.GD_WHEN)
+
+    try:
+        yield
+    finally:
+        # Resets the datastore types to forget the mocked types.
+        del datastore_types._PROPERTY_MEANINGS[MockDatetime] # pylint: disable=protected-access
+        del datastore_types._PACK_PROPERTY_VALUES[MockDatetime] # pylint: disable=protected-access
+        del datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] # pylint: disable=protected-access
+        setattr(ndb.DateTimeProperty, 'data_type', datetime.datetime)
+        setattr(datetime, 'datetime', old_datetime_type)

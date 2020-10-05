@@ -18,12 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // AssetsBackendApiService.ts is upgraded to Angular 8.
-import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory';
-import { FileDownloadRequestObjectFactory } from
-  'domain/utilities/FileDownloadRequestObjectFactory';
-import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory';
+import { AudioFile } from 'domain/utilities/audio-file.model';
+import { ImageFile } from 'domain/utilities/image-file.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 // Jquery is needed in this file because some tests will spyOn Jquery methods.
@@ -38,8 +34,6 @@ describe('Assets Backend API Service', function() {
   describe('on dev mode', function() {
     var AssetsBackendApiService = null;
     var UrlInterpolationService = null;
-    var audioFileObjectFactory = null;
-    var imageFileObjectFactory = null;
     var CsrfService = null;
     var $httpBackend = null;
     var $rootScope = null;
@@ -50,13 +44,6 @@ describe('Assets Backend API Service', function() {
 
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
-      $provide.value(
-        'FileDownloadRequestObjectFactory',
-        new FileDownloadRequestObjectFactory());
-      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
-    }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
@@ -66,8 +53,6 @@ describe('Assets Backend API Service', function() {
     beforeEach(angular.mock.inject(function($injector) {
       AssetsBackendApiService = $injector.get(
         'AssetsBackendApiService');
-      audioFileObjectFactory = $injector.get('AudioFileObjectFactory');
-      imageFileObjectFactory = $injector.get('ImageFileObjectFactory');
       UrlInterpolationService = $injector.get(
         'UrlInterpolationService');
       $httpBackend = $injector.get('$httpBackend');
@@ -166,7 +151,7 @@ describe('Assets Backend API Service', function() {
 
       AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
         function(cachedFile) {
-          expect(cachedFile).toEqual(audioFileObjectFactory.createNew(
+          expect(cachedFile).toEqual(new AudioFile(
             'myfile.mp3',
             new Blob()
           ));
@@ -369,7 +354,7 @@ describe('Assets Backend API Service', function() {
       AssetsBackendApiService.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         function(cachedFile) {
-          expect(cachedFile).toEqual(imageFileObjectFactory.createNew(
+          expect(cachedFile).toEqual(new ImageFile(
             'myfile.png',
             new Blob()
           ));
@@ -480,11 +465,6 @@ describe('Assets Backend API Service', function() {
   describe('without dev mode settings', function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
-      $provide.value(
-        'FileDownloadRequestObjectFactory',
-        new FileDownloadRequestObjectFactory());
-      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.constant('DEV_MODE', false);
       $provide.constant('GCS_RESOURCE_BUCKET_NAME', false);
     }));
@@ -512,11 +492,6 @@ describe('Assets Backend API Service', function() {
 
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
-      $provide.value(
-        'FileDownloadRequestObjectFactory',
-        new FileDownloadRequestObjectFactory());
-      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.constant('DEV_MODE', false);
     }));
     beforeEach(angular.mock.module('oppia', function($provide) {
