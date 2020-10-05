@@ -534,6 +534,40 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJob(
             yield (key, values)
 
 
+class XmlnsAttributeInExplorationMathSvgImagesAuditJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to audit math SVGs on the server that do not have xmlns
+    attribute.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, item.id))
+        filepaths = fs.listdir('image')
+        for filepath in filepaths:
+            filename = filepath.split('/')[-1]
+            if not re.match(constants.MATH_SVG_FILENAME_REGEX, filename):
+                continue
+            old_svg_image = fs.get(filepath)
+            xmlns_attribute_is_present = (
+                html_validation_service.does_svg_tag_contains_xmlns_attribute(
+                    old_svg_image))
+            if not xmlns_attribute_is_present:
+                yield (item.id, filename)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
 class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the translator_ids from the ExpSummaryModel.
     """
