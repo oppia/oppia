@@ -364,8 +364,7 @@ describe('Collection editor state service', function() {
       expect(actualCollection).toEqual(expectedCollection);
 
       // Although the actual collection equals the expected collection, they are
-      // different objects. Ensure that the actual collection is still the same
-      // object from before loading it, however.
+      // different objects.
       expect(actualCollection).not.toBe(expectedCollection);
     }
   );
