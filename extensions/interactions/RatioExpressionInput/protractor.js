@@ -16,6 +16,9 @@
  * @fileoverview End-to-end testing utilities for the Ratio Expression
  * Interaction.
  */
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
 var customizeInteraction = async function(
     elem, placeholderText, minNumberOfTerms) {
@@ -58,7 +61,7 @@ var answerObjectType = 'RatioExpression';
 
 var testSuite = [{
   interactionArguments: ['placeholder', 0],
-  ruleArguments: ['IsEquivalentTo', '1:2'],
+  ruleArguments: ['IsEquivalent', '1:2'],
   expectedInteractionDetails: ['placeholder'],
   wrongAnswers: ['2:5'],
   correctAnswers: ['2:4']
