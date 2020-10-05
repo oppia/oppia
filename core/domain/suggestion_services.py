@@ -650,9 +650,9 @@ def _get_plain_text_from_html_content_string(html_content_string):
 
         Args:
             rte_tag: MatchObject. The oppia-noninteractive rte tag.
-    
+
         Returns:
-            str: The string to replace the rte tag with.
+            str. The string to replace the rte tag with.
         """
         # Convert the MatchObject to a string.
         rte_tag_string = rte_tag.group(0)
