@@ -276,6 +276,15 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'Use "import someFunction from \'lodash/someFunction\'" instead.'),
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r':\n? *HttpClient'),
+        'message': (
+            'An instance of HttpClient is found in this file. You are not '
+            'allowed to create http requests from files that are not backend '
+            'api services.'),
+        'excluded_files': ('backend-api.service.ts',),
+        'excluded_dirs': ()
     }
 ]
 
