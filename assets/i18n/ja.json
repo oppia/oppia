@@ -329,7 +329,6 @@
 	"I18N_SIGNUP_UPDATE_WARNING": "利用規約を最近更新しました。",
 	"I18N_SIGNUP_USERNAME": "ユーザー名",
 	"I18N_SIGNUP_USERNAME_EXPLANATION": "ユーザー名は貢献したコンテンツの隣に表示されます。",
-	"I18N_SIGNUP_WAIVER_OBJECTIVE": "表示（BY）要件の放棄とは、もし誰かがこのコンテンツを再利用した場合、著者名を表示する必要がないということです。ただし、あなたがある探検に対して行なったすべての貢献は、当サイト上の探検変更ログから確認可能です。また探検を再利用する人はこのページにリンクすることを推奨（ただし要件ではない）されます。",
 	"I18N_SIGNUP_WHY_LICENSE": "なぜCC-BY-SA？",
 	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Oppiaの授業、別名「探検」では、対話のないビデオやテキストよりも夢中になれます。ユーザーは行動することで学べます。",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppiaは無料でオープンソースの学習プラットフォームで、「探検」と呼ばれるインタラクティブなアクティビティーが満載です。Oppiaが正しく動作するにはウェブ・ブラウザーでJavaScriptを有効にする必要がありますが、お使いのブラウザーではJavaScriptが無効になっています。JavaScriptを有効にするヘルプは<a href=\"<[hrefUrl]>\">こちらをクリック</a>してください。",
