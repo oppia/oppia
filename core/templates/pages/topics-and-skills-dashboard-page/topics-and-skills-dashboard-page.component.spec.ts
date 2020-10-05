@@ -48,7 +48,6 @@ describe('Topics and Skills Dashboard Page', function() {
   var $rootScope = null;
   var $q = null;
   var $timeout = null;
-  var TopicsAndSkillsDashboardFilterObjectFactory = null;
   var SkillSummaryObjectFactory = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
 
@@ -89,8 +88,6 @@ describe('Topics and Skills Dashboard Page', function() {
       $timeout = $injector.get('$timeout');
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
-        'TopicsAndSkillsDashboardFilterObjectFactory');
       SkillSummaryObjectFactory = $injector.get(
         'SkillSummaryObjectFactory');
 
