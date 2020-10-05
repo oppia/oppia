@@ -1718,8 +1718,9 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             'different_field': 'test'
         }
     ]
-    # ConfigPropertyModel is not associated with a commit log entry model.
-    # PlatformParameterModel is not associated with a commit log entry model.
+    # A commit log entry model is not being created by the commit or
+    # the create function of the ConfigPropertyModel and
+    # the PlatformParameterModel. So, these models are excluded.
     EXCLUDED_CLASS_NAMES = [
         'ConfigPropertySnapshotMetadataModel',
         'PlatformParameterSnapshotMetadataModel'

@@ -598,8 +598,8 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
                         job_class.FAILURE_PREFIX))
 
         message_prefix = (
-            missing_commit_log_msg if (
-                commit_log_model_class is None) else found_commit_log_msg)
+            missing_commit_log_msg if commit_log_model_class is None
+            else found_commit_log_msg)
         yield ('%s - %s' % (message_prefix, class_name), snapshot_model.id)
 
         if parent_model_class is None:
