@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { StoryChange } from 'domain/editor/undo_redo/ChangeObjectFactory';
+import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary-object.factory';
 import { StoryBackendDict } from 'domain/story/StoryObjectFactory';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';

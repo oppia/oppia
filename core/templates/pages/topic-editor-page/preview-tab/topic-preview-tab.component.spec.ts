@@ -21,15 +21,14 @@ import { TestBed } from '@angular/core/testing';
 
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
-import { StorySummaryObjectFactory } from
-  'domain/story/StorySummaryObjectFactory';
+import { StorySummary} from
+  'domain/story/story-summary.model';
 
 describe('Topic preview tab', function() {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
   var TopicEditorStateService = null;
-  var storySummaryObjectFactory = null;
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,7 +44,6 @@ describe('Topic preview tab', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
-    storySummaryObjectFactory = TestBed.get(StorySummaryObjectFactory);
     $scope = $rootScope.$new();
     ctrl = $componentController('topicPreviewTab', {
       $scope: $scope,
@@ -59,9 +57,10 @@ describe('Topic preview tab', function() {
       description: 'Description',
       story_is_published: true,
       completed_node_titles: ['Chapter 1'],
+      url_fragment: 'story-url-fragment',
       pending_node_dicts: []
     };
-    var story = storySummaryObjectFactory.createFromBackendDict(
+    var story = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict);
     spyOn(
       TopicEditorStateService,
