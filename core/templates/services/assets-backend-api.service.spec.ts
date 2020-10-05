@@ -20,8 +20,8 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AppConstants } from 'app.constants';
-import { AudioFile, AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
-import { ImageFile, ImageFileObjectFactory } from 'domain/utilities/ImageFileObjectFactory';
+import { AudioFile } from 'domain/utilities/audio-file.model';
+import { ImageFile } from 'domain/utilities/image-file.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
@@ -30,10 +30,8 @@ const Constants = require('constants.ts');
 describe('Assets Backend API Service', () => {
   describe('on dev mode', () => {
     let assetsBackendApiService: AssetsBackendApiService;
-    let audioFileObjectFactory: AudioFileObjectFactory;
     let csrfTokenService: CsrfTokenService;
     let httpTestingController: HttpTestingController;
-    let imageFileObjectFactory: ImageFileObjectFactory;
 
     const audioRequestUrl = (
       '/assetsdevhandler/exploration/0/assets/audio/myfile.mp3');
@@ -48,10 +46,8 @@ describe('Assets Backend API Service', () => {
         imports: [HttpClientTestingModule],
       });
       assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-      audioFileObjectFactory = TestBed.get(AudioFileObjectFactory);
       csrfTokenService = TestBed.get(CsrfTokenService);
       httpTestingController = TestBed.get(HttpTestingController);
-      imageFileObjectFactory = TestBed.get(ImageFileObjectFactory);
 
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.returnValue(Promise.resolve('token'));
@@ -126,8 +122,7 @@ describe('Assets Backend API Service', () => {
 
       assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
         (cachedFile: AudioFile) => {
-          expect(cachedFile).toEqual(
-            audioFileObjectFactory.createNew('myfile.mp3', audioBlob));
+          expect(cachedFile).toEqual(new AudioFile('myfile.mp3', audioBlob));
         });
     }));
 
@@ -265,8 +260,7 @@ describe('Assets Backend API Service', () => {
       assetsBackendApiService.loadImage(
         AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         (cachedFile: ImageFile) => {
-          expect(cachedFile).toEqual(
-            imageFileObjectFactory.createNew('myfile.png', new Blob()));
+          expect(cachedFile).toEqual(new ImageFile('myfile.png', new Blob()));
         });
     }));
 

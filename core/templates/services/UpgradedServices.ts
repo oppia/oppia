@@ -1212,11 +1212,8 @@ export class UpgradedServices {
       upgradedServices['HttpClient']);
     upgradedServices['AssetsBackendApiService'] =
       new AssetsBackendApiService(
-        upgradedServices['AudioFileObjectFactory'],
         upgradedServices['CsrfTokenService'],
-        upgradedServices['FileDownloadRequestObjectFactory'],
         upgradedServices['HttpClient'],
-        upgradedServices['ImageFileObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardBackendApiService'] =
       new EmailDashboardBackendApiService(

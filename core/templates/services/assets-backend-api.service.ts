@@ -22,9 +22,9 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
-import { AudioFile, AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
-import { FileDownloadRequest, FileDownloadRequestObjectFactory } from 'domain/utilities/FileDownloadRequestObjectFactory';
-import { ImageFile, ImageFileObjectFactory } from 'domain/utilities/ImageFileObjectFactory';
+import { AudioFile } from 'domain/utilities/audio-file.model';
+import { FileDownloadRequest } from 'domain/utilities/file-download-request.model';
+import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
@@ -53,12 +53,8 @@ export class AssetsBackendApiService {
   private assetsCache: Map<string, Blob> = new Map();
 
   constructor(
-      private audioFileObjectFactory: AudioFileObjectFactory,
       private csrfTokenService: CsrfTokenService,
-      private fileDownloadRequestObjectFactory:
-        FileDownloadRequestObjectFactory,
       private http: HttpClient,
-      private imageFileObjectFactory: ImageFileObjectFactory,
       private urlInterpolationService: UrlInterpolationService) {
     if (!Constants.DEV_MODE && !Constants.GCS_RESOURCE_BUCKET_NAME) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
@@ -72,7 +68,7 @@ export class AssetsBackendApiService {
 
   async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
     if (this.isCached(filename)) {
-      return this.audioFileObjectFactory.createNew(
+      return new AudioFile(
         filename, this.assetsCache.get(filename));
     }
     return this.fetchFile(
@@ -84,7 +80,7 @@ export class AssetsBackendApiService {
       entityType: string, entityId: string,
       filename: string): Promise<ImageFile> {
     if (this.isCached(filename)) {
-      return this.imageFileObjectFactory.createNew(
+      return new ImageFile(
         filename, this.assetsCache.get(filename));
     }
     return this.fetchFile(
@@ -198,16 +194,15 @@ export class AssetsBackendApiService {
 
     const fileDownloadRequests = (
       this.getFileDownloadRequestsByAssetType(assetType));
-    fileDownloadRequests.push(
-      this.fileDownloadRequestObjectFactory.createNew(filename, subscription));
+    fileDownloadRequests.push(new FileDownloadRequest(filename, subscription));
 
     try {
       const blob = await blobPromise;
       this.assetsCache.set(filename, blob);
       if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
-        return this.audioFileObjectFactory.createNew(filename, blob);
+        return new AudioFile(filename, blob);
       } else {
-        return this.imageFileObjectFactory.createNew(filename, blob);
+        return new ImageFile(filename, blob);
       }
     } catch {
       return Promise.reject(filename);
