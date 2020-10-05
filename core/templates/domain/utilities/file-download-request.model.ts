@@ -16,12 +16,14 @@
  * @fileoverview Model class for creating audio files.
  */
 
+import { Subscription } from 'rxjs';
+
 export class FileDownloadRequest {
   filename: string;
-  canceler: Q.Deferred<Object>;
+  subscription: Subscription;
 
-  constructor(filename: string, canceler: Q.Deferred<Object>) {
+  constructor(filename: string, subscription: Subscription) {
     this.filename = filename;
-    this.canceler = canceler;
+    this.subscription = subscription;
   }
 }

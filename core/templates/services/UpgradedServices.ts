@@ -53,9 +53,13 @@ import { AnswerGroupObjectFactory } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
+import { AssetsBackendApiService } from
+  'services/assets-backend-api.service';
 import { AssignedSkillObjectFactory } from
   'domain/skill/assigned-skill-object.factory';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
+import { AudioPreloaderService } from
+  'pages/exploration-player-page/services/audio-preloader.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { AudioTranslationManagerService } from
@@ -246,6 +250,8 @@ import { ImageClickInputRulesService } from
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import { ImagePreloaderService } from
+  'pages/exploration-player-page/services/image-preloader.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -1204,6 +1210,11 @@ export class UpgradedServices {
       upgradedServices['TopicSummaryObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
+    upgradedServices['AssetsBackendApiService'] =
+      new AssetsBackendApiService(
+        upgradedServices['CsrfTokenService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardBackendApiService'] =
       new EmailDashboardBackendApiService(
         upgradedServices['HttpClient'],
@@ -1460,7 +1471,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient']);
 
     // Topological level: 4.
-
     upgradedServices['CollectionCreationService'] =
       new CollectionCreationService(
         upgradedServices['CollectionCreationBackendService'],
@@ -1534,11 +1544,21 @@ export class UpgradedServices {
         upgradedServices['InteractionSpecsService'],
         upgradedServices['PredictionAlgorithmRegistryService'],
         upgradedServices['StateClassifierMappingService']);
+    upgradedServices['AudioPreloaderService'] = new AudioPreloaderService(
+      upgradedServices['AssetsBackendApiService'],
+      upgradedServices['AudioTranslationLanguageService'],
+      upgradedServices['ComputeGraphService'],
+      upgradedServices['ContextService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ImagePreloaderService'] = new ImagePreloaderService(
+      upgradedServices['AssetsBackendApiService'],
+      upgradedServices['ComputeGraphService'],
+      upgradedServices['ContextService'],
+      upgradedServices['ExtractImageFilenamesFromStateService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],
