@@ -122,6 +122,7 @@ var ContributorDashboardPage = function() {
 
   this.expectNumberOfOpportunitiesToBe = async function(number) {
     var opportunityCount = (await _getOpportunityElements()).length;
+    await waitFor.visibilityOf(opportunityCount,'Opportunity Count taking too long to appear');
     expect(opportunityCount).toBe(number);
   };
 
@@ -179,6 +180,7 @@ var ContributorDashboardPage = function() {
     await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       expectedHeading, expectedSubheading);
+    await waitFor(opportunity,"Opportunity taking too long to appear");
     expect(opportunity).not.toBe(null);
 
     if (expectedLabel !== null) {
@@ -205,6 +207,7 @@ var ContributorDashboardPage = function() {
     await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       opportunityHeading, opportunitySubheading);
+    await waitFor.visibilityOf(opportunity,"Opportunity taking too long to appear.");
     expect(opportunity).not.toBe(null);
     await action.click(
       'Opportunity action button',
