@@ -91,14 +91,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.NORMAL_USER_EMAIL)
         self.save_new_valid_exploration(
             self.target_id, self.author_id, category='Algebra')
-        self.explorations = [
-            SuggestionServicesUnitTests.MockExploration(
-                'exp1', {'state_1': {}, 'state_2': {}}),
-            SuggestionServicesUnitTests.MockExploration(
-                'exp2', {'state_1': {}, 'state_2': {}}),
-            SuggestionServicesUnitTests.MockExploration(
-                'exp3', {'state_1': {}, 'state_2': {}})
-        ]
 
     def assert_suggestion_status(self, suggestion_id, status):
         """Assert the status of the suggestion with suggestion_id."""
@@ -154,6 +146,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.id = exploration_id
             self.states = states
             self.category = 'Algebra'
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}})
+    ]
 
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
@@ -810,6 +809,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 state_name, content_id
             )
 
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
+    ]
+
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
             if exp.id == exp_id:
@@ -878,15 +884,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.signup(self.REVIEWER_EMAIL_2, 'reviewer2')
         self.reviewer_id_2 = self.get_user_id_from_email(self.REVIEWER_EMAIL_2)
-
-        self.explorations = [
-            SuggestionGetServicesUnitTests.MockExploration(
-                'exp1', {'state_1': {}, 'state_2': {}}),
-            SuggestionGetServicesUnitTests.MockExploration(
-                'exp2', {'state_1': {}, 'state_2': {}}),
-            SuggestionGetServicesUnitTests.MockExploration(
-                'exp3', {'state_1': {}, 'state_2': {}})
-        ]
 
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1653,57 +1650,30 @@ class ReviewableSuggestionEmailInfoUnitTests(
 
     target_id = 'exp1'
     skill_id = 'skill1'
-    target_version_at_submission = 1
     language_code = 'en'
     AUTHOR_EMAIL = 'author1@example.com'
     REVIEWER_EMAIL = 'reviewer@community.org'
     COMMIT_MESSAGE = 'commit message'
-
-    class MockExploration(python_utils.OBJECT):
-        """Mocks an exploration. To be used only for testing."""
-
-        def __init__(self, exploration_id, states):
-            self.id = exploration_id
-            self.states = states
-            self.category = 'Algebra'
-
-        def get_content_html(self, unused_state_name, unused_content_id):
-            """Used to mock the get_content_html method for explorations."""
-            return '<p>This is html to translate.</p>'
-
-    def mock_get_exploration_by_id(self, exp_id):
-        for exp in self.explorations:
-            if exp.id == exp_id:
-                return exp
 
     def _create_translation_suggestion_with_translation_html(
             self, translation_html):
         """Creates a translation suggestion with the given translation_html."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'state_1',
-            'content_id': 'content',
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': self.language_code,
-            'content_html': '<p>This is html to translate.</p>',
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': translation_html
         }
 
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.swap(
-                exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
-                translation_suggestion = (
-                    suggestion_services.create_suggestion(
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
-                        self.target_id, self.target_version_at_submission,
-                        self.author_id, add_translation_change_dict,
-                        'test description')
-                )
-
-        return translation_suggestion
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description'
+        )
 
     def _create_question_suggestion_with_question_html_content(
             self, question_html_content):
@@ -1729,14 +1699,13 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 'skill_difficulty': 0.3
             }
 
-        question_suggestion = suggestion_services.create_suggestion(
+        return suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
-            'test description')
-
-        return question_suggestion
+            'test description'
+        )
 
     def _create_edit_state_content_suggestion(self):
         """Creates an "edit state content" suggestion."""
@@ -1755,46 +1724,13 @@ class ReviewableSuggestionEmailInfoUnitTests(
             }
         }
 
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            edit_state_content_suggestion = (
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, edit_state_content_change_dict,
-                    'test description')
-            )
-
-        return edit_state_content_suggestion
-
-    def mock_update_exploration(
-            self, unused_user_id, unused_exploration_id, unused_change_list,
-            commit_message, is_suggestion):
-        self.assertTrue(is_suggestion)
-        self.assertEqual(
-            commit_message, 'Accepted suggestion by %s: %s' % (
-                'author', self.COMMIT_MESSAGE))
-
-    def mock_accept_suggestion(
-            self, suggestion_id, reviewer_id, commit_message, review_message):
-        """Sets up the appropriate mocks to successfully call
-        accept_suggestion.
-        """
-        with self.swap(
-            exp_services, 'update_exploration',
-            self.mock_update_exploration):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    exp_domain.Exploration, 'get_content_html',
-                    self.MockExploration.get_content_html):
-                    suggestion_services.accept_suggestion(
-                        suggestion_id, reviewer_id, commit_message,
-                        review_message
-                    )
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, edit_state_content_change_dict,
+            'test description'
+        )
 
     def _assert_reviewable_suggestion_email_infos_are_equal(
             self, reviewable_suggestion_email_info,
@@ -1824,10 +1760,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
-        self.explorations = [
-            ReviewableSuggestionEmailInfoUnitTests.MockExploration(
-                'exp1', {'state_1': {}, 'state_2': {}})
-        ]
+        self.save_new_valid_exploration(self.target_id, self.author_id)
 
     def test_create_from_suggestion_returns_info_for_question_suggestion(self):
         question_suggestion = (
@@ -1898,7 +1831,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
                 '<p>default translation content</p>'))
-        self.mock_accept_suggestion(
+        suggestion_services.accept_suggestion(
             translation_suggestion.suggestion_id, self.reviewer_id,
             self.COMMIT_MESSAGE, 'review message ')
         accepted_translation_suggestion = (
@@ -2380,55 +2313,11 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
     """
 
     target_id = 'exp1'
-    target_version_at_submission = 1
+    language_code = 'en'
     AUTHOR_EMAIL = 'author1@example.com'
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
     REVIEWER_2_EMAIL = 'reviewer2@community.org'
     COMMIT_MESSAGE = 'commit message'
-
-    class MockExploration(python_utils.OBJECT):
-        """Mocks an exploration. To be used only for testing."""
-
-        def __init__(self, exploration_id, states):
-            self.id = exploration_id
-            self.states = states
-            self.category = 'Algebra'
-
-        def get_content_html(self, unused_state_name, unused_content_id):
-            """Used to mock the get_content_html method for explorations."""
-            return '<p>This is html to translate.</p>'
-
-    def mock_get_exploration_by_id(self, exp_id):
-        for exp in self.explorations:
-            if exp.id == exp_id:
-                return exp
-
-    def mock_update_exploration(
-            self, unused_user_id, unused_exploration_id, unused_change_list,
-            commit_message, is_suggestion):
-        self.assertTrue(is_suggestion)
-        self.assertEqual(
-            commit_message, 'Accepted suggestion by %s: %s' % (
-                'author', self.COMMIT_MESSAGE))
-
-    def mock_accept_suggestion(
-            self, suggestion_id, reviewer_id, commit_message, review_message):
-        """Sets up the appropriate mocks to successfully call
-        accept_suggestion.
-        """
-        with self.swap(
-            exp_services, 'update_exploration',
-            self.mock_update_exploration):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    exp_domain.Exploration, 'get_content_html',
-                    self.MockExploration.get_content_html):
-                    suggestion_services.accept_suggestion(
-                        suggestion_id, reviewer_id, commit_message,
-                        review_message
-                    )
 
     def _create_translation_suggestion_with_language_code_and_author(
             self, language_code, author_id):
@@ -2437,41 +2326,30 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         """
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'state_1',
-            'content_id': 'content',
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
-            'content_html': '<p>This is html to translate.</p>',
-            'translation_html': '<p>This is translated html.</p>'
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>'
         }
 
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.swap(
-                exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
-                translation_suggestion = (
-                    suggestion_services.create_suggestion(
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
-                        self.target_id, self.target_version_at_submission,
-                        author_id, add_translation_change_dict,
-                        'test description')
-                )
-
-        return translation_suggestion
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_translation_change_dict,
+            'test description'
+        )
 
     def _create_question_suggestion_with_skill_id_and_author_id(
             self, skill_id, author_id):
         """Creates a question suggestion with the given skill_id."""
         add_question_change_dict = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
-                'language_code': 'en',
+                'language_code': self.language_code,
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
@@ -2481,14 +2359,13 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             'skill_difficulty': 0.3
         }
 
-        question_suggestion = suggestion_services.create_suggestion(
+        return suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
             skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             author_id, add_question_change_dict,
-            'test description')
-
-        return question_suggestion
+            'test description'
+        )
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
             self, suggestions):
@@ -2554,12 +2431,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
         self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
-        self.explorations = [
-            (
-                GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests
-                .MockExploration('exp1', {'state_1': {}, 'state_2': {}})
-            )
-        ]
+        self.save_new_valid_exploration(self.target_id, self.author_id)
 
     def test_get_returns_empty_for_reviewers_who_authored_the_suggestions(self):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
@@ -2613,7 +2485,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         translation_suggestion = (
             self._create_translation_suggestion_with_language_code_and_author(
                 'hi', self.author_id))
-        self.mock_accept_suggestion(
+        suggestion_services.accept_suggestion(
             translation_suggestion.suggestion_id, self.reviewer_1_id,
             self.COMMIT_MESSAGE, 'review message')
 
