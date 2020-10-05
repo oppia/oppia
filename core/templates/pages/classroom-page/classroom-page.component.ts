@@ -35,13 +35,11 @@ require('pages/library-page/search-bar/search-bar.component.ts');
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
   controller: [
-    '$filter', 'AlertsService', 'LoaderService',
-    'PageTitleService', 'UrlInterpolationService', 'UrlService',
-    'FATAL_ERROR_CODES',
+    '$filter', 'AlertsService', 'LoaderService', 'PageTitleService',
+    'UrlInterpolationService', 'UrlService', 'FATAL_ERROR_CODES',
     function(
-        $filter, AlertsService, LoaderService,
-        PageTitleService, UrlInterpolationService, UrlService,
-        FATAL_ERROR_CODES) {
+        $filter, AlertsService, LoaderService, PageTitleService,
+        UrlInterpolationService, UrlService, FATAL_ERROR_CODES) {
       var ctrl = this;
 
       ctrl.classroomBackendApiService = (

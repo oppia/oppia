@@ -57,7 +57,8 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.story_url_fragment_1 = 'public-story-title'
         self.story_url_fragment_2 = 'private-story-title'
 
-        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, correctness_feedback_enabled=True)
         self.publish_exploration(self.owner_id, self.exp_id)
 
         self.node_1 = {

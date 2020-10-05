@@ -5437,6 +5437,8 @@ export = {
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
 
+  "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
+
   // Used to disable account removal until it is fully implemented.
   "ENABLE_ACCOUNT_DELETION": false,
 

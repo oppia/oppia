@@ -236,7 +236,7 @@ def does_story_exist_with_url_fragment(url_fragment):
 
 def validate_explorations_for_story(exp_ids, raise_error):
     """Validates the explorations in the given story and checks whether they
-    are compatible with the mobile app.
+    are compatible with the mobile app and ready for publishing.
 
     Args:
         exp_ids: list(str). The exp IDs to validate.
@@ -326,6 +326,14 @@ def validate_explorations_for_story(exp_ids, raise_error):
                 error_string = (
                     'Expected no exploration to have parameter '
                     'values in it. Invalid exploration: %s' % exp.id)
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+            if not exp.correctness_feedback_enabled:
+                error_string = (
+                    'Expected all explorations to have correctness feedback '
+                    'enabled. Invalid exploration: %s' % exp.id)
                 if raise_error:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
