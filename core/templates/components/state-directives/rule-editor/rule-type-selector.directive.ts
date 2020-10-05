@@ -46,19 +46,26 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
 
           var ruleTypesToDescriptions = INTERACTION_SPECS[
             StateInteractionIdService.savedMemento].rule_descriptions;
-          // TODO(bhenning): The order of choices should be meaningful. E.g.,
-          // having "is equal to" for most interactions first makes sense. They
-          // should ideally be ordered based on likelihood of being used.
-          // Currently, they are shown in the same order as defined in
-          // interaction_specs.json.
+          var equalToIndex = null;
+          var idx = 0;
           for (var ruleType in ruleTypesToDescriptions) {
+            if (ruleType.includes('Equal') || ruleType.includes('Exactly')) {
+              equalToIndex = idx;
+            }
             choices.push({
               id: ruleType,
               text: $filter('replaceInputsWithEllipses')(
                 ruleTypesToDescriptions[ruleType])
             });
+            idx++;
           }
-
+          // If the 'Equals' rule is not the first one, swap it with the first
+          // rule, so the equals rule is always the default one selected in the
+          // editor.
+          if (equalToIndex) {
+            [choices[0], choices[equalToIndex]] = [
+              choices[equalToIndex], choices[0]];
+          }
           var select2Node = $element[0].firstChild;
           $(select2Node).select2({
             allowClear: false,
