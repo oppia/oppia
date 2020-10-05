@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for creating instances of frontend
- * topic summary domain objects.
+ * @fileoverview Frontend Model for topic summary.
  */
 
 export interface TopicSummaryBackendDict {

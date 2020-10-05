@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for exploration improvement tasks.
+ * @fileoverview Frontend Model for exploration improvement tasks.
  */
 
 import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
@@ -51,7 +51,7 @@ export class ExplorationTaskModel {
   static createNewObsoleteTask(
       expId: string, expVersion: number, taskType: ExplorationTaskType,
       stateName: string): ExplorationTask {
-    return this.createFromBackendDict({
+    return ExplorationTaskModel.createFromBackendDict({
       entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
       entity_id: expId,
       entity_version: expVersion,
@@ -69,7 +69,7 @@ export class ExplorationTaskModel {
   static createNewResolvedTask(
       expId: string, expVersion: number, taskType: ExplorationTaskType,
       stateName: string): ExplorationTask {
-    return this.createFromBackendDict({
+    return ExplorationTaskModel.createFromBackendDict({
       entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
       entity_id: expId,
       entity_version: expVersion,

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain model for email dashboard query.
+ * @fileoverview Frontend model for email dashboard query.
  */
 
 export interface EmailDashboardQueryDict {

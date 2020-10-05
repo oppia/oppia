@@ -21,8 +21,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { EditableCollectionBackendApiService } from
   'domain/collection/editable-collection-backend-api.service';
-import { Collection } from
-  'domain/collection/collection.model';
+import { Collection } from 'domain/collection/collection.model';
 
 describe('Editable collection backend API service', () => {
   let editableCollectionBackendApiService:

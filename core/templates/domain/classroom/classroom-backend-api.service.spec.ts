@@ -23,8 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
-import { TopicSummaryBackendDict } from
-  'domain/topic/topic-summary.model';
+import { TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
 
 describe('Classroom backend API service', function() {
   let classroomBackendApiService:

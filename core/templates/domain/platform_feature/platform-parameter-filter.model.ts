@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating PlatformParameterFilter domain objects.
+ * @fileoverview Frontend Model for Platform Parameter Filter.
  */
 
 import cloneDeep from 'lodash/cloneDeep';

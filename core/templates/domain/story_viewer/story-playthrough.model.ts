@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for creating and mutating instances of frontend
- * story playthrough domain objects.
+ * @fileoverview Frontend Model for story playthrough.
  */
 
 import {

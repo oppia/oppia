@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Exploration Summary Object Factory.
+ * @fileoverview Unit tests for ExplorationSummaryModel.
  */
 
 import { LearnerExplorationSummary } from

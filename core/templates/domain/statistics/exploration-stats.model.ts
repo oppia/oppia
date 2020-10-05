@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for holding the stats of an exploration.
+ * @fileoverview Frontend Model for exploration stats.
  */
 
 import { StateStatsBackendDict, StateStats } from

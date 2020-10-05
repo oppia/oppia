@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the SuccessiveIncorrectAnswersTask domain
- *    object.
+ * @fileoverview Unit tests for the SuccessiveIncorrectAnswersTaskModel.
  */
 
-import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/successive-incorrect-answers-task.model';
+import { SuccessiveIncorrectAnswersTask } from
+  'domain/improvements/successive-incorrect-answers-task.model';
 
-describe('Successive incorrect answers task', function() {
+describe('Successive incorrect answers task model', function() {
   it('should return new task if there are playthroughs demonstrating ' +
     'multiple incorrect submissions', () => {
     const task = SuccessiveIncorrectAnswersTask.createNew(

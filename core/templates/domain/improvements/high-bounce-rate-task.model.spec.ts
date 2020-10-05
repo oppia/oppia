@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the HighBounceRateTask domain object.
+ * @fileoverview Unit tests for the HighBounceRateTaskModel.
  */
 
 import { ExplorationImprovementsConfig } from
@@ -22,7 +22,7 @@ import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.mo
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
 
-describe('High bounce rate task', function() {
+describe('High bounce rate task model', function() {
   beforeEach(() => {
     this.config = (
       new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.20, 100));

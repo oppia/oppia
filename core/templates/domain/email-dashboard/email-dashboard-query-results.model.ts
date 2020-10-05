@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for email dashboard query
+ * @fileoverview Frontend Model for email dashboard query
  * results.
  */
 

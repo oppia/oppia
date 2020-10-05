@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating PlatformParameterRule domain objects.
+ * @fileoverview Frontend Model for Platform Parameter Rule.
  */
 
 import {

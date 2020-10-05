@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for creating frontend instances of
- * classroom objects.
+ * @fileoverview Frontend Model for classroom data.
  */
 
 import {

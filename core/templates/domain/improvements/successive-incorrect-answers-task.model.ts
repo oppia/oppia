@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for a successive incorrect answers improvements
+ * @fileoverview Frontend Model for successive incorrect answers improvements
  * task.
  */
 
@@ -69,7 +69,8 @@ export class SuccessiveIncorrectAnswersTask extends TaskEntry<
       expId: string, expVersion: number, stateName: string,
       numMultipleIncorrectSubmissionsPlaythroughs: number
   ): SuccessiveIncorrectAnswersTask {
-    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
+    const task = SuccessiveIncorrectAnswersTask.createNewObsoleteTask(
+      expId, expVersion, stateName);
     task.refreshStatus(numMultipleIncorrectSubmissionsPlaythroughs);
     return task;
   }

@@ -52,7 +52,7 @@ describe('Collection update service', function() {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     UndoRedoService = $injector.get('UndoRedoService');
 
-    var sampleCollectionBackendObject = {
+    const sampleCollectionBackendObject = {
       id: 'collection_id',
       title: 'a title',
       objective: 'an objective',

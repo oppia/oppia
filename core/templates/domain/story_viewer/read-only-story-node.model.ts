@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for storing frontend story node domain objects in the
+ * @fileoverview Frontend Model for storing frontend story node in the
  * story viewer.
  */
 

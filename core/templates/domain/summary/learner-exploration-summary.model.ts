@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for learner exploration summary.
+ * @fileoverview Frontend Model for learner exploration summary.
  */
 
 export interface ExplorationRatings {

@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for creating and mutating instances of frontend
- * collection node domain objects.
+ * @fileoverview Frontend Model for Collection Node.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -45,7 +44,7 @@ export class CollectionNode {
   }
 
   static createFromExplorationId(explorationId: string): CollectionNode {
-    return this.create({
+    return CollectionNode.create({
       exploration_id: explorationId,
       exploration_summary: null
     });

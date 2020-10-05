@@ -29,7 +29,7 @@ import { NeedsGuidingResponsesTask } from
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/successive-incorrect-answers-task.model';
 
-describe('Exploration task object factory', () => {
+describe('Exploration task model', () => {
   let newTaskEntryBackendDict;
 
   beforeEach(() => {

@@ -16,8 +16,7 @@
  * @fileoverview Tests for TopicSummaryModel.
  */
 
-import { TopicSummary } from
-  'domain/topic/topic-summary.model';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
 
 describe('Topic summary model', () => {
   let _sampleTopicSummary: TopicSummary = null;

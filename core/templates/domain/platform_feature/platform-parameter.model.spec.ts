@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PlatformParameterRuleModel.
+ * @fileoverview Unit tests for PlatformParameterModel.
  */
 
 import {

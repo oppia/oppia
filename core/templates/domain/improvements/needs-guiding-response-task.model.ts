@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for a needs guiding responses improvements task.
+ * @fileoverview Frontend Model for needs guiding responses improvements task.
  */
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
@@ -67,7 +67,8 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
   static createFromAnswerStats(
       expId: string, expVersion: number, stateName: string,
       answerStats: AnswerStats[]): NeedsGuidingResponsesTask {
-    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
+    const task = NeedsGuidingResponsesTask.createNewObsoleteTask(
+      expId, expVersion, stateName);
     task.refreshStatus(answerStats);
     return task;
   }

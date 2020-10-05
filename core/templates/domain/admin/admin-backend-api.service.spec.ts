@@ -28,8 +28,7 @@ import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
-import { TopicSummary } from
-  'domain/topic/topic-summary.model';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;

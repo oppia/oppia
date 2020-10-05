@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the NeedsGuidingResponsesTask domain object.
+ * @fileoverview Unit tests for the NeedsGuidingResponsesTaskModel.
  */
 
 import { NeedsGuidingResponsesTask } from
   'domain/improvements/needs-guiding-response-task.model';
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 
-describe('Needs guiding responses task', function() {
+describe('Needs guiding responses task model', function() {
   beforeEach(() => {
     this.newTop10AnswerStats = (numUnaddressedAnswers: number) => {
       const answerStats = [];

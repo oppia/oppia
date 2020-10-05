@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for a high bounce-rate improvements task.
+ * @fileoverview Frontend Model for high bounce-rate improvements task.
  */
 
 import { ExplorationImprovementsConfig } from

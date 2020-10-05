@@ -18,8 +18,7 @@
 
 import { LearnerExplorationSummary } from
   'domain/summary/learner-exploration-summary.model';
-import { UserProfile } from
-  'domain/user/user-profile.model';
+import { UserProfile } from 'domain/user/user-profile.model';
 
 describe('User profile model', () => {
   it('should create a user profile object from a backend dict',

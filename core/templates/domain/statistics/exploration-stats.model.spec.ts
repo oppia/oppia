@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ExplorationStats domain object.
+ * @fileoverview Unit tests for the ExplorationStatsModel.
  */
 
 import {
@@ -22,7 +22,7 @@ import {
 } from 'domain/statistics/exploration-stats.model';
 import { StateStats } from 'domain/statistics/state-stats-model';
 
-describe('Exploration stats', function() {
+describe('Exploration stats model', function() {
   it('should derive values from the backend dict', () => {
     const explorationStatsBackendDict: ExplorationStatsBackendDict = {
       exp_id: 'eid',

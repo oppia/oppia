@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for a ineffective feedback loop improvements
+ * @fileoverview Frontend Model for ineffective feedback loop improvements
  *    task.
  */
 
@@ -66,7 +66,8 @@ export class IneffectiveFeedbackLoopTask extends TaskEntry<
       expId: string, expVersion: number, stateName: string,
       numCyclicStateTransitionsPlaythroughs: number
   ): IneffectiveFeedbackLoopTask {
-    const task = this.createNewObsoleteTask(expId, expVersion, stateName);
+    const task = IneffectiveFeedbackLoopTask.createNewObsoleteTask(
+      expId, expVersion, stateName);
     task.refreshStatus(numCyclicStateTransitionsPlaythroughs);
     return task;
   }

@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EmailDashboardQueryObjectFactory.
+ * @fileoverview Unit tests for EmailDashboardQueryModel.
  */
 
 import { EmailDashboardQuery } from
   'domain/email-dashboard/email-dashboard-query.model';
 
-describe('Email dashboard query object factory', () => {
+describe('Email dashboard query model', () => {
   let queryDict = {
     created_on: '04-06-20 14:34:46',
     status: 'processing',
