@@ -249,7 +249,7 @@ var AdminPage = function() {
   };
 
   this.updateRole = async function(name, newRole) {
-    await elementToBeClickable(
+    await waitFor.elementToBeClickable(
       adminRolesTab, 'Admin Roles tab is not clickable');
     await action.click(adminRolesTab);
 
