@@ -2133,6 +2133,7 @@ class SkillModelValidator(base_model_validators.BaseModelValidator):
         questions linked with the skill. The superseding skill
         id check is already performed in domain object validation,
         so it is not repeated here.
+
         Args:
             item: datastore_services.Model. SkillModel to validate.
         """
