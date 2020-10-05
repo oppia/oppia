@@ -18,12 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // story-update.service.ts is upgraded to Angular 8.
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
-import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
@@ -39,14 +35,11 @@ describe('Story update service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
-      'StoryContentsObjectFactory', new StoryContentsObjectFactory(
-        new StoryNodeObjectFactory()));
-    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
+      'StoryContentsObjectFactory', new StoryContentsObjectFactory());
     $provide.value(
       'StoryObjectFactory', new StoryObjectFactory(
-        new StoryContentsObjectFactory(new StoryNodeObjectFactory())));
+        new StoryContentsObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

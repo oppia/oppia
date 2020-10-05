@@ -18,8 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-update.service.ts is upgraded to Angular 8.
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionNodeObjectFactory } from
   'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
@@ -44,7 +42,6 @@ describe('Collection update service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
     $provide.value(

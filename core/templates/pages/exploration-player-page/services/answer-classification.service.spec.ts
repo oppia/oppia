@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerClassificationResult } from
+  'domain/classifier/answer-classification-result.model';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AppService } from 'services/app.service';
@@ -45,8 +45,6 @@ describe('Answer Classification Service', () => {
       answer.toLowerCase().includes(inputs.x.toLowerCase()))
   };
 
-  let answerClassificationResultObjectFactory:
-    AnswerClassificationResultObjectFactory;
   let answerClassificationService: AnswerClassificationService;
   let appService: AppService;
   let interactionSpecsService: InteractionSpecsService;
@@ -58,8 +56,6 @@ describe('Answer Classification Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    answerClassificationResultObjectFactory = TestBed.get(
-      AnswerClassificationResultObjectFactory);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     appService = TestBed.get(AppService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
@@ -180,7 +176,7 @@ describe('Answer Classification Service', () => {
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 10, rules)
       ).toEqual(
-        answerClassificationResultObjectFactory.createNew(
+        new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []),
           0, 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
@@ -189,7 +185,7 @@ describe('Answer Classification Service', () => {
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 5, rules)
       ).toEqual(
-        answerClassificationResultObjectFactory.createNew(
+        new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
           1, 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
@@ -198,7 +194,7 @@ describe('Answer Classification Service', () => {
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 6, rules)
       ).toEqual(
-        answerClassificationResultObjectFactory.createNew(
+        new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
           1, 1,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
@@ -212,7 +208,7 @@ describe('Answer Classification Service', () => {
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 7, rules)
       ).toEqual(
-        answerClassificationResultObjectFactory.createNew(
+        new AnswerClassificationResult(
           outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
           2, 0,
           ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
@@ -388,7 +384,7 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 0, rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
+          new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, null,
             ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
       });
@@ -408,7 +404,7 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 0, rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
+          new AnswerClassificationResult(
             outcomeObjectFactory.createNew(
               'default', 'default_outcome', '', []),
             2, 0,
@@ -515,7 +511,7 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 'abc', rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
+          new AnswerClassificationResult(
             state.interaction.answerGroups[0].outcome, 0, null,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
 
@@ -523,7 +519,7 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 'xyz', rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
+          new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, null,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
       });
@@ -539,7 +535,7 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 'input', rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
+          new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, 0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });

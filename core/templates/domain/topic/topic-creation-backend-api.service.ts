@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 
 import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedTopic } from
-  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+  'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
 interface TopicCreationResponse {
   topicId: string;

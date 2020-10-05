@@ -19,7 +19,7 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
+import { StorySummary } from 'domain/story/story-summary.model';
 
 @Component({
   selector: 'stories-list',

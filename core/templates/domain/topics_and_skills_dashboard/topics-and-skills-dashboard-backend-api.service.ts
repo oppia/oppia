@@ -44,7 +44,7 @@ import { TopicsAndSkillsDashboardDomainConstants } from
 import {
   TopicsAndSkillsDashboardFilter
 // eslint-disable-next-line max-len
-} from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 import { TopicSummary, TopicSummaryBackendDict, TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from

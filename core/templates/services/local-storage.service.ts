@@ -26,16 +26,14 @@ import { Injectable } from '@angular/core';
 
 import {
   ExplorationChangeList,
-  ExplorationDraft,
-  ExplorationDraftObjectFactory
-} from 'domain/exploration/ExplorationDraftObjectFactory';
+  ExplorationDraft
+} from 'domain/exploration/exploration-draft.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
-  constructor(
-    private explorationDraftObjectFactory: ExplorationDraftObjectFactory) {}
+  constructor() {}
 
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
@@ -82,7 +80,7 @@ export class LocalStorageService {
       draftChangeListId: number): void {
     let localSaveKey = this._createExplorationDraftKey(explorationId);
     if (this.isStorageAvailable()) {
-      let draftDict = this.explorationDraftObjectFactory.toLocalStorageDict(
+      let draftDict = ExplorationDraft.toLocalStorageDict(
         changeList, draftChangeListId);
       this.storage.setItem(localSaveKey, JSON.stringify(draftDict));
     }
@@ -100,8 +98,7 @@ export class LocalStorageService {
       let draftDict = JSON.parse(
         this.storage.getItem(this._createExplorationDraftKey(explorationId)));
       if (draftDict) {
-        return this.explorationDraftObjectFactory.createFromLocalStorageDict(
-          draftDict);
+        return ExplorationDraft.createFromLocalStorageDict(draftDict);
       }
     }
     return null;

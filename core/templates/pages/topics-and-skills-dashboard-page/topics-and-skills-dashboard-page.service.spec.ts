@@ -19,9 +19,9 @@
 import { ETopicPublishedOptions, ETopicSortOptions } from
 // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-import { TopicsAndSkillsDashboardFilterObjectFactory } from
+import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
@@ -30,12 +30,10 @@ import { TopicSummaryObjectFactory } from
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService = null;
-  let dfof: TopicsAndSkillsDashboardFilterObjectFactory = null;
   let tsof: TopicSummaryObjectFactory = null;
 
   beforeEach(() => {
     tsds = new TopicsAndSkillsDashboardPageService();
-    dfof = new TopicsAndSkillsDashboardFilterObjectFactory();
     tsof = new TopicSummaryObjectFactory();
   });
 
@@ -101,7 +99,7 @@ describe('Topic and Skill dashboard page service', () => {
       thumbnail_bg_color: '#C6DCDA'
     });
     let topicsArray = [topic1, topic2, topic3];
-    let filterOptions = dfof.createDefault();
+    let filterOptions = TopicsAndSkillsDashboardFilter.createDefault();
     let filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual(topicsArray);
 

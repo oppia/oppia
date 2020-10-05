@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
-import { SkillChange } from 'domain/editor/undo_redo/ChangeObjectFactory';
+import { SkillChange } from 'domain/editor/undo_redo/change.model';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { Skill, SkillBackendDict, SkillObjectFactory } from
   'domain/skill/SkillObjectFactory';

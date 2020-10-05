@@ -33,7 +33,7 @@
   "files": [
     "core/templates/domain/skill/assigned-skill-object.factory.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.spec.ts",
-    "core/templates/domain/utilities/AudioFileObjectFactory.ts",
+    "core/templates/domain/utilities/audio-file.model.ts",
     "core/templates/domain/utilities/browser-checker.service.ts",
     "core/templates/domain/utilities/browser-checker.service.spec.ts",
     "core/templates/filters/string-utility-filters/camel-case-to-hyphens.pipe.ts",

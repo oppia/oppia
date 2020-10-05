@@ -18,21 +18,14 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // undo-redo.service.ts is upgraded to Angular 8.
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
+import { Change } from 'domain/editor/undo_redo/change.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/editor/undo_redo/ChangeObjectFactory.ts');
-
 describe('Undo/Redo Service', function() {
   var UndoRedoService = null;
-  var changeObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
-  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -42,7 +35,6 @@ describe('Undo/Redo Service', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     UndoRedoService = $injector.get('UndoRedoService');
-    changeObjectFactory = $injector.get('ChangeObjectFactory');
   }));
 
   var _createBackendChangeObject = function(value) {
@@ -53,7 +45,7 @@ describe('Undo/Redo Service', function() {
 
   var _createChangeDomainObject = function(
       backendObj, applyFunc = function() {}, reverseFunc = function() {}) {
-    return changeObjectFactory.create(backendObj, applyFunc, reverseFunc);
+    return new Change(backendObj, applyFunc, reverseFunc);
   };
 
   var _createNoOpChangeDomainObject = function(value) {

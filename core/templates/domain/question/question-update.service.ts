@@ -16,9 +16,10 @@
  * @fileoverview Service to handle the updating of a question.
  */
 
+import { Change } from
+  'domain/editor/undo_redo/change.model';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
-require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
@@ -26,19 +27,19 @@ require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionUpdateService', [
-  'ChangeObjectFactory', 'QuestionUndoRedoService',
+  'QuestionUndoRedoService',
   'CMD_UPDATE_QUESTION_PROPERTY',
   'QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS',
   'QUESTION_PROPERTY_LANGUAGE_CODE', 'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   function(
-      ChangeObjectFactory, QuestionUndoRedoService,
+      QuestionUndoRedoService,
       CMD_UPDATE_QUESTION_PROPERTY,
       QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
       QUESTION_PROPERTY_LANGUAGE_CODE, QUESTION_PROPERTY_QUESTION_STATE_DATA) {
     var _applyChange = function(question, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       QuestionUndoRedoService.applyChange(changeObj, question);
     };
 

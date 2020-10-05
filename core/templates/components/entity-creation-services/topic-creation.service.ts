@@ -21,9 +21,6 @@ require(
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 require('domain/topic/topic-update.service.ts');
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardFilterObjectFactory');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
