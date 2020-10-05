@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,307 +16,222 @@
  * @fileoverview Service to serve as the interface for fetching and uploading
  * assets from Google Cloud Storage.
  */
-// Jquery import is needed here in order to spy ajax method on unit tests.
-import $ from 'jquery';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/csrf-token.service.ts');
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { AppConstants } from 'app.constants';
 import { AudioFile } from 'domain/utilities/audio-file.model';
-import { FileDownloadRequest } from
-  'domain/utilities/file-download-request.model';
+import { FileDownloadRequest } from 'domain/utilities/file-download-request.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
-angular.module('oppia').factory('AssetsBackendApiService', [
-  '$http', '$q', 'CsrfTokenService',
-  'UrlInterpolationService', 'DEV_MODE', 'ENTITY_TYPE',
-  'GCS_RESOURCE_BUCKET_NAME',
-  function(
-      $http, $q, CsrfTokenService,
-      UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
-      GCS_RESOURCE_BUCKET_NAME) {
-    if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
+const Constants = require('constants.ts');
+
+interface SaveAudioResponse {
+  'filename': string;
+  'duration_secs': number;
+}
+
+interface SaveImageResponse {
+  'filename': string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AssetsBackendApiService {
+  private readonly downloadUrlTemplate: string;
+
+  /** List of audio files that have been requested but have not returned. */
+  private audioFileDownloadRequests: FileDownloadRequest[] = [];
+  /** List of image files that have been requested but have not returned. */
+  private imageFileDownloadRequests: FileDownloadRequest[] = [];
+  /** Map from asset filename to asset blob. */
+  private assetsCache: Map<string, Blob> = new Map();
+
+  constructor(
+      private csrfTokenService: CsrfTokenService,
+      private http: HttpClient,
+      private urlInterpolationService: UrlInterpolationService) {
+    if (!Constants.DEV_MODE && !Constants.GCS_RESOURCE_BUCKET_NAME) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
+    const urlPrefix = Constants.DEV_MODE ?
+      '/assetsdevhandler' :
+      'https://storage.googleapis.com/' + Constants.GCS_RESOURCE_BUCKET_NAME;
+    this.downloadUrlTemplate = (
+      urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
+  }
 
-    // List of filenames that have been requested for but have
-    // yet to return a response.
-    var _audioFilesCurrentlyBeingRequested = [];
-    var _imageFilesCurrentlyBeingRequested = [];
+  async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
+    if (this.isCached(filename)) {
+      return new AudioFile(filename, this.assetsCache.get(filename));
+    }
+    return this.fetchFile(
+      AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
+      AppConstants.ASSET_TYPE_AUDIO);
+  }
 
-    var ASSET_TYPE_AUDIO = 'audio';
-    var ASSET_TYPE_IMAGE = 'image';
-    var ASSET_TYPE_THUMBNAIL = 'thumbnail';
+  async loadImage(
+      entityType: string, entityId: string,
+      filename: string): Promise<ImageFile> {
+    if (this.isCached(filename)) {
+      return new ImageFile(filename, this.assetsCache.get(filename));
+    }
+    return this.fetchFile(
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
+  }
 
-    var GCS_PREFIX = (
-      'https://storage.googleapis.com/' + GCS_RESOURCE_BUCKET_NAME);
-    var AUDIO_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<entity_type>/<entity_id>/assets/audio/<filename>');
-    var IMAGE_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<entity_type>/<entity_id>/assets/image/<filename>');
-    var THUMBNAIL_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<entity_type>/<entity_id>/assets/thumbnail/<filename>');
+  async saveAudio(
+      explorationId: string, filename: string,
+      rawAssetData: Blob): Promise<SaveAudioResponse> {
+    const form = new FormData();
+    form.append('raw_audio_file', rawAssetData);
+    form.append('payload', JSON.stringify({filename}));
+    form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
+    try {
+      return await this.http.post<SaveAudioResponse>(
+        this.getAudioUploadUrl(explorationId), form).toPromise();
+    } catch (reason) {
+      return Promise.reject(reason.error);
+    }
+  }
 
-    var AUDIO_UPLOAD_URL_TEMPLATE =
-      '/createhandler/audioupload/<exploration_id>';
+  async saveMathExpresionImage(
+      resampledFile: Blob, filename: string, entityType: string,
+      entityId: string): Promise<SaveImageResponse> {
+    const form = new FormData();
+    form.append('image', resampledFile);
+    form.append(
+      'payload', JSON.stringify({filename, filename_prefix: 'image'}));
+    form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
+    try {
+      return await this.http.post<SaveImageResponse>(
+        this.getImageUploadUrl(entityType, entityId), form).toPromise();
+    } catch (reason) {
+      return Promise.reject(reason.error);
+    }
+  }
 
-    var ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE = {
-      [ASSET_TYPE_AUDIO]: AUDIO_DOWNLOAD_URL_TEMPLATE,
-      [ASSET_TYPE_IMAGE]: IMAGE_DOWNLOAD_URL_TEMPLATE,
-      [ASSET_TYPE_THUMBNAIL]: THUMBNAIL_DOWNLOAD_URL_TEMPLATE
-    };
+  isCached(filename: string): boolean {
+    return this.assetsCache.has(filename);
+  }
 
-    // Map from asset filename to asset blob.
-    var assetsCache = {};
-    var _fetchFile = function(
-        entityType, entityId, filename, assetType, successCallback,
-        errorCallback) {
-      var canceler = $q.defer();
-      if (assetType === ASSET_TYPE_AUDIO) {
-        _audioFilesCurrentlyBeingRequested.push(
-          new FileDownloadRequest(filename, canceler));
-      } else {
-        _imageFilesCurrentlyBeingRequested.push(
-          new FileDownloadRequest(filename, canceler));
-      }
+  abortAllCurrentAudioDownloads(): void {
+    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_AUDIO);
+  }
 
-      $http({
-        method: 'GET',
-        responseType: 'blob',
-        url: _getDownloadUrl(entityType, entityId, filename, assetType),
-        timeout: canceler.promise
-      }).then(function(response) {
-        var assetBlob = null;
-        var data = response.data;
-        assetBlob = new Blob([data], {type: data.type});
-        assetsCache[filename] = assetBlob;
-        if (assetType === ASSET_TYPE_AUDIO) {
-          successCallback(
-            new AudioFile(filename, assetBlob));
-        } else {
-          successCallback(
-            new ImageFile(filename, assetBlob));
-        }
-      })['catch'](function() {
-        errorCallback(filename);
-      })['finally'](function() {
-        _removeFromFilesCurrentlyBeingRequested(filename, assetType);
-      });
-    };
+  abortAllCurrentImageDownloads(): void {
+    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_IMAGE);
+  }
 
-    var removeXSSIPrefix = function(data) {
-      var transformedData = data.substring(5);
-      var parsedResponse = JSON.parse(transformedData);
-      return parsedResponse;
-    };
-
-    var _abortAllCurrentDownloads = function(assetType) {
-      if (assetType === ASSET_TYPE_AUDIO) {
-        _audioFilesCurrentlyBeingRequested.forEach(function(request) {
-          request.canceler.resolve();
-        });
-        _audioFilesCurrentlyBeingRequested = [];
-      } else {
-        _imageFilesCurrentlyBeingRequested.forEach(function(request) {
-          request.canceler.resolve();
-        });
-        _imageFilesCurrentlyBeingRequested = [];
-      }
-    };
-
-    var _removeFromFilesCurrentlyBeingRequested = function(
-        filename, assetType) {
-      if (_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_AUDIO)) {
-        for (var index = 0; index <
-             _audioFilesCurrentlyBeingRequested.length; index++) {
-          if (_audioFilesCurrentlyBeingRequested[index].filename === filename) {
-            _audioFilesCurrentlyBeingRequested.splice(index, 1);
-            break;
-          }
-        }
-      } else if (_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_IMAGE)) {
-        for (var index = 0; index <
-             _imageFilesCurrentlyBeingRequested.length; index++) {
-          if (_imageFilesCurrentlyBeingRequested[index].filename === filename) {
-            _imageFilesCurrentlyBeingRequested.splice(index, 1);
-            break;
-          }
-        }
-      }
-    };
-
-    var _saveAudio = function(
-        explorationId, filename, rawAssetData, successCallback,
-        errorCallback) {
-      var form = new FormData();
-
-      form.append('raw_audio_file', rawAssetData);
-      form.append('payload', JSON.stringify({
-        filename: filename
-      }));
-      CsrfTokenService.getTokenAsync().then(function(token) {
-        form.append('csrf_token', token);
-        $.ajax({
-          url: _getAudioUploadUrl(explorationId),
-          data: form,
-          processData: false,
-          contentType: false,
-          type: 'POST',
-          dataType: 'text',
-          dataFilter: removeXSSIPrefix,
-        }).done(function(response) {
-          if (successCallback) {
-            successCallback(response);
-          }
-        }).fail(function(data) {
-          // Remove the XSSI prefix.
-          var parsedResponse = removeXSSIPrefix(data.responseText);
-          if (errorCallback) {
-            errorCallback(parsedResponse);
-          }
-        });
-      });
-    };
-
-    var _saveMathExpresionImage = function(
-        resampledFile, filename, entityType, entityId, successCallback,
-        errorCallback) {
-      let form = new FormData();
-      form.append('image', resampledFile);
-      form.append('payload', JSON.stringify({
-        filename: filename,
-        filename_prefix: 'image'
-      }));
-      var imageUploadUrlTemplate = (
-        '/createhandler/imageupload/<entity_type>/<entity_id>'
-      );
-      CsrfTokenService.getTokenAsync().then(function(token) {
-        form.append('csrf_token', token);
-        $.ajax({
-          url: UrlInterpolationService.interpolateUrl(
-            imageUploadUrlTemplate, {
-              entity_type: entityType,
-              entity_id: entityId
-            }
-          ),
-          data: form,
-          processData: false,
-          contentType: false,
-          type: 'POST',
-          dataFilter: removeXSSIPrefix,
-          dataType: 'text'
-        }).done(function(data) {
-          if (successCallback) {
-            successCallback(data);
-          }
-        }).fail(function(data) {
-          // Remove the XSSI prefix.
-          var parsedResponse = removeXSSIPrefix(data.responseText);
-          if (errorCallback) {
-            errorCallback(parsedResponse);
-          }
-        });
-      });
-    };
-    var _getDownloadUrl = function(entityType, entityId, filename, assetType) {
-      var urlTemplate = null;
-      urlTemplate = ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE[assetType];
-      return UrlInterpolationService.interpolateUrl(
-        urlTemplate, {
-          entity_id: entityId,
-          entity_type: entityType,
-          filename: filename
-        });
-    };
-
-    var _getAudioUploadUrl = function(explorationId) {
-      return UrlInterpolationService.interpolateUrl(AUDIO_UPLOAD_URL_TEMPLATE, {
-        exploration_id: explorationId
-      });
-    };
-
-    var _isAssetCurrentlyBeingRequested = function(filename, assetType) {
-      if (assetType === ASSET_TYPE_AUDIO) {
-        return _audioFilesCurrentlyBeingRequested.some(function(request) {
-          return request.filename === filename;
-        });
-      } else {
-        return _imageFilesCurrentlyBeingRequested.some(function(request) {
-          return request.filename === filename;
-        });
-      }
-    };
-
-    var _isCached = function(filename) {
-      return assetsCache.hasOwnProperty(filename);
-    };
-
+  getAssetsFilesCurrentlyBeingRequested(): (
+    {[assetType: string]: readonly FileDownloadRequest[]}) {
     return {
-      loadAudio: function(explorationId, filename) {
-        return $q(function(resolve, reject) {
-          if (_isCached(filename)) {
-            resolve(new AudioFile(
-              filename, assetsCache[filename]));
-          } else {
-            _fetchFile(
-              ENTITY_TYPE.EXPLORATION, explorationId, filename,
-              ASSET_TYPE_AUDIO, resolve, reject);
-          }
-        });
-      },
-      loadImage: function(entityType, entityId, filename) {
-        return $q(function(resolve, reject) {
-          if (_isCached(filename)) {
-            resolve(new ImageFile(
-              filename, assetsCache[filename]));
-          } else {
-            _fetchFile(
-              entityType, entityId, filename, ASSET_TYPE_IMAGE, resolve,
-              reject);
-          }
-        });
-      },
-      saveAudio: function(explorationId, filename, rawAssetData) {
-        return $q(function(resolve, reject) {
-          _saveAudio(explorationId, filename, rawAssetData, resolve, reject);
-        });
-      },
-      saveMathExpresionImage: function(
-          resampledFile, filename, entityType, entityId) {
-        return $q(function(resolve, reject) {
-          _saveMathExpresionImage(
-            resampledFile, filename, entityType, entityId, resolve, reject);
-        });
-      },
-      isCached: function(filename) {
-        return _isCached(filename);
-      },
-      getAudioDownloadUrl: function(entityType, entityId, filename) {
-        return _getDownloadUrl(
-          entityType, entityId, filename, ASSET_TYPE_AUDIO);
-      },
-      abortAllCurrentAudioDownloads: function() {
-        _abortAllCurrentDownloads(ASSET_TYPE_AUDIO);
-      },
-      abortAllCurrentImageDownloads: function() {
-        _abortAllCurrentDownloads(ASSET_TYPE_IMAGE);
-      },
-      getAssetsFilesCurrentlyBeingRequested: function() {
-        return { audio: _audioFilesCurrentlyBeingRequested,
-          image: _imageFilesCurrentlyBeingRequested
-        };
-      },
-      getImageUrlForPreview: function(entityType, entityId, filename) {
-        return _getDownloadUrl(
-          entityType, entityId, filename, ASSET_TYPE_IMAGE);
-      },
-      getThumbnailUrlForPreview: function(entityType, entityId, filename) {
-        return _getDownloadUrl(
-          entityType, entityId, filename, ASSET_TYPE_THUMBNAIL);
-      }
+      [AppConstants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
+      [AppConstants.ASSET_TYPE_IMAGE]: this.imageFileDownloadRequests,
     };
   }
-]);
+
+  getAudioDownloadUrl(
+      entityType: string, entityId: string, filename: string): string {
+    return this.getDownloadUrl(
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_AUDIO);
+  }
+
+  getImageUrlForPreview(
+      entityType: string, entityId: string, filename: string): string {
+    return this.getDownloadUrl(
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
+  }
+
+  getThumbnailUrlForPreview(
+      entityType: string, entityId: string, filename: string): string {
+    return this.getDownloadUrl(
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
+  }
+
+  private getDownloadUrl(
+      entityType: string, entityId: string, filename: string,
+      assetType: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      this.downloadUrlTemplate, {
+        entity_type: entityType,
+        entity_id: entityId,
+        asset_type: assetType,
+        filename: filename,
+      });
+  }
+
+  private getFileDownloadRequestsByAssetType(
+      assetType: string): FileDownloadRequest[] {
+    if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+      return this.audioFileDownloadRequests;
+    } else {
+      return this.imageFileDownloadRequests;
+    }
+  }
+
+  private async fetchFile(
+      entityType: string, entityId: string, filename: string,
+      assetType: string): Promise<AudioFile | ImageFile> {
+    let onResolve: (_: Blob) => void;
+    let onReject: () => void;
+    const blobPromise = new Promise<Blob>((resolve, reject) => {
+      onResolve = resolve;
+      onReject = reject;
+    });
+
+    const subscription = this.http.get(
+      this.getDownloadUrl(entityType, entityId, filename, assetType), {
+        responseType: 'blob'
+      }).subscribe(onResolve, onReject);
+
+    const fileDownloadRequests = (
+      this.getFileDownloadRequestsByAssetType(assetType));
+    fileDownloadRequests.push(new FileDownloadRequest(filename, subscription));
+
+    try {
+      const blob = await blobPromise;
+      this.assetsCache.set(filename, blob);
+      if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+        return new AudioFile(filename, blob);
+      } else {
+        return new ImageFile(filename, blob);
+      }
+    } catch {
+      return Promise.reject(filename);
+    } finally {
+      const i = fileDownloadRequests.findIndex(r => r.filename === filename);
+      if (i !== -1) {
+        fileDownloadRequests.splice(i, 1);
+      }
+    }
+  }
+
+  private abortAllCurrentDownloads(assetType: string): void {
+    const fileDownloadRequests = (
+      this.getFileDownloadRequestsByAssetType(assetType));
+    fileDownloadRequests.forEach(r => r.subscription.unsubscribe());
+    fileDownloadRequests.length = 0;
+  }
+
+  private getAudioUploadUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
+        exploration_id: explorationId
+      });
+  }
+
+  private getImageUploadUrl(entityType: string, entityId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
+      { entity_type: entityType, entity_id: entityId });
+  }
+}
+
+angular.module('oppia').factory(
+  'AssetsBackendApiService', downgradeInjectable(AssetsBackendApiService));
