@@ -347,8 +347,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         topic_id = 'topic'
         story_id = 'story'
         self.save_new_valid_exploration(
-            '0', owner_id, title='title',
-            end_state_name='End State')
+            '0', owner_id, title='title', end_state_name='End State',
+            correctness_feedback_enabled=True)
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
