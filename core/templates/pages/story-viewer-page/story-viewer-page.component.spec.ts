@@ -22,7 +22,7 @@ import { OppiaAngularRootComponent } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
+import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -36,7 +36,6 @@ describe('Story Viewer Page component', function() {
   var alertsService = null;
   var assetsBackendApiService = null;
   var readOnlyStoryNodeObjectFactory = null;
-  var storyNodeObjectFactory = null;
   var storyPlaythroughObjectFactory = null;
   var storyViewerBackendApiService = null;
   var urlService = null;
@@ -55,7 +54,6 @@ describe('Story Viewer Page component', function() {
     );
     readOnlyStoryNodeObjectFactory = TestBed.get(
       ReadOnlyStoryNodeObjectFactory);
-    storyNodeObjectFactory = TestBed.get(StoryNodeObjectFactory);
     storyPlaythroughObjectFactory = TestBed.get(StoryPlaythroughObjectFactory);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
   });
@@ -210,7 +208,7 @@ describe('Story Viewer Page component', function() {
 
   it('should get complete exploration url when clicking on svg element',
     function() {
-      var node = storyNodeObjectFactory.createFromIdAndTitle(
+      var node = StoryNode.createFromIdAndTitle(
         '1', 'Story node title');
       expect(ctrl.getExplorationUrl(node)).toBe(
         '/explore/null?topic_url_fragment=topic_1&' +
