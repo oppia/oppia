@@ -1528,9 +1528,9 @@ class GeneralFeedbackThreadModelValidator(
             cls._add_error(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
-                'Entity id %s: Original author ID %s is in a wrong format '
-                'should be either pid_<32 chars> or uid_<32 chars>' % (
-                    item.id, item.original_author_id))
+                'Entity id %s: Original author ID %s is in a wrong format. '
+                'It should be either \'pid_<32 chars>\' or \'uid_<32 chars>\'.'
+                % (item.id, item.original_author_id))
 
     @classmethod
     def _validate_last_nonempty_message_author_id(cls, item):
@@ -1607,9 +1607,9 @@ class GeneralFeedbackMessageModelValidator(
             cls._add_error(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
-                'Entity id %s: Author ID %s is in a wrong format should be '
-                'either pid_<32 chars> or uid_<32 chars>' % (
-                    item.id, item.author_id))
+                'Entity id %s: Author ID %s is in a wrong format. '
+                'It should be either \'pid_<32 chars>\' or \'uid_<32 chars>\'.'
+                % (item.id, item.author_id))
 
     @classmethod
     def _validate_message_id(
@@ -2965,8 +2965,8 @@ class GeneralVoiceoverApplicationModelValidator(
             cls._add_error(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
-                'Entity id %s: Final reviewer ID %s is in a wrong format '
-                'should be either pid_<32 chars> or uid_<32 chars>'
+                'Entity id %s: Final reviewer ID %s is in a wrong format. '
+                'It should be either \'pid_<32 chars>\' or \'uid_<32 chars>\'.'
                 % (item.id, item.final_reviewer_id))
 
     @classmethod
@@ -2980,9 +2980,9 @@ class GeneralVoiceoverApplicationModelValidator(
             cls._add_error(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
-                'Entity id %s: Author ID %s is in a wrong format should be '
-                'either pid_<32 chars> or uid_<32 chars>' % (
-                    item.id, item.author_id))
+                'Entity id %s: Author ID %s is in a wrong format. '
+                'It should be either \'pid_<32 chars>\' or \'uid_<32 chars>\'.'
+                % (item.id, item.author_id))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -5296,7 +5296,8 @@ class DeletedUserModelValidator(base_model_validators.BaseUserModelValidator):
             item: DeletedUserModel. Pending deletion request model to validate.
         """
 
-        if not wipeout_service.verify_user_deleted(item.id):
+        if not wipeout_service.verify_user_deleted(
+                item.id, skip_delete_after_verification_models=False):
             cls._add_error(
                 'user properly deleted',
                 'Entity id %s: The deletion verification fails' % (item.id))

@@ -195,22 +195,6 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             pending_deletion_request_model_old.created_on,
             pending_deletion_request_model_new.created_on)
 
-    def test_deletes_pending_deletion_request(self):
-        wipeout_service.save_pending_deletion_requests(
-            [wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id,
-                self.USER_1_EMAIL,
-                self.user_1_role,
-                ['exp1', 'exp2'],
-                ['col1']
-            )]
-        )
-
-        wipeout_service.delete_pending_deletion_request(self.user_1_id)
-
-        self.assertIsNone(
-            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-
 
 class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     """Provides testing of the pre-deletion part of wipeout service."""
@@ -529,6 +513,13 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             wipeout_domain.USER_VERIFICATION_NOT_DELETED
         )
 
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+
     def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
         self.assertEqual(
@@ -536,6 +527,12 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 self.pending_deletion_request),
             wipeout_domain.USER_VERIFICATION_SUCCESS
         )
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
     def test_run_user_deletion_completion_with_user_properly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
@@ -549,6 +546,13 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 self.pending_deletion_request),
             wipeout_domain.USER_VERIFICATION_FAILURE
         )
+
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
 
 class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
@@ -3831,8 +3835,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.profile_user_id)
 
         self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.profile_user_id))
-        self.assertIsNotNone(
             user_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(
@@ -3848,10 +3850,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
 
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.profile_user_id))
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(
                 self.profile_user_id)
@@ -3867,8 +3865,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
 
         self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.profile_user_id))
-        self.assertIsNotNone(
             user_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(
@@ -3880,8 +3876,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(
             user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id))
-        self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
             user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
@@ -3893,10 +3887,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
 
         self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.profile_user_id))
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
-        self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(
                 self.profile_user_id)
         )
@@ -3906,10 +3896,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id))
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
 
@@ -3925,12 +3911,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
 
         self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.profile_user_id))
-        self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
-        self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
             collection_models.CollectionModel.get_by_id(self.COLLECTION_1_ID))
@@ -3942,12 +3922,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
 
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.profile_user_id))
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
         self.assertIsNone(
@@ -3974,12 +3948,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
 
         self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.profile_user_id))
-        self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
-        self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
             collection_models.CollectionModel.get_by_id(self.COLLECTION_1_ID))
@@ -3995,12 +3963,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
 
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.profile_user_id))
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
         self.assertIsNone(
@@ -4025,10 +3987,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
 
         self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
-        self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
             collection_models.CollectionModel.get_by_id(self.COLLECTION_1_ID))
@@ -4038,10 +3996,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
         self.assertIsNone(
@@ -4074,10 +4028,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_2_id)
 
         self.assertIsNotNone(
-            user_models.UserSettingsModel.get_by_id(self.user_2_id))
-        self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_2_id))
-        self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_2_id))
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(self.user_2_id))
@@ -4089,10 +4039,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
 
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.user_2_id))
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_2_id))
         self.assertIsNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_2_id))
         self.assertIsNone(

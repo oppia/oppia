@@ -120,7 +120,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION)
 
     def test_apply_deletion_policy_for_registered_users_deletes_them(self):
         # Case for a full user.
@@ -2331,6 +2331,19 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.USER_1_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.NONEXISTENT_USER_ID))
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.PendingDeletionRequestModel
@@ -2357,7 +2370,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION)
 
     def test_create_raises_error_when_many_id_collisions_occur(self):
         # Swap dependent method get_by_id to simulate collision every time.
@@ -2408,10 +2421,10 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_LEARNER
         )
 
-    def test_get_deletion_policy_is_delete(self):
+    def test_get_deletion_policy_is_delete_after_verification(self):
         self.assertEqual(
             user_models.UserAuthDetailsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.

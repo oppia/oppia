@@ -123,18 +123,6 @@ def save_pending_deletion_requests(pending_deletion_requests):
         final_pending_deletion_request_models)
 
 
-def delete_pending_deletion_request(user_id):
-    """Delete PendingDeletionRequestModel entity in the datastore.
-
-    Args:
-        user_id: str. The unique ID of the user that
-            the PendingDeletionRequestModel belongs to.
-    """
-    pending_deletion_request_model = (
-        user_models.PendingDeletionRequestModel.get_by_id(user_id))
-    pending_deletion_request_model.delete()
-
-
 def pre_delete_user(user_id):
     """Prepare user for the full deletion.
         1. Mark all the activities that are private and solely owned by the user
@@ -288,7 +276,8 @@ def run_user_deletion_completion(pending_deletion_request):
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):
-        delete_pending_deletion_request(pending_deletion_request.user_id)
+        _delete_user_models_with_delete_after_verification_policy(
+            pending_deletion_request.user_id)
         user_models.DeletedUserModel(
             id=pending_deletion_request.user_id
         ).put()
@@ -299,6 +288,19 @@ def run_user_deletion_completion(pending_deletion_request):
         pending_deletion_request.deletion_complete = False
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_VERIFICATION_FAILURE
+
+
+def _delete_user_models_with_delete_after_verification_policy(user_id):
+    """Delete user models with deletion policy 'DELETE_AFTER_VERIFICATION'.
+
+    Args:
+        user_id: str. The unique ID of the user that is being deleted.
+    """
+    for model_class in models.Registry.get_storage_model_classes(
+            [models.NAMES.user]):
+        policy = model_class.get_deletion_policy()
+        if policy == base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION:
+            model_class.apply_deletion_policy(user_id)
 
 
 def delete_user(pending_deletion_request):
@@ -380,22 +382,32 @@ def delete_user(pending_deletion_request):
     _delete_models(user_id, user_role, models.NAMES.email)
 
 
-def verify_user_deleted(user_id):
+def verify_user_deleted(user_id, skip_delete_after_verification_models=True):
     """Verify that all the models for user specified in pending_deletion_request
     are deleted.
 
     Args:
         user_id: str. The ID of the user whose deletion should be verified.
+        skip_delete_after_verification_models: bool. Whether to skip models
+            that have deletion policy equal to 'DELETE_AFTER_VERIFICATION'.
 
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
+    policies_not_to_verify = [
+        base_models.DELETION_POLICY.KEEP,
+        base_models.DELETION_POLICY.NOT_APPLICABLE
+    ]
+    if skip_delete_after_verification_models:
+        policies_not_to_verify.append(
+            base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION)
+
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():
-        if (model_class.get_deletion_policy() not in
-                [base_models.DELETION_POLICY.KEEP,
-                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
-                model_class.has_reference_to_user_id(user_id)):
+        if (
+                model_class.get_deletion_policy() not in policies_not_to_verify
+                and model_class.has_reference_to_user_id(user_id)
+        ):
             logging.error(
                 '%s is not deleted for user with ID %s' % (
                     model_class.__name__, user_id))

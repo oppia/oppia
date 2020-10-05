@@ -41,7 +41,7 @@ VERSION_DELIMITER = '-'
 DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'KEEP',
     'DELETE',
-    'ANONYMIZE',
+    'DELETE_AFTER_VERIFICATION',
     'LOCALLY_PSEUDONYMIZE',
     'KEEP_IF_PUBLIC',
     'NOT_APPLICABLE'
