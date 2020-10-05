@@ -22,7 +22,9 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Translation tab active mode service', () => {
-  var translationTabActiveModeService = null;
+  let translationTabActiveModeService = null;
+  beforeEach(angular.mock.module('oppia'));
+
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {

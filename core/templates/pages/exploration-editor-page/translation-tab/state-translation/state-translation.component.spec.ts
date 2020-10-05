@@ -75,6 +75,10 @@ import { RatioObjectFactory } from
   'domain/objects/RatioObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 
 describe('State translation component', function() {
@@ -367,6 +371,9 @@ describe('State translation component', function() {
 
   var refreshStateTranslationEmitter = new EventEmitter();
   var showTranslationTabBusyModalEmitter = new EventEmitter();
+  beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));

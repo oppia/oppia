@@ -56,6 +56,11 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
@@ -71,6 +76,9 @@ require(
   'state-written-translations.service.ts');
 
 describe('Translation status service', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {
       getAllVoiceoverLanguageCodes: function() {
