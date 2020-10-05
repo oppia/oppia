@@ -1,4 +1,10 @@
-# [Oppia](https://www.oppia.org) [![CircleCI](https://circleci.com/gh/oppia/oppia/tree/develop.svg?style=svg)](https://circleci.com/gh/oppia/oppia/tree/develop) [![Build Status](https://travis-ci.com/oppia/oppia.svg?branch=develop)](https://travis-ci.com/github/oppia/oppia) [![codecov](https://codecov.io/gh/oppia/oppia/branch/develop/graph/badge.svg)](https://codecov.io/gh/oppia/oppia) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# [Oppia](https://www.oppia.org) 
+[![CircleCI](https://circleci.com/gh/oppia/oppia/tree/develop.svg?style=svg)](https://circleci.com/gh/oppia/oppia/tree/develop) [![Build Status](https://travis-ci.com/oppia/oppia.svg?branch=develop)](https://travis-ci.com/github/oppia/oppia) [![codecov](https://codecov.io/gh/oppia/oppia/branch/develop/graph/badge.svg)](https://codecov.io/gh/oppia/oppia) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://img.shields.io/badge/chat-on%20gitter-ff006f.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![GitHub issues by-label](https://img.shields.io/github/issues/oppia/oppia/good%20first%20issue.svg)](https://github.com/oppia/oppia/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+
+![GitHub stars](https://img.shields.io/github/stars/oppia/oppia?style=social)
+![GitHub forks](https://img.shields.io/github/forks/oppia/oppia?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/oppia/oppia?style=social)
+[![Twitter Follow](https://img.shields.io/twitter/follow/oppiaorg.svg?style=social&label=Follow&maxAge=2592000?style=flat-square)](https://twitter.com/oppiaorg)
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing while getting feedback.
 
@@ -18,6 +24,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
   </a>
 </p>
 
+
 ## Installation
 
 Please refer to the [Installing Oppia page](https://github.com/oppia/oppia/wiki/Installing-Oppia) for full instructions.
@@ -26,7 +33,8 @@ Please refer to the [Installing Oppia page](https://github.com/oppia/oppia/wiki/
 
 The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.
 
-You can help with Oppia's development in many ways, including art, coding, design and documentation.
+You can help with Oppia's development in many ways, including [coding](https://github.com/oppia/oppia-android/wiki#instructions-for-making-a-code-change), [instructional design & storytelling](https://github.com/oppia/oppia/wiki/Teaching-with-Oppia), [UX research](https://github.com/oppia/oppia/wiki/Conducting-research-with-students), [creating voiceovers](https://github.com/oppia/oppia/wiki/Instructions-for-voice-artists), [design & art](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia%27s-design), and documentation.
+
   * **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
 
