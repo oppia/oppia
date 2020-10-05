@@ -76,6 +76,8 @@ old_get_distribution = pkg_resources.get_distribution # pylint: disable=invalid-
 
 # Disables "AppEnginePlatformWarning" because it is a "warning" that occurs
 # frequently and tends to bury other important logs.
+# It should be fine to ignore this, see https://stackoverflow.com/a/47494229
+# and https://github.com/urllib3/urllib3/issues/1138#issuecomment-290325277.
 import requests # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 requests.packages.urllib3.disable_warnings(
     requests.packages.urllib3.contrib.appengine.AppEnginePlatformWarning
