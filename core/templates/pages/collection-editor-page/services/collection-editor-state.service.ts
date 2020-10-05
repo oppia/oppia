@@ -26,6 +26,7 @@ require('services/alerts.service.ts');
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
+
 import { CollectionRights } from 'domain/collection/CollectionRightsObjectFactory';
 angular.module('oppia').factory('CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
