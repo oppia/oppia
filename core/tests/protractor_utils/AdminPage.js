@@ -251,7 +251,7 @@ var AdminPage = function() {
   this.updateRole = async function(name, newRole) {
     await waitFor.elementToBeClickable(
       adminRolesTab, 'Admin Roles tab is not clickable');
-    await action.click(adminRolesTab);
+    await action.click('Admin Roles Tab', adminRolesTab);
 
     // Change values for "update role" form, and submit it.
     await visibilityOf(
@@ -261,7 +261,7 @@ var AdminPage = function() {
       by.cssContainingText('option', newRole));
     await visibilityOf(roleOption, 'Admin role option is not visible');
     await action.click('Role Option', roleOption);
-    await action.click(updateFormSubmit);
+    await action.click('Update Form Submit', updateFormSubmit);
     await waitFor.visibilityOf(
       statusMessage, 'Confirmation message not visible');
     await waitFor.textToBePresentInElement(
