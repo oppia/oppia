@@ -2092,6 +2092,65 @@ class QuestionSummaryModelValidator(
         return [cls._validate_question_content]
 
 
+class SkillModelValidator(base_model_validators.BaseModelValidator):
+    """Class for validating SkillModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return skill_fetchers.get_skill_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
+                1, item.version + 1)]
+        superseding_skill_ids = []
+        if item.superseding_skill_id:
+            superseding_skill_ids = [item.superseding_skill_id]
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'skill_commit_log_entry_ids',
+                skill_models.SkillCommitLogEntryModel,
+                ['skill-%s-%s'
+                 % (item.id, version) for version in python_utils.RANGE(
+                     1, item.version + 1)]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'skill_summary_ids', skill_models.SkillSummaryModel, [item.id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'superseding_skill_ids', skill_models.SkillModel,
+                superseding_skill_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'snapshot_metadata_ids',
+                skill_models.SkillSnapshotMetadataModel, snapshot_model_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'snapshot_content_ids', skill_models.SkillSnapshotContentModel,
+                snapshot_model_ids)]
+
+    @classmethod
+    def _validate_all_questions_merged(cls, item):
+        """Validate that all_questions_merged is True only if
+        superseding_skill_id is not None and there are no
+        questions linked with the skill. The superseding skill
+        id check is already performed in domain object validation,
+        so it is not repeated here.
+        Args:
+            item: datastore_services.Model. SkillModel to validate.
+        """
+        questions_ids_linked_with_skill = (
+            question_models.QuestionSkillLinkModel
+            .get_all_question_ids_linked_to_skill_id(item.id))
+        if item.all_questions_merged and questions_ids_linked_with_skill:
+            cls._add_error(
+                'all questions merged check',
+                'Entity id %s: all_questions_merged is True but the '
+                'following question ids are still linked to the skill: %s' % (
+                    item.id, questions_ids_linked_with_skill))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_all_questions_merged]
+
+
 class SkillSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating SkillSnapshotMetadataModel."""
