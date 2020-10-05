@@ -70,6 +70,7 @@ describe('Collection update service', function() {
       }
     };
     _sampleCollection = Collection.create(
+      // TODO(#10875): Fix type mismatch
       sampleCollectionBackendObject as unknown as CollectionBackendDict);
   }));
 

@@ -206,6 +206,7 @@ describe('Learner dashboard page', function() {
       // Generate completed collections and collection playlist.
       for (let i = 0; i < 8; i++) {
         learnerDashboardData.completed_collections_list[i] = (
+          // TODO(#10875): Fix type mismatch
           Collection.create(
             Object.assign(collectionDict, {
               id: i + 1,
@@ -220,6 +221,7 @@ describe('Learner dashboard page', function() {
       // Generate incomplete collections.
       for (let i = 0; i < 8; i++) {
         learnerDashboardData.incomplete_collections_list[i] = (
+          // TODO(#10875): Fix type mismatch
           Collection.create(
             Object.assign(collectionDict, {
               // Create ids from 9 to 17.
@@ -749,7 +751,9 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
       // Get exploration with id 13.
+      // TODO(#10875): Fix type mismatch
       var activity = LearnerExplorationSummary.createFromBackendDict(
+        // TODO(#10875): Fix type mismatch
         {
           id: '100'
         } as unknown as LearnerExplorationSummaryBackendDict);
