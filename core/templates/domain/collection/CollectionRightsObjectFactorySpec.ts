@@ -16,7 +16,7 @@
  * @fileoverview Tests for CollectionRightsObjectFactory.
  */
 
-import { CollectionRightsObjectFactory, CollectionRights } from
+import { CollectionRights, CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
 
 describe('Collection rights object factory', () => {
