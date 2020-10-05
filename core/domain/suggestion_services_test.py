@@ -91,6 +91,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.NORMAL_USER_EMAIL)
         self.save_new_valid_exploration(
             self.target_id, self.author_id, category='Algebra')
+        self.explorations = [
+            SuggestionServicesUnitTests.MockExploration(
+                'exp1', {'state_1': {}, 'state_2': {}}),
+            SuggestionServicesUnitTests.MockExploration(
+                'exp2', {'state_1': {}, 'state_2': {}}),
+            SuggestionServicesUnitTests.MockExploration(
+                'exp3', {'state_1': {}, 'state_2': {}})
+        ]
 
     def assert_suggestion_status(self, suggestion_id, status):
         """Assert the status of the suggestion with suggestion_id."""
@@ -146,13 +154,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.id = exploration_id
             self.states = states
             self.category = 'Algebra'
-
-    # All mock explorations created for testing.
-    explorations = [
-        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
-        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
-        MockExploration('exp3', {'state_1': {}, 'state_2': {}})
-    ]
 
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
@@ -809,13 +810,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 state_name, content_id
             )
 
-    # All mock explorations created for testing.
-    explorations = [
-        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
-        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
-        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
-    ]
-
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
             if exp.id == exp_id:
@@ -884,6 +878,15 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.signup(self.REVIEWER_EMAIL_2, 'reviewer2')
         self.reviewer_id_2 = self.get_user_id_from_email(self.REVIEWER_EMAIL_2)
+
+        self.explorations = [
+            SuggestionGetServicesUnitTests.MockExploration(
+                'exp1', {'state_1': {}, 'state_2': {}}),
+            SuggestionGetServicesUnitTests.MockExploration(
+                'exp2', {'state_1': {}, 'state_2': {}}),
+            SuggestionGetServicesUnitTests.MockExploration(
+                'exp3', {'state_1': {}, 'state_2': {}})
+        ]
 
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1668,11 +1671,6 @@ class ReviewableSuggestionEmailInfoUnitTests(
             """Used to mock the get_content_html method for explorations."""
             return '<p>This is html to translate.</p>'
 
-    # A mock exploration created for testing.
-    explorations = [
-        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
-    ]
-
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
             if exp.id == exp_id:
@@ -1826,6 +1824,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
+        self.explorations = [
+            ReviewableSuggestionEmailInfoUnitTests.MockExploration(
+                'exp1', {'state_1': {}, 'state_2': {}})
+        ]
 
     def test_create_from_suggestion_returns_info_for_question_suggestion(self):
         question_suggestion = (
@@ -1883,7 +1885,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             Exception,
             'Expected suggestion type to be offered on the Contributor '
             'Dashboard for ReviewableSuggestionEmailInfo object creation, '
-            'recieved suggestion type: %s' % (
+            'received suggestion type: %s' % (
                 edit_state_content_suggestion.suggestion_type)):
             (
                 suggestion_services
@@ -1906,7 +1908,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         with self.assertRaisesRegexp(
             Exception,
             'Expected suggestion status to be in review for '
-            'ReviewableSuggestionEmailInfo object creation, recieved '
+            'ReviewableSuggestionEmailInfo object creation, received '
             'suggestion status: %s' % accepted_translation_suggestion.status):
             (
                 suggestion_services
@@ -1929,7 +1931,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         with self.assertRaisesRegexp(
             Exception,
             'Expected suggestion status to be in review for '
-            'ReviewableSuggestionEmailInfo object creation, recieved '
+            'ReviewableSuggestionEmailInfo object creation, received '
             'suggestion status: %s' % rejected_translation_suggestion.status):
             (
                 suggestion_services
@@ -1987,7 +1989,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             self):
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
-                '&nbsp;,&nbsp;&amp; &quot;&quot; &apos;'))
+                '&nbsp;,&nbsp;&amp; &quot;&quot; &#39;'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
@@ -2017,7 +2019,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [MATH]',
+                'translation with rte [Math]',
                 translation_suggestion.last_updated
             ))
 
@@ -2043,7 +2045,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [IMAGE]',
+                'translation with rte [Image]',
                 translation_suggestion.last_updated
             ))
 
@@ -2068,7 +2070,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [LINK]',
+                'translation with rte [Link]',
                 translation_suggestion.last_updated
             ))
 
@@ -2094,7 +2096,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [LINK]  [LINK]',
+                'translation with rte [Link]  [Link]',
                 translation_suggestion.last_updated
             ))
 
@@ -2120,7 +2122,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [LINK]  [MATH]',
+                'translation with rte [Link]  [Math]',
                 translation_suggestion.last_updated
             ))
 
@@ -2147,7 +2149,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [LINK]  [MATH]',
+                'translation with rte [Link]  [Math]',
                 translation_suggestion.last_updated
             ))
 
@@ -2173,7 +2175,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                '[LINK]',
+                '[Link]',
                 translation_suggestion.last_updated
             ))
 
@@ -2198,7 +2200,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [MATH]',
+                'question with rte [Math]',
                 question_suggestion.last_updated
             ))
 
@@ -2224,7 +2226,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [IMAGE]',
+                'question with rte [Image]',
                 question_suggestion.last_updated
             ))
 
@@ -2248,7 +2250,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [LINK]',
+                'question with rte [Link]',
                 question_suggestion.last_updated
             ))
 
@@ -2274,7 +2276,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [LINK]  [LINK]',
+                'question with rte [Link]  [Link]',
                 question_suggestion.last_updated
             ))
 
@@ -2300,7 +2302,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [LINK]  [MATH]',
+                'question with rte [Link]  [Math]',
                 question_suggestion.last_updated
             ))
 
@@ -2327,7 +2329,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [LINK]  [MATH]',
+                'question with rte [Link]  [Math]',
                 question_suggestion.last_updated
             ))
 
@@ -2353,7 +2355,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                '[LINK]',
+                '[Link]',
                 question_suggestion.last_updated
             ))
 
@@ -2395,11 +2397,6 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         def get_content_html(self, unused_state_name, unused_content_id):
             """Used to mock the get_content_html method for explorations."""
             return '<p>This is html to translate.</p>'
-
-    # A mock exploration created for testing.
-    explorations = [
-        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
-    ]
 
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
@@ -2557,6 +2554,12 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
         self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
+        self.explorations = [
+            (
+                GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests
+                .MockExploration('exp1', {'state_1': {}, 'state_2': {}})
+            )
+        ]
 
     def test_get_returns_empty_for_reviewers_who_authored_the_suggestions(self):
         user_services.allow_user_to_review_question(self.reviewer_1_id)

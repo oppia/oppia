@@ -43,6 +43,24 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 # The maximum number of suggestions to recommend to a reviewer to review.
 MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER = 5
 
+# A dictionary that maps the suggestion type to a lambda function, which is
+# used to retrieve the suggestion html content that is bolded on the
+# Contributor Dashboard pages. For example, for translation suggestions the
+# lambda function retrieves the html that contains the translation. Similarly,
+# for question suggestions the lambda function retrieves the html that contains
+# the question. From a UI perspective, the bolded content make it easier for
+# users to identify the different suggestion opportunities.
+RETRIEVE_HTML_BY_SUGGESTION_TYPE_DICT = {
+    # The translation html is always the first element in the list of
+    # translation suggestion html content strings.
+    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+        lambda html_content_strings: html_content_strings[0]),
+    # The question content html is always the last element in the list of
+    # question suggestion html content strings.
+    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+        lambda html_content_strings: html_content_strings[-1])
+}
+
 
 def create_suggestion(
         suggestion_type, target_type, target_id, target_version_at_submission,
@@ -624,25 +642,35 @@ def _get_plain_text_from_html_content_string(html_content_string):
     # Replace frequently used HTML character entities.
     html_content_string = re.sub('&nbsp;', ' ', html_content_string)
     html_content_string = re.sub('&quot;', '"', html_content_string)
-    html_content_string = re.sub('&apos;', '\'', html_content_string)
+    html_content_string = re.sub('&#39;', '\'', html_content_string)
     html_content_string = re.sub('&amp;', '&', html_content_string)
-    # Replace all html tags other than <oppia-noninteractive-**> ones to ''.
-    html_content_string = re.sub(
-        r'<(?!oppia-noninteractive\s*?)[^>]+>', '', html_content_string)
+
     def _replace_rte_tag(rte_tag):
-        """Replaces all of the <oppia-noninteractive-**> tags."""
+        """Replaces all of the <oppia-noninteractive-**> tags.
+
+        Args:
+            rte_tag: MatchObject. The oppia-noninteractive rte tag.
+    
+        Returns:
+            str: The string to replace the rte tag with.
+        """
         # Convert the MatchObject to a string.
         rte_tag_string = rte_tag.group(0)
         # Get the name of the noninteractive tag (ex. math).
         replace_string = rte_tag_string.split('-')[2].split(' ')[0]
         if replace_string[-1] == '>':
             replace_string = replace_string[:-1]
-        replace_string = replace_string.upper()
+        replace_string = replace_string.capitalize()
         replace_string = '%s%s%s' % (' [', replace_string, '] ')
         return replace_string
-    # Replace the rte tags by their name in square brackets.
+
+    # Replace all <oppia-noninteractive-**> tags with their names captialized
+    # in square brackets.
     html_content_string = re.sub(
-        '<([^>]+)>', _replace_rte_tag, html_content_string)
+        r'<(oppia-noninteractive\s*?)[^>]+>', _replace_rte_tag,
+        html_content_string)
+    # Get rid of all of the other html tags.
+    html_content_string = re.sub('<([^>]+)>', '', html_content_string)
     # Remove any leading or trailing whitespace.
     resulting_plain_text = html_content_string.strip()
     return resulting_plain_text
@@ -670,7 +698,7 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     if suggestion.status != suggestion_models.STATUS_IN_REVIEW:
         raise Exception(
             'Expected suggestion status to be in review for '
-            'ReviewableSuggestionEmailInfo object creation, recieved '
+            'ReviewableSuggestionEmailInfo object creation, received '
             'suggestion status: %s' % suggestion.status)
     if suggestion.suggestion_type != (
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT) and (
@@ -679,21 +707,15 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
         raise Exception(
             'Expected suggestion type to be offered on the Contributor '
             'Dashboard for ReviewableSuggestionEmailInfo object creation, '
-            'recieved suggestion type: %s' % suggestion.suggestion_type)
+            'received suggestion type: %s' % suggestion.suggestion_type)
     html_content_strings = suggestion.get_all_html_content_strings()
-    html_content_string = ''
-    if suggestion.suggestion_type == (
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-        # The translation html is always the first element in the list of
-        # translation suggestion html content strings.
-        html_content_string = html_content_strings[0]
-    elif suggestion.suggestion_type == (
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-        # The question content html is always the last element in the list of
-        # question suggestion html content strings.
-        html_content_string = html_content_strings[-1]
+    # Retrieve the html content that is bolded on the Contributor Dashboard
+    # pages. This content is what stands out for users when they view
+    # suggestions.
+    get_bolded_html_content = RETRIEVE_HTML_BY_SUGGESTION_TYPE_DICT[
+        suggestion.suggestion_type]
     plain_text_content = _get_plain_text_from_html_content_string(
-        html_content_string)
+        get_bolded_html_content(html_content_strings))
     return suggestion_registry.ReviewableSuggestionEmailInfo(
         suggestion.suggestion_type, suggestion.language_code,
         plain_text_content, suggestion.last_updated
@@ -794,12 +816,10 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         # Get the key information from each suggestion that will be used to
         # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-        for unused_index in python_utils.RANGE(
-                MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+        for _ in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
             if len(suggestions_waiting_longest_heap) == 0:
                 break
-            unused_key, suggestion = heapq.heappop(
-                suggestions_waiting_longest_heap)
+            _, suggestion = heapq.heappop(suggestions_waiting_longest_heap)
             reviewer_reviewable_suggestion_infos.append(
                 create_reviewable_suggestion_email_info_from_suggestion(
                     suggestion)
