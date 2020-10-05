@@ -4515,8 +4515,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for final author '
                 'check of GeneralFeedbackThreadModel\', [u\'Entity id %s: '
-                'Original author ID %s is in a wrong format '
-                'should be either pid_<32 chars> or uid_<32 chars>\']]'
+                'Original author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
             ) % (
                 self.model_instance.id, self.model_instance.original_author_id)
         ]
@@ -4530,8 +4530,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for final author '
                 'check of GeneralFeedbackThreadModel\', [u\'Entity id %s: '
-                'Last non-empty message author ID %s is in a wrong format '
-                'should be either pid_<32 chars> or uid_<32 chars>\']]'
+                'Last non-empty message author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
             ) % (
                 self.model_instance.id,
                 self.model_instance.last_nonempty_message_author_id
@@ -4664,8 +4664,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for final author '
                 'check of GeneralFeedbackMessageModel\', [u\'Entity id %s: '
-                'Author ID %s is in a wrong format '
-                'should be either pid_<32 chars> or uid_<32 chars>\']]'
+                'Author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
             ) % (
                 self.model_instance.id, self.model_instance.author_id)
         ]
@@ -9150,8 +9150,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
             (
                 '[u\'failed validation check for final reviewer check of '
                 'GeneralVoiceoverApplicationModel\', [u\'Entity id %s: '
-                'Final reviewer ID %s is in a wrong format should be either '
-                'pid_<32 chars> or uid_<32 chars>\']]'
+                'Final reviewer ID %s is in a wrong format. It should be '
+                'either pid_<32 chars> or uid_<32 chars>.\']]'
             ) % (self.model_instance.id, self.model_instance.final_reviewer_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9163,8 +9163,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
             (
                 '[u\'failed validation check for final author check of '
                 'GeneralVoiceoverApplicationModel\', [u\'Entity id %s: '
-                'Author ID %s is in a wrong format should be either '
-                'pid_<32 chars> or uid_<32 chars>\']]'
+                'Author ID %s is in a wrong format. It should be either '
+                'pid_<32 chars> or uid_<32 chars>.\']]'
             ) % (self.model_instance.id, self.model_instance.author_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -15364,7 +15364,9 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         wipeout_service.pre_delete_user(self.user_id)
-        wipeout_service.delete_user(
+        wipeout_service.run_user_deletion(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+        wipeout_service.run_user_deletion_completion(
             wipeout_service.get_pending_deletion_request(self.user_id))
 
         user_models.DeletedUserModel(id=self.user_id).put()

@@ -1529,7 +1529,7 @@ class GeneralFeedbackThreadModelValidator(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
                 'Entity id %s: Original author ID %s is in a wrong format. '
-                'It should be either \'pid_<32 chars>\' or \'uid_<32 chars>\'.'
+                'It should be either pid_<32 chars> or uid_<32 chars>.'
                 % (item.id, item.original_author_id))
 
     @classmethod
@@ -1548,8 +1548,8 @@ class GeneralFeedbackThreadModelValidator(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
                 'Entity id %s: Last non-empty message author ID %s is in a '
-                'wrong format should be either pid_<32 chars> or '
-                'uid_<32 chars>' % (
+                'wrong format. It should be either pid_<32 chars> or '
+                'uid_<32 chars>.' % (
                     item.id, item.last_nonempty_message_author_id))
 
     @classmethod
@@ -1608,7 +1608,7 @@ class GeneralFeedbackMessageModelValidator(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
                 'Entity id %s: Author ID %s is in a wrong format. '
-                'It should be either \'pid_<32 chars>\' or \'uid_<32 chars>\'.'
+                'It should be either pid_<32 chars> or uid_<32 chars>.'
                 % (item.id, item.author_id))
 
     @classmethod
@@ -2966,7 +2966,7 @@ class GeneralVoiceoverApplicationModelValidator(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
                 'Entity id %s: Final reviewer ID %s is in a wrong format. '
-                'It should be either \'pid_<32 chars>\' or \'uid_<32 chars>\'.'
+                'It should be either pid_<32 chars> or uid_<32 chars>.'
                 % (item.id, item.final_reviewer_id))
 
     @classmethod
@@ -2981,7 +2981,7 @@ class GeneralVoiceoverApplicationModelValidator(
                 'final %s' % (
                     base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
                 'Entity id %s: Author ID %s is in a wrong format. '
-                'It should be either \'pid_<32 chars>\' or \'uid_<32 chars>\'.'
+                'It should be either pid_<32 chars> or uid_<32 chars>.'
                 % (item.id, item.author_id))
 
     @classmethod
