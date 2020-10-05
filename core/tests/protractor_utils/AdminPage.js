@@ -254,7 +254,7 @@ var AdminPage = function() {
     await action.click('Admin Roles Tab', adminRolesTab);
 
     // Change values for "update role" form, and submit it.
-    await visibilityOf(
+    await waitFor.visibilityOf(
       updateFormName, 'Update Form Name is not visible');
     await action.sendKeys('Update Form Name', updateFormName, name);
     var roleOption = roleSelect.element(
@@ -270,7 +270,7 @@ var AdminPage = function() {
   };
 
   this.getUsersAsssignedToRole = async function(role) {
-    await visibilityOf(
+    await waitFor.visibilityOf(
       roleDropdown, 'View role dropdown taking too long to be visible');
     await action.sendKeys('Role Drop Down', roleDropdown, 'By Role');
 
@@ -281,7 +281,7 @@ var AdminPage = function() {
   };
 
   this.viewRolesbyUsername = async function(username) {
-    await visibilityOf(
+    await waitFor.visibilityOf(
       roleDropdown, 'View role dropdown taking too long to be visible');
     await action.sendKeys('Role Drop Down', roleDropdown, 'By Username');
 
