@@ -20,8 +20,6 @@
 // collection-editor-state.service.ts is upgraded to Angular 8.
 import { Collection } from
   'domain/collection/collection.model';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -107,7 +105,6 @@ describe('Collection editor state service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'CollectionRightsObjectFactory', new CollectionRightsObjectFactory());
   }));

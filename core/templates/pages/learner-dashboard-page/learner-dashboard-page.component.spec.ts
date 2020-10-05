@@ -23,6 +23,9 @@ import { LearnerExplorationSummary, LearnerExplorationSummaryBackendDict } from 
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { FeedbackThreadSummary } from
+  'domain/feedback_thread/feedback-thread-summary.model';
+
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
@@ -38,7 +41,6 @@ describe('Learner dashboard page', function() {
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
   var ExplorationObjectFactory = null;
-  var feedbackThreadSummaryObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
   var nonExistentActivitiesObjectFactory = null;
   var profileSummaryObjectFactory = null;
@@ -69,8 +71,6 @@ describe('Learner dashboard page', function() {
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
-      feedbackThreadSummaryObjectFactory = $injector.get(
-        'FeedbackThreadSummaryObjectFactory');
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
       nonExistentActivitiesObjectFactory = $injector.get(
@@ -263,7 +263,7 @@ describe('Learner dashboard page', function() {
           numberOfUnreadThreads: learnerDashboardData.number_of_unread_threads,
           threadSummaries: (
             learnerDashboardData.thread_summaries.map(
-              threadSummary => feedbackThreadSummaryObjectFactory
+              threadSummary => FeedbackThreadSummary
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             learnerDashboardData.completed_to_incomplete_collections),

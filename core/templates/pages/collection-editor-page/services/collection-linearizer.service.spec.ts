@@ -18,8 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-linearizer.service.ts is upgraded to Angular 8.
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
+import { Change } from 'domain/editor/undo_redo/change.model';
 import { CollectionNode, CollectionNodeBackendDict } from
   'domain/collection/collection-node.model';
 import { Collection } from
@@ -39,7 +38,7 @@ describe('Collection linearizer service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value('Change', Change);
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

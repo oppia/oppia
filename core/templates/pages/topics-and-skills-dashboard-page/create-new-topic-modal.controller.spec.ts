@@ -21,6 +21,9 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/newly-created-topic.model';
+
 describe('Create new topic modal', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -33,7 +36,6 @@ describe('Create new topic modal', function() {
 
   var $scope = null;
   var $uibModalInstance = null;
-  var NewlyCreatedTopicObjectFactory = null;
   var ImageLocalStorageService = null;
   var TopicEditorStateService = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -41,8 +43,6 @@ describe('Create new topic modal', function() {
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
-    NewlyCreatedTopicObjectFactory =
-        $injector.get('NewlyCreatedTopicObjectFactory');
     $scope = $rootScope.$new();
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
@@ -59,7 +59,7 @@ describe('Create new topic modal', function() {
 
 
   it('should check properties set after controller is initialized', function() {
-    var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
+    var newlyCreatedTopic = NewlyCreatedTopic.createDefault();
     expect($scope.newlyCreatedTopic).toEqual(newlyCreatedTopic);
     expect($scope.MAX_CHARS_IN_TOPIC_NAME).toEqual(39);
     expect($scope.MAX_CHARS_IN_TOPIC_DESCRIPTION).toEqual(240);
@@ -67,13 +67,13 @@ describe('Create new topic modal', function() {
   });
 
   it('should close modal with newlyCreatedTopic', function() {
-    var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
+    var newlyCreatedTopic = NewlyCreatedTopic.createDefault();
     $scope.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith(newlyCreatedTopic);
   });
 
   it('should return whether the topic is valid', function() {
-    var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
+    var newlyCreatedTopic = NewlyCreatedTopic.createDefault();
     expect($scope.isValid()).toEqual(false);
     newlyCreatedTopic.name = 'name';
     newlyCreatedTopic.urlFragment = 'url-fragment';
