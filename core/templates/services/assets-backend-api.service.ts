@@ -68,8 +68,7 @@ export class AssetsBackendApiService {
 
   async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
     if (this.isCached(filename)) {
-      return new AudioFile(
-        filename, this.assetsCache.get(filename));
+      return new AudioFile(filename, this.assetsCache.get(filename));
     }
     return this.fetchFile(
       AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
@@ -80,8 +79,7 @@ export class AssetsBackendApiService {
       entityType: string, entityId: string,
       filename: string): Promise<ImageFile> {
     if (this.isCached(filename)) {
-      return new ImageFile(
-        filename, this.assetsCache.get(filename));
+      return new ImageFile(filename, this.assetsCache.get(filename));
     }
     return this.fetchFile(
       entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
