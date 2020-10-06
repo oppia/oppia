@@ -28,6 +28,7 @@ var DeleteAccountPage = function() {
     by.css('.protractor-test-confirm-deletion-button'));
 
   this.get = async function() {
+    await waitFor.elementToBeClickable(deleteMyAccountButton);
     await browser.get(DELETE_ACCOUNT_PAGE_URL);
   };
 

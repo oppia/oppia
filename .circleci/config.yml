@@ -149,10 +149,6 @@ jobs:
           name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
-      - run:
-          name: Run e2e wipeout test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
       - check_release_changelog_update_branch
       - run:
           name: Run e2e admin page test
@@ -233,6 +229,10 @@ jobs:
           name: Run e2e profileFeatures test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+      - run:
+          name: Run e2e wipeout test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.

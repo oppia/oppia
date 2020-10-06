@@ -31,11 +31,13 @@ describe('When account is deleted it', function() {
   var deleteAccountPage = null;
   var explorationEditorPage = null;
   var explorationEditorSettingsTab = null;
+  var expectedConsoleErrors = null;
 
   beforeEach(function() {
     deleteAccountPage = new DeleteAccountPage.DeleteAccountPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    expectedConsoleErrors = [];
   });
 
   it('should request account deletion', async function() {
@@ -62,6 +64,8 @@ describe('When account is deleted it', function() {
     await users.login('voiceArtist@oppia.com');
     await general.openEditor(explorationId);
     await general.expect404Error();
+    expectedConsoleErrors = [
+      'Failed to load resource: the server responded with a status of 404'];
   });
 
   it('should set published exploration as community owned', async function() {
@@ -103,8 +107,7 @@ describe('When account is deleted it', function() {
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors(
-      ['Failed to load resource: the server responded with a status of 404']);
+    await general.checkForConsoleErrors(expectedConsoleErrors);
     await users.logout();
   });
 });
