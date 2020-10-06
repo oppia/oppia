@@ -159,9 +159,25 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
-      ' input.'
+      message: 'Rule 2 from answer group 1 will never be matched because ' +
+      'the \'HasNumberOfTermsEqualTo\' rule is preceded by a rule with a ' +
+      'matching input.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 3 from answer group 1 will never be matched because' +
+      ' it has differing number of terms than required.'
+    }]);
+
+    // The second rule will never get matched.
+    answerGroups[0].rules = [hasNumberOfTermsEqualTo, hasNumberOfTermsEqualTo];
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because ' +
+      'it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a ' +
+      'matching input.'
     }]);
 
     let equalsTwoTerms = rof.createFromBackendDict({
@@ -185,11 +201,11 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 1 will never be matched because' +
-      ' it has fewer number of terms than required.'
+      ' it has differing number of terms than required.'
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it has fewer number of terms than required.'
+      ' it has differing number of terms than required.'
     }]);
   });
 
@@ -200,7 +216,8 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('The number of terms should be a positive integer.')
+      message: (
+        'The number of terms should be a non-negative integer other than 1.')
     }]);
   });
 
@@ -211,7 +228,8 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('The number of terms should be a positive integer.')
+      message: (
+        'The number of terms should be a non-negative integer other than 1.')
     }]);
   });
 
@@ -222,7 +240,8 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('The number of terms should be a positive integer.')
+      message: (
+        'The number of terms should be a non-negative integer other than 1.')
     }]);
   });
 
