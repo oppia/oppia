@@ -124,8 +124,8 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
             issue.issueCustomizationArgs.state_names.value);
         }
       },
-      resolveIssue: function(issue) {
-        return PlaythroughIssuesBackendApiService.resolveIssue(
+      resolveIssueAsync: function(issue) {
+        return PlaythroughIssuesBackendApiService.resolveIssueAsync(
           issue, explorationId, explorationVersion);
       },
       openPlaythroughModal: function(playthroughId, index) {
