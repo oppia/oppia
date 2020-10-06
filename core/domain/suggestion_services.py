@@ -661,7 +661,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
         return replace_string
 
     # Replace all the opening <oppia-noninteractive-**> tags with their names
-    # captialized in square brackets. 
+    # captialized in square brackets.
     html_content_string_with_noninteractive_tag_replaced = re.sub(
         r'<(oppia-noninteractive\s*?)[^>]+>', _replace_rte_tag,
         html_content_string)
