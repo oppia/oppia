@@ -23,6 +23,7 @@ import datetime
 import itertools
 import re
 
+from constants import constants
 from core.domain import base_model_validators
 from core.domain import classifier_domain
 from core.domain import classifier_services
@@ -175,7 +176,8 @@ class ClassifierTrainingJobModelValidator(
         of exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. ClassifierTrainingJobModel to validate.
+            item: datastore_services.Model. ClassifierTrainingJobModel to
+                validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -200,7 +202,7 @@ class ClassifierTrainingJobModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -221,7 +223,8 @@ class ClassifierTrainingJobModelValidator(
         exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. ClassifierTrainingJobModel to validate.
+            item: datastore_services.Model. ClassifierTrainingJobModel to
+                validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -246,7 +249,7 @@ class ClassifierTrainingJobModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -294,7 +297,8 @@ class TrainingJobExplorationMappingModelValidator(
         of exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. TrainingJobExplorationMappingModel to validate.
+            item: datastore_services.Model. TrainingJobExplorationMappingModel
+                to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -319,7 +323,7 @@ class TrainingJobExplorationMappingModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -340,7 +344,8 @@ class TrainingJobExplorationMappingModelValidator(
         exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
+            item: datastore_services.Model. TrainingJobExplorationMappingbModel
+                to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -365,7 +370,7 @@ class TrainingJobExplorationMappingModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -509,7 +514,7 @@ class CollectionRightsModelValidator(base_model_validators.BaseModelValidator):
         time.
 
         Args:
-            item: ndb.Model. CollectionRightsModel to validate.
+            item: datastore_services.Model. CollectionRightsModel to validate.
         """
         if not item.first_published_msec:
             return
@@ -642,7 +647,7 @@ class CollectionSummaryModelValidator(
         from contributors summary.
 
         Args:
-            item: ndb.Model. CollectionSummaryModel to validate.
+            item: datastore_services.Model. CollectionSummaryModel to validate.
         """
         contributor_ids_from_contributors_summary = (
             list(item.contributors_summary.keys()))
@@ -663,7 +668,7 @@ class CollectionSummaryModelValidator(
         in CollectionModel.collection_contents.
 
         Args:
-            item: ndb.Model. CollectionSummaryModel to validate.
+            item: datastore_services.Model. CollectionSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -688,7 +693,7 @@ class CollectionSummaryModelValidator(
                     'collection_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field collection_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -706,7 +711,7 @@ class CollectionSummaryModelValidator(
         """Validate that ratings for the entity is empty.
 
         Args:
-            item: ndb.Model. CollectionSummaryModel to validate.
+            item: datastore_services.Model. CollectionSummaryModel to validate.
         """
         if item.ratings:
             cls._add_error(
@@ -848,7 +853,7 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
         """Validate that sent_datetime of model is less than current time.
 
         Args:
-            item: ndb.Model. SentEmailModel to validate.
+            item: datastore_services.Model. SentEmailModel to validate.
         """
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
@@ -865,7 +870,7 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
         by using the recipient_id.
 
         Args:
-            item: ndb.Model. SentEmailModel to validate.
+            item: datastore_services.Model. SentEmailModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -890,7 +895,7 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
                     'recipient_id %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field recipient_id having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -930,7 +935,7 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
         """Validate that sent_datetime of model is less than current time.
 
         Args:
-            item: ndb.Model. BulkEmailModel to validate.
+            item: datastore_services.Model. BulkEmailModel to validate.
         """
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
@@ -947,7 +952,7 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
         by using the sender_id.
 
         Args:
-            item: ndb.Model. BulkEmailModel to validate.
+            item: datastore_services.Model. BulkEmailModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -972,7 +977,7 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
                     'sender_id %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sender_id having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -1026,7 +1031,8 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
         REPLY_TO_ID_LENGTH.
 
         Args:
-            item: ndb.Model. GeneralFeedbackEmailReplyToIdModel to validate.
+            item: datastore_services.Model. GeneralFeedbackEmailReplyToIdModel
+                to validate.
         """
         # The reply_to_id of model is created using utils.get_random_int
         # method by using a upper bound as email_models.REPLY_TO_ID_LENGTH.
@@ -1177,7 +1183,7 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
         time.
 
         Args:
-            item: ndb.Model. ExplorationRightsModel to validate.
+            item: datastore_services.Model. ExplorationRightsModel to validate.
         """
         if not item.first_published_msec:
             return
@@ -1308,7 +1314,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
         from contributors summary.
 
         Args:
-            item: ndb.Model. ExpSummaryModel to validate.
+            item: datastore_services.Model. ExpSummaryModel to validate.
         """
         contributor_ids_from_contributors_summary = (
             list(item.contributors_summary.keys()))
@@ -1328,7 +1334,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
         time.
 
         Args:
-            item: ndb.Model. ExpSummaryModel to validate.
+            item: datastore_services.Model. ExpSummaryModel to validate.
         """
         if not item.first_published_msec:
             return
@@ -1348,7 +1354,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
         time when a last commit was made by a human contributor.
 
         Args:
-            item: ndb.Model. ExpSummaryModel to validate.
+            item: datastore_services.Model. ExpSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -1373,7 +1379,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -1476,7 +1482,8 @@ class GeneralFeedbackThreadModelValidator(
         """Validate the entity type is valid.
 
         Args:
-            item: ndb.Model. GeneralFeedbackThreadModel to validate.
+            item: datastore_services.Model. GeneralFeedbackThreadModel to
+                validate.
         """
         if item.entity_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
@@ -1490,7 +1497,8 @@ class GeneralFeedbackThreadModelValidator(
         with id same as thread id exists.
 
         Args:
-            item: ndb.Model. GeneralFeedbackThreadModel to validate.
+            item: datastore_services.Model. GeneralFeedbackThreadModel to
+                validate.
         """
         if not item.has_suggestion:
             suggestion_model = (
@@ -1538,7 +1546,8 @@ class GeneralFeedbackMessageModelValidator(
         feedback thread corresponding to the entity.
 
         Args:
-            item: ndb.Model. GeneralFeedbackMessageModel to validate.
+            item: datastore_services.Model. GeneralFeedbackMessageModel to
+                validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -1564,7 +1573,7 @@ class GeneralFeedbackMessageModelValidator(
                     'feedback_thread_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field feedback_thread_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -1659,7 +1668,8 @@ class UnsentFeedbackEmailModelValidator(
         values in thread_id of feedback_reference.
 
         Args:
-            item: ndb.Model. UnsentFeedbackEmailModel to validate.
+            item: datastore_services.Model. UnsentFeedbackEmailModel to
+                validate.
         """
         for reference in item.feedback_message_references:
             try:
@@ -1702,7 +1712,7 @@ class JobModelValidator(base_model_validators.BaseModelValidator):
         """Validate the time fields in entity.
 
         Args:
-            item: ndb.Model. JobModel to validate.
+            item: datastore_services.Model. JobModel to validate.
         """
         if item.time_started_msec and (
                 item.time_queued_msec > item.time_started_msec):
@@ -1734,7 +1744,7 @@ class JobModelValidator(base_model_validators.BaseModelValidator):
         or failed.
 
         Args:
-            item: ndb.Model. JobModel to validate.
+            item: datastore_services.Model. JobModel to validate.
         """
         if item.error and item.status_code not in [
                 job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
@@ -1756,7 +1766,7 @@ class JobModelValidator(base_model_validators.BaseModelValidator):
         completed.
 
         Args:
-            item: ndb.Model. JobModel to validate.
+            item: datastore_services.Model. JobModel to validate.
         """
         if item.output and item.status_code != job_models.STATUS_CODE_COMPLETED:
             cls._add_error(
@@ -1799,7 +1809,8 @@ class ContinuousComputationModelValidator(
         """Validate the time fields in entity.
 
         Args:
-            item: ndb.Model. ContinuousComputationModel to validate.
+            item: datastore_services.Model. ContinuousComputationModel to
+                validate.
         """
         if item.last_started_msec > item.last_finished_msec and (
                 item.last_started_msec > item.last_stopped_msec):
@@ -1869,7 +1880,7 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
         """Validate that inapplicable skill misconception ids are valid.
 
         Args:
-            item: ndb.Model. QuestionModel to validate.
+            item: datastore_services.Model. QuestionModel to validate.
         """
         inapplicable_skill_misconception_ids = (
             item.inapplicable_skill_misconception_ids)
@@ -2028,7 +2039,7 @@ class QuestionSummaryModelValidator(
         QuestionModel.question_state_data.content.html.
 
         Args:
-            item: ndb.Model. QuestionSummaryModel to validate.
+            item: datastore_services.Model. QuestionSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -2053,7 +2064,7 @@ class QuestionSummaryModelValidator(
                     'question_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field question_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2101,7 +2112,8 @@ class ExplorationRecommendationsModelValidator(
         """Validate that model id is not present in recommended exploration ids.
 
         Args:
-            item: ndb.Model. ExplorationRecommendationsModel to validate.
+            item: datastore_services.Model. ExplorationRecommendationsModel to
+                validate.
         """
         if item.id in item.recommended_exploration_ids:
             cls._add_error(
@@ -2134,7 +2146,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
         values between 0.0 and 1.0.
 
         Args:
-            item: ndb.Model. TopicSimilaritiesModel to validate.
+            item: datastore_services.Model. TopicSimilaritiesModel to validate.
         """
 
         topics = list(item.content.keys())
@@ -2204,7 +2216,7 @@ class SkillModelValidator(base_model_validators.BaseModelValidator):
         so it is not repeated here.
 
         Args:
-            item: ndb.Model. SkillModel to validate.
+            item: datastore_services.Model. SkillModel to validate.
         """
         questions_ids_linked_with_skill = (
             question_models.QuestionSkillLinkModel
@@ -2309,7 +2321,7 @@ class SkillSummaryModelValidator(
         number of misconceptions in SkillModel.misconceptions.
 
         Args:
-            item: ndb.Model. SkillSummaryModel to validate.
+            item: datastore_services.Model. SkillSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -2334,7 +2346,7 @@ class SkillSummaryModelValidator(
                     'skill_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2354,7 +2366,7 @@ class SkillSummaryModelValidator(
         number of misconceptions in SkillModel.skill_contents.worked_examples.
 
         Args:
-            item: ndb.Model. SkillSummaryModel to validate.
+            item: datastore_services.Model. SkillSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -2379,7 +2391,7 @@ class SkillSummaryModelValidator(
                     'skill_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2542,7 +2554,7 @@ class StorySummaryModelValidator(
         in StoryModel.story_contents.
 
         Args:
-            item: ndb.Model. StorySummaryModel to validate.
+            item: datastore_services.Model. StorySummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -2567,7 +2579,7 @@ class StorySummaryModelValidator(
                     'story_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -2649,7 +2661,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         """Validate the target type is valid.
 
         Args:
-            item: ndb.Model. GeneralSuggestionModel to validate.
+            item: datastore_services.Model. GeneralSuggestionModel to validate.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
@@ -2664,7 +2676,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         equal to the version of the target model.
 
         Args:
-            item: ndb.Model. GeneralSuggestionModel to validate.
+            item: datastore_services.Model. GeneralSuggestionModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -2698,7 +2710,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                         item.target_type,
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field %s_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, item.target_type,
                         model_id, model_class.__name__, model_id))
@@ -2718,7 +2730,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         under review.
 
         Args:
-            item: ndb.Model. GeneralSuggestionModel to validate.
+            item: datastore_services.Model. GeneralSuggestionModel to validate.
         """
         if item.final_reviewer_id is None and (
                 item.status != suggestion_models.STATUS_IN_REVIEW):
@@ -2743,7 +2755,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         exploration category.
 
         Args:
-            item: ndb.Model. GeneralSuggestionModel to validate.
+            item: datastore_services.Model. GeneralSuggestionModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -2783,8 +2795,8 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                             item.target_type,
                             base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s_ids having'
-                        ' value %s, expect model %s with id %s but it doesn\'t'
-                        ' exist' % (
+                        ' value %s, expected model %s with id %s but it '
+                        'doesn\'t exist' % (
                             item.id, item.target_type,
                             model_id, model_class.__name__, model_id))
                     continue
@@ -2875,6 +2887,186 @@ class CommunityContributionStatsModelValidator(
             .create_community_contribution_stats_from_model(item)
         )
 
+    @classmethod
+    def _validate_translation_reviewer_counts(cls, item):
+        """For each language code, validate that the translation reviewer
+        count matches the number of translation reviewers in the datastore.
+
+        Args:
+            item: datastore_services.Model. CommunityContributionStatsModel to
+                validate.
+        """
+        supported_language_codes = [
+            language_code['id'] for language_code in
+            constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        all_user_contribution_rights_models = (
+            user_models.UserContributionRightsModel.get_all()
+        )
+        for language_code in supported_language_codes:
+            expected_translation_reviewer_count = (
+                all_user_contribution_rights_models.filter(
+                    (
+                        user_models.UserContributionRightsModel
+                        .can_review_translation_for_language_codes
+                    ) == language_code)
+                .count()
+            )
+            if language_code in item.translation_reviewer_counts_by_lang_code:
+                model_translation_reviewer_count = (
+                    item.translation_reviewer_counts_by_lang_code[
+                        language_code]
+                )
+                if model_translation_reviewer_count != (
+                        expected_translation_reviewer_count):
+                    cls._add_error(
+                        'translation reviewer %s' % (
+                            base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                        'Entity id %s: Translation reviewer count for language'
+                        ' code %s: %s does not match the expected translation '
+                        'reviewer count for language code %s: %s' % (
+                            item.id, language_code,
+                            model_translation_reviewer_count, language_code,
+                            expected_translation_reviewer_count)
+                        )
+            elif expected_translation_reviewer_count != 0:
+                cls._add_error(
+                    'translation reviewer count %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: The translation reviewer count for '
+                    'language code %s is %s, expected model '
+                    'CommunityContributionStatsModel to have the language code '
+                    '%s in its translation reviewer counts but it doesn\'t '
+                    'exist.' % (
+                        item.id, language_code,
+                        expected_translation_reviewer_count, language_code)
+                )
+
+    @classmethod
+    def _validate_translation_suggestion_counts(cls, item):
+        """For each language code, validate that the translation suggestion
+        count matches the number of translation suggestions in the datastore
+        that are currently in review.
+
+        Args:
+            item: datastore_services.Model. CommunityContributionStatsModel to
+                validate.
+        """
+        supported_language_codes = [
+            language_code['id'] for language_code in
+            constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        all_translation_suggestion_models_in_review = (
+            suggestion_models.GeneralSuggestionModel.get_all()
+            .filter(suggestion_models.GeneralSuggestionModel.status == (
+                suggestion_models.STATUS_IN_REVIEW))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT))
+        )
+        for language_code in supported_language_codes:
+            expected_translation_suggestion_count = (
+                all_translation_suggestion_models_in_review.filter(
+                    suggestion_models.GeneralSuggestionModel.language_code == (
+                        language_code))
+                .count()
+            )
+            if language_code in item.translation_suggestion_counts_by_lang_code:
+                model_translation_suggestion_count = (
+                    item.translation_suggestion_counts_by_lang_code[
+                        language_code]
+                )
+                if model_translation_suggestion_count != (
+                        expected_translation_suggestion_count):
+                    cls._add_error(
+                        'translation suggestion %s' % (
+                            base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                        'Entity id %s: Translation suggestion count for '
+                        'language code %s: %s does not match the expected '
+                        'translation suggestion count for language code %s: '
+                        '%s' % (
+                            item.id, language_code,
+                            model_translation_suggestion_count, language_code,
+                            expected_translation_suggestion_count)
+                        )
+            elif expected_translation_suggestion_count != 0:
+                cls._add_error(
+                    'translation suggestion count %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: The translation suggestion count for '
+                    'language code %s is %s, expected model '
+                    'CommunityContributionStatsModel to have the language code '
+                    '%s in its translation suggestion counts but it doesn\'t '
+                    'exist.' % (
+                        item.id, language_code,
+                        expected_translation_suggestion_count, language_code)
+                )
+
+    @classmethod
+    def _validate_question_reviewer_count(cls, item):
+        """Validate that the question reviewer count matches the number of
+        question reviewers in the datastore.
+
+        Args:
+            item: datastore_services.Model. CommunityContributionStatsModel to
+                validate.
+        """
+        expected_question_reviewer_count = (
+            user_models.UserContributionRightsModel.query(
+                ( # pylint: disable=singleton-comparison
+                    user_models.UserContributionRightsModel
+                    .can_review_questions
+                ) == True)
+            .count()
+        )
+        if item.question_reviewer_count != expected_question_reviewer_count:
+            cls._add_error(
+                'question reviewer %s' % (
+                    base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                'Entity id %s: Question reviewer count: %s does not '
+                'match the expected question reviewer count: %s.' % (
+                    item.id, item.question_reviewer_count,
+                    expected_question_reviewer_count)
+            )
+
+    @classmethod
+    def _validate_question_suggestion_count(cls, item):
+        """Validate that the question suggestion count matches the number of
+        question suggestions in the datastore that are currently in review.
+
+        Args:
+            item: datastore_services.Model. CommunityContributionStatsModel to
+                validate.
+        """
+        expected_question_suggestion_count = (
+            suggestion_models.GeneralSuggestionModel.get_all()
+            .filter(
+                suggestion_models.GeneralSuggestionModel.status == (
+                    suggestion_models.STATUS_IN_REVIEW))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION))
+            .count()
+        )
+        if item.question_suggestion_count != expected_question_suggestion_count:
+            cls._add_error(
+                'question suggestion %s' % (
+                    base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                'Entity id %s: Question suggestion count: %s does not '
+                'match the expected question suggestion count: %s.' % (
+                    item.id, item.question_suggestion_count,
+                    expected_question_suggestion_count)
+            )
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_translation_reviewer_counts,
+            cls._validate_translation_suggestion_counts,
+            cls._validate_question_reviewer_count,
+            cls._validate_question_suggestion_count
+        ]
+
 
 class TopicModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating TopicModel."""
@@ -2944,7 +3136,7 @@ class TopicModelValidator(base_model_validators.BaseModelValidator):
         """Validate that canonical name of the model unique.
 
         Args:
-            item: ndb.Model. TopicModel to validate.
+            item: datastore_services.Model. TopicModel to validate.
         """
         topic_models_list = topic_models.TopicModel.query().filter(
             topic_models.TopicModel.canonical_name == (
@@ -2966,7 +3158,7 @@ class TopicModelValidator(base_model_validators.BaseModelValidator):
         model in lowercase.
 
         Args:
-            item: ndb.Model. TopicModel to validate.
+            item: datastore_services.Model. TopicModel to validate.
         """
         name = item.name
         if name.lower() != item.canonical_name:
@@ -2982,7 +3174,7 @@ class TopicModelValidator(base_model_validators.BaseModelValidator):
         any subtopic of the model.
 
         Args:
-            item: ndb.Model. TopicModel to validate.
+            item: datastore_services.Model. TopicModel to validate.
         """
         for skill_id in item.uncategorized_skill_ids:
             for subtopic in item.subtopics:
@@ -3159,7 +3351,7 @@ class TopicSummaryModelValidator(
         number of story ids in TopicModel.canonical_story_ids.
 
         Args:
-            item: ndb.Model. TopicSummaryModel to validate.
+            item: datastore_services.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3184,7 +3376,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3209,7 +3401,7 @@ class TopicSummaryModelValidator(
         number of story ids in TopicModel.additional_story_ids.
 
         Args:
-            item: ndb.Model. TopicSummaryModel to validate.
+            item: datastore_services.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3234,7 +3426,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3261,7 +3453,7 @@ class TopicSummaryModelValidator(
         number of skill ids in TopicModel.uncategorized_skill_ids.
 
         Args:
-            item: ndb.Model. TopicSummaryModel to validate.
+            item: datastore_services.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3286,7 +3478,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3309,7 +3501,7 @@ class TopicSummaryModelValidator(
         ids in subtopics of TopicModel.
 
         Args:
-            item: ndb.Model. TopicSummaryModel to validate.
+            item: datastore_services.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3334,7 +3526,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3361,7 +3553,7 @@ class TopicSummaryModelValidator(
         number of subtopics in TopicModel.
 
         Args:
-            item: ndb.Model. TopicSummaryModel to validate.
+            item: datastore_services.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3386,7 +3578,7 @@ class TopicSummaryModelValidator(
                     'topic_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3563,7 +3755,7 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
         less than the current time when the job is run.
 
         Args:
-            item: ndb.Model. UserSettingsModel to validate.
+            item: datastore_services.Model. UserSettingsModel to validate.
         """
         time_fields = {
             'last agreed to terms': item.last_agreed_to_terms,
@@ -3712,7 +3904,8 @@ class ExpUserLastPlaythroughModelValidator(
         incomplete.
 
         Args:
-            item: ndb.Model. ExpUserLastPlaythroughModel to validate.
+            item: datastore_services.Model. ExpUserLastPlaythroughModel to
+                validate.
         """
         if item.exploration_id not in (
                 learner_progress_services.get_all_incomplete_exp_ids(
@@ -3730,7 +3923,8 @@ class ExpUserLastPlaythroughModelValidator(
         for version of the exploration.
 
         Args:
-            item: ndb.Model. ExpUserLastPlaythroughModel to validate.
+            item: datastore_services.Model. ExpUserLastPlaythroughModel to
+                validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3755,7 +3949,7 @@ class ExpUserLastPlaythroughModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3774,7 +3968,8 @@ class ExpUserLastPlaythroughModelValidator(
         corresponding to the entity.
 
         Args:
-            item: ndb.Model. ExpUserLastPlaythroughModel to validate.
+            item: datastore_services.Model. ExpUserLastPlaythroughModel to
+                validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3799,7 +3994,7 @@ class ExpUserLastPlaythroughModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -3945,7 +4140,7 @@ class UserSubscriptionsModelValidator(
         when job was run.
 
         Args:
-            item: ndb.Model. UserSubscriptionsModel to validate.
+            item: datastore_services.Model. UserSubscriptionsModel to validate.
         """
         current_time = datetime.datetime.utcnow()
         if item.last_checked is not None and item.last_checked > current_time:
@@ -3962,7 +4157,7 @@ class UserSubscriptionsModelValidator(
         subscriber ids of the creators the user has subscribed to.
 
         Args:
-            item: ndb.Model. UserSubscriptionsModel to validate.
+            item: datastore_services.Model. UserSubscriptionsModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -3987,7 +4182,7 @@ class UserSubscriptionsModelValidator(
                     'subscriber_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field subscriber_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4030,7 +4225,7 @@ class UserSubscribersModelValidator(
         subscribers of user.
 
         Args:
-            item: ndb.Model. UserSubscribersModel to validate.
+            item: datastore_services.Model. UserSubscribersModel to validate.
         """
         if item.id in item.subscriber_ids:
             cls._add_error(
@@ -4046,7 +4241,7 @@ class UserSubscribersModelValidator(
         subscribed.
 
         Args:
-            item: ndb.Model. UserSubscribersModel to validate.
+            item: datastore_services.Model. UserSubscribersModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -4071,7 +4266,7 @@ class UserSubscribersModelValidator(
                     'subscription_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field subscription_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4108,7 +4303,8 @@ class UserRecentChangesBatchModelValidator(
         when job was run.
 
         Args:
-            item: ndb.Model. UserRecentChangesBatchModel to validate.
+            item: datastore_services.Model. UserRecentChangesBatchModel to
+                validate.
         """
         current_msec = utils.get_current_time_in_millisecs()
         if item.job_queued_msec > current_msec:
@@ -4137,7 +4333,7 @@ class UserStatsModelValidator(base_model_validators.BaseUserModelValidator):
         """Validates that schema version is less than current version.
 
         Args:
-            item: ndb.Model. UserStatsModel to validate.
+            item: datastore_services.Model. UserStatsModel to validate.
         """
         if item.schema_version > feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
             cls._add_error(
@@ -4156,7 +4352,7 @@ class UserStatsModelValidator(base_model_validators.BaseUserModelValidator):
         integers.
 
         Args:
-            item: ndb.Model. UserStatsModel to validate.
+            item: datastore_services.Model. UserStatsModel to validate.
         """
         current_time_str = datetime.datetime.utcnow().strftime(
             feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
@@ -4209,7 +4405,8 @@ class ExplorationUserDataModelValidator(
         the schema of ExplorationChange domain object.
 
         Args:
-            item: ndb.Model. ExplorationUserDataModel to validate.
+            item: datastore_services.Model. ExplorationUserDataModel to
+                validate.
         """
         if item.draft_change_list is None:
             return
@@ -4227,7 +4424,8 @@ class ExplorationUserDataModelValidator(
         """Validates that rating is in the interval [1, 5].
 
         Args:
-            item: ndb.Model. ExplorationUserDataModel to validate.
+            item: datastore_services.Model. ExplorationUserDataModel to
+                validate.
         """
         if item.rating is not None and (item.rating < 1 or item.rating > 5):
             cls._add_error(
@@ -4241,7 +4439,8 @@ class ExplorationUserDataModelValidator(
         was run.
 
         Args:
-            item: ndb.Model. ExplorationUserDataModel to validate.
+            item: datastore_services.Model. ExplorationUserDataModel to
+                validate.
         """
         if item.rating is not None and not item.rated_on:
             cls._add_error(
@@ -4261,7 +4460,8 @@ class ExplorationUserDataModelValidator(
         the time when job was run.
 
         Args:
-            item: ndb.Model. ExplorationUserDataModel to validate.
+            item: datastore_services.Model. ExplorationUserDataModel to
+                validate.
         """
         if item.draft_change_list and not item.draft_change_list_last_updated:
             cls._add_error(
@@ -4287,7 +4487,8 @@ class ExplorationUserDataModelValidator(
         of the exploration corresponding to the model.
 
         Args:
-            item: ndb.Model. ExplorationUserDataModel to validate.
+            item: datastore_services.Model. ExplorationUserDataModel to
+                validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -4312,7 +4513,7 @@ class ExplorationUserDataModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4371,7 +4572,7 @@ class CollectionProgressModelValidator(
         for the user.
 
         Args:
-            item: ndb.Model. CollectionProgressModel to validate.
+            item: datastore_services.Model. CollectionProgressModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -4400,7 +4601,7 @@ class CollectionProgressModelValidator(
                     'completed_activities_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field completed_activities_ids '
-                    'having value %s, expect model %s with id %s but it '
+                    'having value %s, expected model %s with id %s but it '
                     'doesn\'t exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4427,7 +4628,7 @@ class CollectionProgressModelValidator(
                     'collection_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field collection_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4477,7 +4678,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
         """Validates that story is public.
 
         Args:
-            item: ndb.Model. StoryProgressModel to validate.
+            item: datastore_services.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -4502,7 +4703,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
                     'story_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4528,7 +4729,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
         """Validates that completed nodes belong to the story.
 
         Args:
-            item: ndb.Model. StoryProgressModel to validate.
+            item: datastore_services.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -4555,7 +4756,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
                     'story_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4651,7 +4852,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
         of the recipients.
 
         Args:
-            item: ndb.Model. UserQueryModel to validate.
+            item: datastore_services.Model. UserQueryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -4676,7 +4877,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
                     'sent_email_model_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sent_email_model_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4742,7 +4943,7 @@ class UserBulkEmailsModelValidator(
         for bulk email model.
 
         Args:
-            item: ndb.Model. UserBulkEmailsModel to validate.
+            item: datastore_services.Model. UserBulkEmailsModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -4767,7 +4968,7 @@ class UserBulkEmailsModelValidator(
                     'sent_email_model_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sent_email_model_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -4804,7 +5005,7 @@ class UserSkillMasteryModelValidator(
         """Validates that skill mastery is in range [0.0, 1.0].
 
         Args:
-            item: ndb.Model. UserSkillMasteryModel to validate.
+            item: datastore_services.Model. UserSkillMasteryModel to validate.
         """
         if item.degree_of_mastery < 0 or item.degree_of_mastery > 1:
             cls._add_error(
@@ -4839,7 +5040,8 @@ class UserContributionProficiencyModelValidator(
         """Validates that score is non-negative.
 
         Args:
-            item: ndb.Model. UserContributionProficiencyModel to validate.
+            item: datastore_services.Model. UserContributionProficiencyModel to
+                validate.
         """
         if item.score < 0:
             cls._add_error(
@@ -5144,7 +5346,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
         the whitelist.
 
         Args:
-            item: ndb.Model. PlaythroughModel to validate.
+            item: datastore_services.Model. PlaythroughModel to validate.
         """
         whitelisted_exp_ids_for_playthroughs = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
@@ -5163,7 +5365,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
         """Validate the playthrough reference relations.
 
         Args:
-            item: ndb.Model. PlaythroughModel to validate.
+            item: datastore_services.Model. PlaythroughModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -5189,7 +5391,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
                     'exp_issues_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exp_issues_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -5251,7 +5453,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
         deadline.
 
         Args:
-            item: ndb.Model. PlaythroughModel to validate.
+            item: datastore_services.Model. PlaythroughModel to validate.
         """
         created_on_datetime = item.created_on
         if created_on_datetime < cls.PLAYTHROUGH_INTRODUCTION_DATETIME:
