@@ -25,11 +25,10 @@ import subprocess
 import sys
 import tempfile
 
+import constants
 from core.tests import test_utils
 import python_utils
-import release_constants
 from scripts import common
-from scripts.release_scripts import generate_release_info
 from scripts.release_scripts import update_changelog_and_credits
 
 import github  # isort:skip pylint: disable=wrong-import-position
@@ -91,8 +90,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         def mock_get_git_ref(unused_self, unused_ref):
             return github.GitRef.GitRef(
                 requester='', headers='', attributes={}, completed='')
-        def mock_main(unused_personal_access_token):
-            pass
         def mock_getpass(prompt):  # pylint: disable=unused-argument
             return 'test-token'
 
@@ -101,7 +98,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.branch_name_swap = self.swap(
             common, 'get_current_branch_name', mock_get_current_branch_name)
         self.release_summary_swap = self.swap(
-            release_constants, 'RELEASE_SUMMARY_FILEPATH',
+            constants.release_constants, 'RELEASE_SUMMARY_FILEPATH',
             MOCK_RELEASE_SUMMARY_FILEPATH)
         self.args_swap = self.swap(
             sys, 'argv', [
@@ -110,7 +107,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         self.get_git_ref_swap = self.swap(
             github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
-        self.main_swap = self.swap(generate_release_info, 'main', mock_main)
         self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
     def test_get_previous_release_version_without_hotfix(self):
@@ -119,7 +115,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
-                    release_constants.BRANCH_TYPE_RELEASE, '2.0.8'), '2.0.7')
+                    constants.release_constants.BRANCH_TYPE_RELEASE,
+                    '2.0.8'), '2.0.7')
 
     def test_get_previous_release_version_with_hotfix(self):
         def mock_check_output(unused_cmd_tokens):
@@ -127,7 +124,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
-                    release_constants.BRANCH_TYPE_HOTFIX, '2.0.8'), '2.0.7')
+                    constants.release_constants.BRANCH_TYPE_HOTFIX,
+                    '2.0.8'), '2.0.7')
 
     def test_get_previous_release_version_with_invalid_branch_type(self):
         def mock_check_output(unused_cmd_tokens):
@@ -316,7 +314,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     def test_invalid_ordering_of_sections_in_release_summary(self):
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         invalid_ordering = {
-            release_constants.NEW_AUTHORS_HEADER: '### section2: \n'
+            constants.release_constants.NEW_AUTHORS_HEADER: '### section2: \n'
         }
         ordering_swap = self.swap(
             update_changelog_and_credits, 'EXPECTED_ORDERING_DICT',
@@ -414,8 +412,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             common, 'check_prs_for_current_release_are_released',
             mock_check_prs_for_current_release_are_released)
         release_summary_swap = self.swap(
-            release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
-        with self.main_swap, self.branch_name_swap, release_summary_swap:
+            constants.release_constants, 'RELEASE_SUMMARY_FILEPATH',
+            'invalid.md')
+        with self.branch_name_swap, release_summary_swap:
             with self.args_swap, self.getpass_swap, blocking_bug_swap:
                 with get_org_swap, get_repo_swap, get_org_repo_swap:
                     with check_prs_swap, self.assertRaisesRegexp(
@@ -430,7 +429,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             wrong_lines = []
             for line in correct_lines:
                 line = line.replace(
-                    'gmail.com', release_constants.INVALID_EMAIL_SUFFIX)
+                    'gmail.com',
+                    constants.release_constants.INVALID_EMAIL_SUFFIX)
                 wrong_lines.append(line)
 
         check_function_calls = {
@@ -635,7 +635,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
-            with self.main_swap, self.getpass_swap, input_swap, check_prs_swap:
+            with self.getpass_swap, input_swap, check_prs_swap:
                 with remove_updates_swap, update_authors_swap, open_tab_swap:
                     with update_changelog_swap, update_contributors_swap:
                         with update_developer_names_swap, get_lines_swap:

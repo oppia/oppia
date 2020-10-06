@@ -478,7 +478,6 @@
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
 /redis.conf @seanlip
-/release_constants.py @nithusha21 @DubeySandeep
 /release_constants.json @nithusha21 @DubeySandeep
 
 
