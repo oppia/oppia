@@ -633,10 +633,10 @@ def regenerate_exp_commit_log_model(exp_model, version):
             '%s-%s' % (exp_model.id, version)))
 
     required_rights_model = exp_models.ExplorationRightsModel.get(
-            exp_model.id, strict=True, version=1)
+        exp_model.id, strict=True, version=1)
     for rights_version in python_utils.RANGE(2, version + 1):
         rights_model = exp_models.ExplorationRightsModel.get(
-            exp_model.id, strict=False, version=version)
+            exp_model.id, strict=False, version=rights_version)
         if rights_model is None:
             break
         if rights_model.created_on <= metadata_model.created_on:
@@ -677,7 +677,9 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
                 commit_log_model = regenerate_exp_commit_log_model(
                     item, version)
                 commit_log_model.put(update_last_updated_time=False)
-                yield ('Regenerated Exploration Commit Log Model', item.id)
+                yield (
+                    'Regenerated Exploration Commit Log Model: version %s' % (
+                        version), item.id)
 
     @staticmethod
     def reduce(key, values):

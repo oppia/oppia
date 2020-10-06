@@ -2649,24 +2649,16 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
 
 class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
 
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    QUESTION_ID = 'question_id'
-
     def setUp(self):
         super(RegenerateMissingExpCommitLogModelsTests, self).setUp()
 
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
+        self.user = user_services.UserActionsInfo(self.user_id)
         self.set_admins(['user'])
 
-        exp = exp_domain.Exploration.create_default_exploration(
-            '0',
-            title='title 0',
-            category='Art',
-        )
-        exp_services.save_new_exploration(self.user_id, exp)
+        self.save_new_valid_exploration(
+            '0', self.user_id, end_state_name='End')
 
     def test_standard_operation(self):
         job_id = (
@@ -2682,7 +2674,9 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
             .RegenerateMissingExpCommitLogModels.get_output(job_id))
         self.assertEqual(output, [])
 
-    def test_migration_job_regenerates_missing_commit_log_model(self):
+    def test_migration_job_regenerates_missing_model_with_only_one_rights_model(
+            self):
+        # Commit log v2 will be created.
         exp_services.update_exploration(
             self.user_id, '0', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -2733,15 +2727,141 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
             actual_commit_log_details, regenerated_commit_log_details)
         self.assertEqual(
             output, [
-                '[u\'Regenerated Exploration Commit Log Model\', [u\'0\']]'])
+                '[u\'Regenerated Exploration Commit Log Model: version 2\', '
+                '[u\'0\']]'])
+
+    def test_migration_job_regenerates_missing_model_when_rights_not_updated(
+            self):
+        # Commit log v2 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Updated title.')
+        # Rights updated.
+        rights_manager.publish_exploration(self.user, '0')
+        # Commit log v3 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Updated title.')
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-2'))
+        actual_commit_log_details = [
+            commit_log_model.user_id, commit_log_model.commit_type,
+            commit_log_model.commit_message, commit_log_model.commit_cmds,
+            commit_log_model.version, commit_log_model.post_commit_status,
+            commit_log_model.post_commit_community_owned,
+            commit_log_model.post_commit_is_private,
+            commit_log_model.exploration_id
+        ]
+
+        commit_log_model.delete()
+
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        regenerated_commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-2'))
+        regenerated_commit_log_details = [
+            regenerated_commit_log_model.user_id,
+            regenerated_commit_log_model.commit_type,
+            regenerated_commit_log_model.commit_message,
+            regenerated_commit_log_model.commit_cmds,
+            regenerated_commit_log_model.version,
+            regenerated_commit_log_model.post_commit_status,
+            regenerated_commit_log_model.post_commit_community_owned,
+            regenerated_commit_log_model.post_commit_is_private,
+            regenerated_commit_log_model.exploration_id
+        ]
+        self.assertFalse(regenerated_commit_log_model.deleted)
+        self.assertEqual(
+            actual_commit_log_details, regenerated_commit_log_details)
+        self.assertEqual(
+            output, [
+                '[u\'Regenerated Exploration Commit Log Model: version 2\', '
+                '[u\'0\']]'])
+
+    def test_migration_job_regenerates_missing_model_when_rights_are_updated(
+            self):
+        # Commit log v2 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Updated title.')
+        # Rights updated.
+        rights_manager.publish_exploration(self.user, '0')
+        # Commit log v3 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Updated title.')
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-3'))
+        actual_commit_log_details = [
+            commit_log_model.user_id, commit_log_model.commit_type,
+            commit_log_model.commit_message, commit_log_model.commit_cmds,
+            commit_log_model.version, commit_log_model.post_commit_status,
+            commit_log_model.post_commit_community_owned,
+            commit_log_model.post_commit_is_private,
+            commit_log_model.exploration_id
+        ]
+
+        commit_log_model.delete()
+
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        regenerated_commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-3'))
+        regenerated_commit_log_details = [
+            regenerated_commit_log_model.user_id,
+            regenerated_commit_log_model.commit_type,
+            regenerated_commit_log_model.commit_message,
+            regenerated_commit_log_model.commit_cmds,
+            regenerated_commit_log_model.version,
+            regenerated_commit_log_model.post_commit_status,
+            regenerated_commit_log_model.post_commit_community_owned,
+            regenerated_commit_log_model.post_commit_is_private,
+            regenerated_commit_log_model.exploration_id
+        ]
+        self.assertFalse(regenerated_commit_log_model.deleted)
+        self.assertEqual(
+            actual_commit_log_details, regenerated_commit_log_details)
+        self.assertEqual(
+            output, [
+                '[u\'Regenerated Exploration Commit Log Model: version 3\', '
+                '[u\'0\']]'])
 
 
 class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    QUESTION_ID = 'question_id'
 
     def setUp(self):
         super(ExpCommitLogModelRegenerationValidatorTests, self).setUp()
@@ -2771,7 +2891,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             .ExpCommitLogModelRegenerationValidator.get_output(job_id))
         self.assertEqual(output, [])
 
-    def test_migration_job_skips_check_for_deleted_commit_log_model(self):
+    def test_validation_job_skips_check_for_deleted_commit_log_model(self):
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-0-1'))
@@ -2790,7 +2910,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             .ExpCommitLogModelRegenerationValidator.get_output(job_id))
         self.assertEqual(output, [])
 
-    def test_migration_job_catches_mismatch_in_non_datetime_fields(self):
+    def test_validation_job_catches_mismatch_in_non_datetime_fields(self):
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-0-1'))
@@ -2815,7 +2935,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             '\'title 0\'."]]')]
         self.assertEqual(output, expected_output)
 
-    def test_migration_job_catches_mismatch_in_datetime_fields(self):
+    def test_validation_job_catches_mismatch_in_datetime_fields(self):
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-0-1'))
