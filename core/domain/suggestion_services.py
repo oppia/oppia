@@ -108,7 +108,7 @@ def create_suggestion(
         target_version_at_submission, status, author_id,
         None, change, score_category, thread_id, suggestion.language_code)
 
-    adjust_community_contribution_stats_due_to_suggestion(suggestion, 1)
+    _update_community_contribution_stats_due_to_suggestion(suggestion, 1)
 
     return get_suggestion_by_id(thread_id)
 
@@ -339,7 +339,7 @@ def accept_suggestion(
 
     # Suggestion is no longer in review and so we need to decrease the number
     # of such suggestions that are in review by 1.
-    adjust_community_contribution_stats_due_to_suggestion(suggestion, -1)
+    _update_community_contribution_stats_due_to_suggestion(suggestion, -1)
 
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
@@ -522,7 +522,7 @@ def resubmit_rejected_suggestion(
 
     # Suggestion is now in review and so we need to increase the number of such
     # suggestions that are in review by 1.
-    adjust_community_contribution_stats_due_to_suggestion(suggestion, 1)
+    _update_community_contribution_stats_due_to_suggestion(suggestion, 1)
 
     feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
@@ -911,9 +911,9 @@ def update_community_contribution_stats(community_contribution_stats):
     stats_model.put()
 
 
-def adjust_community_contribution_stats_due_to_suggestion(
-        suggestion, adjust_by):
-    """Adjusts the community contribution stats count associated with the given
+def _update_community_contribution_stats_due_to_suggestion(
+        suggestion, amount):
+    """Updates the community contribution stats count associated with the given
     suggestion by the given amount.
 
     Args:
@@ -921,7 +921,7 @@ def adjust_community_contribution_stats_due_to_suggestion(
             contribution stats count. Suggestion types that are offered on the
             Contributor dashboard are the only suggestion types that will be
             updated.
-        adjust_by: int. The amount to adjust the count by.
+        amount: int. The amount to adjust the count by.
     """
     # This method does nothing for suggestion types that are not offered on the
     # Contributor Dashboard.
@@ -932,14 +932,10 @@ def adjust_community_contribution_stats_due_to_suggestion(
         stats = get_community_contribution_stats()
         if suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-            if suggestion.language_code not in (
-                    stats.translation_suggestion_counts_by_lang_code):
-                stats.translation_suggestion_counts_by_lang_code[
-                    suggestion.language_code] = adjust_by
-            else:
-                stats.translation_suggestion_counts_by_lang_code[
-                    suggestion.language_code] += adjust_by
+            stats.adjust_translation_suggestion_count_for_language_code(
+                suggestion.language_code, amount
+            )
         elif suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-            stats.question_suggestion_count += adjust_by
+            stats.question_suggestion_count += amount
         update_community_contribution_stats(stats)

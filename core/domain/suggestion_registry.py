@@ -1201,27 +1201,40 @@ class CommunityContributionStats(python_utils.OBJECT):
                 'received: %s.' % (self.question_suggestion_count)
             )
 
-    def set_translation_reviewer_count_for_language_code(
-            self, language_code, count):
-        """Sets the translation reviewer count to be count, for the given
-        language code.
+    def adjust_translation_reviewer_count_for_language_code(
+            self, language_code, amount):
+        """Adjusts the translation reviewer count for the given language code
+        by the given amount.
 
         Args:
             language_code: str. The translation suggestion language code that
                 reviewers have the rights to review.
-            count: int. The number of reviewers that have the rights to review
-                translation suggestions in language_code.
+            amount: int. The amount to adjust the translation reviewer count by.
         """
-        self.translation_reviewer_counts_by_lang_code[language_code] = count
+        if language_code not in self.translation_reviewer_counts_by_lang_code:
+            self.translation_reviewer_counts_by_lang_code[language_code] = (
+                amount
+            )
+        else:
+            self.translation_reviewer_counts_by_lang_code[language_code] += (
+                amount
+            )
 
-    def set_translation_suggestion_count_for_language_code(
-            self, language_code, count):
-        """Sets the translation suggestion count to be count, for the language
-        code given.
+    def adjust_translation_suggestion_count_for_language_code(
+            self, language_code, amount):
+        """Adjusts the translation suggestion count for the given language code
+        by the given amount.
 
         Args:
             language_code: str. The translation suggestion language code.
-            count: int. The number of translation suggestions in language_code
-                that are currently in review.
+            amount: int. The amount to adjust the translation suggestion count
+                by.
         """
-        self.translation_suggestion_counts_by_lang_code[language_code] = count
+        if language_code not in self.translation_suggestion_counts_by_lang_code:
+            self.translation_suggestion_counts_by_lang_code[language_code] = (
+                amount
+            )
+        else:
+            self.translation_suggestion_counts_by_lang_code[language_code] += (
+                amount
+            )
