@@ -97,7 +97,7 @@ export class SkillCreationBackendApiService {
       });
   }
 
-  createSkill(
+  async createSkillAsync(
       description: string, rubrics: RubricBackendDict,
       explanation: string, linkedTopicIds: string[], imagesData: ImageData[]
   ): Promise<SkillCreationBackendResponse> {
