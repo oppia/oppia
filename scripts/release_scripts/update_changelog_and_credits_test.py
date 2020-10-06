@@ -324,6 +324,12 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.is_order_of_sections_valid(
                     release_summary_lines))
 
+    def test_valid_ordering_of_sections_in_release_summary(self):
+        release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
+        self.assertTrue(
+            update_changelog_and_credits.is_order_of_sections_valid(
+                release_summary_lines))
+
     def test_removal_of_updates_with_no_exception(self):
         def mock_delete(unused_self):
             pass
