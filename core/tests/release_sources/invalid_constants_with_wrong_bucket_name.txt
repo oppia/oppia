@@ -1,3 +1,0 @@
-  "DEV_MODE": true,
-  "GCS_RESOURCE_BUCKET_NAME": "Bucket-name",
-  "Testing": "Deploy-tests"

@@ -44,8 +44,8 @@ import json
 import re
 import subprocess
 
+import constants
 import python_utils
-import release_constants
 from scripts import common
 
 
@@ -214,7 +214,8 @@ def _get_release_branch_type_and_name(target_version):
         tuple(str, str). The type and name of release branch.
     """
     return (
-        release_constants.BRANCH_TYPE_RELEASE, 'release-%s' % target_version)
+        constants.release_constants.BRANCH_TYPE_RELEASE,
+        'release-%s' % target_version)
 
 
 def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
@@ -228,8 +229,8 @@ def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
         tuple(str, str). The type and name of hotfix branch.
     """
     return (
-        release_constants.BRANCH_TYPE_HOTFIX, 'release-%s-hotfix-%s' % (
-            target_version, hotfix_number))
+        constants.release_constants.BRANCH_TYPE_HOTFIX,
+        'release-%s-hotfix-%s' % (target_version, hotfix_number))
 
 
 def execute_branch_cut(target_version, hotfix_number):
@@ -258,7 +259,8 @@ def execute_branch_cut(target_version, hotfix_number):
     common.verify_current_branch_name('develop')
 
     # Update the local repo.
-    remote_alias = common.get_remote_alias(release_constants.REMOTE_URL)
+    remote_alias = common.get_remote_alias(
+        constants.release_constants.REMOTE_URL)
     subprocess.check_call(['git', 'pull', remote_alias, 'develop'])
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
@@ -278,13 +280,13 @@ def execute_branch_cut(target_version, hotfix_number):
         'Please confirm: are Travis checks passing on %s? (y/n) ' % (
             branch_to_check))
     answer = python_utils.INPUT().lower()
-    if answer not in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+    if answer not in common.AFFIRMATIVE_CONFIRMATIONS:
         raise Exception(
             'Tests should pass on %s before this script is run.' % (
                 branch_to_check))
 
     # Cut a new release or hotfix branch.
-    if new_branch_type == release_constants.BRANCH_TYPE_HOTFIX:
+    if new_branch_type == constants.release_constants.BRANCH_TYPE_HOTFIX:
         verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             remote_alias, target_version, hotfix_number)
         if hotfix_number == 1:
@@ -302,7 +304,7 @@ def execute_branch_cut(target_version, hotfix_number):
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
     # Push the new release branch to GitHub.
-    if new_branch_type == release_constants.BRANCH_TYPE_RELEASE:
+    if new_branch_type == constants.release_constants.BRANCH_TYPE_RELEASE:
         python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
         subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
     else:
