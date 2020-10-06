@@ -160,8 +160,8 @@ describe('Collection rights object factory', () => {
     var sampleCollectionRights = collectionRightsObjectFactory.create(
       noUnpublishCollectionRightsBackendObject);
 
-    var emptyCollectionRightsBackendObject =
-     CollectionRights.copyFromCollectionRights(sampleCollectionRights);
+    var emptyCollectionRightsBackendObject = (
+     CollectionRights.copyFromCollectionRights(sampleCollectionRights));
     expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
     expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
     expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
