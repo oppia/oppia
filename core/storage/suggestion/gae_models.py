@@ -369,15 +369,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
-            start_cursor = datastore_query.Cursor()
+            start_cursor = datastore_services.make_cursor()
 
-        results, cursor, more = cls.query(
-            cls.status == STATUS_IN_REVIEW).filter(
-                cls.suggestion_type == suggestion_type).filter(
-                    cls.author_id != user_id).order(cls.created_on).fetch_page(
-                        page_size, start_cursor=start_cursor)
+        results, cursor, more = (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == suggestion_type)
+            .filter(cls.author_id == user_id)
+            .order(cls.created_on, cls.key)
+            .fetch_page(page_size, start_cursor=start_cursor))
         return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
@@ -457,9 +460,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             type, which the given user has created.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
-            start_cursor = datastore_query.Cursor()
+            start_cursor = datastore_services.make_cursor()
 
         results, cursor, more = cls.query(
             cls.suggestion_type == suggestion_type).filter(

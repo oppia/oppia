@@ -381,6 +381,28 @@ describe('Contributions and review component', function() {
           })
         }));
 
+      spyOn(
+        contributionAndReviewService, 'getReviewableTranslationSuggestions')
+        .and.callFake(callback => callback({
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change: {
+                content_html: 'Translation',
+                translation_html: 'Tradução'
+              },
+              status: 'review'
+            },
+            details: {
+              topic_name: 'Topic 1',
+              story_title: 'Story title',
+              chapter_title: 'Chapter title'
+            }
+          }
+        }, false));
+
       $scope = $rootScope.$new();
       ctrl = $componentController('contributionsAndReview', {
         $scope: $scope,
@@ -412,27 +434,6 @@ describe('Contributions and review component', function() {
 
     it('should get translate contributions when switching to translation' +
       ' in review tab', function() {
-      spyOn(
-        contributionAndReviewService, 'getReviewableTranslationSuggestions')
-        .and.callFake(callback => callback({
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: {
-                content_html: 'Translation',
-                translation_html: 'Tradução'
-              },
-              status: 'review'
-            },
-            details: {
-              topic_name: 'Topic 1',
-              story_title: 'Story title',
-              chapter_title: 'Chapter title'
-            }
-          }
-        }, false));
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
       $scope.$apply();
 
