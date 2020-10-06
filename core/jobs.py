@@ -1146,7 +1146,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             self.realtime_layer and python_utils.UNICODE(self.realtime_layer))
         if realtime_layer_str is None or realtime_layer_str != self.id[0]:
             raise Exception(
-                'Realtime layer %r does not match realtime id %r' %
+                'Realtime layer %s does not match realtime id %s' %
                 (realtime_layer_str, self.id))
 
 
