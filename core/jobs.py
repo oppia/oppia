@@ -1142,12 +1142,11 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         super(
             BaseRealtimeDatastoreClassForContinuousComputations,
             self)._pre_put_hook()
-        realtime_layer_str = (
-            self.realtime_layer and python_utils.UNICODE(self.realtime_layer))
-        if realtime_layer_str is None or realtime_layer_str != self.id[0]:
+        if (self.realtime_layer is None or
+                python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
-                (realtime_layer_str, self.id))
+                (self.realtime_layer, self.id))
 
 
 class BaseContinuousComputationManager(python_utils.OBJECT):
