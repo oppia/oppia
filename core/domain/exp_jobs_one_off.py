@@ -631,15 +631,26 @@ def regenerate_exp_commit_log_model(exp_model, version):
     metadata_model = (
         exp_models.ExplorationSnapshotMetadataModel.get_by_id(
             '%s-%s' % (exp_model.id, version)))
-    rights_model = exp_models.ExplorationRightsModel.get(
-        exp_model.id, strict=True, version=version)
+
+    required_rights_model = exp_models.ExplorationRightsModel.get(
+            exp_model.id, strict=True, version=1)
+    for rights_version in python_utils.RANGE(2, version + 1):
+        rights_model = exp_models.ExplorationRightsModel.get(
+            exp_model.id, strict=False, version=version)
+        if rights_model is None:
+            break
+        if rights_model.created_on <= metadata_model.created_on:
+            required_rights_model = rights_model
+        else:
+            break
     commit_log_model = (
         exp_models.ExplorationCommitLogEntryModel.create(
             exp_model.id, version, metadata_model.committer_id,
             metadata_model.commit_type,
             metadata_model.commit_message,
             metadata_model.commit_cmds,
-            rights_model.status, rights_model.community_owned))
+            required_rights_model.status,
+            required_rights_model.community_owned))
     commit_log_model.exploration_id = exp_model.id
     commit_log_model.created_on = metadata_model.created_on
     commit_log_model.last_updated = metadata_model.last_updated

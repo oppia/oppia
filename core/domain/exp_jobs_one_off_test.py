@@ -2683,9 +2683,15 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
         self.assertEqual(output, [])
 
     def test_migration_job_regenerates_missing_commit_log_model(self):
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Updated title.')
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
+                'exploration-0-2'))
         actual_commit_log_details = [
             commit_log_model.user_id, commit_log_model.commit_type,
             commit_log_model.commit_message, commit_log_model.commit_cmds,
@@ -2710,7 +2716,7 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
             .RegenerateMissingExpCommitLogModels.get_output(job_id))
         regenerated_commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
+                'exploration-0-2'))
         regenerated_commit_log_details = [
             regenerated_commit_log_model.user_id,
             regenerated_commit_log_model.commit_type,
