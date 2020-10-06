@@ -93,7 +93,7 @@ angular.module('oppia').factory('SkillCreationService', [
           // fetched from the backend.
           var newTab = $window.open();
           var imagesData = ImageLocalStorageService.getStoredImagesData();
-          SkillCreationBackendApiService.createSkill(
+          SkillCreationBackendApiService.createSkillAsync(
             result.description, rubrics, result.explanation,
             topicIds || [], imagesData).then(function(response) {
             $timeout(function() {
