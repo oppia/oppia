@@ -489,7 +489,6 @@
 	"I18N_SIGNUP_UPDATE_WARNING": "请注意我们刚刚更新了我们的使用条款。",
 	"I18N_SIGNUP_USERNAME": "用户名",
 	"I18N_SIGNUP_USERNAME_EXPLANATION": "您的用户名将在您的贡献之后显示。",
-	"I18N_SIGNUP_WAIVER_OBJECTIVE": "放弃署名（BY）要求意味着如果有人复用此作品，其不需要注明作者。然而，您所有以个人名义对探险的贡献都将出现在此网站探险更改日志中，并且鼓励（但不要求）复用探险的人包含至此页面的链接。",
 	"I18N_SIGNUP_WHY_LICENSE": "为什么使用CC-BY-SA？",
 	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Oppia的课程，也称作探险，提供比静态视频或文字更身临其境的体验，帮助用户边做边学。",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia是一个自由、开源、拥有称作“探险”的完全交互式活动的学习平台。很抱歉，Oppia需要在您的浏览器中启用JavaScript才能正常工作，而您的浏览器禁用了JavaScript。如果您需要帮助启用JavaScript，请<a href=\"<[hrefUrl]>\">点此。</a>",
