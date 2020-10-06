@@ -1707,31 +1707,6 @@ class ReviewableSuggestionEmailInfoUnitTests(
             'test description'
         )
 
-    def _create_edit_state_content_suggestion(self):
-        """Creates an "edit state content" suggestion."""
-
-        edit_state_content_change_dict = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'Introduction',
-            'new_value': {
-                'content_id': 'content',
-                'html': 'new html content'
-            },
-            'old_value': {
-                'content_id': 'content',
-                'html': 'old html content'
-            }
-        }
-
-        return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            self.author_id, edit_state_content_change_dict,
-            'test description'
-        )
-
     def _assert_reviewable_suggestion_email_infos_are_equal(
             self, reviewable_suggestion_email_info,
             expected_reviewable_suggestion_email_info):
@@ -1809,69 +1784,6 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def test_create_from_suggestion_raises_for_suggestions_not_on_the_dashboard(
-            self):
-        edit_state_content_suggestion = (
-            self._create_edit_state_content_suggestion())
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected suggestion type to be offered on the Contributor '
-            'Dashboard for ReviewableSuggestionEmailInfo object creation, '
-            'received suggestion type: %s' % (
-                edit_state_content_suggestion.suggestion_type)):
-            (
-                suggestion_services
-                .create_reviewable_suggestion_email_info_from_suggestion(
-                    edit_state_content_suggestion)
-            )
-
-    def test_create_from_suggestion_raises_exception_for_accepted_suggestions(
-            self):
-        translation_suggestion = (
-            self._create_translation_suggestion_with_translation_html(
-                '<p>default translation content</p>'))
-        suggestion_services.accept_suggestion(
-            translation_suggestion.suggestion_id, self.reviewer_id,
-            self.COMMIT_MESSAGE, 'review message ')
-        accepted_translation_suggestion = (
-            suggestion_services.get_suggestion_by_id(
-                translation_suggestion.suggestion_id))
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected suggestion status to be in review for '
-            'ReviewableSuggestionEmailInfo object creation, received '
-            'suggestion status: %s' % accepted_translation_suggestion.status):
-            (
-                suggestion_services
-                .create_reviewable_suggestion_email_info_from_suggestion(
-                    accepted_translation_suggestion)
-            )
-
-    def test_create_from_suggestion_raises_exception_for_rejected_suggestions(
-            self):
-        translation_suggestion = (
-            self._create_translation_suggestion_with_translation_html(
-                '<p>default translation content</p>'))
-        suggestion_services.reject_suggestion(
-            translation_suggestion.suggestion_id, self.reviewer_id,
-            'review message ')
-        rejected_translation_suggestion = (
-            suggestion_services.get_suggestion_by_id(
-                translation_suggestion.suggestion_id))
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected suggestion status to be in review for '
-            'ReviewableSuggestionEmailInfo object creation, received '
-            'suggestion status: %s' % rejected_translation_suggestion.status):
-            (
-                suggestion_services
-                .create_reviewable_suggestion_email_info_from_suggestion(
-                    rejected_translation_suggestion)
-            )
-
     def test_create_from_suggestion_returns_info_for_empty_html(self):
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
@@ -1922,7 +1834,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             self):
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
-                '&nbsp;,&nbsp;&amp; &quot;&quot; &#39;'))
+                '&nbsp;,&nbsp;&amp; &quot;&quot;'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,

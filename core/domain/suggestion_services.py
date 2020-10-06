@@ -642,7 +642,6 @@ def _get_plain_text_from_html_content_string(html_content_string):
     # Replace frequently used HTML character entities.
     html_content_string = re.sub('&nbsp;', ' ', html_content_string)
     html_content_string = re.sub('&quot;', '"', html_content_string)
-    html_content_string = re.sub('&#39;', '\'', html_content_string)
     html_content_string = re.sub('&amp;', '&', html_content_string)
 
     def _replace_rte_tag(rte_tag):
@@ -679,35 +678,16 @@ def _get_plain_text_from_html_content_string(html_content_string):
 def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     """Creates an object with the key information needed to notify reviewers or
     admins that the given suggestion needs review.
-    Note: the suggestions must be suggestions that are available for review on
-    the Contributor Dashboard.
 
     Args:
         suggestion: Suggestion. The suggestion used to create the
-            ReviewableSuggestionEmailInfo object.
+            ReviewableSuggestionEmailInfo object. Note that the suggestion's
+            status must be in review.
 
     Returns:
         ReviewableSuggestionEmailInfo. The corresponding reviewable suggestion
         email info.
-
-    Raises:
-        Exception. The suggestion must be in review.
-        Exception. The suggestion type must be offered on the Contributor
-            Dashboard.
     """
-    if suggestion.status != suggestion_models.STATUS_IN_REVIEW:
-        raise Exception(
-            'Expected suggestion status to be in review for '
-            'ReviewableSuggestionEmailInfo object creation, received '
-            'suggestion status: %s' % suggestion.status)
-    if suggestion.suggestion_type != (
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT) and (
-                suggestion.suggestion_type != (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)):
-        raise Exception(
-            'Expected suggestion type to be offered on the Contributor '
-            'Dashboard for ReviewableSuggestionEmailInfo object creation, '
-            'received suggestion type: %s' % suggestion.suggestion_type)
     html_content_strings = suggestion.get_all_html_content_strings()
     # Retrieve the html content that is bolded on the Contributor Dashboard
     # pages. This content is what stands out for users when they view
