@@ -1062,7 +1062,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         suggestions = (
             suggestion_services
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+            .get_translation_suggestions_waiting_longest_for_review(
                 'hi'))
 
         # Assert that the suggestions are in the order that they were created.
@@ -1081,7 +1081,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self):
         suggestions = (
             suggestion_services
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+            .get_translation_suggestions_waiting_longest_for_review(
                 'wrong_language_code'))
 
         self.assertEqual(len(suggestions), 0)
@@ -1830,30 +1830,6 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def test_create_from_suggestion_returns_info_without_html_character_entity(
-            self):
-        translation_suggestion = (
-            self._create_translation_suggestion_with_translation_html(
-                '&nbsp;,&nbsp;&amp; &quot;&quot;'))
-        expected_reviewable_suggestion_email_info = (
-            suggestion_registry.ReviewableSuggestionEmailInfo(
-                translation_suggestion.suggestion_type,
-                translation_suggestion.language_code,
-                ', & "" \'',
-                translation_suggestion.last_updated
-            ))
-
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion)
-        )
-
-        self._assert_reviewable_suggestion_email_infos_are_equal(
-            reviewable_suggestion_email_info,
-            expected_reviewable_suggestion_email_info
-        )
-
     def test_create_returns_info_for_translation_suggestion_if_html_math_rte(
             self):
         translation_suggestion = (
@@ -2514,7 +2490,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 [translation_suggestion_1]))
 
         with self.swap(
-            suggestion_services, 'MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
             reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
@@ -2671,7 +2647,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 [question_suggestion_1]))
 
         with self.swap(
-            suggestion_services, 'MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
             reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(

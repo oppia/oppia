@@ -25,6 +25,7 @@ import re
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
+from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import suggestion_registry
 from core.domain import user_domain
@@ -41,16 +42,16 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 # The maximum number of suggestions to recommend to a reviewer to review.
-MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER = 5
+MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = 5
 
 # A dictionary that maps the suggestion type to a lambda function, which is
-# used to retrieve the suggestion html content that is bolded on the
-# Contributor Dashboard pages. For example, for translation suggestions the
-# lambda function retrieves the html that contains the translation. Similarly,
-# for question suggestions the lambda function retrieves the html that contains
-# the question. From a UI perspective, the bolded content make it easier for
-# users to identify the different suggestion opportunities.
-RETRIEVE_HTML_BY_SUGGESTION_TYPE_DICT = {
+# used to retrieve the html content that corresponds to the suggestion's
+# emphasized text on the Contributor Dashboard. From a UI perspective, the
+# emphasized content makes it easier for users to identify the different
+# suggestion opportunities. For instance, for translation suggestions the
+# emphasized text is the translation itself. Similarly, for question suggestions
+# the emphasized text is the question.
+HTML_FOR_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
     # The translation html is always the first element in the list of
     # translation suggestion html content strings.
     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
@@ -600,7 +601,7 @@ def get_question_suggestions_waiting_longest_for_review():
     ]
 
 
-def get_translation_suggestions_waiting_longest_for_review_per_lang(
+def get_translation_suggestions_waiting_longest_for_review(
         language_code):
     """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
     number of translation suggestions in the specified language code,
@@ -618,7 +619,7 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
     return [
         get_suggestion_from_model(suggestion_model) for suggestion_model in (
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+            .get_translation_suggestions_waiting_longest_for_review(
                 language_code)
         )
     ]
@@ -626,8 +627,8 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
 
 def _get_plain_text_from_html_content_string(html_content_string):
     """Retrieves the plain text from the given html content string. RTE element
-    occurrences in the html are replaced by its corresponding name capitalized
-    in square brackets.
+    occurrences in the html are replaced by their corresponding name,
+    capitalized in square brackets.
     eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
         Sample2 </p> will give as output: Sample1 [MATH] Sample2.
     Note: similar logic exists in the frontend in format-rte-preview.filter.ts.
@@ -639,10 +640,6 @@ def _get_plain_text_from_html_content_string(html_content_string):
     Returns:
         str. The plain text string from the given html content string.
     """
-    # Replace frequently used HTML character entities.
-    html_content_string = re.sub('&nbsp;', ' ', html_content_string)
-    html_content_string = re.sub('&quot;', '"', html_content_string)
-    html_content_string = re.sub('&amp;', '&', html_content_string)
 
     def _replace_rte_tag(rte_tag):
         """Replaces all of the <oppia-noninteractive-**> tags.
@@ -663,16 +660,18 @@ def _get_plain_text_from_html_content_string(html_content_string):
         replace_string = '%s%s%s' % (' [', replace_string, '] ')
         return replace_string
 
-    # Replace all <oppia-noninteractive-**> tags with their names captialized
-    # in square brackets.
-    html_content_string = re.sub(
+    # Replace all the opening <oppia-noninteractive-**> tags with their names
+    # captialized in square brackets. 
+    html_content_string_with_noninteractive_tag_replaced = re.sub(
         r'<(oppia-noninteractive\s*?)[^>]+>', _replace_rte_tag,
         html_content_string)
     # Get rid of all of the other html tags.
-    html_content_string = re.sub('<([^>]+)>', '', html_content_string)
+    plain_text = html_cleaner.strip_html_tags(
+        html_content_string_with_noninteractive_tag_replaced
+    )
     # Remove any leading or trailing whitespace.
-    resulting_plain_text = html_content_string.strip()
-    return resulting_plain_text
+    plain_text_without_trailing_whitespace = plain_text.strip()
+    return plain_text_without_trailing_whitespace
 
 
 def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
@@ -689,16 +688,18 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
         email info.
     """
     html_content_strings = suggestion.get_all_html_content_strings()
-    # Retrieve the html content that is bolded on the Contributor Dashboard
-    # pages. This content is what stands out for users when they view
-    # suggestions.
-    get_bolded_html_content = RETRIEVE_HTML_BY_SUGGESTION_TYPE_DICT[
-        suggestion.suggestion_type]
-    plain_text_content = _get_plain_text_from_html_content_string(
-        get_bolded_html_content(html_content_strings))
+    # Retrieve the html content that is emphasized on the Contributor Dashboard
+    # pages. This content is what stands out for each suggestion when a user
+    # views a list of suggestions.
+    get_html_content_for_emphasized_text = (
+        HTML_FOR_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+            suggestion.suggestion_type]
+    )
+    plain_text = _get_plain_text_from_html_content_string(
+        get_html_content_for_emphasized_text(html_content_strings))
     return suggestion_registry.ReviewableSuggestionEmailInfo(
-        suggestion.suggestion_type, suggestion.language_code,
-        plain_text_content, suggestion.last_updated
+        suggestion.suggestion_type, suggestion.language_code, plain_text,
+        suggestion.last_updated
     )
 
 
@@ -743,9 +744,9 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         if user_contribution_rights.can_review_questions:
             for question_suggestion in question_suggestions:
                 # Break early because we only want the top
-                # MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER number of suggestions.
+                # MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER number of suggestions.
                 if len(suggestions_waiting_longest_heap) == (
-                        MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+                        MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
                     break
                 # We can't include suggestions that were authored by the
                 # reviewer because reviewers aren't allowed to review their own
@@ -764,7 +765,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                 if language_code not in (
                         translation_suggestions_by_lang_code_dict):
                     translation_suggestions_by_lang_code_dict[language_code] = (
-                        get_translation_suggestions_waiting_longest_for_review_per_lang( # pylint: disable=line-too-long
+                        get_translation_suggestions_waiting_longest_for_review(
                             language_code
                         )
                     )
@@ -774,7 +775,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                 )
                 for translation_suggestion in translation_suggestions:
                     if len(suggestions_waiting_longest_heap) == (
-                            MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+                            MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
                         # The shortest review wait time corresponds to the most
                         # recent review submission date, which is the max of
                         # the heap.
@@ -796,7 +797,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         # Get the key information from each suggestion that will be used to
         # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-        for _ in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+        for _ in python_utils.RANGE(MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
             if len(suggestions_waiting_longest_heap) == 0:
                 break
             _, suggestion = heapq.heappop(suggestions_waiting_longest_heap)

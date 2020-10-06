@@ -377,7 +377,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_translation_suggestions_waiting_longest_for_review_per_lang(
+    def get_translation_suggestions_waiting_longest_for_review(
             cls, language_code):
         """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
         number of translation suggestions in the specified language code,
