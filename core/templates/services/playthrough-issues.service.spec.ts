@@ -202,19 +202,19 @@ describe('Playthrough Issues Service', function() {
 
   it('should resolve issue', function() {
     var backendCallSpy = spyOn(
-      PlaythroughIssuesBackendApiService, 'resolveIssue').and.returnValue(
+      PlaythroughIssuesBackendApiService, 'resolveIssueAsync').and.returnValue(
       $q.resolve());
     var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
       angular.copy(backendIssues[0]));
 
-    PlaythroughIssuesService.resolveIssue(issue).then(function() {
+    PlaythroughIssuesService.resolveIssueAsync(issue).then(function() {
       expect(backendCallSpy).toHaveBeenCalledWith(
         issue, explorationId, explorationVersion);
     });
   });
 
   it('should open playthrough modal', function() {
-    spyOn(PlaythroughIssuesBackendApiService, 'fetchPlaythrough').and
+    spyOn(PlaythroughIssuesBackendApiService, 'fetchPlaythroughAsync').and
       .returnValue($q.resolve(PlaythroughObjectFactory.createFromBackendDict(
         backendPlaythrough)));
     var openModalSpy = spyOn(ImprovementModalService, 'openPlaythroughModal')
