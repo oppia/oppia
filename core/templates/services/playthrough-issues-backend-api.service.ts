@@ -58,7 +58,7 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  fetchPlaythrough(
+  async fetchPlaythroughAsync(
       explorationId: string,
       playthroughId: string): Promise<PlaythroughIssue> {
     return new Promise((resolve, reject) => {
@@ -73,7 +73,7 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  resolveIssue(
+  async resolveIssueAsync(
       issueToResolve: PlaythroughIssue,
       explorationId: string, explorationVersion: number): Promise<void> {
     return new Promise((resolve, reject) => {
