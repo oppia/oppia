@@ -768,10 +768,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "StartsWith": "starts with {{x|NormalizedString}}",
-      "Contains": "contains {{x|NormalizedString}}",
-      "Equals": "is equal to {{x|NormalizedString}}, without taking case into account",
-      "FuzzyEquals": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
+      "StartsWith": "starts with one of {{x|SetOfNormalizedString}}",
+      "Contains": "contains one of {{x|SetOfNormalizedString}}",
+      "Equals": "is equal to one of {{x|SetOfNormalizedString}}, without taking case into account",
+      "FuzzyEquals": "is equal to one of {{x|SetOfNormalizedString}}, misspelled by at most one character"
     }
   },
   "InteractiveMap": {

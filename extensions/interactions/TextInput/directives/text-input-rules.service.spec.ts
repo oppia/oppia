@@ -33,7 +33,7 @@ describe('Text Input rules service', () => {
   });
 
   var RULE_INPUT = {
-    x: 'abc def'
+    x: ['abc def']
   };
 
   it('should have a correct \'equals\' rule', () => {
