@@ -2283,7 +2283,9 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
             .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
             .get_output(job_id))
 
-        self.assertEqual(actual_output, [u'[u\'SUCCESS\', 1]'])
+        self.assertEqual(actual_output, [
+            u'[u\'SUCCESS - CHANGED\', [u\'mathImg_12ab_height_1d2_width_2d3_'
+            u'vertical_3d2.svg\', u\'Exp Id: exp_id0\']]'])
 
     def test_the_job_reports_validation_failure(self):
         fs = fs_domain.AbstractFileSystem(
@@ -2323,11 +2325,10 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
             .get_output(job_id))
 
         self.assertEqual(actual_output, [
-            u'[u\'SUCCESS\', 0]',
             u'[u\'FAILED validation\', [u"Exploration with id exp_id0 failed '
             'image validation for the filename '
-            'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg with following '
-            'error: Unsupported tags/attributes found in the SVG:'
+            'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg with following'
+            ' error: Unsupported tags/attributes found in the SVG:'
             '\\n\\nattributes: [u\'svg:role\']"]]'])
 
     def test_the_job_does_not_changes_a_valid_svg_image(self):
@@ -2364,7 +2365,7 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
             .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
             .get_output(job_id))
 
-        self.assertEqual(actual_output, [u'[u\'SUCCESS\', 1]'])
+        self.assertEqual(actual_output, [u'[u\'UNCHANGED\', 1]'])
 
         new_svg_string = fs.get(filepath)
 
@@ -2404,7 +2405,7 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
             .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
             .get_output(job_id))
 
-        self.assertEqual(actual_output, [u'[u\'SUCCESS\', 0]'])
+        self.assertEqual(actual_output, [])
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
