@@ -14405,14 +14405,15 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         self.set_admins([self.OWNER_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
-            category='category%d' % i
-        ) for i in python_utils.RANGE(0, 4)]
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in python_utils.RANGE(4)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
             rights_manager.publish_exploration(self.owner, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(

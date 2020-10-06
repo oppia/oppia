@@ -19,7 +19,6 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/parameter-metadata.service');
-require('domain/exploration/ParamMetadataObjectFactory.ts');
 require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
