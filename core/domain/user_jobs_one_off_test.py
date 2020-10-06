@@ -1821,12 +1821,15 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         output = (
             user_jobs_one_off
             .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
-        self.assertEqual(
-            output, [
-                '[u\'Invalid Exploration IDs cleaned from '
-                'CollectionProgressModel\', [u"Model id: '
-                '%s.col, Collection id: col, Removed exploration ids: '
-                '[u\'3\']"]]' % self.user_id])
+        expected_output = [(
+            '[u\'Added missing exp ids in CompletedActivitiesModel\', '
+            '[u\'%s.col\']]' % self.user_id
+        ), (
+            '[u\'Invalid Exploration IDs cleaned from '
+            'CollectionProgressModel\', '
+            '[u"Model id: %s.col, Collection id: col, Removed exploration ids: '
+            '[u\'3\']"]]' % self.user_id)]
+        self.assertEqual(output, expected_output)
         self.model_instance = user_models.CollectionProgressModel.get_by_id(
             '%s.col' % self.user_id)
         self.assertEqual(
@@ -1835,7 +1838,7 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         completed_activities_model = (
             user_models.CompletedActivitiesModel.get_by_id(self.user_id))
         self.assertEqual(
-            completed_activities_model.exploration_ids, ['0', '1'])
+            completed_activities_model.exploration_ids, ['0', '1', '3'])
 
     def test_job_creates_completed_activities_model_if_it_is_missing(self):
         completed_activities_model = (
@@ -1872,6 +1875,48 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get_by_id(self.user_id))
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1'])
+
+    def test_job_updates_completed_activities_model_if_exp_ids_do_not_match(
+            self):
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, '2')
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '1', '2'])
+        completed_activities_model.exploration_ids = ['0', '2']
+        completed_activities_model.put()
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '2'])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        job_id = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.create_new())
+        user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            user_jobs_one_off
+            .CleanUpCollectionProgressModelOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, [
+                '[u\'Added missing exp ids in CompletedActivitiesModel\', '
+                '[u\'%s.col\']]' % self.user_id])
+
+        self.assertEqual(
+            self.model_instance.completed_explorations, ['0', '1'])
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        self.assertEqual(
+            completed_activities_model.exploration_ids, ['0', '2', '1'])
 
 
 class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):

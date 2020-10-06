@@ -509,6 +509,7 @@ class CleanUpCollectionProgressModelOneOffJob(
         1. Removing exploration ids which are not a part of the collection.
         2. Creating CompletedActivitiesModel for completed explorations if
         it is missing.
+        3. Adding missing exploration ids for completed explorations.
 
     NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
     """
@@ -532,6 +533,18 @@ class CleanUpCollectionProgressModelOneOffJob(
                 item.completed_explorations)
             completed_activities_model.put()
             yield ('Regenerated Missing CompletedActivitiesModel', item.id)
+        else:
+            missing_exp_ids = [
+                exp_id
+                for exp_id in item.completed_explorations if exp_id not in (
+                    completed_activities_model.exploration_ids)]
+            if missing_exp_ids:
+                completed_activities_model.exploration_ids.extend(
+                    missing_exp_ids)
+                completed_activities_model.put()
+                yield (
+                    'Added missing exp ids in CompletedActivitiesModel',
+                    item.id)
 
         col_model = collection_models.CollectionModel.get_by_id(
             item.collection_id)

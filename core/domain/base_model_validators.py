@@ -31,7 +31,7 @@ import python_utils
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 datastore_services = models.Registry.import_datastore_services()
 
-USER_ID_REGEX = 'uid_[a-z]{32}|OppiaSuggestionBot|OppiaMigrationBot'
+USER_ID_REGEX = 'uid_[a-z]{32}'
 
 ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
 ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
