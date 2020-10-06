@@ -83,7 +83,8 @@ export class SkillMasteryBackendApiService {
     });
   }
 
-  async fetchSkillMasteryDegreesAsync(skillIds: string[]): Promise<SkillMastery> {
+  async fetchSkillMasteryDegreesAsync(skillIds: string[]):
+   Promise<SkillMastery> {
     return new Promise((resolve, reject) => {
       this._fetchSkillMasteryDegrees(skillIds, resolve, reject);
     });
