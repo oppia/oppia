@@ -26,7 +26,6 @@ angular.module('oppia').component('setOfNormalizedStringEditor', {
   },
   template: require('./list-editor.directive.html'),
   controller: [function() {
-    console.log("am i alive?");
     var ctrl = this;
     ctrl.$onInit = function() {
       ctrl.SCHEMA = {
