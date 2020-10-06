@@ -3,7 +3,7 @@
   <div ng-if="!data.isHint">
     <div ng-if="getShortAnswerHtml()"
          popover-placement="bottom" uib-popover-template="'<[getAnswerPopoverUrl()]>'"
-         popover-trigger="click" style="cursor: pointer;">
+         popover-trigger="click" class="oppia-popover">
       <angular-html-bind class="oppia-rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
       </angular-html-bind>
     </div>
@@ -36,6 +36,7 @@
     <angular-html-bind ng-if="data.oppiaResponse !== null"
                        html-data="data.oppiaResponse"
                        class="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                       ng-style="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
                        ng-class="getFeedbackAudioHighlightClass()">
     </angular-html-bind>
   </div>
@@ -72,5 +73,9 @@
 
   .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-container:after {
     border-color: rgba(236, 239, 241, 0.4) transparent transparent rgba(236, 239, 241, 0.4);
+  }
+
+  input-response-pair .oppia-popover {
+    cursor: pointer;
   }
 </style>

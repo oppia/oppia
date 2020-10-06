@@ -30,9 +30,11 @@ from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -44,8 +46,13 @@ import feconf
 import python_utils
 import utils
 
-(exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user])
+(
+    feedback_models, exp_models, opportunity_models,
+    recommendations_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.feedback, models.NAMES.exploration, models.NAMES.opportunity,
+    models.NAMES.recommendations, models.NAMES.user
+])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -112,12 +119,10 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 category='Architecture', language_code='en')
 
         interaction_answer_groups = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': 'abc'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 'abc'},
+            }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'feedback': {
@@ -755,6 +760,93 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # The exploration summary model has been purged from the backend.
         self.assertIsNone(
             exp_models.ExpSummaryModel.get_by_id(self.EXP_0_ID))
+
+    def test_recommendations_of_deleted_explorations_are_deleted(self):
+        """Test that recommendations for deleted explorations are correctly
+        deleted.
+        """
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        recommendations_models.ExplorationRecommendationsModel(
+            id=self.EXP_0_ID,
+            recommended_exploration_ids=[]
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        recommendations_models.ExplorationRecommendationsModel(
+            id=self.EXP_1_ID,
+            recommended_exploration_ids=[]
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+
+        # The recommendations model has been purged from the backend.
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                self.EXP_0_ID))
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                self.EXP_1_ID))
+
+    def test_opportunity_of_deleted_explorations_are_deleted(self):
+        """Test that opportunity summary for deleted explorations are correctly
+        deleted.
+        """
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.EXP_0_ID,
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.EXP_1_ID,
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+
+        # The opportunity model has been purged from the backend.
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                self.EXP_0_ID))
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                self.EXP_1_ID))
+
+    def test_feedbacks_belonging_to_exploration_are_deleted(self):
+        """Tests that feedbacks belonging to exploration are deleted."""
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        thread_1_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_0_ID,
+            self.owner_id,
+            'subject',
+            'text'
+        )
+        thread_2_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_0_ID,
+            self.owner_id,
+            'subject 2',
+            'text 2'
+        )
+
+        exp_services.delete_explorations(self.owner_id, [self.EXP_0_ID])
+
+        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            thread_1_id))
+        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            thread_2_id))
 
     def test_exploration_is_removed_from_index_when_deleted(self):
         """Tests that exploration is removed from the search index when
@@ -1567,10 +1659,13 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}, {'x': 1}]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': 1}
+            }],
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -1591,10 +1686,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }],
             'outcome': {
                 'dest': 'state3',
                 'feedback': {
@@ -1610,26 +1705,29 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': [
-                        '<p>This is value1 for ItemSelection</p><oppia-noni'
-                        'nteractive-image filepath-with-value="&amp;quot;s3'
-                        'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
-                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
-                        ';"></oppia-noninteractive-image>'
-                    ]
-                }, {
-                    'x': [
-                        '<p>This is value3 for ItemSelection</p><oppia-noni'
-                        'nteractive-image filepath-with-value="&amp;quot;s3'
-                        'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
-                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
-                        ';"></oppia-noninteractive-image>'
-                    ]
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    (
+                        '<p>This is value1 for ItemSelection</p>'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice1.png&amp;quot;"'
+                        ' caption-with-value="&amp;quot;&amp;quot;" '
+                        'alt-with-value="&amp;quot;&amp;quot;">'
+                        '</oppia-noninteractive-image>')
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    (
+                        '<p>This is value3 for ItemSelection</p>'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice3.png&amp;quot;"'
+                        ' caption-with-value="&amp;quot;&amp;quot;" '
+                        'alt-with-value="&amp;quot;&amp;quot;">'
+                        '</oppia-noninteractive-image>')
+                ]}
+            }],
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -2394,10 +2492,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0},
+            }],
             'outcome': {
                 'dest': self.init_state_name,
                 'feedback': {
@@ -2728,12 +2826,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_state = exploration.init_state
         init_interaction = init_state.interaction
-        rule_types_to_inputs = init_interaction.answer_groups[
-            0].rule_types_to_inputs
+        rule_specs = init_interaction.answer_groups[0].rule_specs
         outcome = init_interaction.answer_groups[0].outcome
-        self.assertEqual(rule_types_to_inputs, {
-            'Equals': [{'x': 0}]
-        })
+        self.assertEqual(rule_specs[0].rule_type, 'Equals')
+        self.assertEqual(rule_specs[0].inputs, {'x': 0})
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
@@ -2778,8 +2874,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
-        self.interaction_answer_groups[0]['rule_types_to_inputs'][
-            'Equals'][0]['x'] = 'abc'
+        self.interaction_answer_groups[0]['rule_specs'][0][
+            'inputs']['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
             'abc has the wrong type. It should be a NonnegativeInt.'):
@@ -3714,6 +3810,13 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
 
+    def setUp(self):
+        super(ExplorationSummaryTests, self).setUp()
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+
     def test_is_exp_summary_editable(self):
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
 
@@ -3729,10 +3832,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_0_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_0_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         # Check that owner and editor may edit, but not viewer.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
@@ -3747,29 +3850,24 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         """Test that a user who only makes a revert on an exploration
         is not counted in the list of that exploration's contributors.
         """
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-
         # Have Albert create a new exploration.
-        self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         # Have Albert update that exploration.
         exp_services.update_exploration(
-            albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
         # Have Bob revert Albert's update.
-        exp_services.revert_exploration(bob_id, self.EXP_ID_1, 2, 1)
+        exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 2, 1)
 
         # Verify that only Albert (and not Bob, who has not made any non-
         # revert changes) appears in the contributors list for this
         # exploration.
         exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_1)
-        self.assertEqual([albert_id], exploration_summary.contributor_ids)
+        self.assertEqual([self.albert_id], exploration_summary.contributor_ids)
 
     def _check_contributors_summary(self, exp_id, expected):
         """Check if contributors summary of the given exp is same as expected.
@@ -3787,54 +3885,74 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertEqual(expected, contributors_summary)
 
     def test_contributors_summary(self):
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-
         # Have Albert create a new exploration. Version 1.
-        self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
-        self._check_contributors_summary(self.EXP_ID_1, {albert_id: 1})
+        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
+        self._check_contributors_summary(self.EXP_ID_1, {self.albert_id: 1})
 
         # Have Bob update that exploration. Version 2.
         exp_services.update_exploration(
-            bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
         self._check_contributors_summary(
-            self.EXP_ID_1, {albert_id: 1, bob_id: 1})
+            self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 1})
         # Have Bob update that exploration. Version 3.
         exp_services.update_exploration(
-            bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
         self._check_contributors_summary(
-            self.EXP_ID_1, {albert_id: 1, bob_id: 2})
+            self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 2})
 
         # Have Albert update that exploration. Version 4.
         exp_services.update_exploration(
-            albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+            self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             })], 'Changed title.')
         self._check_contributors_summary(
-            self.EXP_ID_1, {albert_id: 2, bob_id: 2})
+            self.EXP_ID_1, {self.albert_id: 2, self.bob_id: 2})
 
         # Have Albert revert to version 3. Version 5.
-        exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
+        exp_services.revert_exploration(self.albert_id, self.EXP_ID_1, 4, 3)
         self._check_contributors_summary(
-            self.EXP_ID_1, {albert_id: 1, bob_id: 2})
+            self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 2})
 
     def test_get_exploration_summary_by_id_with_invalid_exploration_id(self):
         exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             'invalid_exploration_id')
 
         self.assertIsNone(exploration_summary)
+
+    def test_create_exploration_summary_with_deleted_contributor(self):
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.albert_id)
+        exp_services.update_exploration(
+            self.bob_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
+            ],
+            'Changed title.')
+        exp_services.regenerate_exploration_summary(self.EXP_ID_1, None)
+
+        self._check_contributors_summary(
+            self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 1})
+
+        user_services.mark_user_for_deletion(self.bob_id)
+        exp_services.regenerate_exploration_summary(self.EXP_ID_1, None)
+
+        self._check_contributors_summary(
+            self.EXP_ID_1, {self.albert_id: 1})
 
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
@@ -3924,7 +4042,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_manager.ACTIVITY_STATUS_PUBLIC,
+                rights_domain.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [], [self.albert_id],
                 {self.albert_id: 1},
                 self.EXPECTED_VERSION_2,
@@ -3959,7 +4077,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_manager.ACTIVITY_STATUS_PRIVATE, False,
+                rights_domain.ACTIVITY_STATUS_PRIVATE, False,
                 [self.albert_id], [], [], [], [self.albert_id, self.bob_id],
                 {self.albert_id: 1, self.bob_id: 1}, self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
@@ -3970,7 +4088,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_manager.ACTIVITY_STATUS_PUBLIC,
+                rights_domain.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [], [self.albert_id],
                 {self.albert_id: 1}, self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
@@ -4661,7 +4779,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'exp_id', self.admin_id, title='title')
 
         rights_manager.assign_role_for_exploration(
-            self.admin, 'exp_id', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.admin, 'exp_id', self.editor_id, rights_domain.ROLE_EDITOR)
 
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.editor_id, 'exp_id')

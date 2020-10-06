@@ -22,11 +22,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
+from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import feconf
 import python_utils
+import utils
 
-from google.appengine.ext import ndb
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -53,65 +55,87 @@ class ExplorationModel(base_models.VersionedModel):
     ALLOW_REVERT = True
 
     # What this exploration is called.
-    title = ndb.StringProperty(required=True)
+    title = datastore_services.StringProperty(required=True)
     # The category this exploration belongs to.
-    category = ndb.StringProperty(required=True, indexed=True)
+    category = datastore_services.StringProperty(required=True, indexed=True)
     # The objective of this exploration.
-    objective = ndb.TextProperty(default='', indexed=False)
+    objective = datastore_services.TextProperty(default='', indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
-    language_code = ndb.StringProperty(
+    language_code = datastore_services.StringProperty(
         default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
     # Tags (topics, skills, concepts, etc.) associated with this
     # exploration.
-    tags = ndb.StringProperty(repeated=True, indexed=True)
+    tags = datastore_services.StringProperty(repeated=True, indexed=True)
     # A blurb for this exploration.
-    blurb = ndb.TextProperty(default='', indexed=False)
+    blurb = datastore_services.TextProperty(default='', indexed=False)
     # 'Author notes' for this exploration.
-    author_notes = ndb.TextProperty(default='', indexed=False)
+    author_notes = datastore_services.TextProperty(default='', indexed=False)
 
     # The version of the states blob schema.
-    states_schema_version = ndb.IntegerProperty(
+    states_schema_version = datastore_services.IntegerProperty(
         required=True, default=0, indexed=True)
     # The name of the initial state of this exploration.
-    init_state_name = ndb.StringProperty(required=True, indexed=False)
+    init_state_name = (
+        datastore_services.StringProperty(required=True, indexed=False))
     # A dict representing the states of this exploration. This dict should
     # not be empty.
-    states = ndb.JsonProperty(default={}, indexed=False)
+    states = datastore_services.JsonProperty(default={}, indexed=False)
     # The dict of parameter specifications associated with this exploration.
     # Each specification is a dict whose keys are param names and whose values
     # are each dicts with a single key, 'obj_type', whose value is a string.
-    param_specs = ndb.JsonProperty(default={}, indexed=False)
+    param_specs = datastore_services.JsonProperty(default={}, indexed=False)
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
-    param_changes = ndb.JsonProperty(repeated=True, indexed=False)
+    param_changes = (
+        datastore_services.JsonProperty(repeated=True, indexed=False))
     # A boolean indicating whether automatic text-to-speech is enabled in
     # this exploration.
-    auto_tts_enabled = ndb.BooleanProperty(default=True, indexed=True)
+    auto_tts_enabled = (
+        datastore_services.BooleanProperty(default=True, indexed=True))
     # A boolean indicating whether correctness feedback is enabled in this
     # exploration.
-    correctness_feedback_enabled = ndb.BooleanProperty(
+    correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
 
     # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
     # caused GAE to raise an error on fetching a specific version of the
     # exploration model.
     # TODO(sll): Fix this error and remove this property.
-    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
+    skill_tags = datastore_services.StringProperty(repeated=True, indexed=True)
     # DEPRECATED in v2.0.1. Do not use.
     # TODO(sll): Remove this property from the model.
-    default_skin = ndb.StringProperty(default='conversation_v1')
+    default_skin = datastore_services.StringProperty(default='conversation_v1')
     # DEPRECATED in v2.5.4. Do not use.
-    skin_customizations = ndb.JsonProperty(indexed=False)
+    skin_customizations = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
     def get_deletion_policy():
         """Exploration is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'blurb': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'author_notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'states_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'init_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'states': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'param_specs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'correctness_feedback_enabled':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'default_skin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skin_customizations': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -124,7 +148,7 @@ class ExplorationModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def get_exploration_count(cls):
@@ -201,7 +225,7 @@ class ExplorationModel(base_models.VersionedModel):
                 )
                 exploration_commit_log.exploration_id = model.id
                 commit_log_models.append(exploration_commit_log)
-            ndb.put_multi_async(commit_log_models)
+            datastore_services.put_multi_async(commit_log_models)
 
 
 class ExplorationContextModel(base_models.BaseModel):
@@ -211,7 +235,7 @@ class ExplorationContextModel(base_models.BaseModel):
     """
 
     # The ID of the story that the exploration is a part of.
-    story_id = ndb.StringProperty(required=True, indexed=True)
+    story_id = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -220,67 +244,16 @@ class ExplorationContextModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """Check whether ExplorationContextModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
-
-
-class ExplorationMathRichTextInfoModel(base_models.BaseModel):
-    """Temporary Storage model for storing information useful while
-    generating images for math rich-text components in explorations.
-
-    TODO(#9952): This model needs to removed once we generate SVG images for
-    all the math rich text componets in old explorations.
-
-    The id of each instance is the id of the corresponding exploration.
-    """
-
-    # A boolean which indicates whether the exploration requires images to be
-    # generated and saved for the math rich-text components. If this field is
-    # False, we will need to generate math rich-text component images for the
-    # exploration. The field will be true only if for each math rich-text
-    # components there is a valid image stored in the datastore.
-    math_images_generation_required = ndb.BooleanProperty(
-        indexed=True, required=True)
-    # Approximate maximum size of Math rich-text components SVG images that
-    # would be generated for the exploration according to the length of
-    # raw_latex string.
-    estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
-        indexed=True, required=True)
-    # List of unique LaTeX strings without an SVG saved from all the math-rich
-    # text components of the exploration.
-    latex_strings_without_svg = ndb.StringProperty(repeated=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """ExplorationMathRichTextInfoModel are temporary model that will be
-        deleted after user migration.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @staticmethod
-    def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether ExplorationMathRichTextInfoModel references the given
-        user.
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
@@ -317,28 +290,32 @@ class ExplorationRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of owners of this exploration.
-    owner_ids = ndb.StringProperty(indexed=True, repeated=True)
+    owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
-    editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this exploration.
-    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
+    voice_artist_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
     # The user_ids of users who are allowed to view this exploration.
-    viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
+    viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     # Whether this exploration is owned by the community.
-    community_owned = ndb.BooleanProperty(indexed=True, default=False)
+    community_owned = (
+        datastore_services.BooleanProperty(indexed=True, default=False))
     # The exploration id which this exploration was cloned from. If None, this
     # exploration was created from scratch.
-    cloned_from = ndb.StringProperty()
+    cloned_from = datastore_services.StringProperty()
     # For private explorations, whether this exploration can be viewed
     # by anyone who has the URL. If the exploration is not private, this
     # setting is ignored.
-    viewable_if_private = ndb.BooleanProperty(indexed=True, default=False)
+    viewable_if_private = (
+        datastore_services.BooleanProperty(indexed=True, default=False))
     # Time, in milliseconds, when the exploration was first published.
-    first_published_msec = ndb.FloatProperty(indexed=True, default=None)
+    first_published_msec = (
+        datastore_services.FloatProperty(indexed=True, default=None))
 
     # The publication status of this exploration.
-    status = ndb.StringProperty(
+    status = datastore_services.StringProperty(
         default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
             constants.ACTIVITY_STATUS_PRIVATE,
@@ -346,7 +323,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ]
     )
     # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    translator_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -355,10 +333,21 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -370,14 +359,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (
-            cls.query(ndb.OR(
-                cls.owner_ids == user_id,
-                cls.editor_ids == user_id,
-                cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id
-            )).get(keys_only=True) is not None
-            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return cls.query(datastore_services.any_of(
+            cls.owner_ids == user_id,
+            cls.editor_ids == user_id,
+            cls.voice_artist_ids == user_id,
+            cls.viewer_ids == user_id
+        )).get(keys_only=True) is not None
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -400,6 +387,52 @@ class ExplorationRightsModel(base_models.VersionedModel):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    @staticmethod
+    def convert_to_valid_dict(model_dict):
+        """Replace invalid fields and values in the ExplorationRightsModel dict.
+
+        Some old ExplorationRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationRightsModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the ExplorationRightsModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
+        if 'all_viewer_ids' in model_dict:
+            del model_dict['all_viewer_ids']
+
+        # The status field could historically take the value 'publicized', this
+        # value is now equivalent to 'public'.
+        if model_dict['status'] == 'publicized':
+            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+
+        # The voice_artist_ids field was previously named translator_ids. We
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if 'translator_ids' in model_dict and model_dict['translator_ids']:
+            model_dict['voice_artist_ids'] = model_dict['translator_ids']
+            model_dict['translator_ids'] = []
+
+        # We need to remove pseudonymous IDs from all the fields that contain
+        # user IDs.
+        for field_name in (
+                'owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'):
+            model_dict[field_name] = [
+                user_id for user_id in model_dict[field_name]
+                if not utils.is_pseudonymous_id(user_id)
+            ]
+
+        return model_dict
+
     def _reconstitute(self, snapshot_dict):
         """Populates the model instance with the snapshot.
 
@@ -416,27 +449,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             VersionedModel. The instance of the VersionedModel class populated
             with the the snapshot.
         """
-        # The all_viewer_ids field was previously used in some versions of the
-        # model, we need to remove it.
-        if 'all_viewer_ids' in snapshot_dict:
-            del snapshot_dict['all_viewer_ids']
-
-        # The status field could historically take the value 'publicized', this
-        # value is now equivalent to 'public'.
-        if snapshot_dict['status'] == 'publicized':
-            snapshot_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
-
-        # The voice_artist_ids field was previously named translator_ids. We
-        # need to move the values from translator_ids field to voice_artist_ids
-        # and delete translator_ids.
-        if (
-                'translator_ids' in snapshot_dict and
-                snapshot_dict['translator_ids']
-        ):
-            snapshot_dict['voice_artist_ids'] = snapshot_dict['translator_ids']
-            snapshot_dict['translator_ids'] = []
-
-        self.populate(**snapshot_dict)
+        self.populate(
+            **ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
     def _trusted_commit(
@@ -480,6 +494,29 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
+
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+        snapshot_metadata_model.content_user_ids = list(sorted(
+            set(self.owner_ids) |
+            set(self.editor_ids) |
+            set(self.voice_artist_ids) |
+            set(self.viewer_ids)
+        ))
+
+        commit_cmds_user_ids = set()
+        for commit_cmd in commit_cmds:
+            user_id_attribute_names = python_utils.NEXT(
+                cmd['user_id_attribute_names']
+                for cmd in feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                if cmd['name'] == commit_cmd['cmd']
+            )
+            for user_id_attribute_name in user_id_attribute_names:
+                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+        snapshot_metadata_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+
+        snapshot_metadata_model.put()
 
     @classmethod
     def export_data(cls, user_id):
@@ -526,7 +563,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the exploration being edited.
-    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -535,12 +573,14 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
@@ -632,35 +672,38 @@ class ExpSummaryModel(base_models.BaseModel):
     """
 
     # What this exploration is called.
-    title = ndb.StringProperty(required=True)
+    title = datastore_services.StringProperty(required=True)
     # The category this exploration belongs to.
-    category = ndb.StringProperty(required=True, indexed=True)
+    category = datastore_services.StringProperty(required=True, indexed=True)
     # The objective of this exploration.
-    objective = ndb.TextProperty(required=True, indexed=False)
+    objective = datastore_services.TextProperty(required=True, indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # Tags associated with this exploration.
-    tags = ndb.StringProperty(repeated=True, indexed=True)
+    tags = datastore_services.StringProperty(repeated=True, indexed=True)
 
     # Aggregate user-assigned ratings of the exploration.
-    ratings = ndb.JsonProperty(default=None, indexed=False)
+    ratings = datastore_services.JsonProperty(default=None, indexed=False)
 
     # Scaled average rating for the exploration.
-    scaled_average_rating = ndb.FloatProperty(indexed=True)
+    scaled_average_rating = datastore_services.FloatProperty(indexed=True)
 
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
     # exploration *summary* model was last updated).
-    exploration_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    exploration_model_last_updated = (
+        datastore_services.DateTimeProperty(indexed=True))
     # Time when the exploration model was created (not to be confused
     # with created_on, which is the time when the exploration *summary*
     # model was created).
-    exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
+    exploration_model_created_on = (
+        datastore_services.DateTimeProperty(indexed=True))
     # Time when the exploration was first published.
-    first_published_msec = ndb.FloatProperty(indexed=True)
+    first_published_msec = datastore_services.FloatProperty(indexed=True)
 
     # The publication status of this exploration.
-    status = ndb.StringProperty(
+    status = datastore_services.StringProperty(
         default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
             constants.ACTIVITY_STATUS_PRIVATE,
@@ -669,32 +712,33 @@ class ExpSummaryModel(base_models.BaseModel):
     )
 
     # Whether this exploration is owned by the community.
-    community_owned = ndb.BooleanProperty(required=True, indexed=True)
+    community_owned = (
+        datastore_services.BooleanProperty(required=True, indexed=True))
 
     # The user_ids of owners of this exploration.
-    owner_ids = ndb.StringProperty(indexed=True, repeated=True)
+    owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
-    editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this exploration.
-    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
+    voice_artist_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
     # The user_ids of users who are allowed to view this exploration.
-    viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
+    viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the exploration's content).
     # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
     # synchronized, meaning that the keys in contributors_summary need be
     # equal to the contributor_ids list.
-    contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    contributor_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
     # A dict representing the contributors of non-trivial commits to this
     # exploration. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
-    contributors_summary = ndb.JsonProperty(default={}, indexed=False)
+    contributors_summary = (
+        datastore_services.JsonProperty(default={}, indexed=False))
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.).
-    version = ndb.IntegerProperty()
-
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    version = datastore_services.IntegerProperty()
 
     @staticmethod
     def get_deletion_policy():
@@ -713,7 +757,7 @@ class ExpSummaryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(ndb.OR(
+        return cls.query(datastore_services.any_of(
             cls.owner_ids == user_id,
             cls.editor_ids == user_id,
             cls.voice_artist_ids == user_id,
@@ -769,7 +813,7 @@ class ExpSummaryModel(base_models.BaseModel):
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(
+            datastore_services.any_of(
                 ExpSummaryModel.owner_ids == user_id,
                 ExpSummaryModel.editor_ids == user_id,
                 ExpSummaryModel.voice_artist_ids == user_id,
@@ -790,7 +834,7 @@ class ExpSummaryModel(base_models.BaseModel):
             editable by the given user.
         """
         return ExpSummaryModel.query().filter(
-            ndb.OR(
+            datastore_services.any_of(
                 ExpSummaryModel.owner_ids == user_id,
                 ExpSummaryModel.editor_ids == user_id)
         ).filter(
@@ -817,10 +861,32 @@ class ExpSummaryModel(base_models.BaseModel):
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model data has already been exported as a part of the
         ExplorationModel and thus does not need a separate export_data
         function.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ratings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'scaled_average_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_model_created_on':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'owner_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'editor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voice_artist_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

@@ -115,55 +115,67 @@ class SkillChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_SKILL_MISCONCEPTION,
         'required_attribute_names': ['new_misconception_dict'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_SKILL_MISCONCEPTION,
         'required_attribute_names': ['misconception_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_PREREQUISITE_SKILL,
         'required_attribute_names': ['skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_PREREQUISITE_SKILL,
         'required_attribute_names': ['skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_RUBRICS,
         'required_attribute_names': ['difficulty', 'explanations'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
         'required_attribute_names': [
             'misconception_id', 'property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SKILL_MISCONCEPTIONS_PROPERTIES}
     }, {
         'name': CMD_UPDATE_SKILL_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SKILL_PROPERTIES}
     }, {
         'name': CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SKILL_CONTENTS_PROPERTIES}
     }, {
         'name': CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -907,6 +919,20 @@ class Skill(python_utils.OBJECT):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [])
+
+    def generate_skill_misconception_id(self, misconception_id):
+        """Given a misconception id, it returns the skill-misconception-id.
+        It is of the form <skill_id>-<misconception_id>.
+
+        Args:
+            misconception_id: int. The id of the misconception.
+
+        Returns:
+            str. The format is '<skill_id>-<misconception_id>', where skill_id
+            is the skill ID of the misconception and misconception_id is
+            the id of the misconception.
+        """
+        return '%s-%d' % (self.id, misconception_id)
 
     @classmethod
     def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict):

@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerClassificationResult } from
+  'domain/classifier/answer-classification-result.model';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AppService } from 'services/app.service';
@@ -45,8 +45,6 @@ describe('Answer Classification Service', () => {
       answer.toLowerCase().includes(inputs.x.toLowerCase()))
   };
 
-  let answerClassificationResultObjectFactory:
-    AnswerClassificationResultObjectFactory;
   let answerClassificationService: AnswerClassificationService;
   let appService: AppService;
   let interactionSpecsService: InteractionSpecsService;
@@ -58,8 +56,6 @@ describe('Answer Classification Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    answerClassificationResultObjectFactory = TestBed.get(
-      AnswerClassificationResultObjectFactory);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     appService = TestBed.get(AppService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
@@ -107,14 +103,10 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 10
-                }
-              ]
-            }
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 10}
+            }],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -127,22 +119,16 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 5
-                },
-                {
-                  x: 6
-                }
-              ],
-              NotEquals: [
-                {
-                  x: 7
-                }
-              ]
-            }
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: { x: 5 }
+            }, {
+              rule_type: 'Equals',
+              inputs: { x: 6 }
+            }, {
+              rule_type: 'NotEquals',
+              inputs: { x: 7 }
+            }],
           }],
           default_outcome: {
             dest: 'default',
@@ -190,24 +176,27 @@ describe('Answer Classification Service', () => {
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 10, rules)
       ).toEqual(
-        answerClassificationResultObjectFactory.createNew(
-          outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []), 0,
+        new AnswerClassificationResult(
+          outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []),
+          0, 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 5, rules)
       ).toEqual(
-        answerClassificationResultObjectFactory.createNew(
-          outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []), 1,
+        new AnswerClassificationResult(
+          outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
+          1, 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 6, rules)
       ).toEqual(
-        answerClassificationResultObjectFactory.createNew(
-          outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []), 1,
+        new AnswerClassificationResult(
+          outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
+          1, 1,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
     });
 
@@ -219,9 +208,9 @@ describe('Answer Classification Service', () => {
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 7, rules)
       ).toEqual(
-        answerClassificationResultObjectFactory.createNew(
+        new AnswerClassificationResult(
           outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
-          2,
+          2, 0,
           ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
         )
       );
@@ -243,14 +232,10 @@ describe('Answer Classification Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Equals: [
-              {
-                x: 10
-              }
-            ]
-          }
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {x: 10}
+          }],
         }];
 
         const state = (
@@ -333,14 +318,10 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 10
-                }
-              ]
-            }
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: { x: 10 }
+            }],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -354,16 +335,13 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 5
-                },
-                {
-                  x: 7
-                }
-              ]
-            }
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: { x: 5 }
+            }, {
+              rule_type: 'Equals',
+              inputs: { x: 7 }
+            }],
           }],
           default_outcome: {
             dest: 'default',
@@ -406,8 +384,8 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 0, rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
-            state.interaction.answerGroups[1].outcome, 1,
+          new AnswerClassificationResult(
+            state.interaction.answerGroups[1].outcome, 1, null,
             ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
       });
 
@@ -426,10 +404,10 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 0, rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
+          new AnswerClassificationResult(
             outcomeObjectFactory.createNew(
               'default', 'default_outcome', '', []),
-            2,
+            2, 0,
             ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
           )
         );
@@ -474,14 +452,10 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['abc', 'input'],
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 'equal'
-                }
-              ]
-            }
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: { x: 'equal' }
+            }],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -495,14 +469,10 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['xyz'],
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [
-                {
-                  x: 'npu'
-                }
-              ]
-            },
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: 'npu'}
+            }],
           }],
           default_outcome: {
             dest: 'default',
@@ -541,16 +511,16 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 'abc', rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
-            state.interaction.answerGroups[0].outcome, 0,
+          new AnswerClassificationResult(
+            state.interaction.answerGroups[0].outcome, 0, null,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 'xyz', rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
-            state.interaction.answerGroups[1].outcome, 1,
+          new AnswerClassificationResult(
+            state.interaction.answerGroups[1].outcome, 1, null,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
       });
 
@@ -565,8 +535,8 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 'input', rules)
         ).toEqual(
-          answerClassificationResultObjectFactory.createNew(
-            state.interaction.answerGroups[1].outcome, 1,
+          new AnswerClassificationResult(
+            state.interaction.answerGroups[1].outcome, 1, 0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
   });

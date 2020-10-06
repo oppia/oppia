@@ -231,7 +231,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts'),
+            'ck-editor-copy-content-service.spec.ts',
+            'core/templates/tests/unit-test-utils.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
@@ -266,6 +267,14 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'audio-translation-bar/audio-translation-bar.directive.spec.ts',
             'core/templates/pages/library-page/search-bar/'
             'search-bar.component.spec.ts'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'import \{.*\} from \'lodash\''),
+        'message': (
+            'Please do not use "import { someFunction } from \'lodash\'". '
+            'Use "import someFunction from \'lodash/someFunction\'" instead.'),
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]
@@ -327,6 +336,12 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\s+style\s*=\s*'),
+        'message': 'Please do not use inline styling.',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -343,6 +358,18 @@ BAD_PATTERNS_PYTHON_REGEXP = [
                    'datetime.datetime.now().',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'ndb\.'),
+        'message': (
+            'Please use datastore_services instead of ndb, for example:\n'
+            '\n'
+            'datastore_services = models.Registry.import_datastore_services()\n'
+            '\n'
+            'class SampleModel(datastore_services.Model):\n'
+            '    ...\n'),
+        'excluded_files': (),
+        'excluded_dirs': ('core/platform',),
     },
     {
         'regexp': re.compile(r'\Wprint\('),

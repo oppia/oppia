@@ -139,13 +139,9 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
-         'set to critical.',
-    default='critical',
+         'set to error.',
+    default='error',
     choices=['critical', 'error', 'warning', 'info'])
-
-_PARSER.add_argument(
-    '--contributor_dashboard_enabled', action='store_true',
-    help='Run the test after enabling the contributor dashboard page.')
 
 _PARSER.add_argument(
     '--source_maps',
@@ -245,22 +241,6 @@ def run_webdriver_manager(parameters):
     web_driver_command.extend(parameters)
     p = subprocess.Popen(web_driver_command)
     p.communicate()
-
-
-def update_contributor_dashboard_status_in_feconf_file(
-        feconf_file_path, enable_contributor_dashboard):
-    """Change feconf.py file based on whether the contributor dashboard is
-    enabled.
-
-    Args:
-        feconf_file_path: str. Path to the feconf.py file.
-        enable_contributor_dashboard: bool. Represents whether contributor
-            dashboard is enabled.
-    """
-    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
-    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = %s' % (
-        enable_contributor_dashboard)
-    common.inplace_replace_file(feconf_file_path, pattern, replace)
 
 
 def setup_and_install_dependencies(skip_install):
@@ -552,9 +532,6 @@ def main(args=None):
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
-
-    update_contributor_dashboard_status_in_feconf_file(
-        FECONF_FILE_PATH, parsed_args.contributor_dashboard_enabled)
 
     if parsed_args.skip_build:
         build.modify_constants(prod_env=parsed_args.prod_env)

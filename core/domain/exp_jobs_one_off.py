@@ -28,6 +28,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -49,7 +50,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if item.content['status'] == rights_domain.ACTIVITY_STATUS_PUBLIC:
             yield (
                 item.get_unversioned_instance_id(),
                 utils.get_time_in_millisecs(item.created_on))
@@ -88,7 +89,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         exp_rights = rights_manager.get_exploration_rights(item.id)
 
         try:
-            if exp_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            if exp_rights.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                 exploration.validate()
             else:
                 exploration.validate(strict=True)
@@ -265,29 +266,6 @@ class ExplorationMathSvgFilenameValidationOneOffJob(
         }
         yield ('Overall result.', final_value_dict)
         yield ('Detailed information on invalid tags. ', invalid_tags_info)
-
-
-class ExplorationMathRichTextInfoModelDeletionOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes all instances of the ExplorationMathRichTextInfoModel
-    from the datastore.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationMathRichTextInfoModel]
-
-    @staticmethod
-    def map(item):
-        item.delete()
-        yield ('model_deleted', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        no_of_models_deleted = (
-            sum(ast.literal_eval(v) for v in values))
-        yield (key, ['%d models successfully delelted.' % (
-            no_of_models_deleted)])
 
 
 class ExplorationRteMathContentValidationOneOffJob(
@@ -498,3 +476,33 @@ class RTECustomizationArgsValidationOneOffJob(
             index += 2
         output_values.sort()
         yield (key, output_values)
+
+
+class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the translator_ids from the ExpSummaryModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExpSummaryModel]
+
+    @staticmethod
+    def map(exp_summary_model):
+        # This is the only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'translator_ids' in exp_summary_model._properties:  # pylint: disable=protected-access
+            del exp_summary_model._properties['translator_ids']  # pylint: disable=protected-access
+            if 'translator_ids' in exp_summary_model._values:  # pylint: disable=protected-access
+                del exp_summary_model._values['translator_ids']  # pylint: disable=protected-access
+            exp_summary_model.put(update_last_updated_time=False)
+            yield ('SUCCESS_REMOVED - ExpSummaryModel', exp_summary_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - ExpSummaryModel',
+                exp_summary_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))

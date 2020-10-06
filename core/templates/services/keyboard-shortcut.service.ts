@@ -17,8 +17,12 @@
  */
 import 'mousetrap';
 
-import { Injectable } from '@angular/core';
+import { Injectable, ApplicationRef } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { KeyboardShortcutHelpModalComponent } from
+  // eslint-disable-next-line max-len
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 
@@ -26,14 +30,30 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
-  constructor(private windowRef: WindowRef) {}
+  constructor(
+    private windowRef: WindowRef,
+    private ngbModal: NgbModal,
+    private appRef: ApplicationRef) {}
+
+  openQuickReference(): void {
+    this.ngbModal.dismissAll();
+    this.ngbModal.open(
+      KeyboardShortcutHelpModalComponent, {backdrop: true});
+    this.appRef.tick();
+  }
+
   bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', function() {
-      document.getElementById('skipToMainContentId').focus();
+      var skipButton = <HTMLElement>document.querySelector(
+        '.oppia-skip-to-content');
+      if (skipButton !== null) {
+        skipButton.focus();
+      }
     });
 
     Mousetrap.bind('k', function() {
-      var previousButton = document.getElementById('backButtonId');
+      var previousButton = <HTMLElement>document.querySelector(
+        '.oppia-back-button');
       if (previousButton !== null) {
         previousButton.focus();
       }
@@ -50,6 +70,10 @@ export class KeyboardShortcutService {
       if (continueButton !== null) {
         continueButton.focus();
       }
+    });
+
+    Mousetrap.bind('?', () => {
+      this.openQuickReference();
     });
   }
 
@@ -68,7 +92,15 @@ export class KeyboardShortcutService {
     });
 
     Mousetrap.bind('s', function() {
-      document.getElementById('skipToMainContentId').focus();
+      var skipButton = <HTMLElement>document.querySelector(
+        '.oppia-skip-to-content');
+      if (skipButton !== null) {
+        skipButton.focus();
+      }
+    });
+
+    Mousetrap.bind('?', () => {
+      this.openQuickReference();
     });
   }
 

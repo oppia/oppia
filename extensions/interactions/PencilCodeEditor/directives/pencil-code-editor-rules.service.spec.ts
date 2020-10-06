@@ -19,10 +19,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-/* eslint-disable max-len */
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-/* eslint-enable max-len */
+import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 
@@ -285,8 +282,6 @@ describe('Pencil Code Editor rules service', () => {
   });
 
   describe('\'results in error\' rule', () => {
-    var RULE_INPUT = null;
-
     it('should check if error is not empty', () => {
       expect(pcers.ResultsInError({
         error: '',

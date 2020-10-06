@@ -55,7 +55,6 @@ angular.module('oppia').factory('TranslationStatusService', [
     var stateWiseStatusColor = {};
     var explorationContentRequiredCount = 0;
     var explorationContentNotAvailableCount = 0;
-    var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
 
     var _getVoiceOverStatus = function(recordedVoiceovers, contentId) {
       var availabilityStatus = {
@@ -122,6 +121,7 @@ angular.module('oppia').factory('TranslationStatusService', [
 
       if (ExplorationStatesService.isInitialized()) {
         ExplorationStatesService.getStateNames().forEach(function(stateName) {
+          var stateNeedsUpdate = false;
           var noTranslationCount = 0;
           var recordedVoiceovers = (
             ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
@@ -148,16 +148,19 @@ angular.module('oppia').factory('TranslationStatusService', [
               if (TranslationTabActiveModeService.isTranslationModeActive()) {
                 stateNeedsUpdateWarnings[stateName] = (
                   TRANSLATION_NEEDS_UPDATE_MESSAGE);
+                stateNeedsUpdate = true;
               } else {
                 stateNeedsUpdateWarnings[stateName] = (
                   AUDIO_NEEDS_UPDATE_MESSAGE);
+                stateNeedsUpdate = true;
               }
             }
           });
           explorationContentNotAvailableCount += noTranslationCount;
-          if (noTranslationCount === 0) {
+          if (noTranslationCount === 0 && !stateNeedsUpdate) {
             stateWiseStatusColor[stateName] = ALL_ASSETS_AVAILABLE_COLOR;
-          } else if (noTranslationCount === allContentId.length) {
+          } else if (
+            noTranslationCount === allContentId.length && !stateNeedsUpdate) {
             stateWiseStatusColor[stateName] = NO_ASSETS_AVAILABLE_COLOR;
           } else {
             stateWiseStatusColor[stateName] = FEW_ASSETS_AVAILABLE_COLOR;

@@ -55,40 +55,29 @@ import threading
 import time
 import unittest
 
-import python_utils
 
-from . import common
-from . import concurrent_task_utils
 from . import install_third_party_libs
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, python_utils).
+install_third_party_libs.main()
+
+import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import concurrent_task_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DIRS_TO_ADD_TO_SYS_PATH = [
-    os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
-    common.GOOGLE_APP_ENGINE_SDK_HOME,
+    os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION),
+
     os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'grpcio-%s' % common.GRPCIO_VERSION),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
-    common.CURR_DIR,
-    os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.5'),
-    os.path.join(common.THIRD_PARTY_DIR, 'callbacks-0.3.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.43.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'packaging-20.4'),
-    os.path.join(common.THIRD_PARTY_DIR, 'pylatexenc-2.6'),
-    os.path.join(common.THIRD_PARTY_DIR, 'redis-3.5.3'),
-    os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.17.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'six-1.15.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
-    os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+    os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
+    common.CURR_DIR
 ]
 
 COVERAGE_DIR = os.path.join(
@@ -242,10 +231,6 @@ def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    # Make sure that third-party libraries are up-to-date before running tests,
-    # otherwise import errors may result.
-    install_third_party_libs.main()
-
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
@@ -255,8 +240,7 @@ def main(args=None):
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    import dev_appserver
-    dev_appserver.fix_sys_path()
+    common.fix_third_party_imports()
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

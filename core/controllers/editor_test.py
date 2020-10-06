@@ -31,6 +31,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import user_services
@@ -1018,13 +1019,21 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                     exp_id, 'invalid_state_name'),
                 expected_status_int=404)
 
+        self.assertEqual(len(observed_log_messages), 3)
         self.assertEqual(
-            observed_log_messages,
+            observed_log_messages[:2],
             [
                 'Could not find state: invalid_state_name',
                 'Available states: [u\'Introduction\']'
             ]
         )
+        # The last log message is the traceback for an Exception. It cannot be
+        # exactly compared to a static string because the traceback includes
+        # filepaths which will vary depending on the machine that runs the
+        # test. So the starting portion of the traceback that will remain
+        # constant is matched instead.
+        self.assertTrue(
+            'Traceback (most recent call last):' in observed_log_messages[2])
 
         self.logout()
 
@@ -1077,11 +1086,11 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
         rights_manager.assign_role_for_exploration(
             self.owner, unpublished_exp_id, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_exploration(
             self.owner, unpublished_exp_id, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_VOICE_ARTIST)
 
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
@@ -1116,10 +1125,10 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_VOICE_ARTIST)
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
@@ -1464,25 +1473,25 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.VIEWER_USERNAME,
-                'new_member_role': rights_manager.ROLE_VIEWER
+                'new_member_role': rights_domain.ROLE_VIEWER
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.VOICE_ARTIST_USERNAME,
-                'new_member_role': rights_manager.ROLE_VOICE_ARTIST
+                'new_member_role': rights_domain.ROLE_VOICE_ARTIST
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR2_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
 
         self.logout()
@@ -1522,7 +1531,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
             }, csrf_token=csrf_token,
             expected_status_int=401)
 
@@ -1557,7 +1566,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token, expected_status_int=401)
 
         self.logout()
@@ -1576,7 +1585,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token, expected_status_int=401)
 
         self.logout()

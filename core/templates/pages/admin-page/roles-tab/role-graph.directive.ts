@@ -42,18 +42,12 @@ angular.module('oppia').directive('roleGraph', [
         '/pages/admin-page/roles-tab/admin-roles-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$element', '$filter', 'StateGraphLayoutService',
+        '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
-            $element, $filter, StateGraphLayoutService,
+            $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
-          var getElementDimensions = function() {
-            return {
-              h: $element.height(),
-              w: $element.width()
-            };
-          };
 
           ctrl.getGraphHeightInPixels = function() {
             return Math.max(ctrl.GRAPH_HEIGHT, 300);

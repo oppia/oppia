@@ -23,11 +23,11 @@ import ast
 
 from core.domain import question_jobs_one_off
 from core.domain import question_services
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-taskqueue_services = models.Registry.import_taskqueue_services()
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
@@ -44,7 +44,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test questions.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.skill_id = 'skill_id'
         self.save_new_skill(
             self.skill_id, self.albert_id, description='Skill Description')
@@ -69,7 +69,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
         question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the question is exactly the same after migration.
         updated_question = (
@@ -106,7 +106,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted question is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the question is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -136,7 +136,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
         question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the question migrates correctly.
         updated_question = (
@@ -170,10 +170,10 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
         question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
             question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
@@ -181,3 +181,187 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                      [u'Question %s failed validation: linked_skill_ids is '
                       'either null or an empty list' % question_id]]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+
+    def setUp(self):
+        super(RegenerateQuestionSummaryOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test question.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
+        self.save_new_question(
+            self.QUESTION_ID, self.albert_id,
+            self._create_valid_question_data('ABC'), [self.skill_id])
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_job_skips_deleted_question(self):
+        """Tests that the regenerate summary job skips deleted question."""
+
+        question_services.delete_question(self.albert_id, self.QUESTION_ID)
+
+        # Ensure the question is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            question_services.get_question_by_id(self.QUESTION_ID)
+
+        # Start migration job on sample question.
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.create_new())
+        question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        # Ensure the question is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            question_services.get_question_by_id(self.QUESTION_ID)
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.get_output(job_id))
+
+        expected = [[u'question_deleted',
+                     [u'Encountered 1 deleted questions.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_regenerates_valid_question(self):
+        """Tests that the regenerate summary job skips deleted question."""
+
+        # Start migration job on sample question.
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.create_new())
+        question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.get_output(job_id))
+
+        expected = [[u'question_processed',
+                     [u'Successfully processed 1 questions.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_regeneration_job_skips_invalid_question(self):
+
+        def _mock_get_question_by_id(unused_question_id):
+            """Mocks get_question_by_id()."""
+            return 'invalid_question'
+
+        get_question_by_id_swap = self.swap(
+            question_services, 'get_question_by_id', _mock_get_question_by_id)
+
+        with get_question_by_id_swap:
+            job_id = (
+                question_jobs_one_off
+                .RegenerateQuestionSummaryOneOffJob.create_new())
+            question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.get_output(job_id))
+
+        for x in output:
+            self.assertRegexpMatches(
+                x, 'object has no attribute \'question_state_data\'')
+
+
+class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+
+    def setUp(self):
+        super(MissingQuestionMigrationOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
+
+        self.question = self.save_new_question(
+            self.QUESTION_ID, self.albert_id,
+            self._create_valid_question_data('ABC'), [self.skill_id])
+
+        self.model_instance = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-question_id-1'))
+
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            question_jobs_one_off
+            .MissingQuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            question_jobs_one_off.MissingQuestionMigrationOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+        self.assertFalse(self.model_instance.deleted)
+
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance.deleted = True
+        self.model_instance.put()
+
+        def mock_get_question_by_id(unused_question_id, strict=True): # pylint: disable=unused-argument
+            return None
+
+        with self.swap(
+            question_services, 'get_question_by_id',
+            mock_get_question_by_id):
+            job_id = (
+                question_jobs_one_off
+                .MissingQuestionMigrationOneOffJob.create_new())
+            question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+            output = (
+                question_jobs_one_off
+                .MissingQuestionMigrationOneOffJob.get_output(job_id))
+            self.assertEqual(output, [])
+
+    def test_migration_job_removes_commit_model_if_question_model_is_missing(
+            self):
+        def mock_get_question_by_id(unused_question_id, strict=True): # pylint: disable=unused-argument
+            return None
+
+        with self.swap(
+            question_services, 'get_question_by_id',
+            mock_get_question_by_id):
+            job_id = (
+                question_jobs_one_off
+                .MissingQuestionMigrationOneOffJob.create_new())
+            question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+            output = (
+                question_jobs_one_off
+                .MissingQuestionMigrationOneOffJob.get_output(job_id))
+            self.assertEqual(
+                output, [
+                    '[u\'Question Commit Model deleted\', '
+                    '[u\'question-question_id-1\']]'])
+            self.model_instance = (
+                question_models.QuestionCommitLogEntryModel.get_by_id(
+                    'question-question_id-1'))
+            self.assertIsNone(self.model_instance)

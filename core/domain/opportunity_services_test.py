@@ -85,7 +85,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
-            end_state_name='End State'
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
@@ -320,10 +321,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Contains': [{'x': 'Test'}]
-            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -750,7 +753,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
-            end_state_name='End State'
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:

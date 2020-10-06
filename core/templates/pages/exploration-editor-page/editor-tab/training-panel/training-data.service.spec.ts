@@ -20,18 +20,11 @@
 // training-data.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-/* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
+  /* eslint-disable-next-line max-len */
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-/* eslint-enable max-len */
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -43,16 +36,10 @@ import { ParamChangesObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -68,7 +55,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('App.ts');
-require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
@@ -83,8 +69,7 @@ require(
   'state-interaction-id.service.ts');
 
 describe('TrainingDataService', function() {
-  var $httpBackend;
-  var scope, siis, ecs, cls, rs, tds, ess, IS, oof;
+  var siis, ecs, rs, tds, ess, oof;
   var mockExplorationData;
 
   beforeEach(
@@ -101,25 +86,13 @@ describe('TrainingDataService', function() {
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
     angular.mock.module(function($provide) {
-      $provide.constant('INTERACTION_SPECS', {
-        TextInput: {
-          display_mode: 'inline',
-          is_terminal: false
-        }
-      });
       $provide.value('AngularNameService', new AngularNameService());
-      $provide.value(
-        'AnswerClassificationResultObjectFactory',
-        new AnswerClassificationResultObjectFactory());
       $provide.value(
         'AnswerGroupsCacheService', new AnswerGroupsCacheService());
       $provide.value(
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
           new RuleObjectFactory()));
-      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-      $provide.value(
-        'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
@@ -138,8 +111,7 @@ describe('TrainingDataService', function() {
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
-        'StateClassifierMappingService', new StateClassifierMappingService(
-          new ClassifierObjectFactory()));
+        'StateClassifierMappingService', new StateClassifierMappingService());
       $provide.value(
         'StateEditorService', new StateEditorService(
           new SolutionValidityService()));
@@ -166,15 +138,11 @@ describe('TrainingDataService', function() {
   });
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
-    scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('StateInteractionIdService');
     ecs = $injector.get('StateEditorService');
-    cls = $injector.get('ChangeListService');
     ess = $injector.get('ExplorationStatesService');
     rs = $injector.get('ResponsesService');
     tds = $injector.get('TrainingDataService');
-    IS = $injector.get('INTERACTION_SPECS');
     oof = $injector.get('OutcomeObjectFactory');
 
     // Set the currently loaded interaction ID.
@@ -196,14 +164,10 @@ describe('TrainingDataService', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [
-                {
-                  x: 'Test'
-                }
-              ]
-            },
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: 'Test'}
+            }],
             outcome: {
               dest: 'State',
               feedback: {

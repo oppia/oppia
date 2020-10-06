@@ -24,9 +24,9 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
+datastore_services = models.Registry.import_datastore_services()
 
 # Available choices of algorithms for classification.
 ALGORITHM_CHOICES = [classifier_details['algorithm_id'] for (
@@ -41,40 +41,54 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     """
 
     # The ID of the algorithm used to create the model.
-    algorithm_id = ndb.StringProperty(
+    algorithm_id = datastore_services.StringProperty(
         required=True, choices=ALGORITHM_CHOICES, indexed=True)
     # The ID of the interaction to which the algorithm belongs.
-    interaction_id = ndb.StringProperty(required=True, indexed=True)
+    interaction_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True, indexed=True)
+    exp_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration version at the time this training job was created.
-    exp_version = ndb.IntegerProperty(required=True, indexed=True)
+    exp_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True, indexed=True)
+    state_name = datastore_services.StringProperty(required=True, indexed=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING.
-    status = ndb.StringProperty(
+    status = datastore_services.StringProperty(
         required=True, choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
         default=feconf.TRAINING_JOB_STATUS_PENDING, indexed=True)
     # The training data which is to be populated when retrieving the job.
     # The list contains dicts where each dict represents a single training
     # data group.
-    training_data = ndb.JsonProperty(default=None)
+    training_data = datastore_services.JsonProperty(default=None)
     # The time when the job's status should next be checked.
     # It is incremented by TTL when a job with status NEW is picked up by VM.
-    next_scheduled_check_time = ndb.DateTimeProperty(
+    next_scheduled_check_time = datastore_services.DateTimeProperty(
         required=True, indexed=True)
     # The schema version for the data that is being classified.
-    data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    data_schema_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
         """ClassifierTrainingJobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_scheduled_check_time':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'data_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -212,24 +226,30 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     """
 
     # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True, indexed=True)
+    exp_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration version at the time the corresponding classifier's
     # training job was created.
-    exp_version = ndb.IntegerProperty(required=True, indexed=True)
+    exp_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True, indexed=True)
+    state_name = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the training job corresponding to the exploration attributes.
-    job_id = ndb.StringProperty(required=True, indexed=True)
+    job_id = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
         """TrainingJobExplorationMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):

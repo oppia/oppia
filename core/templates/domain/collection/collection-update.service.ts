@@ -19,27 +19,24 @@
  * undo/redo service.
  */
 
+import { Change } from 'domain/editor/undo_redo/change.model';
+
 require('domain/collection/collection-node-object.factory.ts');
-require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 
 require('domain/collection/collection-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('CollectionUpdateService', [
-  'ChangeObjectFactory',
   'CollectionNodeObjectFactory', 'UndoRedoService',
   'CMD_ADD_COLLECTION_NODE',
   'CMD_DELETE_COLLECTION_NODE',
-  'CMD_EDIT_COLLECTION_NODE_PROPERTY',
   'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_SWAP_COLLECTION_NODES',
   'COLLECTION_PROPERTY_CATEGORY', 'COLLECTION_PROPERTY_LANGUAGE_CODE',
   'COLLECTION_PROPERTY_OBJECTIVE',
   'COLLECTION_PROPERTY_TAGS', 'COLLECTION_PROPERTY_TITLE', function(
-      ChangeObjectFactory,
       CollectionNodeObjectFactory, UndoRedoService,
       CMD_ADD_COLLECTION_NODE,
       CMD_DELETE_COLLECTION_NODE,
-      CMD_EDIT_COLLECTION_NODE_PROPERTY,
       CMD_EDIT_COLLECTION_PROPERTY, CMD_SWAP_COLLECTION_NODES,
       COLLECTION_PROPERTY_CATEGORY, COLLECTION_PROPERTY_LANGUAGE_CODE,
       COLLECTION_PROPERTY_OBJECTIVE,
@@ -50,7 +47,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
     var _applyChange = function(collection, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       UndoRedoService.applyChange(changeObj, collection);
     };
 
@@ -71,19 +68,6 @@ angular.module('oppia').factory('CollectionUpdateService', [
 
     var _getNewPropertyValueFromChangeDict = function(changeDict) {
       return _getParameterFromChangeDict(changeDict, 'new_value');
-    };
-
-    // Applies a property change to a collection node. See _applyChanges() for
-    // details on the other behavior of this function.
-    var _applyNodePropertyChange = function(
-        collection, propertyName, explorationId, newValue, oldValue, apply,
-        reverse) {
-      _applyChange(collection, CMD_EDIT_COLLECTION_NODE_PROPERTY, {
-        property_name: propertyName,
-        exploration_id: explorationId,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
-      }, apply, reverse);
     };
 
     var _getExplorationIdFromChangeDict = function(changeDict) {

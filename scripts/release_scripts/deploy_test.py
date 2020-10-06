@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 from core.tests import test_utils
 import python_utils
@@ -98,8 +99,6 @@ class DeployTests(test_utils.GenericTestBase):
             self.print_arr.append(msg)
         def mock_check_release_doc():
             pass
-        def mock_add_redishost():
-            pass
 
         self.install_swap = self.swap(
             install_third_party_libs, 'main', mock_main)
@@ -135,8 +134,6 @@ class DeployTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.release_doc_swap = self.swap(
             deploy, 'check_release_doc', mock_check_release_doc)
-        self.redishost_swap = self.swap(
-            update_configs, 'add_redishost', mock_add_redishost)
 
     def test_invalid_app_name(self):
         args_swap = self.swap(
@@ -234,13 +231,57 @@ class DeployTests(test_utils.GenericTestBase):
                         Exception, 'Invalid last commit message: Invalid.'):
                         deploy.execute_deployment()
 
-    def test_missing_mailgun_api(self):
+    def test_mailgun_api_update_done_for_prod_server(self):
+        check_function_calls = {
+            'main_gets_called': False,
+            'prompt_value': False
+        }
+        expected_check_function_calls = {
+            'main_gets_called': True,
+            'prompt_value': True
+        }
+        def mock_main(
+                unused_release_dir_path, unused_deploy_data_path,
+                unused_personal_access_token,
+                prompt_for_mailgun_and_terms_update):
+            check_function_calls['main_gets_called'] = True
+            check_function_calls['prompt_value'] = (
+                prompt_for_mailgun_and_terms_update)
+        config_swap = self.swap(update_configs, 'main', mock_main)
+
+        with config_swap:
+            deploy.update_configs_in_deploy_data(
+                'oppiaserver', 'test-release-dir', 'test-deploy-dir',
+                'test-token')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_mailgun_api_update_not_done_for_test_server(self):
+        check_function_calls = {
+            'main_gets_called': False,
+            'prompt_value': False
+        }
+        expected_check_function_calls = {
+            'main_gets_called': True,
+            'prompt_value': False
+        }
+        def mock_main(
+                unused_release_dir_path, unused_deploy_data_path,
+                unused_personal_access_token,
+                prompt_for_mailgun_and_terms_update):
+            check_function_calls['main_gets_called'] = True
+            check_function_calls['prompt_value'] = (
+                prompt_for_mailgun_and_terms_update)
+        config_swap = self.swap(update_configs, 'main', mock_main)
+
+        with config_swap:
+            deploy.update_configs_in_deploy_data(
+                'oppiatestserver', 'test-release-dir', 'test-deploy-dir',
+                'test-token')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_missing_third_party_dir(self):
         args_swap = self.swap(
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
-        feconf_swap = self.swap(
-            common, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
-        def mock_main(unused_personal_access_token):
-            pass
         def mock_get_personal_access_token():
             return 'test'
         def mock_get_organization(unused_self, unused_name):
@@ -257,7 +298,6 @@ class DeployTests(test_utils.GenericTestBase):
         def mock_check_travis_and_circleci_tests(unused_current_branch_name):
             pass
 
-        config_swap = self.swap(update_configs, 'main', mock_main)
         get_token_swap = self.swap(
             common, 'get_personal_access_token', mock_get_personal_access_token)
         get_org_swap = self.swap(
@@ -275,30 +315,20 @@ class DeployTests(test_utils.GenericTestBase):
         check_tests_swap = self.swap(
             deploy, 'check_travis_and_circleci_tests',
             mock_check_travis_and_circleci_tests)
-
-        with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
-            with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, self.release_doc_swap, config_swap:
-                    with get_token_swap, get_org_swap, get_repo_swap:
-                        with bug_check_swap, pr_check_swap, out_swap:
-                            with args_swap, feconf_swap, check_tests_swap:
-                                with self.assertRaisesRegexp(
-                                    Exception,
-                                    'The mailgun API key must be added before '
-                                    'deployment.'):
-                                    deploy.execute_deployment()
-
-    def test_missing_third_party_dir(self):
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, self.args_swap, self.redishost_swap:
-                    with third_party_swap, self.assertRaisesRegexp(
-                        Exception,
-                        'Could not find third_party directory at INVALID_DIR. '
-                        'Please run install_third_party_libs.py prior to '
-                        'running this script.'):
-                        deploy.execute_deployment()
+                with self.run_swap, self.release_doc_swap, args_swap:
+                    with get_token_swap, get_org_swap, get_repo_swap:
+                        with bug_check_swap, pr_check_swap, out_swap:
+                            with check_tests_swap, third_party_swap:
+                                with self.assertRaisesRegexp(
+                                    Exception,
+                                    'Could not find third_party directory at '
+                                    'INVALID_DIR. Please run '
+                                    'install_third_party_libs.py prior to '
+                                    'running this script.'):
+                                    deploy.execute_deployment()
 
     def test_invalid_dir_access(self):
         def mock_getcwd():
@@ -308,7 +338,7 @@ class DeployTests(test_utils.GenericTestBase):
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
-                        with self.run_swap, self.redishost_swap, getcwd_swap:
+                        with self.run_swap, getcwd_swap:
                             with self.assertRaisesRegexp(
                                 Exception,
                                 'Invalid directory accessed '
@@ -323,7 +353,8 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': False,
             'switch_version_gets_called': False,
             'flush_memcache_gets_called': False,
-            'check_breakage_gets_called': False
+            'check_breakage_gets_called': False,
+            'update_configs_in_deploy_data_gets_called': False
         }
         expected_check_function_calls = {
             'preprocess_release_gets_called': True,
@@ -332,12 +363,14 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': True,
             'switch_version_gets_called': True,
             'flush_memcache_gets_called': True,
-            'check_breakage_gets_called': True
+            'check_breakage_gets_called': True,
+            'update_configs_in_deploy_data_gets_called': True
         }
         def mock_getcwd():
             return 'deploy-oppiatestserver-release-1.2.3-%s' % (
                 deploy.CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
-        def mock_preprocess_release(unused_app_name, unused_deploy_data_path):
+        def mock_preprocess_release(
+                unused_app_name, unused_deploy_data_path):
             check_function_calls['preprocess_release_gets_called'] = True
         def mock_update_and_check_indexes(unused_app_name):
             check_function_calls['update_and_check_indexes_gets_called'] = True
@@ -359,6 +392,11 @@ class DeployTests(test_utils.GenericTestBase):
                 unused_app_name, current_release_version):
             if current_release_version == '1-2-3':
                 check_function_calls['check_breakage_gets_called'] = True
+        def mock_update_configs_in_deploy_data(
+                unused_app_name, unused_release_dir_path,
+                unused_deploy_data_path, unused_personal_access_token):
+            check_function_calls[
+                'update_configs_in_deploy_data_gets_called'] = True
 
         cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         preprocess_swap = self.swap(
@@ -375,13 +413,113 @@ class DeployTests(test_utils.GenericTestBase):
             deploy, 'flush_memcache', mock_flush_memcache)
         check_breakage_swap = self.swap(
             deploy, 'check_breakage', mock_check_breakage)
+        uc_swap = self.swap(
+            deploy, 'update_configs_in_deploy_data',
+            mock_update_configs_in_deploy_data)
 
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
                         with cwd_swap, preprocess_swap, update_swap, build_swap:
-                            with deploy_swap, switch_swap, self.redishost_swap:
+                            with uc_swap, deploy_swap, switch_swap:
+                                with memcache_swap, check_breakage_swap:
+                                    deploy.execute_deployment()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_function_calls_with_custom_release_dir_path(self):
+        check_function_calls = {
+            'getcwd_gets_called': False,
+            'preprocess_release_gets_called': False,
+            'update_and_check_indexes_gets_called': False,
+            'build_scripts_gets_called': False,
+            'deploy_application_and_write_log_entry_gets_called': False,
+            'switch_version_gets_called': False,
+            'flush_memcache_gets_called': False,
+            'check_breakage_gets_called': False,
+            'update_configs_in_deploy_data_gets_called': False,
+            'copyfile_gets_called': False
+        }
+        expected_check_function_calls = {
+            'getcwd_gets_called': True,
+            'preprocess_release_gets_called': True,
+            'update_and_check_indexes_gets_called': True,
+            'build_scripts_gets_called': True,
+            'deploy_application_and_write_log_entry_gets_called': True,
+            'switch_version_gets_called': True,
+            'flush_memcache_gets_called': True,
+            'check_breakage_gets_called': True,
+            'update_configs_in_deploy_data_gets_called': True,
+            'copyfile_gets_called': True
+        }
+        release_dir_path = 'deploy-oppiatestserver-release-1.2.3-%s' % (
+            deploy.CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+        def mock_getcwd():
+            if not check_function_calls['getcwd_gets_called']:
+                check_function_calls['getcwd_gets_called'] = True
+                return 'oppia'
+            return release_dir_path
+        def mock_preprocess_release(
+                unused_app_name, unused_deploy_data_path):
+            check_function_calls['preprocess_release_gets_called'] = True
+        def mock_update_and_check_indexes(unused_app_name):
+            check_function_calls['update_and_check_indexes_gets_called'] = True
+        def mock_build_scripts(unused_maintenance_mode):
+            check_function_calls['build_scripts_gets_called'] = True
+        def mock_deploy_application_and_write_log_entry(
+                unused_app_name, version_to_deploy_to,
+                unused_current_git_revision):
+            if version_to_deploy_to == '1-2-3':
+                check_function_calls[
+                    'deploy_application_and_write_log_entry_gets_called'] = True
+        def mock_switch_version(
+                unused_app_name, current_release_version):
+            if current_release_version == '1-2-3':
+                check_function_calls['switch_version_gets_called'] = True
+        def mock_flush_memcache(unused_app_name):
+            check_function_calls['flush_memcache_gets_called'] = True
+        def mock_check_breakage(
+                unused_app_name, current_release_version):
+            if current_release_version == '1-2-3':
+                check_function_calls['check_breakage_gets_called'] = True
+        def mock_update_configs_in_deploy_data(
+                unused_app_name, unused_release_dir_path,
+                unused_deploy_data_path, unused_personal_access_token):
+            check_function_calls[
+                'update_configs_in_deploy_data_gets_called'] = True
+        def mock_copyfile(unused_src, unused_dest):
+            check_function_calls['copyfile_gets_called'] = True
+
+        cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+        preprocess_swap = self.swap(
+            deploy, 'preprocess_release', mock_preprocess_release)
+        update_swap = self.swap(
+            deploy, 'update_and_check_indexes', mock_update_and_check_indexes)
+        build_swap = self.swap(deploy, 'build_scripts', mock_build_scripts)
+        deploy_swap = self.swap(
+            deploy, 'deploy_application_and_write_log_entry',
+            mock_deploy_application_and_write_log_entry)
+        switch_swap = self.swap(
+            deploy, 'switch_version', mock_switch_version)
+        memcache_swap = self.swap(
+            deploy, 'flush_memcache', mock_flush_memcache)
+        check_breakage_swap = self.swap(
+            deploy, 'check_breakage', mock_check_breakage)
+        uc_swap = self.swap(
+            deploy, 'update_configs_in_deploy_data',
+            mock_update_configs_in_deploy_data)
+        copy_swap = self.swap(shutil, 'copyfile', mock_copyfile)
+        args_swap = self.swap(
+            sys, 'argv', [
+                'deploy.py', '--app_name=oppiatestserver',
+                '--release_dir_path=%s' % release_dir_path])
+
+        with self.get_branch_swap, self.install_swap:
+            with self.release_script_exist_swap, self.gcloud_available_swap:
+                with args_swap, self.exists_swap, self.check_output_swap:
+                    with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
+                        with cwd_swap, preprocess_swap, update_swap, build_swap:
+                            with uc_swap, deploy_swap, switch_swap, copy_swap:
                                 with memcache_swap, check_breakage_swap:
                                     deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -394,7 +532,8 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': False,
             'switch_version_gets_called': False,
             'flush_memcache_gets_called': False,
-            'check_breakage_gets_called': False
+            'check_breakage_gets_called': False,
+            'update_configs_in_deploy_data_gets_called': False
         }
         expected_check_function_calls = {
             'preprocess_release_gets_called': True,
@@ -403,12 +542,14 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': True,
             'switch_version_gets_called': True,
             'flush_memcache_gets_called': True,
-            'check_breakage_gets_called': True
+            'check_breakage_gets_called': True,
+            'update_configs_in_deploy_data_gets_called': True
         }
         def mock_getcwd():
             return 'deploy-oppiatestserver-release-1.2.3-%s' % (
                 deploy.CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
-        def mock_preprocess_release(unused_app_name, unused_deploy_data_path):
+        def mock_preprocess_release(
+                unused_app_name, unused_deploy_data_path):
             check_function_calls['preprocess_release_gets_called'] = True
         def mock_update_and_check_indexes(unused_app_name):
             check_function_calls['update_and_check_indexes_gets_called'] = True
@@ -430,6 +571,11 @@ class DeployTests(test_utils.GenericTestBase):
                 unused_app_name, current_release_version):
             if current_release_version == 'release-1-2-3-custom':
                 check_function_calls['check_breakage_gets_called'] = True
+        def mock_update_configs_in_deploy_data(
+                unused_app_name, unused_release_dir_path,
+                unused_deploy_data_path, unused_personal_access_token):
+            check_function_calls[
+                'update_configs_in_deploy_data_gets_called'] = True
 
         cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         preprocess_swap = self.swap(
@@ -450,13 +596,16 @@ class DeployTests(test_utils.GenericTestBase):
             sys, 'argv', [
                 'deploy.py', '--app_name=oppiatestserver',
                 '--version=release-1.2.3-custom'])
+        uc_swap = self.swap(
+            deploy, 'update_configs_in_deploy_data',
+            mock_update_configs_in_deploy_data)
 
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
                         with cwd_swap, preprocess_swap, update_swap, build_swap:
-                            with deploy_swap, switch_swap, self.redishost_swap:
+                            with uc_swap, deploy_swap, switch_swap:
                                 with memcache_swap, check_breakage_swap:
                                     deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -474,7 +623,7 @@ class DeployTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         with exists_swap, self.assertRaisesRegexp(
             Exception,
-            'Could not find source path deploy_dir/%s. Please '
+            'Could not find source path deploy_dir/assets/%s. Please '
             'check your deploy_data folder.' % deploy.FILES_AT_ROOT[0]):
             deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
@@ -503,7 +652,7 @@ class DeployTests(test_utils.GenericTestBase):
         with exists_swap, images_dir_swap, self.copyfile_swap:
             with self.assertRaisesRegexp(
                 Exception,
-                'Could not find source dir deploy_dir/images/invalid. '
+                'Could not find source dir deploy_dir/assets/images/invalid. '
                 'Please check your deploy_data folder.'):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
@@ -577,29 +726,63 @@ class DeployTests(test_utils.GenericTestBase):
     def test_indexes_not_serving(self):
         check_function_calls = {
             'update_indexes_gets_called': False,
-            'check_all_indexes_are_serving_gets_called': False
+            'check_all_indexes_are_serving_gets_called': 0,
+            'sleep_gets_called': 0
         }
         expected_check_function_calls = {
             'update_indexes_gets_called': True,
-            'check_all_indexes_are_serving_gets_called': True
+            'check_all_indexes_are_serving_gets_called': 2,
+            'sleep_gets_called': 1
         }
         def mock_update_indexes(unused_index_yaml_path, unused_app_name):
             check_function_calls['update_indexes_gets_called'] = True
         def mock_check_indexes(unused_app_name):
             check_function_calls[
-                'check_all_indexes_are_serving_gets_called'] = True
+                'check_all_indexes_are_serving_gets_called'] += 1
+            if check_function_calls[
+                    'check_all_indexes_are_serving_gets_called'] == 2:
+                return True
             return False
+        def mock_sleep(unused_time):
+            check_function_calls['sleep_gets_called'] += 1
 
         update_indexes_swap = self.swap(
             gcloud_adapter, 'update_indexes', mock_update_indexes)
         check_indexes_swap = self.swap(
             gcloud_adapter, 'check_all_indexes_are_serving', mock_check_indexes)
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
         with self.open_tab_swap, update_indexes_swap, check_indexes_swap:
-            with self.assertRaisesRegexp(
-                Exception,
-                'Please wait for all indexes to serve, then run this '
-                'script again to complete the deployment. For details, '
-                'visit the indexes page. Exiting.'):
+            with sleep_swap:
+                deploy.update_and_check_indexes('oppiaserver')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_indexes_serving(self):
+        check_function_calls = {
+            'update_indexes_gets_called': False,
+            'check_all_indexes_are_serving_gets_called': 0,
+            'sleep_gets_called': 0
+        }
+        expected_check_function_calls = {
+            'update_indexes_gets_called': True,
+            'check_all_indexes_are_serving_gets_called': 1,
+            'sleep_gets_called': 0
+        }
+        def mock_update_indexes(unused_index_yaml_path, unused_app_name):
+            check_function_calls['update_indexes_gets_called'] = True
+        def mock_check_indexes(unused_app_name):
+            check_function_calls[
+                'check_all_indexes_are_serving_gets_called'] += 1
+            return True
+        def mock_sleep(unused_time):
+            check_function_calls['sleep_gets_called'] += 1
+
+        update_indexes_swap = self.swap(
+            gcloud_adapter, 'update_indexes', mock_update_indexes)
+        check_indexes_swap = self.swap(
+            gcloud_adapter, 'check_all_indexes_are_serving', mock_check_indexes)
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+        with self.open_tab_swap, update_indexes_swap, check_indexes_swap:
+            with sleep_swap:
                 deploy.update_and_check_indexes('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

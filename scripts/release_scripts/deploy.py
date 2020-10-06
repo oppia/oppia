@@ -47,6 +47,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 
 import python_utils
 import release_constants
@@ -69,6 +70,10 @@ _PARSER.add_argument(
     '--version', help='version to deploy', type=str)
 _PARSER.add_argument(
     '--maintenance_mode', action='store_true', default=False)
+_PARSER.add_argument(
+    '--release_dir_path',
+    help='Path to directory which contains all the files to be released',
+    type=str)
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
@@ -80,6 +85,7 @@ APP_DEV_YAML_PATH = os.path.join('.', 'app_dev.yaml')
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
+FECONF_FILE_PATH = os.path.join('.', 'feconf.py')
 
 FILES_AT_ROOT = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
@@ -101,7 +107,6 @@ def preprocess_release(app_name, deploy_data_path):
     (1) Substitutes files from the per-app deployment data.
     (2) Changes GCS_RESOURCE_BUCKET in assets/constants.ts.
     (3) Updates project id for vpc_access_connector in app_dev.yaml.
-    (4) Updates REDISHOST in feconf.py
 
     Args:
         app_name: str. Name of the app to deploy.
@@ -120,7 +125,7 @@ def preprocess_release(app_name, deploy_data_path):
 
     # Copies files in root folder to assets/.
     for filename in FILES_AT_ROOT:
-        src = os.path.join(deploy_data_path, filename)
+        src = os.path.join(deploy_data_path, 'assets', filename)
         dst = os.path.join(os.getcwd(), 'assets', filename)
         if not os.path.exists(src):
             raise Exception(
@@ -134,7 +139,7 @@ def preprocess_release(app_name, deploy_data_path):
 
     # Copies files in images to /assets/images.
     for dir_name in IMAGE_DIRS:
-        src_dir = os.path.join(deploy_data_path, 'images', dir_name)
+        src_dir = os.path.join(deploy_data_path, 'assets', 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'assets', 'images', dir_name)
 
         if not os.path.exists(src_dir):
@@ -221,12 +226,14 @@ def update_and_check_indexes(app_name):
         'https://console.cloud.google.com/datastore/indexes'
         '?project=%s') % app_name
     gcloud_adapter.update_indexes(INDEX_YAML_PATH, app_name)
-    if not gcloud_adapter.check_all_indexes_are_serving(app_name):
-        common.open_new_tab_in_browser_if_possible(indexes_page_url)
-        raise Exception(
-            'Please wait for all indexes to serve, then run this '
-            'script again to complete the deployment. For details, '
-            'visit the indexes page. Exiting.')
+
+    counter = 1
+    while not gcloud_adapter.check_all_indexes_are_serving(app_name):
+        if counter == 1:
+            common.open_new_tab_in_browser_if_possible(indexes_page_url)
+            python_utils.PRINT('Waiting for all indexes to serve...')
+        counter += 1
+        time.sleep(30)
 
 
 def build_scripts(maintenance_mode):
@@ -266,11 +273,11 @@ def deploy_application_and_write_log_entry(
         version_to_deploy_to: str. The version to deploy to.
         current_git_revision: str. The current git revision.
     """
-    # Deploy export service to GAE.
-    gcloud_adapter.deploy_application('export/app.yaml', app_name)
     # Deploy app to GAE.
     gcloud_adapter.deploy_application(
         './app.yaml', app_name, version=version_to_deploy_to)
+    # Deploy cron yaml to GAE.
+    gcloud_adapter.deploy_application('cron.yaml', app_name)
     # Writing log entry.
     common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
     with python_utils.open_file(LOG_FILE_PATH, 'a') as log_file:
@@ -464,6 +471,27 @@ def check_release_doc():
     common.ask_user_to_confirm(message)
 
 
+def update_configs_in_deploy_data(
+        app_name, release_dir_path, deploy_data_path, personal_access_token):
+    """Updates feconf and constants file in deploy data to match the config
+    files in release scripts.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+        release_dir_path: str. Path of directory where all files are copied
+            for release.
+        deploy_data_path: str. Path for deploy data directory.
+        personal_access_token: str. The personal access token for the
+            GitHub id of user.
+    """
+    if app_name == APP_NAME_OPPIASERVER:
+        update_configs.main(
+            release_dir_path, deploy_data_path, personal_access_token, True)
+    else:
+        update_configs.main(
+            release_dir_path, deploy_data_path, personal_access_token, False)
+
+
 def execute_deployment():
     """Executes the deployment process after doing the prerequisite checks.
 
@@ -498,15 +526,6 @@ def execute_deployment():
 
     current_branch_name = common.get_current_branch_name()
 
-    release_dir_name = 'deploy-%s-%s-%s' % (
-        '-'.join('-'.join(app_name.split('.')).split(':')),
-        current_branch_name,
-        CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
-    release_dir_path = os.path.join(os.getcwd(), '..', release_dir_name)
-
-    deploy_data_path = os.path.join(
-        os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', app_name)
-
     install_third_party_libs.main()
 
     if not (common.is_current_branch_a_release_branch() or (
@@ -537,45 +556,58 @@ def execute_deployment():
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
     gcloud_adapter.require_gcloud_to_be_available()
-    try:
-        if app_name == APP_NAME_OPPIASERVER:
-            check_release_doc()
-            release_version_number = common.get_current_release_version_number(
-                current_branch_name)
-            last_commit_message = subprocess.check_output(
-                'git log -1 --pretty=%B'.split())
-            personal_access_token = common.get_personal_access_token()
-            if not common.is_current_branch_a_hotfix_branch():
-                if not last_commit_message.startswith(
-                        'Update authors and changelog for v%s' % (
-                            release_version_number)):
-                    raise Exception(
-                        'Invalid last commit message: %s.' % (
-                            last_commit_message))
-                g = github.Github(personal_access_token)
-                repo = g.get_organization('oppia').get_repo('oppia')
-                common.check_blocking_bug_issue_count(repo)
-                common.check_prs_for_current_release_are_released(repo)
 
-            check_travis_and_circleci_tests(current_branch_name)
-            update_configs.main(personal_access_token)
-            with python_utils.open_file(common.FECONF_PATH, 'r') as f:
-                feconf_contents = f.read()
-                if ('MAILGUN_API_KEY' not in feconf_contents or
-                        'MAILGUN_API_KEY = None' in feconf_contents):
-                    raise Exception(
-                        'The mailgun API key must be added before deployment.')
+    personal_access_token = None
+    if app_name == APP_NAME_OPPIASERVER:
+        check_release_doc()
+        release_version_number = common.get_current_release_version_number(
+            current_branch_name)
+        last_commit_message = subprocess.check_output(
+            'git log -1 --pretty=%B'.split())
+        personal_access_token = common.get_personal_access_token()
+        if not common.is_current_branch_a_hotfix_branch():
+            if not last_commit_message.startswith(
+                    'Update authors and changelog for v%s' % (
+                        release_version_number)):
+                raise Exception(
+                    'Invalid last commit message: %s.' % (
+                        last_commit_message))
+            g = github.Github(personal_access_token)
+            repo = g.get_organization('oppia').get_repo('oppia')
+            common.check_blocking_bug_issue_count(repo)
+            common.check_prs_for_current_release_are_released(repo)
 
-        update_configs.add_redishost()
+        check_travis_and_circleci_tests(current_branch_name)
 
-        if not os.path.exists(THIRD_PARTY_DIR):
-            raise Exception(
-                'Could not find third_party directory at %s. Please run '
-                'install_third_party_libs.py prior to running this script.'
-                % THIRD_PARTY_DIR)
+    if not os.path.exists(THIRD_PARTY_DIR):
+        raise Exception(
+            'Could not find third_party directory at %s. Please run '
+            'install_third_party_libs.py prior to running this script.'
+            % THIRD_PARTY_DIR)
 
-        current_git_revision = subprocess.check_output(
-            ['git', 'rev-parse', 'HEAD']).strip()
+    current_git_revision = subprocess.check_output(
+        ['git', 'rev-parse', 'HEAD']).strip()
+
+    if parsed_args.release_dir_path:
+        release_dir_path = parsed_args.release_dir_path
+        release_dir_name = os.path.basename(release_dir_path)
+
+        # These files are copied even when an existing dir is supplied
+        # since we want to overwrite any previous changes that were made
+        # to the config.
+        config_filepaths = [
+            APP_DEV_YAML_PATH, common.CONSTANTS_FILE_PATH,
+            FECONF_FILE_PATH, INDEX_YAML_PATH,
+        ]
+        for filepath in config_filepaths:
+            shutil.copyfile(
+                filepath, os.path.join(release_dir_path, filepath))
+    else:
+        release_dir_name = 'deploy-%s-%s-%s' % (
+            '-'.join('-'.join(app_name.split('.')).split(':')),
+            current_branch_name,
+            CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+        release_dir_path = os.path.join(os.getcwd(), '..', release_dir_name)
 
         # Create a folder in which to save the release candidate.
         python_utils.PRINT('Ensuring that the release directory parent exists')
@@ -587,37 +619,37 @@ def execute_deployment():
             os.getcwd(), release_dir_path,
             ignore=shutil.ignore_patterns('.git'))
 
-        # Change the current directory to the release candidate folder.
-        with common.CD(release_dir_path):
-            if not os.getcwd().endswith(release_dir_name):
-                raise Exception(
-                    'Invalid directory accessed during deployment: %s'
-                    % os.getcwd())
+    deploy_data_path = os.path.join(
+        os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', app_name)
 
-            python_utils.PRINT('Changing directory to %s' % os.getcwd())
+    # Change the current directory to the release candidate folder.
+    with common.CD(release_dir_path):
+        if not os.getcwd().endswith(release_dir_name):
+            raise Exception(
+                'Invalid directory accessed during deployment: %s'
+                % os.getcwd())
 
-            python_utils.PRINT('Preprocessing release...')
-            preprocess_release(app_name, deploy_data_path)
+        python_utils.PRINT('Changing directory to %s' % os.getcwd())
 
-            update_and_check_indexes(app_name)
-            build_scripts(parsed_args.maintenance_mode)
-            deploy_application_and_write_log_entry(
-                app_name, current_release_version,
-                current_git_revision)
+        update_configs_in_deploy_data(
+            app_name, release_dir_path, deploy_data_path, personal_access_token)
 
-            python_utils.PRINT('Returning to oppia/ root directory.')
+        python_utils.PRINT('Preprocessing release...')
+        preprocess_release(app_name, deploy_data_path)
 
-        switch_version(app_name, current_release_version)
-        flush_memcache(app_name)
-        check_breakage(app_name, current_release_version)
+        update_and_check_indexes(app_name)
+        build_scripts(parsed_args.maintenance_mode)
+        deploy_application_and_write_log_entry(
+            app_name, current_release_version,
+            current_git_revision)
 
-        python_utils.PRINT('Done!')
-    finally:
-        subprocess.check_output([
-            'git', 'checkout', '--',
-            update_configs.LOCAL_FECONF_PATH,
-            update_configs.LOCAL_CONSTANTS_PATH,
-            APP_DEV_YAML_PATH])
+        python_utils.PRINT('Returning to oppia/ root directory.')
+
+    switch_version(app_name, current_release_version)
+    flush_memcache(app_name)
+    check_breakage(app_name, current_release_version)
+
+    python_utils.PRINT('Done!')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

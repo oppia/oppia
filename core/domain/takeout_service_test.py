@@ -24,7 +24,7 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
@@ -34,32 +34,28 @@ import feconf
 import utils
 
 (
-    base_models, collection_models, config_models,
-    email_models, exploration_models, feedback_models,
-    improvements_models, question_models, skill_models,
-    story_models, suggestion_models, topic_models,
-    user_models,
+    collection_models, config_models, email_models,
+    exploration_models, feedback_models, improvements_models,
+    question_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user
 ])
 
 
-class TakeoutServiceUnitTests(test_utils.GenericTestBase):
-    """Tests for the takeout service."""
+class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
+    """Tests for the takeout service for profile user."""
 
     USER_ID_1 = 'user_1'
+    PROFILE_ID_1 = 'profile_1'
     USER_GAE_ID_1 = 'gae_1'
-    THREAD_ID_1 = 'thread_id_1'
-    THREAD_ID_2 = 'thread_id_2'
-    TOPIC_ID_1 = 'topic_id_1'
-    TOPIC_ID_2 = 'topic_id_2'
-    USER_1_REPLY_TO_ID_1 = 'user_1_reply_to_id_thread_1'
-    USER_1_REPLY_TO_ID_2 = 'user_1_reply_to_id_thread_2'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
+    PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     USER_1_EMAIL = 'user1@example.com'
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
@@ -69,6 +65,200 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
     GENERIC_DISPLAY_ALIAS = 'display_alias'
+    GENERIC_DISPLAY_ALIAS_2 = 'display_alias2'
+    EXPLORATION_IDS = ['exp_1']
+    EXPLORATION_IDS_2 = ['exp_2']
+    COLLECTION_IDS = ['23', '42', '4']
+    COLLECTION_IDS_2 = ['32', '44', '6']
+    SKILL_ID_1 = 'skill_id_1'
+    SKILL_ID_2 = 'skill_id_2'
+    SKILL_ID_3 = 'skill_id_3'
+    DEGREE_OF_MASTERY = 0.5
+    DEGREE_OF_MASTERY_2 = 0.6
+    EXP_VERSION = 1
+    STATE_NAME = 'state_name'
+    STORY_ID_1 = 'story_id_1'
+    COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
+
+    def set_up_non_trivial(self):
+        """Set up all models for use in testing.
+        1) Simulates skill mastery of user_1 and profile_1.
+        2) Simulates completion of some activities of user_1 and profile_1.
+        3) Simulates incomplete status of some activities.
+        4) Populates ExpUserLastPlaythroughModel of user.
+        5) Creates user LearnerPlaylsts.
+        6) Simulates collection progress of user.
+        7) Simulates story progress of user.
+        8) Creates new collection rights.
+        9) Simulates a general suggestion.
+        10) Creates new exploration rights.
+        11) Populates user settings.
+        """
+        super(TakeoutServiceProfileUserUnitTests, self).setUp()
+
+        # Setup for UserSkillModel.
+        user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID_1, self.SKILL_ID_3),
+            user_id=self.USER_ID_1,
+            skill_id=self.SKILL_ID_3,
+            degree_of_mastery=self.DEGREE_OF_MASTERY_2).put()
+        user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                self.PROFILE_ID_1, self.SKILL_ID_1),
+            user_id=self.PROFILE_ID_1,
+            skill_id=self.SKILL_ID_1,
+            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+
+        # Setup for CompletedActivitiesModel.
+        user_models.CompletedActivitiesModel(
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_2,
+            collection_ids=self.COLLECTION_IDS_2).put()
+        user_models.CompletedActivitiesModel(
+            id=self.PROFILE_ID_1,
+            exploration_ids=self.EXPLORATION_IDS,
+            collection_ids=self.COLLECTION_IDS).put()
+
+        # Setup for IncompleteACtivitiesModel.
+        user_models.IncompleteActivitiesModel(
+            id=self.PROFILE_ID_1,
+            exploration_ids=self.EXPLORATION_IDS,
+            collection_ids=self.COLLECTION_IDS).put()
+
+        # Setup for ExpUserLastPlaythroughModel.
+        user_models.ExpUserLastPlaythroughModel(
+            id='%s.%s' % (self.PROFILE_ID_1, self.EXPLORATION_IDS[0]),
+            user_id=self.PROFILE_ID_1, exploration_id=self.EXPLORATION_IDS[0],
+            last_played_exp_version=self.EXP_VERSION,
+            last_played_state_name=self.STATE_NAME).put()
+
+        # Setup for LearnerPlaylistModel.
+        user_models.LearnerPlaylistModel(
+            id=self.PROFILE_ID_1,
+            exploration_ids=self.EXPLORATION_IDS,
+            collection_ids=self.COLLECTION_IDS).put()
+
+        # Setup for CollectionProgressModel.
+        user_models.CollectionProgressModel(
+            id='%s.%s' % (self.PROFILE_ID_1, self.COLLECTION_IDS[0]),
+            user_id=self.PROFILE_ID_1,
+            collection_id=self.COLLECTION_IDS[0],
+            completed_explorations=self.EXPLORATION_IDS).put()
+
+        # Setup for StoryProgressModel.
+        user_models.StoryProgressModel(
+            id='%s.%s' % (self.PROFILE_ID_1, self.STORY_ID_1),
+            user_id=self.PROFILE_ID_1,
+            story_id=self.STORY_ID_1,
+            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+
+        # Setup for UserSettingsModel.
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id=self.USER_GAE_ID_1,
+            email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE,
+            username=self.GENERIC_USERNAME,
+            normalized_username=self.GENERIC_USERNAME,
+            last_agreed_to_terms=self.GENERIC_DATE,
+            last_started_state_editor_tutorial=self.GENERIC_DATE,
+            last_started_state_translation_tutorial=self.GENERIC_DATE,
+            last_logged_in=self.GENERIC_DATE,
+            last_created_an_exploration=self.GENERIC_DATE,
+            last_edited_an_exploration=self.GENERIC_DATE,
+            profile_picture_data_url=self.GENERIC_IMAGE_URL,
+            default_dashboard='learner', creator_dashboard_display_pref='card',
+            user_bio=self.GENERIC_USER_BIO,
+            subject_interests=self.GENERIC_SUBJECT_INTERESTS,
+            first_contribution_msec=1,
+            preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
+            preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            display_alias=self.GENERIC_DISPLAY_ALIAS
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.PROFILE_ID_1,
+            gae_id=self.USER_GAE_ID_1,
+            email=self.USER_1_EMAIL,
+            role=self.PROFILE_1_ROLE,
+            username=None,
+            normalized_username=None,
+            last_agreed_to_terms=self.GENERIC_DATE,
+            last_started_state_editor_tutorial=None,
+            last_started_state_translation_tutorial=None,
+            last_logged_in=self.GENERIC_DATE,
+            last_created_an_exploration=None,
+            last_edited_an_exploration=None,
+            profile_picture_data_url=None,
+            default_dashboard='learner', creator_dashboard_display_pref='card',
+            user_bio=self.GENERIC_USER_BIO,
+            subject_interests=self.GENERIC_SUBJECT_INTERESTS,
+            first_contribution_msec=None,
+            preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
+            preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            display_alias=self.GENERIC_DISPLAY_ALIAS_2
+        ).put()
+
+    def set_up_trivial(self):
+        """Setup for trivial test of export_data functionality."""
+        super(TakeoutServiceProfileUserUnitTests, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id=self.USER_GAE_ID_1,
+            email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.PROFILE_ID_1,
+            gae_id=self.USER_GAE_ID_1,
+            email=self.USER_1_EMAIL,
+            role=self.PROFILE_1_ROLE
+        ).put()
+
+    def test_export_data_for_profile_user_trivial_raises_error(self):
+        """Trivial test of export_data functionality."""
+
+        self.set_up_trivial()
+        error_msg = 'Takeout for profile users is not yet supported.'
+        with self.assertRaisesRegexp(NotImplementedError, error_msg):
+            takeout_service.export_data_for_user(self.PROFILE_ID_1)
+
+    def test_export_data_for_profile_user_nontrivial_raises_error(self):
+        """Nontrivial test of export_data functionality."""
+
+        self.set_up_non_trivial()
+        error_msg = 'Takeout for profile users is not yet supported.'
+        with self.assertRaisesRegexp(NotImplementedError, error_msg):
+            takeout_service.export_data_for_user(self.PROFILE_ID_1)
+
+
+class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
+    """Tests for the takeout service for full user."""
+
+    USER_ID_1 = 'user_1'
+    PROFILE_ID_1 = 'profile_1'
+    USER_GAE_ID_1 = 'gae_1'
+    THREAD_ID_1 = 'thread_id_1'
+    THREAD_ID_2 = 'thread_id_2'
+    TOPIC_ID_1 = 'topic_id_1'
+    TOPIC_ID_2 = 'topic_id_2'
+    USER_1_REPLY_TO_ID_1 = 'user_1_reply_to_id_thread_1'
+    USER_1_REPLY_TO_ID_2 = 'user_1_reply_to_id_thread_2'
+    USER_1_ROLE = feconf.ROLE_ID_ADMIN
+    PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
+    USER_1_EMAIL = 'user1@example.com'
+    GENERIC_USERNAME = 'user'
+    GENERIC_PIN = '12345'
+    GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
+    GENERIC_IMAGE_URL = 'www.example.com/example.png'
+    GENERIC_USER_BIO = 'I am a user of Oppia!'
+    GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
+    GENERIC_LANGUAGE_CODES = ['en', 'es']
+    GENERIC_DISPLAY_ALIAS = 'display_alias'
+    GENERIC_DISPLAY_ALIAS_2 = 'display_alias2'
     USER_1_IMPACT_SCORE = 0.87
     USER_1_TOTAL_PLAYS = 33
     USER_1_AVERAGE_RATINGS = 4.37
@@ -88,19 +278,25 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
     ]
     EXPLORATION_IDS = ['exp_1']
+    EXPLORATION_IDS_2 = ['exp_2']
     CREATOR_IDS = ['4', '8', '16']
     CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
+    COLLECTION_IDS_2 = ['32', '44', '6']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     MESSAGE_IDS_READ_BY_USER = [0, 1]
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
+    SKILL_ID_3 = 'skill_id_3'
     DEGREE_OF_MASTERY = 0.5
+    DEGREE_OF_MASTERY_2 = 0.6
     EXP_VERSION = 1
     STATE_NAME = 'state_name'
     STORY_ID_1 = 'story_id_1'
+    STORY_ID_2 = 'story_id_2'
     COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
+    COMPLETED_NODE_IDS_2 = ['node_id_3', 'node_id_4']
     THREAD_ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
     THREAD_ENTITY_ID = 'exp_id_2'
     THREAD_STATUS = 'open'
@@ -144,7 +340,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         16) Creates two reply-to ids for feedback.
         17) Creates a task closed by the user.
         """
-        super(TakeoutServiceUnitTests, self).setUp()
+        super(TakeoutServiceFullUserUnitTests, self).setUp()
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -162,13 +358,18 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1,
             skill_id=self.SKILL_ID_1,
             degree_of_mastery=self.DEGREE_OF_MASTERY).put()
-
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_ID_1, self.SKILL_ID_2),
             user_id=self.USER_ID_1,
             skill_id=self.SKILL_ID_2,
             degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+        user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                self.PROFILE_ID_1, self.SKILL_ID_3),
+            user_id=self.PROFILE_ID_1,
+            skill_id=self.SKILL_ID_3,
+            degree_of_mastery=self.DEGREE_OF_MASTERY_2).put()
 
         # Setup for UserSubscriptionsModel.
         for creator_id in self.CREATOR_IDS:
@@ -214,6 +415,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS).put()
+        user_models.CompletedActivitiesModel(
+            id=self.PROFILE_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_2,
+            collection_ids=self.COLLECTION_IDS_2).put()
 
         # Setup for IncompleteACtivitiesModel.
         user_models.IncompleteActivitiesModel(
@@ -233,6 +438,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS).put()
+        user_models.LearnerPlaylistModel(
+            id=self.PROFILE_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_2,
+            collection_ids=self.COLLECTION_IDS_2).put()
 
         # Setup for CollectionProgressModel.
         user_models.CollectionProgressModel(
@@ -240,6 +449,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1,
             collection_id=self.COLLECTION_IDS[0],
             completed_explorations=self.EXPLORATION_IDS).put()
+        user_models.CollectionProgressModel(
+            id='%s.%s' % (self.PROFILE_ID_1, self.COLLECTION_IDS_2[0]),
+            user_id=self.PROFILE_ID_1,
+            collection_id=self.COLLECTION_IDS_2[0],
+            completed_explorations=self.EXPLORATION_IDS_2).put()
 
         # Setup for StoryProgressModel.
         user_models.StoryProgressModel(
@@ -247,6 +461,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1,
             story_id=self.STORY_ID_1,
             completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+        user_models.StoryProgressModel(
+            id='%s.%s' % (self.PROFILE_ID_1, self.STORY_ID_2),
+            user_id=self.PROFILE_ID_1,
+            story_id=self.STORY_ID_2,
+            completed_node_ids=self.COMPLETED_NODE_IDS_2).put()
 
         # Setup for CollectionRightsModel.
         collection_models.CollectionRightsModel(
@@ -261,7 +480,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
@@ -270,7 +489,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.EXPLORATION_IDS[0], 1,
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
-            'exploration.exp1.thread_1')
+            'exploration.exp1.thread_1', None)
 
         # Setup for TopicRightsModel.
         topic_models.TopicRightsModel(
@@ -303,7 +522,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
@@ -327,7 +546,31 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
             preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
-            display_alias=self.GENERIC_DISPLAY_ALIAS
+            display_alias=self.GENERIC_DISPLAY_ALIAS,
+            pin=self.GENERIC_PIN
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.PROFILE_ID_1,
+            gae_id=self.USER_GAE_ID_1,
+            email=self.USER_1_EMAIL,
+            role=self.PROFILE_1_ROLE,
+            username=None,
+            normalized_username=None,
+            last_agreed_to_terms=self.GENERIC_DATE,
+            last_started_state_editor_tutorial=None,
+            last_started_state_translation_tutorial=None,
+            last_logged_in=self.GENERIC_DATE,
+            last_created_an_exploration=None,
+            last_edited_an_exploration=None,
+            profile_picture_data_url=None,
+            default_dashboard='learner', creator_dashboard_display_pref='card',
+            user_bio=self.GENERIC_USER_BIO,
+            subject_interests=self.GENERIC_SUBJECT_INTERESTS,
+            first_contribution_msec=None,
+            preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
+            preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            display_alias=self.GENERIC_DISPLAY_ALIAS_2
         ).put()
 
         # Setup for GeneralFeedbackReplyToId.
@@ -377,14 +620,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             can_review_voiceover_for_language_codes=['hi'],
             can_review_questions=True).put()
 
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_ID_1),
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
             onboarding_email_sent=False
         ).put()
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_ID_1),
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_2,
@@ -409,7 +652,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
-        topic_models.SubtopicPageSnapshotMetadataModel(
+        subtopic_models.SubtopicPageSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
@@ -472,16 +715,22 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
-        super(TakeoutServiceUnitTests, self).setUp()
+        super(TakeoutServiceFullUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
         ).put()
+        user_models.UserSettingsModel(
+            id=self.PROFILE_ID_1,
+            gae_id=self.USER_GAE_ID_1,
+            email=self.USER_1_EMAIL,
+            role=self.PROFILE_1_ROLE
+        ).put()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
-    def test_export_nonexistent_user_raises_error(self):
+    def test_export_nonexistent_full_user_raises_error(self):
         """Setup for nonexistent user test of export_data functionality."""
         with self.assertRaisesRegexp(
             user_models.UserSettingsModel.EntityNotFoundError,
@@ -489,7 +738,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'not found'):
             takeout_service.export_data_for_user('fake_user_id')
 
-    def test_export_data_trivial(self):
+    def test_export_data_for_full_user_trivial_is_correct(self):
         """Trivial test of export_data functionality."""
         self.set_up_trivial()
 
@@ -518,7 +767,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         last_playthrough_data = {}
         learner_playlist_data = {}
         incomplete_activities_data = {}
-        settings_data = {
+        user_settings_data = {
             'email': 'user1@example.com',
             'role': feconf.ROLE_ID_ADMIN,
             'username': None,
@@ -537,7 +786,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'display_alias': None
+            'display_alias': None,
+            'pin': None
         }
         skill_data = {}
         stats_data = {}
@@ -557,7 +807,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         expected_voiceover_application_data = {}
-        expected_contrib_score_data = {}
+        expected_contrib_proficiency_data = {}
         expected_contribution_rights_data = {}
         expected_collection_rights_sm = {}
         expected_collection_sm = {}
@@ -572,9 +822,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_exploration_sm = {}
         expected_platform_parameter_sm = {}
 
-        expected_data = {
+        expected_user_data = {
             'user_stats': stats_data,
-            'user_settings': settings_data,
+            'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
             'user_skill_mastery': skill_data,
             'user_contributions': contribution_data,
@@ -597,7 +847,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id': reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
-            'user_contribution_scoring': expected_contrib_score_data,
+            'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
@@ -626,14 +876,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
-        self.assertEqual(expected_data, observed_data)
+        self.assertEqual(expected_user_data, observed_data)
         observed_json = json.dumps(observed_data)
-        expected_json = json.dumps(expected_data)
+        expected_json = json.dumps(expected_user_data)
         self.assertEqual(json.loads(expected_json), json.loads(observed_json))
         expected_images = []
         self.assertEqual(expected_images, observed_images)
 
-    def test_export_data_nontrivial(self):
+    def test_export_data_for_full_user_nontrivial_is_correct(self):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
         # We set up the feedback_thread_model here so that we can easily
@@ -657,7 +907,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'num_ratings': self.USER_1_NUM_RATINGS,
             'weekly_creator_stats_list': self.USER_1_WEEKLY_CREATOR_STATS_LIST
         }
-        expected_skill_data = {
+        expected_user_skill_data = {
             self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
             self.SKILL_ID_2: self.DEGREE_OF_MASTERY
         }
@@ -793,7 +1043,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 [self.EXPLORATION_IDS[0]]),
             'viewable_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
-        expected_settings_data = {
+        expected_user_settings_data = {
             'email': self.USER_1_EMAIL,
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
@@ -812,7 +1062,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'display_alias': self.GENERIC_DISPLAY_ALIAS
+            'display_alias': self.GENERIC_DISPLAY_ALIAS,
+            'pin': self.GENERIC_PIN
         }
 
         expected_reply_to_data = {
@@ -863,7 +1114,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'can_review_questions': True
         }
 
-        expected_contrib_score_data = {
+        expected_contrib_proficiency_data = {
             self.SCORE_CATEGORY_1: {
                 'onboarding_email_sent': False,
                 'score': 1.5
@@ -956,11 +1207,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        expected_data = {
+        expected_user_data = {
             'user_stats': expected_stats_data,
-            'user_settings': expected_settings_data,
+            'user_settings': expected_user_settings_data,
             'user_subscriptions': expected_subscriptions_data,
-            'user_skill_mastery': expected_skill_data,
+            'user_skill_mastery': expected_user_skill_data,
             'user_contributions': expected_contribution_data,
             'exploration_user_data': expected_exploration_data,
             'completed_activities': expected_completed_activities_data,
@@ -984,7 +1235,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id': expected_reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
-            'user_contribution_scoring': expected_contrib_score_data,
+            'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
@@ -1007,14 +1258,16 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
         }
+
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
-        self.assertEqual(observed_data, expected_data)
+        self.assertItemsEqual(observed_data, expected_user_data)
         observed_json = json.dumps(observed_data)
-        expected_json = json.dumps(expected_data)
-        self.assertEqual(json.loads(observed_json), json.loads(expected_json))
+        expected_json = json.dumps(expected_user_data)
+        self.assertItemsEqual(
+            json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(
                 self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
@@ -1029,3 +1282,67 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_images[i].image_export_path,
                 observed_images[i].image_export_path
             )
+
+    def test_export_for_full_user_does_not_export_profile_data(self):
+        """Test that exporting data for a full user does not export
+        data for any profile user, atleast for the models that were
+        populated for the profile user.
+        """
+        self.set_up_non_trivial()
+        profile_user_settings_data = {
+            'email': self.USER_1_EMAIL,
+            'role': self.PROFILE_1_ROLE,
+            'username': None,
+            'normalized_username': None,
+            'last_agreed_to_terms': self.GENERIC_DATE,
+            'last_started_state_editor_tutorial': None,
+            'last_started_state_translation_tutorial': None,
+            'last_logged_in': self.GENERIC_DATE,
+            'last_created_an_exploration': None,
+            'last_edited_an_exploration': None,
+            'profile_picture_data_url': None,
+            'default_dashboard': 'learner',
+            'creator_dashboard_display_pref': 'card',
+            'user_bio': self.GENERIC_USER_BIO,
+            'subject_interests': self.GENERIC_SUBJECT_INTERESTS,
+            'first_contribution_msec': None,
+            'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
+            'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'display_alias': self.GENERIC_DISPLAY_ALIAS_2
+        }
+        user_skill_data = {
+            self.SKILL_ID_3: self.DEGREE_OF_MASTERY_2
+        }
+        completed_activities_data = {
+            'completed_exploration_ids': self.EXPLORATION_IDS_2,
+            'completed_collection_ids': self.COLLECTION_IDS_2
+        }
+        incomplete_activities_data = {}
+        last_playthrough_data = {}
+        learner_playlist_data = {
+            'playlist_exploration_ids': self.EXPLORATION_IDS_2,
+            'playlist_collection_ids': self.COLLECTION_IDS_2
+        }
+        collection_progress_data = {
+            self.COLLECTION_IDS_2[0]: self.EXPLORATION_IDS_2
+        }
+        story_progress_data = {
+            self.STORY_ID_2: self.COMPLETED_NODE_IDS_2
+        }
+        profile_user_data = {
+            'user_settings': profile_user_settings_data,
+            'user_skill_mastery': user_skill_data,
+            'completed_activities': completed_activities_data,
+            'incomplete_activities': incomplete_activities_data,
+            'exp_user_last_playthrough': last_playthrough_data,
+            'learner_playlist': learner_playlist_data,
+            'collection_progress': collection_progress_data,
+            'story_progress': story_progress_data,
+        }
+
+        user_takeout_object = takeout_service.export_data_for_user(
+            self.USER_ID_1)
+        observed_data = user_takeout_object.user_data
+        for key, value in profile_user_data.items():
+            self.assertNotEqual(value, observed_data[key])

@@ -1,4 +1,4 @@
-<div class="subtopic-card" ng-click="$ctrl.openSubtopicPage()" ng-class="{'disabled-link': !ctrl.classroomUrlFragment}">
+<div class="subtopic-card" ng-click="$ctrl.openSubtopicPage()" ng-class="{'disabled-link': !$ctrl.classroomUrlFragment}">
   <div class="subtopic-thumbnail"
        ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
     <img ng-src="<[$ctrl.thumbnailUrl]>"
@@ -80,7 +80,7 @@
 
   @media(max-width: 500px) {
     subtopics-list .subtopic-card {
-      width: 140px;
+      width: 135px;
     }
 
     subtopic-summary-tile .subtopic-title {
@@ -89,6 +89,31 @@
 
     subtopic-summary-tile .subtopic-thumbnail {
       height: 100px;
+    }
+  }
+
+  .oppia-topic-viewer-container .background-banner-position {
+    position: inherit;
+  }
+
+  .oppia-page-card {
+    border-radius: 0.25em;
+    margin-top: 5vh;
+    padding-bottom: 7.5vh;
+    width: 704px;
+  }
+
+  @media(max-width: 1024px) {
+    .oppia-page-card {
+      margin-top: 5vh;
+      width: 80vw;
+    }
+  }
+
+  @media(max-width: 500px) {
+    .oppia-page-card {
+      padding: 15px 24px 64px 24px;
+      width: 90vw;
     }
   }
 </style>

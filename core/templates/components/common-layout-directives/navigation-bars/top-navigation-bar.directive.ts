@@ -72,8 +72,6 @@ angular.module('oppia').directive('topNavigationBar', [
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
-          var truncateNavbarDebounced =
-            DebouncerService.debounce(truncateNavbar, 500);
 
           ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
@@ -222,8 +220,12 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
             ctrl.logoutUrl = LOGOUT_URL;
             ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
+            ctrl.inClassroomPage = false;
             ctrl.standardNavIsShown = (
               NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);
+            if (ctrl.currentUrl === 'learn') {
+              ctrl.inClassroomPage = true;
+            }
             ctrl.googleSignInIconUrl = (
               UrlInterpolationService.getStaticImageUrl(
                 '/google_signin_buttons/google_signin.svg'));

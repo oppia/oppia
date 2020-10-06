@@ -52,6 +52,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import python_utils
@@ -458,6 +459,24 @@ class AdminHandler(base.BaseHandler):
             self._reload_exploration('15')
             self._reload_exploration('25')
             self._reload_exploration('13')
+            exp_services.update_exploration(
+                self.user_id, '15', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'correctness_feedback_enabled',
+                    'new_value': True
+                })], 'Changed correctness_feedback_enabled.')
+            exp_services.update_exploration(
+                self.user_id, '25', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'correctness_feedback_enabled',
+                    'new_value': True
+                })], 'Changed correctness_feedback_enabled.')
+            exp_services.update_exploration(
+                self.user_id, '13', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'correctness_feedback_enabled',
+                    'new_value': True
+                })], 'Changed correctness_feedback_enabled.')
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
@@ -1008,3 +1027,18 @@ class UpdateUsernameHandler(base.BaseHandler):
         user_services.log_username_change(
             self.user_id, old_username, new_username)
         self.render_json({})
+
+
+class NumberOfDeletionRequestsHandler(base.BaseHandler):
+    """Handler for getting the number of pending deletion requests via admin
+    page.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        self.render_json({
+            'number_of_pending_deletion_models': (
+                wipeout_service.get_number_of_pending_deletion_requests())
+        })

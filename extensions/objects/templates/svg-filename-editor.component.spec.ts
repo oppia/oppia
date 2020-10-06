@@ -514,9 +514,8 @@ describe('SvgFilenameEditor', function() {
     // string. That's why double quotes is being used here. It's not
     // possible to use \' instead of ' so the XSSI Prefix won't be
     // evaluated correctly.
-    /* eslint-disable quotes */
+    /* eslint-disable-next-line quotes */
     var responseText = ")]}'\n{ \"filename\": \"imageFile1.svg\" }";
-    /* eslint-enable quotes */
 
     // This throws "Argument of type '() => Promise<any, any, any>' is not
     // assignable to parameter of type '{ (url: string, ...):
@@ -558,9 +557,8 @@ describe('SvgFilenameEditor', function() {
         // )]}' string. That's why double quotes is being used here. It's not
         // possible to use \' instead of ' so the XSSI Prefix won't be
         // evaluated correctly.
-        /* eslint-disable quotes */
+        /* eslint-disable-next-line quotes */
         responseText: ")]}'\n{ \"error\": \"" + errorMessage + "\" }"
-        /* eslint-enable quotes */
       });
       return d.promise();
     });
@@ -660,6 +658,9 @@ describe('SvgFilenameEditor with image save destination as ' +
     },
     deleteImage: function(filename) {
       return 'Image file is deleted.';
+    },
+    isInStorage: function(filename) {
+      return true;
     }
   };
 

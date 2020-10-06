@@ -47,7 +47,6 @@ def create_suggestion(
             be one of the constants defined in storage/suggestion/gae_models.py.
         target_type: str. The target entity being edited. This parameter should
             be one of the constants defined in storage/suggestion/gae_models.py.
-
         target_id: str. The ID of the target entity being suggested to.
         target_version_at_submission: int. The version number of the target
             entity at the time of creation of the suggestion.
@@ -72,10 +71,15 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        # Suggestions of this type do not have an associated language code,
+        # since they are not queryable by language.
+        language_code = None
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        # The language code of the translation, used for querying purposes.
+        language_code = change['language_code']
         content_html = exploration.get_content_html(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
@@ -86,6 +90,8 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        # The language code of the question, used for querying purposes.
+        language_code = change['question_dict']['language_code']
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
@@ -94,13 +100,13 @@ def create_suggestion(
             suggestion_type])
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category)
+        None, change, score_category, language_code)
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        None, change, score_category, thread_id)
+        None, change, score_category, thread_id, suggestion.language_code)
     return get_suggestion_by_id(thread_id)
 
 
@@ -122,7 +128,8 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
-        suggestion_model.score_category, suggestion_model.last_updated)
+        suggestion_model.score_category, suggestion_model.language_code,
+        suggestion_model.last_updated)
 
 
 def get_suggestion_by_id(suggestion_id):
@@ -250,6 +257,7 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
         suggestion_model.change_cmd = suggestion.change.to_dict()
         suggestion_model.score_category = suggestion.score_category
+        suggestion_model.language_code = suggestion.language_code
 
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update,
@@ -336,12 +344,12 @@ def accept_suggestion(
         user_id = suggestion.author_id
         score_category = suggestion.score_category
 
-        # Get user scoring domain object.
-        user_scoring = _get_user_scoring(user_id, score_category)
+        # Get user proficiency domain object.
+        user_proficiency = _get_user_proficiency(user_id, score_category)
 
         # Increment the score of the author due to their suggestion being
         # accepted.
-        user_scoring.increment_score(
+        user_proficiency.increment_score(
             suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY
         )
 
@@ -349,16 +357,16 @@ def accept_suggestion(
         # created when the score of the user passes the minimum score required
         # to review.
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            if user_scoring.can_user_review_category() and (
-                    not user_scoring.onboarding_email_sent):
+            if user_proficiency.can_user_review_category() and (
+                    not user_proficiency.onboarding_email_sent):
                 email_manager.send_mail_to_onboard_new_reviewers(
                     user_id, score_category
                 )
-                user_scoring.mark_onboarding_email_as_sent()
+                user_proficiency.mark_onboarding_email_as_sent()
 
-        # Need to update the corresponding user scoring model after we updated
-        # the domain object.
-        _update_user_scoring(user_scoring)
+        # Need to update the corresponding user proficiency model after we
+        # updated the domain object.
+        _update_user_proficiency(user_proficiency)
 
 
 def reject_suggestion(suggestion_id, reviewer_id, review_message):
@@ -508,7 +516,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
         to review.
     """
     score_categories = (
-        user_models.UserContributionScoringModel
+        user_models.UserContributionProficiencyModel
         .get_all_categories_where_user_can_review(user_id))
 
     if len(score_categories) == 0:
@@ -551,6 +559,46 @@ def get_reviewable_suggestions(user_id, suggestion_type):
     return all_suggestions
 
 
+def get_question_suggestions_waiting_longest_for_review():
+    """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
+    of question suggestions, sorted in descending order by review wait time.
+
+    Returns:
+        list(Suggestion). A list of question suggestions, sorted in descending
+        order based on how long the suggestions have been waiting for review.
+    """
+    return [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_question_suggestions_waiting_longest_for_review()
+        )
+    ]
+
+
+def get_translation_suggestions_waiting_longest_for_review_per_lang(
+        language_code):
+    """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
+    number of translation suggestions in the specified language code,
+    sorted in descending order by review wait time.
+
+    Args:
+        language_code: str. The ISO 639-1 language code of the translation
+            suggestions.
+
+    Returns:
+        list(Suggestion). A list of translation suggestions, sorted in
+        descending order based on how long the suggestions have been waiting
+        for review.
+    """
+    return [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                language_code)
+        )
+    ]
+
+
 def get_submitted_suggestions(user_id, suggestion_type):
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
@@ -571,51 +619,51 @@ def get_submitted_suggestions(user_id, suggestion_type):
     ])
 
 
-def get_user_scoring_from_model(user_scoring_model):
-    """Converts the given UserContributionScoringModel to a
-    UserContributionScoring domain object.
+def get_user_proficiency_from_model(user_proficiency_model):
+    """Converts the given UserContributionProficiencyModel to a
+    UserContributionProficiency domain object.
 
     Args:
-        user_scoring_model: UserContributionScoringModel.
-            UserContributionScoringModel to be
-            converted to UserContributionScoring domain object.
+        user_proficiency_model: UserContributionProficiencyModel.
+            UserContributionProficiencyModel to be converted to
+            a UserContributionProficiency domain object.
 
     Returns:
-        UserContributionScoring. The corresponding UserContributionScoring
-        domain object.
+        UserContributionProficiency. The corresponding
+        UserContributionProficiency domain object.
     """
-    return user_domain.UserContributionScoring(
-        user_scoring_model.user_id, user_scoring_model.score_category,
-        user_scoring_model.score,
-        user_scoring_model.onboarding_email_sent
+    return user_domain.UserContributionProficiency(
+        user_proficiency_model.user_id, user_proficiency_model.score_category,
+        user_proficiency_model.score,
+        user_proficiency_model.onboarding_email_sent
     )
 
 
-def _update_user_scoring(user_scoring):
-    """Updates the user_scoring.
+def _update_user_proficiency(user_proficiency):
+    """Updates the user_proficiency.
 
     Args:
-        user_scoring: UserContributionScoring. The user scoring to be
-            updated.
+        user_proficiency: UserContributionProficiency. The user proficiency to
+            be updated.
     """
-    user_scoring_model = user_models.UserContributionScoringModel.get(
-        user_scoring.user_id, user_scoring.score_category
+    user_proficiency_model = user_models.UserContributionProficiencyModel.get(
+        user_proficiency.user_id, user_proficiency.score_category
     )
 
-    if user_scoring_model is not None:
-        user_scoring_model.user_id = user_scoring.user_id
-        user_scoring_model.score_category = user_scoring.score_category
-        user_scoring_model.score = user_scoring.score
-        user_scoring_model.onboarding_email_sent = (
-            user_scoring.onboarding_email_sent
+    if user_proficiency_model is not None:
+        user_proficiency_model.user_id = user_proficiency.user_id
+        user_proficiency_model.score_category = user_proficiency.score_category
+        user_proficiency_model.score = user_proficiency.score
+        user_proficiency_model.onboarding_email_sent = (
+            user_proficiency.onboarding_email_sent
         )
 
-        user_scoring_model.put()
+        user_proficiency_model.put()
 
     else:
-        user_models.UserContributionScoringModel.create(
-            user_scoring.user_id, user_scoring.score_category,
-            user_scoring.score, user_scoring.onboarding_email_sent)
+        user_models.UserContributionProficiencyModel.create(
+            user_proficiency.user_id, user_proficiency.score_category,
+            user_proficiency.score, user_proficiency.onboarding_email_sent)
 
 
 def get_all_scores_of_user(user_id):
@@ -630,7 +678,7 @@ def get_all_scores_of_user(user_id):
     """
     scores = {}
     for model in (
-            user_models.UserContributionScoringModel.get_all_scores_of_user(
+            user_models.UserContributionProficiencyModel.get_all_scores_of_user(
                 user_id)):
         scores[model.score_category] = model.score
 
@@ -650,8 +698,8 @@ def can_user_review_category(user_id, score_category):
         bool. Whether the user can review suggestions under category
         score_category.
     """
-    user_scoring = _get_user_scoring(user_id, score_category)
-    return user_scoring.can_user_review_category()
+    user_proficiency = _get_user_proficiency(user_id, score_category)
+    return user_proficiency.can_user_review_category()
 
 
 def get_all_user_ids_who_are_allowed_to_review(score_category):
@@ -666,31 +714,32 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
         category.
     """
     return [
-        model.user_id for model in user_models.UserContributionScoringModel
+        model.user_id for model in user_models.UserContributionProficiencyModel
         .get_all_users_with_score_above_minimum_for_category(score_category)
     ]
 
 
-def _get_user_scoring(user_id, score_category):
-    """Gets the user scoring model from storage and creates the
-    corresponding user scoring domain object if the model exists. If the model
-    does not exist a user scoring domain object with the given user_id and
-    score category is created with the initial score and email values.
+def _get_user_proficiency(user_id, score_category):
+    """Gets the user proficiency model from storage and creates the
+    corresponding user proficiency domain object if the model exists. If the
+    model does not exist a user proficiency domain object with the given
+    user_id and score category is created with the initial score and email
+    values.
 
     Args:
         user_id: str. The id of the user.
         score_category: str. The category of the suggestion.
 
     Returns:
-        UserContributionScoring. The user scoring object.
+        UserContributionProficiency. The user proficiency object.
     """
-    user_scoring_model = user_models.UserContributionScoringModel.get(
+    user_proficiency_model = user_models.UserContributionProficiencyModel.get(
         user_id, score_category)
 
-    if user_scoring_model is not None:
-        return get_user_scoring_from_model(user_scoring_model)
+    if user_proficiency_model is not None:
+        return get_user_proficiency_from_model(user_proficiency_model)
 
-    return user_domain.UserContributionScoring(
+    return user_domain.UserContributionProficiency(
         user_id, score_category, 0, False)
 
 
@@ -757,3 +806,50 @@ def get_voiceover_application(voiceover_application_id):
         voiceover_application_model.filename,
         voiceover_application_model.content,
         voiceover_application_model.rejection_message)
+
+
+def create_community_contribution_stats_from_model(
+        community_contribution_stats_model):
+    """Creates a domain object that represents the community contribution
+    stats from the model given. Note that each call to this function returns
+    a new domain object, but the data copied into the domain object comes from
+    a single, shared source.
+
+    Args:
+        community_contribution_stats_model: CommunityContributionStatsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        CommunityContributionStats. The corresponding
+        CommunityContributionStats domain object.
+    """
+    return suggestion_registry.CommunityContributionStats(
+        (
+            community_contribution_stats_model
+            .translation_reviewer_counts_by_lang_code
+        ),
+        (
+            community_contribution_stats_model
+            .translation_suggestion_counts_by_lang_code
+        ),
+        community_contribution_stats_model.question_reviewer_count,
+        community_contribution_stats_model.question_suggestion_count
+    )
+
+
+def get_community_contribution_stats():
+    """Gets the CommunityContributionStatsModel and converts it into the
+    corresponding domain object that represents the community contribution
+    stats. Note that there is only ever one instance of this model and if the
+    model doesn't exist yet, it will be created.
+
+    Returns:
+        CommunityContributionStats. The corresponding
+        CommunityContributionStats domain object.
+    """
+    community_contribution_stats_model = (
+        suggestion_models.CommunityContributionStatsModel.get()
+    )
+
+    return create_community_contribution_stats_from_model(
+        community_contribution_stats_model)

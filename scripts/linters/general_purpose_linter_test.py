@@ -42,6 +42,8 @@ INVALID_PARENT_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_parent.html')
 INVALID_GLYPHICON_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_glyphicon.html')
+INVALID_STYLE_TAG_HTML_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_style_tag.html')
 
 # CSS filepaths.
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
@@ -78,6 +80,8 @@ INVALID_ESLINT_ANY_TYPE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_eslint_any_type.ts')
 INVALID_BROADCAST_USE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_broadcast_use.ts')
+INVALID_LODASH_IMPORT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_lodash_import.ts')
 
 # PY filepaths.
 INVALID_ITERKEY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iterkeys.py')
@@ -117,6 +121,7 @@ INVALID_URLRETRIEVE_FILEPATH = os.path.join(
 INVALID_AUTHOR_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_author.py')
 INVALID_DATETIME_NOW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_datetime_now.py')
+INVALID_NDB_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_ndb.py')
 INVALID_PRINT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_print.py')
 INVALID_PYLINT_ID_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pylint_id.py')
@@ -171,6 +176,16 @@ class HTMLLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Line 13: Please do not access parent properties using '
             '$parent. Use the scope object for this purpose.'
+            ], lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_use_of_style(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_STYLE_TAG_HTML_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements([
+            'Line 2: Please do not use inline styling.'
             ], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -360,6 +375,20 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
+    def test_invalid_lodash_import(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_LODASH_IMPORT_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements(
+            [
+                'Line 20: Please do not use "import { someFunction } '
+                'from \'lodash\'". Use "import someFunction '
+                'from \'lodash/someFunction\'" instead.',
+            ],
+            lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
 
 class PythonLintTests(test_utils.LinterTestBase):
     """Test the Python lint functions."""
@@ -381,6 +410,19 @@ class PythonLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Line 42: Please use datetime.datetime.utcnow() instead '
             'of datetime.datetime.now().'], lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_use_of_ndb(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_NDB_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements(
+            ['Line 31: Please use datastore_services instead of ndb'],
+            lint_task_report.trimmed_messages)
+        self.assert_same_list_elements(
+            ['Line 34: Please use datastore_services instead of ndb'],
+            lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

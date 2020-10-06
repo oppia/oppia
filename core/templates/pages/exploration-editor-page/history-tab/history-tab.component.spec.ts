@@ -21,8 +21,6 @@ import { EventEmitter } from '@angular/core';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -95,9 +93,6 @@ describe('History tab component', function() {
       'AnswerGroupObjectFactory', TestBed.get(AnswerGroupObjectFactory));
     $provide.value('CsrfTokenService', TestBed.get(CsrfTokenService));
     $provide.value('EditabilityService', TestBed.get(EditabilityService));
-    $provide.value(
-      'ExplorationDraftObjectFactory',
-      TestBed.get(ExplorationDraftObjectFactory));
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
     $provide.value(
@@ -238,11 +233,11 @@ describe('History tab component', function() {
     expect(ctrl.diffData).toEqual({});
 
     expect(ctrl.earlierVersionHeader).toBe(
-      'Revision #2 by committer_3 (11/21/2014):' +
-        ' This is the commit message 2');
-    expect(ctrl.laterVersionHeader).toBe(
       'Revision #1 by committer_3 (11/21/2014):' +
         ' This is the commit message');
+    expect(ctrl.laterVersionHeader).toBe(
+      'Revision #2 by committer_3 (11/21/2014):' +
+        ' This is the commit message 2');
   });
 
   it('should open a new tab for download exploration with version', function() {
@@ -354,5 +349,86 @@ describe('History tab component', function() {
     expect(ctrl.highlightedIndex).toBe(null);
     ctrl.toggleHistoryOptions(5);
     expect(ctrl.highlightedIndex).toBe(5);
+  });
+
+  it('should reverse the array when the date filter is applied', function() {
+    var snapshots = [{
+      commit_message: 'This is the commit message',
+      committerId: 'committer_3',
+      commit_type: '',
+      version_number: 1,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }, {
+      commit_message: 'This is the commit message 2',
+      committerId: 'committer_3',
+      commit_type: '',
+      version_number: 2,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }, {
+      commit_message: 'This is the commit message 2',
+      committerId: 'committer_1',
+      commit_type: '',
+      version_number: 3,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }];
+    ctrl.explorationVersionMetadata = snapshots;
+    ctrl.reverseDateOrder();
+    expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(3);
+    expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(1);
+
+    ctrl.reverseDateOrder();
+    expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(1);
+    expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(3);
+  });
+
+  it('should find the versions to compare', function() {
+    ctrl.selectedVersionsArray = [1, 4];
+    ctrl.compareVersionMetadata = {};
+    ctrl.totalExplorationVersionMetadata = [
+      {
+        committerId: '1',
+        createdOnMsecsStr: 10,
+        commitMessage: 'commit message 1',
+        versionNumber: 1
+      }, {
+        committerId: '2',
+        createdOnMsecsStr: 10,
+        commitMessage: 'commit message 2',
+        versionNumber: 2
+      }, {
+        committerId: '3',
+        createdOnMsecsStr: 10,
+        commitMessage: 'commit message 3',
+        versionNumber: 3
+      }, {
+        committerId: '4',
+        createdOnMsecsStr: 10,
+        commitMessage: 'commit message 4',
+        versionNumber: 4
+      }];
+    ctrl.changeCompareVersion();
+    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[0]);
+    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[3]);
+
+    ctrl.selectedVersionsArray = [2, 4];
+
+    ctrl.changeCompareVersion();
+    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[1]);
+    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[3]);
+
+    ctrl.selectedVersionsArray = [2, 3];
+
+    ctrl.changeCompareVersion();
+    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[1]);
+    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[2]);
   });
 });

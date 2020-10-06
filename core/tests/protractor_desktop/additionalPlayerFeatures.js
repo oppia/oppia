@@ -25,8 +25,6 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
@@ -38,7 +36,6 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
-  var adminPage = null;
   var collectionEditorPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
@@ -49,7 +46,6 @@ describe('Full exploration editor', function() {
   var explorationEditorSettingsTab = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -422,7 +418,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('uses hints and solutions in an exploration', async function() {
+  it('should use hints and solutions in an exploration', async function() {
     var explorationPlayerPage = (
       new ExplorationPlayerPage.ExplorationPlayerPage());
     await users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');
