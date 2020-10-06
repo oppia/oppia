@@ -61,7 +61,6 @@ var ProfilePage = function() {
   this.expectUserToHaveNoInterests = async function() {
     await waitFor.visibilityOf(interests,
       'interests label element taking too long to appear'); //Err
-    expect(await bio.getText()).toMatch(expectedText);
     var numInterests = await interests.count();
     expect(numInterests).toEqual(0);
   };
