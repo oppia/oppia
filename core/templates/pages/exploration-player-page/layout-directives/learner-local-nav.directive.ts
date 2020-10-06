@@ -53,13 +53,15 @@ angular.module('oppia').directive('learnerLocalNav', [
         '$http', '$uibModal', 'AlertsService', 'ExplorationEngineService',
         'LoaderService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
-        'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
+        'UrlInterpolationService', 'UserService',
+        'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
             $http, $uibModal, AlertsService, ExplorationEngineService,
             LoaderService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
-            UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
+            UrlInterpolationService, UserService,
+            ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getFeedbackPopoverUrl = function() {
@@ -117,9 +119,15 @@ angular.module('oppia').directive('learnerLocalNav', [
                 ctrl.canEdit = exploration.can_edit;
               });
             ctrl.username = '';
+            ctrl.feedbackOptionIsShown = true;
             LoaderService.showLoadingScreen('Loading');
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
+              if (
+                ctrl.username === null &&
+                !ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS) {
+                ctrl.feedbackOptionIsShown = false;
+              }
               LoaderService.hideLoadingScreen();
             });
           };

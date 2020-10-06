@@ -156,7 +156,6 @@
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Teach with Oppia",
 	"I18N_SIGNUP_USERNAME": "Käyttäjänimi",
 	"I18N_SIGNUP_USERNAME_EXPLANATION": "Käyttäjänimesi näkkyy mookkaustesi vieressä.",
-	"I18N_SIGNUP_WAIVER_OBJECTIVE": "Nimeämisestä (BY) luopumisen vaatimus tarkoittaa, ette jos joku uudelleenkäyttää tätä työtä, heitä ei vaadita nimeämään tekijöitä. Kuitenkin, kaikki yksittäiset muutokset tutkimukseen tulevat saataville tälle sivustolle tutkimuksen muutoslokiin ja ihmisiä, jotka uudelleenkäyttävät tutkimusta, suositellaan (muttei vaadita) sisällyttämään länkki tähän sivuun.",
 	"I18N_SIGNUP_WHY_LICENSE": "Miksi CC-BY-SA?",
 	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Oppian oppitunnit, tunnetaan myös tutkimuksina, tarjoavat enemmän mukaansatempaavia kokemuksia kuin muuttumattomat videot ja teksti, auttamalla käyttäjiä oppimaan tekemällä.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia on vapaa, avvoimen lähekootin oppimisalusta täynnä interaktiivisia toimintoja nimeltä \"tutkimukset\". Valitettavasti Oppia edellyttää, ette JavaScript oon käytössä selaimessasi, jotta se toimisi kunnolla ja selaimessasi JavaScript on poistettu käytöstä. Jos tarvitset apua JavaScriptin käytöönotossa, <a href=\"<[hrefUrl]>\">klikkaa tästä.</a>",

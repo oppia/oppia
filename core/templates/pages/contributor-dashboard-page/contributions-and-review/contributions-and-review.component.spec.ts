@@ -448,51 +448,6 @@ describe('Contributions and review component', function() {
       expect(ctrl.contributionsDataLoading).toBe(false);
     });
 
-    it('should not throw error for undefined translation opportunities' +
-      ' in review tab', function() {
-      spyOn(
-        contributionAndReviewService, 'getReviewableTranslationSuggestions')
-        .and.callFake(callback => callback({
-          suggestion_undefined_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_undefined_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change: undefined,
-              status: 'review'
-            },
-            details: undefined
-          }
-        }));
-      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
-      $scope.$apply();
-
-      expect(Object.keys(ctrl.contributions)).toContain(
-        'suggestion_undefined_1');
-    });
-
-    it('should not throw error for undefined question opportunities' +
-      ' in review tab', function() {
-      spyOn(
-        contributionAndReviewService, 'getReviewableQuestionSuggestions')
-        .and.callFake(callback => callback({
-          suggestion_undefined_2: {
-            suggestion: {
-              suggestion_id: 'suggestion_undefined_2',
-              target_id: '2',
-              suggestion_type: 'add_question',
-              change: undefined,
-              status: 'review'
-            },
-            details: undefined
-          }
-        }));
-      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-
-      expect(Object.keys(ctrl.contributions)).toContain(
-        'suggestion_undefined_2');
-    });
-
     it('should open show view question modal when clicking on' +
       ' question suggestion', function() {
       spyOn($uibModal, 'open').and.callThrough();
