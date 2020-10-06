@@ -107,6 +107,9 @@ def create_suggestion(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
         None, change, score_category, thread_id, suggestion.language_code)
+
+    adjust_community_contribution_stats_due_to_suggestion(suggestion, 1)
+
     return get_suggestion_by_id(thread_id)
 
 
@@ -334,6 +337,10 @@ def accept_suggestion(
 
     _update_suggestion(suggestion)
 
+    # Suggestion is no longer in review and so we need to decrease the number
+    # of such suggestions that are in review by 1.
+    adjust_community_contribution_stats_due_to_suggestion(suggestion, -1)
+
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
@@ -419,6 +426,20 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
 
     _update_suggestions(suggestions)
 
+    community_contribution_stats = get_community_contribution_stats()
+    for suggestion in suggestions:
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code]
+            ) -= 1 
+        elif suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            community_contribution_stats.question_suggestion_count -= 1
+    update_community_contribution_stats(community_contribution_stats)
+
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message
@@ -498,6 +519,10 @@ def resubmit_rejected_suggestion(
     suggestion.change = change
     suggestion.set_suggestion_status_to_in_review()
     _update_suggestion(suggestion)
+
+    # Suggestion is now in review and so we need to increase the number of such
+    # suggestions that are in review by 1.
+    adjust_community_contribution_stats_due_to_suggestion(suggestion, 1)
 
     feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
@@ -853,3 +878,68 @@ def get_community_contribution_stats():
 
     return create_community_contribution_stats_from_model(
         community_contribution_stats_model)
+
+
+def update_community_contribution_stats(community_contribution_stats):
+    """Updates the CommunityContributionStatsModel using
+    community_contribution_stats.
+
+    Args:
+        community_contribution_stats: CommunityContributionStats. The
+            domain object that will be used to update the
+            CommunityContributionStatsModel.
+    """
+
+    community_contribution_stats.validate()
+
+    stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+    stats_model.translation_reviewer_counts_by_lang_code = (
+        community_contribution_stats.translation_reviewer_counts_by_lang_code
+    )
+    stats_model.translation_suggestion_counts_by_lang_code = (
+        community_contribution_stats
+        .translation_suggestion_counts_by_lang_code
+    )
+    stats_model.question_reviewer_count = (
+        community_contribution_stats.question_reviewer_count
+    )
+    stats_model.question_suggestion_count = (
+        community_contribution_stats.question_suggestion_count
+    )
+
+    stats_model.put()
+
+
+def adjust_community_contribution_stats_due_to_suggestion(
+        suggestion, adjust_by):
+    """Adjusts the community contribution stats count associated with the given
+    suggestion by the given amount.
+
+    Args:
+        suggestion: Suggestion. The suggestion that corresponds to a community
+            contribution stats count. Suggestion types that are offered on the
+            Contributor dashboard are the only suggestion types that will be
+            updated.
+        adjust_by: int. The amount to adjust the count by.
+    """
+    # This method does nothing for suggestion types that are not offered on the
+    # Contributor Dashboard.
+    if suggestion.suggestion_type == (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+        return
+    else:
+        stats = get_community_contribution_stats()
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if suggestion.language_code not in (
+                    stats.translation_suggestion_counts_by_lang_code):
+                stats.translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code] = adjust_by
+            else:
+                stats.translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code] += adjust_by
+        elif suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            stats.question_suggestion_count += adjust_by
+        update_community_contribution_stats(stats)
