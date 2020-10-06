@@ -39,6 +39,10 @@ export class Ratio {
     return this.components.length;
   }
 
+  getComponents(): number[] {
+    return this.components;
+  }
+
   /**
    * Returns this Ratio in its most simplified form.
    */
