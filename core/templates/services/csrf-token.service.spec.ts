@@ -24,7 +24,7 @@ import $ from 'jquery';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Csrf Token Service', function() {
-  let csrfTokenService: CsrfTokenService = null;
+  let csrfTokenService: CsrfTokenService;
   beforeEach(() => {
     csrfTokenService = new CsrfTokenService();
     // TODO(#8035): Remove the use of $.ajax in csrf-token.service

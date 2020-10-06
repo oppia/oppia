@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for non negative int editor.
+ * @fileoverview Directive for non-negative int editor.
  */
 
 // Every editor directive should implement an alwaysEditable option. There
