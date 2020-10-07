@@ -16,60 +16,31 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// hints-and-solution-manager.service.spec.ts is upgraded to Angular 8.
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service.ts';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service.ts';
+import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 
-require('domain/exploration/HintObjectFactory.ts');
-require('domain/exploration/SolutionObjectFactory.ts');
-require(
-  'pages/exploration-player-page/services/' +
-  'hints-and-solution-manager.service.ts');
+describe('HintsAndSolutionManager service', () => {
+  let hasms;
+  let hof;
+  let sof;
+  let firstHint, secondHint, thirdHint;
+  let solution;
+  let pps;
 
-describe('HintsAndSolutionManager service', function() {
-  var $timeout;
-  var hasms;
-  var hof;
-  var sof;
-  var firstHint, secondHint, thirdHint;
-  var solution;
-  var pps;
+  let mockNewCardAvailableEmitter = new EventEmitter();
 
-  var mockNewCardAvailableEmitter = new EventEmitter();
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $timeout = $injector.get('$timeout');
-    pps = $injector.get('PlayerPositionService');
+  beforeEach(() => {
+    pps = TestBed.get(PlayerPositionService);
     spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter);
-    hasms = $injector.get('HintsAndSolutionManagerService');
-    hof = $injector.get('HintObjectFactory');
-    sof = $injector.get('SolutionObjectFactory');
+    hasms = TestBed.get(HintsAndSolutionManagerService);
+    hof = TestBed.get(HintObjectFactory);
+    sof = TestBed.get(SolutionObjectFactory);
 
 
     firstHint = hof.createFromBackendDict({
@@ -101,9 +72,9 @@ describe('HintsAndSolutionManager service', function() {
 
     // Initialize the service with two hints and a solution.
     hasms.reset([firstHint, secondHint], solution);
-  }));
+  });
 
-  it('should display hints at the right times', function() {
+  it('should display hints at the right times', () => {
     expect(hasms.isHintTooltipOpen()).toBe(false);
     expect(hasms.isHintViewable(0)).toBe(false);
     expect(hasms.isHintViewable(1)).toBe(false);
@@ -145,7 +116,7 @@ describe('HintsAndSolutionManager service', function() {
   });
 
   it('should not continue to display hints after after a correct answer is' +
-     'submitted', function() {
+     'submitted', () => {
     expect(hasms.isHintViewable(0)).toBe(false);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
@@ -175,11 +146,11 @@ describe('HintsAndSolutionManager service', function() {
     $timeout.verifyNoPendingTasks();
   });
 
-  it('should show the correct number of hints', function() {
+  it('should show the correct number of hints', () => {
     expect(hasms.getNumHints()).toBe(2);
   });
 
-  it('should correctly retrieve the solution', function() {
+  it('should correctly retrieve the solution', () => {
     $timeout.flush();
 
     expect(hasms.isSolutionConsumed()).toBe(false);
@@ -190,7 +161,7 @@ describe('HintsAndSolutionManager service', function() {
     $timeout.verifyNoPendingTasks();
   });
 
-  it('should reset the service', function() {
+  it('should reset the service', () => {
     hasms.reset([firstHint, secondHint, thirdHint], solution);
     expect(hasms.getNumHints()).toBe(3);
 
@@ -231,7 +202,7 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isSolutionViewable()).toBe(true);
   });
 
-  it('should reset the service when timeouts was called before', function() {
+  it('should reset the service when timeouts was called before', () => {
     // Set timeout.
     $timeout.flush();
     // Set tooltipTimeout.
@@ -249,7 +220,7 @@ describe('HintsAndSolutionManager service', function() {
   });
 
   it('should not record the wrong answer when a hint is already released',
-    function() {
+    () => {
       expect(hasms.isHintTooltipOpen()).toBe(false);
       expect(hasms.isHintViewable(0)).toBe(false);
       expect(hasms.isHintViewable(1)).toBe(false);
@@ -274,7 +245,7 @@ describe('HintsAndSolutionManager service', function() {
       expect(hasms.isSolutionViewable()).toBe(false);
     });
 
-  it('should record the wrong answer twice', function() {
+  it('should record the wrong answer twice', () => {
     expect(hasms.isHintTooltipOpen()).toBe(false);
     expect(hasms.isHintViewable(0)).toBe(false);
     expect(hasms.isHintViewable(1)).toBe(false);
