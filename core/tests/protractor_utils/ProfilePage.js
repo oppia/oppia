@@ -43,7 +43,7 @@ var ProfilePage = function() {
   this.expectCurrUserToHaveProfilePhoto = async function() {
     await waitFor.visibilityOf(
       currUserProfilePhoto,
-      'Current user profile picture taking too long to appear');s
+      'Current user profile picture taking too long to appear');
   };
 
   this.expectOtherUserToHaveProfilePhoto = async function() {
