@@ -198,8 +198,8 @@ var AdminPage = function() {
     await waitFor.visibilityOf(
       await oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
-    var text = await (
-      await waitFor.visibilityOf(oneOffJobRows.get(i)).getText());
+      await waitFor.visibilityOf(oneOffJobRows.get(i));
+      var text = await oneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var oneOffJobRowsButton = oneOffJobRows.get(i).element(
         by.css('.protractor-test-one-off-jobs-start-btn'));
