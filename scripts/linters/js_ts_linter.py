@@ -230,46 +230,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
 
-    def _check_http_requests(self):
-        """Checks if the http requests are made only by
-        backend-api.service.ts.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        http_client_pattern = r':\n? *HttpClient'
-
-        excluded_files = [
-            'core/templates/services/request-interceptor.service.spec.ts'
-        ]
-
-        error_messages = []
-        name = 'HTTP request'
-
-        failed = False
-
-        for file_path in self.all_filepaths:
-            if file_path in excluded_files:
-                continue
-
-            if file_path.endswith('backend-api.service.ts'):
-                continue
-
-            file_content = self.file_cache.read(file_path)
-
-            if re.findall(http_client_pattern, file_content):
-                failed = True
-                error_message = (
-                    '%s --> An instance of HttpClient is found in this '
-                    'file. You are not allowed to create http requests '
-                    'from files that are not backend api services.' % (
-                        file_path))
-                error_messages.append(error_message)
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _check_ts_ignore(self):
         """Checks if ts ignore is used.
 
@@ -1067,7 +1027,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         linter_stdout = []
 
         linter_stdout.append(self._check_extra_js_files())
-        linter_stdout.append(self._check_http_requests())
         linter_stdout.append(self._check_js_and_ts_component_name_and_count())
         linter_stdout.append(self._check_directive_scope())
         linter_stdout.append(self._check_sorted_dependencies())
