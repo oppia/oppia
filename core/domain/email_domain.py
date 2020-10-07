@@ -70,3 +70,37 @@ class FeedbackThreadReplyInfo(python_utils.OBJECT):
         """
         return '.'.join(
             [self.entity_type, self.entity_id, self.id.split('.')[3]])
+
+
+class SendEmailInfo(python_utils.OBJECT):
+    """The information needed to send an email.
+    Attributes:
+        recipient_id: str. The user ID of the email recipient.
+        sender_id: str. The user ID of the sender.
+        intent: str. The intent string for the email, i.e. the purpose/type.
+        email_subject: str. The subject of the email.
+        email_html_body: str. The body (message) of the email.
+        sender_email: str. The sender's email address.
+        recipient_email: str. The recipient's email address.
+        bcc_admin: bool. Whether to send a copy of the email to the admin's
+            email address.
+        sender_name: str|None. The name to be shown in the "sender" field of
+            the email.
+        reply_to_id: str or None. The unique reply-to id used in reply-to email
+            address sent to recipient.
+    """
+
+    def __init__(
+            self, recipient_id, sender_id, intent, email_subject,
+            email_html_body, sender_email, recipient_email, sender_name,
+            bcc_admin=False, reply_to_id=None):
+        self.recipient_id = recipient_id
+        self.sender_id = sender_id
+        self.intent = intent
+        self.email_subject = email_subject
+        self.email_html_body = email_html_body
+        self.sender_email = sender_email
+        self.recipient_email = recipient_email
+        self.sender_name = sender_name
+        self.bcc_admin = bcc_admin
+        self.reply_to_id = reply_to_id

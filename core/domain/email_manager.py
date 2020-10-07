@@ -24,6 +24,7 @@ import logging
 
 from constants import constants
 from core.domain import config_domain
+from core.domani import email_domain
 from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_domain
@@ -34,7 +35,8 @@ import feconf
 import python_utils
 import utils
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
+(email_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.email, models.NAMES.suggestion])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -208,6 +210,15 @@ NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
     []
 )
 
+SUGGESTIONS_TO_REVIEW_TEMPLATE = {
+    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+        '<li>The following translation suggestion in language %s was submitted '
+        'for review %s ago:<br>%s</li>'),
+    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+        '<li>The following %s question suggestion was submitted for review %s '
+        'ago:<br>%s</li>')
+}
+
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
@@ -348,6 +359,60 @@ def _send_email(
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     transaction_services.run_in_transaction(_send_email_in_transaction)
+
+
+def _send_emails(send_email_infos):
+    """Sends emails to the given recipients.
+    Args:
+        send_email_infos: list(SendEmailInfo). Each SendEmailInfo object
+            contains the information necessary to send an email.
+    Raises:
+        Exception. A sender_id is not appropriate for an intent.
+    """
+    for send_email_info in send_email_infos:
+        if send_email_info.sender_name is None:
+            send_email_info.sender_name = EMAIL_SENDER_NAME.value
+
+        require_sender_id_is_valid(
+            send_email_info.intent, send_email_info.sender_id)
+
+        if send_email_info.recipient_email is None:
+            send_email_info.recipient_email = (
+                user_services.get_email_from_user_id(
+                    send_email_info.recipient_id)
+            )
+
+        cleaned_html_body = html_cleaner.clean(send_email_info.email_html_body)
+        if cleaned_html_body != send_email_info.email_html_body:
+            log_new_error(
+                'Original email HTML body does not match cleaned HTML body:\n'
+                'Original:\n%s\n\nCleaned:\n%s\n' %
+                (send_email_info.email_html_body, cleaned_html_body))
+            return
+
+        raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
+            '<br>', '\n').replace('<li>', '<li>- ').replace(
+                '</p><p>', '</p>\n<p>')
+        cleaned_plaintext_body = html_cleaner.strip_html_tags(
+            raw_plaintext_body)
+
+        def _send_email_in_transaction(
+                send_email_info=send_email_info,
+                cleaned_plaintext_body=cleaned_plaintext_body):
+            """Sends the email to a single recipient."""
+            sender_name_email = '%s <%s>' % (
+                send_email_info.sender_name, send_email_info.sender_email)
+
+            email_services.send_mail(
+                sender_name_email, send_email_info.recipient_email,
+                send_email_info.email_subject, cleaned_plaintext_body,
+                send_email_info.email_html_body,
+                bcc_admin=send_email_info.bcc_admin,
+                reply_to_id=send_email_info.reply_to_id)
+
+        transaction_services.run_in_transaction(_send_email_in_transaction)
+
+    email_models.SentEmailModel.create_multi(send_email_infos)
 
 
 def _send_bulk_mail(
@@ -1158,6 +1223,110 @@ def send_mail_to_notify_users_to_review(user_id, category):
             feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
+
+def send_mail_to_notify_contributor_dashboard_reviewers(
+        reviewer_ids, reviewers_suggestion_email_infos):
+    """Sends an email to each Contributor Dashboard reviewer notifying them of
+    the suggestions that have been waiting the longest for reivew, that the
+    reviewer has permission to review.
+
+    Args:
+        reviewer_ids: list(str). A list of the Contributor Dashboard reviewer
+            user ids to notify.
+        reviewers_suggestion_email_infos:
+        list(list(ReviewableSuggestionEmailInfo)). A list of suggestion
+            email content info objects for each reviewer. These suggestion
+            email content info objects will be used to compose the email
+            body for each reviewer.
+    """
+    email_subject = 'Contributor Dashboard Review Opportunities'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'There are new review opportunites that we think you might be '
+        'interested in on the '
+        '<a href="https://www.oppia.org/contributor-dashboard/">'
+        'Contritubor Dashboard</a> page.' 'Here are some examples of the '
+        'contributions that have been waiting the longest for review:'
+        '<br><br>%s<br><br>'
+        'Please take some time to review any of the above contributions '
+        '(if they still need a review) or any other contributions on the '
+        'dashboard. We appreciate your help!<br><br>'
+        'Thanks again, and happy reviewing!'
+        '- The Oppia Contributor Dashboard Team'
+        '<br><br>%s'
+    )
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not config_domain.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED:
+        log_new_error(
+            'Contributor Dashboard reviewer emails must be enabled on the '
+            'config page in order to send reviewers the emails.'
+        )
+        return
+
+    reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
+    reviewer_usernames = [
+        reviewer_user_setting.username if reviewer_user_setting is not None else
+        None for reviewer_user_setting in reviewer_user_settings
+    ]
+    reviewer_emails = [
+        reviewer_user_setting.email if reviewer_user_setting is not None else
+        None for reviewer_user_setting in reviewer_user_settings
+    ]
+
+    send_email_infos = []
+    for index, reviewer_id in enumerate(reviewer_ids):
+        if not reviewers_suggestion_email_infos[index]:
+            log_new_error(
+                'There were no suggestions to recommend to the reviewer with '
+                'user id:%s' % reviewer_id)
+            continue
+        elif not reviewer_usernames[index]:
+            log_new_error(
+                'There was no username for the given reviewer id:%s' % (
+                    reviewer_id))
+            continue
+        elif not reviewer_emails[index]:
+            log_new_error(
+                'There was no email for the given reviewer id:%s' % (
+                    reviewer_id))
+            continue
+        else:
+            list_of_suggestions_strings = []
+            for reviewer_suggestion_email_info in (
+                    reviewers_suggestion_email_infos[index]):
+                # Set the language code for question suggestions to be the empty
+                # string in order to use the same suggestion template format.
+                if reviewers_suggestion_email_infos.suggestion_type == (
+                        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                    reviewers_suggestion_email_infos.language_code = ''
+                # Calculate how long the suggestion has been waiting for review.
+                suggestion_review_wait_time = (
+                    datetime.now() - (
+                        reviewers_suggestion_email_infos.submission_datetime))
+                suggestion_template = SUGGESTIONS_TO_REVIEW_TEMPLATE[
+                    reviewers_suggestion_email_infos.suggestion_type]
+                list_of_suggestions_strings.append(suggestion_template % (
+                    reviewers_suggestion_email_infos.language_code,
+                    suggestion_review_wait_time,
+                    reviewers_suggestion_email_infos.suggestion_content)
+                )
+            email_body = email_body_template % (
+                reviewer_usernames[index], ''.join(list_of_suggestions_strings),
+                EMAIL_FOOTER.value)
+
+            send_email_infos.append(email_domain.SendEmailInfo(
+                reviewer_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+                reviewer_emails[index], EMAIL_SENDER_NAME.value)
+            )
+            
+    _send_emails(send_email_infos)
 
 def send_accepted_voiceover_application_email(
         user_id, lesson_title, language_code):

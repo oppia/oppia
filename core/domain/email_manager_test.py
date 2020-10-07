@@ -28,6 +28,7 @@ from core.domain import email_manager
 from core.domain import html_cleaner
 from core.domain import rights_domain
 from core.domain import subscription_services
+from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -2006,6 +2007,187 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
 
         messages = self._get_sent_email_messages(
             self.REVIEWER_EMAIL)
+        self.assertEqual(len(messages), 0)
+
+    def test_that_correct_completion_email_is_sent(self):
+        expected_email_subject = 'Notification to review suggestions'
+        expected_email_html_body = (
+            'Hi reviewer,<br><br>'
+            'Just a heads-up that there are new suggestions to '
+            'review in Algebra, which you are registered as a reviewer for.'
+            '<br><br>Please take a look at and accept/reject these suggestions '
+            'at your earliest convenience. You can visit your '
+            '<a href="https://www.oppia.org/creator-dashboard/">dashboard</a> '
+            'to view the list of suggestions that need a review.<br><br>'
+            'Thank you for helping improve Oppia\'s lessons!'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_users_to_review(
+                self.reviewer_id, 'Algebra')
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(
+                self.REVIEWER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.reviewer_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.REVIEWER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS)
+
+
+class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
+    """Test that correct email is sent while notifying Contributor Dashboard
+    reviewers.
+    """
+
+    target_id = 'exp1'
+    language_code = 'en'
+    AUTHOR_EMAIL = 'author1@example.com'
+    REVIEWER_1_EMAIL = 'reviewer1@community.org'
+    REVIEWER_2_EMAIL = 'reviewer2@community.org'
+    COMMIT_MESSAGE = 'commit message'
+
+    def _create_translation_suggestion_with_language_code_and_author_id(
+            self, language_code, author_id):
+        """Creates a translation suggestion in the given language_code by the
+        given author_id.
+        """
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>'
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_translation_change_dict,
+            'test description'
+        )
+
+    def _create_question_suggestion_with_skill_id_and_author_id(
+            self, skill_id, author_id):
+        """Creates a question suggestion with the given skill_id by the given
+        author_id.
+        """
+        add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': self.language_code,
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_question_change_dict,
+            'test description'
+        )
+
+    def _create_reviewable_suggestion_email_infos_from_suggestions(
+            self, suggestions):
+        """Creates a list of ReviewableSuggestionEmailInfo objects from
+        the given suggestions.
+        """
+
+        return [
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion)
+            ) for suggestion in suggestions
+        ]
+
+    def setUp(self):
+        super(NotifyContributionDashboardReviewersEmailTests, self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
+        self.reviewer_1_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_1_id, True, False, False, False)
+        self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
+        self.reviewer_2_id = self.get_user_id_from_email(self.REVIEWER_2_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_2_id, True, False, False, False)
+
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+        self.can_send_reviewer_emails_ctx = self.swap(
+            config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
+            True)
+        self.cannot_send_reviewer_emails_ctx = self.swap(
+            config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
+            False)
+        
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        question_suggestion = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id))
+        self.reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+
+    def test_email_not_sent_if_can_send_emails_is_false(self):
+
+        with self.cannot_send_emails_ctx and self.can_send_reviewer_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                self.reviewer_1_id, self.reviewable_suggestion_email_info)
+
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 0)
+
+    def test_email_not_sent_if_reviewer_notifications_is_not_enabled(self):
+
+        with self.can_send_emails_ctx and self.cannot_send_reviewer_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                self.reviewer_1_id, self.reviewable_suggestion_email_info)
+
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 0)
+
+    def test_email_not_sent_if_reviewer_does_not_exist(self):
+
+        with self.can_send_emails_ctx and self.can_send_reviewer_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                'invalid_reviewer_id', self.reviewable_suggestion_email_info)
+
+        messages = self._get_sent_email_messages('invalid_reviewer_id')
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_completion_email_is_sent(self):
