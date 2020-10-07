@@ -21,7 +21,10 @@ import { Injectable } from '@angular/core';
 
 import { EventEmitter } from '@angular/core';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
+import { Hint } from 'domain/exploration/HintObjectFactory';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service.ts';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -36,8 +39,8 @@ export class HintsAndSolutionManagerService {
   numHintsConsumed: number = 0;
   solutionReleased: boolean = false;
   solutionConsumed: boolean = false;
-  hintsForLatestCard = [];
-  solutionForLatestCard = null;
+  hintsForLatestCard: Hint[] = [];
+  solutionForLatestCard: Solution = null;
   wrongAnswersSinceLastHintConsumed: number = 0;
   correctAnswerSubmitted: boolean = false;
 
@@ -65,7 +68,8 @@ export class HintsAndSolutionManagerService {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
-    this.timeout = setTimeout(func, timeToWaitMsec);
+
+    this.timeout = setTimeout(func.bind(this), timeToWaitMsec);
   }
 
   showTooltip(): void {
@@ -78,7 +82,7 @@ export class HintsAndSolutionManagerService {
       this.numHintsReleased++;
       if (!this.hintsDiscovered && !this.tooltipTimeout) {
         this.tooltipTimeout = setTimeout(
-          this.showTooltip, this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+          this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
     }
   }
@@ -119,7 +123,7 @@ export class HintsAndSolutionManagerService {
     }
   }
 
-  reset(newHints, newSolution): void {
+  reset(newHints: Hint[], newSolution: Solution): void {
     this.numHintsReleased = 0;
     this.numHintsConsumed = 0;
     this.solutionReleased = false;
@@ -145,7 +149,7 @@ export class HintsAndSolutionManagerService {
   // WARNING: This method has a side-effect. If the retrieved hint is a
   // pending hint that's being viewed, it starts the timer for the next
   // hint.
-  displayHint(index) {
+  displayHint(index: number): SubtitledHtml | null {
     if (index === this.numHintsConsumed &&
       this.numHintsConsumed < this.numHintsReleased) {
       // The latest hint has been consumed. Start the timer.
@@ -158,7 +162,7 @@ export class HintsAndSolutionManagerService {
     return null;
   }
 
-  displaySolution() {
+  displaySolution(): Solution {
     this.hintsDiscovered = true;
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();
@@ -210,11 +214,11 @@ export class HintsAndSolutionManagerService {
     }
   }
 
-  onSolutionViewedEventEmitter() {
+  get onSolutionViewedEventEmitter() {
     return this._solutionViewedEventEmitter;
   }
 
-  onHintConsumed() {
+  get onHintConsumed() {
     return this._hintConsumedEventEmitter;
   }
 }
