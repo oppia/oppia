@@ -268,9 +268,9 @@ class ClassifierTrainingJobModelValidator(
             cls._validate_state_name]
 
 
-class TrainingJobExplorationMappingModelValidator(
+class StateTrainingJobsMappingModelValidator(
         base_model_validators.BaseModelValidator):
-    """Class for validating TrainingJobExplorationMappingModels."""
+    """Class for validating StateTrainingJobsMappingModels."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -281,8 +281,9 @@ class TrainingJobExplorationMappingModelValidator(
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return classifier_domain.TrainingJobExplorationMapping(
-            item.exp_id, item.exp_version, item.state_name, item.job_id)
+        return classifier_domain.StateTrainingJobsMapping(
+            item.exp_id, item.exp_version, item.state_name,
+            item.algorithm_ids_to_job_ids)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -297,7 +298,7 @@ class TrainingJobExplorationMappingModelValidator(
         of exploration corresponding to exp_id.
 
         Args:
-            item: datastore_services.Model. TrainingJobExplorationMappingModel
+            item: datastore_services.Model. StateTrainingJobsMappingModel
                 to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
@@ -344,7 +345,7 @@ class TrainingJobExplorationMappingModelValidator(
         exploration corresponding to exp_id.
 
         Args:
-            item: datastore_services.Model. TrainingJobExplorationMappingbModel
+            item: datastore_services.Model. StateTrainingJobsMappingModel
                 to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
