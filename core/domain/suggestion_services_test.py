@@ -1917,7 +1917,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [Link]  [Link]',
+                'translation with rte [Link] [Link]',
                 translation_suggestion.last_updated
             ))
 
@@ -1943,7 +1943,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [Link]  [Math]',
+                'translation with rte [Link] [Math]',
                 translation_suggestion.last_updated
             ))
 
@@ -1970,7 +1970,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
                 translation_suggestion.language_code,
-                'translation with rte [Link]  [Math]',
+                'translation with rte [Link] [Math]',
                 translation_suggestion.last_updated
             ))
 
@@ -2097,7 +2097,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [Link]  [Link]',
+                'question with rte [Link] [Link]',
                 question_suggestion.last_updated
             ))
 
@@ -2123,7 +2123,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [Link]  [Math]',
+                'question with rte [Link] [Math]',
                 question_suggestion.last_updated
             ))
 
@@ -2150,7 +2150,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [Link]  [Math]',
+                'question with rte [Link] [Math]',
                 question_suggestion.last_updated
             ))
 
@@ -2474,7 +2474,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             reviewable_suggestion_email_infos[0],
             expected_reviewable_suggestion_email_infos)
 
-    def test_get_returns_suggestion_infos_for_translation_reviewer_past_limit(
+    def test_get_returns_infos_for_translation_reviewer_past_limit_same_lang(
             self):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'hi')
@@ -2491,6 +2491,43 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
 
         with self.swap(
             suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewable_suggestion_email_infos = (
+                suggestion_services
+                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                    [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_infos_for_translation_reviewer_past_limit_diff_lang(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'en', self.author_id))
+        # Create another hindi and english translation suggestion so that we
+        # reach the MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER limit for each
+        # language code but continue to update the suggestions that have been
+        # waiting the longest (since the top two suggestions waiting the
+        # longest are from different language codes).
+        self._create_translation_suggestion_with_language_code_and_author(
+            'en', self.author_id)
+        self._create_translation_suggestion_with_language_code_and_author(
+            'hi', self.author_id)
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1, translation_suggestion_2]))
+
+        with self.swap(
+            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 2):
             reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
@@ -2717,3 +2754,36 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
             reviewable_suggestion_email_infos[1],
             expected_reviewable_suggestion_email_infos_reviewer_2)
+
+    def test_get_returns_infos_for_reviewer_with_multi_rights_past_limit(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        # Create additional suggestions so that we pass the
+        # MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER limit regardless of suggestion
+        # type.
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.author_id)
+        self._create_translation_suggestion_with_language_code_and_author(
+            'hi', self.author_id)
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.author_id)
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1]))
+
+        with self.swap(
+            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewable_suggestion_email_infos = (
+                suggestion_services
+                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                    [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)

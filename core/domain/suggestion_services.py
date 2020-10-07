@@ -49,8 +49,8 @@ MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = 5
 # emphasized text on the Contributor Dashboard. From a UI perspective, the
 # emphasized content makes it easier for users to identify the different
 # suggestion opportunities. For instance, for translation suggestions the
-# emphasized text is the translation itself. Similarly, for question suggestions
-# the emphasized text is the question.
+# emphasized text is the translation. Similarly, for question suggestions the
+# emphasized text is the question being asked.
 HTML_FOR_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
     # The translation html is always the first element in the list of
     # translation suggestion html content strings.
@@ -645,7 +645,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
         """Replaces all of the <oppia-noninteractive-**> tags.
 
         Args:
-            rte_tag: MatchObject. The oppia-noninteractive rte tag.
+            rte_tag: MatchObject. The matched oppia-noninteractive rte tag.
 
         Returns:
             str. The string to replace the rte tag with.
@@ -657,7 +657,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
         if replace_string[-1] == '>':
             replace_string = replace_string[:-1]
         replace_string = replace_string.capitalize()
-        replace_string = '%s%s%s' % (' [', replace_string, '] ')
+        replace_string = ' [%s] ' % replace_string
         return replace_string
 
     # Replace all the opening <oppia-noninteractive-**> tags with their names
@@ -665,13 +665,15 @@ def _get_plain_text_from_html_content_string(html_content_string):
     html_content_string_with_noninteractive_tag_replaced = re.sub(
         r'<(oppia-noninteractive\s*?)[^>]+>', _replace_rte_tag,
         html_content_string)
-    # Get rid of all of the other html tags.
+    # Get rid of all of the other html tags, including closing tags and
+    # malformed html tags if they exist.
     plain_text = html_cleaner.strip_html_tags(
         html_content_string_with_noninteractive_tag_replaced
     )
-    # Remove any leading or trailing whitespace.
-    plain_text_without_trailing_whitespace = plain_text.strip()
-    return plain_text_without_trailing_whitespace
+    # Remove trailing and leading whitespace and ensure that all words are
+    # separated by a single space.
+    plain_text_without_whitespace_issues = ' '.join(plain_text.split())
+    return plain_text_without_whitespace_issues
 
 
 def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
@@ -788,7 +790,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                                 most_recent_review_submission):
                             break
                     # Reviewers can never review their own suggestions.
-                    elif translation_suggestion.author_id != (
+                    if translation_suggestion.author_id != (
                             user_contribution_rights.id):
                         heapq.heappush(suggestions_waiting_longest_heap, (
                             translation_suggestion.last_updated,

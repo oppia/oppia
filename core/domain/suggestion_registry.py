@@ -1235,7 +1235,9 @@ class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
     Attributes:
         suggestion_type: str. The type of the suggestion.
         language_code: str. The language code of the suggestion.
-        suggestion_content: str. The question or translation of the suggestion.
+        suggestion_content: str. The suggestion content that is emphasized for
+            a user when they are viewing a list of suggestions on the
+            Contributor Dashboard.
         submission_datetime: datetime.datetime. Date and time when the
             suggestion was submitted for review.
     """
