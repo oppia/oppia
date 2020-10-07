@@ -28,27 +28,27 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 })
 export class HintsAndSolutionManagerService {
   timeout = null;
-  ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
-  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 60000;
+  ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
+  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 60000;
   _solutionViewedEventEmitter = new EventEmitter();
 
-  numHintsReleased = 0;
-  numHintsConsumed = 0;
-  solutionReleased = false;
-  solutionConsumed = false;
+  numHintsReleased: number = 0;
+  numHintsConsumed: number = 0;
+  solutionReleased: boolean = false;
+  solutionConsumed: boolean = false;
   hintsForLatestCard = [];
   solutionForLatestCard = null;
-  wrongAnswersSinceLastHintConsumed = 0;
-  correctAnswerSubmitted = false;
+  wrongAnswersSinceLastHintConsumed: number = 0;
+  correctAnswerSubmitted: boolean = false;
 
   _hintConsumedEventEmitter = new EventEmitter();
 
   // Variable tooltipIsOpen is a flag which says that the tooltip is currently
   // visible to the learner.
-  tooltipIsOpen = false;
+  tooltipIsOpen: boolean = false;
   // This is set to true as soon as a hint/solution is clicked or when the
   // tooltip has been triggered.
-  hintsDiscovered = false;
+  hintsDiscovered: boolean = false;
   tooltipTimeout = null;
 
   constructor(private playerPositionService: PlayerPositionService) {
@@ -61,46 +61,47 @@ export class HintsAndSolutionManagerService {
   }
 
   // This replaces any timeouts that are already queued.
-  enqueueTimeout(func, timeToWaitMsec) {
-    if (timeout) {
-      $timeout.cancel(timeout);
+  enqueueTimeout(func, timeToWaitMsec: number): void {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
     }
-    timeout = $timeout(func, timeToWaitMsec);
+    this.timeout = setTimeout(func, timeToWaitMsec);
   }
 
-  showTooltip() {
+  showTooltip(): void {
     this.tooltipIsOpen = true;
     this.hintsDiscovered = true;
   }
 
-  releaseHint() {
+  releaseHint(): void {
     if (!this.correctAnswerSubmitted) {
       this.numHintsReleased++;
       if (!this.hintsDiscovered && !this.tooltipTimeout) {
-        this.tooltipTimeout = $timeout(
+        this.tooltipTimeout = setTimeout(
           this.showTooltip, this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
     }
   }
-  releaseSolution() {
+  releaseSolution(): void {
     this.solutionReleased = true;
   }
-  accelerateHintRelease() {
+  accelerateHintRelease(): void {
     this.enqueueTimeout(this.releaseHint, this.ACCELERATED_HINT_WAIT_TIME_MSEC);
   }
 
-  areAllHintsExhausted() {
+  areAllHintsExhausted(): boolean {
     return this.numHintsReleased === this.hintsForLatestCard.length;
   }
-  isAHintWaitingToBeViewed() {
+  isAHintWaitingToBeViewed(): boolean {
     return this.numHintsConsumed < this.numHintsReleased;
   }
 
-  consumeHint() {
+  consumeHint(): void {
     this.hintsDiscovered = true;
     this.tooltipIsOpen = false;
     if (this.tooltipTimeout) {
-      $timeout.cancel(this.tooltipTimeout);
+      clearTimeout(this.tooltipTimeout);
+      this.tooltipTimeout = null;
     }
     this._hintConsumedEventEmitter.emit();
     this.numHintsConsumed++;
@@ -127,11 +128,13 @@ export class HintsAndSolutionManagerService {
     this.solutionForLatestCard = newSolution;
     this.wrongAnswersSinceLastHintConsumed = 0;
     this.correctAnswerSubmitted = false;
-    if (timeout) {
-      $timeout.cancel(timeout);
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
     }
-    if (tooltipTimeout) {
-      $timeout.cancel(tooltipTimeout);
+    if (this.tooltipTimeout) {
+      clearTimeout(this.tooltipTimeout);
+      this.tooltipTimeout = null;
     }
 
     if (this.hintsForLatestCard.length > 0) {
@@ -160,36 +163,37 @@ export class HintsAndSolutionManagerService {
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();
     if (this.tooltipTimeout) {
-      $timeout.cancel(this.tooltipTimeout);
+      clearTimeout(this.tooltipTimeout);
+      this.tooltipTimeout = null;
     }
     return this.solutionForLatestCard;
   }
 
-  getNumHints() {
+  getNumHints(): number {
     return this.hintsForLatestCard.length;
   }
 
-  isHintViewable(index) {
+  isHintViewable(index: number): boolean {
     return index < this.numHintsReleased;
   }
 
-  isHintConsumed(index) {
+  isHintConsumed(index: number): boolean {
     return index < this.numHintsConsumed;
   }
 
-  isHintTooltipOpen() {
+  isHintTooltipOpen(): boolean {
     return this.tooltipIsOpen;
   }
 
-  isSolutionViewable() {
+  isSolutionViewable(): boolean {
     return this.solutionReleased;
   }
 
-  isSolutionConsumed() {
+  isSolutionConsumed(): boolean {
     return this.solutionConsumed;
   }
 
-  recordWrongAnswer() {
+  recordWrongAnswer(): void {
     if (this.isAHintWaitingToBeViewed()) {
       return;
     }
