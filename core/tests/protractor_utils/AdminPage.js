@@ -140,23 +140,24 @@ var AdminPage = function() {
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
-  var saveConfigProperty = async function(
+    this.saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
-    var title = await waitFor.visibilityOf(
-      configProperty.element(
-        by.css('.protractor-test-config-title')).getText());
-    if (title.match(propertyName)) {
-      await editingInstructions(
-        await forms.getEditor(objectType)(configProperty));
-      await action.click('Saves All Configs', saveAllConfigs);
-      await general.acceptAlert();
-      // Waiting for success message.
-      await waitFor.textToBePresentInElement(
-        statusMessage, 'saved successfully',
-        'New config could not be saved');
-      return true;
-    }
-  };
+        await this.get();
+        var title = await waitFor.visibilityOf(
+        configProperty.element(
+          by.css('.protractor-test-config-title')).getText());
+        if (title.match(propertyName)) {
+          await editingInstructions(
+            await forms.getEditor(objectType)(configProperty));
+          await action.click('Saves All Configs', saveAllConfigs);
+          await general.acceptAlert();
+          // Waiting for success message.
+          await waitFor.textToBePresentInElement(
+            statusMessage, 'saved successfully',
+            'New config could not be saved');
+            return true;
+            }
+      };
 
   this.get = async function() {
     await browser.get(ADMIN_URL_SUFFIX);
