@@ -16,7 +16,8 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
-require('domain/exploration/ParamMetadataObjectFactory.ts');
+import { ParamMetadata } from 'domain/exploration/param-metadata.model';
+
 require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -30,11 +31,11 @@ require(
 angular.module('oppia').factory('ParameterMetadataService', [
   'ExplorationParamChangesService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'GraphDataService',
-  'ParamMetadataObjectFactory', 'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
+  'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
   function(
       ExplorationParamChangesService, ExplorationStatesService,
       ExpressionInterpolationService, GraphDataService,
-      ParamMetadataObjectFactory, PARAM_ACTION_GET, PARAM_ACTION_SET) {
+      PARAM_ACTION_GET, PARAM_ACTION_SET) {
     var PARAM_SOURCE_ANSWER = 'answer';
     var PARAM_SOURCE_CONTENT = 'content';
     var PARAM_SOURCE_FEEDBACK = 'feedback';
@@ -46,25 +47,25 @@ angular.module('oppia').factory('ParameterMetadataService', [
         var pc = paramChanges[i];
         if (pc.generatorId === 'Copier') {
           if (!pc.customizationArgs.parse_with_jinja) {
-            result.push(ParamMetadataObjectFactory.createWithSetAction(
-              pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
+            result.push(ParamMetadata.createWithSetAction(
+              pc.name, PARAM_SOURCE_PARAM_CHANGES, String(i)));
           } else {
             var paramsReferenced = (
               ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
-              result.push(ParamMetadataObjectFactory.createWithGetAction(
-                paramsReferenced[j], PARAM_SOURCE_PARAM_CHANGES, i));
+              result.push(ParamMetadata.createWithGetAction(
+                paramsReferenced[j], PARAM_SOURCE_PARAM_CHANGES, String(i)));
             }
 
-            result.push(ParamMetadataObjectFactory.createWithSetAction(
-              pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
+            result.push(ParamMetadata.createWithSetAction(
+              pc.name, PARAM_SOURCE_PARAM_CHANGES, String(i)));
           }
         } else {
           // RandomSelector. Elements in the list of possibilities are treated
           // as raw unicode strings, not expressions.
-          result.push(ParamMetadataObjectFactory.createWithSetAction(
-            pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
+          result.push(ParamMetadata.createWithSetAction(
+            pc.name, PARAM_SOURCE_PARAM_CHANGES, String(i)));
         }
       }
 
@@ -84,20 +85,20 @@ angular.module('oppia').factory('ParameterMetadataService', [
       ExpressionInterpolationService.getParamsFromString(
         state.content.getHtml()).forEach(
         function(paramName) {
-          result.push(ParamMetadataObjectFactory.createWithGetAction(
+          result.push(ParamMetadata.createWithGetAction(
             paramName, PARAM_SOURCE_CONTENT, null));
         }
       );
 
       // Next, the answer is received.
-      result.push(ParamMetadataObjectFactory.createWithSetAction(
+      result.push(ParamMetadata.createWithSetAction(
         'answer', PARAM_SOURCE_ANSWER, null));
 
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
         ExpressionInterpolationService.getParamsFromString(
           group.outcome.feedback.getHtml()).forEach(function(paramName, index) {
-          result.push(ParamMetadataObjectFactory.createWithGetAction(
+          result.push(ParamMetadata.createWithGetAction(
             paramName, PARAM_SOURCE_FEEDBACK, index));
         });
       });
