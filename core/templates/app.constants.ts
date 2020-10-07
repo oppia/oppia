@@ -150,6 +150,7 @@ export const AppConstants = {
   COLLECTION_DATA_URL_TEMPLATE: '/collection_handler/data/<collection_id>',
 
   ENTITY_TYPE: {
+    COLLECTION: 'collection',
     EXPLORATION: 'exploration',
     TOPIC: 'topic',
     SKILL: 'skill',
