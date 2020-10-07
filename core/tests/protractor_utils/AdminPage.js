@@ -214,8 +214,8 @@ var AdminPage = function() {
   };
 
   this._stopOneOffJob = async function(jobName, i) {
-    var text = await (
-      await waitFor.visibilityOf(unfinishedOneOffJobRows.get(i)).getText());
+      await waitFor.visibilityOf(unfinishedOneOffJobRows.get(i));
+      var text = await unfinishedOneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var unfinishedOffJobRowsButton = (
         await unfinishedOneOffJobRows.get(i)
