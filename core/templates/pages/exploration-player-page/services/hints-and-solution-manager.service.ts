@@ -16,190 +16,205 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-require('pages/exploration-player-page/services/player-position.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 import { EventEmitter } from '@angular/core';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service.ts';
 
-require(
-  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class HintsAndSolutionManagerService {
+  timeout = null;
+  ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
+  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 60000;
+  _solutionViewedEventEmitter = new EventEmitter();
 
-angular.module('oppia').factory('HintsAndSolutionManagerService', [
-  '$timeout', 'PlayerPositionService',
-  'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
-  function(
-      $timeout, PlayerPositionService,
-      WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
-    var timeout = null;
-    var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
-    var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 60000;
-    var _solutionViewedEventEmitter = new EventEmitter();
+  numHintsReleased = 0;
+  numHintsConsumed = 0;
+  solutionReleased = false;
+  solutionConsumed = false;
+  hintsForLatestCard = [];
+  solutionForLatestCard = null;
+  wrongAnswersSinceLastHintConsumed = 0;
+  correctAnswerSubmitted = false;
 
-    var numHintsReleased = 0;
-    var numHintsConsumed = 0;
-    var solutionReleased = false;
-    var solutionConsumed = false;
-    var hintsForLatestCard = [];
-    var solutionForLatestCard = null;
-    var wrongAnswersSinceLastHintConsumed = 0;
-    var correctAnswerSubmitted = false;
+  _hintConsumedEventEmitter = new EventEmitter();
 
-    var _hintConsumedEventEmitter = new EventEmitter();
+  // Variable tooltipIsOpen is a flag which says that the tooltip is currently
+  // visible to the learner.
+  tooltipIsOpen = false;
+  // This is set to true as soon as a hint/solution is clicked or when the
+  // tooltip has been triggered.
+  hintsDiscovered = false;
+  tooltipTimeout = null;
 
-    // Variable tooltipIsOpen is a flag which says that the tooltip is currently
-    // visible to the learner.
-    var tooltipIsOpen = false;
-    // This is set to true as soon as a hint/solution is clicked or when the
-    // tooltip has been triggered.
-    var hintsDiscovered = false;
-    var tooltipTimeout = null;
-
-    PlayerPositionService.onNewCardAvailable.subscribe(
+  constructor(private playerPositionService: PlayerPositionService) {
+    playerPositionService.onNewCardAvailable.subscribe(
       () => {
-        correctAnswerSubmitted = true;
-        tooltipIsOpen = false;
+        this.correctAnswerSubmitted = true;
+        this.tooltipIsOpen = false;
       }
     );
-
-    // This replaces any timeouts that are already queued.
-    var enqueueTimeout = function(func, timeToWaitMsec) {
-      if (timeout) {
-        $timeout.cancel(timeout);
-      }
-      timeout = $timeout(func, timeToWaitMsec);
-    };
-
-    var showTooltip = function() {
-      tooltipIsOpen = true;
-      hintsDiscovered = true;
-    };
-
-    var releaseHint = function() {
-      if (!correctAnswerSubmitted) {
-        numHintsReleased++;
-        if (!hintsDiscovered && !tooltipTimeout) {
-          tooltipTimeout = $timeout(
-            showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
-        }
-      }
-    };
-    var releaseSolution = function() {
-      solutionReleased = true;
-    };
-    var accelerateHintRelease = function() {
-      enqueueTimeout(releaseHint, ACCELERATED_HINT_WAIT_TIME_MSEC);
-    };
-
-    var areAllHintsExhausted = function() {
-      return numHintsReleased === hintsForLatestCard.length;
-    };
-    var isAHintWaitingToBeViewed = function() {
-      return numHintsConsumed < numHintsReleased;
-    };
-
-    var consumeHint = function() {
-      hintsDiscovered = true;
-      tooltipIsOpen = false;
-      if (tooltipTimeout) {
-        $timeout.cancel(tooltipTimeout);
-      }
-      _hintConsumedEventEmitter.emit();
-      numHintsConsumed++;
-      wrongAnswersSinceLastHintConsumed = 0;
-
-      var funcToEnqueue = null;
-      if (!areAllHintsExhausted()) {
-        funcToEnqueue = releaseHint;
-      } else if (!!solutionForLatestCard && !solutionReleased) {
-        funcToEnqueue = releaseSolution;
-      }
-      if (funcToEnqueue) {
-        enqueueTimeout(funcToEnqueue, WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
-      }
-    };
-
-    return {
-      reset: function(newHints, newSolution) {
-        numHintsReleased = 0;
-        numHintsConsumed = 0;
-        solutionReleased = false;
-        solutionConsumed = false;
-        hintsForLatestCard = newHints;
-        solutionForLatestCard = newSolution;
-        wrongAnswersSinceLastHintConsumed = 0;
-        correctAnswerSubmitted = false;
-        if (timeout) {
-          $timeout.cancel(timeout);
-        }
-        if (tooltipTimeout) {
-          $timeout.cancel(tooltipTimeout);
-        }
-
-        if (hintsForLatestCard.length > 0) {
-          enqueueTimeout(releaseHint, WAIT_FOR_FIRST_HINT_MSEC);
-        }
-      },
-      // WARNING: This method has a side-effect. If the retrieved hint is a
-      // pending hint that's being viewed, it starts the timer for the next
-      // hint.
-      displayHint: function(index) {
-        if (index === numHintsConsumed && numHintsConsumed < numHintsReleased) {
-          // The latest hint has been consumed. Start the timer.
-          consumeHint();
-        }
-
-        if (index < numHintsReleased) {
-          return hintsForLatestCard[index].hintContent;
-        }
-        return null;
-      },
-      displaySolution: function() {
-        hintsDiscovered = true;
-        solutionConsumed = true;
-        _solutionViewedEventEmitter.emit();
-        if (tooltipTimeout) {
-          $timeout.cancel(tooltipTimeout);
-        }
-        return solutionForLatestCard;
-      },
-      getNumHints: function() {
-        return hintsForLatestCard.length;
-      },
-      isHintViewable: function(index) {
-        return index < numHintsReleased;
-      },
-      isHintConsumed: function(index) {
-        return index < numHintsConsumed;
-      },
-      isHintTooltipOpen: function() {
-        return tooltipIsOpen;
-      },
-      isSolutionViewable: function() {
-        return solutionReleased;
-      },
-      isSolutionConsumed: function() {
-        return solutionConsumed;
-      },
-      recordWrongAnswer: function() {
-        if (isAHintWaitingToBeViewed()) {
-          return;
-        }
-
-        wrongAnswersSinceLastHintConsumed++;
-        if (!areAllHintsExhausted()) {
-          if (
-            numHintsReleased === 0 && wrongAnswersSinceLastHintConsumed >= 2) {
-            accelerateHintRelease();
-          } else if (
-            numHintsReleased > 0 && wrongAnswersSinceLastHintConsumed >= 1) {
-            accelerateHintRelease();
-          }
-        }
-      },
-      get onSolutionViewedEventEmitter() {
-        return _solutionViewedEventEmitter;
-      },
-      get onHintConsumed() {
-        return _hintConsumedEventEmitter;
-      }
-    };
   }
-]);
+
+  // This replaces any timeouts that are already queued.
+  enqueueTimeout(func, timeToWaitMsec) {
+    if (timeout) {
+      $timeout.cancel(timeout);
+    }
+    timeout = $timeout(func, timeToWaitMsec);
+  }
+
+  showTooltip() {
+    this.tooltipIsOpen = true;
+    this.hintsDiscovered = true;
+  }
+
+  releaseHint() {
+    if (!this.correctAnswerSubmitted) {
+      this.numHintsReleased++;
+      if (!this.hintsDiscovered && !this.tooltipTimeout) {
+        this.tooltipTimeout = $timeout(
+          this.showTooltip, this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+      }
+    }
+  }
+  releaseSolution() {
+    this.solutionReleased = true;
+  }
+  accelerateHintRelease() {
+    this.enqueueTimeout(this.releaseHint, this.ACCELERATED_HINT_WAIT_TIME_MSEC);
+  }
+
+  areAllHintsExhausted() {
+    return this.numHintsReleased === this.hintsForLatestCard.length;
+  }
+  isAHintWaitingToBeViewed() {
+    return this.numHintsConsumed < this.numHintsReleased;
+  }
+
+  consumeHint() {
+    this.hintsDiscovered = true;
+    this.tooltipIsOpen = false;
+    if (this.tooltipTimeout) {
+      $timeout.cancel(this.tooltipTimeout);
+    }
+    this._hintConsumedEventEmitter.emit();
+    this.numHintsConsumed++;
+    this.wrongAnswersSinceLastHintConsumed = 0;
+
+    var funcToEnqueue = null;
+    if (!this.areAllHintsExhausted()) {
+      funcToEnqueue = this.releaseHint;
+    } else if (!!this.solutionForLatestCard && !this.solutionReleased) {
+      funcToEnqueue = this.releaseSolution;
+    }
+    if (funcToEnqueue) {
+      this.enqueueTimeout(funcToEnqueue,
+        ExplorationPlayerConstants.WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
+    }
+  }
+
+  reset(newHints, newSolution): void {
+    this.numHintsReleased = 0;
+    this.numHintsConsumed = 0;
+    this.solutionReleased = false;
+    this.solutionConsumed = false;
+    this.hintsForLatestCard = newHints;
+    this.solutionForLatestCard = newSolution;
+    this.wrongAnswersSinceLastHintConsumed = 0;
+    this.correctAnswerSubmitted = false;
+    if (timeout) {
+      $timeout.cancel(timeout);
+    }
+    if (tooltipTimeout) {
+      $timeout.cancel(tooltipTimeout);
+    }
+
+    if (this.hintsForLatestCard.length > 0) {
+      this.enqueueTimeout(this.releaseHint,
+        ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
+    }
+  }
+  // WARNING: This method has a side-effect. If the retrieved hint is a
+  // pending hint that's being viewed, it starts the timer for the next
+  // hint.
+  displayHint(index) {
+    if (index === this.numHintsConsumed &&
+      this.numHintsConsumed < this.numHintsReleased) {
+      // The latest hint has been consumed. Start the timer.
+      this.consumeHint();
+    }
+
+    if (index < this.numHintsReleased) {
+      return this.hintsForLatestCard[index].hintContent;
+    }
+    return null;
+  }
+
+  displaySolution() {
+    this.hintsDiscovered = true;
+    this.solutionConsumed = true;
+    this._solutionViewedEventEmitter.emit();
+    if (this.tooltipTimeout) {
+      $timeout.cancel(this.tooltipTimeout);
+    }
+    return this.solutionForLatestCard;
+  }
+
+  getNumHints() {
+    return this.hintsForLatestCard.length;
+  }
+
+  isHintViewable(index) {
+    return index < this.numHintsReleased;
+  }
+
+  isHintConsumed(index) {
+    return index < this.numHintsConsumed;
+  }
+
+  isHintTooltipOpen() {
+    return this.tooltipIsOpen;
+  }
+
+  isSolutionViewable() {
+    return this.solutionReleased;
+  }
+
+  isSolutionConsumed() {
+    return this.solutionConsumed;
+  }
+
+  recordWrongAnswer() {
+    if (this.isAHintWaitingToBeViewed()) {
+      return;
+    }
+
+    this.wrongAnswersSinceLastHintConsumed++;
+    if (!this.areAllHintsExhausted()) {
+      if (
+        this.numHintsReleased === 0 && this.wrongAnswersSinceLastHintConsumed >= 2) {
+        this.accelerateHintRelease();
+      } else if (
+        this.numHintsReleased > 0 && this.wrongAnswersSinceLastHintConsumed >= 1) {
+        this.accelerateHintRelease();
+      }
+    }
+  }
+
+  onSolutionViewedEventEmitter() {
+    return this._solutionViewedEventEmitter;
+  }
+
+  onHintConsumed() {
+    return this._hintConsumedEventEmitter;
+  }
+}
+
+angular.module('oppia').factory(
+  'HintsAndSolutionManagerService',
+  downgradeInjectable(HintsAndSolutionManagerService));
