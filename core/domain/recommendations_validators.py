@@ -25,12 +25,10 @@ from core.platform import models
 import python_utils
 
 (
-    exp_models, skill_models, story_models,
-    topic_models, recommendations_models) = (
+    exp_models, recommendations_models) = (
         models.Registry.import_models([
             models.NAMES.exploration,
-            models.NAMES.skill, models.NAMES.story,
-            models.NAMES.topic, models.NAMES.recommendations]))
+            models.NAMES.recommendations]))
 
 
 class ExplorationRecommendationsModelValidator(
