@@ -64,7 +64,7 @@ export class HintsAndSolutionManagerService {
   }
 
   // This replaces any timeouts that are already queued.
-  enqueueTimeout(func, timeToWaitMsec: number): void {
+  enqueueTimeout(func: () => void, timeToWaitMsec: number): void {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
@@ -118,7 +118,8 @@ export class HintsAndSolutionManagerService {
       funcToEnqueue = this.releaseSolution;
     }
     if (funcToEnqueue) {
-      this.enqueueTimeout(funcToEnqueue,
+      this.enqueueTimeout(
+        funcToEnqueue,
         ExplorationPlayerConstants.WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
     }
   }
@@ -142,7 +143,8 @@ export class HintsAndSolutionManagerService {
     }
 
     if (this.hintsForLatestCard.length > 0) {
-      this.enqueueTimeout(this.releaseHint,
+      this.enqueueTimeout(
+        this.releaseHint,
         ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
     }
   }
@@ -205,20 +207,22 @@ export class HintsAndSolutionManagerService {
     this.wrongAnswersSinceLastHintConsumed++;
     if (!this.areAllHintsExhausted()) {
       if (
-        this.numHintsReleased === 0 && this.wrongAnswersSinceLastHintConsumed >= 2) {
+        this.numHintsReleased === 0 &&
+        this.wrongAnswersSinceLastHintConsumed >= 2) {
         this.accelerateHintRelease();
       } else if (
-        this.numHintsReleased > 0 && this.wrongAnswersSinceLastHintConsumed >= 1) {
+        this.numHintsReleased > 0 &&
+        this.wrongAnswersSinceLastHintConsumed >= 1) {
         this.accelerateHintRelease();
       }
     }
   }
 
-  get onSolutionViewedEventEmitter() {
+  get onSolutionViewedEventEmitter(): EventEmitter<unknown> {
     return this._solutionViewedEventEmitter;
   }
 
-  get onHintConsumed() {
+  get onHintConsumed(): EventEmitter<unknown> {
     return this._hintConsumedEventEmitter;
   }
 }
