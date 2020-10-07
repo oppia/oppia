@@ -87,6 +87,8 @@ var ProfilePage = function() {
   };
 
   this.expectUserToNotHaveInterestPlaceholder = async function() {
+    await waitFor.visibilityOf(interestPlaceholder,
+      'interestPlaceholder label element taking too long to appear');
     expect(await interestPlaceholder.isPresent()).toBe(false);
   };
 
