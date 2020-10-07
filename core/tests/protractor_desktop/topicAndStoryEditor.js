@@ -93,7 +93,8 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
       Constants.SKILL_STATUS_UNASSIGNED);
-    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill 1', 'Topic 1');
 
     await topicEditorPage.get(topicId);
     await topicEditorPage.moveToQuestionsTab();
@@ -174,15 +175,15 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
         Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-        0, TOPIC_NAME);
+      await topicsAndSkillsDashboardPage.assignSkillToTopic(
+        'Skill 3', TOPIC_NAME);
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
         Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-        0, TOPIC_NAME);
+      await topicsAndSkillsDashboardPage.assignSkillToTopic(
+        'Skill 2', TOPIC_NAME);
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);

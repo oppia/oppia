@@ -85,7 +85,8 @@ describe('Classroom page functionality', function() {
           'Skill 1', 'Concept card explanation', false));
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+      await topicsAndSkillsDashboardPage.assignSkillToTopic(
+        'Skill 1', 'Topic 1');
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
       await topicEditorPage.addSubtopic(
