@@ -171,7 +171,6 @@ var AdminPage = function() {
 
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
-    await this.get();
     await action.click('Config Tab', configTab);
     await waitFor.elementToBeClickable(saveAllConfigs);
 
