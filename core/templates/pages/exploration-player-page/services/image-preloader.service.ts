@@ -16,293 +16,301 @@
  * @fileoverview Service to preload image into AssetsBackendApiService's cache.
  */
 
-require(
-  'pages/exploration-player-page/services/' +
-  'extract-image-filenames-from-state.service.ts');
-require('services/assets-backend-api.service.ts');
-require('services/compute-graph.service.ts');
-require('services/context.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('ImagePreloaderService', [
-  '$q', 'AssetsBackendApiService', 'ComputeGraphService',
-  'ContextService', 'ExtractImageFilenamesFromStateService', 'ENTITY_TYPE',
-  function(
-      $q, AssetsBackendApiService, ComputeGraphService,
-      ContextService, ExtractImageFilenamesFromStateService, ENTITY_TYPE) {
-    var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
+import { AppConstants } from 'app.constants';
+import { Exploration } from 'domain/exploration/ExplorationObjectFactory';
+import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { ComputeGraphService } from 'services/compute-graph.service';
+import { ContextService } from 'services/context.service';
 
-    var _filenamesOfImageCurrentlyDownloading = [];
-    var _filenamesOfImageToBeDownloaded = [];
-    var _filenamesOfImageFailedToDownload = [];
-    var _exploration = null;
-    var _states = null;
-    var _hasImagePreloaderServiceStarted = false;
-    // Variable imageLoadedCallback is an object of objects (identified by the
-    // filenames which are being downloaded at the time they are required by the
-    // directive).The object contains the resolve method of the promise
-    // attached with getInImageUrl method.
-    var _imageLoadedCallback = {};
-    var _hasImagePreloaderServiceStarted = false;
+interface ImageCallback {
+  resolveMethod: (_: string) => void;
+  rejectMethod: () => void;
+}
 
-    var _init = function(exploration) {
-      _exploration = exploration;
-      _states = exploration.states;
-      _hasImagePreloaderServiceStarted = true;
-    };
+interface ImageDimensions {
+  width: number;
+  height: number;
+  verticalPadding?: number;
+}
 
-    /**
-     * Gets the Url for the image file.
-     * @param {string} filename - Filename of the image whose Url is to be
-     *                            created.
-     * @param {function} onLoadCallback - Function that is called when the
-     *                                    Url of the loaded image is obtained.
-     */
-    var _getImageUrl = function(filename, onLoadCallback, onErrorCallback) {
-      AssetsBackendApiService.loadImage(
-        ContextService.getEntityType(), ContextService.getEntityId(), filename)
-        .then(function(loadedImageFile) {
-          if (_isInFailedDownload(loadedImageFile.filename)) {
-            _removeFromFailedDownload(loadedImageFile.filename);
-          }
-          var objectUrl = URL.createObjectURL(loadedImageFile.data);
-          onLoadCallback(objectUrl);
-        }, function(filename) {
-          onErrorCallback();
-        });
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class ImagePreloaderService {
+  constructor(
+      private assetsBackendApiService: AssetsBackendApiService,
+      private computeGraphService: ComputeGraphService,
+      private contextService: ContextService,
+      private extractImageFilenamesFromStateService:
+        ExtractImageFilenamesFromStateService) {}
 
-    /**
-     * Checks if the given filename is in _filenamesOfImageFailedToDownload or
-     * not.
-     * @param {string} filename - The filename of the image which is to be
-     *                            removed from the
-     *                            _filenamesOfImageFailedToDownload array.
-     */
-    var _isInFailedDownload = function(filename) {
-      return _filenamesOfImageFailedToDownload.indexOf(filename) >= 0;
-    };
+  private filenamesOfImageCurrentlyDownloading: string[] = [];
+  private filenamesOfImageToBeDownloaded: string[] = [];
+  private filenamesOfImageFailedToDownload: string[] = [];
+  private exploration: Exploration = null;
+  private imagePreloaderServiceHasStarted: boolean = false;
+  // Variable imageLoadedCallback is an object of objects (identified by the
+  // filenames which are being downloaded at the time they are required by the
+  // directive).The object contains the resolve method of the promise
+  // attached with getInImageUrl method.
+  private imageLoadedCallback: {[filename: string]: ImageCallback} = {};
 
-    /**
-     * Removes the given filename from the _filenamesOfImageFailedToDownload.
-     * @param {string} filename - The filename of the file which is to be
-     *                            removed from the
-     *                            _filenamesOfImageFailedToDownload array.
-     */
-    var _removeFromFailedDownload = function(filename) {
-      var index = _filenamesOfImageFailedToDownload.indexOf(filename);
-      _filenamesOfImageFailedToDownload.splice(index, 1);
-    };
+  init(exploration: Exploration): void {
+    this.exploration = exploration;
+    this.imagePreloaderServiceHasStarted = true;
+  }
 
-    /**
-     * Gets image files names in Bfs order from the state.
-     * @param {string} sourceStateName - The name of the starting state
-     *                                   from which the filenames should
-     *                                   be obtained.
-     */
-    var _getImageFilenamesInBfsOrder = function(sourceStateName) {
-      var stateNamesInBfsOrder = (
-        ComputeGraphService.computeBfsTraversalOfStates(
-          _exploration.getInitialState().name,
-          _exploration.getStates(),
-          sourceStateName));
-      var imageFilenames = [];
+  /**
+   * Checks if the given filename is in this.filenamesOfImageFailedToDownload or
+   * not.
+   * @param {string} filename - The filename of the image which is to be
+   *                            removed from the
+   *                            this.filenamesOfImageFailedToDownload array.
+   */
+  isInFailedDownload(filename: string): boolean {
+    return this.filenamesOfImageFailedToDownload.includes(filename);
+  }
 
-      stateNamesInBfsOrder.forEach(function(stateName) {
-        var state = _states.getState(stateName);
-        ExtractImageFilenamesFromStateService.getImageFilenamesInState(state)
-          .forEach(function(filename) {
-            imageFilenames.push(filename);
-          });
-      });
-      return imageFilenames;
-    };
+  /**
+   * Initiates the image preloader beginning from the sourceStateName.
+   * @param {string} sourceStateName - The name of the state from which
+   *                                   preloader should start.
+   */
+  kickOffImagePreloader(sourceStateName: string): void {
+    this.filenamesOfImageToBeDownloaded = (
+      this.getImageFilenamesInBfsOrder(sourceStateName));
+    const imageFilesInGivenState = (
+      this.extractImageFilenamesFromStateService.getImageFilenamesInState(
+        this.exploration.states.getState(sourceStateName)));
+    this.filenamesOfImageFailedToDownload = (
+      this.filenamesOfImageFailedToDownload.filter(
+        filename => !imageFilesInGivenState.includes(filename)));
+    while (this.filenamesOfImageCurrentlyDownloading.length <
+        AppConstants.MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
+        this.filenamesOfImageToBeDownloaded.length > 0) {
+      const imageFilename = this.filenamesOfImageToBeDownloaded.shift();
+      this.filenamesOfImageCurrentlyDownloading.push(imageFilename);
+      this.loadImage(imageFilename);
+    }
+  }
 
-    /**
-     * Removes the filename from the _filenamesOfImageCurrentlyDownloading and
-     * initiates the loading of the next image file.
-     * @param {string} filename - The filename which is to be removed from the
-     *                            _filenamesOfImageCurrentlyDownloading array.
-     */
-    var _removeCurrentAndLoadNextImage = function(filename) {
-      _filenamesOfImageCurrentlyDownloading = (
-        _filenamesOfImageCurrentlyDownloading.filter(
-          function(imageFilename) {
-            return filename !== imageFilename;
-          })
-      );
-      if (_filenamesOfImageToBeDownloaded.length > 0) {
-        var nextImageFilename = _filenamesOfImageToBeDownloaded.shift();
-        _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
-        _loadImage(nextImageFilename);
-      }
-    };
+  /**
+   * Cancels the preloading of the images that are being downloaded.
+   */
+  cancelPreloading(): void {
+    this.assetsBackendApiService.abortAllCurrentImageDownloads();
+    this.filenamesOfImageCurrentlyDownloading.length = 0;
+  }
 
-    /**
-     * Handles the loading of the image file.
-     * @param {string} imageFilename - The filename of the image to be loaded.
-     */
-    var _loadImage = function(imageFilename) {
-      AssetsBackendApiService.loadImage(
-        ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
-        imageFilename)
-        .then(function(loadedImage) {
-          _removeCurrentAndLoadNextImage(loadedImage.filename);
-          if (_imageLoadedCallback[loadedImage.filename]) {
-            var onLoadImageResolve = (
-              (_imageLoadedCallback[loadedImage.filename]).resolveMethod);
-            var objectUrl = URL.createObjectURL(loadedImage.data);
-            onLoadImageResolve(objectUrl);
-            _imageLoadedCallback[loadedImage.filename] = null;
-          }
-        }, function(filename) {
-          if (_imageLoadedCallback[filename]) {
-            var onFailedDownload = (
-              (_imageLoadedCallback[filename]).rejectMethod);
-            onFailedDownload();
-            _imageLoadedCallback[filename] = null;
-          }
-          _filenamesOfImageFailedToDownload.push(filename);
-          _removeCurrentAndLoadNextImage(filename);
-        });
-    };
+  /**
+   * When the state changes, it decides whether to restart the preloader
+   * starting from the 'stateName' state or not.
+   * @param {string} stateName - The name of the state the user shifts to.
+   */
+  onStateChange(stateName: string): void {
+    if (stateName !== this.exploration.getInitialState().name) {
+      this.imageLoadedCallback = {};
 
-    /**
-     * Initiates the image preloader beginning from the sourceStateName.
-     * @param {string} sourceStateName - The name of the state from which
-     *                                   preloader should start.
-     */
-    var _kickOffImagePreloader = function(sourceStateName) {
-      _filenamesOfImageToBeDownloaded = (
-        _getImageFilenamesInBfsOrder(sourceStateName));
-      var imageFilesInGivenState = ExtractImageFilenamesFromStateService
-        .getImageFilenamesInState(_states.getState(sourceStateName));
-      _filenamesOfImageFailedToDownload = _filenamesOfImageFailedToDownload
-        .filter(function(filename) {
-          return imageFilesInGivenState.indexOf(filename) === -1;
-        });
-      while (_filenamesOfImageCurrentlyDownloading.length <
-          MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
-          _filenamesOfImageToBeDownloaded.length > 0) {
-        var imageFilename = _filenamesOfImageToBeDownloaded.shift();
-        _filenamesOfImageCurrentlyDownloading.push(imageFilename);
-        _loadImage(imageFilename);
-      }
-    };
+      const state = this.exploration.states.getState(stateName);
 
-    /**
-     * Cancels the preloading of the images that are being downloaded.
-     */
-    var _cancelPreloading = function() {
-      AssetsBackendApiService.abortAllCurrentImageDownloads();
-      _filenamesOfImageCurrentlyDownloading = [];
-    };
+      let numImageFilesCurrentlyDownloading = 0;
+      let numImagesNeitherInCacheNorDownloading = 0;
 
-    /**
-     * When the state changes, it decides whether to restart the preloader
-     * starting from the 'stateName' state or not.
-     * @param {string} stateName - The name of the state the user shifts to.
-     */
-    var _onStateChange = function(stateName) {
-      if (stateName !== _exploration.getInitialState().name) {
-        _imageLoadedCallback = {};
-        var imageFilenamesInState = [];
-        var noOfImageFilesCurrentlyDownloading = 0;
-        var noOfImagesNeitherInCacheNorDownloading = 0;
-
-        var state = _states.getState(stateName);
-        imageFilenamesInState = (
-          ExtractImageFilenamesFromStateService
-            .getImageFilenamesInState(state));
-        imageFilenamesInState.forEach(function(filename) {
-          var isFileCurrentlyDownloading = (
-            _filenamesOfImageCurrentlyDownloading.indexOf(filename) >= 0
-          );
-          if (!AssetsBackendApiService.isCached(filename) &&
-              !isFileCurrentlyDownloading) {
-            noOfImagesNeitherInCacheNorDownloading += 1;
-          }
-          if (isFileCurrentlyDownloading) {
-            noOfImageFilesCurrentlyDownloading += 1;
-          }
-        });
-        if (noOfImagesNeitherInCacheNorDownloading > 0 &&
-            noOfImageFilesCurrentlyDownloading <= 1) {
-          _cancelPreloading();
-          _kickOffImagePreloader(stateName);
+      this.extractImageFilenamesFromStateService.getImageFilenamesInState(
+        state
+      ).forEach(filename => {
+        var isFileCurrentlyDownloading = (
+          this.filenamesOfImageCurrentlyDownloading.includes(filename));
+        if (!this.assetsBackendApiService.isCached(filename) &&
+            !isFileCurrentlyDownloading) {
+          numImagesNeitherInCacheNorDownloading += 1;
         }
-      }
-    };
+        if (isFileCurrentlyDownloading) {
+          numImageFilesCurrentlyDownloading += 1;
+        }
+      });
 
-    /**
-    * Gets the dimensions of the images from the filename provided.
-    * @param {string} filename - The string from which the dimensions of the
-    *                           images should be extracted.
-    */
-    var getDimensionsOfImage = function(filename) {
-      var dimensionsRegex = RegExp(
-        '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif|svg)$', 'g');
-      var imageDimensions = dimensionsRegex.exec(filename);
-      if (imageDimensions) {
-        var dimensions = {
-          height: Number(imageDimensions[1]),
-          width: Number(imageDimensions[2])
-        };
-        return dimensions;
-      } else {
-        throw new Error(
-          'The image name is invalid, it does not contain dimensions.');
+      if (numImagesNeitherInCacheNorDownloading > 0 &&
+          numImageFilesCurrentlyDownloading <= 1) {
+        this.cancelPreloading();
+        this.kickOffImagePreloader(stateName);
       }
-    };
+    }
+  }
 
-    /**
-    * Gets the dimensions of the math SVGs from the SVG filename provided.
-    * @param {string} filename - The string from which the dimensions of the
-    *                           math SVGs should be extracted.
-    */
-    var getDimensionsOfMathSvg = function(filename) {
-      var dimensionsRegex = RegExp(
-        '[^/]+_height_([0-9d]+)_width_([0-9d]+)_vertical_([0-9d]+)\.svg', 'g');
-      var imageDimensions = dimensionsRegex.exec(filename);
+  /**
+  * Gets the dimensions of the images from the filename provided.
+  * @param {string} filename - The string from which the dimensions of the
+  *                           images should be extracted.
+  */
+  getDimensionsOfImage(filename: string): ImageDimensions {
+    const dimensionsRegex = RegExp(
+      '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif|svg)$', 'g');
+    var imageDimensions = dimensionsRegex.exec(filename);
+    if (imageDimensions) {
       var dimensions = {
-        height: imageDimensions[1].replace('d', '.'),
-        width: imageDimensions[2].replace('d', '.'),
-        verticalPadding: imageDimensions[3].replace('d', '.')
+        height: Number(imageDimensions[1]),
+        width: Number(imageDimensions[2])
       };
       return dimensions;
-    };
-    return {
-      init: _init,
-      kickOffImagePreloader: _kickOffImagePreloader,
-      getDimensionsOfImage: getDimensionsOfImage,
-      getDimensionsOfMathSvg: getDimensionsOfMathSvg,
-      onStateChange: _onStateChange,
-      isInFailedDownload: _isInFailedDownload,
-      isLoadingImageFile: function(filename) {
-        return _filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1;
-      },
-      restartImagePreloader: function(sourceStateName) {
-        _cancelPreloading();
-        _kickOffImagePreloader(sourceStateName);
-      },
-      getFilenamesOfImageCurrentlyDownloading: function() {
-        return _filenamesOfImageCurrentlyDownloading;
-      },
-      getImageUrl: function(filename) {
-        return $q(function(resolve, reject) {
-          if (AssetsBackendApiService.isCached(filename) ||
-              _isInFailedDownload(filename)) {
-            _getImageUrl(filename, resolve, reject);
-          } else {
-            _imageLoadedCallback[filename] = {
-              resolveMethod: resolve,
-              rejectMethod: reject
-            };
-          }
-        });
-      },
-      inExplorationPlayer: function() {
-        return _hasImagePreloaderServiceStarted;
-      }
-    };
+    } else {
+      throw new Error(
+        `Input path ${filename} is invalid, it does not contain dimensions.`);
+    }
   }
-]);
+
+  /**
+  * Gets the dimensions of the math SVGs from the SVG filename provided.
+  * @param {string} filename - The string from which the dimensions of the
+  *                           math SVGs should be extracted.
+  */
+  getDimensionsOfMathSvg(filename: string): ImageDimensions {
+    var dimensionsRegex = RegExp(
+      '[^/]+_height_([0-9d]+)_width_([0-9d]+)_vertical_([0-9d]+)\.svg', 'g');
+    var imageDimensions = dimensionsRegex.exec(filename);
+    if (imageDimensions) {
+      var dimensions = {
+        height: Number(imageDimensions[1].replace('d', '.')),
+        width: Number(imageDimensions[2].replace('d', '.')),
+        verticalPadding: Number(imageDimensions[3].replace('d', '.'))
+      };
+      return dimensions;
+    } else {
+      throw new Error(
+        `Input path ${filename} is invalid, it does not contain dimensions.`);
+    }
+  }
+
+  isLoadingImageFile(filename: string): boolean {
+    return this.filenamesOfImageCurrentlyDownloading.includes(filename);
+  }
+
+  restartImagePreloader(sourceStateName: string): void {
+    this.cancelPreloading();
+    this.kickOffImagePreloader(sourceStateName);
+  }
+
+  getFilenamesOfImageCurrentlyDownloading(): string[] {
+    return this.filenamesOfImageCurrentlyDownloading;
+  }
+
+  /**
+   * Gets the Url for the image file.
+   * @param {string} filename - Filename of the image whose Url is to be
+   *                            created.
+   * @param {function} onLoadCallback - Function that is called when the
+   *                                    Url of the loaded image is obtained.
+   */
+  getImageUrl(filename: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (this.assetsBackendApiService.isCached(filename) ||
+          this.isInFailedDownload(filename)) {
+        this.assetsBackendApiService.loadImage(
+          this.contextService.getEntityType(),
+          this.contextService.getEntityId(), filename
+        ).then(
+          loadedImageFile => {
+            if (this.isInFailedDownload(loadedImageFile.filename)) {
+              this.removeFromFailedDownload(loadedImageFile.filename);
+            }
+            resolve(URL.createObjectURL(loadedImageFile.data));
+          },
+          reject);
+      } else {
+        this.imageLoadedCallback[filename] = {
+          resolveMethod: resolve,
+          rejectMethod: reject
+        };
+      }
+    });
+  }
+
+  inExplorationPlayer(): boolean {
+    return this.imagePreloaderServiceHasStarted;
+  }
+
+  /**
+   * Removes the given filename from the this.filenamesOfImageFailedToDownload.
+   * @param {string} filename - The filename of the file which is to be
+   *                            removed from the
+   *                            this.filenamesOfImageFailedToDownload array.
+   */
+  private removeFromFailedDownload(filename: string): void {
+    var index = this.filenamesOfImageFailedToDownload.indexOf(filename);
+    this.filenamesOfImageFailedToDownload.splice(index, 1);
+  }
+
+  /**
+   * Gets image files names in Bfs order from the state.
+   * @param {string} sourceStateName - The name of the starting state
+   *                                   from which the filenames should
+   *                                   be obtained.
+   */
+  private getImageFilenamesInBfsOrder(sourceStateName: string): string[] {
+    var stateNamesInBfsOrder = (
+      this.computeGraphService.computeBfsTraversalOfStates(
+        this.exploration.getInitialState().name, this.exploration.getStates(),
+        sourceStateName));
+    var imageFilenames = [];
+
+    stateNamesInBfsOrder.forEach(stateName => {
+      var state = this.exploration.states.getState(stateName);
+      this.extractImageFilenamesFromStateService.getImageFilenamesInState(state)
+        .forEach(filename => imageFilenames.push(filename));
+    });
+    return imageFilenames;
+  }
+
+  /**
+   * Removes the filename from the filenamesOfImageCurrentlyDownloading and
+   * initiates the loading of the next image file.
+   * @param {string} filename - The filename which is to be removed from the
+   *                            filenamesOfImageCurrentlyDownloading array.
+   */
+  private removeCurrentAndLoadNextImage(filename: string): void {
+    this.filenamesOfImageCurrentlyDownloading.splice(
+      this.filenamesOfImageCurrentlyDownloading.findIndex(
+        imageFilename => filename === imageFilename),
+      1);
+    if (this.filenamesOfImageToBeDownloaded.length > 0) {
+      var nextImageFilename = this.filenamesOfImageToBeDownloaded.shift();
+      this.filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
+      this.loadImage(nextImageFilename);
+    }
+  }
+
+  /**
+   * Handles the loading of the image file.
+   * @param {string} imageFilename - The filename of the image to be loaded.
+   */
+  private loadImage(imageFilename: string): void {
+    this.assetsBackendApiService.loadImage(
+      AppConstants.ENTITY_TYPE.EXPLORATION,
+      this.contextService.getExplorationId(), imageFilename
+    ).then(
+      loadedImage => {
+        this.removeCurrentAndLoadNextImage(loadedImage.filename);
+        if (this.imageLoadedCallback[loadedImage.filename]) {
+          var onLoadImageResolve = (
+            this.imageLoadedCallback[loadedImage.filename].resolveMethod);
+          onLoadImageResolve(URL.createObjectURL(loadedImage.data));
+          this.imageLoadedCallback[loadedImage.filename] = null;
+        }
+      },
+      filename => {
+        if (this.imageLoadedCallback[filename]) {
+          this.imageLoadedCallback[filename].rejectMethod();
+          this.imageLoadedCallback[filename] = null;
+        }
+        this.filenamesOfImageFailedToDownload.push(filename);
+        this.removeCurrentAndLoadNextImage(filename);
+      });
+  }
+}
+
+angular.module('oppia').factory(
+  'ImagePreloaderService', downgradeInjectable(ImagePreloaderService));
