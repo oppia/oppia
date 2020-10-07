@@ -17,6 +17,9 @@
       <b>Rules:</b>
     </div>
   </div>
+  <div class="row oppia-feature-top-margin oppia-feature-bottom-margin">
+    <div class="admin-note">Note: The first rule that matches client criteria will be chosen.</div>
+  </div>
   <div class="oppia-flex-center oppia-feature-bottom-margin">
     <button class="btn btn-secondary" (click)="addNewRuleToTop(featureFlag)">
       Add Rule To Top
@@ -189,7 +192,7 @@
   </div>
 </div>
 
-<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text oppia-empty-indicator">
+<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text oppia-admin-features oppia-empty-indicator">
   No platform features are available.
 </div>
 
@@ -300,7 +303,7 @@
     padding-top: 10px;
   }
 
-  .oppia-admin-features .oppia-empty-indicator {
+  .oppia-admin-features.oppia-empty-indicator {
     max-width: 1050px;
   }
 
@@ -314,5 +317,12 @@
     justify-content: space-around;
     min-height: 100px;
     padding: 1px
+  }
+
+  .oppia-admin-features .admin-note {
+    display: flex;
+    font-weight: bold;
+    justify-content: center;
+    width: 100%;
   }
 </style>
