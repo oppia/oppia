@@ -909,7 +909,7 @@ def _update_reviewer_counts_in_community_contribution_stats(
     """
     past_user_contribution_rights = get_user_contribution_rights(
         user_contribution_rights.id)
-    #stats = suggestion_services.get_community_contribution_stats()
+    stats = suggestion_services.get_community_contribution_stats()
 
     languages_that_reviewer_can_no_longer_review = (
         past_user_contribution_rights
@@ -924,7 +924,7 @@ def _update_reviewer_counts_in_community_contribution_stats(
             .can_review_translation_for_language_codes
         )
     )
-    """
+
     # Update question reviewer counts.
     if past_user_contribution_rights.can_review_questions and not (
             user_contribution_rights.can_review_questions):
@@ -941,7 +941,7 @@ def _update_reviewer_counts_in_community_contribution_stats(
             language_code, -1)
 
     suggestion_services.update_community_contribution_stats(stats)
-    """
+
 
 def get_usernames_by_role(role):
     """Get usernames of all the users with given role ID.
