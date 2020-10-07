@@ -35,8 +35,8 @@ describe('Audio translation manager service', () => {
     vof = TestBed.get(VoiceoverObjectFactory);
   });
 
-  var testAudioTranslations;
-  var testAudioTranslations2;
+  var testAudioTranslations:any;
+  var testAudioTranslations2:any;
   beforeEach(() => {
     testAudioTranslations = {
       en: vof.createFromBackendDict({
