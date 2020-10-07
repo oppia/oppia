@@ -1582,7 +1582,7 @@ class MockUserSettingsModel(user_models.UserSettingsModel):
     """Mock UserSettingsModel so that it allows to set `gae_user_id`."""
 
     gae_user_id = (
-        datastore_services.StringProperty(indexed=False, required=False))
+        datastore_services.StringProperty(indexed=True, required=False))
 
 
 class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
