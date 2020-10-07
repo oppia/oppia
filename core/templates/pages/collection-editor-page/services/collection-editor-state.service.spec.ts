@@ -377,7 +377,7 @@ describe('Collection editor state service', function() {
 
       var actualCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
-    
+
       expect(actualCollectionRights).toEqual(expectedCollectionRights);
       // Although the actual collection rights equals the expected collection
       // rights, they are different objects.
