@@ -237,7 +237,7 @@ describe('Learner dashboard page', function() {
         $q.resolve(profilePictureDataUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
+      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.resolve({
           completedExplorationsList: (
             learnerDashboardData.completed_explorations_list.map(
@@ -871,7 +871,7 @@ describe('Learner dashboard page', function() {
         $q.resolve(profilePictureDataUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
+      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404
         }));
