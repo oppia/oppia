@@ -29,6 +29,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+#from core.domain import suggestion_services
 from core.domain import user_domain
 from core.domain import user_jobs_continuous
 from core.domain import user_services
@@ -2217,6 +2218,86 @@ class UserContributionsTests(test_utils.GenericTestBase):
             migration_bot_contributions_model.edited_exploration_ids, [])
 
 
+class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
+    """Test the functionality related to the community contribution stats."""
+
+    AUTHOR_EMAIL = 'author@example.com'
+    REVIEWER_1_EMAIL = 'reviewer1@community.org'
+    REVIEWER_2_EMAIL = 'reviewer2@community.org'
+
+    def _assert_community_contribution_stats_is_in_default_state(self):
+        """Checks if the community contribution stats is in its default
+        state.
+        """
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            community_contribution_stats.question_reviewer_count, 0)
+        self.assertEqual(
+            community_contribution_stats.question_suggestion_count, 0)
+
+    def setUp(self):
+        super(
+            CommunityContributionStatsUnitTests, self).setUp()
+
+        self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
+        self.reviewer_1_id = self.get_user_id_from_email(
+            self.REVIEWER_1_EMAIL)
+
+        self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
+        self.reviewer_2_id = self.get_user_id_from_email(
+            self.REVIEWER_2_EMAIL)
+
+
+    def test_grant_reviewer_translation_reviewing_rights_increases_count(self):
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {}
+        )
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1}
+        )
+
+    def test_grant_reviewer_translation_existing_reviewing_rights_no_count_diff(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {}
+        )
+        # Granting the reviewer the same reviewing rights twice should only
+        # increase the reviewer count by 1.
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1}
+        )
+
 class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
     TRANSLATOR_EMAIL = 'translator@community.org'
@@ -2502,7 +2583,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.can_review_question_suggestions(
                 self.translator_id))
 
-    def test_removal_of_all_review_rights_delets_model(self):
+    def test_removal_of_all_review_rights_deletes_model(self):
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
         user_services.allow_user_to_review_question(self.translator_id)

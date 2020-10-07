@@ -27,6 +27,7 @@ import re
 
 from constants import constants
 from core.domain import role_services
+from core.domain import suggestion_services
 from core.domain import user_domain
 from core.platform import models
 import feconf
@@ -872,6 +873,8 @@ def _save_user_contribution_rights(user_contribution_rights):
     # TODO(#8794): Add limitation on number of reviewers allowed in any
     # category.
     user_contribution_rights.validate()
+    _update_reviewer_counts_in_community_contribution_stats(
+        user_contribution_rights)
     user_models.UserContributionRightsModel(
         id=user_contribution_rights.id,
         can_review_translation_for_language_codes=(
@@ -895,6 +898,50 @@ def _update_user_contribution_rights(user_contribution_rights):
     else:
         remove_contribution_reviewer(user_contribution_rights.id)
 
+def _update_reviewer_counts_in_community_contribution_stats(
+        user_contribution_rights):
+    """Updates the reviewer counts in the community contribution stats based
+    on the updates to the given user contribution rights.
+
+    Args:
+        user_contribution_rights: UserContributionRights. The user contribution
+            rights.
+    """
+    past_user_contribution_rights = get_user_contribution_rights(
+        user_contribution_rights.id)
+    #stats = suggestion_services.get_community_contribution_stats()
+
+    languages_that_reviewer_can_no_longer_review = (
+        past_user_contribution_rights
+        .can_review_translation_for_language_codes.difference(
+            user_contribution_rights.can_review_translation_for_language_codes
+        )
+    )
+    new_languages_that_review_can_review = (
+        user_contribution_rights
+        .can_review_translation_for_language_codes.difference(
+            past_user_contribution_rights
+            .can_review_translation_for_language_codes
+        )
+    )
+    """
+    # Update question reviewer counts.
+    if past_user_contribution_rights.can_review_questions and not (
+            user_contribution_rights.can_review_questions):
+        stats.question_reviewer_count -= 1
+    if not past_user_contribution_rights.can_review_questions and (
+            user_contribution_rights.can_review_questions):
+        stats.question_reviewer_count += 1
+    # Update translation reviewer counts.
+    for language_code in languages_that_reviewer_can_no_longer_review:
+        stats.adjust_translation_reviewer_count_for_language_code(
+            language_code, -1)
+    for language_code in new_languages_that_review_can_review:
+        stats.adjust_translation_reviewer_count_for_language_code(
+            language_code, -1)
+
+    suggestion_services.update_community_contribution_stats(stats)
+    """
 
 def get_usernames_by_role(role):
     """Get usernames of all the users with given role ID.
@@ -2541,6 +2588,8 @@ def remove_contribution_reviewer(user_id):
     user_contribution_rights_model = (
         user_models.UserContributionRightsModel.get_by_id(user_id))
     if user_contribution_rights_model is not None:
+        _update_reviewer_counts_in_community_contribution_stats(
+            user_contribution_rights)
         user_contribution_rights_model.delete()
 
 

@@ -1655,7 +1655,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     target_id = 'exp1'
     language_code = 'en'
-    AUTHOR_EMAIL = 'author1@example.com'
+    AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_EMAIL = 'reviewer@community.org'
     COMMIT_MESSAGE = 'commit message'
 
