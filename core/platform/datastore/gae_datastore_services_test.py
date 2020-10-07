@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import unittest
 
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -144,3 +145,14 @@ class TransactionTests(test_utils.GenericTestBase):
             gae_datastore_services.transaction(
                 lambda: gae_datastore_services.transaction(lambda: 1)),
             1)
+
+
+class EnforcedPropertyTests(unittest.TestCase):
+
+    def test_string_property_raises_value_error_if_indexed_is_false(self):
+        with self.assertRaisesRegexp(ValueError, 'no longer supported'):
+            gae_datastore_services.StringProperty(indexed=False)
+
+    def test_text_property_raises_value_error_if_indexed_is_true(self):
+        with self.assertRaisesRegexp(ValueError, 'no longer supported'):
+            gae_datastore_services.TextProperty(indexed=True)
