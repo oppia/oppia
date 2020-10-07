@@ -1822,8 +1822,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
 
 class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that there is a single space
-    between a keyword and a bracket `(` if a bracket is used. Keywords
-    tested are `if`, `elif`, `while`, and `yield`.
+    after keywords like `if`, `elif`, `while`, and `yield`.
     """
 
     __implements__ = interfaces.ITokenChecker
@@ -1838,26 +1837,25 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
         ),
     }
 
+    keywords = set(['if', 'elif', 'while', 'yield'])
+
     def process_tokens(self, tokens):
-        """Custom pylint checker which makes sure that every `if`, `elif`,
-        `while`, and `yield` statement is followed by a single space.
+        """Custom pylint checker which makes sure that every keyword is
+        followed by a single space.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        keywords = set(['if', 'elif', 'while', 'yield'])
         for (token_type, token, (line_num, _), _, line) in tokens:
-            if token_type == tokenize.NAME and token in keywords:
+            if token_type == tokenize.NAME and token in self.keywords:
                 line = line.strip()
-                if re.search(br'^' + token + br'\s*\(', line):
-                    parenthesis_index = line.find('(')
-                    first_space_index = line.find(' ')
-                    # There should be exactly one space between these indices.
-                    if parenthesis_index - first_space_index != 1:
-                        self.add_message(
-                            'single-space-after-keyword',
-                            args=(token),
-                            line=line_num)
+                # Regex evaluates to True if the line is of the form "if #" or
+                # "... if #" where # is not a space.
+                if not re.search(br'(\s|^)' + token + br'\s[^\s]', line):
+                    self.add_message(
+                        'single-space-after-keyword',
+                        args=(token),
+                        line=line_num)
 
 
 def register(linter):

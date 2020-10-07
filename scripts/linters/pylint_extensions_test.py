@@ -2770,6 +2770,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
                 while(True):
                     pass
                 yield(1)
+                return True if(True) else False
                 """)
         node_no_space_after_keyword.file = filename
         node_no_space_after_keyword.path = filename
@@ -2785,9 +2786,12 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
             msg_id='single-space-after-keyword', args=('while'), line=6)
         yield_message = testutils.Message(
             msg_id='single-space-after-keyword', args=('yield'), line=8)
+        if_exp_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('if'), line=9)
 
         with self.checker_test_object.assertAddsMessages(
-            if_message, elif_message, while_message, yield_message):
+            if_message, elif_message, while_message, yield_message,
+            if_exp_message):
             temp_file.close()
 
     def test_multiple_spaces_after_keyword(self):
@@ -2800,13 +2804,14 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                if  (False):
+                if  False:
                     pass
-                elif  (True):
+                elif  True:
                     pass
-                while  (True):
+                while  True:
                     pass
-                yield  (1)
+                yield  1
+                return True if  True else False
                 """)
         node_multiple_spaces_after_keyword.file = filename
         node_multiple_spaces_after_keyword.path = filename
@@ -2822,9 +2827,12 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
             msg_id='single-space-after-keyword', args=('while'), line=6)
         yield_message = testutils.Message(
             msg_id='single-space-after-keyword', args=('yield'), line=8)
+        if_exp_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('if'), line=9)
 
         with self.checker_test_object.assertAddsMessages(
-            if_message, elif_message, while_message, yield_message):
+            if_message, elif_message, while_message, yield_message,
+            if_exp_message):
             temp_file.close()
 
     def test_single_space_after_keyword(self):
@@ -2837,13 +2845,14 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                if (False):
+                if False:
                     pass
-                elif (True):
+                elif True:
                     pass
-                while (True):
+                while True:
                     pass
-                yield (1)
+                yield 1
+                return True if True else False
                 """)
         node_single_space_after_keyword.file = filename
         node_single_space_after_keyword.path = filename
