@@ -1138,6 +1138,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         # Valid interactions.
+        init_state.update_interaction_id('AlgebraicExpressionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('Continue')
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('DragAndDropSortInput')
@@ -1147,6 +1149,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('FractionInput')
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('ItemSelectionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MathEquationInput')
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('MultipleChoiceInput')
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
