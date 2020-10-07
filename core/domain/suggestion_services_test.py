@@ -2515,7 +2515,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 'en', self.author_id))
         # Create another hindi and english translation suggestion so that we
         # reach the MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER limit for each
-        # language code but continue to update the suggestions that have been
+        # language code but continue to update which suggestions have been
         # waiting the longest (since the top two suggestions waiting the
         # longest are from different language codes).
         self._create_translation_suggestion_with_language_code_and_author(
