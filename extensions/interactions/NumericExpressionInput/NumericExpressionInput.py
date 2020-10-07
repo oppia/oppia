@@ -34,4 +34,15 @@ class NumericExpressionInput(base.BaseInteraction):
     can_have_solution = True
     show_generic_submit_button = True
 
-    _customization_arg_specs = []
+    _customization_arg_specs = [{
+        'name': 'placeholder',
+        'description': 'Placeholder text',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'SubtitledUnicode'
+        },
+        'default_value': {
+            'content_id': None,
+            'unicode_str': 'Type an expression here, using only numbers.'
+        }
+    }]
