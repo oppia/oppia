@@ -135,7 +135,7 @@ class UserSettingsModel(base_models.BaseModel):
         """UserSettingsModel should be deleted after all the other models
         belonging to the user are deleted or pseudonymized.
         """
-        return base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):
@@ -2367,7 +2367,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         """PendingDeletionRequestModel should be deleted after all the other
         models belonging to the user are deleted or pseudonymized.
         """
-        return base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):
@@ -2501,7 +2501,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """The model can be deleted since it only contains information
         relevant to one user account.
         """
-        return base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):

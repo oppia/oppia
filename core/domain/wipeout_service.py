@@ -291,7 +291,7 @@ def run_user_deletion_completion(pending_deletion_request):
 
 
 def _delete_user_models_with_delete_after_verification_policy(user_id):
-    """Delete user models with deletion policy 'DELETE_AFTER_VERIFICATION'.
+    """Delete user models with deletion policy 'DELETE_AT_END'.
 
     Args:
         user_id: str. The unique ID of the user that is being deleted.
@@ -299,7 +299,7 @@ def _delete_user_models_with_delete_after_verification_policy(user_id):
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.user]):
         policy = model_class.get_deletion_policy()
-        if policy == base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION:
+        if policy == base_models.DELETION_POLICY.DELETE_AT_END:
             model_class.apply_deletion_policy(user_id)
 
 
@@ -382,14 +382,14 @@ def delete_user(pending_deletion_request):
     _delete_models(user_id, user_role, models.NAMES.email)
 
 
-def verify_user_deleted(user_id, skip_delete_after_verification_models=True):
+def verify_user_deleted(user_id, include_delete_at_end_models=False):
     """Verify that all the models for user specified in pending_deletion_request
     are deleted.
 
     Args:
         user_id: str. The ID of the user whose deletion should be verified.
-        skip_delete_after_verification_models: bool. Whether to skip models
-            that have deletion policy equal to 'DELETE_AFTER_VERIFICATION'.
+        include_delete_at_end_models: bool. Whether to skip models
+            that have deletion policy equal to 'DELETE_AT_END'.
 
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
@@ -398,9 +398,9 @@ def verify_user_deleted(user_id, skip_delete_after_verification_models=True):
         base_models.DELETION_POLICY.KEEP,
         base_models.DELETION_POLICY.NOT_APPLICABLE
     ]
-    if skip_delete_after_verification_models:
+    if not include_delete_at_end_models:
         policies_not_to_verify.append(
-            base_models.DELETION_POLICY.DELETE_AFTER_VERIFICATION)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():

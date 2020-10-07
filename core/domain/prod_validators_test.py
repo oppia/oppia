@@ -15363,6 +15363,9 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
+        # Run the full user deletion process as it works when the user
+        # pre-deletes itself via frontend and then is fully deleted via
+        # subsequent cron jobs.
         wipeout_service.pre_delete_user(self.user_id)
         wipeout_service.run_user_deletion(
             wipeout_service.get_pending_deletion_request(self.user_id))

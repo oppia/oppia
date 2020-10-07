@@ -39,11 +39,18 @@ VERSION_DELIMITER = '-'
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    # Models that should be kept.
     'KEEP',
+    # Models that should be deleted.
     'DELETE',
-    'DELETE_AFTER_VERIFICATION',
+    # Models that should be deleted after all the other models are deleted and
+    # verified to be deleted.
+    'DELETE_AT_END',
+    # Models that should be pseudonymized in their local context.
     'LOCALLY_PSEUDONYMIZE',
+    # Models that should only be kept if published.
     'KEEP_IF_PUBLIC',
+    # Models that are not directly or indirectly related to users.
     'NOT_APPLICABLE'
 )
 

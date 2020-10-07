@@ -5297,7 +5297,7 @@ class DeletedUserModelValidator(base_model_validators.BaseUserModelValidator):
         """
 
         if not wipeout_service.verify_user_deleted(
-                item.id, skip_delete_after_verification_models=False):
+                item.id, include_delete_at_end_models=True):
             cls._add_error(
                 'user properly deleted',
                 'Entity id %s: The deletion verification fails' % (item.id))
