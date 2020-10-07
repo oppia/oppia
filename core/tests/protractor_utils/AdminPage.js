@@ -140,7 +140,7 @@ var AdminPage = function() {
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
-    this.saveConfigProperty = async function(
+    var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
         await this.get();
         var title = await waitFor.visibilityOf(
