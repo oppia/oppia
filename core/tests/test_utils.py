@@ -1251,22 +1251,31 @@ tags: []
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            str. ID of the user possessing the given email.
+            str or None. ID of the user possessing the given email, or None if
+            the user does not exist.
         """
-        gae_id = self.get_gae_id_from_email(email)
-        return (
-            user_services.get_user_settings_by_gae_id(gae_id).user_id)
+        user_settings = user_services.get_user_settings_by_gae_id(
+            self.get_gae_id_from_email(email))
+        return user_settings and user_settings.user_id
 
     def get_gae_id_from_email(self, email):
-        """Gets the GAE user ID corresponding to the given email.
+        """Returns a mock GAE user ID corresponding to the given email.
+
+        This method can use any algorithm to produce results as long as, during
+        the runtime of each test case/method, it is:
+        1.  Pure (same input always returns the same output).
+        2.  One-to-one (no two distinct inputs return the same output).
+        3.  An integer byte-string (to match the behavior of actual GAE IDs).
 
         Args:
-            email: str. A valid email stored in the App Engine database.
+            email: str. The email address of the user.
 
         Returns:
-            str. GAE ID of the user possessing the given email.
+            bytes. The mock GAE ID of a user possessing the given email.
         """
-        return current_user_services.get_gae_id_from_email(email)
+        # Although the hash function doesn't guarantee a one-to-one mapping, in
+        # practice it is sufficient for our tests.
+        return python_utils.convert_to_bytes(hash(email))
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
