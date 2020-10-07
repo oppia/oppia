@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for DisplaySolutionModalController.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
 import { TestBed } from '@angular/core/testing';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
@@ -46,6 +51,8 @@ describe('Display Solution Modal Controller', function() {
 
   var testSubscriptions = null;
   const autoplayAudioSpy = jasmine.createSpy('autoplayAudio');
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
