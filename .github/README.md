@@ -1,3 +1,5 @@
+![](https://www.oppia.org/build/assets/images/library/banner2.84bdf7acd0b9696a0499380d9c8af283.svg)
+
 # [Oppia](https://www.oppia.org) 
 [![CircleCI](https://circleci.com/gh/oppia/oppia/tree/develop.svg?style=svg)](https://circleci.com/gh/oppia/oppia/tree/develop) [![Build Status](https://travis-ci.com/oppia/oppia.svg?branch=develop)](https://travis-ci.com/github/oppia/oppia) [![codecov](https://codecov.io/gh/oppia/oppia/branch/develop/graph/badge.svg)](https://codecov.io/gh/oppia/oppia) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://img.shields.io/badge/chat-on%20gitter-ff006f.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![GitHub issues by-label](https://img.shields.io/github/issues/oppia/oppia/good%20first%20issue.svg)](https://github.com/oppia/oppia/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 
@@ -20,10 +22,9 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
 
 <p align="center">
   <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank" rel="noopener">
-    <img src="https://cloud.githubusercontent.com/assets/8845039/16814722/b219cac0-4954-11e6-9573-c37557d1b410.png">
-  </a>
+    <img src="https://i.postimg.cc/dtHfqTpF/Screenshot-2020-10-07-at-12-13-31.png">
+ </a>
 </p>
-
 
 ## Installation
 
@@ -38,6 +39,10 @@ You can help with Oppia's development in many ways, including [coding](https://g
   * **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
 
+## Screenshots 
+![](https://i.postimg.cc/0Q1SDcMs/Screenshot-2020-10-07-at-12-22-22.png)
+![](https://i.postimg.cc/VsBqBQWH/Screenshot-2020-10-07-at-12-23-23.png)
+![](https://i.postimg.cc/5NbmZNtV/Screenshot-2020-10-07-at-12-23-54.png)
 
 ## Support
 
