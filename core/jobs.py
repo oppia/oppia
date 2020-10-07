@@ -1140,8 +1140,8 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             Exception. The current instance has an invalid realtime layer id.
         """
         super(
-            BaseRealtimeDatastoreClassForContinuousComputations,
-            self)._pre_put_hook()
+            BaseRealtimeDatastoreClassForContinuousComputations, self
+        )._pre_put_hook()
         if (self.realtime_layer is None or
                 python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
