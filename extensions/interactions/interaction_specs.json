@@ -74,7 +74,18 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "NumericExpressionInput",
-    "customization_arg_specs": [],
+    "customization_arg_specs": [{
+      "description": "Placeholder text",
+      "name": "placeholder",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SubtitledUnicode"
+      },
+      "default_value": {
+        "content_id": null,
+        "unicode_str": "Type an expression here, using only numbers."
+      }
+    }],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {

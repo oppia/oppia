@@ -23,6 +23,7 @@
 require(
   'interactions/NumericExpressionInput/directives/' +
   'numeric-expression-input-rules.service.ts');
+require('interactions/interaction-attributes-extractor.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/device-info.service.ts');
@@ -33,15 +34,15 @@ require('services/math-interactions.service.ts');
 angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
   template: require('./numeric-expression-input-interaction.component.html'),
   controller: [
-    '$scope', 'CurrentInteractionService', 'DeviceInfoService',
+    '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService', 'NumericExpressionInputRulesService',
-    'MATH_INTERACTION_PLACEHOLDERS',
+    'InteractionAttributesExtractorService', 'MathInteractionsService',
+    'NumericExpressionInputRulesService',
     function(
-        $scope, CurrentInteractionService, DeviceInfoService,
+        $attrs, $scope, CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService, NumericExpressionInputRulesService,
-        MATH_INTERACTION_PLACEHOLDERS) {
+        InteractionAttributesExtractorService, MathInteractionsService,
+        NumericExpressionInputRulesService) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
@@ -85,9 +86,11 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
+        const { placeholder } = (
+          InteractionAttributesExtractorService.getValuesFromAttributes(
+            'NumericExpressionInput', $attrs));
         GuppyInitializationService.init(
-          'guppy-div-learner',
-          MATH_INTERACTION_PLACEHOLDERS.NumericExpressionInput);
+          'guppy-div-learner', placeholder.getUnicode());
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
