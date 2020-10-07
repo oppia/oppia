@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2019 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,12 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
+
 import datetime
-import math
-import random
-import time
-import types
 
 from constants import constants
 from core.domain import collection_domain
@@ -39,22 +35,20 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
-gae_search_services = models.Registry.import_search_services()
+gae_search_services = models.Registry.import_search_services() 
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    audit_models, collection_models,
-    email_models, exp_models,
+    collection_models, exp_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.collection,
-    models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.collection,
+    models.NAMES.exploration,
     models.NAMES.user
 ])
 
@@ -642,7 +636,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
         for index, collection in enumerate(collections):
             collection.add_node('%s' % (index * 2))
             collection.add_node('%s' % (index * 2 + 1))
-            collection_services.save_new_collection(self.owner_id, collection)
+            collection_services.save_new_collection(self.owner_id, collection)e
 
         rights_manager.assign_role_for_collection(
             self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
