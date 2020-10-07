@@ -33,14 +33,14 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionPlayerEngineService', [
-  'AlertsService', 'AnswerClassificationService',
+  '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
   'QuestionObjectFactory', 'ReadOnlyExplorationBackendApiService',
   'StateCardObjectFactory', 'UrlService', 'ENTITY_TYPE',
   'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
   function(
-      AlertsService, AnswerClassificationService,
+      $rootScope, AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
       QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
@@ -56,6 +56,7 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
         .loadExploration(_explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
+          $rootScope.$apply();
         });
     }
 

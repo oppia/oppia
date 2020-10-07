@@ -23,11 +23,11 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('EditableExplorationBackendApiService', [
-  '$http', '$q', 'ReadOnlyExplorationBackendApiService',
+  '$http', '$rootScope', '$q', 'ReadOnlyExplorationBackendApiService',
   'UrlInterpolationService', 'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   function(
-      $http, $q, ReadOnlyExplorationBackendApiService,
+      $http, $rootScope, $q, ReadOnlyExplorationBackendApiService,
       UrlInterpolationService, EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_URL_TEMPLATE) {
     var _fetchExploration = function(
@@ -66,6 +66,7 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
           // As the two versions of the data (learner and editor) now differ.
           ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
             explorationId, exploration);
+          $rootScope.$apply();
 
           if (successCallback) {
             successCallback(exploration);
@@ -86,6 +87,7 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
         // Delete item from the ReadOnlyExplorationBackendApiService's cache.
         ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
           explorationId);
+        $rootScope.$apply();
         if (successCallback) {
           successCallback({});
         }

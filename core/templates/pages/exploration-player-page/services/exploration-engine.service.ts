@@ -57,7 +57,7 @@ require('pages/interaction-specs.constants.ajs.ts');
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
 angular.module('oppia').factory('ExplorationEngineService', [
-  'AlertsService', 'AnswerClassificationService',
+  '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
   'ExplorationFeaturesBackendApiService', 'ExplorationHtmlFormatterService',
   'ExplorationObjectFactory', 'ExpressionInterpolationService',
@@ -65,7 +65,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
   'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
   function(
-      AlertsService, AnswerClassificationService,
+      $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
       ExplorationFeaturesBackendApiService, ExplorationHtmlFormatterService,
       ExplorationObjectFactory, ExpressionInterpolationService,
@@ -97,6 +97,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         .loadExploration(_explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
+          $rootScope.$apply();
         });
     }
 

@@ -50,14 +50,16 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$uibModal', 'AlertsService', 'ExplorationEngineService',
+        '$http', '$rootScope', '$uibModal', 'AlertsService',
+        'ExplorationEngineService',
         'LoaderService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService',
         'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $uibModal, AlertsService, ExplorationEngineService,
+            $http, $rootScope, $uibModal, AlertsService,
+            ExplorationEngineService,
             LoaderService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserService,
@@ -117,6 +119,7 @@ angular.module('oppia').directive('learnerLocalNav', [
               .loadExploration(ctrl.explorationId)
               .then(function(exploration) {
                 ctrl.canEdit = exploration.can_edit;
+                $rootScope.$apply();
               });
             ctrl.username = '';
             ctrl.feedbackOptionIsShown = true;
