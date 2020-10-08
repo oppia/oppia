@@ -38,7 +38,7 @@
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/components/ @srijanreddy98
 /core/templates/domain/ @kevintab95
-/core/templates/pages/ @seanlip
+/core/templates/pages/ @srijanreddy98
 /core/templates/services/ @nithusha21
 /extensions/ @vojtechjelinek
 /scripts/ @DubeySandeep
@@ -103,27 +103,34 @@
 
 
 # Contributor Dashboard project.
-# TODO(#10779): Revert ownership to @sagangwee after 2020-10-05.
-/core/controllers/contributor_dashboard*.py @DubeySandeep
-/core/domain/opportunity*.py @DubeySandeep
-/core/domain/voiceover_services*.py @DubeySandeep
-/core/storage/opportunity/ @DubeySandeep
-/core/templates/domain/opportunity/ @DubeySandeep
-/core/templates/pages/contributor-dashboard-page/ @DubeySandeep
+/core/controllers/contributor_dashboard*.py @sagangwee
+/core/domain/opportunity*.py @sagangwee
+/core/domain/voiceover_services*.py @sagangwee
+/core/storage/opportunity/ @sagangwee
+/core/templates/domain/opportunity/ @sagangwee
+/core/templates/pages/contributor-dashboard-page/ @sagangwee
 
 
 # Core documentation
-/AUTHORS @seanlip
-/CHANGELOG @seanlip
-/CONTRIBUTORS @seanlip
-/LICENSE @seanlip
-/NOTICE @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/AUTHORS @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/CHANGELOG @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/CONTRIBUTORS @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/LICENSE @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/NOTICE @BenHenning
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.component.html @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/templates/pages/about-page/about-page.component.html @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
-/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @BenHenning
 /core/templates/pages/terms-page/ @DubeySandeep
-/core/templates/pages/terms-page/terms-page.component.html @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/templates/pages/terms-page/terms-page.component.html @BenHenning
 
 
 # Dashboard pages.
@@ -234,9 +241,12 @@
 # Google-app-engine configurations
 /appengine_config*.py @nithusha21
 /cron.yaml @nithusha21
-/index.yaml @seanlip
-/queue.yaml @seanlip
-/main_taskqueue.py @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/index.yaml @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/queue.yaml @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/main_taskqueue.py @BenHenning
 
 
 # Global components and filters.
@@ -445,17 +455,23 @@
 /main_cron.py @nithusha21
 /main_mail.py @aks681
 /main.py @nithusha21 @DubeySandeep
-/feconf.py @nithusha21 @seanlip
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/feconf.py @nithusha21 @BenHenning
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
-/core/domain/image_service*.py @seanlip
-/core/domain/prod_validation_jobs_one_off*.py @seanlip
-/core/domain/storage_model_audit_jobs_test.py @seanlip
-/core/jobs*.py @seanlip
-/core/platform/ @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/domain/image_service*.py @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/domain/prod_validation_jobs_one_off*.py @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/domain/storage_model_audit_jobs_test.py @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/jobs*.py @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/platform/ @BenHenning
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
@@ -477,7 +493,8 @@
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
-/redis.conf @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/redis.conf @BenHenning
 /release_constants.json @nithusha21 @DubeySandeep
 
 
@@ -487,22 +504,27 @@
 /core/controllers/__init__.py @nithusha21
 /core/domain/__init__.py @nithusha21
 /core/domain/config*.py @DubeySandeep
-/core/domain/change_domain.py @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/domain/change_domain.py @BenHenning
 /core/templates/tests/ @nithusha21
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/domain/utilities/ @DubeySandeep
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/Polyfills.ts @srijanreddy98
-/schema_utils*.py @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/schema_utils*.py @BenHenning
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep
 
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
-/core/controllers/moderator*.py @seanlip
-/core/controllers/recent_commits*.py @seanlip
-/core/domain/moderator_services*.py @seanlip
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/controllers/moderator*.py @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/controllers/recent_commits*.py @BenHenning
+# TODO(#10897): Revert ownership to @seanlip after 2020-10-15
+/core/domain/moderator_services*.py @BenHenning
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
@@ -596,8 +618,10 @@
 
 
 # User Data Takeout.
-/core/domain/takeout_*.py @seanlip @vojtechjelinek
-/core/domain/wipeout_*.py @seanlip @vojtechjelinek
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/domain/takeout_*.py @BenHenning @vojtechjelinek
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/domain/wipeout_*.py @BenHenning @vojtechjelinek
 
 
 # User’s profile page.
@@ -658,14 +682,22 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/pre_commit_linter.py in sync with the modifications.
-/scripts/linters/warranted_angular_security_bypasses.py @seanlip
-/core/controllers/acl_decorators*.py @seanlip
-/core/controllers/base*.py @seanlip
-/core/domain/html*.py @seanlip
-/core/domain/rights_manager*.py @seanlip
-/core/domain/role_services*.py @seanlip
-/core/storage/ @seanlip
-/core/domain/user*.py @seanlip
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/scripts/linters/warranted_angular_security_bypasses.py @BenHenning
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/controllers/acl_decorators*.py @BenHenning
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/controllers/base*.py @BenHenning
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/domain/html*.py @BenHenning
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/domain/rights_manager*.py @BenHenning
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/domain/role_services*.py @BenHenning
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/storage/ @BenHenning
+# TODO(#10897): Replace @BenHenning with @seanlip after 2020-10-15
+/core/domain/user*.py @BenHenning
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek

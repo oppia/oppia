@@ -196,19 +196,16 @@ var SkillEditorPage = function() {
 
   this.saveQuestion = async function() {
     await general.scrollToTop();
-    await saveQuestionButton.click();
+    await action.click('Save Question Button', saveQuestionButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.moveToQuestionsTab = async function() {
-    await waitFor.elementToBeClickable(
-      questionsTab,
-      'Questions tab button takes too long to be clickable');
-    await questionsTab.click();
+    await action.click('Questions tab button', questionsTab);
   };
 
   this.clickCreateQuestionButton = async function() {
-    await createQuestionButton.click();
+    await action.click('Create Question Button', createQuestionButton);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
