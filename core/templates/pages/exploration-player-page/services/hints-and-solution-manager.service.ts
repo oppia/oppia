@@ -55,7 +55,7 @@ export class HintsAndSolutionManagerService {
   tooltipTimeout = null;
 
   constructor(private playerPositionService: PlayerPositionService) {
-    // TODO(#10904): Remove the subscription
+    // TODO(#10904): Remove the subscription.
     playerPositionService.onNewCardAvailable.subscribe(
       () => {
         this.correctAnswerSubmitted = true;
