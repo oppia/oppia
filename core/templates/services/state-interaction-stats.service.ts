@@ -96,7 +96,7 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(expId: string, state: State): Promise<StateInteractionStats> {
+  async computeStatsAsync(expId: string, state: State): Promise<StateInteractionStats> {
     if (this.statsCache.has(state.name)) {
       return this.statsCache.get(state.name);
     }
