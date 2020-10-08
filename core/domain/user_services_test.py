@@ -2611,7 +2611,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def test_grant_reviewer_voiceover_reviewing_permissions_does_nothing(self):
         # Granting reviewers voiceover reviewing permissions does not change the
         # counts because voiceover suggestions are currently not offered on the
-        # Contributor Dashboard. 
+        # Contributor Dashboard.
         self._assert_community_contribution_stats_is_in_default_state()
 
         user_services.allow_user_to_review_voiceover_in_language(
@@ -2622,7 +2622,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def test_remove_reviewer_voiceover_reviewing_permissions_does_nothing(self):
         # Removing reviewers voiceover reviewing permissions does not change the
         # counts because voiceover suggestions are currently not offered on the
-        # Contributor Dashboard. 
+        # Contributor Dashboard.
         self._assert_community_contribution_stats_is_in_default_state()
         user_services.allow_user_to_review_voiceover_in_language(
             self.reviewer_1_id, 'hi')

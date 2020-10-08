@@ -1780,6 +1780,64 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self._assert_community_contribution_stats_is_in_default_state()
 
+    def test_accept_edit_state_content_suggestion_does_not_change_the_counts(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        edit_state_content_suggestion = _create_edit_state_content_suggestion()
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        suggestion_services.accept_suggestion(
+            edit_state_content_suggestion.suggestion_id, self.reviewer_1_id,
+            self.COMMIT_MESSAGE, 'review message')
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_reject_edit_state_content_suggestion_does_not_change_the_counts(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        edit_state_content_suggestion = _create_edit_state_content_suggestion()
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        suggestion_services.reject_suggestion(
+            edit_state_content_suggestion.suggestion_id, self.reviewer_1_id,
+            'review message')
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_reject_edit_state_content_suggestions_does_not_change_the_counts(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        edit_state_content_suggestion_1 = (
+            _create_edit_state_content_suggestion())
+        edit_state_content_suggestion_2 = (
+            _create_edit_state_content_suggestion())
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        suggestion_services.reject_suggestions(
+            [
+                edit_state_content_suggestion_1.suggestion_id,
+                edit_state_content_suggestion_2.suggestion_id
+            ], self.reviewer_1_id, 'review message')
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_resubmit_edit_state_content_suggestions_does_not_change_the_counts(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        edit_state_content_suggestion = _create_edit_state_content_suggestion()
+        self._assert_community_contribution_stats_is_in_default_state()
+        suggestion_services.reject_suggestion(
+            edit_state_content_suggestion.suggestion_id, self.reviewer_1_id,
+            'review message')
+        self._assert_community_contribution_stats_is_in_default_state()
+        suggestion_services.reject_suggestions(
+            [
+                edit_state_content_suggestion_1.suggestion_id,
+                edit_state_content_suggestion_2.suggestion_id
+            ], self.reviewer_1_id, 'review message')
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
     def test_create_question_suggestion_increases_question_suggestion_count(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
@@ -1906,7 +1964,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             stats.translation_reviewer_counts_by_lang_code, {}
         )
 
-    def test_create_translation_suggestion_increases_translation_suggestion_count(
+    def test_create_translation_suggestion_raises_translation_suggestion_count(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
 
@@ -2036,7 +2094,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             [
                 translation_suggestion_1.suggestion_id,
                 translation_suggestion_2.suggestion_id
-             ], self.reviewer_id, 'review message')
+            ], self.reviewer_id, 'review message')
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
@@ -2068,7 +2126,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             [
                 translation_suggestion_1.suggestion_id,
                 translation_suggestion_2.suggestion_id
-             ], self.reviewer_id, 'review message')
+            ], self.reviewer_id, 'review message')
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
@@ -2086,6 +2144,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         suggestion_2 = (
             self._create_translation_suggestion_with_language_code('en'))
         suggestion_3 = self._create_question_suggestion()
+        suggestion_4 = self._create_edit_state_content_suggestion()
         # Assert that the translation suggestion count increased.
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
@@ -2100,7 +2159,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             [
                 suggestion_1.suggestion_id, suggestion_2.suggestion_id,
                 suggestion_3.suggestion_id
-             ], self.reviewer_id, 'review message')
+            ], self.reviewer_id, 'review message')
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)

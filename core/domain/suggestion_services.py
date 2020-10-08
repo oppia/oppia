@@ -915,18 +915,19 @@ def _update_community_contribution_stats_due_to_suggestions_transactional(
     Args:
         suggestions: list(Suggestion). Suggestions that are accounted for in
             the community contribution stats counts. Only suggestion types that
-            are offered on the Contributor Dashboard are accounted for. 
+            are offered on the Contributor Dashboard are accounted for.
         amount: int. The amount to adjust the counts by.
     """
     stats_model = suggestion_models.CommunityContributionStatsModel.get()
     for suggestion in suggestions:
-        # This method does nothing for suggestion types that are not offered on the
-        # Contributor Dashboard.
+        # This method does nothing for suggestion types that are not offered on
+        # the Contributor Dashboard.
         if suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
-            return
+            continue
         else:
-            stats_model = suggestion_models.CommunityContributionStatsModel.get()
+            stats_model = (
+                suggestion_models.CommunityContributionStatsModel.get())
             if suggestion.suggestion_type == (
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                 if suggestion.language_code not in (
@@ -943,7 +944,8 @@ def _update_community_contribution_stats_due_to_suggestions_transactional(
     stats_model.put()
 
 
-def _update_community_contribution_stats_due_to_suggestions(suggestions, amount):
+def _update_community_contribution_stats_due_to_suggestions(
+        suggestions, amount):
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount. The GET and PUT is done in a single
     transaction to avoid loss of updates that come in rapid succession.
@@ -951,7 +953,7 @@ def _update_community_contribution_stats_due_to_suggestions(suggestions, amount)
     Args:
         suggestions: list(Suggestion). Suggestions that may update the counts
             stored in the community contribution stats. Only suggestion types
-            that are offered on the Contributor Dashboard are accounted for. 
+            that are offered on the Contributor Dashboard are accounted for.
         amount: int. The amount to adjust the counts by.
     """
     transaction_services.run_in_transaction(

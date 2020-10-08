@@ -903,8 +903,8 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
     on the updates to the given user contribution rights.
 
     Args:
-        future_contribution_rights: UserContributionRights. The most up to date
-            user contribution rights.
+        future_user_contribution_rights: UserContributionRights. The most up to
+            date user contribution rights.
     """
     past_user_contribution_rights = get_user_contribution_rights(
         future_user_contribution_rights.id)
