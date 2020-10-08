@@ -16,11 +16,13 @@
  * @fileoverview Translate service for i18n translations
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
-import { UtilsService } from './utils.service';
+import { Injectable, EventEmitter } from "@angular/core";
+import { UtilsService } from "./utils.service";
 
-import { TranslationsDict, TranslationsBackendApiService } from
-  'services/translations-backend-api.service';
+import {
+  TranslationsDict,
+  TranslationsBackendApiService,
+} from "services/translations-backend-api.service";
 
 /**
  * Commonly used terms in this file.
@@ -53,11 +55,11 @@ export interface LangChangeEvent {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class TranslateService {
-  currentLang = 'en';
-  fallbackLang = 'en';
+  currentLang = "en";
+  fallbackLang = "en";
   translations: TranslationsDict[] = [];
   templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
 
@@ -68,7 +70,8 @@ export class TranslateService {
 
   constructor(
     private translationsBackendApiService: TranslationsBackendApiService,
-    private utilsService: UtilsService) {}
+    private utilsService: UtilsService
+  ) {}
 
   /**
    * Function to fetch JSON file containing translations.
@@ -76,8 +79,12 @@ export class TranslateService {
    * @returns {Promise<TranslationsDict>} - A promise that resolves to the
    * translations
    */
-  async fetchTranslationsAsync(languageCode: string): Promise<TranslationsDict> {
-    return this.translationsBackendApiService.fetchTranslations(languageCode);
+  async fetchTranslationsAsync(
+    languageCode: string
+  ): Promise<TranslationsDict> {
+    return this.translationsBackendApiService.fetchTranslationsAsync(
+      languageCode
+    );
   }
 
   /**
@@ -88,21 +95,20 @@ export class TranslateService {
     // Check if the translations for the "lang" have been fetched before.
     this.currentLang = newLanguageCode;
     if (Object.keys(this.translations).includes(newLanguageCode)) {
-      this.onLangChangeEventEmitter.emit(
-        {newLanguageCode: newLanguageCode });
+      this.onLangChangeEventEmitter.emit({ newLanguageCode: newLanguageCode });
       return;
     }
     // Otherwise fetch the translations.
     this.translations[newLanguageCode] = this.fetchTranslationsAsync(
-      newLanguageCode).then(
-      translations => {
-        this.translations[newLanguageCode] = translations;
-        if (this.currentLang === newLanguageCode) {
-          this.onLangChangeEventEmitter.emit(
-            {newLanguageCode: newLanguageCode});
-        }
+      newLanguageCode
+    ).then((translations) => {
+      this.translations[newLanguageCode] = translations;
+      if (this.currentLang === newLanguageCode) {
+        this.onLangChangeEventEmitter.emit({
+          newLanguageCode: newLanguageCode,
+        });
       }
-    );
+    });
   }
 
   /**
@@ -112,8 +118,9 @@ export class TranslateService {
    * @returns {string} interpolated translatedValue
    */
   interpolateTranslatedValue(
-      translatedValue: string,
-      interpolateParams?: Object | undefined): string {
+    translatedValue: string,
+    interpolateParams?: Object | undefined
+  ): string {
     if (!interpolateParams) {
       return translatedValue;
     }
@@ -125,7 +132,8 @@ export class TranslateService {
           return interpolateParamsValue;
         }
         return substring;
-      });
+      }
+    );
   }
 
   /**
@@ -136,9 +144,7 @@ export class TranslateService {
    * @returns {string} - interpolated string of the translatedValue
    * corresponding to the key.
    */
-  getInterpolatedString(
-      key: string,
-      interpolateParams?: Object): string {
+  getInterpolatedString(key: string, interpolateParams?: Object): string {
     if (!this.utilsService.isDefined(key) || !key.length) {
       throw new Error('Parameter "key" required');
     }
@@ -146,15 +152,23 @@ export class TranslateService {
 
     if (translations && translations[key]) {
       return this.interpolateTranslatedValue(
-        translations[key], interpolateParams);
+        translations[key],
+        interpolateParams
+      );
     }
 
     // If the translation for the current lang doesn't exist use fallback lang.
     translations = this.translations[this.fallbackLang];
-    if (this.fallbackLang !== null && this.fallbackLang !== this.currentLang &&
-        (translations && translations[key])) {
+    if (
+      this.fallbackLang !== null &&
+      this.fallbackLang !== this.currentLang &&
+      translations &&
+      translations[key]
+    ) {
       return this.interpolateTranslatedValue(
-        translations[key], interpolateParams);
+        translations[key],
+        interpolateParams
+      );
     }
 
     // If the translation for the fallback lang doesn't exist, return the key.
