@@ -17,30 +17,32 @@
  * in the translation tab is currently active.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { List } from 'lodash';
+
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { List } from 'lodash';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class TranslationLanguageService {
+  private activeLanguageCode: string = null;
+  private allAudioLanguageCodes: string[] = (
+    this.languageUtilService.getAllVoiceoverLanguageCodes());
+  private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
+
   constructor(
     private languageUtilService: LanguageUtilService,
     private loggerService: LoggerService) {}
 
-  private activeLanguageCode: string = null;
-  private allAudioLanguageCodes: List<string> = (
-    this.languageUtilService.getAllVoiceoverLanguageCodes());
-  private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
-
-  getActiveLanguageCode = function(): string {
+  getActiveLanguageCode(): string {
     return this.activeLanguageCode;
   };
 
-  setActiveLanguageCode = function(newActiveLanguageCode: string): null {
+  setActiveLanguageCode(newActiveLanguageCode: string): null {
     if (this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
       this.loggerService.error(
         'Invalid active language code: ' + newActiveLanguageCode);
@@ -50,7 +52,7 @@ export class TranslationLanguageService {
     this._activeLanguageChangedEventEmitter.emit();
   };
 
-  getActiveLanguageDescription = function(): string {
+  getActiveLanguageDescription(): string {
     if (!this.activeLanguageCode) {
       return null;
     }

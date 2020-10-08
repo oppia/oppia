@@ -32,7 +32,7 @@ describe('Translation language service', () => {
       ['en', 'hi']);
     spyOn(languageUtilService, 'getAudioLanguageDescription').and.callFake(
       (activeLanguageCode: string) => {
-        var descriptions = {
+        let descriptions = {
           en: 'English'
         };
         return descriptions[activeLanguageCode];
