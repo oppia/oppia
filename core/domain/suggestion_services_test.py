@@ -1823,7 +1823,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self._assert_community_contribution_stats_is_in_default_state()
 
-    def test_resubmit_edit_state_content_suggestions_does_not_change_the_counts(
+    def test_resubmit_edit_state_content_suggestion_does_not_change_the_counts(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
         edit_state_content_suggestion = (
@@ -1878,8 +1878,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self):
         self._assert_community_contribution_stats_is_in_default_state()
         question_suggestion = self._create_question_suggestion()
-        stats = suggestion_services.get_community_contribution_stats()
         # Assert that the question suggestion count increased.
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)
         self.assertDictEqual(
@@ -1897,8 +1897,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self):
         self._assert_community_contribution_stats_is_in_default_state()
         question_suggestion = self._create_question_suggestion()
-        stats = suggestion_services.get_community_contribution_stats()
         # Assert that the question suggestion count increased.
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)
         self.assertDictEqual(
@@ -1917,8 +1917,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self._assert_community_contribution_stats_is_in_default_state()
         question_suggestion_1 = self._create_question_suggestion()
         question_suggestion_2 = self._create_question_suggestion()
-        stats = suggestion_services.get_community_contribution_stats()
         # Assert that the question suggestion count increased.
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 2)
         self.assertDictEqual(
@@ -1938,8 +1938,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self):
         self._assert_community_contribution_stats_is_in_default_state()
         question_suggestion = self._create_question_suggestion()
-        stats = stats = suggestion_services.get_community_contribution_stats()
         # Assert that the question suggestion count increased.
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)
         self.assertDictEqual(
@@ -1988,7 +1988,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             stats.translation_reviewer_counts_by_lang_code, {})
 
-    def test_create_translation_suggestions_diff_lang_raises_translation_count(
+    def test_create_translation_suggestions_diff_lang_raises_translation_counts(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
 
@@ -2153,7 +2153,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self._create_translation_suggestion_with_language_code('en'))
         suggestion_3 = self._create_edit_state_content_suggestion()
         suggestion_4 = self._create_question_suggestion()
-        # Assert that the translation suggestion count increased.
+        # Assert that the suggestion counts increased.
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)

@@ -110,7 +110,7 @@ def create_suggestion(
         None, change, score_category, thread_id, suggestion.language_code)
 
     # Update the community contribution stats so that the number of suggestions
-    # of this type that are in review has increased by one.
+    # of this type that are in review increases by one.
     _update_community_contribution_stats_due_to_suggestion(suggestion, 1)
 
     return get_suggestion_by_id(thread_id)
@@ -341,7 +341,7 @@ def accept_suggestion(
     _update_suggestion(suggestion)
 
     # Update the community contribution stats so that the number of suggestions
-    # of this type that are in review has decreased by one, since this
+    # of this type that are in review decreases by one, since this
     # suggestion is no longer in review.
     _update_community_contribution_stats_due_to_suggestion(suggestion, -1)
 
@@ -431,7 +431,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
     _update_suggestions(suggestions)
 
     # Update the community contribution stats so that the number of suggestions
-    # that are in review has decreased, since these suggestions are no longer in
+    # that are in review decreases, since these suggestions are no longer in
     # review.
     _update_community_contribution_stats_due_to_suggestions(suggestions, -1)
 
@@ -516,8 +516,8 @@ def resubmit_rejected_suggestion(
     _update_suggestion(suggestion)
 
     # Update the community contribution stats so that the number of suggestions
-    # of this type that are in review has increased by one, since this
-    # suggestion is now back in review.
+    # of this type that are in review increases by one, since this suggestion is
+    # now back in review.
     _update_community_contribution_stats_due_to_suggestion(suggestion, 1)
 
     feedback_services.create_message(
@@ -876,46 +876,15 @@ def get_community_contribution_stats():
         community_contribution_stats_model)
 
 
-def update_community_contribution_stats(community_contribution_stats):
-    """Updates the CommunityContributionStatsModel using
-    community_contribution_stats.
-
-    Args:
-        community_contribution_stats: CommunityContributionStats. The
-            domain object that will be used to update the
-            CommunityContributionStatsModel.
-    """
-
-    community_contribution_stats.validate()
-
-    stats_model = suggestion_models.CommunityContributionStatsModel.get()
-
-    stats_model.translation_reviewer_counts_by_lang_code = (
-        community_contribution_stats.translation_reviewer_counts_by_lang_code
-    )
-    stats_model.translation_suggestion_counts_by_lang_code = (
-        community_contribution_stats
-        .translation_suggestion_counts_by_lang_code
-    )
-    stats_model.question_reviewer_count = (
-        community_contribution_stats.question_reviewer_count
-    )
-    stats_model.question_suggestion_count = (
-        community_contribution_stats.question_suggestion_count
-    )
-
-    stats_model.put()
-
-
 def _update_community_contribution_stats_due_to_suggestions_transactional(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount.
 
     Args:
-        suggestions: list(Suggestion). Suggestions that are accounted for in
-            the community contribution stats counts. Only suggestion types that
-            are offered on the Contributor Dashboard are accounted for.
+        suggestions: list(Suggestion). Suggestions that may update the counts
+            stored in the community contribution stats. Only suggestion types
+            that are offered on the Contributor Dashboard are accounted for.
         amount: int. The amount to adjust the counts by.
     """
     stats_model = suggestion_models.CommunityContributionStatsModel.get()
@@ -940,6 +909,10 @@ def _update_community_contribution_stats_due_to_suggestions_transactional(
             elif suggestion.suggestion_type == (
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
                 stats_model.question_suggestion_count += amount
+
+        # Create a community contribution stats object to validate the updates.
+        stats = create_community_contribution_stats_from_model(stats_model)
+        stats.validate()
 
     stats_model.put()
 

@@ -2223,7 +2223,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     stats.
     """
 
-    AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
     REVIEWER_2_EMAIL = 'reviewer2@community.org'
 
