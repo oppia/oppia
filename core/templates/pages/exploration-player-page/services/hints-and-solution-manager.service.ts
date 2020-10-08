@@ -18,13 +18,13 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
 import { EventEmitter } from '@angular/core';
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
+
 import { Hint } from 'domain/exploration/HintObjectFactory';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service.ts';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -55,6 +55,7 @@ export class HintsAndSolutionManagerService {
   tooltipTimeout = null;
 
   constructor(private playerPositionService: PlayerPositionService) {
+    // TODO(#10904): Remove the subscription
     playerPositionService.onNewCardAvailable.subscribe(
       () => {
         this.correctAnswerSubmitted = true;
@@ -111,7 +112,7 @@ export class HintsAndSolutionManagerService {
     this.numHintsConsumed++;
     this.wrongAnswersSinceLastHintConsumed = 0;
 
-    var funcToEnqueue = null;
+    let funcToEnqueue = null;
     if (!this.areAllHintsExhausted()) {
       funcToEnqueue = this.releaseHint;
     } else if (!!this.solutionForLatestCard && !this.solutionReleased) {

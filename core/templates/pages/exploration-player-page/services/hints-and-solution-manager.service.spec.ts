@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
-import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
+import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service.ts';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service.ts';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 
 describe('HintsAndSolutionManager service', () => {
   let hasms;
