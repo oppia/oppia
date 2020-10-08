@@ -3001,4 +3001,3 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             'in regenerated model: %s\']]' % (
                 commit_log_model.created_on, metadata_model.created_on))]
         self.assertEqual(output, expected_output)
-        
