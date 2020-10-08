@@ -57,8 +57,8 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
 
     def test_custom_linter_with_invalid_style_indentation(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
-            [INVALID_STYLE_INDENTATION_HTML_FILEPATH], FILE_CACHE,
-            debug=True).check_html_tags_and_attributes()
+            [INVALID_STYLE_INDENTATION_HTML_FILEPATH], FILE_CACHE
+            ).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'invalid_style_indentation.html --> Expected indentation of 6,'
             ' found indentation of 4 for content of style tag on line 7'
@@ -68,8 +68,8 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
 
     def test_custom_linter_with_invalid_indentation(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
-            [INVALID_INDENTATION_HTML_FILEPATH], FILE_CACHE,
-            debug=True).check_html_tags_and_attributes()
+            [INVALID_INDENTATION_HTML_FILEPATH], FILE_CACHE
+            ).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Expected indentation of 10, found indentation of 12 for '
             'classroom-page tag on line 14'], lint_task_report.trimmed_messages)
@@ -78,8 +78,8 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
 
     def test_custom_linter_with_invalid_quotes(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
-            [INVALID_QUOTES_HTML_FILEPATH], FILE_CACHE,
-            debug=True).check_html_tags_and_attributes()
+            [INVALID_QUOTES_HTML_FILEPATH], FILE_CACHE
+            ).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'The value color:white; of attribute '
             'style for the tag content on line 12 should be enclosed '
@@ -89,8 +89,8 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
 
     def test_custom_linter_with_invalid_alignment(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
-            [INVALID_ALIGNMENT_HTML_FILEPATH], FILE_CACHE,
-            debug=True).check_html_tags_and_attributes()
+            [INVALID_ALIGNMENT_HTML_FILEPATH], FILE_CACHE
+            ).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Attribute for tag content on line 13 should align with the '
             'leftmost attribute on line 12'], lint_task_report.trimmed_messages)
@@ -101,20 +101,20 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         with self.assertRaisesRegexp(
             html_linter.TagMismatchException, 'Error in line 2 of file'):
             html_linter.HTMLLintChecksManager(
-                [INVALID_MISMATCHED_TAGS_HTML_FILEPATH], FILE_CACHE,
-                debug=True).perform_all_lint_checks()
+                [INVALID_MISMATCHED_TAGS_HTML_FILEPATH], FILE_CACHE
+                ).perform_all_lint_checks()
 
     def test_custom_linter_with_tag_mismatch(self):
         with self.assertRaisesRegexp(
             html_linter.TagMismatchException, 'Error in line 13 of file'):
             html_linter.HTMLLintChecksManager(
-                [INVALID_TAG_MISMATCH_HTML_FILEPATH], FILE_CACHE,
-                debug=True).perform_all_lint_checks()
+                [INVALID_TAG_MISMATCH_HTML_FILEPATH], FILE_CACHE
+                ).perform_all_lint_checks()
 
     def test_custom_linter_with_mismatched_indentation(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
-            [INVALID_MISMATCH_INDENTATION_HTML_FILEPATH], FILE_CACHE,
-            debug=True).check_html_tags_and_attributes()
+            [INVALID_MISMATCH_INDENTATION_HTML_FILEPATH], FILE_CACHE
+            ).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Indentation for end tag content on line 18 does not match the'
             ' indentation of the start tag content on line 12'
@@ -126,13 +126,12 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         with self.assertRaisesRegexp(
             html_linter.TagMismatchException, 'Error in file'):
             html_linter.HTMLLintChecksManager(
-                [INVALID_MISSING_HTML_TAG_HTML_FILEPATH], FILE_CACHE,
-                debug=True).perform_all_lint_checks()
+                [INVALID_MISSING_HTML_TAG_HTML_FILEPATH], FILE_CACHE
+                ).perform_all_lint_checks()
 
     def test_valid_html_file_with_custom_linter(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
-            [VALID_HTML_FILEPATH], FILE_CACHE,
-            debug=True).check_html_tags_and_attributes()
+            [VALID_HTML_FILEPATH], FILE_CACHE).check_html_tags_and_attributes()
         self.assertEqual(
             ['SUCCESS  HTML tag and attribute check passed'],
             lint_task_report.get_report())
@@ -141,7 +140,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
 
     def test_custom_linter_with_no_files(self):
         lint_task_report = html_linter.HTMLLintChecksManager(
-            [], FILE_CACHE, debug=True).perform_all_lint_checks()
+            [], FILE_CACHE).perform_all_lint_checks()
         self.assertEqual(
             [
                 'There are no HTML files to lint.',
