@@ -1851,7 +1851,7 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                 line = line.strip()
                 # Regex evaluates to True if the line is of the form "if #" or
                 # "... if #" where # is not a space.
-                if not re.search(br'(\s|^)' + token + br'\s[^\s]', line):
+                if not re.search(br'(\s|^)' + token + br'(\s[^\s]|$)', line):
                     self.add_message(
                         'single-space-after-keyword',
                         args=(token),
