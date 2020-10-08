@@ -698,7 +698,7 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     # is added to the Contributor Dashboard but hasn't been added to
     # SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.
     if set(suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES) != set(
-        SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys()):
+            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys()):
         raise Exception(
             'Expected keys in SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS to '
             'be [%s], received: [%s].' % (
@@ -711,7 +711,7 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
         raise Exception(
             'Expected suggestion type to be offered on the Contributor '
             'Dashboard, received: %s.' % suggestion.suggestion_type)
-    
+
     # Retrieve the html content that is emphasized on the Contributor Dashboard
     # pages. This content is what stands out for each suggestion when a user
     # views a list of suggestions.

@@ -1786,7 +1786,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         with self.assertRaisesRegexp(
             Exception,
             'Expected keys in SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS to '
-            'be \[%s\], received: \[\].'% ' '.join(
+            r'be \[%s\], received: \[\].' % ' '.join(
                 suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)):
             with self.swap(
                 suggestion_services,
