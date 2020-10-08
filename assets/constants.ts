@@ -1,3 +1,7 @@
+// We are using eslint disable here for multilines because we have used quotes
+// around properties at a lot of places so it is not possible to use
+// "eslint disable next line" for each of them.
+/* eslint-disable oppia/no-multiline-disable */
 /* eslint-disable quote-props */
 /* eslint-disable quotes */
 /* Don't modify anything outside the {} brackets.
@@ -5322,6 +5326,9 @@ export = {
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
+  // A regular expression for valid skill misconception id.
+  "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
+
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",
@@ -5429,6 +5436,8 @@ export = {
   // The bucket name is set to None-resources to enable it to be used
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+
+  "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
   // Used to disable account removal until it is fully implemented.
   "ENABLE_ACCOUNT_DELETION": false,

@@ -21,6 +21,9 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { FeedbackThreadSummary } from
+  'domain/feedback_thread/feedback-thread-summary.model';
+
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
@@ -31,14 +34,12 @@ describe('Learner dashboard page', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModal = null;
-  var $window = null;
   var AlertsService = null;
   var CollectionObjectFactory = null;
   var collectionSummaryObjectFactory = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
   var ExplorationObjectFactory = null;
-  var feedbackThreadSummaryObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
   var learnerExplorationSummaryObjectFactory = null;
   var nonExistentActivitiesObjectFactory = null;
@@ -65,15 +66,12 @@ describe('Learner dashboard page', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
-      $window = $injector.get('$window');
       CollectionObjectFactory = $injector.get('CollectionObjectFactory');
       collectionSummaryObjectFactory = $injector.get(
         'CollectionSummaryObjectFactory');
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
-      feedbackThreadSummaryObjectFactory = $injector.get(
-        'FeedbackThreadSummaryObjectFactory');
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
       learnerExplorationSummaryObjectFactory = $injector.get(
@@ -239,7 +237,7 @@ describe('Learner dashboard page', function() {
         $q.resolve(profilePictureDataUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
+      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.resolve({
           completedExplorationsList: (
             learnerDashboardData.completed_explorations_list.map(
@@ -268,7 +266,7 @@ describe('Learner dashboard page', function() {
           numberOfUnreadThreads: learnerDashboardData.number_of_unread_threads,
           threadSummaries: (
             learnerDashboardData.thread_summaries.map(
-              threadSummary => feedbackThreadSummaryObjectFactory
+              threadSummary => FeedbackThreadSummary
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             learnerDashboardData.completed_to_incomplete_collections),
@@ -427,22 +425,10 @@ describe('Learner dashboard page', function() {
     });
 
     it('should detect when application is being used on a mobile', function() {
-      // This approach was choosen because spyOn() doesn't work on properties
-      // that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property innerWidth does not have access type get' error.
-      // eslint-disable-next-line max-len
-      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-      // ref: https://github.com/jasmine/jasmine/issues/1415
-      Object.defineProperty($window, 'innerWidth', {
-        get: () => undefined
-      });
-      var innerWidthSpy = spyOnProperty($window, 'innerWidth');
-      innerWidthSpy.and.returnValue(400);
-      expect(ctrl.checkMobileView()).toBe(true);
-
-      innerWidthSpy.and.returnValue(700);
       expect(ctrl.checkMobileView()).toBe(false);
+
+      spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
+      expect(ctrl.checkMobileView()).toBe(true);
     });
 
     it('should show username popover based on its length', function() {
@@ -885,7 +871,7 @@ describe('Learner dashboard page', function() {
         $q.resolve(profilePictureDataUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
+      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404
         }));

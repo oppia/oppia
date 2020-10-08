@@ -36,9 +36,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+import requests_mock
 import utils
-
-from google.appengine.api import urlfetch
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -71,36 +70,41 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserServicesUnitTests, self).setUp()
-        schema_version = 1
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version, 'user_id'
-        )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': 'user_id',
+        }
+        new_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias3',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        self.modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
+        self.modifiable_new_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
-    def test_is_user_id_correct(self):
+    def test_is_user_id_valid(self):
         self.assertTrue(
-            user_services.is_user_id_correct(feconf.SYSTEM_COMMITTER_ID))
+            user_services.is_user_id_valid(feconf.SYSTEM_COMMITTER_ID))
         self.assertTrue(
-            user_services.is_user_id_correct(feconf.MIGRATION_BOT_USER_ID))
+            user_services.is_user_id_valid(feconf.MIGRATION_BOT_USER_ID))
         self.assertTrue(
-            user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
-        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
+            user_services.is_user_id_valid(feconf.SUGGESTION_BOT_USER_ID))
+        self.assertTrue(user_services.is_user_id_valid('uid_%s' % ('a' * 32)))
         self.assertFalse(
-            user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))
-        self.assertFalse(user_services.is_user_id_correct('uid_' + 'a' * 31))
-        self.assertFalse(user_services.is_user_id_correct('a' * 36))
-
-    def test_is_pseudonymous_id(self):
-        self.assertTrue(user_services.is_pseudonymous_id('pid_' + 'a' * 32))
-        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 32))
-        self.assertFalse(
-            user_services.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
-        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 31))
-        self.assertFalse(user_services.is_pseudonymous_id('a' * 36))
+            user_services.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(user_services.is_user_id_valid('uid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_id_valid('a' * 36))
 
     def test_set_and_get_username(self):
         gae_id = 'someUser'
@@ -380,63 +384,52 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
+        gravatar_url = user_services.get_gravatar_url(user_email)
+
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
         with python_utils.open_file(
             expected_gravatar_filepath, 'rb', encoding=None) as f:
-            gravatar = f.read()
-        with self.urlfetch_mock(content=gravatar):
-            profile_picture = user_services.fetch_gravatar(user_email)
-            gravatar_data_url = utils.convert_png_to_data_url(
-                expected_gravatar_filepath)
-            self.assertEqual(profile_picture, gravatar_data_url)
+            expected_gravatar = f.read()
+
+        with requests_mock.Mocker() as requests_mocker:
+            requests_mocker.get(gravatar_url, content=expected_gravatar)
+            gravatar = user_services.fetch_gravatar(user_email)
+
+        self.assertEqual(
+            gravatar, utils.convert_png_to_data_url(expected_gravatar_filepath))
 
     def test_fetch_gravatar_failure_404(self):
         user_email = 'user@example.com'
+        gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages = []
-        def mock_log_function(message):
-            error_messages.append(message)
+        logging_mocker = self.swap(logging, 'error', error_messages.append)
 
-        gravatar_url = user_services.get_gravatar_url(user_email)
-        expected_error_message = (
-            '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
-        logging_error_mock = test_utils.CallCounter(mock_log_function)
-        urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
-        urlfetch_mock_ctx = self.urlfetch_mock(status_code=404)
-        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
-        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_counter)
-        with urlfetch_mock_ctx, log_swap_ctx, fetch_swap_ctx:
-            profile_picture = user_services.fetch_gravatar(user_email)
-            self.assertEqual(urlfetch_counter.times_called, 1)
-            self.assertEqual(logging_error_mock.times_called, 1)
-            self.assertEqual(expected_error_message, error_messages[0])
-            self.assertEqual(
-                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+        with logging_mocker, requests_mock.Mocker() as requests_mocker:
+            requests_mocker.get(gravatar_url, status_code=404)
+            gravatar = user_services.fetch_gravatar(user_email)
+
+        self.assertEqual(
+            error_messages,
+            ['[Status 404] Failed to fetch Gravatar from %s' % gravatar_url])
+        self.assertEqual(gravatar, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_fetch_gravatar_failure_exception(self):
         user_email = 'user@example.com'
+        gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages = []
-        def mock_log_function(message):
-            error_messages.append(message)
+        logging_mocker = self.swap(logging, 'exception', error_messages.append)
 
-        gravatar_url = user_services.get_gravatar_url(user_email)
-        expected_error_message = (
-            'Failed to fetch Gravatar from %s' % gravatar_url)
-        logging_error_mock = test_utils.CallCounter(mock_log_function)
-        urlfetch_fail_mock = test_utils.FailingFunction(
-            urlfetch.fetch, urlfetch.InvalidURLError,
-            test_utils.FailingFunction.INFINITY)
-        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
-        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_fail_mock)
-        with log_swap_ctx, fetch_swap_ctx:
-            profile_picture = user_services.fetch_gravatar(user_email)
-            self.assertEqual(logging_error_mock.times_called, 1)
-            self.assertEqual(expected_error_message, error_messages[0])
-            self.assertEqual(
-                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+        with logging_mocker, requests_mock.Mocker() as requests_mocker:
+            requests_mocker.get(gravatar_url, exc=Exception)
+            gravatar = user_services.fetch_gravatar(user_email)
+
+        self.assertEqual(
+            error_messages, ['Failed to fetch Gravatar from %s' % gravatar_url])
+        self.assertEqual(gravatar, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(
@@ -799,7 +792,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 gae_id, email, [self.modifiable_new_user_data])
 
     def test_create_multiple_new_profiles_for_same_user_works_correctly(self):
-        schema_version = 1
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
@@ -819,10 +811,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
-        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
-            display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        new_user_data_dict_2 = {
+            'schema_version': 1,
+            'display_alias': display_alias_3,
+            'pin': None,
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        modifiable_new_user_data_2 = (
+            user_domain.ModifiableUserData.from_raw_dict(
+                new_user_data_dict_2))
         user_settings_list = user_services.create_new_profiles(
             gae_id, email, [
                 self.modifiable_new_user_data, modifiable_new_user_data_2
@@ -957,7 +957,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_users_data_for_multiple_users_works_correctly(self):
         # Preparing for the test.
-        schema_version = 1
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
@@ -977,10 +976,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
-        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
-            display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        new_user_data_dict_2 = {
+            'schema_version': 1,
+            'display_alias': display_alias_3,
+            'pin': None,
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        modifiable_new_user_data_2 = (
+            user_domain.ModifiableUserData.from_raw_dict(
+                new_user_data_dict_2))
         user_settings_list = user_services.create_new_profiles(
             gae_id, email, [
                 self.modifiable_new_user_data, modifiable_new_user_data_2
@@ -1509,8 +1516,9 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
-        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
+        MockUserStatsAggregator.start_computation()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
@@ -1785,15 +1793,28 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
-        schema_version = 1
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version, 'user_id'
-        )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': 'user_id',
+        }
+        self.modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
+        new_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias_3',
+            'pin': None,
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        self.modifiable_new_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
     def test_validate_non_str_user_id_raises_exception(self):
         self.user_settings.user_id = 0
@@ -2219,7 +2240,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.signup(
             self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
         self.question_reviewer_id = (
-            self.get_user_id_from_email(self.TRANSLATOR_EMAIL))
+            self.get_user_id_from_email(self.QUESTION_REVIEWER_EMAIL))
 
     def test_assign_user_review_translation_suggestion_in_language(self):
         self.assertFalse(
@@ -2288,8 +2309,57 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.can_review_question_suggestions(self.voice_artist_id))
 
-    def test_get_all_contribution_reviewers(self):
-        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+    def test_get_users_contribution_rights_with_multiple_reviewer_user_ids(
+            self):
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'en')
+        expected_reviewer_ids = [self.question_reviewer_id, self.translator_id]
+
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights(expected_reviewer_ids)
+        )
+
+        reviewer_ids = [
+            user_contribution_rights.id for user_contribution_rights in
+            users_contribution_rights
+        ]
+        self.assertEqual(len(users_contribution_rights), 2)
+        self.assertItemsEqual(reviewer_ids, expected_reviewer_ids)
+
+    def test_get_users_contribution_rights_with_one_reviewer_user_id(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'en')
+
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights([self.translator_id])
+        )
+
+        self.assertEqual(len(users_contribution_rights), 1)
+        self.assertEqual(users_contribution_rights[0].id, self.translator_id)
+        self.assertEqual(
+            (
+                users_contribution_rights[0]
+                .can_review_translation_for_language_codes
+            ), ['en', 'hi']
+        )
+
+    def test_get_users_contribution_rights_returns_empty_for_no_reviewers_ids(
+            self):
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights([])
+        )
+
+        self.assertEqual(len(users_contribution_rights), 0)
+
+    def test_get_all_reviewers_contribution_rights(self):
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
 
         user_services.allow_user_to_review_voiceover_in_language(
             self.voice_artist_id, 'hi')
@@ -2297,10 +2367,75 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
 
-        all_reviewers = user_services.get_all_contribution_reviewers()
+        all_reviewers = user_services.get_all_reviewers_contribution_rights()
         self.assertItemsEqual(
             [reviewer.id for reviewer in all_reviewers],
             [self.voice_artist_id, self.translator_id])
+
+    def test_get_reviewer_user_ids_to_notify_when_reviewers_want_notifications(
+            self):
+        # Assert that there are no reviewers at the start.
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
+        # Add a question reviewer and a translation reviewer.
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        # Ensure that these reviewers want email updates.
+        user_services.update_email_preferences(
+            self.question_reviewer_id, True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        user_services.update_email_preferences(
+            self.translator_id, True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
+
+        self.assertEqual(len(reviewer_ids_to_notify), 2)
+        self.assertIn(self.question_reviewer_id, reviewer_ids_to_notify)
+        self.assertIn(self.translator_id, reviewer_ids_to_notify)
+
+    def test_get_reviewer_user_ids_to_notify_when_reviewers_do_not_want_emails(
+            self):
+        # Assert that there are no reviewers at the start.
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
+        # Add a question reviewer and a translation reviewer.
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        # Ensure that these reviewers do not want email updates.
+        user_services.update_email_preferences(
+            self.question_reviewer_id, False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        user_services.update_email_preferences(
+            self.translator_id, False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
+
+        self.assertEqual(len(reviewer_ids_to_notify), 0)
+
+    def test_get_reviewer_user_ids_to_notify_returns_empty_for_no_reviewers(
+            self):
+        # Assert that there are no reviewers.
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
+
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
+
+        self.assertEqual(len(reviewer_ids_to_notify), 0)
 
     def test_remove_translation_review_rights_in_language(self):
         user_services.allow_user_to_review_translation_in_language(

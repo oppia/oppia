@@ -27,6 +27,8 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
+import python_utils
+
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
 
@@ -191,12 +193,15 @@ class InteractionCustomizationArgsValidationOneOffJob(
                     fail_on_validation_errors=True
                 )
             except Exception as e:
-                error_messages.append('%s: %s' % (state.interaction.id, e))
+                error_messages.append(
+                    '%s: %s'.encode(encoding='utf-8') % (
+                        state.interaction.id, e))
 
         if error_messages:
+            error_msg = (', '.join(error_messages)).encode(encoding='utf-8')
             yield (
                 'Failed customization args validation for exp '
-                'id %s' % item.id, ', '.join(error_messages))
+                'id %s' % item.id, python_utils.convert_to_bytes(error_msg))
 
     @staticmethod
     def reduce(key, values):

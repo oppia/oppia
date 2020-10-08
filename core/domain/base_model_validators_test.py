@@ -41,6 +41,22 @@ class MockBaseModelValidator(base_model_validators.BaseModelValidator):
     pass
 
 
+class MockModelValidatorWithInvalidValidationType(
+        base_model_validators.BaseModelValidator):
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, unused_item):
+        return MockModel()
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, unused_item):
+        return 'Invalid'
+
+
 class MockSummaryModelValidator(
         base_model_validators.BaseSummaryModelValidator):
 
@@ -91,27 +107,27 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
-        self.item = MockModel(id='mockmodel')
-        self.item.put()
+        self.invalid_model = MockModel(id='mockmodel')
+        self.invalid_model.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_id_relationships\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
-            MockBaseModelValidator().validate(self.item)
+            MockBaseModelValidator().validate(self.invalid_model)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_model_properties\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
-            MockSummaryModelValidator().validate(self.item)
+            MockSummaryModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
         with self.assertRaisesRegexp(
             Exception, 'External model name should be specified'):
-            MockSnapshotContentModelValidator().validate(self.item)
+            MockSnapshotContentModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
         with self.assertRaisesRegexp(
@@ -132,6 +148,16 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             with self.swap(jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
                 job_id = job_class.create_new()
                 job_class.enqueue(job_id)
+
+    def test_error_is_raised_with_invalid_validation_type_for_domain_objects(
+            self):
+        MockModelValidatorWithInvalidValidationType.validate(self.invalid_model)
+        expected_errors = {
+            'domain object check': [
+                'Entity id mockmodel: Entity fails domain validation with '
+                'the error Invalid validation type for domain object: Invalid']}
+        self.assertEqual(
+            MockModelValidatorWithInvalidValidationType.errors, expected_errors)
 
     def test_no_error_is_raised_for_base_user_model(self):
         user = MockModel(id='12345')

@@ -184,7 +184,7 @@ class BaseSuggestion(python_utils.OBJECT):
 
         if (
                 self.author_id is not None and
-                not user_services.is_user_id_correct(self.author_id)
+                not user_services.is_user_id_valid(self.author_id)
         ):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
@@ -196,7 +196,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
             if (
-                    not user_services.is_user_id_correct(
+                    not user_services.is_user_id_valid(
                         self.final_reviewer_id) and
                     self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
             ):
@@ -879,7 +879,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 conversion_fn,
                 state_uses_old_interaction_cust_args_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 37)
+                        'question_state_data_schema_version'] < 38)
             )
         )
 
@@ -1095,3 +1095,133 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
         SuggestionTranslateContent),
     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }
+
+
+class CommunityContributionStats(python_utils.OBJECT):
+    """Domain object for the CommunityContributionStatsModel.
+
+    Attributes:
+        translation_reviewer_counts_by_lang_code: dict. A dictionary where the
+            keys represent the language codes that translation suggestions are
+            offered in and the values correspond to the total number of
+            reviewers who have permission to review translation suggestions in
+            that language.
+        translation_suggestion_counts_by_lang_code: dict. A dictionary where
+            the keys represent the language codes that translation suggestions
+            are offered in and the values correspond to the total number of
+            translation suggestions that are currently in review in that
+            language.
+        question_reviewer_count: int. The total number of reviewers who have
+            permission to review question suggestions.
+        question_suggestion_count: int. The total number of question
+            suggestions that are currently in review.
+    """
+
+    def __init__(
+            self, translation_reviewer_counts_by_lang_code,
+            translation_suggestion_counts_by_lang_code,
+            question_reviewer_count, question_suggestion_count):
+        self.translation_reviewer_counts_by_lang_code = (
+            translation_reviewer_counts_by_lang_code
+        )
+        self.translation_suggestion_counts_by_lang_code = (
+            translation_suggestion_counts_by_lang_code
+        )
+        self.question_reviewer_count = question_reviewer_count
+        self.question_suggestion_count = question_suggestion_count
+
+    def validate(self):
+        """Validates the CommunityContributionStats object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                CommunityContributionStats object is invalid.
+        """
+        for language_code, reviewer_count in (
+                self.translation_reviewer_counts_by_lang_code.items()):
+            # Translation languages are a part of audio languages.
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language code for the translation reviewer '
+                    'counts: %s.' % language_code
+                )
+            if not isinstance(reviewer_count, int):
+                raise utils.ValidationError(
+                    'Expected the translation reviewer count to be '
+                    'an integer for %s language code, received: %s.' % (
+                        language_code, reviewer_count)
+                )
+            elif reviewer_count < 0:
+                raise utils.ValidationError(
+                    'Expected the translation reviewer count to be '
+                    'non-negative for %s language code, received: %s.' % (
+                        language_code, reviewer_count)
+                )
+
+        for language_code, suggestion_count in (
+                self.translation_suggestion_counts_by_lang_code.items()):
+            # Translation languages are a part of audio languages.
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language code for the translation suggestion '
+                    'counts: %s.' % language_code
+                )
+            if not isinstance(suggestion_count, int):
+                raise utils.ValidationError(
+                    'Expected the translation suggestion count to be '
+                    'an integer for %s language code, received: %s.' % (
+                        language_code, suggestion_count)
+                )
+            elif suggestion_count < 0:
+                raise utils.ValidationError(
+                    'Expected the translation suggestion count to be '
+                    'non-negative for %s language code, received: %s.' % (
+                        language_code, suggestion_count)
+                )
+
+        if not isinstance(self.question_reviewer_count, int):
+            raise utils.ValidationError(
+                'Expected the question reviewer count to be an integer, '
+                'received: %s.' % self.question_reviewer_count
+            )
+        if self.question_reviewer_count < 0:
+            raise utils.ValidationError(
+                'Expected the question reviewer count to be non-negative, '
+                'received: %s.' % (self.question_reviewer_count)
+            )
+
+        if not isinstance(self.question_suggestion_count, int):
+            raise utils.ValidationError(
+                'Expected the question suggestion count to be an integer, '
+                'received: %s.' % self.question_suggestion_count
+            )
+        if self.question_suggestion_count < 0:
+            raise utils.ValidationError(
+                'Expected the question suggestion count to be non-negative, '
+                'received: %s.' % (self.question_suggestion_count)
+            )
+
+    def set_translation_reviewer_count_for_language_code(
+            self, language_code, count):
+        """Sets the translation reviewer count to be count, for the given
+        language code.
+
+        Args:
+            language_code: str. The translation suggestion language code that
+                reviewers have the rights to review.
+            count: int. The number of reviewers that have the rights to review
+                translation suggestions in language_code.
+        """
+        self.translation_reviewer_counts_by_lang_code[language_code] = count
+
+    def set_translation_suggestion_count_for_language_code(
+            self, language_code, count):
+        """Sets the translation suggestion count to be count, for the language
+        code given.
+
+        Args:
+            language_code: str. The translation suggestion language code.
+            count: int. The number of translation suggestions in language_code
+                that are currently in review.
+        """
+        self.translation_suggestion_counts_by_lang_code[language_code] = count
