@@ -39,8 +39,72 @@ import feconf
 import python_utils
 import utils
 
-(exp_models,) = models.Registry.import_models([
-    models.NAMES.exploration])
+(
+    base_models,
+    exp_models,
+    feedback_models,
+    improvements_models,
+    skill_models,
+    stats_models,
+    story_models,
+) = models.Registry.import_models([
+    models.NAMES.base_model,
+    models.NAMES.exploration,
+    models.NAMES.feedback,
+    models.NAMES.improvements,
+    models.NAMES.skill,
+    models.NAMES.statistics,
+    models.NAMES.story,
+])
+
+
+class RegenerateStringPropertyIndexOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for regenerating the index of models changed to use an
+    indexed StringProperty.
+
+    Cloud NDB dropped support for StringProperty(indexed=False) and
+    TextProperty(indexed=True). Therefore, to prepare for the migration to Cloud
+    NDB, we need to regenerate the indexes for every model that has been changed
+    in this way.
+
+    https://cloud.google.com/appengine/docs/standard/python/datastore/indexes#unindexed-properties:
+    > changing a property from unindexed to indexed does not affect any existing
+    > entities that may have been created before the change. Queries filtering
+    > on the property will not return such existing entities, because the
+    > entities weren't written to the query's index when they were created. To
+    > make the entities accessible by future queries, you must rewrite them to
+    > Datastore so that they will be entered in the appropriate indexes. That
+    > is, you must do the following for each such existing entity:
+    > 1.  Retrieve (get) the entity from Datastore.
+    > 2.  Write (put) the entity back to Datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationModel,
+            feedback_models.GeneralFeedbackMessageModel,
+            improvements_models.TaskEntryModel,
+            skill_models.SkillModel,
+            stats_models.ExplorationAnnotationsModel,
+            story_models.StoryModel,
+            story_models.StorySummaryModel,
+        ]
+
+    @staticmethod
+    def map(model):
+        model_kind = type(model).__name__
+        if isinstance(model, base_models.VersionedModel):
+            # Change the method resolution order of model to use BaseModel's
+            # implementation of `put`.
+            model = super(base_models.VersionedModel, model)
+        model.put(update_last_updated_time=False)
+        yield (model_kind, 1)
+
+    @staticmethod
+    def reduce(key, counts):
+        yield (key, len(counts))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
