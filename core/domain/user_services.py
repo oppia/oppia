@@ -914,8 +914,7 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
         future_user_contribution_rights
         .can_review_translation_for_language_codes)
     past_languages_that_reviewer_can_review = set(
-        past_user_contribution_rights
-        .can_review_translation_for_language_codes)
+        past_user_contribution_rights.can_review_translation_for_language_codes)
 
     languages_that_reviewer_can_no_longer_review = (
         past_languages_that_reviewer_can_review.difference(

@@ -1654,6 +1654,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to the community contribution stats."""
 
     target_id = 'exp1'
+    skill_id = 'skill_123456'
     language_code = 'en'
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_EMAIL = 'reviewer@community.org'
@@ -1678,8 +1679,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'test description'
         )
 
-    def _create_question_suggestion_with_skill_id(self, skill_id):
-        """Creates a question suggestion with the given skill_id."""
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
         add_question_change_dict = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1691,14 +1692,14 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
-            'skill_id': skill_id,
+            'skill_id': self.skill_id,
             'skill_difficulty': 0.3
         }
 
         return suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
-            skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
         )
@@ -1761,74 +1762,82 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
-
-    def test_update_community_contribution_stats_updates_correctly(self):
-        self._assert_community_contribution_stats_is_in_default_state()
-        stats = suggestion_services.get_community_contribution_stats()
-        expected_question_reviewer_count = 1
-        expected_question_suggestion_count = 2
-        expected_translation_suggestion_counts_by_lang_code = {'en': 3}
-        expected_translation_reviewer_counts_by_lang_code = {'hi': 4}
-        stats.question_reviewer_count = expected_question_reviewer_count
-        stats.question_suggestion_count = expected_question_suggestion_count
-        stats.translation_suggestion_counts_by_lang_code = (
-            expected_translation_suggestion_counts_by_lang_code
-        )
-        stats.translation_reviewer_counts_by_lang_code = (
-            expected_translation_reviewer_counts_by_lang_code
-        )
-
-        suggestion_services.update_community_contribution_stats(stats)
-
-        self.assertEqual(
-            stats.question_reviewer_count, expected_question_reviewer_count
-        )
-        self.assertEqual(
-            stats.question_suggestion_count, expected_question_suggestion_count
-        )
-        self.assertDictEqual(
-            stats.translation_suggestion_counts_by_lang_code,
-            expected_translation_suggestion_counts_by_lang_code
-        )
-        self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code,
-            expected_translation_reviewer_counts_by_lang_code
-        )
+        self.save_new_skill(self.skill_id, self.author_id)
 
     def test_create_question_suggestion_increases_question_suggestion_count(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
 
-        self._create_question_suggestion_with_skill_id('skill_1')
+        self._create_question_suggestion()
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)
         self.assertDictEqual(
-            stats.translation_suggestion_counts_by_lang_code, {}
-        )
+            stats.translation_suggestion_counts_by_lang_code, {})
         self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code, {}
-        )
+            stats.translation_reviewer_counts_by_lang_code, {})
+
+    def test_create_multi_question_suggestions_increases_question_count(self):
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        self._create_question_suggestion()
+        self._create_question_suggestion()
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 2)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
 
     def test_create_translation_suggestion_increases_translation_suggestion_count(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
 
         self._create_translation_suggestion_with_language_code(
-            self.language_code
-        )
+            self.language_code)
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
             stats.translation_suggestion_counts_by_lang_code,
-            {self.language_code: 1}
-        )
+            {self.language_code: 1})
         self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code, {}
-        )
+            stats.translation_reviewer_counts_by_lang_code, {})
+
+    def test_create_translation_suggestions_diff_lang_raises_translation_count(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('en')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code,
+            {'hi': 1, 'en': 1})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
+
+    def test_create_translation_suggestions_eq_lang_increases_translation_count(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {'hi': 2})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
 
     def test_create_edit_state_content_suggestion_does_not_change_the_counts(
             self):
@@ -1841,47 +1850,58 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def test_accept_question_suggestion_decreases_question_suggestion_count(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
-        question_suggestion = self._create_question_suggestion_with_skill_id(
-            'skill_123456'
-        )
-        stats = stats = suggestion_services.get_community_contribution_stats()
+        question_suggestion = self._create_question_suggestion()
+        stats = suggestion_services.get_community_contribution_stats()
+        # Assert that the question suggestion count increased.
+        self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
 
         suggestion_services.accept_suggestion(
             question_suggestion.suggestion_id, self.reviewer_id,
-            self.COMMIT_MESSAGE, 'review message'
-        )
+            self.COMMIT_MESSAGE, 'review message')
 
         self._assert_community_contribution_stats_is_in_default_state()
 
     def test_reject_question_suggestion_decreases_question_suggestion_count(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
-        question_suggestion = self._create_question_suggestion_with_skill_id(
-            'skill_1'
-        )
+        question_suggestion = self._create_question_suggestion()
         stats = stats = suggestion_services.get_community_contribution_stats()
+        # Assert that the question suggestion count increased.
+        self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
 
         suggestion_services.reject_suggestion(
             question_suggestion.suggestion_id, self.reviewer_id,
-            'review message'
-        )
+            'review message')
 
         self._assert_community_contribution_stats_is_in_default_state()
 
     def test_resubmit_question_suggestion_increases_question_suggestion_count(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
-        question_suggestion = self._create_question_suggestion_with_skill_id(
-            'skill_1'
-        )
+        question_suggestion = self._create_question_suggestion()
         stats = stats = suggestion_services.get_community_contribution_stats()
+        # Assert that the question suggestion count increased.
+        self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
         suggestion_services.reject_suggestion(
             question_suggestion.suggestion_id, self.reviewer_id,
-            'review message'
-        )
+            'review message')
+        # Assert that the question suggestion decreased because the suggestion
+        # was rejected.
         self._assert_community_contribution_stats_is_in_default_state()
         # Change the question_dict of the question suggestion that got rejected
         # so we can resubmit the suggestion for review.
@@ -1898,8 +1918,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 1)
         self.assertDictEqual(
-            stats.translation_suggestion_counts_by_lang_code, {}
-        )
+            stats.translation_suggestion_counts_by_lang_code, {})
         self.assertDictEqual(
             stats.translation_reviewer_counts_by_lang_code, {}
         )
@@ -1909,18 +1928,20 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self._assert_community_contribution_stats_is_in_default_state()
         translation_suggestion = (
             self._create_translation_suggestion_with_language_code(
-                self.language_code)
-        )
+                self.language_code))
+        # Assert that the translation suggestion count increased.
         stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
             stats.translation_suggestion_counts_by_lang_code,
-            {self.language_code: 1}
-        )
+            {self.language_code: 1})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
 
         suggestion_services.accept_suggestion(
             translation_suggestion.suggestion_id, self.reviewer_id,
-            self.COMMIT_MESSAGE, 'review message'
-        )
+            self.COMMIT_MESSAGE, 'review message')
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
@@ -1938,26 +1959,27 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self._assert_community_contribution_stats_is_in_default_state()
         translation_suggestion = (
             self._create_translation_suggestion_with_language_code(
-                self.language_code)
-        )
-        stats = stats = suggestion_services.get_community_contribution_stats()
+                self.language_code))
+        # Assert that the translation suggestion count increased.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
             stats.translation_suggestion_counts_by_lang_code,
-            {self.language_code: 1}
-        )
+            {self.language_code: 1})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
 
         suggestion_services.reject_suggestion(
             translation_suggestion.suggestion_id, self.reviewer_id,
-            'review message'
-        )
+            'review message')
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
             stats.translation_suggestion_counts_by_lang_code,
-            {self.language_code: 0}
-        )
+            {self.language_code: 0})
         self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code, {}
-        )
+            stats.translation_reviewer_counts_by_lang_code, {})
+
