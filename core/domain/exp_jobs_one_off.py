@@ -733,6 +733,9 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
+        if item.deleted:
+            return
+
         for version in python_utils.RANGE(1, item.version + 1):
             commit_log_model = (
                 exp_models.ExplorationCommitLogEntryModel.get_by_id(
@@ -764,6 +767,9 @@ class ExpCommitLogModelRegenerationValidator(
 
     @staticmethod
     def map(item):
+        if item.deleted:
+            return
+
         for version in python_utils.RANGE(1, item.version + 1):
             commit_log_model = (
                 exp_models.ExplorationCommitLogEntryModel.get_by_id(

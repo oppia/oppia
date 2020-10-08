@@ -2712,6 +2712,17 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
             .RegenerateMissingExpCommitLogModels.get_output(job_id))
         self.assertEqual(output, [])
 
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-1'))
+        commit_log_model.delete()
+        exp_services.delete_exploration(self.user_id, '0')
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.RegenerateMissingExpCommitLogModels,
+            exp_id='0')
+
     def test_migration_job_regenerates_missing_model_with_only_one_rights_model(
             self):
         # Commit log v2 will be created.
@@ -2928,6 +2939,17 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             exp_jobs_one_off
             .ExpCommitLogModelRegenerationValidator.get_output(job_id))
         self.assertEqual(output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-1'))
+        commit_log_model.delete()
+        exp_services.delete_exploration(self.user_id, '0')
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
+            exp_id='0')
 
     def test_validation_job_skips_check_for_deleted_commit_log_model(self):
         commit_log_model = (
