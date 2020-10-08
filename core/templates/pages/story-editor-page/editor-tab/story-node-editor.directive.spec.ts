@@ -16,17 +16,13 @@
  * @fileoverview Unit tests for the story node editor directive.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Story node editor directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
+
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
