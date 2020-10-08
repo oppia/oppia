@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-import { ParamType } from 'domain/exploration/ParamType.model';
+import { ParamType, ParamTypeRegistry } from 'domain/exploration/ParamType.model';
 
 export interface ParamSpecBackendDict {
   'obj_type': string;
@@ -53,12 +53,12 @@ export class ParamSpec {
    */
   static createFromBackendDict(
       paramSpecBackendDict: ParamSpecBackendDict): ParamSpec {
-    return new ParamSpec(ParamType.getTypeFromBackendName(
+    return new ParamSpec(ParamTypeRegistry.getTypeFromBackendName(
       paramSpecBackendDict.obj_type));
   }
 
   /** @returns {ParamSpec} - A default instance for ParamSpec. */
   static createDefault(): ParamSpec {
-    return new ParamSpec(ParamType.getDefaultType());
+    return new ParamSpec(ParamTypeRegistry.getDefaultType());
   }
 }

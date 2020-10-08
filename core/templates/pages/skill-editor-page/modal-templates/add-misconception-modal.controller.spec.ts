@@ -102,7 +102,7 @@ describe('Add Misconception Modal Controller', function() {
   it('should save misconception when closing the modal', function() {
     $scope.saveMisconception();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
-      misconception: Misconception.create('3', '', '', '', true)
+      misconception: Misconception.create(3, '', '', '', true)
     });
   });
 });

@@ -16,26 +16,29 @@
  * @fileoverview Tests for ParamType model.
  */
 
-import { ParamType } from 'domain/exploration/ParamType.model';
+import { ParamType, ParamTypeRegistry } from 'domain/exploration/ParamType.model';
 
 describe('ParamType objects', () => {
   it('should have its registry frozen', () => {
-    expect(Object.isFrozen(ParamType.registry)).toBe(true);
+    expect(Object.isFrozen(ParamTypeRegistry.registry)).toBe(true);
   });
 
   it('should use UnicodeString as default type', () => {
-    expect(ParamType.getDefaultType()).toBe(ParamType.registry.UnicodeString);
+    expect(ParamTypeRegistry.getDefaultType()).toBe(
+      ParamTypeRegistry.registry.UnicodeString);
   });
 
   it('should return correct values for existing types', () => {
-    Object.entries(ParamType.registry).forEach(([backendName, value]) => {
-      expect(ParamType.getTypeFromBackendName(backendName)).toEqual(value);
-    });
+    Object.entries(ParamTypeRegistry.registry).forEach(
+      ([backendName, value]) => {
+        expect(
+          ParamTypeRegistry.getTypeFromBackendName(backendName)).toEqual(value);
+      });
   });
 
   it('should throw for non-existant types', () => {
     expect(() => {
-      ParamType.getTypeFromBackendName('MissingType');
+      ParamTypeRegistry.getTypeFromBackendName('MissingType');
     })
       .toThrowError(/not a registered parameter type/);
   });
@@ -56,7 +59,7 @@ describe('ParamType objects', () => {
     let UnicodeString: ParamType = null;
 
     beforeEach(() => {
-      UnicodeString = ParamType.registry.UnicodeString;
+      UnicodeString = ParamTypeRegistry.registry.UnicodeString;
     });
 
     it('should be frozen', () => {

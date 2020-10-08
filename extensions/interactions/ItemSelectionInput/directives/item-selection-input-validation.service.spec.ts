@@ -78,7 +78,7 @@ describe('ItemSelectionInputValidationService', () => {
         value: 1
       }
     };
-    goodAnswerGroups = [agof.createNew(
+    goodAnswerGroups = [AnswerGroup   .createNew(
       [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {

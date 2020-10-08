@@ -23,7 +23,6 @@ import { State } from 'domain/state/State.model';
 import { States } from 'domain/exploration/States.model';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 import { Voiceover } from 'domain/exploration/Voiceover.model';
-import { null } from 'mathjs';
 
 const constants = require('constants.ts');
 

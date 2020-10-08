@@ -37,7 +37,8 @@ export class ParamType {
    * Defines a specific type that a parameter can take.
    *
    * IMPORTANT: All new types must be created in this file and registered in the
-   * {@link ParamType.registry}. See {@link ParamType.registry.UnicodeString}
+   * {@link ParamTypeRegistry.registry}.
+   * See {@link ParamTypeRegistry.registry.UnicodeString}
    * for an example.
    *
    * @param {Function.<?, Boolean>} validateFunction - Returns true when a value
@@ -58,20 +59,6 @@ export class ParamType {
     this.valueIsValid = typeDefinitionObject.validate;
     /** @member {Object} */
     this.defaultValue = typeDefinitionObject.default_value;
-
-    // To finalize type registration, we encode the name of each type into their
-    // definition, then freeze them from modifications.
-    Object.keys(ParamType.registry).forEach((paramTypeName: string) => {
-      // The bracket notation is needed since 'paramTypeName' is a dynamic
-      // property and is not defined on 'registry'.
-      /* eslint-disable-next-line dot-notation */
-      var paramType = ParamType.registry[paramTypeName];
-      paramType._name = paramTypeName;
-      Object.freeze(paramType);
-    });
-
-    // Finally, we freeze the registry itself.
-    Object.freeze(ParamType.registry);
   }
 
   /** @returns {Object} - A valid default value for this particular type. */
@@ -83,7 +70,27 @@ export class ParamType {
   getName(): string {
     return this._name;
   }
+}
 
+export class ParamTypeRegistry {
+  static _freezeRegistry(): void {
+    if (!Object.isFrozen(this.registry)) {
+      // To finalize type registration, we encode the name of each type into
+      // their definition, then freeze them from modifications.
+      Object.keys(ParamTypeRegistry.registry).forEach(
+        (paramTypeName: string) => {
+          // The bracket notation is needed since 'paramTypeName' is a dynamic
+          // property and is not defined on 'registry'.
+          /* eslint-disable-next-line dot-notation */
+          var paramType = ParamTypeRegistry.registry[paramTypeName];
+          paramType._name = paramTypeName;
+          Object.freeze(paramType);
+        });
+
+      // Finally, we freeze the registry itself.
+      Object.freeze(ParamTypeRegistry.registry);
+    }
+  }
   // Type registration.
 
   /** @type {Object.<String, ParamType>} */
@@ -113,3 +120,5 @@ export class ParamType {
     return this.registry[backendName];
   }
 }
+
+$(() => ParamTypeRegistry._freezeRegistry());

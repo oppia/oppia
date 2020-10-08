@@ -22,7 +22,7 @@ import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model'
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
 import { Topic } from 'domain/topic/Topic.model';
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -107,12 +107,7 @@ describe('Topic update service', function() {
   };
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {
     TopicUpdateService = $injector.get('TopicUpdateService');

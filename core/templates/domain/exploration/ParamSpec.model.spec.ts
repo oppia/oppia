@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for ParamSpec model.
  */
 import { ParamSpec } from 'domain/exploration/ParamSpec.model';
-import { ParamType } from 'domain/exploration/ParamType.model';
+import { ParamTypeRegistry } from 'domain/exploration/ParamType.model';
 
-describe('Param Spec Object Factory', () => {
+describe('Param Spec Model', () => {
   let paramType;
 
   beforeEach(() => {
-    paramType = ParamType.getDefaultType();
+    paramType = ParamTypeRegistry.getDefaultType();
   });
 
   it('should create a param spec object from backend dict', () => {
@@ -36,8 +36,8 @@ describe('Param Spec Object Factory', () => {
     });
   });
 
-  it('should create a param spec objec from a non default type', () => {
-    const paramType = ParamType.getTypeFromBackendName('UnicodeString');
+  it('should create a param spec object from a non default type', () => {
+    const paramType = ParamTypeRegistry.getTypeFromBackendName('UnicodeString');
     const paramSpecObject = ParamSpec.createFromBackendDict({
       obj_type: 'UnicodeString'
     });

@@ -182,7 +182,7 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionData);
 
     var updatedDefaultOutcome = Outcome.createNew(
-      'Hola', 'new_id', 'This is a new feedback text', null);
+      'Hola', 'new_id', 'This is a new feedback text', []);
     var callbackSpy = jasmine.createSpy('callback');
     ResponsesService.updateDefaultOutcome(updatedDefaultOutcome, callbackSpy);
 

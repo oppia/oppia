@@ -115,8 +115,8 @@ export class Solution {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
       answer: (
-        OppiaAngularRootComponent.explorationHtmlFormatterService
-          .getShortAnswerHtml(
+        OppiaAngularRootComponent.explorationHtmlFormatterService.
+          getShortAnswerHtml(
             this.correctAnswer, interaction.id,
             interaction.customizationArgs))};
   }
