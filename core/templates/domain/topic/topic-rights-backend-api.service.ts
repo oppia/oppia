@@ -25,13 +25,13 @@ import cloneDeep from 'lodash/cloneDeep';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 import { TopicDomainConstants } from
-  'domain/topic/topic-domain.constants.ajs.ts'
+  'domain/topic/topic-domain.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopicRightsBackendApiService {
-	constructor(
+  constructor(
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
 
@@ -39,87 +39,87 @@ export class TopicRightsBackendApiService {
     private _topicRightsCache = {};
 
     private _fetchTopicRights(
-    	topicId: string,
-    	successCallback: (value?: Object | PromiseLike<Object>) => void,
-    	errorCallback: (reason?: string) => void): void {
-    	var topicRightsUrl = this.urlInterpolation.interpolateUrl(
-    		TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
-    			topic_id: topicId
-    		});
+        topicId: string,
+        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        errorCallback: (reason?: string) => void): void {
+      var topicRightsUrl = this.urlInterpolation.interpolateUrl(
+        TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
+          topic_id: topicId
+        });
 
-    	this.http.get(topicRightsUrl).toPromise().then(response => {
-    		if (successCallback) {
-    			successCallback(response);
-    		}
-    	}, errorResponse => {
-    		if (errorCallback) {
-    			errorCallback(errorResponse.error.error);
-    		}
-    	});
+      this.http.get(topicRightsUrl).toPromise().then(response => {
+        if (successCallback) {
+          successCallback(response);
+        }
+      }, errorResponse => {
+        if (errorCallback) {
+          errorCallback(errorResponse.error.error);
+        }
+      });
     }
 
     private _setTopicStatus(
-    	topicId: string,
-    	publishStatus: boolean,
-    	successCallback: (value?: Object | PromiseLike<Object>) => void,
-    	errorCallback: (reason?: string) => void): void {
-    	var changeTopicStatusUrl = this.urlInterpolation.interpolateUrl(
-    		'/rightshandler/change_topic_status/<topic_id>', {
-    			topic_id: topicId
-    		});
+        topicId: string,
+        publishStatus: boolean,
+        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        errorCallback: (reason?: string) => void): void {
+      var changeTopicStatusUrl = this.urlInterpolation.interpolateUrl(
+        '/rightshandler/change_topic_status/<topic_id>', {
+          topic_id: topicId
+        });
 
-    	var putParams = {
-    		publish_status: publishStatus
-    	};
+      var putParams = {
+        publish_status: publishStatus
+      };
 
-    	this.http.put(changeTopicStatusUrl, putParams).toPromise()
-    	  .then(response => {
-    	  	if (successCallback) {
-    	  		successCallback(response);
-    	  	}
-    	  }, errorResponse => {
-    	  	if (errorCallback) {
-    	  		errorCallback(errorResponse.error.error);
-    	  	}
-    	  });
-    	}
+      this.http.put(changeTopicStatusUrl, putParams).toPromise()
+        .then(response => {
+          if (successCallback) {
+            successCallback(response);
+          }
+        }, errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        });
+    }
 
     private _sendMail(
-    	topicId: string,
-    	topicName: string,
-    	successCallback: (value?: Object | PromiseLike<Object>) => void,
-    	errorCallback: (reason?: string) => void): void {
-    	var sendMailUrl = this.urlInterpolation.interpolateUrl(
-    		'/rightshandler/send_topic_publish_mail/<topic_id>', {
-    			topic_id: topicId
-    		});
+        topicId: string,
+        topicName: string,
+        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        errorCallback: (reason?: string) => void): void {
+      var sendMailUrl = this.urlInterpolation.interpolateUrl(
+        '/rightshandler/send_topic_publish_mail/<topic_id>', {
+          topic_id: topicId
+        });
 
-    	var putParams = {
-    		topic_name: topicName
-    	};
+      var putParams = {
+        topic_name: topicName
+      };
 
-    	this.http.put(sendMailUrl, putParams).toPromise().then(response => {
-    		if (successCallback) {
-    			successCallback(response);
-    		}
-    	}, errorResponse => {
-    		if (errorCallback) {
-    			errorCallback(errorResponse.error.error);
-    		}
-    	});
+      this.http.put(sendMailUrl, putParams).toPromise().then(response => {
+        if (successCallback) {
+          successCallback(response);
+        }
+      }, errorResponse => {
+        if (errorCallback) {
+          errorCallback(errorResponse.error.error);
+        }
+      });
     }
 
     private _isCached(topicId: string) : boolean {
-    	return this._topicRightsCache.hasOwnProperty(topicId);
+      return this._topicRightsCache.hasOwnProperty(topicId);
     }
 
     /**
      * Gets a topic's rights, given its ID.
      */
     fetchTopicRights(topicId: string) {
-    	return new Promise((resolve, reject) => {
-    		this._fetchTopicRights(topicId, resolve, reject);
-    	});
+      return new Promise((resolve, reject) => {
+        this._fetchTopicRights(topicId, resolve, reject);
+      });
     }
 
     /**
@@ -132,20 +132,20 @@ export class TopicRightsBackendApiService {
      * requests from the backend in further function calls.
      */
     loadTopicRights(topicId: string) {
-    	return new Promise((resolve, reject) => {
-    		if (this._isCached(topicId)) {
-    			if (resolve) {
-    				resolve(this._topicRightsCache[topicId]);
-    			}
-    		} else {
-    			this._fetchTopicRights(topicId, (topicRights) => {
-    				this._topicRightsCache[topicId] = topicRights;
-    				if (resolve) {
-    					resolve(this._topicRightsCache[topicId]);
-    				}
-    			}, reject);
-    		}
-    	});
+      return new Promise((resolve, reject) => {
+        if (this._isCached(topicId)) {
+          if (resolve) {
+            resolve(this._topicRightsCache[topicId]);
+          }
+        } else {
+          this._fetchTopicRights(topicId, (topicRights) => {
+            this._topicRightsCache[topicId] = topicRights;
+            if (resolve) {
+              resolve(this._topicRightsCache[topicId]);
+            }
+          }, reject);
+        }
+      });
     }
 
     /**
@@ -154,7 +154,7 @@ export class TopicRightsBackendApiService {
      * upon a laod.
      */
     isCached(topicId: string) : boolean {
-    	return this._isCached(topicId);
+      return this._isCached(topicId);
     }
 
     /**
@@ -162,33 +162,33 @@ export class TopicRightsBackendApiService {
      * specified topic ID with a new topic rights object.
      */
     cacheTopicRights(topicId: string, topicRights: any) {
-    	this._topicRightsCache[topicId] = cloneDeep(topicRights);
+      this._topicRightsCache[topicId] = cloneDeep(topicRights);
     }
 
     /**
      * Publishes a topic.
      */
     publishTopic(topicId: string) {
-    	return new Promise((resolve, reject) => {
-    		this._setTopicStatus(topicId, true, resolve, reject);
-    	});
+      return new Promise((resolve, reject) => {
+        this._setTopicStatus(topicId, true, resolve, reject);
+      });
     }
 
     sendMail(topicId: string, topicName: string) {
-    	return new Promise((resolve, reject) => {
-    		this._sendMail(topicId, topicName, resolve, reject);
-    	});
+      return new Promise((resolve, reject) => {
+        this._sendMail(topicId, topicName, resolve, reject);
+      });
     }
 
     /**
      * Unpublishes a topic.
      */
     unpublishTopic(topicId: string) {
-    	return new Promise((resolve, reject) => {
-    		this._setTopicStatus(topicId, false, resolve, reject);
-    	});
+      return new Promise((resolve, reject) => {
+        this._setTopicStatus(topicId, false, resolve, reject);
+      });
     }
-  }
+}
 
 angular.module('oppia').factory(
   'TopicRightsBackendApiService',

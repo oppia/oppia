@@ -25,13 +25,11 @@ import { SolutionValidityService } from
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 // ^^^ This block is to be removed.
 
-require('domain/question/QuestionObjectFactory.ts');
-require('services/question-validation.service.ts');
-
 import { QuestionObjectFactory } from
-  'domain/question/QuestionObjectFactory.ts'
+  'domain/question/QuestionObjectFactory.ts';
 import { QuestionValidationService } from
   'services/question-validation.service.ts';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 fdescribe('Question Validation Service', () => {
   let questionValidationService: QuestionValidationService = null;
@@ -42,16 +40,12 @@ fdescribe('Question Validation Service', () => {
   let mockQuestionDict = null;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [QuestionValidationService]
-    });
-
     questionValidationService = TestBed.get(QuestionValidationService);
     questionObjectFactory = TestBed.get(QuestionObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
 
-    mockMisconceptionObject = {
+    mockQuestionDict = {
       id: 'question_1',
       question_state_data: {
         content: {
@@ -164,25 +158,28 @@ fdescribe('Question Validation Service', () => {
           '2', 'misc2', 'notes2', 'feedback1', false)
       ]
     };
-  })
+  });
 
   it('should return false if question validation fails', fakeAsync(() => {
+    console.log("in test");
+    console.log(mockQuestionDict);
     var interaction = mockQuestionDict.question_state_data.interaction;
     interaction.answer_groups[0].outcome.labelled_as_correct = false;
     expect(
       questionValidationService.isQuestionValid(
         questionObjectFactory.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject)).toBeFalse();
-  });
+  }));
 
-  it('should return false if misconceptions are not addressed', fakeAsync(() => {
-    var interaction = mockQuestionDict.question_state_data.interaction;
-    interaction.answer_groups[1].tagged_skill_misconception_id = null;
-    expect(
-      questionValidationService.isQuestionValid(
-        questionObjectFactory.createFromBackendDict(mockQuestionDict),
-        mockMisconceptionObject)).toBeFalse();
-  });
+  it('should return false if misconceptions are not addressed', 
+    fakeAsync(() => {
+      var interaction = mockQuestionDict.question_state_data.interaction;
+      interaction.answer_groups[1].tagged_skill_misconception_id = null;
+      expect(
+        questionValidationService.isQuestionValid(
+          questionObjectFactory.createFromBackendDict(mockQuestionDict),
+          mockMisconceptionObject)).toBeFalse();
+  }));
 
   it('should return false if solution is invalid', fakeAsync(() => {
     stateEditorService.isCurrentSolutionValid.and.returnValue(false);
@@ -190,12 +187,12 @@ fdescribe('Question Validation Service', () => {
       questionValidationService.isQuestionValid(
         questionObjectFactory.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject)).toBeFalse();
-  });
+  }));
 
   it('should return true if validation is successful', fakeAsync(() => {
     var question = questionObjectFactory.createFromBackendDict(
       mockQuestionDict);
     expect(questionValidationService.isQuestionValid(
       question, mockMisconceptionObject)).toBeTrue();
-  });
+  }));
 });

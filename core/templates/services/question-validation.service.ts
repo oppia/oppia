@@ -16,10 +16,10 @@
  * @fileoverview Service to validate a question.
  *
  */
-
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { StateEditorService } from  
+  'components/state-editor/state-editor-properties-services/state-editor.service.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class QuestionValidationService {
       question.getValidationErrorMessage() ||
       question.getUnaddressedMisconceptionNames(
         misconceptionsBySkill).length > 0 ||
-      !this.stateEditorService.isCurrentSolutionValid());)
+      !this.stateEditorService.isCurrentSolutionValid());
   }
 }
 

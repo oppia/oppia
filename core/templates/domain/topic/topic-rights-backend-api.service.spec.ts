@@ -17,16 +17,11 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
-   '@angular/common/http/testing';
+  '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { TopicRightsBackendApiService } from
   'domain/topic/topic-rights-backend-api.service';
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
@@ -35,6 +30,7 @@ fdescribe('Topic rights backend API service', () => {
   let topicRightsBackendApiService: TopicRightsBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let topicId = '0';
+  let topicName = '';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -65,7 +61,7 @@ fdescribe('Topic rights backend API service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should not fetch a topic rights', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -76,13 +72,15 @@ fdescribe('Topic rights backend API service', () => {
     var req = httpTestingController.expectOne(
       '/rightshandler/get_topic_rights/' + topicId);
     expect(req.request.method).toEqual('GET');
-    req.flush(404);
+    req.flush(404, {
+        status: 404, statusText: ''
+      });
 
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
-  });
+  }));
 
   it('should successfully publish and unpublish a topic', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -111,7 +109,7 @@ fdescribe('Topic rights backend API service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should call the provided fail handler on HTTP failure', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -122,41 +120,44 @@ fdescribe('Topic rights backend API service', () => {
     var req = httpTestingController.expectOne(
       '/rightshandler/change_topic_status/0');
     expect(req.request.method).toEqual('PUT');
-    req.flush(404, 'Topic doesn\'t not exist.');
+    req.flush('Topic does not exist.', {
+        status: 404, statusText: 'Topic does not exist.'
+      });
 
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
-  });
+  }));
 
-  it('should report an uncached topic rights after caching it', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it('should report an uncached topic rights after caching it', 
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    // The topic should not currently be cached.
-    expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
+      // The topic should not currently be cached.
+      expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
 
-    // A new topic should be fetched from the backend. Also,
-    // the returned topic should match the expected topic object.
-    topicRightsBackendApiService.loadTopicRights(topicId).then(
-      successHandler, failHandler);
-    var req = httpTestingController.expectOne(
-      '/rightshandler/get_topic_rights/0');
-    expect(req.request.method).toEqual('GET');
-    req.flush(200, {
-      topic_id: 0,
-      topic_is_published: true,
-      manager_ids: ['user_id']
-    });
+      // A new topic should be fetched from the backend. Also,
+      // the returned topic should match the expected topic object.
+      topicRightsBackendApiService.loadTopicRights(topicId).then(
+        successHandler, failHandler);
+      var req = httpTestingController.expectOne(
+        '/rightshandler/get_topic_rights/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        topic_id: 0,
+        topic_is_published: true,
+        manager_ids: ['user_id']
+      });
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-    // It should now be cached.
-    expect(TopicRightsBackendApiService.isCached(topicId)).toBe(true);
-  });
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+      // It should now be cached.
+      expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
+  }));
 
   it('should report a cached topic rights after caching it', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -186,13 +187,13 @@ fdescribe('Topic rights backend API service', () => {
       manager_ids: ['user_id']
     });
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should send a topic rights mail', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    topicRightsBackendApiService.sendMail(topicId).then(
+    topicRightsBackendApiService.sendMail(topicId, topicName).then(
       successHandler, failHandler);
     var req = httpTestingController.expectOne(
       '/rightshandler/send_topic_publish_mail/' + topicId);
@@ -203,23 +204,24 @@ fdescribe('Topic rights backend API service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should handler error on sending topic rights mail', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    topicRightsBackendApiService.sendMail(topicId).then(
+    topicRightsBackendApiService.sendMail(topicId, topicName).then(
       successHandler, failHandler);
     var req = httpTestingController.expectOne(
       '/rightshandler/send_topic_publish_mail/' + topicId);
     expect(req.request.method).toEqual('PUT');
-    req.flush(404);
+    req.flush(404, {
+        status: 404, statusText: ''
+      });
 
     flushMicrotasks();
 
-
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
-  });
+  }));
 });
