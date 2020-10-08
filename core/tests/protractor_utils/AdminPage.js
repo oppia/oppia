@@ -142,9 +142,11 @@ var AdminPage = function() {
 
   var saveConfigProperty = async function(
     configProperty, propertyName, objectType, editingInstructions) {
-      var title = await waitFor.visibilityOf(
+      await waitFor.visibilityOf(
         configProperty.element(
-          by.css('.protractor-test-config-title')).getText());
+          by.css('.protractor-test-config-title')));
+      var title = await configProperty.element(
+        by.css('.protractor-test-config-title')).getText();
       if (title.match(propertyName)) {
         await editingInstructions(
           await forms.getEditor(objectType)(configProperty));
