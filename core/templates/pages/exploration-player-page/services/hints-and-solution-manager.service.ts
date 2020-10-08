@@ -16,9 +16,9 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { EventEmitter } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
@@ -55,7 +55,7 @@ export class HintsAndSolutionManagerService {
   tooltipTimeout = null;
 
   constructor(private playerPositionService: PlayerPositionService) {
-    // TODO(#10904): Remove the subscription.
+    // TODO(#10904): Refactor to move subcriptions into components.
     playerPositionService.onNewCardAvailable.subscribe(
       () => {
         this.correctAnswerSubmitted = true;
