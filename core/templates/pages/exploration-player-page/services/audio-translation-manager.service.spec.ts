@@ -36,7 +36,7 @@ describe('Audio translation manager service', () => {
   });
 
   var testAudioTranslations: AudioTranslations;
-  var testAudioTranslations2 :AudioTranslations;
+  var testAudioTranslations2: AudioTranslations;
   beforeEach(() => {
     testAudioTranslations = {
       en: vof.createFromBackendDict({
