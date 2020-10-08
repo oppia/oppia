@@ -33,11 +33,10 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif', '*.png',
     '*.webp', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
-    'assets/scripts/*', 'core/domain/proto/*.py', 'core/tests/data/*',
-    'core/tests/build_sources/*', '*.mp3', '*.mp4', 'node_modules/*',
-    'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
-    'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
-    'scripts/linters/test_files/*',
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
+    'webpack_bundles/*', 'core/tests/services_sources/*',
+    'core/tests/release_sources/tmp_unzip.zip', 'scripts/linters/test_files/*',
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
@@ -269,6 +268,25 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/pages/library-page/search-bar/'
             'search-bar.component.spec.ts'),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'import \{.*\} from \'lodash\''),
+        'message': (
+            'Please do not use "import { someFunction } from \'lodash\'". '
+            'Use "import someFunction from \'lodash/someFunction\'" instead.'),
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r':\n? *HttpClient'),
+        'message': (
+            'An instance of HttpClient is found in this file. You are not '
+            'allowed to create http requests from files that are not backend '
+            'api services.'),
+        'excluded_files': (
+            'backend-api.service.ts',
+            'core/templates/services/request-interceptor.service.spec.ts',),
+        'excluded_dirs': ()
     }
 ]
 
@@ -351,6 +369,18 @@ BAD_PATTERNS_PYTHON_REGEXP = [
                    'datetime.datetime.now().',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'ndb\.'),
+        'message': (
+            'Please use datastore_services instead of ndb, for example:\n'
+            '\n'
+            'datastore_services = models.Registry.import_datastore_services()\n'
+            '\n'
+            'class SampleModel(datastore_services.Model):\n'
+            '    ...\n'),
+        'excluded_files': (),
+        'excluded_dirs': ('core/platform',),
     },
     {
         'regexp': re.compile(r'\Wprint\('),

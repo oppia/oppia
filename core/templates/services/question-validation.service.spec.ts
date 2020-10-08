@@ -152,7 +152,8 @@ fdescribe('Question Validation Service', () => {
       },
       language_code: 'en',
       version: 1,
-      linked_skill_ids: ['abc']
+      linked_skill_ids: ['abc'],
+      inapplicable_skill_misconception_ids: ['abc-2']
     };
 
     mockMisconceptionObject = {

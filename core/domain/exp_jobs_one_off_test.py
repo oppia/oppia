@@ -30,8 +30,10 @@ from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import image_validation_services
 from core.domain import rights_manager
 from core.domain import state_domain
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -39,14 +41,15 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
+(
+    job_models, exp_models, base_models, classifier_models, improvements_models,
+) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
+    models.NAMES.classifier, models.NAMES.improvements
+])
 
-(job_models, exp_models, base_models, classifier_models) = (
-    models.Registry.import_models([
-        models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
-        models.NAMES.classifier]))
+datastore_services = models.Registry.import_datastore_services()
 search_services = models.Registry.import_search_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 # This mock should be used only in ExplorationContentValidationJobForCKEditor
@@ -78,10 +81,10 @@ def run_job_for_deleted_exp(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     job_class.enqueue(job_id)
     self.assertEqual(
-        self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
+        self.count_jobs_in_mapreduce_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+    self.process_and_flush_pending_mapreduce_tasks()
     self.process_and_flush_pending_tasks()
-
     if check_error:
         with self.assertRaisesRegexp(error_type, error_msg):
             function_to_be_called(exp_id)
@@ -118,7 +121,7 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         # Test to see whether first_published_msec was correctly updated.
@@ -133,7 +136,7 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Test to see whether first_published_msec remains the same despite the
         # republication.
@@ -176,7 +179,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_validation_errors_are_not_raised_for_valid_exploration(self):
         """Checks validation errors are not raised for a valid exploration."""
@@ -204,7 +207,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         # Start ExplorationValidityJobManager job on unpublished exploration.
         job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExplorationValidityJobManager.get_output(
@@ -219,7 +222,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         # Start ExplorationValidityJobManager job on published exploration.
         job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExplorationValidityJobManager.get_output(
@@ -238,7 +241,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         # Start ExplorationValidityJobManager job on unpublished exploration.
         job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExplorationValidityJobManager.get_output(
@@ -253,7 +256,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         # Start ExplorationValidityJobManager job on published exploration.
         job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExplorationValidityJobManager.get_output(
@@ -274,7 +277,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         # Start ExplorationValidityJobManager job on published exploration.
         job_id = exp_jobs_one_off.ExplorationValidityJobManager.create_new()
         exp_jobs_one_off.ExplorationValidityJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -322,7 +325,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def create_exploration_with_states_schema_version(
             self, states_schema_version, exp_id, user_id, states_dict):
@@ -394,7 +397,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(
+        exp_services.regenerate_exploration_summary(
             self.NEW_EXP_ID, None)
 
         # Delete the exploration before migration occurs.
@@ -411,7 +414,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         # This running without errors indicates the deleted exploration is
         # being ignored, since otherwise exp_fetchers.get_exploration_by_id
         # (used within the job) will raise an error.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -426,7 +429,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
         exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(job_id))
 
@@ -511,7 +514,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         with swap_states_schema_version, swap_exp_schema_version:
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             actual_output = (
                 exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(
@@ -610,7 +613,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         ):
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             actual_output = (
                 exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(
@@ -639,7 +642,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_exp(self):
         """Tests that the exploration migration job does not convert an
@@ -661,7 +664,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the exploration is exactly the same after migration.
         updated_exp = exp_fetchers.get_exploration_by_id(self.VALID_EXP_ID)
@@ -682,7 +685,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the new exploration has been migrated by the job.
         updated_exp = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -703,7 +706,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(
+        exp_services.regenerate_exploration_summary(
             self.NEW_EXP_ID, None)
 
         # Delete the exploration before migration occurs.
@@ -720,7 +723,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         # This running without errors indicates the deleted exploration is
         # being ignored, since otherwise exp_fetchers.get_exploration_by_id
         # (used within the job) will raise an error.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -738,7 +741,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id))
@@ -760,9 +763,9 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow(), {}, initial_state_name,
             feconf.TRAINING_JOB_STATUS_COMPLETE, 1)
         # Store training job model for the classifier model.
-        classifier_models.StateTrainingJobsMappingModel.create(
+        classifier_models.TrainingJobExplorationMappingModel.create(
             self.NEW_EXP_ID, exploration.version, initial_state_name,
-            {'TextClassifier': classifier_model_id})
+            classifier_model_id)
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
@@ -770,17 +773,16 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    self.process_and_flush_pending_tasks()
+                    self.process_and_flush_pending_mapreduce_tasks()
 
         new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         initial_state_name = list(new_exploration.states.keys())[0]
         self.assertLess(exploration.version, new_exploration.version)
-        classifier_exp_mapping_model = classifier_models.StateTrainingJobsMappingModel.get_models( # pylint: disable=line-too-long
+        classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
             self.NEW_EXP_ID, new_exploration.version,
             [initial_state_name])[0]
         self.assertEqual(
-            classifier_exp_mapping_model.algorithm_ids_to_job_ids[
-                'TextClassifier'], classifier_model_id)
+            classifier_exp_mapping_model.job_id, classifier_model_id)
 
     def test_migration_job_fails_with_invalid_exploration(self):
         observed_log_messages = []
@@ -804,7 +806,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
         with self.swap(logging, 'error', _mock_logging_function):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             observed_log_messages,
@@ -828,7 +830,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_output_contains_only_viewable_private_explorations(self):
         """Checks that only viewable private explorations are present
@@ -842,7 +844,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         # Start ViewableExplorationsAudit job on sample exploration.
         job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(
@@ -858,7 +860,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         # Start ViewableExplorationsAudit job on sample exploration.
         job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(
@@ -871,7 +873,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         # Start ViewableExplorationsAudit job on sample exploration.
         job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(
@@ -899,7 +901,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         # Start ViewableExplorationsAudit job on sample exploration.
         job_id = exp_jobs_one_off.ViewableExplorationsAuditJob.create_new()
         exp_jobs_one_off.ViewableExplorationsAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off.ViewableExplorationsAuditJob.get_output(
@@ -941,7 +943,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_number_of_hints_tabulated_are_correct_in_single_exp(self):
         """Checks that correct number of hints are tabulated when
@@ -984,7 +986,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         # Start HintsAuditOneOff job on sample exploration.
         job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
         exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
         expected_output = [
@@ -1052,7 +1054,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         # Start HintsAuditOneOff job on sample exploration.
         job_id = exp_jobs_one_off.HintsAuditOneOffJob.create_new()
         exp_jobs_one_off.HintsAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = exp_jobs_one_off.HintsAuditOneOffJob.get_output(job_id)
 
@@ -1114,7 +1116,7 @@ class ExplorationContentValidationJobForCKEditorTests(
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_for_validation_job(self):
         """Tests that the exploration validation job validates the content
@@ -1144,7 +1146,7 @@ class ExplorationContentValidationJobForCKEditorTests(
             .ExplorationContentValidationJobForCKEditor.create_new())
         exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -1218,7 +1220,7 @@ class ExplorationContentValidationJobForCKEditorTests(
                 .ExplorationContentValidationJobForCKEditor.create_new())
             exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
                 job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -1298,7 +1300,7 @@ class ExplorationContentValidationJobForCKEditorTests(
             .ExplorationContentValidationJobForCKEditor.create_new())
         exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -1327,7 +1329,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_explorations_with_invalid_math_tags_fails_validation(self):
         """Tests for the case when there are invalid svg_filenames in the
@@ -1485,7 +1487,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             .ExplorationMathSvgFilenameValidationOneOffJob.create_new())
         exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -1605,7 +1607,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             .ExplorationMathSvgFilenameValidationOneOffJob.create_new())
         exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -1630,7 +1632,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_explorations_with_invalid_math_tags_fails_validation(self):
         """Tests for the case when there are invalid svg_filenames in the
@@ -1792,7 +1794,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             exp_jobs_one_off.
             ExplorationRteMathContentValidationOneOffJob.enqueue(
                 job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             exp_jobs_one_off
             .ExplorationRteMathContentValidationOneOffJob.get_output(
@@ -1910,7 +1912,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             exp_jobs_one_off.
             ExplorationRteMathContentValidationOneOffJob.enqueue(
                 job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -1935,7 +1937,7 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_for_customization_arg_validation_job_with_single_exp(self):
         """Check expected errors are produced for invalid html strings in RTE
@@ -2001,7 +2003,7 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
                 exp_jobs_one_off
                 .RTECustomizationArgsValidationOneOffJob.enqueue(
                     job_id))
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -2122,7 +2124,7 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
                 exp_jobs_one_off
                 .RTECustomizationArgsValidationOneOffJob.enqueue(
                     job_id))
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -2208,7 +2210,7 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             exp_jobs_one_off
             .RTECustomizationArgsValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -2222,10 +2224,344 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
 
+class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
+        test_utils.GenericTestBase):
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests,
+            self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        self.process_and_flush_pending_tasks()
+
+    def test_the_job_adds_xmlns_attribute_in_svg_images_successful(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The svg tag does not contains the \'xmlns\' attribute.'):
+            image_validation_services.validate_image_and_filename(
+                invalid_svg_string.encode(encoding='utf-8'), svg_filename)
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [
+            u'[u\'SUCCESS - CHANGED\', [u\'mathImg_12ab_height_1d2_width_2d3_'
+            u'vertical_3d2.svg\', u\'Exp Id: exp_id0\']]'])
+
+    def test_the_job_reports_validation_failure(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" role="" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Unsupported tags/attributes found in the SVG:'):
+            image_validation_services.validate_image_and_filename(
+                invalid_svg_string.encode(encoding='utf-8'), svg_filename)
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [
+            u'[u\'FAILED validation\', [u"Exploration with id exp_id0 failed '
+            'image validation for the filename '
+            'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg with following'
+            ' error: Unsupported tags/attributes found in the SVG:'
+            '\\n\\nattributes: [u\'svg:role\']"]]'])
+
+    def test_the_job_does_not_changes_a_valid_svg_image(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        old_svg_string = (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
+            'width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        image_validation_services.validate_image_and_filename(
+            old_svg_string.encode(encoding='utf-8'), svg_filename)
+
+        filepath = 'image/%s' % svg_filename
+        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [u'[u\'UNCHANGED\', 1]'])
+
+        new_svg_string = fs.get(filepath)
+
+        self.assertEqual(
+            old_svg_string.encode(encoding='utf-8'), new_svg_string)
+
+    def test_no_action_is_performed_on_non_math_svgs(self):
+        """Test that no action is performed on non-math SVGs."""
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        old_svg_string = (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
+            'width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'random_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        filepath = 'image/%s' % svg_filename
+        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" role="" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob)
+
+
+class XmlnsAttributeInExplorationMathSvgImagesAuditJobTests(
+        test_utils.GenericTestBase):
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            XmlnsAttributeInExplorationMathSvgImagesAuditJobTests,
+            self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        self.process_and_flush_pending_tasks()
+
+    def test_reports_math_svgs_without_xmlns_attributes(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob.create_new())
+        (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [
+            u'[u\'exp_id0\', '
+            u'[u\'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg\']]'
+        ])
+
+    def test_no_action_is_performed_on_non_math_svgs(self):
+        """Test that no action is performed on non-math SVGs."""
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        old_svg_string = (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
+            'width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'random_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        filepath = 'image/%s' % svg_filename
+        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob.create_new())
+        (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" role="" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob)
+
+
 class MockExpSummaryModel(exp_models.ExpSummaryModel):
     """Mock ExpSummaryModel so that it allows to set `translator_ids`."""
 
-    translator_ids = ndb.StringProperty(
+    translator_ids = datastore_services.StringProperty(
         indexed=True, repeated=True, required=False)
 
 
@@ -2237,9 +2573,9 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.create_new())
         exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             exp_jobs_one_off.RemoveTranslatorIdsOneOffJob
             .get_output(job_id))
@@ -2311,3 +2647,39 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_summary_model.last_updated,
             migrated_summary_model.last_updated)
+
+
+class RegenerateStringPropertyIndexOneOffJobTests(test_utils.GenericTestBase):
+
+    JOB = exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
+
+    def run_job(self):
+        """Runs the job and returns its output."""
+        job_id = self.JOB.create_new()
+        self.JOB.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        return [ast.literal_eval(s) for s in self.JOB.get_output(job_id)]
+
+    def test_outputs_successful_writes(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+        self.save_new_valid_exploration('exp2', 'owner2')
+        improvements_models.TaskEntryModel.create(
+            'exploration', 'eid', 1, 'high_bounce_rate', 'state',
+            'Introduction')
+
+        self.assertItemsEqual(
+            self.run_job(), [['ExplorationModel', 2], ['TaskEntryModel', 1]])
+
+    def test_versioned_models_are_not_changed_to_a_newer_version(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+
+        self.assertItemsEqual(self.run_job(), [['ExplorationModel', 1]])
+
+        exp_model = exp_models.ExplorationModel.get_by_id('exp1')
+        self.assertEqual(exp_model.version, 1)

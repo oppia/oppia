@@ -464,7 +464,7 @@ class BaseHandler(webapp2.RequestHandler):
                     current_user_services.create_login_url(self.request.uri))
             return
 
-        logging.info(b''.join(traceback.format_exception(*sys.exc_info())))
+        logging.error(b''.join(traceback.format_exception(*sys.exc_info())))
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -635,23 +635,3 @@ class CsrfTokenHandler(BaseHandler):
         self.render_json({
             'token': csrf_token,
         })
-
-
-class OppiaMLVMHandler(BaseHandler):
-    """Base class for the handlers that communicate with Oppia-ML VM instances.
-    """
-
-    def extract_request_message_vm_id_and_signature(self):
-        """Returns the message, vm_id and signature from the incoming request.
-
-        Since incoming request can be either a protobuf serialized binary or
-        a JSON object, the derived classes must implement the necessary
-        logic to decode the incoming request and return a tuple of size 3
-        where message is at index 0, vm_id is at index 1 and signature is at
-        index 2.
-
-        Raises:
-            NotImplementedError. The derived child classes must implement the
-                necessary logic as described above.
-        """
-        raise NotImplementedError

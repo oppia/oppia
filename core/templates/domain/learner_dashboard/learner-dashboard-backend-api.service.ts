@@ -28,9 +28,8 @@ import {
 } from 'domain/collection/collection-summary-object.factory';
 import {
   FeedbackThreadSummary,
-  FeedbackThreadSummaryObjectFactory,
   FeedbackThreadSummaryBackendDict
-} from 'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
+} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
@@ -82,15 +81,13 @@ export class LearnerDashboardBackendApiService {
   constructor(
     private http: HttpClient,
     private collectionSummaryObjectFactory: CollectionSummaryObjectFactory,
-    private feedbackThreadSummaryObjectFactory:
-    FeedbackThreadSummaryObjectFactory,
     private learnerExplorationSummaryObjectFactory:
     LearnerExplorationSummaryObjectFactory,
     private nonExistentActivitiesObjectFactory:
     NonExistentActivitiesObjectFactory,
     private profileSummaryObjectFactory: ProfileSummaryObjectFactory) {}
 
-  _fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
+  async _fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardDataBackendDict>(
         '/learnerdashboardhandler/data').toPromise().then(dashboardData => {
@@ -122,7 +119,7 @@ export class LearnerDashboardBackendApiService {
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (
             dashboardData.thread_summaries.map(
-              threadSummary => this.feedbackThreadSummaryObjectFactory
+              threadSummary => FeedbackThreadSummary
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             dashboardData.completed_to_incomplete_collections),
@@ -140,8 +137,8 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
-    return this._fetchLearnerDashboardData();
+  async fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
+    return this._fetchLearnerDashboardDataAsync();
   }
 }
 

@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 
@@ -28,7 +29,7 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 PREREQUISITES = [
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
-    ('future', '0.17.1', os.path.join(
+    ('future', '0.18.2', os.path.join(
         'third_party', 'python_libs')),
 ]
 
@@ -67,24 +68,6 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
     'configparser.py')
 
-# Download locations for prototool binary.
-PROTOTOOL_LINUX_BIN_URL = (
-    'https://github.com/uber/prototool/releases/download/v1.10.0/'
-    'prototool-Linux-x86_64')
-
-PROTOTOOL_DARWIN_BIN_URL = (
-    'https://github.com/uber/prototool/releases/download/v1.10.0/'
-    'prototool-Darwin-x86_64')
-
-# Path of the prototool executable.
-PROTOTOOL_DIR = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'prototool-%s' % common.PROTOTOOL_VERSION)
-PROTOTOOL_BIN_PATH = os.path.join(PROTOTOOL_DIR, 'prototool')
-# Path of files which needs to be compiled by protobuf.
-PROTO_FILES_PATHS = [
-    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
-    os.path.join('core', 'domain', 'proto')]
-
 
 def tweak_yarn_executable():
     """When yarn is run on Windows, the file yarn will be executed by default.
@@ -106,39 +89,6 @@ def get_yarn_command():
     return 'yarn'
 
 
-def install_prototool():
-    """Installs prototool for Linux or Darwin, depending upon the platform."""
-    if os.path.exists(PROTOTOOL_BIN_PATH):
-        return
-
-    prototool_url = PROTOTOOL_LINUX_BIN_URL
-    if common.is_mac_os():
-        prototool_url = PROTOTOOL_DARWIN_BIN_URL
-
-    common.ensure_directory_exists(PROTOTOOL_DIR)
-    python_utils.url_retrieve(prototool_url, filename=PROTOTOOL_BIN_PATH)
-    common.recursive_chmod(PROTOTOOL_BIN_PATH, 0o744)
-
-
-def compile_protobuf_files(proto_files_paths):
-    """Compiles protobuf files using prototool.
-
-    Raises:
-        Exception. If there is any error in compiling the proto files.
-    """
-    for path in proto_files_paths:
-        command = [
-            PROTOTOOL_BIN_PATH, 'generate', path]
-        process = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        if process.returncode == 0:
-            python_utils.PRINT(stdout)
-        else:
-            python_utils.PRINT(stderr)
-            raise Exception('Error compiling proto files at %s' % path)
-
-
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
 
@@ -157,11 +107,33 @@ def ensure_pip_library_is_installed(package, version, path):
             package, version, exact_lib_path)
 
 
+def ensure_system_python_libraries_are_installed(package, version):
+    """Installs the pip library with the corresponding version to the system
+    globally. This is necessary because the development application server
+    requires certain libraries on the host machine.
+
+    Args:
+        package: str. The package name.
+        version: str. The package version.
+    """
+    python_utils.PRINT(
+        'Checking if %s is installed.' % (package))
+    install_backend_python_libs.pip_install_to_system(package, version)
+
+
 def main():
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
-    pip_dependencies = [
+    # These system python libraries are REQUIRED to start the development server
+    # and cannot be added to oppia_tools because the dev_appserver python script
+    # looks for them in the default system paths when it is run. Therefore, we
+    # must install these libraries to the developer's computer.
+    system_pip_dependencies = [
+        ('enum34', common.ENUM_VERSION),
+        ('protobuf', common.PROTOBUF_VERSION)
+    ]
+    local_pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
         ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
@@ -171,14 +143,16 @@ def main():
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
-        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR)
+        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
+        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
-    for package, version, path in pip_dependencies:
+    for package, version, path in local_pip_dependencies:
         ensure_pip_library_is_installed(package, version, path)
 
+    for package, version in system_pip_dependencies:
+        ensure_system_python_libraries_are_installed(package, version)
     # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
     # on ConverterMapping, which is not implemented in some Python
     # distributions.
@@ -212,11 +186,55 @@ def main():
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
 
-    # Compile protobuf files.
-    python_utils.PRINT('Installing Prototool.')
-    install_prototool()
-    python_utils.PRINT('Compiling protobuf files.')
-    compile_protobuf_files(PROTO_FILES_PATHS)
+    # The following steps solves the problem of multiple google paths confusing
+    # the python interpreter. Namely, there are two modules named google/, one
+    # that is installed with google cloud libraries and another that comes with
+    # the Google Cloud SDK. Python cannot import from both paths simultaneously
+    # so we must combine the two modules into one. We solve this by copying the
+    # Google Cloud SDK libraries that we need into the correct google
+    # module directory in the 'third_party/python_libs' directory.
+    python_utils.PRINT(
+        'Copying Google Cloud SDK modules to third_party/python_libs...')
+    correct_google_path = os.path.join(
+        common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+    if not os.path.isdir(correct_google_path):
+        os.mkdir(correct_google_path)
+
+    if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
+        shutil.copytree(
+            os.path.join(
+                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+            os.path.join(correct_google_path, 'appengine'))
+
+    if not os.path.isdir(os.path.join(correct_google_path, 'net')):
+        shutil.copytree(
+            os.path.join(
+                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+            os.path.join(correct_google_path, 'net'))
+
+    if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
+        shutil.copytree(
+            os.path.join(
+                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+            os.path.join(correct_google_path, 'pyglib'))
+
+    # The following for loop populates all of the google modules with
+    # the correct __init__.py files if they do not exist. This solves the bug
+    # mentioned below where namespace packages sometimes install modules without
+    # __init__.py files (python requires modules to have __init__.py files in
+    # in order to recognize them as modules and import them):
+    # https://github.com/googleapis/python-ndb/issues/518
+    python_utils.PRINT(
+        'Checking that all google library modules contain __init__.py files...')
+    for path_list in os.walk(
+            correct_google_path):
+        root_path = path_list[0]
+        if not root_path.endswith('__pycache__'):
+            with python_utils.open_file(
+                os.path.join(root_path, '__init__.py'), 'a'):
+                # If the file doesn't exist, it is created. If it does exist,
+                # this open does nothing.
+                pass
 
     if common.is_windows_os():
         tweak_yarn_executable()
