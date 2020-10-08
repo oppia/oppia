@@ -444,7 +444,7 @@ angular.module('oppia').component('learnerDashboardPage', {
         });
 
         var dashboardDataPromise = (
-          LearnerDashboardBackendApiService.fetchLearnerDashboardData());
+          LearnerDashboardBackendApiService.fetchLearnerDashboardDataAsync());
         dashboardDataPromise.then(
           function(responseData) {
             ctrl.isCurrentExpSortDescending = true;

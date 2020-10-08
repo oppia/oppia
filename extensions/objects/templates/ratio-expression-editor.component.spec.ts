@@ -65,7 +65,7 @@ describe('RatioExpression', function() {
   it('should initialize ctrl.warningText with invalid colons', function() {
     RationExpressionCtrl.isValidRatio('1:2::3');
     expect(RationExpressionCtrl.warningText)
-      .toBe('Your answer has two colons (:) next to each other.');
+      .toBe('Your answer has multiple colons (:) next to each other.');
   });
 
   it('should initialize ctrl.warningText with invalid zero ratio', function() {

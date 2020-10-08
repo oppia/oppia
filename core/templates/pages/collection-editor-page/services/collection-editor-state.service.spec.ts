@@ -24,8 +24,6 @@ import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
   'domain/collection/CollectionPlaythroughObjectFactory';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionRights } from
   'domain/collection/collection-rights.model';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -110,7 +108,6 @@ describe('Collection editor state service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
     $provide.value(
