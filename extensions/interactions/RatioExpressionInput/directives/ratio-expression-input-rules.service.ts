@@ -30,7 +30,6 @@ import {
   providedIn: 'root'
 })
 export class RatioExpressionInputRulesService {
-  constructor() {}
   Equals(
       answer: RatioInputAnswer, inputs: RatioInputEqualRuleInputs): boolean {
     return Ratio.arrayEquals(answer, inputs.x);

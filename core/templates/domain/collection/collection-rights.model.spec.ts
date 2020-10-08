@@ -19,7 +19,7 @@
 import { CollectionRights } from
   'domain/collection/collection-rights.model';
 
-describe('Collection rights object factory', () => {
+describe('Collection rights model', () => {
   it('should not be able to modify owner names', () => {
     var initialCollectionRightsBackendObject = {
       collection_id: 0,

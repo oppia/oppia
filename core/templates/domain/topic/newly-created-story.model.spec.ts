@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for NewlyCreatedStoryObjectFactory.
+ * @fileoverview Unit tests for NewlyCreatedStoryModel.
  */
 
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 
-describe('Newly Created Story Object Factory', () => {
+describe('Newly Created Story Model', () => {
   let story: NewlyCreatedStory = null;
 
   beforeEach(() => {

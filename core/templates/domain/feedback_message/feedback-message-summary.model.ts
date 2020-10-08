@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of feedback
-   message domain objects.
+ * @fileoverview Frontend Model for feedback message summary.
  */
 
 interface FeedbackMessageSummaryBackendDict {

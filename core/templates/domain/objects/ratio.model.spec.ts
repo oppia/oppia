@@ -21,7 +21,7 @@ import { ObjectsDomainConstants } from
 import { Ratio } from
   'domain/objects/ratio.model';
 
-describe('Ratio Object Factory', () => {
+describe('Ratio Model', () => {
   let errors = null;
 
   beforeEach(() => {

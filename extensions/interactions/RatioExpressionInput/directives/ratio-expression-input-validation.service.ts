@@ -25,8 +25,7 @@ import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { RatioExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-import { Ratio } from
-  'domain/objects/ratio.model';
+import { Ratio } from 'domain/objects/ratio.model';
 import { RatioExpressionInputRulesService } from
   './ratio-expression-input-rules.service';
 import { Outcome } from

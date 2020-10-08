@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
- * skill rights domain objects.
+ * @fileoverview Frontend Model for skill rights.
  */
 
 export interface SkillRightsBackendDict {

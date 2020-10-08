@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating frontend instances of
- * skill opportunity domain object.
+ * @fileoverview Frontend Model for skill opportunity.
  */
 
 export interface SkillOpportunityBackendDict {

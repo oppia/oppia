@@ -15,6 +15,7 @@
 /**
  * @fileoverview Component for ratio editor.
  */
+
 import { Ratio } from 'domain/objects/ratio.model';
 
 angular.module('oppia').component('ratioExpressionEditor', {

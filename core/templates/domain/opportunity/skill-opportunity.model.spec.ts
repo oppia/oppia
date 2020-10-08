@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SkillOpportunityObjectFactory.
+ * @fileoverview Unit tests for SkillOpportunityModel.
  */
 
 import { SkillOpportunity, SkillOpportunityBackendDict } from
   'domain/opportunity/skill-opportunity.model';
 
-describe('Skill opportunity object factory', () => {
-  describe('SkillOpportunityObjectFactory', () => {
+describe('Skill opportunity model', () => {
+  describe('SkillOpportunityModel', () => {
     let backendDict: SkillOpportunityBackendDict;
 
     beforeEach(() => {

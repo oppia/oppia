@@ -19,7 +19,7 @@
 import { GuestCollectionProgress } from
   'domain/collection/guest-collection-progress.model';
 
-describe('Guest collection progress object factory', () => {
+describe('Guest collection progress model', () => {
   var _collectionId0 = null;
   var _collectionId1 = null;
   var _expId0 = null;

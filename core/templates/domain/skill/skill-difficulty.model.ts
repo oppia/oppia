@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating frontend instances of
- * skills with their difficulty for a question.
+ * @fileoverview Frontend Model for skill difficulty.
  */
 
 export interface SkillDifficultyBackendDict {

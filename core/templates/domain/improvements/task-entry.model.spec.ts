@@ -13,14 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the public interface of the TaskEntry domain
- *    object.
+ * @fileoverview Unit tests for TaskEntryModel.
  */
 
 import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/task-entry.model';
 
-describe('Task entry', function() {
+describe('Task entry model', function() {
   it('should use same values from backend dict', () => {
     const taskBackendDict: TaskEntryBackendDict = {
       entity_type: 'exploration',

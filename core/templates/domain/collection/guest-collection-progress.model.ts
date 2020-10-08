@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for creating and mutating a domain object which
- * represents the progress of a guest playing through a collection.
+ * @fileoverview Frontend Model for guest collection progress.
  */
 
 import cloneDeep from 'lodash/cloneDeep';

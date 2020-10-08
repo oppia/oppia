@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
- * collection rights domain objects.
+ * @fileoverview Frontend Model for collection rights.
  */
 
 import cloneDeep from 'lodash/cloneDeep';

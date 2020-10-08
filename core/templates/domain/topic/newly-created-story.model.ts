@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating domain object that represents a newly
- * create Story Object used in the topic editor.
+ * @fileoverview Frontend Model for newly created story.
  */
 const constants = require('constants.ts');
 

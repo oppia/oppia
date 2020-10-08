@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for holding details about an improvements task.
+ * @fileoverview Frontend Model for task entry.
  */
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';

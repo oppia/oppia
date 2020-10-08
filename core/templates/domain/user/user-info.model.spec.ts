@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for CreatorDashboardBackendApiService.
+ * @fileoverview Unit tests for user info.
  */
 
 import { UserInfo } from 'domain/user/user-info.model';
 
-describe('User info factory', () => {
+describe('User info model', () => {
   var sampleUserInfoBackendObject = {
     is_moderator: true,
     is_admin: false,

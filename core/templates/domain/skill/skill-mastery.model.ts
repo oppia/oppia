@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model for creating and mutating instances of frontend
- * skill mastery domain objects.
+ * @fileoverview Frontend Model for skill mastery.
  */
 
 export interface SkillMasteryBackendDict {

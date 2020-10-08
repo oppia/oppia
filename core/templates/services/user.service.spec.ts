@@ -51,13 +51,6 @@ describe('User Service', function() {
       'UrlInterpolationService');
     UrlService = $injector.get(
       'UrlService');
-    // The injector is required because this service is directly used in this
-    // spec, therefore even though UserInfoModel is upgraded to
-    // Angular, it cannot be used just by instantiating it by its class but
-    // instead needs to be injected. Note that 'userInfoModel' is
-    // the injected service instance whereas 'UserInfoModel' is the
-    // service class itself. Therefore, use the instance instead of the class in
-    // the specs.
     $httpBackend = $injector.get('$httpBackend');
 
     CsrfService = $injector.get('CsrfTokenService');

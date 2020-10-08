@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of Ratio
- * domain objects.
+ * @fileoverview Frontend Model for ratio.
  */
 
 import { ObjectsDomainConstants } from

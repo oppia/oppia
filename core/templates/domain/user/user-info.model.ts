@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and instances of frontend user UserInfo
- * domain objects.
+ * @fileoverview Frontend Model for user info.
  */
 
 export interface UserInfoBackendDict {
