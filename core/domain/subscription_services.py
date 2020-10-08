@@ -103,6 +103,8 @@ def subscribe_to_creator(user_id, creator_id):
         user_id: str. The user ID of the new subscriber.
         creator_id: str. The user ID of the creator.
     """
+    if user_id == creator_id:
+        raise Exception('User %s is not allowed to self subscribe.' % user_id)
     subscribers_model_creator = user_models.UserSubscribersModel.get(
         creator_id, strict=False)
     subscriptions_model_user = user_models.UserSubscriptionsModel.get(
