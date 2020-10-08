@@ -211,6 +211,28 @@ NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
 )
 
 SUGGESTIONS_TO_REVIEW_TEMPLATE = {
+    email_body_template: (
+        'Hi %s,<br><br>'
+        'Thank you for actively contributing high-quality suggestions for '
+        'Oppia\'s lessons in %s, and for helping to make these lessons better '
+        'for students around the world!<br><br>'
+        'In recognition of your contributions, we would like to invite you to '
+        'become one of Oppia\'s reviewers. As a reviewer, you will be able to '
+        'review suggestions in %s, and contribute to helping ensure that any '
+        'edits made to lessons preserve the lessons\' quality and are '
+        'beneficial for students.<br><br>'
+        'If you\'d like to help out as a reviewer, please visit your '
+        '<a href="https://www.oppia.org/creator-dashboard/">dashboard</a>. '
+        'and set your review preferences accordingly. Note that, if you accept,'
+        'you will receive occasional emails inviting you to review incoming '
+        'suggestions by others.<br><br>'
+        'Again, thank you for your contributions to the Oppia community!<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+    ),
+    email_subject: 'Contributor Dashboard Review Opportunities',
+    # The templates below are for listing the information for each suggestion
+    # type.
     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
         '<li>The following translation suggestion in language %s was submitted '
         'for review %s ago:<br>%s</li>'),
@@ -1241,23 +1263,10 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             email content info objects will be used to compose the email
             body for each reviewer.
     """
-    email_subject = 'Contributor Dashboard Review Opportunities'
+    email_subject = SUGGESTIONS_TO_REVIEW_TEMPLATE['email_subject']
 
-    email_body_template = (
-        'Hi %s,<br><br>'
-        'There are new review opportunites that we think you might be '
-        'interested in on the '
-        '<a href="https://www.oppia.org/contributor-dashboard/">'
-        'Contritubor Dashboard</a> page.' 'Here are some examples of the '
-        'contributions that have been waiting the longest for review:'
-        '<br><br>%s<br><br>'
-        'Please take some time to review any of the above contributions '
-        '(if they still need a review) or any other contributions on the '
-        'dashboard. We appreciate your help!<br><br>'
-        'Thanks again, and happy reviewing!'
-        '- The Oppia Contributor Dashboard Team'
-        '<br><br>%s'
-    )
+    email_body_template = SUGGESTIONS_TO_REVIEW_TEMPLATE['email_body_template']
+    
 
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')

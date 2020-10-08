@@ -2194,20 +2194,25 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_completion_email_is_sent(self):
-        expected_email_subject = 'Notification to review suggestions'
+        question_suggestion = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id)
+        )
+        reviewable_suggestion_email_info = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion]
+            )
+        )
+        expected_email_subject = (
+            email_manger.SUGGESTIONS_TO_REVIEW_TEMPLATE['email_subject']
+        ) 
         expected_email_html_body = (
-            'Hi reviewer,<br><br>'
-            'Just a heads-up that there are new suggestions to '
-            'review in Algebra, which you are registered as a reviewer for.'
-            '<br><br>Please take a look at and accept/reject these suggestions '
-            'at your earliest convenience. You can visit your '
-            '<a href="https://www.oppia.org/creator-dashboard/">dashboard</a> '
-            'to view the list of suggestions that need a review.<br><br>'
-            'Thank you for helping improve Oppia\'s lessons!'
-            '- The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            email_manger.SUGGESTIONS_TO_REVIEW_TEMPLATE[
+                'email_body_template'] % (
+                    '', 
+
+                )
+        )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_users_to_review(
