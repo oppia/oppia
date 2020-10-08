@@ -906,10 +906,6 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
         elif suggestion.suggestion_type == (
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
             stats_model.question_suggestion_count += amount
-        else:
-            raise Exception(
-                'Suggestion type: %s not accounted for.' % (
-                    suggestion.suggestion_type))
 
         # Create a community contribution stats object to validate the updates.
         stats = create_community_contribution_stats_from_model(stats_model)
