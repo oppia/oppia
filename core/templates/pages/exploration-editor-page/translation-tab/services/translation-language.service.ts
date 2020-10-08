@@ -19,7 +19,6 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { List } from 'lodash';
 
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -40,7 +39,7 @@ export class TranslationLanguageService {
 
   getActiveLanguageCode(): string {
     return this.activeLanguageCode;
-  };
+  }
 
   setActiveLanguageCode(newActiveLanguageCode: string): null {
     if (this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
@@ -50,7 +49,7 @@ export class TranslationLanguageService {
     }
     this.activeLanguageCode = newActiveLanguageCode;
     this._activeLanguageChangedEventEmitter.emit();
-  };
+  }
 
   getActiveLanguageDescription(): string {
     if (!this.activeLanguageCode) {
@@ -58,7 +57,7 @@ export class TranslationLanguageService {
     }
     return this.languageUtilService.getAudioLanguageDescription(
       this.activeLanguageCode);
-  };
+  }
 
   get onActiveLanguageChanged(): EventEmitter<void> {
     return this._activeLanguageChangedEventEmitter;

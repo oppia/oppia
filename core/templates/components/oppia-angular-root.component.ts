@@ -1858,7 +1858,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.topicViewerBackendApiService = (
       this.topicViewerBackendApiService);
     OppiaAngularRootComponent.translateService = this.translateService;
-    OppiaAngularRootComponent.translationLanguageService = this.translateLanguageService;
+    OppiaAngularRootComponent.translationLanguageService = (
+      this.translateLanguageService);
     OppiaAngularRootComponent.unitsObjectFactory = this.unitsObjectFactory;
     OppiaAngularRootComponent.urlInterpolationService = (
       this.urlInterpolationService);
