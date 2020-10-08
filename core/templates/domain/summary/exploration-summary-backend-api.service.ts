@@ -68,8 +68,8 @@ export class ExplorationSummaryBackendApiService {
             );
             throw new Error(summariesError);
           } else if (typeof (summaries) === 'string') {
-            const fetchingError =
-            'Error on loading public exploration summaries.';
+            const fetchingError = (
+              'Error on loading public exploration summaries.');
             throw new Error(fetchingError);
           }
           successCallback(summaries);
