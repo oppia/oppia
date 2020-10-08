@@ -17,21 +17,26 @@
  *
  */
 
-require(
+import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
+  'state-editor.service.ts';
 
-angular.module('oppia').factory('QuestionValidationService', [
-  'StateEditorService',
-  function(StateEditorService) {
-    return {
-      isQuestionValid: function(question, misconceptionsBySkill) {
-        return !(
-          question.getValidationErrorMessage() ||
-          question.getUnaddressedMisconceptionNames(
-            misconceptionsBySkill).length > 0 ||
-          !StateEditorService.isCurrentSolutionValid());
-      }
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionValidationService {
+  constructor(
+    private stateEditorService: StateEditorService) {}
+
+  isQuestionValid(question: Question, misconceptionsBySkill: any) : boolean {
+    return !(
+      question.getValidationErrorMessage() ||
+      question.getUnaddressedMisconceptionNames(
+        misconceptionsBySkill).length > 0 ||
+      !this.stateEditorService.isCurrentSolutionValid());)
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'QuestionValidationService',
+  downgradeInjectable(QuestionValidationService));
