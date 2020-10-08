@@ -2219,7 +2219,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
 
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
-    """Test the functionality related to the community contribution stats."""
+    """Test the functionality related to updating the community contribution
+    stats.
+    """
 
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
@@ -2357,6 +2359,33 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             stats.translation_reviewer_counts_by_lang_code, {'hi': 0, 'en': 1})
 
+    def test_remove_translation_contribution_reviewer_decreases_count(self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        # Assert that the translation reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+
+        user_services.remove_contribution_reviewer(self.reviewer_1_id)
+
+        # Assert that the translation reviewer counts decreased by one after the
+        # contribution reviewer was removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 0, 'en': 0})
+
     def test_grant_reviewer_question_reviewing_rights_increases_count(self):
         self._assert_community_contribution_stats_is_in_default_state()
 
@@ -2415,6 +2444,29 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             stats.translation_suggestion_counts_by_lang_code, {})
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
 
+    def test_remove_question_contribution_reviewer_decreases_count(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the question reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
+
+        user_services.remove_contribution_reviewer(self.reviewer_1_id)
+
+        # Assert that the question reviewer count decreased by one after the
+        # contribution reviewer was removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
+
     def test_grant_reviewer_multiple_reviewing_rights_increases_counts(self):
         self._assert_community_contribution_stats_is_in_default_state()
 
@@ -2455,6 +2507,88 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             stats.translation_reviewer_counts_by_lang_code,
             {'hi': 2, 'en': 1, 'fr': 1})
+
+    def test_remove_question_rights_from_multi_rights_reviewer_updates_count(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the counts were updated before the question rights are
+        # removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+
+        user_services.remove_question_review_rights(self.reviewer_1_id)
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+
+    def test_remove_translation_rights_from_multi_rights_reviewer_updates_count(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the counts were updated before the translation rights are
+        # removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+
+        user_services.remove_translation_review_rights_in_language(
+            self.reviewer_1_id, 'hi')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 0})
+
+    def test_remove_multi_rights_contribution_reviewer_decreases_counts(self):
+        self._assert_community_contribution_stats_is_in_default_state()
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the counts were updated before the contribution reviewer
+        # is removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+
+        user_services.remove_contribution_reviewer(self.reviewer_1_id)
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 0, 'en': 0})
 
     def test_grant_reviewer_voiceover_reviewing_permissions_does_nothing(self):
         # Granting reviewers voiceover reviewing permissions does not change the
