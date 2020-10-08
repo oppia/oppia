@@ -26,6 +26,7 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import html_cleaner
+from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import suggestion_services
@@ -35,7 +36,8 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
+(email_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.email, models.NAMES.suggestion])
 
 
 class FailedMLTest(test_utils.EmailTestBase):
@@ -2153,7 +2155,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.cannot_send_reviewer_emails_ctx = self.swap(
             config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
             False)
-        
+
         self.save_new_valid_exploration(self.target_id, self.author_id)
         question_suggestion = (
             self._create_question_suggestion_with_skill_id_and_author_id(

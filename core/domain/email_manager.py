@@ -24,7 +24,7 @@ import logging
 
 from constants import constants
 from core.domain import config_domain
-from core.domani import email_domain
+from core.domain import email_domain
 from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_domain
@@ -363,9 +363,11 @@ def _send_email(
 
 def _send_emails(send_email_infos):
     """Sends emails to the given recipients.
+
     Args:
         send_email_infos: list(SendEmailInfo). Each SendEmailInfo object
             contains the information necessary to send an email.
+
     Raises:
         Exception. A sender_id is not appropriate for an intent.
     """
@@ -1234,7 +1236,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         reviewer_ids: list(str). A list of the Contributor Dashboard reviewer
             user ids to notify.
         reviewers_suggestion_email_infos:
-        list(list(ReviewableSuggestionEmailInfo)). A list of suggestion
+            list(list(ReviewableSuggestionEmailInfo)). A list of suggestion
             email content info objects for each reviewer. These suggestion
             email content info objects will be used to compose the email
             body for each reviewer.
@@ -1301,20 +1303,19 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     reviewers_suggestion_email_infos[index]):
                 # Set the language code for question suggestions to be the empty
                 # string in order to use the same suggestion template format.
-                if reviewers_suggestion_email_infos.suggestion_type == (
+                if reviewer_suggestion_email_info.suggestion_type == (
                         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-                    reviewers_suggestion_email_infos.language_code = ''
+                    reviewer_suggestion_email_info.language_code = ''
                 # Calculate how long the suggestion has been waiting for review.
                 suggestion_review_wait_time = (
                     datetime.now() - (
-                        reviewers_suggestion_email_infos.submission_datetime))
+                        reviewer_suggestion_email_info.submission_datetime))
                 suggestion_template = SUGGESTIONS_TO_REVIEW_TEMPLATE[
-                    reviewers_suggestion_email_infos.suggestion_type]
+                    reviewer_suggestion_email_info.suggestion_type]
                 list_of_suggestions_strings.append(suggestion_template % (
-                    reviewers_suggestion_email_infos.language_code,
+                    reviewer_suggestion_email_info.language_code,
                     suggestion_review_wait_time,
-                    reviewers_suggestion_email_infos.suggestion_content)
-                )
+                    reviewer_suggestion_email_info.suggestion_content))
             email_body = email_body_template % (
                 reviewer_usernames[index], ''.join(list_of_suggestions_strings),
                 EMAIL_FOOTER.value)
@@ -1323,10 +1324,10 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 reviewer_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                reviewer_emails[index], EMAIL_SENDER_NAME.value)
-            )
-            
+                reviewer_emails[index], EMAIL_SENDER_NAME.value))
+      
     _send_emails(send_email_infos)
+
 
 def send_accepted_voiceover_application_email(
         user_id, lesson_title, language_code):

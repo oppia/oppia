@@ -188,6 +188,7 @@ class SentEmailModel(base_models.BaseModel):
     @classmethod
     def create_multi(cls, send_email_infos):
         """Creates SentEmailModel entries for multiple emails.
+
         Args:
             send_email_infos: list(SendEmailInfo). Each SendEmailInfo object
                 contains the information needed to generate a SentEmailModel.
