@@ -82,6 +82,8 @@ INVALID_BROADCAST_USE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_broadcast_use.ts')
 INVALID_LODASH_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_lodash_import.ts')
+INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 
 # PY filepaths.
 INVALID_ITERKEY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iterkeys.py')
@@ -386,6 +388,17 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 'from \'lodash/someFunction\'" instead.',
             ],
             lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_http_client_used_with_error_message(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_HTTP_CLIENT_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements([
+            'Line 22: An instance of HttpClient is found in this file. You are '
+            'not allowed to create http requests from files that are not '
+            'backend api services.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

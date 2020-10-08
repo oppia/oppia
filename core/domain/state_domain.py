@@ -203,16 +203,10 @@ class AnswerGroup(python_utils.OBJECT):
                                 html_list = html_list + [rule_input_variable]
                             elif (html_type_format ==
                                   feconf.HTML_RULE_VARIABLE_FORMAT_SET):
-                                # Here we are checking the type of the
-                                # rule_specs.inputs because the rule type
-                                # 'Equals' is used by other interactions as
-                                # well which don't have HTML and we don't have
-                                # a reference to the interaction ID.
-                                if isinstance(rule_input_variable, list):
-                                    for value in rule_input_variable:
-                                        if isinstance(
-                                                value, python_utils.BASESTRING):
-                                            html_list = html_list + [value]
+                                for value in rule_input_variable:
+                                    if isinstance(
+                                            value, python_utils.BASESTRING):
+                                        html_list = html_list + [value]
                             elif (html_type_format ==
                                   feconf.
                                   HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):

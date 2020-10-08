@@ -103,13 +103,12 @@
 
 
 # Contributor Dashboard project.
-# TODO(#10779): Revert ownership to @sagangwee after 2020-10-05.
-/core/controllers/contributor_dashboard*.py @DubeySandeep
-/core/domain/opportunity*.py @DubeySandeep
-/core/domain/voiceover_services*.py @DubeySandeep
-/core/storage/opportunity/ @DubeySandeep
-/core/templates/domain/opportunity/ @DubeySandeep
-/core/templates/pages/contributor-dashboard-page/ @DubeySandeep
+/core/controllers/contributor_dashboard*.py @sagangwee
+/core/domain/opportunity*.py @sagangwee
+/core/domain/voiceover_services*.py @sagangwee
+/core/storage/opportunity/ @sagangwee
+/core/templates/domain/opportunity/ @sagangwee
+/core/templates/pages/contributor-dashboard-page/ @sagangwee
 
 
 # Core documentation
@@ -478,7 +477,6 @@
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
 /redis.conf @seanlip
-/release_constants.py @nithusha21 @DubeySandeep
 /release_constants.json @nithusha21 @DubeySandeep
 
 

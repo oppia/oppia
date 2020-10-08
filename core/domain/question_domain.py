@@ -734,7 +734,40 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
-        """Converts from version 38 to 39. Version 39 converts TextInput rule
+        """Converts from version 38 to 39. Version 39 adds a new
+        customization arg to NumericExpressionInput interaction which allows
+        creators to modify the placeholder text.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': (
+                            'Type an expression here, using only numbers.')
+                    }
+                }
+            })
+            question_state_dict['written_translations']['translations_mapping'][
+                'ca_placeholder_0'] = {}
+            question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
+                'ca_placeholder_0'] = {}
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v39_dict_to_v40_dict(cls, question_state_dict):
+        """Converts from version 39 to 40. Version 40 converts TextInput rule
         inputs from NormalizedString to SetOfNormalizedString.
 
         Args:

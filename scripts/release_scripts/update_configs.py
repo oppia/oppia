@@ -30,7 +30,6 @@ import re
 import sys
 
 import python_utils
-import release_constants
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -124,7 +123,7 @@ def check_updates_to_terms_of_service(
         terms_of_service_are_changed = python_utils.INPUT().lower()
 
     if terms_of_service_are_changed in (
-            release_constants.AFFIRMATIVE_CONFIRMATIONS):
+            common.AFFIRMATIVE_CONFIRMATIONS):
         python_utils.PRINT(
             'Enter sha of the commit which changed the terms of service.')
         commit_sha = python_utils.INPUT().lstrip().rstrip()
