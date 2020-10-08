@@ -12302,21 +12302,6 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
-    def test_missing_user_contributions_model_failure(self):
-        user_models.UserContributionsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_contributions_ids '
-                'field check of UserSettingsModel\', '
-                '[u"Entity id %s: based on '
-                'field user_contributions_ids having value '
-                '%s, expected model UserContributionsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserSettingsModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
     def test_model_with_invalid_schema(self):
         self.model_instance_1.email = 'invalid'
         self.model_instance_1.put()
