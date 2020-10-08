@@ -1133,23 +1133,20 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             BaseRealtimeDatastoreClassForContinuousComputations, cls
         ).get(entity_id, strict=strict)
 
-    def put(self):
-        """Stores the current realtime layer entity into the database.
+    def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage.
 
         Raises:
             Exception. The current instance has an invalid realtime layer id.
-
-        Returns:
-            realtime_layer. The realtime layer entity.
         """
+        super(
+            BaseRealtimeDatastoreClassForContinuousComputations, self
+        )._pre_put_hook()
         if (self.realtime_layer is None or
                 python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))
-
-        return super(
-            BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
 class BaseContinuousComputationManager(python_utils.OBJECT):
