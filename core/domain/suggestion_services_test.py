@@ -2151,8 +2151,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self._create_translation_suggestion_with_language_code('hi'))
         suggestion_2 = (
             self._create_translation_suggestion_with_language_code('en'))
-        suggestion_3 = self._create_question_suggestion()
-        suggestion_4 = self._create_edit_state_content_suggestion()
+        suggestion_3 = self._create_edit_state_content_suggestion()
+        suggestion_4 = self._create_question_suggestion()
         # Assert that the translation suggestion count increased.
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
@@ -2166,7 +2166,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         suggestion_services.reject_suggestions(
             [
                 suggestion_1.suggestion_id, suggestion_2.suggestion_id,
-                suggestion_3.suggestion_id
+                suggestion_3.suggestion_id, suggestion_4.suggestion_id
             ], self.reviewer_id, 'review message')
 
         stats = suggestion_services.get_community_contribution_stats()

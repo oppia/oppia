@@ -1205,6 +1205,7 @@ class CommunityContributionStats(python_utils.OBJECT):
             self, language_code, count):
         """Sets the translation reviewer count to be count, for the given
         language code.
+
         Args:
             language_code: str. The translation suggestion language code that
                 reviewers have the rights to review.
@@ -1217,6 +1218,7 @@ class CommunityContributionStats(python_utils.OBJECT):
             self, language_code, count):
         """Sets the translation suggestion count to be count, for the language
         code given.
+
         Args:
             language_code: str. The translation suggestion language code.
             count: int. The number of translation suggestions in language_code

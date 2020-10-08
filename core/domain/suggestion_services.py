@@ -969,7 +969,7 @@ def _update_community_contribution_stats_due_to_suggestion(suggestion, amount):
     Args:
         suggestion: Suggestion. A suggestion that may update a count stored in
             the community contribution stats. Only suggestion types that are
-            offered on the Contributor Dashboard are accounted for. 
+            offered on the Contributor Dashboard are accounted for.
         amount: int. The amount to adjust the count by.
     """
     _update_community_contribution_stats_due_to_suggestions(

@@ -897,6 +897,7 @@ def _update_user_contribution_rights(user_contribution_rights):
     else:
         remove_contribution_reviewer(user_contribution_rights.id)
 
+
 def _update_reviewer_counts_in_community_contribution_stats_transactional(
         future_user_contribution_rights):
     """Updates the reviewer counts in the community contribution stats based
@@ -933,7 +934,7 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
     # Update translation reviewer counts.
     for language_code in languages_that_reviewer_can_no_longer_review:
         stats_model.translation_reviewer_counts_by_lang_code[
-            language_code] -= 1 
+            language_code] -= 1
     for language_code in new_languages_that_reviewer_can_review:
         if language_code not in (
                 stats_model.translation_reviewer_counts_by_lang_code):
