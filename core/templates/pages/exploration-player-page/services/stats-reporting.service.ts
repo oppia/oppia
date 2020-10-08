@@ -25,8 +25,7 @@ import { PlaythroughService } from 'services/playthrough.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { AggregatedStats, StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
-import { Stopwatch, StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
+import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 @Injectable({
   providedIn: 'root'
@@ -37,8 +36,8 @@ export class StatsReportingService {
       private messengerService: MessengerService,
       private playthroughService: PlaythroughService,
       private siteAnalyticsService: SiteAnalyticsService,
-      private statsReportingBackendApiService: StatsReportingBackendApiService,
-      private stopwatchObjectFactory: StopwatchObjectFactory) {
+      private statsReportingBackendApiService: StatsReportingBackendApiService
+  ) {
     StatsReportingService.editorPreviewMode = (
       this.contextService.isInExplorationEditorPage());
     StatsReportingService.questionPlayerMode = (
@@ -130,7 +129,7 @@ export class StatsReportingService {
     StatsReportingService.explorationTitle = newExplorationTitle;
     StatsReportingService.explorationVersion = newExplorationVersion;
     StatsReportingService.sessionId = newSessionId;
-    StatsReportingService.stateStopwatch = this.stopwatchObjectFactory.create();
+    StatsReportingService.stateStopwatch = Stopwatch.create();
     StatsReportingService.optionalCollectionId = collectionId;
     this.refreshAggregatedStats();
     this.startStatsTimer();

@@ -391,8 +391,16 @@ export interface TextInputCustomizationArgs {
 }
 
 
-export interface NumericExpressionInputCustomizationArgsBackendDict { }
-export interface NumericExpressionInputCustomizationArgs { }
+export interface NumericExpressionInputCustomizationArgsBackendDict {
+  placeholder: {
+    value: SubtitledUnicodeBackendDict;
+  };
+}
+export interface NumericExpressionInputCustomizationArgs {
+  placeholder: {
+    value: SubtitledUnicode;
+  };
+}
 
 
 export interface NumericInputCustomizationArgsBackendDict { }

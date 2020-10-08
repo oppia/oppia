@@ -55,7 +55,8 @@ import {
   SetInputCustomizationArgs,
   SetInputCustomizationArgsBackendDict,
   TextInputCustomizationArgs,
-  TextInputCustomizationArgsBackendDict
+  TextInputCustomizationArgsBackendDict,
+  NumericExpressionInputCustomizationArgsBackendDict
 } from 'interactions/customization-args-defs';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
@@ -315,6 +316,17 @@ export class Interaction {
     };
   }
 
+  static _createFromNumericExpressionInputCustomizationArgsBackendDict(
+      caBackendDict: NumericExpressionInputCustomizationArgsBackendDict
+  ): NumericExpressionInputCustomizationArgs {
+    const { placeholder } = caBackendDict;
+    return {
+      placeholder: {
+        value: SubtitledUnicode.createFromBackendDict(placeholder.value)
+      }
+    };
+  }
+
   static _createFromRatioExpressionInputCustomizationArgsBackendDict(
       caBackendDict: RatioExpressionInputCustomizationArgsBackendDict
   ): RatioExpressionInputCustomizationArgs {
@@ -374,7 +386,9 @@ export class Interaction {
         return <NumberWithUnitsCustomizationArgs> cloneDeep(caBackendDict);
       case 'NumericExpressionInput':
         return (
-          <NumericExpressionInputCustomizationArgs> cloneDeep(caBackendDict));
+          this._createFromNumericExpressionInputCustomizationArgsBackendDict(
+            <NumericExpressionInputCustomizationArgsBackendDict> caBackendDict)
+        );
       case 'NumericInput':
         return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'PencilCodeEditor':

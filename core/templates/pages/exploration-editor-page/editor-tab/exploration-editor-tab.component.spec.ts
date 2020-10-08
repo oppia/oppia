@@ -19,17 +19,13 @@
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
-import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from 'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { Hint } from 'domain/exploration/Hint.model';
 import { ImprovementsService } from 'services/improvements.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { ParamMetadataObjectFactory } from 'domain/exploration/ParamMetadataObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -71,21 +67,11 @@ describe('Exploration editor tab component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      TestBed.get(AnswerClassificationResultObjectFactory));
-    $provide.value(
       'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
-    $provide.value(
-      'ClassifierObjectFactory', TestBed.get(ClassifierObjectFactory));
-    $provide.value(
-      'ExplorationDraftObjectFactory',
-      TestBed.get(ExplorationDraftObjectFactory));
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('ImprovementsService', TestBed.get(ImprovementsService));
-    $provide.value(
-      'ParamMetadataObjectFactory', TestBed.get(ParamMetadataObjectFactory));
     $provide.value(
       'SolutionValidityService', TestBed.get(SolutionValidityService));
     $provide.value(

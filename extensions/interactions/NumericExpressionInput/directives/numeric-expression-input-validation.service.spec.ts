@@ -23,6 +23,7 @@ import { NumericExpressionInputValidationService } from 'interactions/NumericExp
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
 import { NumericExpressionInputCustomizationArgs } from 'extensions/interactions/customization-args-defs';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 import { AppConstants } from 'app.constants';
 
@@ -57,7 +58,12 @@ describe('NumericExpressionInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    customizationArgs = {};
+    customizationArgs = {
+      placeholder: {
+        value: new SubtitledUnicode(
+          'Type an expression here, using only numbers.', 'ca_placeholder_0')
+      }
+    };
 
     isEquivalentTo = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',

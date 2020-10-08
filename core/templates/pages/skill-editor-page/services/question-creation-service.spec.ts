@@ -187,7 +187,8 @@ describe('Question Creation Service', function() {
           solicit_answer_details: false
         },
         language_code: 'en',
-        version: 1
+        version: 1,
+        inapplicable_skill_misconception_ids: ['skillId1-Id1']
       };
       var sampleQuestion = QuestionObjectFactory.createFromBackendDict(
         sampleQuestionBackendDict);
@@ -545,7 +546,8 @@ describe('Question Creation Service', function() {
           solicit_answer_details: false
         },
         language_code: 'en',
-        version: 1
+        version: 1,
+        inapplicable_skill_misconception_ids: []
       };
 
       var sampleQuestion = QuestionObjectFactory.createFromBackendDict(

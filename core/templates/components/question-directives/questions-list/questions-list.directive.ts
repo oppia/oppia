@@ -96,14 +96,17 @@ angular.module('oppia').directive('questionsList', [
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         'QuestionValidationService', 'QuestionsListService',
         'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-        'WindowDimensionsService', 'NUM_QUESTIONS_PER_PAGE', function(
+        'UtilsService', 'WindowDimensionsService', 'INTERACTION_SPECS',
+        'NUM_QUESTIONS_PER_PAGE',
+        function(
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
             ImageLocalStorageService, QuestionCreationService,
             QuestionObjectFactory, QuestionUndoRedoService,
             QuestionValidationService, QuestionsListService,
             SkillBackendApiService, SkillDifficultyObjectFactory,
-            WindowDimensionsService, NUM_QUESTIONS_PER_PAGE) {
+            UtilsService, WindowDimensionsService, INTERACTION_SPECS,
+            NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
@@ -126,6 +129,17 @@ angular.module('oppia').directive('questionsList', [
             );
             ctrl.questionIsBeingUpdated = false;
             ctrl.misconceptionsBySkill = {};
+            ctrl.misconceptionIdsForSelectedSkill = [];
+            if (ctrl.getSelectedSkillId()) {
+              SkillBackendApiService.fetchSkill(
+                ctrl.getSelectedSkillId()
+              ).then(responseObject => {
+                ctrl.misconceptionIdsForSelectedSkill = (
+                  responseObject.skill.getMisconceptions().map(
+                    misconception => misconception.getId()));
+                $rootScope.$apply();
+              });
+            }
           };
 
           ctrl.getQuestionIndex = function(index) {
@@ -148,6 +162,21 @@ angular.module('oppia').directive('questionsList', [
             ctrl.getQuestionSummariesAsync(
               ctrl.selectedSkillIds, false, false
             );
+          };
+
+          ctrl.showUnaddressedSkillMisconceptionWarning = function(
+              skillMisconceptionIds) {
+            var skillId = ctrl.getSelectedSkillId();
+            var expectedMisconceptionIds = (
+              ctrl.misconceptionIdsForSelectedSkill);
+            var actualMisconceptionIds = (
+              skillMisconceptionIds.map(skillMisconceptionId => {
+                if (skillMisconceptionId.startsWith(skillId)) {
+                  return parseInt(skillMisconceptionId.split('-')[1]);
+                }
+              }));
+            return UtilsService.isEquivalent(
+              actualMisconceptionIds.sort(), expectedMisconceptionIds.sort());
           };
 
           ctrl.getDifficultyString = (
@@ -519,8 +548,17 @@ angular.module('oppia').directive('questionsList', [
           ctrl.isQuestionValid = function() {
             return Boolean(QuestionValidationService.isQuestionValid(
               ctrl.question, ctrl.misconceptionsBySkill) &&
+                ctrl.newQuestionSkillDifficulties &&
                 ctrl.newQuestionSkillDifficulties.length);
           };
+
+          ctrl.showSolutionCheckpoint = function() {
+            const interactionId = ctrl.question.getStateData().interaction.id;
+            return (
+              interactionId && INTERACTION_SPECS[
+                interactionId].can_have_solution);
+          };
+
           ctrl.addSkill = function() {
             var skillsInSameTopicCount =
                 ctrl.getGroupedSkillSummaries().current.length;

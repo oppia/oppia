@@ -18,9 +18,9 @@
  */
 
 import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
-import { StorySummaryBackendDict, StorySummary } from
-  'domain/story/StorySummaryObjectFactory';
-import {SkillIdToDescriptionMap, SubtopicBackendDict, Subtopic} from 'domain/topic/Subtopic.model';
+import { StorySummaryBackendDict, StorySummary } from 'domain/story/story-summary.model';
+import { SkillIdToDescriptionMap, SubtopicBackendDict, Subtopic } from 'domain/topic/Subtopic.model';
+import { StoryNode } from 'domain/story/story-node.model';
 
 export interface DegreesOfMastery {
   [skillId: string]: number | null;
@@ -135,19 +135,29 @@ export class ReadOnlyTopic {
         topicDataDict.skill_descriptions;
     let canonicalStories =
         topicDataDict.canonical_story_dicts.map(storyDict => {
+          let pendingNodes = (
+            storyDict.pending_node_dicts.map(storyNodeDict => {
+              return StoryNode.createFromBackendDict(
+                storyNodeDict);
+            }));
           return new StorySummary(
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment);
+            storyDict.url_fragment, pendingNodes);
         });
     let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
+          let pendingNodes = (
+            storyDict.pending_node_dicts.map(storyNodeDict => {
+              return StoryNode.createFromBackendDict(
+                storyNodeDict);
+            }));
           return new StorySummary(
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment);
+            storyDict.url_fragment, pendingNodes);
         });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,

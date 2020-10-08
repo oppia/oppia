@@ -19,8 +19,6 @@
 import { EventEmitter } from '@angular/core';
 
 import { EditabilityService } from 'services/editability.service';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VersionTreeService } from
@@ -72,9 +70,6 @@ describe('History tab component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CsrfTokenService', TestBed.get(CsrfTokenService));
     $provide.value('EditabilityService', TestBed.get(EditabilityService));
-    $provide.value(
-      'ExplorationDraftObjectFactory',
-      TestBed.get(ExplorationDraftObjectFactory));
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
     $provide.value(
@@ -192,11 +187,11 @@ describe('History tab component', function() {
     expect(ctrl.diffData).toEqual({});
 
     expect(ctrl.earlierVersionHeader).toBe(
-      'Revision #2 by committer_3 (11/21/2014):' +
-        ' This is the commit message 2');
-    expect(ctrl.laterVersionHeader).toBe(
       'Revision #1 by committer_3 (11/21/2014):' +
         ' This is the commit message');
+    expect(ctrl.laterVersionHeader).toBe(
+      'Revision #2 by committer_3 (11/21/2014):' +
+        ' This is the commit message 2');
   });
 
   it('should open a new tab for download exploration with version', function() {
@@ -341,5 +336,53 @@ describe('History tab component', function() {
     ctrl.reverseDateOrder();
     expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(1);
     expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(3);
+  });
+
+  it('should find the versions to compare', function() {
+    ctrl.selectedVersionsArray = [1, 4];
+    ctrl.compareVersionMetadata = {};
+    ctrl.totalExplorationVersionMetadata = [
+      {
+        committerId: '1',
+        createdOnMsecsStr: 10,
+        commitMessage: 'commit message 1',
+        versionNumber: 1
+      }, {
+        committerId: '2',
+        createdOnMsecsStr: 10,
+        commitMessage: 'commit message 2',
+        versionNumber: 2
+      }, {
+        committerId: '3',
+        createdOnMsecsStr: 10,
+        commitMessage: 'commit message 3',
+        versionNumber: 3
+      }, {
+        committerId: '4',
+        createdOnMsecsStr: 10,
+        commitMessage: 'commit message 4',
+        versionNumber: 4
+      }];
+    ctrl.changeCompareVersion();
+    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[0]);
+    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[3]);
+
+    ctrl.selectedVersionsArray = [2, 4];
+
+    ctrl.changeCompareVersion();
+    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[1]);
+    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[3]);
+
+    ctrl.selectedVersionsArray = [2, 3];
+
+    ctrl.changeCompareVersion();
+    expect(ctrl.compareVersionMetadata.earlierVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[1]);
+    expect(ctrl.compareVersionMetadata.laterVersion).toEqual(
+      ctrl.totalExplorationVersionMetadata[2]);
   });
 });

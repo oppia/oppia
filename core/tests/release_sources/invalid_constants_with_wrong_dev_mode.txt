@@ -1,3 +1,0 @@
-  "DEV_MODE": false,
-  "GCS_RESOURCE_BUCKET_NAME": "None-resources",
-  "Testing": "Deploy-tests"

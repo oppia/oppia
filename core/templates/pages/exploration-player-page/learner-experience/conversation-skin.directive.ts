@@ -16,8 +16,6 @@
  * @fileoverview Controller for the conversation skin.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { Subscription } from 'rxjs';
 
 require(
@@ -399,8 +397,6 @@ angular.module('oppia').directive('conversationSkin', [
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          StatsReportingService = (
-            OppiaAngularRootComponent.statsReportingService);
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
           var TIME_PADDING_MSEC = 250;

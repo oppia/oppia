@@ -311,14 +311,26 @@ describe('Interaction model', () => {
     const testInteraction = Interaction.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            unicode_str: 'Type an expression here, using only numbers.'
+          }
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericExpressionInput',
       solution: solutionDict
     });
 
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      placeholder: {
+        value: new SubtitledUnicode(
+          'Type an expression here, using only numbers.', 'ca_placeholder_0')
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +

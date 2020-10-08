@@ -26,7 +26,7 @@ import {
   ExplorationTaskObjectFactory
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from 'domain/improvements/HighBounceRateTaskObjectFactory';
-import { StateStatsBackendDict } from  'domain/statistics/StateStatsObjectFactory';
+import { StateStatsBackendDict } from 'domain/statistics/state-stats-model';
 import { IneffectiveFeedbackLoopTask } from 'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';

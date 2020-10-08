@@ -22,11 +22,12 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { State } from 'domain/state/State.model';
 
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
 
 describe('Learner answer info service', function() {
-  var acrof = null;
   var stateDict = null;
   var firstState = null;
   var secondState = null;
@@ -129,7 +130,6 @@ describe('Learner answer info service', function() {
       }
     };
 
-    acrof = $injector.get('AnswerClassificationResultObjectFactory');
     LearnerAnswerInfoService = $injector.get('LearnerAnswerInfoService');
     AnswerClassificationService = $injector.get('AnswerClassificationService');
     ladbas = $injector.get(
@@ -140,8 +140,8 @@ describe('Learner answer info service', function() {
     secondState = State.createFromBackendDict('fake state', stateDict);
     thirdState = State.createFromBackendDict('demo state', stateDict);
     spyOn(AnswerClassificationService, 'getMatchingClassificationResult')
-      .and.returnValue(acrof.createNew(
-        Outcome.createNew('default', 'default_outcome', '', []), 2,
+      .and.returnValue(new AnswerClassificationResult(
+        Outcome.createNew('default', 'default_outcome', '', []), 2, 0,
         DEFAULT_OUTCOME_CLASSIFICATION));
     mockAnswer = 'This is my answer';
     mockInteractionRulesService = {

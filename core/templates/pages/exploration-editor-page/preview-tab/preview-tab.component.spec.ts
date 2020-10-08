@@ -19,10 +19,13 @@
 import { ParamChange } from 'domain/exploration/ParamChange.model';
 import { EventEmitter } from '@angular/core';
 
-// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Preview Tab Component', function() {
+  importAllAngularServices();
+
   var ctrl = null;
   var $flushPendingTasks = null;
   var $q = null;
@@ -59,13 +62,6 @@ describe('Preview Tab Component', function() {
   }, {
     paramName: 'paramName2'
   }];
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationDataService', {

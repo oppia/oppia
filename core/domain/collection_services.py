@@ -785,7 +785,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
-    create_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary(collection.id, committer_id)
 
 
 def save_new_collection(committer_id, collection):
@@ -928,7 +928,7 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
 
     _save_collection(committer_id, collection, commit_message, change_list)
-    update_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary(collection.id, committer_id)
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
@@ -936,29 +936,19 @@ def update_collection(
             committer_id, utils.get_current_time_in_millisecs())
 
 
-def create_collection_summary(collection_id, contributor_id_to_add):
-    """Creates and stores a summary of the given collection.
+def regenerate_collection_summary(collection_id, contributor_id_to_add):
+    """Regenerate a summary of the given collection. If the summary does not
+    exist, this function generates a new one.
 
     Args:
         collection_id: str. ID of the collection.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
+        contributor_id_to_add: str|None. ID of the contributor to be added to
+            the collection summary.
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = compute_summary_of_collection(
         collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
-
-
-def update_collection_summary(collection_id, contributor_id_to_add):
-    """Update the summary of an collection.
-
-    Args:
-        collection_id: str. ID of the collection.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
-    """
-    create_collection_summary(collection_id, contributor_id_to_add)
 
 
 def compute_summary_of_collection(collection, contributor_id_to_add):
@@ -992,6 +982,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
             contributors_summary.get(contributor_id_to_add, 0) + 1)
+
     contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
@@ -1036,6 +1027,15 @@ def compute_collection_contributors_summary(collection_id):
             break
 
         current_version -= 1
+
+    contributor_ids = list(contributors_summary)
+    # Remove IDs that are deleted or do not exist.
+    users_settings = user_services.get_users_settings(contributor_ids)
+    for contributor_id, user_settings in python_utils.ZIP(
+            contributor_ids, users_settings):
+        if user_settings is None:
+            del contributors_summary[contributor_id]
+
     return contributors_summary
 
 

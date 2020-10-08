@@ -35,7 +35,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
-interface ExplorationBackendDict {
+export interface ExplorationBackendDict {
   'init_state_name': string;
   'param_changes': ParamChangeBackendDict[];
   'param_specs': ParamSpecsBackendDict;

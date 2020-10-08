@@ -24,14 +24,10 @@ import { StateTopAnswersStats } from 'domain/statistics/state-top-answers-stats-
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
-import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from 'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
-import { ParamMetadataObjectFactory } from 'domain/exploration/ParamMetadataObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -54,23 +50,14 @@ describe('Exploration Warnings Service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
       'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('ImprovementsService', new ImprovementsService());
-    $provide.value(
-      'ParamMetadataObjectFactory', new ParamMetadataObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
+      'StateClassifierMappingService', new StateClassifierMappingService());
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
