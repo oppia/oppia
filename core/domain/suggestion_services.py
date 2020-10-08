@@ -883,18 +883,14 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
 
     Args:
         suggestions: list(Suggestion). Suggestions that may update the counts
-            stored in the community contribution stats. Only suggestion types
-            that are offered on the Contributor Dashboard are accounted for.
+            stored in the community contribution stats model. Only suggestion
+            types that are tracked in the community contribution stats model
+            trigger count updates.
         amount: int. The amount to adjust the counts by.
     """
     stats_model = suggestion_models.CommunityContributionStatsModel.get()
     for suggestion in suggestions:
-        # This method does nothing for suggestion types that are not offered on
-        # the Contributor Dashboard.
         if suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
-            continue
-        elif suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if suggestion.language_code not in (
                     stats_model.translation_suggestion_counts_by_lang_code):
@@ -904,12 +900,12 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
                 stats_model.translation_suggestion_counts_by_lang_code[
                     suggestion.language_code] += amount
         elif suggestion.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
             stats_model.question_suggestion_count += amount
 
-        # Create a community contribution stats object to validate the updates.
-        stats = create_community_contribution_stats_from_model(stats_model)
-        stats.validate()
+    # Create a community contribution stats object to validate the updates.
+    stats = create_community_contribution_stats_from_model(stats_model)
+    stats.validate()
 
     stats_model.put()
 
@@ -922,8 +918,9 @@ def _update_suggestion_counts_in_community_contribution_stats(
 
     Args:
         suggestions: list(Suggestion). Suggestions that may update the counts
-            stored in the community contribution stats. Only suggestion types
-            that are offered on the Contributor Dashboard are accounted for.
+            stored in the community contribution stats model. Only suggestion
+            types that are tracked in the community contribution stats model
+            trigger count updates.
         amount: int. The amount to adjust the counts by.
     """
     transaction_services.run_in_transaction(
