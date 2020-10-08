@@ -51,15 +51,12 @@ MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = 5
 # suggestion opportunities. For instance, for translation suggestions the
 # emphasized text is the translation. Similarly, for question suggestions the
 # emphasized text is the question being asked.
-HTML_FOR_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
-    # The translation html is always the first element in the list of
-    # translation suggestion html content strings.
+SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-        lambda html_content_strings: html_content_strings[0]),
-    # The question content html is always the last element in the list of
-    # question suggestion html content strings.
+        lambda suggestion: suggestion.change.translation_html),
     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-        lambda html_content_strings: html_content_strings[-1])
+        lambda suggestion: suggestion.change.question_dict[
+            'question_state_data']['content']['html'])
 }
 
 
@@ -645,7 +642,8 @@ def _get_plain_text_from_html_content_string(html_content_string):
         """Replaces all of the <oppia-noninteractive-**> tags.
 
         Args:
-            rte_tag: MatchObject. The matched oppia-noninteractive rte tag.
+            rte_tag: MatchObject. A matched object that contins the
+                oppia-noninteractive rte tag.
 
         Returns:
             str. The string to replace the rte tag with.
@@ -672,8 +670,8 @@ def _get_plain_text_from_html_content_string(html_content_string):
     )
     # Remove trailing and leading whitespace and ensure that all words are
     # separated by a single space.
-    plain_text_without_whitespace_issues = ' '.join(plain_text.split())
-    return plain_text_without_whitespace_issues
+    plain_text_without_contiguous_whitespace = ' '.join(plain_text.split())
+    return plain_text_without_contiguous_whitespace
 
 
 def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
@@ -688,17 +686,41 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     Returns:
         ReviewableSuggestionEmailInfo. The corresponding reviewable suggestion
         email info.
+
+    Raises:
+        Exception. The keys in SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS
+            should be consist with the suggestion types offered on the
+            Contributor Dashboard.
+        Exception. The suggestion type must be offered on the Contributor
+            Dashboard.
     """
-    html_content_strings = suggestion.get_all_html_content_strings()
+    # This check makes sure that an error is raised if a new suggestion type
+    # is added to the Contributor Dashboard but hasn't been added to
+    # SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.
+    if set(suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES) != set(
+        SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys()):
+        raise Exception(
+            'Expected keys in SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS to '
+            'be [%s], received: [%s].' % (
+                ' '.join(
+                    suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES),
+                ' '.join(SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys())))
+
+    if suggestion.suggestion_type not in (
+            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS):
+        raise Exception(
+            'Expected suggestion type to be offered on the Contributor '
+            'Dashboard, received: %s.' % suggestion.suggestion_type)
+    
     # Retrieve the html content that is emphasized on the Contributor Dashboard
     # pages. This content is what stands out for each suggestion when a user
     # views a list of suggestions.
     get_html_content_for_emphasized_text = (
-        HTML_FOR_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+        SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
             suggestion.suggestion_type]
     )
     plain_text = _get_plain_text_from_html_content_string(
-        get_html_content_for_emphasized_text(html_content_strings))
+        get_html_content_for_emphasized_text(suggestion))
     return suggestion_registry.ReviewableSuggestionEmailInfo(
         suggestion.suggestion_type, suggestion.language_code, plain_text,
         suggestion.last_updated

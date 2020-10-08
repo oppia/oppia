@@ -1707,6 +1707,30 @@ class ReviewableSuggestionEmailInfoUnitTests(
             'test description'
         )
 
+    def _create_edit_state_content_suggestion(self):
+        """Creates an "edit state content" suggestion."""
+
+        edit_state_content_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new html content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'old html content'
+            }
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, edit_state_content_change_dict,
+            'test description')
+
     def _assert_reviewable_suggestion_email_infos_are_equal(
             self, reviewable_suggestion_email_info,
             expected_reviewable_suggestion_email_info):
@@ -1736,6 +1760,42 @@ class ReviewableSuggestionEmailInfoUnitTests(
         self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
+
+    def test_create_raises_for_suggestion_type_not_on_contributor_dashboard(
+            self):
+        edit_state_content_suggestion = (
+            self._create_edit_state_content_suggestion())
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected suggestion type to be offered on the Contributor '
+            'Dashboard, received: %s.' % (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    edit_state_content_suggestion)
+            )
+
+    def test_create_raises_for_unexpected_contributor_suggestion_type_keys(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p>default question content</p>'))
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected keys in SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS to '
+            'be \[%s\], received: \[\].'% ' '.join(
+                suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)):
+            with self.swap(
+                suggestion_services,
+                'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS', {}):
+                (
+                    suggestion_services
+                    .create_reviewable_suggestion_email_info_from_suggestion(
+                        question_suggestion)
+                )
 
     def test_create_from_suggestion_returns_info_for_question_suggestion(self):
         question_suggestion = (

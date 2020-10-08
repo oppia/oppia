@@ -62,6 +62,12 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# The types of suggestions that are offered on the Contributor Dashboard.
+CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]
+
 # Daily emails are sent to reviewers to notify them of suggestions on the
 # Contributor Dashboard to review. The constants below define the number of
 # question and translation suggestions to fetch to come up with these daily
