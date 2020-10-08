@@ -2439,7 +2439,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.question_suggestion_count
         )
 
-    def test_adjust_translation_reviewer_count_for_lang_code_updates_empty_dict(
+    def test_set_translation_reviewer_count_for_lang_code_updates_empty_dict(
             self):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
@@ -2452,7 +2452,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         (
             community_contribution_stats
-            .adjust_translation_reviewer_count_for_language_code(
+            .set_translation_reviewer_count_for_language_code(
                 self.sample_language_code, 2)
         )
 
@@ -2464,7 +2464,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             {self.sample_language_code: 2}
         )
 
-    def test_adjust_translation_reviewer_count_for_lang_code_increments_count(
+    def test_set_translation_reviewer_count_for_lang_code_updates_count_value(
             self):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
@@ -2477,7 +2477,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         (
             community_contribution_stats
-            .adjust_translation_reviewer_count_for_language_code(
+            .set_translation_reviewer_count_for_language_code(
                 self.sample_language_code, 2)
         )
 
@@ -2486,35 +2486,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code
             ),
-            {self.sample_language_code: 3}
+            {self.sample_language_code: 2}
         )
 
-    def test_adjust_translation_reviewer_count_for_lang_code_decrements_count(
-            self):
-        community_contribution_stats = (
-            suggestion_services.get_community_contribution_stats()
-        )
-        community_contribution_stats.validate()
-        (
-            community_contribution_stats
-            .translation_reviewer_counts_by_lang_code
-        ) = {self.sample_language_code: 1}
-
-        (
-            community_contribution_stats
-            .adjust_translation_reviewer_count_for_language_code(
-                self.sample_language_code, -1)
-        )
-
-        self.assertDictEqual(
-            (
-                community_contribution_stats
-                .translation_reviewer_counts_by_lang_code
-            ),
-            {self.sample_language_code: 0}
-        )
-
-    def test_adjust_translation_reviewer_count_for_lang_code_adds_new_lang_key(
+    def test_set_translation_reviewer_count_for_lang_code_adds_new_lang_key(
             self):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
@@ -2527,7 +2502,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         (
             community_contribution_stats
-            .adjust_translation_reviewer_count_for_language_code('hi', 2)
+            .set_translation_reviewer_count_for_language_code('hi', 2)
         )
 
         self.assertDictEqual(
@@ -2538,7 +2513,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             {'en': 1, 'hi': 2}
         )
 
-    def test_adjust_translation_suggestion_count_for_lang_updates_empty_dict(
+    def test_set_translation_suggestion_count_for_lang_code_updates_empty_dict(
             self):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
@@ -2551,7 +2526,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         (
             community_contribution_stats
-            .adjust_translation_suggestion_count_for_language_code(
+            .set_translation_suggestion_count_for_language_code(
                 self.sample_language_code, 2)
         )
 
@@ -2562,7 +2537,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             ), {self.sample_language_code: 2}
         )
 
-    def test_adjust_translation_suggestion_count_for_lang_code_increments_count(
+    def test_set_translation_suggestion_count_for_lang_code_updates_count_value(
             self):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
@@ -2575,7 +2550,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         (
             community_contribution_stats
-            .adjust_translation_suggestion_count_for_language_code(
+            .set_translation_suggestion_count_for_language_code(
                 self.sample_language_code, 2)
         )
 
@@ -2584,35 +2559,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 community_contribution_stats
                 .translation_suggestion_counts_by_lang_code
             ),
-            {self.sample_language_code: 3}
+            {self.sample_language_code: 2}
         )
 
-    def test_adjust_translation_suggestion_count_for_lang_code_decrements_count(
-            self):
-        community_contribution_stats = (
-            suggestion_services.get_community_contribution_stats()
-        )
-        community_contribution_stats.validate()
-        (
-            community_contribution_stats
-            .translation_suggestion_counts_by_lang_code
-        ) = {self.sample_language_code: 1}
-
-        (
-            community_contribution_stats
-            .adjust_translation_suggestion_count_for_language_code(
-                self.sample_language_code, -1)
-        )
-
-        self.assertDictEqual(
-            (
-                community_contribution_stats
-                .translation_suggestion_counts_by_lang_code
-            ),
-            {self.sample_language_code: 0}
-        )
-
-    def test_adjust_translation_suggestion_count_for_lang_code_adds_new_key(
+    def test_set_translation_suggestion_count_for_lang_code_adds_new_lang_key(
             self):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
@@ -2625,7 +2575,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         (
             community_contribution_stats
-            .adjust_translation_suggestion_count_for_language_code('hi', 2)
+            .set_translation_suggestion_count_for_language_code('hi', 2)
         )
 
         self.assertDictEqual(

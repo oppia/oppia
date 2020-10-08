@@ -1783,11 +1783,12 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def test_accept_edit_state_content_suggestion_does_not_change_the_counts(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
-        edit_state_content_suggestion = _create_edit_state_content_suggestion()
+        edit_state_content_suggestion = (
+            self._create_edit_state_content_suggestion())
         self._assert_community_contribution_stats_is_in_default_state()
 
         suggestion_services.accept_suggestion(
-            edit_state_content_suggestion.suggestion_id, self.reviewer_1_id,
+            edit_state_content_suggestion.suggestion_id, self.reviewer_id,
             self.COMMIT_MESSAGE, 'review message')
 
         self._assert_community_contribution_stats_is_in_default_state()
@@ -1795,11 +1796,12 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def test_reject_edit_state_content_suggestion_does_not_change_the_counts(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
-        edit_state_content_suggestion = _create_edit_state_content_suggestion()
+        edit_state_content_suggestion = (
+            self._create_edit_state_content_suggestion())
         self._assert_community_contribution_stats_is_in_default_state()
 
         suggestion_services.reject_suggestion(
-            edit_state_content_suggestion.suggestion_id, self.reviewer_1_id,
+            edit_state_content_suggestion.suggestion_id, self.reviewer_id,
             'review message')
 
         self._assert_community_contribution_stats_is_in_default_state()
@@ -1808,33 +1810,39 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self):
         self._assert_community_contribution_stats_is_in_default_state()
         edit_state_content_suggestion_1 = (
-            _create_edit_state_content_suggestion())
+            self._create_edit_state_content_suggestion())
         edit_state_content_suggestion_2 = (
-            _create_edit_state_content_suggestion())
+            self._create_edit_state_content_suggestion())
         self._assert_community_contribution_stats_is_in_default_state()
 
         suggestion_services.reject_suggestions(
             [
                 edit_state_content_suggestion_1.suggestion_id,
                 edit_state_content_suggestion_2.suggestion_id
-            ], self.reviewer_1_id, 'review message')
+            ], self.reviewer_id, 'review message')
 
         self._assert_community_contribution_stats_is_in_default_state()
 
     def test_resubmit_edit_state_content_suggestions_does_not_change_the_counts(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
-        edit_state_content_suggestion = _create_edit_state_content_suggestion()
+        edit_state_content_suggestion = (
+            self._create_edit_state_content_suggestion())
         self._assert_community_contribution_stats_is_in_default_state()
         suggestion_services.reject_suggestion(
-            edit_state_content_suggestion.suggestion_id, self.reviewer_1_id,
+            edit_state_content_suggestion.suggestion_id, self.reviewer_id,
             'review message')
         self._assert_community_contribution_stats_is_in_default_state()
-        suggestion_services.reject_suggestions(
-            [
-                edit_state_content_suggestion_1.suggestion_id,
-                edit_state_content_suggestion_2.suggestion_id
-            ], self.reviewer_1_id, 'review message')
+        # Change the new_value of the html of the suggestion that got rejected
+        # so we can resubmit the suggestion for review.
+        resubmit_suggestion_change = edit_state_content_suggestion.change
+        resubmit_suggestion_change.new_value['html'] = 'new html to resubmit'
+
+        # Resubmit the rejected "edit state content" suggestion.
+        suggestion_services.resubmit_rejected_suggestion(
+            edit_state_content_suggestion.suggestion_id,
+            'resubmit summary message', self.author_id,
+            resubmit_suggestion_change)
 
         self._assert_community_contribution_stats_is_in_default_state()
 
