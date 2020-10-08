@@ -1137,11 +1137,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _checked_interaction_ids = set()
 
         def _create_init_state_for_interaction_verification():
+            """Creates an init state for interaction verification."""
             exploration = (
                 exp_domain.Exploration.create_default_exploration('0'))
             return exploration.states[exploration.init_state_name]
 
         def _verify_interaction_supports_android(self, interaction_id):
+            """Checks that the provided interaction is supported on android."""
             init_state = _create_init_state_for_interaction_verification()
             init_state.update_interaction_id(interaction_id)
             self.assertTrue(
@@ -1149,6 +1151,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             _checked_interaction_ids.add(interaction_id)
 
         def _verify_interaction_does_not_support_android(self, interaction_id):
+            """Checks that the provided interaction is not supported on
+            android.
+            """
             init_state = _create_init_state_for_interaction_verification()
             init_state.update_interaction_id(interaction_id)
             self.assertFalse(
@@ -1156,6 +1161,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             _checked_interaction_ids.add(interaction_id)
 
         def _verify_all_interaction_ids_checked(self):
+            """Verifies that all the interaction ids are checked."""
             all_interaction_ids = set(
                 interaction_registry.Registry.get_all_interaction_ids())
             missing_interaction_ids = (
