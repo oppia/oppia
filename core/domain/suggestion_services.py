@@ -111,7 +111,7 @@ def create_suggestion(
 
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review increases by one.
-    _update_community_contribution_stats_due_to_suggestion(suggestion, 1)
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], 1)
 
     return get_suggestion_by_id(thread_id)
 
@@ -343,7 +343,7 @@ def accept_suggestion(
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review decreases by one, since this
     # suggestion is no longer in review.
-    _update_community_contribution_stats_due_to_suggestion(suggestion, -1)
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], -1)
 
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
@@ -433,7 +433,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
     # Update the community contribution stats so that the number of suggestions
     # that are in review decreases, since these suggestions are no longer in
     # review.
-    _update_community_contribution_stats_due_to_suggestions(suggestions, -1)
+    _update_suggestion_counts_in_community_contribution_stats(suggestions, -1)
 
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
@@ -518,7 +518,7 @@ def resubmit_rejected_suggestion(
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review increases by one, since this suggestion is
     # now back in review.
-    _update_community_contribution_stats_due_to_suggestion(suggestion, 1)
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], 1)
 
     feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
@@ -876,7 +876,7 @@ def get_community_contribution_stats():
         community_contribution_stats_model)
 
 
-def _update_community_contribution_stats_due_to_suggestions_transactional(
+def _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount.
@@ -894,21 +894,22 @@ def _update_community_contribution_stats_due_to_suggestions_transactional(
         if suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             continue
-        else:
-            stats_model = (
-                suggestion_models.CommunityContributionStatsModel.get())
-            if suggestion.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-                if suggestion.language_code not in (
-                        stats_model.translation_suggestion_counts_by_lang_code):
-                    stats_model.translation_suggestion_counts_by_lang_code[
-                        suggestion.language_code] = amount
-                else:
-                    stats_model.translation_suggestion_counts_by_lang_code[
-                        suggestion.language_code] += amount
-            elif suggestion.suggestion_type == (
+        elif suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if suggestion.language_code not in (
+                    stats_model.translation_suggestion_counts_by_lang_code):
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code] = amount
+            else:
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code] += amount
+        elif suggestion.suggestion_type == (
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-                stats_model.question_suggestion_count += amount
+            stats_model.question_suggestion_count += amount
+        else:
+            raise Exception(
+                'Suggestion type: %s not accounted for.' % (
+                    suggestion.suggestion_type))
 
         # Create a community contribution stats object to validate the updates.
         stats = create_community_contribution_stats_from_model(stats_model)
@@ -917,7 +918,7 @@ def _update_community_contribution_stats_due_to_suggestions_transactional(
     stats_model.put()
 
 
-def _update_community_contribution_stats_due_to_suggestions(
+def _update_suggestion_counts_in_community_contribution_stats(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount. The GET and PUT is done in a single
@@ -930,20 +931,5 @@ def _update_community_contribution_stats_due_to_suggestions(
         amount: int. The amount to adjust the counts by.
     """
     transaction_services.run_in_transaction(
-        _update_community_contribution_stats_due_to_suggestions_transactional,
+        _update_suggestion_counts_in_community_contribution_stats_transactional,
         suggestions, amount)
-
-
-def _update_community_contribution_stats_due_to_suggestion(suggestion, amount):
-    """Updates the community contribution stats count associated with the given
-    suggestion by the given amount. The GET and PUT is done in a single
-    transaction to avoid loss of updates that come in rapid succession.
-
-    Args:
-        suggestion: Suggestion. A suggestion that may update a count stored in
-            the community contribution stats. Only suggestion types that are
-            offered on the Contributor Dashboard are accounted for.
-        amount: int. The amount to adjust the count by.
-    """
-    _update_community_contribution_stats_due_to_suggestions(
-        [suggestion], amount)
