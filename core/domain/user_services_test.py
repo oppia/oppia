@@ -2276,6 +2276,24 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
 
+    def test_grant_reviewer_translation_multi_reviewing_rights_increases_count(
+            self):
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code,
+            {'hi': 1, 'en': 1})
+
     def test_grant_reviewer_existing_translation_reviewing_rights_no_count_diff(
             self):
         self._assert_community_contribution_stats_is_in_default_state()
