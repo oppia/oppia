@@ -138,6 +138,35 @@ describe('TextInputValidationService', () => {
     }]);
   });
 
+  it('should catch non-unique rule type within one answer group', () => {
+    let answerGroups = [
+      createAnswerGroupByRules(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: ['xyz']
+            }
+          }),
+          rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: ['xyza']
+            }
+          })
+        ]
+      )];
+
+    let warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Answer group 1 has multiple rules with ' +
+        'the same type \'Equals\' within the same group.'
+    }]);
+  });
+
   it('should catch redundancy of contains rules with matching inputs', () => {
     let answerGroups = [
       createAnswerGroupByRules(

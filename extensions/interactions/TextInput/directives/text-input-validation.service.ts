@@ -121,7 +121,7 @@ export class TextInputValidationService {
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
               `Answer group ${answerGroupIndex + 1} has multiple rules with ` +
-              `the same type (${rule.type}) within the same group.`
+              `the same type \'${rule.type}\' within the same group.`
             )
           });
         }
