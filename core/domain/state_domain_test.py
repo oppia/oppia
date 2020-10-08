@@ -3612,7 +3612,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '[[]] has the wrong type. It should be a SetOfNormalizedString.')
+                '[[]] has the wrong type. It should be a SetOfNormalizedString.'
+            )
         ):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)

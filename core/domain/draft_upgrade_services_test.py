@@ -227,7 +227,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_change_list_2_v39_dict_list,
             migrated_draft_change_list_2_v40_dict_list)
 
-
     def test_convert_states_v38_dict_to_v39_dict(self):
         draft_change_list_v38 = [
             exp_domain.ExplorationChange({
