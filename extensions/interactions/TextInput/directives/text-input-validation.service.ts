@@ -120,7 +120,7 @@ export class TextInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
-              `Answer group ${answerGroupIndex + 1} has multiple rules on ` +
+              `Answer group ${answerGroupIndex + 1} has multiple rules with ` +
               `the same type (${rule.type}) within the same group.`
             )
           });

@@ -39,7 +39,7 @@ export class TextInputRulesService {
     const normalizedInput = inputs.x.map(
       input => this.nws.transform(input).toLowerCase());
 
-    const levenshtein = (inputString, matchString) => {
+    const hasEditDistanceEqualToOne = (inputString, matchString) => {
       if (inputString === matchString) {
         return true;
       }
@@ -64,7 +64,8 @@ export class TextInputRulesService {
       return editDistance[inputString.length][matchString.length] === 1;
     };
 
-    return normalizedInput.some(input => levenshtein(input, normalizedAnswer));
+    return normalizedInput.some(
+      input => hasEditDistanceEqualToOne(input, normalizedAnswer));
   }
   StartsWith(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
