@@ -153,7 +153,7 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self, interaction_id):
         """Get all html content strings in the AnswerGroup.
 
         Returns:
@@ -175,10 +175,14 @@ class AnswerGroup(python_utils.OBJECT):
         html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-
         for rule_spec in self.rule_specs:
             for interaction_and_rule_details in (
                     html_field_types_to_rule_specs_dict.values()):
+                if (
+                        interaction_and_rule_details['interactionId'] !=
+                        interaction_id):
+                    continue
+
                 rule_type_has_html = (
                     rule_spec.rule_type in
                     interaction_and_rule_details['ruleTypes'].keys())
@@ -777,7 +781,8 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            html_list = html_list + answer_group.get_all_html_content_strings()
+            html_list = html_list + answer_group.get_all_html_content_strings(
+                self.id)
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html

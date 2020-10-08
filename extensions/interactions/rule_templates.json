@@ -265,16 +265,16 @@
   },
   "TextInput": {
     "Equals": {
-      "description": "is equal to {{x|SetOfNormalizedString}}, without taking case into account"
+      "description": "is equal to one of {{x|SetOfNormalizedString}}, without taking case into account"
     },
     "StartsWith": {
-      "description": "starts with {{x|SetOfNormalizedString}}"
+      "description": "starts with one of {{x|SetOfNormalizedString}}"
     },
     "Contains": {
-      "description": "contains {{x|SetOfNormalizedString}}"
+      "description": "contains one of {{x|SetOfNormalizedString}}"
     },
     "FuzzyEquals": {
-      "description": "is equal to {{x|SetOfNormalizedString}}, misspelled by at most one character"
+      "description": "is equal to one of {{x|SetOfNormalizedString}}, misspelled by at most one character"
     }
   },
   "RatioExpressionInput": {

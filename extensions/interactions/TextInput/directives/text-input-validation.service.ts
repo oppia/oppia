@@ -130,11 +130,15 @@ export class TextInputValidationService {
 
         let currentStrings = <string[]> rule.inputs.x;
         if (rule.type === 'Contains') {
-          // Check if the current string contains any of the previously seen
-          // strings as a substring.
-          if (seenStringsContains.some(
-            (seenString) => currentStrings.includes(seenString)) ||
-            seenStringsStartsWith.includes('')) {
+          // Check if any of the current strings contain any of the previously
+          // seen strings as a substring.
+          const hasCollision = seenStringsContains.some(
+            seenString => currentStrings.some(
+              currentString => currentString.includes(seenString)
+            )
+          );
+
+          if (hasCollision || seenStringsStartsWith.includes('')) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -145,10 +149,16 @@ export class TextInputValidationService {
 
           seenStringsContains.push(...currentStrings);
         } else if (rule.type === 'StartsWith') {
-          // Check if the current string contains any of the previously seen
-          // strings as a prefix.
-          if (seenStringsStartsWith.concat(seenStringsContains).some(
-            (seenString) => currentStrings.indexOf(seenString) === 0)) {
+          // Check if any of the current strings contain any of the previously
+          // seen strings as a prefix.
+          const hasCollision = (
+            seenStringsStartsWith.concat(seenStringsContains).some(
+              seenString => currentStrings.some(
+                currentString => currentString.indexOf(seenString) === 0)
+            )
+          );
+
+          if (hasCollision) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +

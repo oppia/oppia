@@ -62,8 +62,8 @@ describe('Testing filters', function() {
       expect($filter('parameterizeRuleDescription')(
         ruleMultipleChoice, interactionIdMultipleChoice, choicesMultipleChoice)
       ).toEqual(
-        'is equal to \'$10 should not become $$10\', without taking case' +
-        ' into account'
+        'is equal to one of \'$10 should not become $$10\', without taking' +
+        ' case into account'
       );
 
       choicesMultipleChoice = [
@@ -150,7 +150,7 @@ describe('Testing filters', function() {
         $filter('parameterizeRuleDescription')(
           ruleMath, interactionIdMath, choicesMath)))
       ).toEqual(
-        'is ' + 'equal to \'[Math]\', without taking case into account');
+        'is ' + 'equal to one of \'[Math]\', without taking case into account');
 
       expect($filter('convertToPlainText')($filter('formatRtePreview')(
         $filter('parameterizeRuleDescription')(

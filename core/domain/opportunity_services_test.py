@@ -323,7 +323,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
