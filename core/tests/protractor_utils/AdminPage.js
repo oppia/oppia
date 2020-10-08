@@ -134,31 +134,30 @@ var AdminPage = function() {
     await action.click('Admin roles tab button', adminRolesTab);
     await waitFor.pageToFullyLoad();
 
-    await waitFor.visibilityOf(
-      expect(adminRolesTab.getAttribute('class')).toMatch('active'));
+    expect(await adminRolesTab.getAttribute('class')).toMatch('active');
     await waitFor.visibilityOf(
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
   var saveConfigProperty = async function(
-    configProperty, propertyName, objectType, editingInstructions) {
-      await waitFor.visibilityOf(
-        configProperty.element(
-          by.css('.protractor-test-config-title')));
-      var title = await configProperty.element(
-        by.css('.protractor-test-config-title')).getText();
-      if (title.match(propertyName)) {
-        await editingInstructions(
-          await forms.getEditor(objectType)(configProperty));
-        await action.click('Saves All Configs', saveAllConfigs);
-        await general.acceptAlert();
-        // Waiting for success message.
-        await waitFor.textToBePresentInElement(
-          statusMessage, 'saved successfully',
-          'New config could not be saved');
+      configProperty, propertyName, objectType, editingInstructions) {
+    await waitFor.visibilityOf(
+      configProperty.element(
+        by.css('.protractor-test-config-title')));
+    var title = await configProperty.element(
+      by.css('.protractor-test-config-title')).getText();
+    if (title.match(propertyName)) {
+      await editingInstructions(
+        await forms.getEditor(objectType)(configProperty));
+      await action.click('Saves All Configs', saveAllConfigs);
+      await general.acceptAlert();
+      // Waiting for success message.
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'saved successfully',
+        'New config could not be saved');
       return true;
     }
-    };
+  };
 
   this.get = async function() {
     await browser.get(ADMIN_URL_SUFFIX);
