@@ -2593,7 +2593,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
-            .adjust_translation_reviewer_count_for_language_code(
+            .set_translation_reviewer_count_for_language_code(
                 self.sample_language_code, self.negative_count)
         )
 
@@ -2611,7 +2611,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
-            .adjust_translation_suggestion_count_for_language_code(
+            .set_translation_suggestion_count_for_language_code(
                 self.sample_language_code, self.negative_count)
         )
 
@@ -2659,7 +2659,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
-            .adjust_translation_reviewer_count_for_language_code(
+            .set_translation_reviewer_count_for_language_code(
                 self.sample_language_code, self.non_integer_count)
         )
 
@@ -2677,7 +2677,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
-            .adjust_translation_suggestion_count_for_language_code(
+            .set_translation_suggestion_count_for_language_code(
                 self.sample_language_code, self.non_integer_count)
         )
 
@@ -2727,7 +2727,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
-            .adjust_translation_reviewer_count_for_language_code(
+            .set_translation_reviewer_count_for_language_code(
                 self.invalid_language_code, 1)
         )
 
@@ -2744,7 +2744,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
-            .adjust_translation_suggestion_count_for_language_code(
+            .set_translation_suggestion_count_for_language_code(
                 self.invalid_language_code, 1)
         )
 
