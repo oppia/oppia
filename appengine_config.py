@@ -20,9 +20,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import sys
 
+from google.appengine.ext import vendor
 import pkg_resources
 import python_utils
-from google.appengine.ext import vendor
 
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
