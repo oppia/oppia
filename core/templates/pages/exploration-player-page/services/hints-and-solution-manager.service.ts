@@ -16,8 +16,8 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-import { Injectable } from '@angular/core';
 import { EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Hint } from 'domain/exploration/HintObjectFactory';
