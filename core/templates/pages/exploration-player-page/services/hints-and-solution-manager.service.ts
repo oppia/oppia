@@ -55,7 +55,7 @@ export class HintsAndSolutionManagerService {
   tooltipTimeout = null;
 
   constructor(private playerPositionService: PlayerPositionService) {
-    // TODO(#10904): Refactor to move subcriptions into components.
+    // TODO(#10904): Refactor to move subscriptions into components.
     playerPositionService.onNewCardAvailable.subscribe(
       () => {
         this.correctAnswerSubmitted = true;
