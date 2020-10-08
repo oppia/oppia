@@ -33,7 +33,8 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
   template: require('./ratio-expression-input-interaction.component.html'),
   controller: [
     '$attrs', '$scope', 'CurrentInteractionService',
-    'InteractionAttributesExtractorService', 'RatioExpressionInputRulesService',
+    'InteractionAttributesExtractorService',
+    'RatioExpressionInputRulesService',
     function(
         $attrs, $scope, CurrentInteractionService,
         InteractionAttributesExtractorService,
