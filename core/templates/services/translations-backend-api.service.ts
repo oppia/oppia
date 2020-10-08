@@ -16,29 +16,35 @@
  * @fileoverview Translations backend api service.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { downgradeInjectable } from "@angular/upgrade/static";
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 
 export interface TranslationsDict {
   [translation: string]: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class TranslationsBackendApiService {
-  private prefix = '/assets/i18n/';
-  private suffix = '.json';
+  private prefix = "/assets/i18n/";
+  private suffix = ".json";
 
   constructor(private http: HttpClient) {}
 
-  async fetchTranslationsAsync(languageCode: string): Promise<TranslationsDict> {
-    return this.http.get<TranslationsDict>(
-      `${this.prefix}${languageCode}${this.suffix}`).toPromise();
+  async fetchTranslationsAsync(
+    languageCode: string
+  ): Promise<TranslationsDict> {
+    return this.http
+      .get<TranslationsDict>(`${this.prefix}${languageCode}${this.suffix}`)
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'TranslationsBackendApiService',
-  downgradeInjectable(TranslationsBackendApiService));
+angular
+  .module("oppia")
+  .factory(
+    "TranslationsBackendApiService",
+    downgradeInjectable(TranslationsBackendApiService)
+  );
