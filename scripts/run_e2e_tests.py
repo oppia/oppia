@@ -27,8 +27,8 @@ import subprocess
 import sys
 import time
 
-import google
-import pkg_resources
+#import google
+#import pkg_resources
 import python_utils
 from scripts import build
 from scripts import common
@@ -40,35 +40,17 @@ _SIMPLE_CRYPT_PATH = os.path.join(
     'simple-crypt-' + common.SIMPLE_CRYPT_VERSION)
 sys.path.insert(0, _SIMPLE_CRYPT_PATH)
 
-_GOOGLE_API_PYTHON_CLIENT_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools',
-    'google-api-python-client-' + common.GOOGLE_API_PYTHON_CLIENT_VERSION)
-sys.path.insert(0, _GOOGLE_API_PYTHON_CLIENT_PATH)
+# _GOOGLE_API_PYTHON_CLIENT_PATH = os.path.join(
+#     os.getcwd(), '..', 'oppia_tools',
+#     'google-api-python-client-' + common.GOOGLE_API_PYTHON_CLIENT_VERSION)
+# sys.path.insert(0, _GOOGLE_API_PYTHON_CLIENT_PATH)
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+# _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
-_PATHS_TO_INSERT = [
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-api-core-%s' % common.GOOGLE_API_CORE_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-auth-%s' % common.GOOGLE_AUTH_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-auth-httplib2-%s' % common.GOOGLE_AUTH_HTTPLIB2_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-auth-oauthlib-%s' % common.GOOGLE_AUTH_OAUTHLIB_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-api-python-client-%s' %
-        common.GOOGLE_API_PYTHON_CLIENT_VERSION)
-]
-for path in _PATHS_TO_INSERT:
-    sys.path.insert(0, path)
-    pkg_resources.working_set.add_entry(path)
-    google.__path__.insert(0, os.path.join(path, 'google'))
+# for path in _PATHS_TO_INSERT:
+#     sys.path.insert(0, path)
+#     pkg_resources.working_set.add_entry(path)
+#     google.__path__.insert(0, os.path.join(path, 'google'))
 
 import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order

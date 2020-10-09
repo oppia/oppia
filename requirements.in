@@ -27,3 +27,7 @@ requests-toolbelt==0.9.1
 google-cloud-tasks==1.5.0
 googleapis_common_protos==1.52.0
 webapp2==3.0.0b1
+google-auth==1.21.1
+google-auth-httplib2==0.0.4
+google-api-python-client==1.11.0
+google-auth-oauthlib==0.4.1

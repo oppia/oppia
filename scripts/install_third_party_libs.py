@@ -149,21 +149,8 @@ def main():
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-        ('google-auth', common.GOOGLE_AUTH_VERSION, common.OPPIA_TOOLS_DIR),
-        (
-            'google-api-core', common.GOOGLE_API_CORE_VERSION,
-            common.OPPIA_TOOLS_DIR),
-        (
-            'google-auth-httplib2', common.GOOGLE_AUTH_HTTPLIB2_VERSION,
-            common.OPPIA_TOOLS_DIR),
-        (
-            'google-api-python-client', common.GOOGLE_API_PYTHON_CLIENT_VERSION,
-            common.OPPIA_TOOLS_DIR),
-        (
-            'google-auth-oauthlib', common.GOOGLE_AUTH_OAUTHLIB_VERSION,
-            common.OPPIA_TOOLS_DIR),
-        ('simple-crypt', common.SIMPLE_CRYPT_VERSION, common.OPPIA_TOOLS_DIR)
-        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
+        ('simple-crypt', common.SIMPLE_CRYPT_VERSION, common.OPPIA_TOOLS_DIR),
+        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR)
     ]
 
     for package, version, path in local_pip_dependencies:
