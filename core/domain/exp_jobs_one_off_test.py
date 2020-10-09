@@ -2918,9 +2918,10 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
         self.set_admins(['user'])
+        self.exp_id = '0b'
 
         exp = exp_domain.Exploration.create_default_exploration(
-            '0',
+            self.exp_id,
             title='title 0',
             category='Art',
         )
@@ -2943,18 +2944,35 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
     def test_no_action_is_performed_for_deleted_exploration(self):
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
+                'exploration-%s-1' % self.exp_id))
         commit_log_model.delete()
-        exp_services.delete_exploration(self.user_id, '0')
+        exp_services.delete_exploration(self.user_id, self.exp_id)
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
-            exp_id='0')
+            exp_id=self.exp_id)
+
+    def test_no_action_is_performed_for_exp_not_satisfying_id_constraint(self):
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0z',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.user_id, exp)
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0z-1'))
+        commit_log_model.delete()
+        exp_services.delete_exploration(self.user_id, '0z')
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
+            exp_id='0z')
 
     def test_validation_job_skips_check_for_deleted_commit_log_model(self):
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
+                'exploration-%s-1' % self.exp_id))
         commit_log_model.delete()
 
         job_id = (
@@ -2973,7 +2991,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
     def test_validation_job_catches_mismatch_in_non_datetime_fields(self):
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
+                'exploration-%s-1' % self.exp_id))
         commit_log_model.commit_message = 'Test change'
         commit_log_model.put()
 
@@ -2998,7 +3016,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
     def test_validation_job_catches_mismatch_in_datetime_fields(self):
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exploration-0-1'))
+                'exploration-%s-1' % self.exp_id))
         commit_log_model.created_on = commit_log_model.created_on + (
             datetime.timedelta(days=1))
         commit_log_model.put()
@@ -3016,7 +3034,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             .ExpCommitLogModelRegenerationValidator.get_output(job_id))
 
         metadata_model = exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-            '0-1')
+            '%s-1' % self.exp_id)
         expected_output = [(
             '[u\'Mismatch between original model and regenerated model\', '
             '[u\'created_on in original model: %s, '

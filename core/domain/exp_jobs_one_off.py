@@ -770,6 +770,12 @@ class ExpCommitLogModelRegenerationValidator(
         if item.deleted:
             return
 
+        # This is done to ensure that all explorations are not checked and
+        # a random sample of the explorations is checked.
+        last_char_in_id = item.id[-1]
+        if not(last_char_in_id >= 'a' and last_char_in_id <= 'j'):
+            return
+
         for version in python_utils.RANGE(1, item.version + 1):
             commit_log_model = (
                 exp_models.ExplorationCommitLogEntryModel.get_by_id(
