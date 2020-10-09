@@ -143,9 +143,6 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
-          name: Install dependencies
-          command: python -m scripts.install_third_party_libs
-      - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
@@ -176,9 +173,6 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
-      - run:
-          name: Install dependencies
-          command: python -m scripts.install_third_party_libs
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
@@ -212,9 +206,6 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
-      - run:
-          name: Install dependencies
-          command: python -m scripts.install_third_party_libs
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
@@ -252,9 +243,6 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
-          name: Install dependencies
-          command: python -m scripts.install_third_party_libs
-      - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
@@ -283,9 +271,6 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
-      - run:
-          name: Install dependencies
-          command: python -m scripts.install_third_party_libs
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0

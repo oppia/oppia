@@ -423,7 +423,7 @@ def pip_install(
     Args:
         package: str. The package name.
         version: str. The package version.
-        install_path: str or None. The installation path for the package.
+        install_path: str. The installation path for the package.
         upgrade: bool. Whether to call pip with the --upgrade flag.
         no_dependencies: bool. Whether call the pip with --no-dependencies flag.
     """
@@ -433,13 +433,9 @@ def pip_install(
     if no_dependencies:
         additional_pip_args.append('--no-dependencies')
 
-    if install_path is not None:
-        _run_pip_command([
-            'install', '%s==%s' % (package, version), '--target', install_path
-        ] + additional_pip_args)
-    else:
-        _run_pip_command(
-            ['install', '%s==%s' % (package, version)] + additional_pip_args)
+    _run_pip_command([
+        'install', '%s==%s' % (package, version), '--target', install_path
+    ] + additional_pip_args)
 
 
 def _pip_install_requirements(install_path, requirements_path):
