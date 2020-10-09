@@ -639,7 +639,8 @@ def _get_plain_text_from_html_content_string(html_content_string):
     """
 
     def _replace_rte_tag(rte_tag):
-        """Replaces all of the <oppia-noninteractive-**> tags.
+        """Replaces all of the opening <oppia-noninteractive-**> tags with
+        their corresponding name in square brackets.
 
         Args:
             rte_tag: MatchObject. A matched object that contins the
@@ -650,23 +651,34 @@ def _get_plain_text_from_html_content_string(html_content_string):
         """
         # Convert the MatchObject to a string.
         rte_tag_string = rte_tag.group(0)
-        # Get the name of the noninteractive tag (ex. math).
-        replace_string = rte_tag_string.split('-')[2].split(' ')[0]
-        if replace_string[-1] == '>':
-            replace_string = replace_string[:-1]
-        replace_string = replace_string.capitalize()
-        replace_string = ' [%s] ' % replace_string
-        return replace_string
+        # First grab the **> in the <oppia-noninteractive-**> tag.
+        replacement_string = rte_tag_string.split('-')[2]
+        # Get rid of the tag's attribute(s) if it has any. For example, if the
+        # tag was similar to
+        # <oppia-noninteractive-math math_content-with-value=*>, at this step we
+        # have 'math math_content-with-value=*>' and want 'math'.
+        replacement_string = replacement_string.split(' ')[0]
+        # If the tag doesn't have attributes then at this step our string ends
+        # with >. For example, if the tag was similar to
+        # <oppia-noninteractive-math>, at this step we have 'math>' and want
+        # 'math'.
+        replacement_string = replacement_string.split('>')[0]
+        replacement_string = replacement_string.capitalize()
+        replacement_string = ' [%s] ' % replacement_string
+        return replacement_string
 
-    # Replace all the opening <oppia-noninteractive-**> tags with their names
+    # Replace all the <oppia-noninteractive-**> opening tags with their names
     # capitalized in square brackets.
-    html_content_string_with_noninteractive_tag_replaced = re.sub(
-        r'<(oppia-noninteractive\s*?)[^>]+>', _replace_rte_tag,
-        html_content_string)
-    # Get rid of all of the other html tags, including closing tags and
-    # malformed html tags if they exist.
+    html_content_string_with_noninteractive_opening_tags_replaced = re.sub(
+        r'<(oppia-noninteractive\s*?)[^>]+>',
+        _replace_rte_tag, html_content_string)
+    # Get rid of all of the </oppia-noninteractive-**> closing tags.
+    html_content_string_with_all_noninteractive_tags_replaced = re.sub(
+        '</oppia-noninteractive.+?>', '',
+        html_content_string_with_noninteractive_opening_tags_replaced)
+    # Get rid of all of the other html tags.
     plain_text = html_cleaner.strip_html_tags(
-        html_content_string_with_noninteractive_tag_replaced
+        html_content_string_with_all_noninteractive_tags_replaced
     )
     # Remove trailing and leading whitespace and ensure that all words are
     # separated by a single space.
