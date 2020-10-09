@@ -658,7 +658,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
         # <oppia-noninteractive-math math_content-with-value=*>, at this step we
         # have 'math math_content-with-value=*>' and want 'math'.
         replacement_string = replacement_string.split(' ')[0]
-        # If the tag doesn't have attributes then at this step our string ends
+        # If the tag doesn't have attributes, then at this step our string ends
         # with >. For example, if the tag was similar to
         # <oppia-noninteractive-math>, at this step we have 'math>' and want
         # 'math'.
