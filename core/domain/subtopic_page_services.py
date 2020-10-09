@@ -25,7 +25,7 @@ from core.domain import subtopic_page_domain
 from core.platform import models
 import feconf
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -102,7 +102,7 @@ def get_subtopic_page_by_id(topic_id, subtopic_id, strict=True):
     """
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic_id)
-    subtopic_page_model = topic_models.SubtopicPageModel.get(
+    subtopic_page_model = subtopic_models.SubtopicPageModel.get(
         subtopic_page_id, strict=strict)
     if subtopic_page_model:
         subtopic_page = get_subtopic_page_from_model(subtopic_page_model)
@@ -127,7 +127,7 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
         subtopic_page_ids.append(
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 topic_id, subtopic_id))
-    subtopic_page_models = topic_models.SubtopicPageModel.get_multi(
+    subtopic_page_models = subtopic_models.SubtopicPageModel.get_multi(
         subtopic_page_ids)
     subtopic_pages = []
     for subtopic_page_model in subtopic_page_models:
@@ -185,10 +185,10 @@ def save_subtopic_page(
             'save topic %s: %s' % (subtopic_page.id, change_list))
     subtopic_page.validate()
 
-    subtopic_page_model = topic_models.SubtopicPageModel.get(
+    subtopic_page_model = subtopic_models.SubtopicPageModel.get(
         subtopic_page.id, strict=False)
     if subtopic_page_model is None:
-        subtopic_page_model = topic_models.SubtopicPageModel(
+        subtopic_page_model = subtopic_models.SubtopicPageModel(
             id=subtopic_page.id)
     else:
         if subtopic_page.version > subtopic_page_model.version:
@@ -228,6 +228,6 @@ def delete_subtopic_page(
     """
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic_id)
-    topic_models.SubtopicPageModel.get(subtopic_page_id).delete(
+    subtopic_models.SubtopicPageModel.get(subtopic_page_id).delete(
         committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED,
         force_deletion=force_deletion)

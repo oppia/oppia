@@ -38,7 +38,7 @@ angular.module('oppia').component('emailDashboardPage', {
         ctrl.editedFewerThanNExps = null;
       };
 
-      ctrl.submitQuery = function() {
+      ctrl.submitQueryAsync = async function() {
         var data = {
           hasNotLoggedInForNDays: ctrl.hasNotLoggedInForNDays,
           inactiveInLastNDays: ctrl.inactiveInLastNDays,
@@ -47,19 +47,20 @@ angular.module('oppia').component('emailDashboardPage', {
           editedAtLeastNExps: ctrl.editedAtLeastNExps,
           editedFewerThanNExps: ctrl.editedFewerThanNExps
         };
-        EmailDashboardDataService.submitQuery(data).then(function(queries) {
-          ctrl.currentPageOfQueries = queries;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the directive is migrated to angular.
-          $rootScope.$apply();
-        });
+        EmailDashboardDataService.submitQueryAsync(data).then(
+          function(queries) {
+            ctrl.currentPageOfQueries = queries;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
+          });
         ctrl.resetForm();
         ctrl.showSuccessMessage = true;
       };
 
       ctrl.getNextPageOfQueries = function() {
         if (EmailDashboardDataService.isNextPageAvailable()) {
-          EmailDashboardDataService.getNextQueries().then(
+          EmailDashboardDataService.getNextQueriesAsync().then(
             function(queries) {
               ctrl.currentPageOfQueries = queries;
               // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -89,7 +90,7 @@ angular.module('oppia').component('emailDashboardPage', {
           ctrl.currentPageOfQueries[index] : null;
         if (query) {
           var queryId = query.id;
-          EmailDashboardDataService.fetchQuery(queryId).then(
+          EmailDashboardDataService.fetchQueryAsync(queryId).then(
             function(query) {
               ctrl.currentPageOfQueries[index] = query;
               // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -112,7 +113,7 @@ angular.module('oppia').component('emailDashboardPage', {
         });
 
         ctrl.currentPageOfQueries = [];
-        EmailDashboardDataService.getNextQueries().then(function(queries) {
+        EmailDashboardDataService.getNextQueriesAsync().then(function(queries) {
           ctrl.currentPageOfQueries = queries;
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the directive is migrated to angular.

@@ -27,9 +27,6 @@ require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
 
 require('domain/skill/RubricObjectFactory.ts');
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardFilterObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -57,20 +54,21 @@ require('services/image-local-storage.service.ts');
 import { Subscription } from 'rxjs';
 import debounce from 'lodash/debounce';
 
+import { TopicsAndSkillsDashboardFilter } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
     '$rootScope', '$scope', '$timeout', 'AlertsService', 'SkillCreationService',
     'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
-    'TopicsAndSkillsDashboardFilterObjectFactory',
     'TopicsAndSkillsDashboardPageService', 'WindowDimensionsService',
     'FATAL_ERROR_CODES', 'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
     'TOPIC_PUBLISHED_OPTIONS', 'TOPIC_SORT_OPTIONS',
     function(
         $rootScope, $scope, $timeout, AlertsService, SkillCreationService,
         TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
-        TopicsAndSkillsDashboardFilterObjectFactory,
         TopicsAndSkillsDashboardPageService, WindowDimensionsService,
         FATAL_ERROR_CODES, SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
         TOPIC_PUBLISHED_OPTIONS, TOPIC_SORT_OPTIONS) {
@@ -348,7 +346,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.itemsPerPageChoice = [10, 15, 20];
         ctrl.filterBoxIsShown = !WindowDimensionsService.isWindowNarrow();
         ctrl.filterObject = (
-          TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
+          TopicsAndSkillsDashboardFilter.createDefault());
         ctrl.classrooms = [];
         ctrl.sortOptions = [];
         for (let key in TOPIC_SORT_OPTIONS) {

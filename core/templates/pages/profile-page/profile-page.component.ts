@@ -55,7 +55,7 @@ angular.module('oppia').component('profilePage', {
       ctrl.$onInit = function() {
         LoaderService.showLoadingScreen('Loading');
         let fetchProfileData = () =>
-          ProfilePageBackendApiService.fetchProfileData();
+          ProfilePageBackendApiService.fetchProfileDataAsync();
         fetchProfileData().then(function(data) {
           ctrl.username = {
             title: 'Username',
@@ -130,7 +130,7 @@ angular.module('oppia').component('profilePage', {
               );
             } else {
               if (!ctrl.isAlreadySubscribed) {
-                ProfilePageBackendApiService.subscribe(
+                ProfilePageBackendApiService.subscribeAsync(
                   data.usernameOfViewedProfile
                 ).then(() => {
                   ctrl.isAlreadySubscribed = true;
@@ -138,7 +138,7 @@ angular.module('oppia').component('profilePage', {
                   $scope.$apply();
                 });
               } else {
-                ProfilePageBackendApiService.unsubscribe(
+                ProfilePageBackendApiService.unsubscribeAsync(
                   data.usernameOfViewedProfile
                 ).then(() => {
                   ctrl.isAlreadySubscribed = false;
