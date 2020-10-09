@@ -31,6 +31,8 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { SuggestionsService } from 'services/suggestions.service';
 
+import { forkJoin } from 'rxjs';
+
 type AnyThread = FeedbackThread | SuggestionThread;
 
 interface SuggestionAndFeedbackThreads {
@@ -52,7 +54,7 @@ export class ThreadDataService {
     private alertsService: AlertsService,
     private contextService: ContextService,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
-    private httpClient: HttpClient,
+    private http: HttpClient,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
     private threadMessageObjectFactory: ThreadMessageObjectFactory,
@@ -129,7 +131,7 @@ export class ThreadDataService {
   getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
     // TODO(#8016): Move this $http call to a backend-api.service with unit
     // tests.
-    let suggestionsPromise = $http.get(this.getSuggestionListHandlerUrl(), {
+    let suggestionsPromise = this.http.get(this.getSuggestionListHandlerUrl(), {
       params: {
         target_type: 'exploration',
         target_id: this.contextService.getExplorationId()
@@ -137,10 +139,10 @@ export class ThreadDataService {
     });
     // TODO(#8016): Move this $http call to a backend-api.service with unit
     // tests.
-    let threadsPromise = $http.get(this.getThreadListHandlerUrl());
+    let threadsPromise = this.http.get(this.getThreadListHandlerUrl());
 
-    return $q.all([suggestionsPromise, threadsPromise]).then(response => {
-      let [suggestionData, threadData] = response.map(r => r.data);
+    return forkJoin([suggestionsPromise, threadsPromise]).toPromise().then((response: any) => {
+      let [suggestionData, threadData] = response;
       let suggestionBackendDicts: SuggestionBackendDict[] = (
         suggestionData.suggestions);
       let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
@@ -160,7 +162,7 @@ export class ThreadDataService {
             dict, suggestionBackendDictsByThreadId.get(dict.thread_id)))
       };
     },
-    () => $q.reject('Error on retrieving feedback threads.'));
+    () => Promise.reject('Error on retrieving feedback threads.'));
   }
 
   getMessagesAsync(thread: AnyThread): Promise<ThreadMessage[]> {
@@ -170,19 +172,21 @@ export class ThreadDataService {
     let threadId = thread.threadId;
     // TODO(#8016): Move this $http call to a backend-api.service with unit
     // tests.
-    return $http.get(this.getThreadHandlerUrl(threadId)).then(response => {
-      let threadMessageBackendDicts = response.data.messages;
-      thread.setMessages(threadMessageBackendDicts.map(
-        m => this.threadMessageObjectFactory.createFromBackendDict(m)));
-      return thread.getMessages();
-    });
+    return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
+      .then((response: any) => {
+        let threadMessageBackendDicts = response.messages;
+        thread.setMessages(threadMessageBackendDicts.map(
+          m => this.threadMessageObjectFactory.createFromBackendDict(m)));
+        return thread.getMessages();
+      });
   }
 
   getOpenThreadsCountAsync(): Promise<number> {
     // TODO(#8016): Move this $http call to a backend-api.service with unit
     // tests.
-    return $http.get(this.getFeedbackStatsHandlerUrl()).then(response => {
-      return this.openThreadsCount = response.data.num_open_threads;
+    return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
+      .then((response: any) => {
+        return this.openThreadsCount = response.num_open_threads;
     });
   }
 
@@ -190,21 +194,23 @@ export class ThreadDataService {
     return this.openThreadsCount;
   }
 
-  createNewThreadAsync(
-      newSubject: string, newText: string): Promise<void> {
-    // TODO(#8016): Move this $http call to a backend-api.service with unit
-    // tests.
-    return $http.post(this.getThreadListHandlerUrl(), {
-      state_name: null,
-      subject: newSubject,
-      text: newText
-    }).then(() => {
-      this.openThreadsCount += 1;
-      return this.getThreadsAsync();
-    },
-    error => {
-      this.alertsService.addWarning(
-        'Error creating new thread: ' + error + '.');
+  createNewThreadAsync(newSubject: string, newText: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // TODO(#8016): Move this $http call to a backend-api.service with unit
+      // tests.
+      return this.http.post(this.getThreadListHandlerUrl(), {
+        state_name: null,
+        subject: newSubject,
+        text: newText
+      }).toPromise().then(() => {
+        this.openThreadsCount += 1;
+        return this.getThreadsAsync();
+      },
+      error => {
+        this.alertsService.addWarning(
+          'Error creating new thread: ' + error + '.');
+        reject(error.error.error);
+      });
     });
   }
 
@@ -213,10 +219,13 @@ export class ThreadDataService {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
-    // TODO(#8016): Move this $http call to a backend-api.service with unit
-    // tests.
-    return $http.post(this.getFeedbackThreadViewEventUrl(threadId), {
-      thread_id: threadId
+
+    return new Promise((resolve, reject) => {
+      // TODO(#8016): Move this $http call to a backend-api.service with unit
+      // tests.
+      return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
+        thread_id: threadId
+      });
     });
   }
 
@@ -231,17 +240,17 @@ export class ThreadDataService {
     let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
     // TODO(#8016): Move this $http call to a backend-api.service with unit
     // tests.
-    return $http.post(this.getThreadHandlerUrl(threadId), {
+    return this.http.post(this.getThreadHandlerUrl(threadId), {
       updated_status: updatedStatus,
       updated_subject: null,
       text: newMessage
-    }).then((response) => {
+    }).toPromise().then((response: any) => {
       if (updatedStatus) {
         this.openThreadsCount += (
           (newStatus === ExplorationEditorPageConstants.STATUS_OPEN) ? 1 : -1);
       }
       thread.status = newStatus;
-      let threadMessageBackendDicts = response.data.messages;
+      let threadMessageBackendDicts = response.messages;
       thread.setMessages(threadMessageBackendDicts.map(
         m => this.threadMessageObjectFactory.createFromBackendDict(m)));
       return thread.messages;
@@ -257,13 +266,13 @@ export class ThreadDataService {
     let threadId = thread.threadId;
     // TODO(#8016): Move this $http call to a backend-api.service with unit
     // tests.
-    return $http.put(this.getSuggestionActionHandlerUrl(threadId), {
+    return this.http.put(this.getSuggestionActionHandlerUrl(threadId), {
       action: action,
       review_message: reviewMsg,
       commit_message: (
         action === ExplorationEditorPageConstants.ACTION_ACCEPT_SUGGESTION ?
           commitMsg : null)
-    }).then(() => {
+    }).toPromise().then(() => {
       thread.status = (
         action === ExplorationEditorPageConstants.ACTION_ACCEPT_SUGGESTION ?
          ExplorationEditorPageConstants.STATUS_FIXED :

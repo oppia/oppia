@@ -250,6 +250,7 @@ import { EmailDashboardDataService } from 'pages/email-dashboard-pages/email-das
 import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { ThreadDataService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
@@ -670,6 +671,7 @@ export const angularServices: [string, unknown][] = [
   ['TextInputRulesService', TextInputRulesService],
   ['TextInputTokenizer', TextInputTokenizer],
   ['TextInputValidationService', TextInputValidationService],
+  ['ThreadDataService', ThreadDataService],
   ['ThreadMessageObjectFactory', ThreadMessageObjectFactory],
   ['ThreadMessageSummaryObjectFactory', ThreadMessageSummaryObjectFactory],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
