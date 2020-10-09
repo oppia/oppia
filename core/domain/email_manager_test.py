@@ -2066,8 +2066,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     target_id = 'exp1'
     skill_id = 'skill_123456'
     language_code = 'en'
-    default_question_html_content = '<p>What is the meaning of life?</p>'
-    default_translation_html_content = '<p>Sample translation</p>'
+    default_question_content = 'What is the meaning of life?'
+    default_translation_content = 'Sample translation'
     AUTHOR_EMAIL = 'author1@example.com'
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
     REVIEWER_2_EMAIL = 'reviewer2@community.org'
@@ -2141,18 +2141,48 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         ]
 
     def _create_question_suggestion_html_email_content(
-            self, reviewable_suggestion_email_infos):
-        """Creates the html email content for the list of suggestions to notify
+            self, question_content, review_wait_time):
+        """Creates the html email content for a question suggestion to notify
         the reviewer about.
         """
+        return email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+            'listing_suggestion_template'][
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] % (
+                    '', review_wait_time, question_content)
 
-        return [
-            (
-                suggestion_services
-                .create_reviewable_suggestion_email_info_from_suggestion(
-                    suggestion)
-            ) for suggestion in suggestions
-        ]
+    def _create_translation_suggestion_html_email_content(
+            self, translation_content, language_code, review_wait_time):
+        """Creates the html email content for a translation suggestion to notify
+        the reviewer about.
+        """
+        return email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+            'listing_suggestion_template'][
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] % (
+                    language_code, review_wait_time, translation_content)
+
+    def _assert_created_sent_email_model_is_correct(
+            self, expected_email_html_body, reviewer_id, reviewer_email):
+        """Asserts that the sent email model that was created from the email
+        that was sent contains the right information.
+        """
+        all_models = email_models.SentEmailModel.get_all().fetch()
+        sent_email_model = all_models[0]
+        self.assertEqual(
+            sent_email_model.subject,
+            email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+                'email_subject'])
+        self.assertEqual(
+            sent_email_model.recipient_id, reviewer_id)
+        self.assertEqual(
+            sent_email_model.recipient_email, reviewer_email)
+        self.assertEqual(
+            sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
     def setUp(self):
         super(NotifyContributionDashboardReviewersEmailTests, self).setUp()
@@ -2187,49 +2217,63 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
 
+        self.default_translation_html_content = '<p>%s</p>' % (
+            self.default_translation_content)
+        self.default_question_html_content = '<p>%s</p>' % (
+            self.default_question_content)
+        
         self.mock_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
 
-        with self.cannot_send_emails_ctx and self.can_send_reviewer_emails_ctx:
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                self.reviewer_1_id, self.reviewable_suggestion_email_info)
+        with self.cannot_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                    self.reviewer_1_id, self.reviewable_suggestion_email_info)
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_reviewer_notifications_is_not_enabled(self):
 
-        with self.can_send_emails_ctx and self.cannot_send_reviewer_emails_ctx:
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                self.reviewer_1_id, self.reviewable_suggestion_email_info)
+        with self.can_send_emails_ctx:
+            with self.cannot_send_reviewer_emails_ctx:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                    [self.reviewer_1_id],
+                    [[self.reviewable_suggestion_email_info]])
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_reviewer_does_not_exist(self):
 
-        with self.can_send_emails_ctx and self.can_send_reviewer_emails_ctx:
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                'invalid_reviewer_id', self.reviewable_suggestion_email_info)
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                    ['invalid_reviewer_id'],
+                    [[self.reviewable_suggestion_email_info]])
 
         messages = self._get_sent_email_messages('invalid_reviewer_id')
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_completion_email_is_sent(self):
         question_suggestion = (
-            self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_1', self.author_id))
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_html_content))
         reviewable_suggestion_email_info = (
-            self._create_reviewable_suggestion_email_infos_from_suggestions(
-                [question_suggestion])
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
         review_wait_time = 5
         reviewable_suggestion_email_info.submission_datetime = (
             self.mock_review_submission_datetime)
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(days=review_wait_time))
- 
+
+        expected_question_html_email_content = (
+            self._create_question_suggestion_html_email_content(
+                self.default_question_content, '%s days' % review_wait_time))
         expected_email_html_body = (
             'Hi reviewer1,<br><br>'
             'There are new review opportunities that we think you might be '
@@ -2242,53 +2286,26 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '(if they still need a review) or any other contributions on the '
             'dashboard. We appreciate your help!<br>'
             'Thanks again, and happy reviewing!<br><br>'
-            '- The Oppia Contributor Dashboard Team <br><br>'
+            '- The Oppia Contributor Dashboard Team<br><br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
-        )
+            '<a href="https://www.example.com">Preferences</a> page.' % (
+                expected_question_html_email_content))
         
-        with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-        
-
-        expected_email_subject = (
-            email_manger.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-            'email_subject']) 
-        expected_email_html_body = (
-            NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-                'email_body_template'] % (
-                    '', 
-
-                )
-        )
-
         with self.can_send_emails_ctx:
-            email_manager.send_mail_to_notify_users_to_review(
-                self.reviewer_id, 'Algebra')
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id], [[reviewable_suggestion_email_info]])
 
-            # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.REVIEWER_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
 
-            # Make sure correct email model is stored.
-            all_models = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.reviewer_id)
-            self.assertEqual(
-                sent_email_model.recipient_email, self.REVIEWER_EMAIL)
-            self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
-            self.assertEqual(
-                sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(
-                sent_email_model.intent,
-                feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS)
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
 
 
 class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):

@@ -221,7 +221,7 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
         '<br>%s<br>'
         'Please take some time to review any of the above contributions (if '
         'they still need a review) or any other contributions on the dashboard.'
-        'We appreciate your help!<br>'
+        ' We appreciate your help!<br>'
         'Thanks again, and happy reviewing!<br><br>'
         '- The Oppia Contributor Dashboard Team'
         '<br><br>%s'
@@ -234,7 +234,7 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
             '<li>The following translation suggestion in language %s was '
             'submitted for review %s ago:<br>%s</li>'),
         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-            '<li>The following %s question suggestion was submitted for review '
+            '<li>The following %squestion suggestion was submitted for review '
             '%s ago:<br>%s</li>')
     }
 }
@@ -265,6 +265,8 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1265,7 +1267,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         'email_subject']
     email_body_template = NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
         'email_body_template']
-    
+
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
@@ -1289,6 +1291,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     send_email_infos = []
     for index, reviewer_id in enumerate(reviewer_ids):
+        #raise Exception('hereee ')
         if not reviewers_suggestion_email_infos[index]:
             log_new_error(
                 'There were no suggestions to recommend to the reviewer with '
@@ -1315,7 +1318,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     reviewer_suggestion_email_info.language_code = ''
                 # Calculate how long the suggestion has been waiting for review.
                 suggestion_review_wait_time = (
-                    datetime.utcnow() - (
+                    datetime.datetime.utcnow() - (
                         reviewer_suggestion_email_info.submission_datetime))
                 # Get a string composed of the largest time unit that has a
                 # value, followed by that time unit. For example, if the
@@ -1328,8 +1331,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 suggestion_template = (
                     NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
                         'listing_suggestion_template'][
-                            reviewer_suggestion_email_info.suggestion_type]
-                )
+                            reviewer_suggestion_email_info.suggestion_type])
                 list_of_suggestions_strings.append(suggestion_template % (
                     reviewer_suggestion_email_info.language_code,
                     human_readable_review_wait_time,
