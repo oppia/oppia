@@ -25,10 +25,8 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
-from google.appengine.ext import ndb
-
 transaction_services = models.Registry.import_transaction_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
@@ -61,17 +59,19 @@ RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 
-class BaseModel(ndb.Model):
+class BaseModel(datastore_services.Model):
     """Base model for all persistent object storage classes."""
 
     # When this entity was first created. This value should only be modified
     # with the _update_timestamps method.
-    created_on = ndb.DateTimeProperty(indexed=True, required=True)
+    created_on = (
+        datastore_services.DateTimeProperty(indexed=True, required=True))
     # When this entity was last updated. This value should only be modified
     # with the _update_timestamps method.
-    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
+    last_updated = (
+        datastore_services.DateTimeProperty(indexed=True, required=True))
     # Whether the current version of the model instance is deleted.
-    deleted = ndb.BooleanProperty(indexed=True, default=False)
+    deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
     @property
     def id(self):
@@ -189,11 +189,11 @@ class BaseModel(ndb.Model):
         none_argument_indices = []
         for index, entity_id in enumerate(entity_ids):
             if entity_id:
-                entity_keys.append(ndb.Key(cls, entity_id))
+                entity_keys.append(datastore_services.Key(cls, entity_id))
             else:
                 none_argument_indices.append(index)
 
-        entities = ndb.get_multi(entity_keys)
+        entities = datastore_services.get_multi(entity_keys)
         for index in none_argument_indices:
             entities.insert(index, None)
 
@@ -217,7 +217,7 @@ class BaseModel(ndb.Model):
             self.last_updated = datetime.datetime.utcnow()
 
     def put(self, update_last_updated_time=True):
-        """Stores the given ndb.Model instance to the datastore.
+        """Stores the given datastore_services.Model instance to the datastore.
 
         Args:
             update_last_updated_time: bool. Whether to update the
@@ -230,7 +230,8 @@ class BaseModel(ndb.Model):
         return super(BaseModel, self).put()
 
     def put_async(self, update_last_updated_time=True):
-        """Stores the given ndb.Model instance to the datastore asynchronously.
+        """Stores the given datastore_services.Model instance to the datastore
+        asynchronously.
 
         Args:
             update_last_updated_time: bool. Whether to update the
@@ -244,24 +245,26 @@ class BaseModel(ndb.Model):
 
     @classmethod
     def put_multi(cls, entities, update_last_updated_time=True):
-        """Stores the given ndb.Model instances.
+        """Stores the given datastore_services.Model instances.
 
         Args:
-            entities: list(ndb.Model). List of model instances to be stored.
+            entities: list(datastore_services.Model). List of model instances to
+                be stored.
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
         """
         # Internally put_multi calls put so we don't need to call
         # _update_timestamps here.
-        ndb.put_multi(
+        datastore_services.put_multi(
             entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     def put_multi_async(cls, entities, update_last_updated_time=True):
-        """Stores the given ndb.Model instances asynchronously.
+        """Stores the given datastore_services.Model instances asynchronously.
 
         Args:
-            entities: list(ndb.Model). The list of model instances to be stored.
+            entities: list(datastore_services.Model). The list of model
+                instances to be stored.
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
 
@@ -270,19 +273,19 @@ class BaseModel(ndb.Model):
         """
         # Internally put_multi_async calls put_async so we don't need to call
         # _update_timestamps here.
-        return ndb.put_multi_async(
+        return datastore_services.put_multi_async(
             entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     def delete_multi(cls, entities):
-        """Deletes the given ndb.Model instances.
+        """Deletes the given datastore_services.Model instances.
 
         Args:
-            entities: list(ndb.Model). The list of model instances to be
-                deleted.
+            entities: list(datastore_services.Model). The list of model
+                instances to be deleted.
         """
         keys = [entity.key for entity in entities]
-        ndb.delete_multi(keys)
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def delete_by_id(cls, instance_id):
@@ -291,7 +294,7 @@ class BaseModel(ndb.Model):
         Args:
             instance_id: str. Id of the model to delete.
         """
-        ndb.Key(cls, instance_id).delete()
+        datastore_services.Key(cls, instance_id).delete()
 
     def delete(self):
         """Deletes this instance."""
@@ -347,7 +350,8 @@ class BaseModel(ndb.Model):
         descending order (newly updated first).
 
         Args:
-            query: ndb.Query. The query object to be used to fetch entities.
+            query: datastore_services.Query. The query object to be used to
+                fetch entities.
             page_size: int. The maximum number of entities to be returned.
             urlsafe_start_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise,
@@ -366,7 +370,8 @@ class BaseModel(ndb.Model):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
             start_cursor = None
 
@@ -384,24 +389,26 @@ class BaseCommitLogEntryModel(BaseModel):
     """
 
     # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
+    user_id = datastore_services.StringProperty(indexed=True, required=True)
     # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
+    commit_type = datastore_services.StringProperty(indexed=True, required=True)
     # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
+    commit_message = datastore_services.TextProperty(indexed=False)
     # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
+    commit_cmds = datastore_services.JsonProperty(indexed=False, required=True)
     # The status of the entity after the edit event ('private', 'public').
-    post_commit_status = ndb.StringProperty(indexed=True, required=True)
+    post_commit_status = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # Whether the entity is community-owned after the edit event.
-    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
+    post_commit_community_owned = (
+        datastore_services.BooleanProperty(indexed=True))
     # Whether the entity is private after the edit event. Having a
     # separate field for this makes queries faster, since an equality query
     # on this property is faster than an inequality query on
     # post_commit_status.
-    post_commit_is_private = ndb.BooleanProperty(indexed=True)
+    post_commit_is_private = datastore_services.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
-    version = ndb.IntegerProperty()
+    version = datastore_services.IntegerProperty()
 
     @classmethod
     def get_export_policy(cls):
@@ -591,7 +598,7 @@ class VersionedModel(BaseModel):
     # version number starts at 1 when the model instance is first created.
     # All data in this instance represents the version at HEAD; data about the
     # previous versions is stored in the snapshot models.
-    version = ndb.IntegerProperty(default=0)
+    version = datastore_services.IntegerProperty(default=0)
 
     def _require_not_marked_deleted(self):
         """Checks whether the model instance is deleted."""
@@ -725,14 +732,15 @@ class VersionedModel(BaseModel):
                 for version_number in version_numbers]
 
             metadata_keys = [
-                ndb.Key(self.SNAPSHOT_METADATA_CLASS, snapshot_id)
+                datastore_services.Key(
+                    self.SNAPSHOT_METADATA_CLASS, snapshot_id)
                 for snapshot_id in snapshot_ids]
-            ndb.delete_multi(metadata_keys)
+            datastore_services.delete_multi(metadata_keys)
 
             content_keys = [
-                ndb.Key(self.SNAPSHOT_CONTENT_CLASS, snapshot_id)
+                datastore_services.Key(self.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                 for snapshot_id in snapshot_ids]
-            ndb.delete_multi(content_keys)
+            datastore_services.delete_multi(content_keys)
 
             super(VersionedModel, self).delete()
         else:
@@ -778,14 +786,16 @@ class VersionedModel(BaseModel):
                     for version_number in model_version_numbers]
 
                 all_models_metadata_keys.extend([
-                    ndb.Key(model.SNAPSHOT_METADATA_CLASS, snapshot_id)
+                    datastore_services.Key(
+                        model.SNAPSHOT_METADATA_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
                 all_models_content_keys.extend([
-                    ndb.Key(model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
+                    datastore_services.Key(
+                        model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
             versioned_models_keys = [model.key for model in versioned_models]
             transaction_services.run_in_transaction(
-                ndb.delete_multi,
+                datastore_services.delete_multi,
                 all_models_metadata_keys + all_models_content_keys +
                 versioned_models_keys)
         else:
@@ -1064,9 +1074,9 @@ class VersionedModel(BaseModel):
             cls.get_snapshot_id(model_instance_id, version_number)
             for version_number in version_numbers]
         metadata_keys = [
-            ndb.Key(cls.SNAPSHOT_METADATA_CLASS, snapshot_id)
+            datastore_services.Key(cls.SNAPSHOT_METADATA_CLASS, snapshot_id)
             for snapshot_id in snapshot_ids]
-        returned_models = ndb.get_multi(metadata_keys)
+        returned_models = datastore_services.get_multi(metadata_keys)
 
         for ind, model in enumerate(returned_models):
             if model is None:
@@ -1100,20 +1110,23 @@ class BaseSnapshotMetadataModel(BaseModel):
     """
 
     # The id of the user who committed this revision.
-    committer_id = ndb.StringProperty(required=True, indexed=True)
+    committer_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The type of the commit associated with this snapshot.
-    commit_type = ndb.StringProperty(
+    commit_type = datastore_services.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
     # The commit message associated with this snapshot.
-    commit_message = ndb.StringProperty(indexed=True)
+    commit_message = datastore_services.StringProperty(indexed=True)
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
-    commit_cmds = ndb.JsonProperty(indexed=False)
+    commit_cmds = datastore_services.JsonProperty(indexed=False)
     # The user ids that are in some field in commit_cmds.
-    commit_cmds_user_ids = ndb.StringProperty(repeated=True, indexed=True)
+    commit_cmds_user_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # The user ids that are enclosed inside the 'content' field in the relevant
     # snapshot content model.
-    content_user_ids = ndb.StringProperty(repeated=True, indexed=True)
+    content_user_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -1144,7 +1157,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(ndb.OR(
+        return cls.query(datastore_services.any_of(
             cls.committer_id == user_id,
             cls.commit_cmds_user_ids == user_id,
             cls.content_user_ids == user_id,
@@ -1219,7 +1232,7 @@ class BaseSnapshotContentModel(BaseModel):
     """
 
     # The snapshot content, as a JSON blob.
-    content = ndb.JsonProperty(indexed=False)
+    content = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
     def get_deletion_policy():

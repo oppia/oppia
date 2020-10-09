@@ -41,11 +41,8 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
-(
-    suggestion_models, feedback_models, opportunity_models
-) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.opportunity
-])
+(suggestion_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.suggestion, models.NAMES.feedback])
 
 
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
@@ -88,7 +85,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
-            end_state_name='End State'
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
@@ -755,7 +753,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
-            end_state_name='End State'
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
@@ -884,20 +883,3 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 observed_log_messages[0],
                 'Missing language codes [u\'new_lang\'] in exploration '
                 'opportunity model with id 0')
-
-    def _mock_get_multi_function(self, unused_ids):
-        """Mocks opportunity_models.SkillOpportunityModel.get_multi()"""
-        return [None]
-
-    def test_get_skill_opportunities_by_ids_if_returns_empty_list(
-            self):
-        get_multi_swap = self.swap(
-            opportunity_models.SkillOpportunityModel,
-            'get_multi', self._mock_get_multi_function)
-
-        with get_multi_swap:
-            opportunities = (
-                opportunity_services.get_skill_opportunities_by_ids(
-                    ['0']))
-
-        self.assertEqual(len(opportunities), 0)
