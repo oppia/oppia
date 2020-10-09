@@ -1,8 +1,7 @@
 {
     "APP_DEV_YAML_PATH": "app_dev.yaml",
-    "APP_YAML_PATH_TO_VERSION_USAGE_DICT": {
-        "app.yaml": "given"
-    },
+    "APP_YAML_PATH": "app.yaml",
+    "APP_YAML_VERSION_TYPE": "given",
     "BLOCKING_BUG_MILESTONE_NUMBER": 39,
     "BRANCH_TYPE_HOTFIX": "hotfix",
     "BRANCH_TYPE_RELEASE": "release",
