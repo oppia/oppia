@@ -2192,20 +2192,56 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def test_create_raises_if_suggestion_html_has_an_rte_tag_without_a_name(
+    def test_create_returns_info_for_suggestion_if_html_has_rte_with_text(
             self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
-                '<p><oppia-noninteractive-l>text</oppia-noninteractive ></p>'))
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
+                'quot;">text</oppia-noninteractive-link></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                '[Link]',
+                question_suggestion.last_updated
+            ))
 
-        #with self.assertRaisesRegexp(
-        #    Exception, 
-        #    'Expected the rte tag to contain oppia-noninteractive-\*\*, '
-        #    'received: <oppia-noninteractive></oppia-noninteractive>'):
-        (
+        reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_suggestion_if_html_has_rte_with_html(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
+                'quot;"><p>text</p></oppia-noninteractive-link></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                '[Link]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
         )
 
 

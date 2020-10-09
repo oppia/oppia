@@ -653,24 +653,18 @@ def _get_plain_text_from_html_content_string(html_content_string):
         rte_tag_string = rte_tag.group(0)
         rte_tag_name = re.search(
             'oppia-noninteractive-\w+', rte_tag_string)
-        raise Exception('{} {}'.format(rte_tag_string, rte_tag_name.group(0)))
-        if rte_tag_name is None:
-            raise Exception(
-                'Expected the rte tag to contain oppia-noninteractive-**, '
-                'received: %s.' % rte_tag_string)
-        else:
-            # Convert the MatchObject to a string.
-            rte_tag_name_string = rte_tag_name.group(0)
-            # Get the name of the rte.
-            rte_name_string = rte_tag_name_string.split('-')[2]
-            capitalized_rte_name_string = rte_name_string.capitalize()
-            formatted_rte_name_string = ' [%s] ' % capitalized_rte_name_string
-            return formatted_rte_name_string
+        # Convert the MatchObject to a string.
+        rte_tag_name_string = rte_tag_name.group(0)
+        # Get the name of the rte.
+        rte_name_string = rte_tag_name_string.split('-')[2]
+        capitalized_rte_name_string = rte_name_string.capitalize()
+        formatted_rte_name_string = ' [%s] ' % capitalized_rte_name_string
+        return formatted_rte_name_string
 
     # Replace all the <oppia-noninteractive-**> tags with their rte names
     # capitalized in square brackets.
     html_content_string_with_rte_tags_replaced = re.sub(
-        r'<(oppia-noninteractive\s*?)[^>]+>[^\w]</oppia-noninteractive.+?>',
+        r'<(oppia-noninteractive\s*?)[^>]+>(.*?)</oppia-noninteractive.+?>',
         _replace_rte_tag, html_content_string)
     # Get rid of all of the other html tags.
     plain_text = html_cleaner.strip_html_tags(
@@ -707,12 +701,12 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     # Retrieve the html content that is emphasized on the Contributor Dashboard
     # pages. This content is what stands out for each suggestion when a user
     # views a list of suggestions.
-    get_html_content_for_emphasized_text = (
+    get_html_representing_suggestion = (
         SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
             suggestion.suggestion_type]
     )
     plain_text = _get_plain_text_from_html_content_string(
-        get_html_content_for_emphasized_text(suggestion))
+        get_html_representing_suggestion(suggestion))
     return suggestion_registry.ReviewableSuggestionEmailInfo(
         suggestion.suggestion_type, suggestion.language_code, plain_text,
         suggestion.last_updated
