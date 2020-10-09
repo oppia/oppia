@@ -20,21 +20,20 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-
 import datetime
 
 from constants import constants
-from core.platform import models
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import learner_progress_services
+from core.domain import prod_validation_jobs_one_off
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import prod_validation_jobs_one_off
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import rights_manager
-from core.domain import learner_progress_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import python_utils
 import utils
