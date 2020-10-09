@@ -211,7 +211,7 @@ NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
 )
 
 SUGGESTIONS_TO_REVIEW_TEMPLATE = {
-    email_body_template: (
+    'email_body_template': (
         'Hi %s,<br><br>'
         'Thank you for actively contributing high-quality suggestions for '
         'Oppia\'s lessons in %s, and for helping to make these lessons better '
@@ -228,9 +228,9 @@ SUGGESTIONS_TO_REVIEW_TEMPLATE = {
         'suggestions by others.<br><br>'
         'Again, thank you for your contributions to the Oppia community!<br>'
         '- The Oppia Team<br>'
-        '<br>%s')
+        '<br>%s'
     ),
-    email_subject: 'Contributor Dashboard Review Opportunities',
+    'email_subject': 'Contributor Dashboard Review Opportunities',
     # The templates below are for listing the information for each suggestion
     # type.
     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
