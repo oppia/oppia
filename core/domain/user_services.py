@@ -2058,7 +2058,7 @@ def create_user_contributions(
         user_id, created_exploration_ids, edited_exploration_ids):
     """Creates a new UserContributionsModel and returns the domain object.
     Note: This does not create a contributions model if the user is
-    OppiaMigraitonBot.
+    OppiaMigrationBot.
 
     Args:
         user_id: str. The unique ID of the user.
