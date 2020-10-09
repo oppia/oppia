@@ -181,8 +181,8 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
-         'set to critical.',
-    default='critical',
+         'set to error.',
+    default='error',
     choices=['critical', 'error', 'warning', 'info'])
 
 _PARSER.add_argument(

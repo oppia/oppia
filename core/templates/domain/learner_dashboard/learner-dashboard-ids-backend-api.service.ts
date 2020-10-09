@@ -23,9 +23,8 @@ import { Injectable } from '@angular/core';
 
 import {
   LearnerDashboardActivityIds,
-  LearnerDashboardActivityIdsDict,
-  LearnerDashboardActivityIdsObjectFactory
-} from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+  LearnerDashboardActivityIdsDict
+} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 interface LearnerDashboardIdsBackendResponse {
   'learner_dashboard_activity_ids': LearnerDashboardActivityIdsDict;
@@ -36,16 +35,14 @@ interface LearnerDashboardIdsBackendResponse {
 })
 export class LearnerDashboardIdsBackendApiService {
   constructor(
-    private http: HttpClient,
-    private learnerDashboardActivityIdsObjectFactory:
-    LearnerDashboardActivityIdsObjectFactory) {}
+    private http: HttpClient) {}
 
-  _fetchLearnerDashboardIds(): Promise<LearnerDashboardActivityIds> {
+  async _fetchLearnerDashboardIdsAsync(): Promise<LearnerDashboardActivityIds> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardIdsBackendResponse>(
         '/learnerdashboardidshandler/data').toPromise().then(response => {
         resolve(
-          this.learnerDashboardActivityIdsObjectFactory
+          LearnerDashboardActivityIds
             .createFromBackendDict(response.learner_dashboard_activity_ids));
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -53,8 +50,8 @@ export class LearnerDashboardIdsBackendApiService {
     });
   }
 
-  fetchLearnerDashboardIds(): Promise<LearnerDashboardActivityIds> {
-    return this._fetchLearnerDashboardIds();
+  async fetchLearnerDashboardIdsAsync(): Promise<LearnerDashboardActivityIds> {
+    return this._fetchLearnerDashboardIdsAsync();
   }
 }
 
