@@ -56,19 +56,19 @@ describe('Email Dashboard Services', () => {
       fakeAsync(() => {
         var recentQueriesDict: EmailDashboardQueryDict[] = [
           {
-              id: 'q123',
-              status: 'processing',
-              num_qualified_users: 0,
-              submitter_username: '',
-              created_on: ''
-            }
+            id: 'q123',
+            status: 'processing',
+            num_qualified_users: 0,
+            submitter_username: '',
+            created_on: ''
+          }
           ,
           {
-              id: 'q456',
-              status: 'processing',
-              num_qualified_users: 0,
-              submitter_username: '',
-              created_on: ''
+            id: 'q456',
+            status: 'processing',
+            num_qualified_users: 0,
+            submitter_username: '',
+            created_on: ''
           }];
         var recentQueries = recentQueriesDict.map(
           emailDashboardQueryObjectFactory.createFromQueryDict);
@@ -108,7 +108,7 @@ describe('Email Dashboard Services', () => {
           num_qualified_users: 0,
           submitter_username: '',
           created_on: ''
-        }
+        };
         var queryData = emailDashboardQueryObjectFactory.createFromQueryDict(
           queryDataDict);
         var expectedQueries = [queryData];
