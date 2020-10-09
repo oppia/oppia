@@ -773,7 +773,7 @@ class ExpCommitLogModelRegenerationValidator(
         # This is done to ensure that all explorations are not checked and
         # a random sample of the explorations is checked.
         last_char_in_id = item.id[-1]
-        if not(last_char_in_id >= 'a' and last_char_in_id <= 'j'):
+        if last_char_in_id < 'a' or last_char_in_id > 'j':
             return
 
         for version in python_utils.RANGE(1, item.version + 1):
