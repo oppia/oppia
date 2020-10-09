@@ -16,13 +16,13 @@
  * @fileoverview Translate service for i18n translations
  */
 
-import { Injectable, EventEmitter } from "@angular/core";
-import { UtilsService } from "./utils.service";
+import { Injectable, EventEmitter } from '@angular/core';
+import { UtilsService } from './utils.service';
 
 import {
   TranslationsDict,
   TranslationsBackendApiService,
-} from "services/translations-backend-api.service";
+} from 'services/translations-backend-api.service';
 
 /**
  * Commonly used terms in this file.
@@ -55,11 +55,11 @@ export interface LangChangeEvent {
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class TranslateService {
-  currentLang = "en";
-  fallbackLang = "en";
+  currentLang = 'en';
+  fallbackLang = 'en';
   translations: TranslationsDict[] = [];
   templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
 
@@ -146,7 +146,7 @@ export class TranslateService {
    */
   getInterpolatedString(key: string, interpolateParams?: Object): string {
     if (!this.utilsService.isDefined(key) || !key.length) {
-      throw new Error("Parameter 'key' required");
+      throw new Error('Parameter \'key\' required');
     }
     let translations = this.translations[this.currentLang];
 
