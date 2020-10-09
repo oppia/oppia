@@ -221,6 +221,9 @@ var ExplorationEditorPage = function() {
       saveDraftButton, 'Save Draft button is not clickable');
     await saveDraftButton.click();
 
+    await waitFor.invisibilityOf(
+      element(by.css('.protractor-test-saving-changes-dots')),
+      'Saving exploration changes loading dots takes too long to disappear.');
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
     await waitFor.invisibilityOf(
