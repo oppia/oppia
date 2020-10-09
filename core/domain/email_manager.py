@@ -1311,11 +1311,14 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             list_of_suggestions_to_notify_reviewer_strings = []
             for reviewer_suggestion_email_info in (
                     reviewers_suggestion_email_infos[index]):
-                # Set the language code for question suggestions to be the empty
+                # Get the language of the suggestion.
+                language = utils.get_supported_audio_language_description(
+                    reviewer_suggestion_email_info.language_code)
+                # Set the language for question suggestions to be the empty
                 # string in order to use the a single suggestion template format.
                 if reviewer_suggestion_email_info.suggestion_type == (
                         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-                    reviewer_suggestion_email_info.language_code = ''
+                    language = ''
                 # Calculate how long the suggestion has been waiting for review.
                 suggestion_review_wait_time = (
                     datetime.datetime.utcnow() - (
@@ -1334,7 +1337,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                             reviewer_suggestion_email_info.suggestion_type])
                 list_of_suggestions_to_notify_reviewer_strings.append(
                     suggestion_template % (
-                        reviewer_suggestion_email_info.language_code,
+                        language,
                         human_readable_review_wait_time,
                         reviewer_suggestion_email_info.suggestion_content))
 
