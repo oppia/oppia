@@ -34,6 +34,11 @@ describe('HintsAndSolutionManager service', () => {
 
   let mockNewCardAvailableEmitter = new EventEmitter();
 
+  const ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
+  const WAIT_FOR_FIRST_HINT_MSEC: number = 60000;
+  const WAIT_FOR_SUBSEQUENT_HINTS_MSEC: number = 30000;
+  const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 60000;
+
   beforeEach(fakeAsync(() => {
     pps = TestBed.get(PlayerPositionService);
     spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
@@ -82,9 +87,9 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintConsumed(1)).toBe(false);
 
     // For releaseHint.
-    tick(60000);
+    tick(WAIT_FOR_FIRST_HINT_MSEC);
     // For showTooltip (called only in the first call of releaseHint).
-    tick(60000);
+    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
     expect(hasms.isHintTooltipOpen()).toBe(true);
     expect(hasms.isHintViewable(0)).toBe(true);
@@ -94,7 +99,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
-    tick(30000);
+    tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
     // Function displayHint hides tooltip.
     expect(hasms.isHintTooltipOpen()).toBe(false);
@@ -107,7 +112,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(true);
 
-    tick(30000);
+    tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
     expect(hasms.isSolutionViewable()).toBe(true);
   }));
@@ -123,7 +128,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintConsumed(0)).toBe(false);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
-    tick(60000);
+    tick(WAIT_FOR_FIRST_HINT_MSEC);
 
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
@@ -133,7 +138,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintConsumed(1)).toBe(false);
 
     mockNewCardAvailableEmitter.emit();
-    tick(30000);
+    tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
@@ -155,7 +160,7 @@ describe('HintsAndSolutionManager service', () => {
     // Initialize the service with two hints and a solution.
     hasms.reset([firstHint, secondHint], solution);
 
-    tick(60000);
+    tick(WAIT_FOR_FIRST_HINT_MSEC);
 
     expect(hasms.isSolutionConsumed()).toBe(false);
     expect(hasms.displaySolution().correctAnswer).toBe(
@@ -175,7 +180,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(2)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
 
-    tick(60000);
+    tick(WAIT_FOR_FIRST_HINT_MSEC);
 
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
@@ -183,7 +188,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isSolutionViewable()).toBe(false);
     expect(hasms.displayHint(0).getHtml()).toBe('one');
 
-    tick(30000);
+    tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(true);
@@ -192,7 +197,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.displayHint(0).getHtml()).toBe('one');
     expect(hasms.displayHint(1).getHtml()).toBe('two');
 
-    tick(30000);
+    tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(true);
@@ -202,7 +207,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.displayHint(1).getHtml()).toBe('two');
     expect(hasms.displayHint(2).getHtml()).toBe('three');
 
-    tick(30000);
+    tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
     expect(hasms.isSolutionViewable()).toBe(true);
   }));
@@ -213,9 +218,9 @@ describe('HintsAndSolutionManager service', () => {
       hasms.reset([firstHint, secondHint], solution);
 
       // Set timeout.
-      tick(60000);
+      tick(WAIT_FOR_FIRST_HINT_MSEC);
       // Set tooltipTimeout.
-      tick(60000);
+      tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
       // Reset service to 0 solutions so releaseHint timeout won't be called.
       hasms.reset([], solution);
@@ -235,8 +240,8 @@ describe('HintsAndSolutionManager service', () => {
       expect(hasms.isHintViewable(1)).toBe(false);
       expect(hasms.isSolutionViewable()).toBe(false);
 
-      tick(60000);
-      tick(60000);
+      tick(WAIT_FOR_FIRST_HINT_MSEC);
+      tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
       expect(hasms.isHintTooltipOpen()).toBe(true);
       // It only changes hint visibility.
@@ -264,16 +269,16 @@ describe('HintsAndSolutionManager service', () => {
 
     hasms.recordWrongAnswer();
     hasms.recordWrongAnswer();
-    tick(10000);
-    tick(60000);
+    tick(ACCELERATED_HINT_WAIT_TIME_MSEC);
+    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
     expect(hasms.isHintTooltipOpen()).toBe(true);
 
     hasms.displayHint(0);
 
     hasms.recordWrongAnswer();
-    tick(10000);
+    tick(ACCELERATED_HINT_WAIT_TIME_MSEC);
 
-    tick(60000);
+    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
     expect(hasms.isHintTooltipOpen()).toBe(false);
     expect(hasms.isHintViewable(0)).toBe(true);
