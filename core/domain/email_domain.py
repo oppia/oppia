@@ -92,7 +92,7 @@ class SendEmailInfo(python_utils.OBJECT):
 
     def __init__(
             self, recipient_id, sender_id, intent, email_subject,
-            email_html_body, sender_email, recipient_email, sender_name,
+            email_html_body, sender_email, recipient_email, sender_name=None,
             bcc_admin=False, reply_to_id=None):
         self.recipient_id = recipient_id
         self.sender_id = sender_id

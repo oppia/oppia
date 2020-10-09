@@ -2064,59 +2064,65 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     """
 
     target_id = 'exp1'
+    skill_id = 'skill_123456'
     language_code = 'en'
+    default_question_html_content = '<p>What is the meaning of life?</p>'
+    default_translation_html_content = '<p>Sample translation</p>'
     AUTHOR_EMAIL = 'author1@example.com'
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
     REVIEWER_2_EMAIL = 'reviewer2@community.org'
     COMMIT_MESSAGE = 'commit message'
 
-    def _create_translation_suggestion_with_language_code_and_author_id(
-            self, language_code, author_id):
-        """Creates a translation suggestion in the given language_code by the
-        given author_id.
-        """
+    def _create_translation_suggestion_in_lang_with_translation_html(
+            self, language_code, translation_html):
+        """Creates a translation suggestion in the given language code. with
+        the given translation_html."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>'
+            'translation_html': translation_html
         }
 
         return suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            author_id, add_translation_change_dict,
+            self.author_id, add_translation_change_dict,
             'test description'
         )
 
-    def _create_question_suggestion_with_skill_id_and_author_id(
-            self, skill_id, author_id):
-        """Creates a question suggestion with the given skill_id by the given
-        author_id.
+    def _create_question_suggestion_with_question_html_content(
+            self, question_html_content):
+        """Creates a question suggestion with the html content used for the
+        question in the question suggestion.
         """
-        add_question_change_dict = {
-            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': self.language_code,
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id,
-            'skill_difficulty': 0.3
-        }
+        with self.swap(
+            feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html_content):
+            add_question_change_dict = {
+                'cmd': (
+                    question_domain
+                    .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                'question_dict': {
+                    'question_state_data': self._create_valid_question_data(
+                        'default_state').to_dict(),
+                    'language_code': self.language_code,
+                    'question_state_data_schema_version': (
+                        feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': ['skill_1'],
+                    'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                },
+                'skill_id': self.skill_id,
+                'skill_difficulty': 0.3
+            }
 
         return suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
-            skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            author_id, add_question_change_dict,
+            self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_question_change_dict,
             'test description'
         )
 
@@ -2124,6 +2130,20 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self, suggestions):
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
+        """
+
+        return [
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion)
+            ) for suggestion in suggestions
+        ]
+
+    def _create_question_suggestion_html_email_content(
+            self, reviewable_suggestion_email_infos):
+        """Creates the html email content for the list of suggestions to notify
+        the reviewer about.
         """
 
         return [
@@ -2158,13 +2178,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             False)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
         question_suggestion = (
-            self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_1', self.author_id))
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_content))
         self.reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
+
+        self.mock_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
 
@@ -2196,18 +2219,42 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_that_correct_completion_email_is_sent(self):
         question_suggestion = (
             self._create_question_suggestion_with_skill_id_and_author_id(
-                'skill_1', self.author_id)
-        )
+                'skill_1', self.author_id))
         reviewable_suggestion_email_info = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
-                [question_suggestion]
-            )
-        )
-        expected_email_subject = (
-            email_manger.SUGGESTIONS_TO_REVIEW_TEMPLATE['email_subject']
-        ) 
+                [question_suggestion])
+        review_wait_time = 5
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mock_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=review_wait_time))
+ 
         expected_email_html_body = (
-            email_manger.SUGGESTIONS_TO_REVIEW_TEMPLATE[
+            'Hi reviewer1,<br><br>'
+            'There are new review opportunities that we think you might be '
+            'interested in on the '
+            '<a href="https://www.oppia.org/contributor-dashboard/">'
+            'Contributor Dashboard</a>. Here are some examples of contributions '
+            'that have been waiting the longest for review:'
+            '<br>%s<br>'
+            'Please take some time to review any of the above contributions '
+            '(if they still need a review) or any other contributions on the '
+            'dashboard. We appreciate your help!<br>'
+            'Thanks again, and happy reviewing!<br><br>'
+            '- The Oppia Contributor Dashboard Team <br><br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.'
+        )
+        
+        with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+        
+
+        expected_email_subject = (
+            email_manger.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+            'email_subject']) 
+        expected_email_html_body = (
+            NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
                 'email_body_template'] % (
                     '', 
 

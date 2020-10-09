@@ -210,35 +210,33 @@ NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
     []
 )
 
-SUGGESTIONS_TO_REVIEW_TEMPLATE = {
+NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
     'email_body_template': (
         'Hi %s,<br><br>'
-        'Thank you for actively contributing high-quality suggestions for '
-        'Oppia\'s lessons in %s, and for helping to make these lessons better '
-        'for students around the world!<br><br>'
-        'In recognition of your contributions, we would like to invite you to '
-        'become one of Oppia\'s reviewers. As a reviewer, you will be able to '
-        'review suggestions in %s, and contribute to helping ensure that any '
-        'edits made to lessons preserve the lessons\' quality and are '
-        'beneficial for students.<br><br>'
-        'If you\'d like to help out as a reviewer, please visit your '
-        '<a href="https://www.oppia.org/creator-dashboard/">dashboard</a>. '
-        'and set your review preferences accordingly. Note that, if you accept,'
-        'you will receive occasional emails inviting you to review incoming '
-        'suggestions by others.<br><br>'
-        'Again, thank you for your contributions to the Oppia community!<br>'
-        '- The Oppia Team<br>'
-        '<br>%s'
+        'There are new review opportunities that we think you might be '
+        'interested in on the '
+        '<a href="https://www.oppia.org/contributor-dashboard/">Contributor '
+        'Dashboard</a>. Here are some examples of contributions that have been '
+        'waiting the longest for review:'
+        '<br>%s<br>'
+        'Please take some time to review any of the above contributions (if '
+        'they still need a review) or any other contributions on the dashboard.'
+        'We appreciate your help!<br>'
+        'Thanks again, and happy reviewing!<br><br>'
+        '- The Oppia Contributor Dashboard Team'
+        '<br><br>%s'
     ),
-    'email_subject': 'Contributor Dashboard Review Opportunities',
+    'email_subject': 'Contributor Dashboard Reviewer Opportunities',
     # The templates below are for listing the information for each suggestion
     # type.
-    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-        '<li>The following translation suggestion in language %s was submitted '
-        'for review %s ago:<br>%s</li>'),
-    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-        '<li>The following %s question suggestion was submitted for review %s '
-        'ago:<br>%s</li>')
+    'listing_suggestion_template': {
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+            '<li>The following translation suggestion in language %s was '
+            'submitted for review %s ago:<br>%s</li>'),
+        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+            '<li>The following %s question suggestion was submitted for review '
+            '%s ago:<br>%s</li>')
+    }
 }
 
 SENDER_VALIDATORS = {
@@ -1263,11 +1261,11 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             email content info objects will be used to compose the email
             body for each reviewer.
     """
-    email_subject = SUGGESTIONS_TO_REVIEW_TEMPLATE['email_subject']
-
-    email_body_template = SUGGESTIONS_TO_REVIEW_TEMPLATE['email_body_template']
+    email_subject = NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+        'email_subject']
+    email_body_template = NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+        'email_body_template']
     
-
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
@@ -1317,14 +1315,26 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     reviewer_suggestion_email_info.language_code = ''
                 # Calculate how long the suggestion has been waiting for review.
                 suggestion_review_wait_time = (
-                    datetime.now() - (
+                    datetime.utcnow() - (
                         reviewer_suggestion_email_info.submission_datetime))
-                suggestion_template = SUGGESTIONS_TO_REVIEW_TEMPLATE[
-                    reviewer_suggestion_email_info.suggestion_type]
+                # Get a string composed of the largest time unit that has a
+                # value, followed by that time unit. For example, if the
+                # suggestion had been waiting for review for 5 days and 2 hours,
+                # '5 days' would be returned. This is more user friendly since a
+                # high level of precision is not needed.
+                human_readable_review_wait_time = (
+                    utils.create_string_from_largest_unit_in_timedelta(
+                        suggestion_review_wait_time))
+                suggestion_template = (
+                    NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+                        'listing_suggestion_template'][
+                            reviewer_suggestion_email_info.suggestion_type]
+                )
                 list_of_suggestions_strings.append(suggestion_template % (
                     reviewer_suggestion_email_info.language_code,
-                    suggestion_review_wait_time,
+                    human_readable_review_wait_time,
                     reviewer_suggestion_email_info.suggestion_content))
+
             email_body = email_body_template % (
                 reviewer_usernames[index], ''.join(list_of_suggestions_strings),
                 EMAIL_FOOTER.value)
@@ -1333,7 +1343,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 reviewer_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                reviewer_emails[index], EMAIL_SENDER_NAME.value))
+                reviewer_emails[index]))
 
     _send_emails(send_email_infos)
 
