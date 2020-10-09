@@ -24,9 +24,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 # changed, just this array has to be modified to include the new
 # interactions or remove existing ones.
 VALID_INTERACTION_IDS = [
-    'Continue', 'DragAndDropSortInput', 'EndExploration', 'FractionInput',
-    'ImageClickInput', 'ItemSelectionInput', 'MultipleChoiceInput',
-    'NumericExpressionInput', 'NumericInput', 'NumberWithUnits', 'TextInput'
+    'AlgebraicExpressionInput', 'Continue', 'DragAndDropSortInput',
+    'EndExploration', 'FractionInput', 'ImageClickInput', 'ItemSelectionInput',
+    'MathEquationInput', 'MultipleChoiceInput', 'NumericExpressionInput',
+    'NumericInput', 'NumberWithUnits', 'TextInput'
 ]
 
 SUPPORTED_LANGUAGES = ['en']
