@@ -1777,25 +1777,20 @@ class ReviewableSuggestionEmailInfoUnitTests(
                     edit_state_content_suggestion)
             )
 
-    def test_create_raises_for_unexpected_contributor_suggestion_type_keys(
+    def test_contributor_suggestion_types_are_in_suggestion_text_getter_dict(
             self):
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_content(
-                '<p>default question content</p>'))
+        # This test will fail if a new suggestion type is added to the
+        # Contributor Dashboard but hasn't been added to
+        # SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.
+        sorted_text_getter_dict_suggestion_types = sorted(
+            suggestion_services
+            .SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys())
+        sorted_contributor_dashboard_suggestion_types = sorted(
+            suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected keys in SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS to '
-            r'be \[%s\], received: \[\].' % ' '.join(
-                suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)):
-            with self.swap(
-                suggestion_services,
-                'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS', {}):
-                (
-                    suggestion_services
-                    .create_reviewable_suggestion_email_info_from_suggestion(
-                        question_suggestion)
-                )
+        self.assertListEqual(
+            sorted_text_getter_dict_suggestion_types,
+            sorted_contributor_dashboard_suggestion_types)
 
     def test_create_from_suggestion_returns_info_for_question_suggestion(self):
         question_suggestion = (

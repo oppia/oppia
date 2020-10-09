@@ -700,24 +700,9 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
         email info.
 
     Raises:
-        Exception. The keys in SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS
-            should be consist with the suggestion types offered on the
-            Contributor Dashboard.
         Exception. The suggestion type must be offered on the Contributor
             Dashboard.
     """
-    # This check makes sure that an error is raised if a new suggestion type
-    # is added to the Contributor Dashboard but hasn't been added to
-    # SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.
-    if set(suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES) != set(
-            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys()):
-        raise Exception(
-            'Expected keys in SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS to '
-            'be [%s], received: [%s].' % (
-                ' '.join(
-                    suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES),
-                ' '.join(SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys())))
-
     if suggestion.suggestion_type not in (
             SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS):
         raise Exception(
