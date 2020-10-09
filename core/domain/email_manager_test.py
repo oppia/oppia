@@ -2662,6 +2662,79 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self._assert_created_sent_email_model_is_correct(
             expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
 
+    def test_email_sent_for_one_reviewer_multi_question_suggestions(self):
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p>Question 1</p>'))
+        reviewable_suggestion_email_info_1 = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion_1))
+        # Question suggestion 1 has waited 1 day for review.
+        reviewable_suggestion_email_info_1.submission_datetime = (
+            self.mock_review_submission_datetime + datetime.timedelta(hours=1))
+        question_suggestion_2 = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p>Question 2</p>'))
+        reviewable_suggestion_email_info_2 = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion_2))
+        # Question suggestion 2 has waited 1 hour for review.
+        reviewable_suggestion_email_info_1.submission_datetime = (
+            self.mock_review_submission_datetime + datetime.timedelta(days=1))
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=1, hours=1))
+        expected_question_1_html_email_content = (
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s day' % review_wait_time, 'Question 1'))
+        expected_question_2_html_email_content = (
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s hour' % review_wait_time, 'Question 2'))
+        expected_question_html_content = '%s%s' % (
+            expected_question_1_html_email_content,
+            expected_question_2_html_email_content)
+        expected_email_html_body = (
+            'Hi reviewer1,<br><br>'
+            'There are new review opportunities that we think you might be '
+            'interested in on the '
+            '<a href="https://www.oppia.org/contributor-dashboard/">'
+            'Contributor Dashboard</a>. Here are some examples of contributions '
+            'that have been waiting the longest for review:'
+            '<br>%s<br>'
+            'Please take some time to review any of the above contributions '
+            '(if they still need a review) or any other contributions on the '
+            'dashboard. We appreciate your help!<br>'
+            'Thanks again, and happy reviewing!<br><br>'
+            '- The Oppia Contributor Dashboard Team<br><br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.' % (
+                expected_question_html_email_content))
+        
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [
+                                [reviewable_suggestion_email_info_1,
+                                reviewable_suggestion_email_info_2]
+                            ])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
+
     def test_email_sent_for_one_reviewer_one_translation_review_wait_time_a_day(
             self):
         translation_suggestion = (
