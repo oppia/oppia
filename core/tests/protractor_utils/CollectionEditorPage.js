@@ -90,7 +90,7 @@ var CollectionEditorPage = function() {
     if (isEnabled) {
       await action.click('Add Exploration Button', addExplorationButton);
     } else {
-      throw new Error ('Add Exploration Button is not clickable');
+      throw new Error ('Add Exploration Button is not Clickable');
     }
   };
 
