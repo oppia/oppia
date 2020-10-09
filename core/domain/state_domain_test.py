@@ -1143,7 +1143,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return exploration.states[exploration.init_state_name]
 
         def _verify_interaction_supports_android(self, interaction_id):
-            """Checks that the provided interaction is supported on android."""
+            """Checks that the provided interaction is supported on Android."""
             init_state = _create_init_state_for_interaction_verification()
             init_state.update_interaction_id(interaction_id)
             self.assertTrue(
@@ -1152,7 +1152,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         def _verify_interaction_does_not_support_android(self, interaction_id):
             """Checks that the provided interaction is not supported on
-            android.
+            Android.
             """
             init_state = _create_init_state_for_interaction_verification()
             init_state.update_interaction_id(interaction_id)
