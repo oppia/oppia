@@ -45,7 +45,8 @@ describe('Translations backend API service', () => {
       I18N_T_1: 'Hello'
     };
 
-    translationsBackendApiService.fetchTranslationsAsync('en').then(response => {
+    translationsBackendApiService.fetchTranslationsAsync('en')
+      .then(response => {
       expect(response).toEqual(translations);
     });
 
