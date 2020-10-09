@@ -56,8 +56,9 @@ var ContributorDashboardPage = function() {
 
   this.get = async function() {
     await browser.get('/contributor-dashboard');
-    await waitFor.visibilityOf(
-      usernameContainer, 'Username takes too much time to load');
+    /*await waitFor.visibilityOf(
+      usernameContainer, 'Username takes too much time to load');*/
+    await waitFor.pageToFullyLoad();
   };
 
   this.getTranslateTextTab = function() {

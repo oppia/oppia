@@ -95,7 +95,6 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.get();
 
     await contributorDashboardPage.navigateToSubmitQuestionTab();
-    await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0.00%)');
 

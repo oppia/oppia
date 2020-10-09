@@ -500,10 +500,10 @@ var ExplorationEditorMainTab = function() {
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
-    await richTextEditor.clear();
+    //await richTextEditor.clear();
+    await action.clear('Rich Text editor', richTextEditor);
     await richTextInstructions(richTextEditor);
-    expect(await saveStateContentButton.isDisplayed()).toBe(true);
-    await saveStateContentButton.click();
+    await action.click('Save State Content Button', saveStateContentButton);
     await waitFor.invisibilityOf(
       saveStateContentButton,
       'State content editor takes too long to disappear');
@@ -528,7 +528,8 @@ var ExplorationEditorMainTab = function() {
   // ---- HINT ----
 
   this.addHint = async function(hint) {
-    await addHintButton.click();
+    //await addHintButton.click();
+    await action.click('Add hint button', addHintButton);
     var addHintModal = element(
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
     await waitFor.visibilityOf(
@@ -537,16 +538,13 @@ var ExplorationEditorMainTab = function() {
       .last().click();
     await browser.switchTo().activeElement().sendKeys(hint);
 
-    await waitFor.elementToBeClickable(
-      saveHintButton,
-      'Save Hint button takes too long to be clickable');
-    await saveHintButton.click();
+    await action.click('Save Hint button', saveHintButton);
     await waitFor.invisibilityOf(
       addHintModal, 'Add Hint modal takes too long to close');
   };
 
   this.addSolution = async function(interactionId, solution) {
-    await addSolutionButton.click();
+    await action.click('Add Solution button', addSolutionButton);
     var addOrUpdateSolutionModal = element(
       by.css('.protractor-test-add-or-update-solution-modal'));
     await waitFor.visibilityOf(
@@ -561,10 +559,7 @@ var ExplorationEditorMainTab = function() {
     await browser.switchTo().activeElement().sendKeys(solution.explanation);
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
-    await waitFor.elementToBeClickable(
-      submitSolutionButton,
-      'Submit Solution button takes too long to be clickable');
-    await submitSolutionButton.click();
+    await action.click('Submit Solution button', submitSolutionButton);
     await waitFor.invisibilityOf(
       addOrUpdateSolutionModal,
       'Add/Update Solution modal takes too long to close');

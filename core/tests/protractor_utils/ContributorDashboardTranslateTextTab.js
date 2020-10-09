@@ -17,6 +17,7 @@
  * for use in Protractor tests.
  */
 
+var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var ContributorDashboardTranslateTextTab = function() {
@@ -34,20 +35,17 @@ var ContributorDashboardTranslateTextTab = function() {
     by.css('.protractor-test-language-selector-featured-explanation'));
 
   var _openLanguageSelector = async function() {
-    await waitFor.elementToBeClickable(
-      selectorContainer,
-      'Language selector taking too long to be clickable'
-    );
-    await selectorContainer.click();
+    await action.click('Language selector', selectorContainer);
   };
 
   var _selectLanguage = async function(language) {
     await _openLanguageSelector();
-    await selectorContainer.element(
+    var testLanguageSelector = await selectorContainer.element(
       by.cssContainingText(
         '.protractor-test-language-selector-option',
         language
-      )).click();
+      ));
+    await action.click('Test Language Selector', testLanguageSelector);
   };
 
   this.changeLanguage = async function(language) {
@@ -88,6 +86,8 @@ var ContributorDashboardTranslateTextTab = function() {
   };
 
   this.expectSelectedLanguageToBe = async function(language) {
+    await waitFor.visibilityOf(selectedLanguageElement,
+      'Selected language element taking too long to show up.');
     expect(await selectedLanguageElement.getText()).toMatch(language);
   };
 };
