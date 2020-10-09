@@ -48,15 +48,12 @@
     "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts",
     "core/templates/services/audio-bar-status.service.ts",
     "core/templates/services/audio-bar-status.service.spec.ts",
-<<<<<<< HEAD
     "core/templates/services/editability.service.ts",
     "core/templates/services/editability.service.spec.ts",
-=======
     "core/templates/services/csrf-token.service.ts",
     "core/templates/services/csrf-token.service.spec.ts",
     "core/templates/services/date-time-format.service.ts",
     "core/templates/services/date-time-format.service.spec.ts",
->>>>>>> upstream/develop
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
