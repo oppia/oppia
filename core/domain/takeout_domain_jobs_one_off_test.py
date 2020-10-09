@@ -26,8 +26,6 @@ from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
-import google.appengine.api.datastore_errors
-
 (base_models, config_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config])
 
@@ -84,7 +82,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
 
             # Try a query on the unindexed field and observe failure.
             with self.assertRaisesRegexp(
-                google.appengine.api.datastore_errors.BadFilterError,
+                Exception,
                 'invalid filter: Cannot query for unindexed property None.'):
                 model_class.query(model_class.commit_message == 'test1')
 

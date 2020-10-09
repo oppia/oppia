@@ -28,10 +28,12 @@ import subprocess
 import sys
 import time
 
+import constants
 import feconf
 import python_utils
-import release_constants
 
+
+AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable
 
@@ -356,45 +358,6 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
-def ensure_release_scripts_folder_exists_and_is_up_to_date():
-    """Checks that the release-scripts folder exists and is up-to-date."""
-    parent_dirpath = os.path.join(os.getcwd(), os.pardir)
-    release_scripts_dirpath = os.path.join(parent_dirpath, 'release-scripts')
-
-    # If the release-scripts folder does not exist, set it up.
-    if not os.path.isdir(release_scripts_dirpath):
-        with CD(parent_dirpath):
-            # Taken from the "Check your SSH section" at
-            # https://help.github.com/articles/error-repository-not-found/
-            _, stderr = subprocess.Popen(
-                ['ssh', '-T', 'git@github.com'],
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE).communicate()
-            if 'You\'ve successfully authenticated' not in stderr:
-                raise Exception(
-                    'You need SSH access to GitHub. See the '
-                    '"Check your SSH access" section here and follow the '
-                    'instructions: '
-                    'https://help.github.com/articles/'
-                    'error-repository-not-found/#check-your-ssh-access')
-            subprocess.check_call([
-                'git', 'clone',
-                'git@github.com:oppia/release-scripts.git'])
-
-    with CD(release_scripts_dirpath):
-        python_utils.PRINT('Verifying that ../release-scripts repo is clean...')
-        verify_local_repo_is_clean()
-        python_utils.PRINT(
-            'Verifying that user is on master branch in '
-            '../release-scripts repo...')
-        verify_current_branch_name('master')
-
-        # Update the local repo.
-        remote_alias = get_remote_alias(
-            'git@github.com:oppia/release-scripts.git')
-        subprocess.check_call(['git', 'pull', remote_alias])
-
-
 def is_port_open(port):
     """Checks if a process is listening to the port.
 
@@ -480,7 +443,7 @@ def ask_user_to_confirm(message):
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
         answer = python_utils.INPUT().lower()
-        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
 
@@ -517,7 +480,7 @@ def check_blocking_bug_issue_count(repo):
         Exception. The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
-        number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
+        number=constants.release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
     if blocking_bugs_milestone.state == 'closed':
         raise Exception('The blocking bug milestone is closed.')
     if blocking_bugs_milestone.open_issues:
@@ -542,12 +505,13 @@ def check_prs_for_current_release_are_released(repo):
             "PR: released" label.
     """
     current_release_label = repo.get_label(
-        release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
+        constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
     current_release_prs = repo.get_issues(
         state='all', labels=[current_release_label])
     for pr in current_release_prs:
         label_names = [label.name for label in pr.labels]
-        if release_constants.LABEL_FOR_RELEASED_PRS not in label_names:
+        if constants.release_constants.LABEL_FOR_RELEASED_PRS not in (
+                label_names):
             open_new_tab_in_browser_if_possible(
                 'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
                 '+label%3A%22PR%3A+for+current+release%22+')

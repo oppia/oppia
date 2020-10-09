@@ -68,7 +68,7 @@ describe('Email Dashboard Services', () => {
             }
           }].map(emailDashboardQueryObjectFactory.createFromBackendDict);
 
-        emailDashboardDataService.getNextQueries();
+        emailDashboardDataService.getNextQueriesAsync();
 
         var req = httpTestingController.expectOne(
           req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
@@ -103,7 +103,7 @@ describe('Email Dashboard Services', () => {
         });
         var expectedQueries = [queryData];
 
-        emailDashboardDataService.submitQuery(data);
+        emailDashboardDataService.submitQueryAsync(data);
 
         var req = httpTestingController.expectOne('/emaildashboarddatahandler');
         expect(req.request.method).toEqual('POST');
@@ -137,7 +137,7 @@ describe('Email Dashboard Services', () => {
           status: 'processing'
         }].map(emailDashboardQueryObjectFactory.createFromQueryDict);
 
-        emailDashboardDataService.getNextQueries();
+        emailDashboardDataService.getNextQueriesAsync();
 
         var req = httpTestingController.expectOne(
           req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
@@ -159,7 +159,7 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getQueries().length).toEqual(2);
         expect(emailDashboardDataService.getQueries()).toEqual(recentQueries);
 
-        emailDashboardDataService.fetchQuery('q123').then((query) => {
+        emailDashboardDataService.fetchQueryAsync('q123').then((query) => {
           expect(query.id).toEqual('q123');
           expect(query.status).toEqual('completed');
         });
@@ -185,7 +185,7 @@ describe('Email Dashboard Services', () => {
     it('should check simulation',
       fakeAsync(() => {
         // Get next page of queries.
-        emailDashboardDataService.getNextQueries();
+        emailDashboardDataService.getNextQueriesAsync();
 
         var req = httpTestingController.expectOne(
           req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
@@ -218,7 +218,7 @@ describe('Email Dashboard Services', () => {
             status: 'processing'
           };
 
-          emailDashboardDataService.submitQuery(data);
+          emailDashboardDataService.submitQueryAsync(data);
           totalQueries.unshift(queryData);
 
           var req = httpTestingController.expectOne(
@@ -239,7 +239,7 @@ describe('Email Dashboard Services', () => {
           totalQueriesResponse);
 
         // Check that queries on page 1 are correct.
-        emailDashboardDataService.getNextQueries().then(
+        emailDashboardDataService.getNextQueriesAsync().then(
           (queries) => {
             expect(queries.length).toEqual(10);
             expect(queries).toEqual(totalQueriesResponse.slice(10, 20));
@@ -247,7 +247,7 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(1);
 
         // Check that queries on page 2 are correct.
-        emailDashboardDataService.getNextQueries().then(
+        emailDashboardDataService.getNextQueriesAsync().then(
           (queries) => {
             expect(queries.length).toEqual(5);
             expect(queries).toEqual(totalQueriesResponse.slice(20, 25));
@@ -265,7 +265,7 @@ describe('Email Dashboard Services', () => {
           status: 'processing'
         };
 
-        emailDashboardDataService.submitQuery(data);
+        emailDashboardDataService.submitQueryAsync(data);
 
         var req = httpTestingController.expectOne(
           '/emaildashboarddatahandler');
@@ -290,7 +290,7 @@ describe('Email Dashboard Services', () => {
           queryDataResponse);
 
         // Check queries on page 2.
-        emailDashboardDataService.getNextQueries().then(
+        emailDashboardDataService.getNextQueriesAsync().then(
           (queries) => {
             expect(queries.length).toEqual(6);
             expect(queries).toEqual(totalQueriesResponse.slice(20, 26));
