@@ -1,4 +1,3 @@
-
 # coding: utf-8
 #
 # Copyright 2020 The Oppia Authors. All Rights Reserved.
@@ -17,7 +16,6 @@
 
 """Validators for story models."""
 
-
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -27,7 +25,6 @@ from core.domain import story_domain
 from core.domain import story_fetchers
 from core.platform import models
 import python_utils
-import utils
 
 (
     base_models, exp_models, story_models,
@@ -164,7 +161,7 @@ class StorySummaryModelValidator(
         in StoryModel.story_contents.
 
         Args:
-            item: ndb.Model. StorySummaryModel to validate.
+            item: datastore_services.Model. StorySummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -245,7 +242,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
         """Validates that story is public.
 
         Args:
-            item: ndb.Model. StoryProgressModel to validate.
+            item: datastore_services.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -296,7 +293,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
         """Validates that completed nodes belong to the story.
 
         Args:
-            item: ndb.Model. StoryProgressModel to validate.
+            item: datastore_services.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
