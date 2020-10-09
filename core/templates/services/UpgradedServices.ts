@@ -153,6 +153,8 @@ import { DragAndDropSortInputValidationService } from
 import { EditableCollectionBackendApiService } from
   'domain/collection/editable-collection-backend-api.service';
 import { EditabilityService } from 'services/editability.service';
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { EmailDashboardBackendApiService } from
@@ -1220,6 +1222,10 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['EmailDashboardQueryResultsObjectFactory'],
         upgradedServices['EmailDashboardQueryObjectFactory']);
+    upgradedServices['EditableStoryBackendApiService'] =
+        new EditableStoryBackendApiService(
+          upgradedServices['HttpClient'],
+          upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationPermissionsBackendApiService'] =
       new ExplorationPermissionsBackendApiService(
         upgradedServices['ContextService'],

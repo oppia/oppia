@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for story preview tab component.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -31,6 +33,9 @@ describe('Story Preview tab', function() {
   var MockStoryEditorNavigationService = null;
   var storyInitializedEventEmitter = null;
   var storyReinitializedEventEmitter = null;
+
+  importAllAngularServices();
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],

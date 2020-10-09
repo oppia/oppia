@@ -157,6 +157,7 @@ import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFac
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { ReadOnlyStoryNodeObjectFactory } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
@@ -412,8 +413,10 @@ export const angularServices: [string, unknown][] = [
   ['DragAndDropSortInputValidationService',
     DragAndDropSortInputValidationService],
   ['EditabilityService', EditabilityService],
-  ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
+  ['EditableCollectionBackendApiService',
+    EditableCollectionBackendApiService],
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
+  ['EditableStoryBackendApiService', EditableStoryBackendApiService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EmailDashboardQueryObjectFactory', EmailDashboardQueryObjectFactory],

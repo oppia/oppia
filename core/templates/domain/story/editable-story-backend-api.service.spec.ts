@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,40 +18,43 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-require('domain/story/editable-story-backend-api.service.ts');
-require('services/csrf-token.service.ts');
+import { EditableStoryBackendApiService, PublishedStoryModel } from
+  'domain/story/editable-story-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Editable story backend API service', function() {
-  var EditableStoryBackendApiService = null;
+describe('Editable story backend API service', () => {
+  let editableStoryBackendApiService:
+    EditableStoryBackendApiService = null;
   var sampleDataResults = null;
-  var $httpBackend = null;
-  var CsrfService = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    EditableStoryBackendApiService = $injector.get(
-      'EditableStoryBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
+    editableStoryBackendApiService = TestBed.get(
+      EditableStoryBackendApiService
+    );
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+    csrfService = TestBed.get(CsrfTokenService);
+    httpTestingController = TestBed.get(
+      HttpTestingController
+    );
+
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('simple-csrf-token');
     });
 
     // Sample story object returnable from the backend.
@@ -86,24 +89,22 @@ describe('Editable story backend API service', function() {
       topic_url_fragment: 'topic-frag',
       classroom_url_fragment: 'math'
     };
-  }));
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing story from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      $httpBackend.expect(
-        'GET', '/story_editor_handler/data/storyId').respond(
-        sampleDataResults);
-      EditableStoryBackendApiService.fetchStory('storyId').then(
+    fakeAsync(() => {
+      editableStoryBackendApiService.fetchStory('storyId').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      const requestUrl = '/story_editor_handler/data/storyId';
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
         story: sampleDataResults.story,
@@ -114,135 +115,127 @@ describe('Editable story backend API service', function() {
         classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    }));
 
   it('should successfully delete a story from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      $httpBackend.expect(
-        'DELETE', '/story_editor_handler/data/storyId').respond(200);
-      EditableStoryBackendApiService.deleteStory('storyId').then(
+    fakeAsync(() => {
+      editableStoryBackendApiService.deleteStory('storyId').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      const requestUrl = '/story_editor_handler/data/storyId';
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('DELETE');
+      req.flush(200);
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    }));
 
   it('should use the rejection handler if the backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      $httpBackend.expect(
-        'GET', '/story_editor_handler/data/2').respond(
-        500, 'Error loading story 2.');
-      EditableStoryBackendApiService.fetchStory('2').then(
+    fakeAsync(() => {
+      editableStoryBackendApiService.fetchStory('2').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      const requestUrl = '/story_editor_handler/data/2';
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {error: 'Error loading story 2.'},
+        {status: 500, statusText: ''}
+      );
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading story 2.');
-    }
-  );
+    }));
 
   it('should update a story after fetching it from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
       var story = null;
 
       // Loading a story the first time should fetch it from the backend.
-      $httpBackend.expect(
-        'GET', '/story_editor_handler/data/storyId').respond(
-        sampleDataResults);
-
-      EditableStoryBackendApiService.fetchStory('storyId').then(
-        function(data) {
+      editableStoryBackendApiService.fetchStory('storyId').then(
+        (data: PublishedStoryModel) => {
           story = data.story;
         });
-      $httpBackend.flush();
+      let requestUrl = '/story_editor_handler/data/storyId';
+      let req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
 
       story.title = 'New Title';
       story.version = '2';
-      var storyWrapper = {
+      let storyWrapper = {
         story: story
       };
-
-      $httpBackend.expect(
-        'PUT', '/story_editor_handler/data/storyId').respond(
-        storyWrapper);
-
-      // Send a request to update story.
-      EditableStoryBackendApiService.updateStory(
+      editableStoryBackendApiService.updateStory(
         story.id, story.version, 'Title is updated', []
       ).then(successHandler, failHandler);
-      $httpBackend.flush();
+
+      req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('PUT');
+      req.flush(storyWrapper);
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(story);
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    }));
 
   it('should use the rejection handler if the story to update doesn\'t exist',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
+    fakeAsync(() => {
       // Loading a story the first time should fetch it from the backend.
-      $httpBackend.expect(
-        'PUT', '/story_editor_handler/data/storyId_1').respond(
-        404, 'Story with given id doesn\'t exist.');
-
-      EditableStoryBackendApiService.updateStory(
-        'storyId_1', '1', 'Update an invalid Story.', []
+      editableStoryBackendApiService.updateStory(
+        'storyId_1', 1, 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
-      $httpBackend.flush();
+      const requestUrl = '/story_editor_handler/data/storyId_1';
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('PUT');
+      req.flush(
+        {error: 'Story with given id doesn\'t exist.'},
+        {status: 400, statusText: ''}
+      );
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Story with given id doesn\'t exist.');
-    }
-  );
+    }));
 
-  it('should publish a story', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/story_publish_handler/storyId').respond();
-
+  it('should publish a story', fakeAsync(() => {
     // Send a request to update story.
-    EditableStoryBackendApiService.changeStoryPublicationStatus(
+    editableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true
     ).then(successHandler, failHandler);
-    $httpBackend.flush();
+
+    const requestUrl = '/story_publish_handler/storyId';
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({});
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use the rejection handler if the story to publish doesn\'t exist',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
+    fakeAsync(() => {
       // Loading a story the first time should fetch it from the backend.
-      $httpBackend.expect(
-        'PUT', '/story_publish_handler/storyId_1').respond(
-        404, 'Story with given id doesn\'t exist.');
-
-      EditableStoryBackendApiService.changeStoryPublicationStatus(
+      editableStoryBackendApiService.changeStoryPublicationStatus(
         'storyId_1', true).then(successHandler, failHandler);
-      $httpBackend.flush();
+
+      const requestUrl = '/story_publish_handler/storyId_1';
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('PUT');
+      req.flush(
+        {error: 'Story with given id doesn\'t exist.'},
+        {status: 404, statusText: ''}
+      );
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Story with given id doesn\'t exist.');
-    }
-  );
+    }));
 });

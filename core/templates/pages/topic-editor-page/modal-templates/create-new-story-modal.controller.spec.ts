@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for CreateNewStoryModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 import { NewlyCreatedStoryObjectFactory } from
   'domain/topic/NewlyCreatedStoryObjectFactory';
 
@@ -26,6 +28,8 @@ describe('Create New Story Modal Controller', function() {
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
   var StoryEditorStateService = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {

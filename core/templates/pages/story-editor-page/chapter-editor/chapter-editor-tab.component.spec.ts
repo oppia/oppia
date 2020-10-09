@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for chapter editor tab controller.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
@@ -30,6 +32,7 @@ describe('Chapter Editor tab', function() {
   var storyInitializedEventEmitter = null;
   var storyReinitializedEventEmitter = null;
 
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));

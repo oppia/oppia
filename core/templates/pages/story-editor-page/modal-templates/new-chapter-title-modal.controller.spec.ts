@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for CreateNewChapterModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { StoryContentsObjectFactory } from
@@ -34,6 +36,8 @@ describe('Create New Chapter Modal Controller', function() {
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
