@@ -35,6 +35,7 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
+
 _SIMPLE_CRYPT_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools',
     'simple-crypt-' + common.SIMPLE_CRYPT_VERSION)

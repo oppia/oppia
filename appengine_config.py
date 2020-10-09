@@ -22,6 +22,7 @@ import sys
 
 import pkg_resources
 import python_utils
+
 from google.appengine.ext import vendor
 
 # Root path of the app.

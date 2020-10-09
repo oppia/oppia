@@ -26,18 +26,15 @@ import signal
 import subprocess
 import sys
 import time
-import StringIO
 
 from core.tests import test_utils
 import feconf
 import python_utils
-
 from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
-
 
 CHROME_DRIVER_VERSION = '77.0.3865.40'
 
@@ -60,6 +57,8 @@ class MockProcessClass(python_utils.OBJECT):
 
         Args:
             clean_shutdown: bool. Whether to shut down when SIGINT received.
+            stdout: str. The text written to standard output by the
+                process.
         """
         self.poll_count = 0
         self.signals_received = []
@@ -67,7 +66,7 @@ class MockProcessClass(python_utils.OBJECT):
         self.poll_return = True
         self.clean_shutdown = clean_shutdown
 
-        self.stdout = StringIO.StringIO(stdout)
+        self.stdout = python_utils.string_io(buffer_value=stdout)
 
     def kill(self):
         """Increment kill_count.
@@ -878,7 +877,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands, stdout=None):
+        def mock_popen(unused_commands, stdout=None): # pylint: disable=unused-argument
             def mock_communicate():
                 return
             result = mock_process
@@ -1005,7 +1004,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands, stdout=None):
+        def mock_popen(unused_commands, stdout=None): # pylint: disable=unused-argument
             def mock_communicate():
                 return
             result = mock_process
@@ -1180,7 +1179,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands, stdout=None):
+        def mock_popen(unused_commands, stdout=None): # pylint: disable=unused-argument
             def mock_communicate():
                 return
             result = mock_process
@@ -1309,7 +1308,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands, stdout=None):
+        def mock_popen(unused_commands, stdout=None): # pylint: disable=unused-argument
             def mock_communicate():
                 return
             result = mock_process
