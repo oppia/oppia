@@ -651,8 +651,9 @@ def _get_plain_text_from_html_content_string(html_content_string):
         """
         # Convert the MatchObject to a string.
         rte_tag_string = rte_tag.group(0)
+        # Get the name of the rte tag.
         rte_tag_name = re.search(
-            'oppia-noninteractive-\w+', rte_tag_string)
+            r'oppia-noninteractive-\w+', rte_tag_string)
         # Convert the MatchObject to a string.
         rte_tag_name_string = rte_tag_name.group(0)
         # Get the name of the rte.
