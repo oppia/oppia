@@ -37,11 +37,18 @@ VERSION_DELIMITER = '-'
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    # Models that should be kept.
     'KEEP',
+    # Models that should be deleted.
     'DELETE',
-    'ANONYMIZE',
+    # Models that should be deleted after all the other models are deleted and
+    # verified to be deleted.
+    'DELETE_AT_END',
+    # Models that should be pseudonymized in their local context.
     'LOCALLY_PSEUDONYMIZE',
+    # Models that should only be kept if published.
     'KEEP_IF_PUBLIC',
+    # Models that are not directly or indirectly related to users.
     'NOT_APPLICABLE'
 )
 
@@ -774,6 +781,10 @@ class VersionedModel(BaseModel):
         """
         versioned_models = cls.get_multi(
             entity_ids, include_deleted=force_deletion)
+        versioned_models = [
+            versioned_model for versioned_model in versioned_models
+            if versioned_model is not None
+        ]
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []

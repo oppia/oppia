@@ -315,6 +315,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        suggestion.author_id = self.PSEUDONYMOUS_ID
+        suggestion.validate()
+
         suggestion.author_id = ''
         with self.assertRaisesRegexp(
             Exception, 'Expected author_id to be in a valid user ID format'):
@@ -349,6 +352,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
 
+        suggestion.validate()
+
+        suggestion.final_reviewer_id = self.PSEUDONYMOUS_ID
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
@@ -1304,6 +1310,31 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.')
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
+
+    def test_accept_suggestion_with_psedonymous_author_adds_translation(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {})
+
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.PSEUDONYMOUS_ID,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
