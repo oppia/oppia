@@ -2013,33 +2013,6 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def test_create_returns_info_for_translation_suggestion_if_html_nested_rte(
-            self):
-        translation_suggestion = (
-            self._create_translation_suggestion_with_translation_html(
-                '<p> translation with rte'
-                '<oppia-noninteractive-link>'
-                '<oppia-noninteractive-math></oppia-noninteractive-math>'
-                '</oppia-noninteractive-link></p>'))
-        expected_reviewable_suggestion_email_info = (
-            suggestion_registry.ReviewableSuggestionEmailInfo(
-                translation_suggestion.suggestion_type,
-                translation_suggestion.language_code,
-                'translation with rte [Link] [Math]',
-                translation_suggestion.last_updated
-            ))
-
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion)
-        )
-
-        self._assert_reviewable_suggestion_email_infos_are_equal(
-            reviewable_suggestion_email_info,
-            expected_reviewable_suggestion_email_info
-        )
-
     def test_create_returns_info_for_translation_suggestion_if_html_rte_value(
             self):
         translation_suggestion = (
@@ -2193,33 +2166,6 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def test_create_returns_info_for_question_suggestion_if_html_has_nested_rte(
-            self):
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_content(
-                '<p> question with rte'
-                '<oppia-noninteractive-link>'
-                '<oppia-noninteractive-math></oppia-noninteractive-math>'
-                '</oppia-noninteractive-link></p>'))
-        expected_reviewable_suggestion_email_info = (
-            suggestion_registry.ReviewableSuggestionEmailInfo(
-                question_suggestion.suggestion_type,
-                question_suggestion.language_code,
-                'question with rte [Link] [Math]',
-                question_suggestion.last_updated
-            ))
-
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                question_suggestion)
-        )
-
-        self._assert_reviewable_suggestion_email_infos_are_equal(
-            reviewable_suggestion_email_info,
-            expected_reviewable_suggestion_email_info
-        )
-
     def test_create_returns_info_for_question_suggestion_if_html_has_rte_value(
             self):
         question_suggestion = (
@@ -2244,6 +2190,22 @@ class ReviewableSuggestionEmailInfoUnitTests(
         self._assert_reviewable_suggestion_email_infos_are_equal(
             reviewable_suggestion_email_info,
             expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_raises_if_suggestion_html_has_an_rte_tag_without_a_name(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p><oppia-noninteractive-l>text</oppia-noninteractive ></p>'))
+
+        #with self.assertRaisesRegexp(
+        #    Exception, 
+        #    'Expected the rte tag to contain oppia-noninteractive-\*\*, '
+        #    'received: <oppia-noninteractive></oppia-noninteractive>'):
+        (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
         )
 
 

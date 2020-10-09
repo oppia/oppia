@@ -624,10 +624,10 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def _get_plain_text_from_html_content_string(html_content_string):
     """Retrieves the plain text from the given html content string. RTE element
-    occurrences in the html are replaced by their corresponding name,
+    occurrences in the html are replaced by their corresponding rte name,
     capitalized in square brackets.
     eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
-        Sample2 </p> will give as output: Sample1 [MATH] Sample2.
+        Sample2 </p> will give as output: Sample1 [Math] Sample2.
     Note: similar logic exists in the frontend in format-rte-preview.filter.ts.
 
     Args:
@@ -639,47 +639,42 @@ def _get_plain_text_from_html_content_string(html_content_string):
     """
 
     def _replace_rte_tag(rte_tag):
-        """Replaces all of the opening <oppia-noninteractive-**> tags with
-        their corresponding name in square brackets.
+        """Replaces all of the <oppia-noninteractive-**> tags with their
+        corresponding rte name in square brackets.
 
         Args:
             rte_tag: MatchObject. A matched object that contins the
-                oppia-noninteractive rte tag.
+                oppia-noninteractive rte tags.
 
         Returns:
-            str. The string to replace the rte tag with.
+            str. The string to replace the rte tags with.
         """
         # Convert the MatchObject to a string.
         rte_tag_string = rte_tag.group(0)
-        # First grab the **> in the <oppia-noninteractive-**> tag.
-        replacement_string = rte_tag_string.split('-')[2]
-        # Get rid of the tag's attribute(s) if it has any. For example, if the
-        # tag was similar to
-        # <oppia-noninteractive-math math_content-with-value=*>, at this step we
-        # have 'math math_content-with-value=*>' and want 'math'.
-        replacement_string = replacement_string.split(' ')[0]
-        # If the tag doesn't have attributes, then at this step our string ends
-        # with >. For example, if the tag was similar to
-        # <oppia-noninteractive-math>, at this step we have 'math>' and want
-        # 'math'.
-        replacement_string = replacement_string.split('>')[0]
-        replacement_string = replacement_string.capitalize()
-        replacement_string = ' [%s] ' % replacement_string
-        return replacement_string
+        rte_tag_name = re.search(
+            'oppia-noninteractive-\w+', rte_tag_string)
+        raise Exception('{} {}'.format(rte_tag_string, rte_tag_name.group(0)))
+        if rte_tag_name is None:
+            raise Exception(
+                'Expected the rte tag to contain oppia-noninteractive-**, '
+                'received: %s.' % rte_tag_string)
+        else:
+            # Convert the MatchObject to a string.
+            rte_tag_name_string = rte_tag_name.group(0)
+            # Get the name of the rte.
+            rte_name_string = rte_tag_name_string.split('-')[2]
+            capitalized_rte_name_string = rte_name_string.capitalize()
+            formatted_rte_name_string = ' [%s] ' % capitalized_rte_name_string
+            return formatted_rte_name_string
 
-    # Replace all the <oppia-noninteractive-**> opening tags with their names
+    # Replace all the <oppia-noninteractive-**> tags with their rte names
     # capitalized in square brackets.
-    html_content_string_with_noninteractive_opening_tags_replaced = re.sub(
-        r'<(oppia-noninteractive\s*?)[^>]+>',
+    html_content_string_with_rte_tags_replaced = re.sub(
+        r'<(oppia-noninteractive\s*?)[^>]+>[^\w]</oppia-noninteractive.+?>',
         _replace_rte_tag, html_content_string)
-    # Get rid of all of the </oppia-noninteractive-**> closing tags.
-    html_content_string_with_all_noninteractive_tags_replaced = re.sub(
-        '</oppia-noninteractive.+?>', '',
-        html_content_string_with_noninteractive_opening_tags_replaced)
     # Get rid of all of the other html tags.
     plain_text = html_cleaner.strip_html_tags(
-        html_content_string_with_all_noninteractive_tags_replaced
-    )
+        html_content_string_with_rte_tags_replaced)
     # Remove trailing and leading whitespace and ensure that all words are
     # separated by a single space.
     plain_text_without_contiguous_whitespace = ' '.join(plain_text.split())
