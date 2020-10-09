@@ -2140,8 +2140,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             ) for suggestion in suggestions
         ]
 
-    def _create_question_suggestion_html_email_content(
-            self, question_content, review_wait_time):
+    def _create_html_email_content_for_a_question_suggestion(
+            self, review_wait_time, question_content):
         """Creates the html email content for a question suggestion to notify
         the reviewer about.
         """
@@ -2150,8 +2150,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] % (
                     '', review_wait_time, question_content)
 
-    def _create_translation_suggestion_html_email_content(
-            self, translation_content, language_code, review_wait_time):
+    def _create_html_email_content_for_a_translation_suggestion(
+            self, language_code, review_wait_time, translation_content):
         """Creates the html email content for a translation suggestion to notify
         the reviewer about.
         """
@@ -2207,20 +2207,20 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
             False)
 
-        self.save_new_valid_exploration(self.target_id, self.author_id)
-        self.save_new_skill(self.skill_id, self.author_id)
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_content(
-                self.default_question_content))
-        self.reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                question_suggestion))
-
         self.default_translation_html_content = '<p>%s</p>' % (
             self.default_translation_content)
         self.default_question_html_content = '<p>%s</p>' % (
             self.default_question_content)
+
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_html_content))
+        self.reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
         
         self.mock_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
 
@@ -2228,8 +2228,12 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.cannot_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
-                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                    self.reviewer_1_id, self.reviewable_suggestion_email_info)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[self.reviewable_suggestion_email_info]])
+                )
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 0)
@@ -2238,9 +2242,12 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.can_send_emails_ctx:
             with self.cannot_send_reviewer_emails_ctx:
-                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                    [self.reviewer_1_id],
-                    [[self.reviewable_suggestion_email_info]])
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[self.reviewable_suggestion_email_info]])
+                )
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 0)
@@ -2256,7 +2263,20 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages('invalid_reviewer_id')
         self.assertEqual(len(messages), 0)
 
-    def test_that_correct_completion_email_is_sent(self):
+    def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
+            self):
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                    [self.reviewer_1_id],
+                    [[]])
+
+        messages = self._get_sent_email_messages(self.reviewer_1_id)
+        self.assertEqual(len(messages), 0)
+
+    def test_email_sent_for_one_reviewer_one_question_suggestion_wait_time_day(
+            self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 self.default_question_html_content))
@@ -2264,16 +2284,15 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
-        review_wait_time = 5
+        review_wait_time = 1
         reviewable_suggestion_email_info.submission_datetime = (
             self.mock_review_submission_datetime)
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(days=review_wait_time))
-
         expected_question_html_email_content = (
-            self._create_question_suggestion_html_email_content(
-                self.default_question_content, '%s days' % review_wait_time))
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s day' % review_wait_time, self.default_question_content))
         expected_email_html_body = (
             'Hi reviewer1,<br><br>'
             'There are new review opportunities that we think you might be '
@@ -2294,8 +2313,342 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id], [[reviewable_suggestion_email_info]])
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
+
+    def test_email_sent_for_one_reviewer_one_question_suggestion_wait_time_days(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_html_content))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 5
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mock_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=review_wait_time))
+        expected_question_html_email_content = (
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s days' % review_wait_time, self.default_question_content))
+        expected_email_html_body = (
+            'Hi reviewer1,<br><br>'
+            'There are new review opportunities that we think you might be '
+            'interested in on the '
+            '<a href="https://www.oppia.org/contributor-dashboard/">'
+            'Contributor Dashboard</a>. Here are some examples of contributions '
+            'that have been waiting the longest for review:'
+            '<br>%s<br>'
+            'Please take some time to review any of the above contributions '
+            '(if they still need a review) or any other contributions on the '
+            'dashboard. We appreciate your help!<br>'
+            'Thanks again, and happy reviewing!<br><br>'
+            '- The Oppia Contributor Dashboard Team<br><br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.' % (
+                expected_question_html_email_content))
+        
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
+
+    def test_email_sent_for_one_reviewer_one_question_suggestion_wait_time_a_hr(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_html_content))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 1
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mock_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(hours=review_wait_time))
+        expected_question_html_email_content = (
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s hour' % review_wait_time, self.default_question_content))
+        expected_email_html_body = (
+            'Hi reviewer1,<br><br>'
+            'There are new review opportunities that we think you might be '
+            'interested in on the '
+            '<a href="https://www.oppia.org/contributor-dashboard/">'
+            'Contributor Dashboard</a>. Here are some examples of contributions '
+            'that have been waiting the longest for review:'
+            '<br>%s<br>'
+            'Please take some time to review any of the above contributions '
+            '(if they still need a review) or any other contributions on the '
+            'dashboard. We appreciate your help!<br>'
+            'Thanks again, and happy reviewing!<br><br>'
+            '- The Oppia Contributor Dashboard Team<br><br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.' % (
+                expected_question_html_email_content))
+        
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
+
+def test_email_sent_for_one_reviewer_one_question_suggestion_wait_time_hrs(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_html_content))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 5
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mock_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(hours=review_wait_time))
+        expected_question_html_email_content = (
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s hours' % review_wait_time, self.default_question_content))
+        expected_email_html_body = (
+            'Hi reviewer1,<br><br>'
+            'There are new review opportunities that we think you might be '
+            'interested in on the '
+            '<a href="https://www.oppia.org/contributor-dashboard/">'
+            'Contributor Dashboard</a>. Here are some examples of contributions '
+            'that have been waiting the longest for review:'
+            '<br>%s<br>'
+            'Please take some time to review any of the above contributions '
+            '(if they still need a review) or any other contributions on the '
+            'dashboard. We appreciate your help!<br>'
+            'Thanks again, and happy reviewing!<br><br>'
+            '- The Oppia Contributor Dashboard Team<br><br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.' % (
+                expected_question_html_email_content))
+        
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
+
+def test_email_sent_for_one_reviewer_one_question_suggestion_wait_time_a_min(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_html_content))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 1
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mock_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(minutes=review_wait_time))
+        expected_question_html_email_content = (
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s min' % review_wait_time, self.default_question_content))
+        expected_email_html_body = (
+            'Hi reviewer1,<br><br>'
+            'There are new review opportunities that we think you might be '
+            'interested in on the '
+            '<a href="https://www.oppia.org/contributor-dashboard/">'
+            'Contributor Dashboard</a>. Here are some examples of contributions '
+            'that have been waiting the longest for review:'
+            '<br>%s<br>'
+            'Please take some time to review any of the above contributions '
+            '(if they still need a review) or any other contributions on the '
+            'dashboard. We appreciate your help!<br>'
+            'Thanks again, and happy reviewing!<br><br>'
+            '- The Oppia Contributor Dashboard Team<br><br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.' % (
+                expected_question_html_email_content))
+        
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
+
+def test_email_sent_for_one_reviewer_one_question_suggestion_wait_time_mins(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_html_content))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 5
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mock_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(minutes=review_wait_time))
+        expected_question_html_email_content = (
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s mins' % review_wait_time, self.default_question_content))
+        expected_email_html_body = (
+            'Hi reviewer1,<br><br>'
+            'There are new review opportunities that we think you might be '
+            'interested in on the '
+            '<a href="https://www.oppia.org/contributor-dashboard/">'
+            'Contributor Dashboard</a>. Here are some examples of contributions '
+            'that have been waiting the longest for review:'
+            '<br>%s<br>'
+            'Please take some time to review any of the above contributions '
+            '(if they still need a review) or any other contributions on the '
+            'dashboard. We appreciate your help!<br>'
+            'Thanks again, and happy reviewing!<br><br>'
+            '- The Oppia Contributor Dashboard Team<br><br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.' % (
+                expected_question_html_email_content))
+        
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.reviewer_1_id, self.REVIEWER_1_EMAIL)
+
+    def test_email_sent_for_one_reviewer_one_question_suggestion_wait_time_secs(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                self.default_question_html_content))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 1
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mock_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(seconds=review_wait_time))
+        expected_question_html_email_content = (
+            self._create_html_email_content_for_a_question_suggestion(
+                '%s min' % review_wait_time, self.default_question_content))
+        expected_email_html_body = (
+            'Hi reviewer1,<br><br>'
+            'There are new review opportunities that we think you might be '
+            'interested in on the '
+            '<a href="https://www.oppia.org/contributor-dashboard/">'
+            'Contributor Dashboard</a>. Here are some examples of contributions '
+            'that have been waiting the longest for review:'
+            '<br>%s<br>'
+            'Please take some time to review any of the above contributions '
+            '(if they still need a review) or any other contributions on the '
+            'dashboard. We appreciate your help!<br>'
+            'Thanks again, and happy reviewing!<br><br>'
+            '- The Oppia Contributor Dashboard Team<br><br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.' % (
+                expected_question_html_email_content))
+        
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
