@@ -1,13 +1,13 @@
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an 'AS-IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -31,10 +31,10 @@ import {
  *   interpolateParams or params - Key-value pairs for interpolation
  *   interpolatedValue - The final translation that is returned.
  *
- * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'Oppia'}">
+ * Example: <h1 [innerHTM]=''I18N_ABOUT_PAGE_HEADING' | translate:{x: 'Oppia'}'>
  *   'I18N_ABOUT_PAGE_HEADING' is referred here as key or key.
  *
- *   "translate" is the pipe.
+ *   'translate' is the pipe.
  *
  *   The object following the pipe, i.e. {x: 'Oppia'}, is called params or
  *   interpolationParams.
@@ -42,11 +42,11 @@ import {
  *   Each i18n translation JSON file contains translations as:
  *   {key: translatedValue, key2: translatedValue2}.
  *
- *   Let us say that translatedValue is "Hola <[x]>". Here the value of x comes
+ *   Let us say that translatedValue is 'Hola <[x]>'. Here the value of x comes
  *   from the params passed. So, after interpolation it will become
- *   "Hola Oppia".
+ *   'Hola Oppia'.
  *
- * Note: Intentionally left out the L of innerHTM"L" (only in this file) to
+ * Note: Intentionally left out the L of innerHTM'L' (only in this file) to
  * avoid the linting error.
  */
 
@@ -80,7 +80,7 @@ export class TranslateService {
    * translations
    */
   async fetchTranslationsAsync(
-    languageCode: string
+      languageCode: string
   ): Promise<TranslationsDict> {
     return this.translationsBackendApiService.fetchTranslationsAsync(
       languageCode
@@ -92,7 +92,7 @@ export class TranslateService {
    * @param {string} languageCode - language code of the translation to be used
    */
   use(newLanguageCode: string): void {
-    // Check if the translations for the "lang" have been fetched before.
+    // Check if the translations for the 'lang' have been fetched before.
     this.currentLang = newLanguageCode;
     if (Object.keys(this.translations).includes(newLanguageCode)) {
       this.onLangChangeEventEmitter.emit({ newLanguageCode: newLanguageCode });
@@ -118,8 +118,8 @@ export class TranslateService {
    * @returns {string} interpolated translatedValue
    */
   interpolateTranslatedValue(
-    translatedValue: string,
-    interpolateParams?: Object | undefined
+      translatedValue: string,
+      interpolateParams?: Object | undefined
   ): string {
     if (!interpolateParams) {
       return translatedValue;
@@ -146,7 +146,7 @@ export class TranslateService {
    */
   getInterpolatedString(key: string, interpolateParams?: Object): string {
     if (!this.utilsService.isDefined(key) || !key.length) {
-      throw new Error('Parameter "key" required');
+      throw new Error("Parameter 'key' required");
     }
     let translations = this.translations[this.currentLang];
 
