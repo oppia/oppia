@@ -35,7 +35,7 @@
     "core/templates/domain/email-dashboard/email-dashboard-query-object.factory.spec.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.spec.ts",
-    "core/templates/domain/utilities/AudioFileObjectFactory.ts",
+    "core/templates/domain/utilities/audio-file.model.ts",
     "core/templates/domain/utilities/browser-checker.service.ts",
     "core/templates/domain/utilities/browser-checker.service.spec.ts",
     "core/templates/filters/string-utility-filters/camel-case-to-hyphens.pipe.ts",
@@ -48,8 +48,15 @@
     "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts",
     "core/templates/services/audio-bar-status.service.ts",
     "core/templates/services/audio-bar-status.service.spec.ts",
+<<<<<<< HEAD
     "core/templates/services/editability.service.ts",
     "core/templates/services/editability.service.spec.ts",
+=======
+    "core/templates/services/csrf-token.service.ts",
+    "core/templates/services/csrf-token.service.spec.ts",
+    "core/templates/services/date-time-format.service.ts",
+    "core/templates/services/date-time-format.service.spec.ts",
+>>>>>>> upstream/develop
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",

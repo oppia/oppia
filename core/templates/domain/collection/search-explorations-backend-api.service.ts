@@ -28,9 +28,8 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
   ExplorationMetaDataBackendDict,
-  ExplorationMetadata,
-  ExplorationMetadataObjectFactory
-} from 'domain/exploration/ExplorationMetadataObjectFactory';
+  ExplorationMetadata
+} from 'domain/exploration/exploration-metadata.model';
 
 interface SearchExplorationBackendResponse {
   'collection_node_metadata_list': ExplorationMetaDataBackendDict[];
@@ -59,7 +58,7 @@ export class SearchExplorationsBackendApiService {
       var explorationMetadataBackendList = cloneDeep(
         response.collection_node_metadata_list);
       var explorationMetadataList = explorationMetadataBackendList.map(
-        explorationMetaData => ExplorationMetadataObjectFactory.
+        explorationMetaData => ExplorationMetadata.
           createFromBackendDict(explorationMetaData));
       successCallback(explorationMetadataList);
     }, (errorResponse) => {
