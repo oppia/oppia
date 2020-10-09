@@ -1260,8 +1260,9 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         reviewers_suggestion_email_infos:
             list(list(ReviewableSuggestionEmailInfo)). A list of suggestion
             email content info objects for each reviewer. These suggestion
-            email content info objects will be used to compose the email
-            body for each reviewer.
+            email content info objects contain the key imformation about the
+            suggestions we're notifying reviewers about and will be used to
+            compose the email body for each reviewer.
     """
     email_subject = NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
         'email_subject']
@@ -1291,7 +1292,6 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     send_email_infos = []
     for index, reviewer_id in enumerate(reviewer_ids):
-        #raise Exception('hereee ')
         if not reviewers_suggestion_email_infos[index]:
             log_new_error(
                 'There were no suggestions to recommend to the reviewer with '
@@ -1308,11 +1308,11 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     reviewer_id))
             continue
         else:
-            list_of_suggestions_strings = []
+            list_of_suggestions_to_notify_reviewer_strings = []
             for reviewer_suggestion_email_info in (
                     reviewers_suggestion_email_infos[index]):
                 # Set the language code for question suggestions to be the empty
-                # string in order to use the same suggestion template format.
+                # string in order to use the a single suggestion template format.
                 if reviewer_suggestion_email_info.suggestion_type == (
                         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
                     reviewer_suggestion_email_info.language_code = ''
@@ -1332,13 +1332,15 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
                         'listing_suggestion_template'][
                             reviewer_suggestion_email_info.suggestion_type])
-                list_of_suggestions_strings.append(suggestion_template % (
-                    reviewer_suggestion_email_info.language_code,
-                    human_readable_review_wait_time,
-                    reviewer_suggestion_email_info.suggestion_content))
+                list_of_suggestions_to_notify_reviewer_strings.append(
+                    suggestion_template % (
+                        reviewer_suggestion_email_info.language_code,
+                        human_readable_review_wait_time,
+                        reviewer_suggestion_email_info.suggestion_content))
 
             email_body = email_body_template % (
-                reviewer_usernames[index], ''.join(list_of_suggestions_strings),
+                reviewer_usernames[index], ''.join(
+                    list_of_suggestions_to_notify_reviewer_strings),
                 EMAIL_FOOTER.value)
 
             send_email_infos.append(email_domain.SendEmailInfo(
