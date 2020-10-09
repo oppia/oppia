@@ -625,6 +625,7 @@ var ExplorationEditorMainTab = function() {
       MathEquationInput: 'Math',
       NumericExpressionInput: 'Math',
       NumberWithUnits: 'Math',
+      RatioExpressionInput: 'Math',
       CodeRepl: 'Programming',
       PencilCodeEditor: 'Programming',
       MusicNotesInput: 'Music',

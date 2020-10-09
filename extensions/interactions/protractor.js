@@ -55,6 +55,7 @@ var INTERACTIONS = {
   NumericExpressionInput: require('./NumericExpressionInput/protractor.js'),
   NumericInput: require('./NumericInput/protractor.js'),
   NumberWithUnits: require('./NumberWithUnits/protractor.js'),
+  RatioExpressionInput: require('./RatioExpressionInput/protractor.js'),
   TextInput: require('./TextInput/protractor.js'),
   CodeRepl: require('./CodeRepl/protractor.js')
 };
