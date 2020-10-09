@@ -2963,11 +2963,19 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-0z-1'))
         commit_log_model.delete()
-        exp_services.delete_exploration(self.user_id, '0z')
 
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
-            exp_id='0z')
+        job_id = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.create_new())
+        (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.get_output(job_id))
+        self.assertEqual(output, [])
 
     def test_validation_job_skips_check_for_deleted_commit_log_model(self):
         commit_log_model = (
