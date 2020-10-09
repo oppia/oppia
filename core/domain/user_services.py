@@ -1849,6 +1849,17 @@ def get_email_preferences(user_id):
             email_preferences_model.subscription_notifications)
 
 
+def flush_migration_bot_contributions_model():
+    """Cleans migration bot contributions model."""
+    user_contributions = get_user_contributions(
+        feconf.MIGRATION_BOT_USER_ID, strict=False)
+
+    if user_contributions is not None:
+        user_contributions.edited_exploration_ids = []
+        user_contributions.created_exploration_ids = []
+        _save_user_contributions(user_contributions)
+
+
 def get_users_email_preferences(user_ids):
     """Get email preferences for the list of users.
 

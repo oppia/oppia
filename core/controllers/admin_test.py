@@ -311,9 +311,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_flush_migration_bot_contributions_action(self):
         created_exploration_ids = ['exp_1', 'exp_2']
         edited_exploration_ids = ['exp_3', 'exp_4']
-        user_services.create_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, created_exploration_ids,
-            edited_exploration_ids)
+        user_models.UserContributionsModel(
+            id=feconf.MIGRATION_BOT_USER_ID,
+            created_exploration_ids=created_exploration_ids,
+            edited_exploration_ids=edited_exploration_ids,
+        ).put()
 
         migration_bot_contributions_model = (
             user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
