@@ -49,9 +49,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
-    activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    activity_jobs_one_off.RemoveCommitUsernamesOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
@@ -62,10 +60,15 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationRteMathContentValidationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
+    exp_jobs_one_off.PopulateXmlnsAttributeInExplorationMathSvgImagesJob,
+    exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
+    exp_jobs_one_off.XmlnsAttributeInExplorationMathSvgImagesAuditJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
+    feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
+    feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
     (
         interaction_jobs_one_off
         .DragAndDropSortInputInteractionOneOffJob),
@@ -78,9 +81,13 @@ ONE_OFF_JOB_MANAGERS = [
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
+    question_jobs_one_off.MissingQuestionMigrationOneOffJob,
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    recommendations_jobs_one_off.CleanUpExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
+    skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
+    skill_jobs_one_off.MissingSkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
@@ -112,6 +119,9 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     user_jobs_one_off.RemoveGaeUserIdOneOffJob,
+    user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob,
+    user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
+    user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -146,6 +156,7 @@ AUDIT_JOB_MANAGERS = [
         .ConfigPropertySnapshotMetadataModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
