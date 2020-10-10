@@ -486,5 +486,13 @@ describe('Contributions and review component', function() {
 
       expect($uibModal.open).toHaveBeenCalled();
     });
+
+    it('should return correctly check the active tab', function() {
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
+      ctrl.isActiveTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+      ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+    });
   });
 });
