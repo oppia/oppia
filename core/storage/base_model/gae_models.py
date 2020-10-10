@@ -710,9 +710,9 @@ class VersionedModel(BaseModel):
         snapshot_content_instance = (
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
-        models = [snapshot_metadata_instance, snapshot_content_instance, self]
-        self.update_timestamps_multi(models)
-        transaction_services.run_in_transaction(BaseModel.put_multi, models)
+        entities = [snapshot_metadata_instance, snapshot_content_instance, self]
+        self.update_timestamps_multi(entities)
+        transaction_services.run_in_transaction(BaseModel.put_multi, entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
