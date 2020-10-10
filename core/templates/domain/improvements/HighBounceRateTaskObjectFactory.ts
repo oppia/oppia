@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { ExplorationStats } from
