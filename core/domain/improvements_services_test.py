@@ -317,7 +317,8 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
             task_entry.last_updated = (
                 self.MOCK_DATE - datetime.timedelta(minutes=5 * i))
             task_entries.append(task_entry)
-        improvements_services.put_tasks(task_entries)
+        improvements_services.put_tasks(
+            task_entries, update_last_updated_time=False)
 
     def test_fetch_returns_first_page_of_history(self):
         results, cursor, more = (
@@ -458,7 +459,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         task_entry = self._new_resolved_task()
 
         with self.mock_datetime_utcnow(updated_on):
-            improvements_services.put_tasks([task_entry])
+            improvements_services.put_tasks(
+                [task_entry], update_last_updated_time=False)
 
         model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)

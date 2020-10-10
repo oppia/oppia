@@ -116,7 +116,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
-        model.update_timestamps()
+        model.update_timestamps(update_last_updated_time=False)
         model.put()
         model_id = model.id
         self.assertIsNotNone(
@@ -127,7 +127,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
-        model.update_timestamps()
+        model.update_timestamps(update_last_updated_time=False)
         model.put()
         self.assertEqual(
             base_models.BaseModel.get_by_id(model_id).last_updated,
@@ -147,6 +147,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
+        model.update_timestamps(update_last_updated_time=False)
         future = model.put_async()
         future.get_result()
         model_id = model.id
@@ -158,6 +159,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
+        model.update_timestamps(update_last_updated_time=False)
         future = model.put_async()
         future.get_result()
         self.assertEqual(
@@ -166,6 +168,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
+        model.update_timestamps()
         future = model.put_async()
         future.get_result()
         self.assertNotEqual(
@@ -179,7 +182,9 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
-        base_models.BaseModel.put_multi()
+        base_models.BaseModel.update_timestamps_multi(
+            models_1, update_last_updated_time=False)
+        base_models.BaseModel.put_multi(models_1)
         model_ids = [model.id for model in models_1]
         last_updated_values = []
         for model_id in model_ids:
@@ -191,6 +196,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
         models_2 = base_models.BaseModel.get_multi(model_ids)
+        base_models.BaseModel.update_timestamps_multi(
+            models_2, update_last_updated_time=False)
         base_models.BaseModel.put_multi(models_2)
         for model_id, last_updated in python_utils.ZIP(
                 model_ids, last_updated_values):
@@ -214,6 +221,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
+        base_models.BaseModel.update_timestamps_multi(
+            models_1, update_last_updated_time=False)
         futures = base_models.BaseModel.put_multi_async(models_1)
         for future in futures:
             future.get_result()
@@ -228,6 +237,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
         models_2 = base_models.BaseModel.get_multi(model_ids)
+        base_models.BaseModel.update_timestamps_multi(
+            models_1, update_last_updated_time=False)
         futures = base_models.BaseModel.put_multi_async(models_2)
         for future in futures:
             future.get_result()
@@ -239,6 +250,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
         models_3 = base_models.BaseModel.get_multi(model_ids)
+        base_models.BaseModel.update_timestamps_multi(models_1)
         futures = base_models.BaseModel.put_multi_async(models_3)
         for future in futures:
             future.get_result()

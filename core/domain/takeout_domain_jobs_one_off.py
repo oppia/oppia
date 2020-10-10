@@ -61,7 +61,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJob(
     @staticmethod
     def map(item):
         try:
-            item.update_timestamps()
+            item.update_timestamps(update_last_updated_time=False)
             item.put()
         except Exception as e:
             model_name = item.__class__.__name__

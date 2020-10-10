@@ -160,7 +160,7 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids)))
-        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.update_timestamps(update_last_updated_time=False)
         snapshot_metadata_model.put()
 
     @staticmethod
@@ -181,7 +181,7 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids)))
-        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.update_timestamps(update_last_updated_time=False)
         snapshot_metadata_model.put()
 
     @staticmethod
@@ -196,7 +196,7 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
                 snapshot_content_model.id))
         snapshot_metadata_model.content_user_ids = list(sorted(set(
             reconstituted_rights_model.manager_ids)))
-        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.update_timestamps(update_last_updated_time=False)
         snapshot_metadata_model.put()
 
     @classmethod
@@ -293,7 +293,7 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
             )
         )
         if commit_log_model is None:
-            snapshot_model.update_timestamps()
+            snapshot_model.update_timestamps(update_last_updated_time=False)
             snapshot_model.put()
             return (
                 'MIGRATION_SUCCESS_MISSING_COMMIT_LOG',
@@ -304,9 +304,9 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
 
         def _put_both_models():
             """Put both models into the datastore together."""
-            snapshot_model.update_timestamps()
+            snapshot_model.update_timestamps(update_last_updated_time=False)
             snapshot_model.put()
-            commit_log_model.update_timestamps()
+            commit_log_model.update_timestamps(update_last_updated_time=False)
             commit_log_model.put()
 
         transaction_services.run_in_transaction(_put_both_models)
@@ -327,7 +327,7 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
                 commit_cmds_user_ids.add(commit_cmd['assignee_id'])
         snapshot_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
-        snapshot_model.update_timestamps()
+        snapshot_model.update_timestamps(update_last_updated_time=False)
         snapshot_model.put()
 
     @staticmethod
@@ -347,7 +347,7 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
                 commit_cmds_user_ids.add(commit_cmd['removed_user_id'])
         snapshot_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
-        snapshot_model.update_timestamps()
+        snapshot_model.update_timestamps(update_last_updated_time=False)
         snapshot_model.put()
 
     @classmethod

@@ -248,7 +248,7 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
 
         # If we do not wish to update the last_updated time, we should set
         # the update_last_updated_time argument to False in the put function.
-        email_reply_model.update_timestamps()
+        email_reply_model.update_timestamps(update_last_updated_time=False)
         email_reply_model.put()
         self.assertEqual(email_reply_model.last_updated, last_updated)
 

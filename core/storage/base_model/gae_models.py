@@ -86,7 +86,7 @@ class BaseModel(datastore_services.Model):
 
     def _pre_put_hook(self):
         super(BaseModel, self)._pre_put_hook()
-        self.update_timestamps(update_last_updated_time=False)
+        self._update_empty_timestamps(update_last_updated_time=False)
         if not self._last_updated_timestamp_is_fresh:
             raise Exception('Did not call self.update_timestamps() yet')
         self._last_updated_timestamp_is_fresh = False
@@ -228,12 +228,27 @@ class BaseModel(datastore_services.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the model.
         """
+        self._last_updated_timestamp_is_fresh = True
+
         if self.created_on is None:
             self.created_on = datetime.datetime.utcnow()
 
         if update_last_updated_time or self.last_updated is None:
             self.last_updated = datetime.datetime.utcnow()
+
+    def _update_empty_timestamps(self):
+        """Update the created_on and last_updated fields.
+
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated field of the model.
+        """
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
+        if self.last_updated is None:
             self._last_updated_timestamp_is_fresh = True
+            self.last_updated = datetime.datetime.utcnow()
 
     @classmethod
     def update_timestamps_multi(cls, entities, update_last_updated_time=True):
