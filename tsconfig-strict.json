@@ -33,8 +33,8 @@
   "files": [
     "core/templates/domain/email-dashboard/email-dashboard-query-object.factory.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query-object.factory.spec.ts",
-    "core/templates/domain/skill/assigned-skill-object.factory.ts",
-    "core/templates/domain/skill/assigned-skill-object.factory.spec.ts",
+    "core/templates/domain/skill/assigned-skill.model.ts",
+    "core/templates/domain/skill/assigned-skill.model.spec.ts",
     "core/templates/domain/utilities/audio-file.model.ts",
     "core/templates/domain/utilities/browser-checker.service.ts",
     "core/templates/domain/utilities/browser-checker.service.spec.ts",
