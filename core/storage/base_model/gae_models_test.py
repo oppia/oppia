@@ -115,7 +115,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
-        model.put(update_last_updated_time=False)
+        model.put()
         model_id = model.id
         self.assertIsNotNone(
             base_models.BaseModel.get_by_id(model_id).created_on)
@@ -125,7 +125,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
-        model.put(update_last_updated_time=False)
+        model.put()
         self.assertEqual(
             base_models.BaseModel.get_by_id(model_id).last_updated,
             last_updated)
@@ -143,7 +143,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
-        future = model.put_async(update_last_updated_time=False)
+        future = model.put_async()
         future.get_result()
         model_id = model.id
         self.assertIsNotNone(
@@ -154,7 +154,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
-        future = model.put_async(update_last_updated_time=False)
+        future = model.put_async()
         future.get_result()
         self.assertEqual(
             base_models.BaseModel.get_by_id(model_id).last_updated,
@@ -175,8 +175,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
-        base_models.BaseModel.put_multi(
-            models_1, update_last_updated_time=False)
+        base_models.BaseModel.put_multi()
         model_ids = [model.id for model in models_1]
         last_updated_values = []
         for model_id in model_ids:
@@ -188,8 +187,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
         models_2 = base_models.BaseModel.get_multi(model_ids)
-        base_models.BaseModel.put_multi(
-            models_2, update_last_updated_time=False)
+        base_models.BaseModel.put_multi(models_2)
         for model_id, last_updated in python_utils.ZIP(
                 model_ids, last_updated_values):
             model = base_models.BaseModel.get_by_id(model_id)
@@ -211,8 +209,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
-        futures = base_models.BaseModel.put_multi_async(
-            models_1, update_last_updated_time=False)
+        futures = base_models.BaseModel.put_multi_async(models_1)
         for future in futures:
             future.get_result()
         model_ids = [model.id for model in models_1]
@@ -226,8 +223,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
         models_2 = base_models.BaseModel.get_multi(model_ids)
-        futures = base_models.BaseModel.put_multi_async(
-            models_2, update_last_updated_time=False)
+        futures = base_models.BaseModel.put_multi_async(models_2)
         for future in futures:
             future.get_result()
         for model_id, last_updated in python_utils.ZIP(

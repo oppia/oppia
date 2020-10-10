@@ -366,7 +366,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
 
         # If we do not wish to update the last_updated time, we should set
         # the update_last_updated_time argument to False in the put function.
-        feedback_thread_model.put(update_last_updated_time=False)
+        feedback_thread_model.put()
         self.assertEqual(feedback_thread_model.last_updated, last_updated)
 
         # If we do wish to change it however, we can simply use the put function
