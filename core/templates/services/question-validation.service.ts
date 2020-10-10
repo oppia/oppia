@@ -18,8 +18,10 @@
  */
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { StateEditorService } from  
-  'components/state-editor/state-editor-properties-services/state-editor.service.ts';
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Question } from
+  'domain/question/QuestionObjectFactory.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +30,7 @@ export class QuestionValidationService {
   constructor(
     private stateEditorService: StateEditorService) {}
 
-  isQuestionValid(question: Question, misconceptionsBySkill: any) : boolean {
+  isQuestionValid(question: Question, misconceptionsBySkill: {}) : boolean {
     return !(
       question.getValidationErrorMessage() ||
       question.getUnaddressedMisconceptionNames(

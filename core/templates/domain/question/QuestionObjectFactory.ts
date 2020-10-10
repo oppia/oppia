@@ -19,7 +19,8 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { StateBackendDict } from 'domain/state/StateObjectFactory';
+import { State, StateBackendDict, StateObjectFactory }
+  from 'domain/state/StateObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 const constants = require('constants.ts');
@@ -36,14 +37,14 @@ export interface QuestionBackendDict {
 
 export class Question {
   _id: string;
-  _stateData: any;
+  _stateData: State;
   _languageCode: string;
   _version: number;
   _linkedSkillIds: string[];
   _inapplicableSkillMisconceptionIds: string[];
 
   constructor(
-      id: string, stateData: any, languageCode: string,
+      id: string, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[],
       inapplicableSkillMisconceptionIds: string[]) {
     this._id = id;
@@ -59,19 +60,19 @@ export class Question {
     return this._id;
   }
 
-  getStateData(): any {
+  getStateData(): State {
     return this._stateData;
   }
 
-  setStateData(newStateData) {
+  setStateData(newStateData): void {
     this._stateData = angular.copy(newStateData);
   }
 
-  getLanguageCode(): any {
+  getLanguageCode(): string {
     return this._languageCode;
   }
 
-  setLanguageCode(languageCode) {
+  setLanguageCode(languageCode): void {
     this._languageCode = languageCode;
   }
 
@@ -83,7 +84,7 @@ export class Question {
     return this._linkedSkillIds;
   }
 
-  setLinkedSkillIds(linkedSkillIds) {
+  setLinkedSkillIds(linkedSkillIds): void {
     this._linkedSkillIds = linkedSkillIds;
   }
 
@@ -91,7 +92,7 @@ export class Question {
     return this._inapplicableSkillMisconceptionIds;
   }
 
-  setInapplicableSkillMisconceptionIds(inapplicableSkillMisconceptionIds) {
+  setInapplicableSkillMisconceptionIds(inapplicableSkillMisconceptionIds): void {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
@@ -156,7 +157,7 @@ export class Question {
     return unaddressedMisconceptionNames;
   }
 
-  toBackendDict(isNewQuestion) {
+  toBackendDict(isNewQuestion: boolean): QuestionBackendDict {
     var questionBackendDict = {
       id: null,
       question_state_data: this._stateData.toBackendDict(),
@@ -189,12 +190,16 @@ export class QuestionObjectFactory {
 
   createFromBackendDict(questionBackendDict: QuestionBackendDict) {
     return new Question(
-        questionBackendDict.id,
-        this.stateObject.createFromBackendDict(
-          'question', questionBackendDict.question_state_data),
-        questionBackendDict.language_code, questionBackendDict.version,
-        questionBackendDict.linked_skill_ids,
-        questionBackendDict.inapplicable_skill_misconception_ids
-      );
+      questionBackendDict.id,
+      this.stateObject.createFromBackendDict(
+        'question', questionBackendDict.question_state_data),
+      questionBackendDict.language_code, questionBackendDict.version,
+      questionBackendDict.linked_skill_ids,
+      questionBackendDict.inapplicable_skill_misconception_ids
+    );
   }
 }
+
+angular.module('oppia').factory(
+  'QuestionObjectFactory',
+  downgradeInjectable(QuestionObjectFactory));

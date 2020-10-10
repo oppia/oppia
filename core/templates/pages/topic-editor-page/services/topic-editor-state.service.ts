@@ -150,8 +150,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
       _topicRights.copyFromTopicRights(topicRights);
     };
     var _updateTopicRights = function(newBackendTopicRightsObject) {
-      _setTopicRights(TopicRights.createFromBackendDict(
-        newBackendTopicRightsObject));
+      _setTopicRights(newBackendTopicRightsObject);
     };
     var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
       _canonicalStorySummaries = canonicalStorySummaries.map(

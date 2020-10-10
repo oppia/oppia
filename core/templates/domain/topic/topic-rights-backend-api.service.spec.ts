@@ -22,15 +22,19 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { TopicRightsBackendApiService } from
   'domain/topic/topic-rights-backend-api.service';
+import { TopicRights } from 'domain/topic/topic-rights.model.ts'
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
-
-
-fdescribe('Topic rights backend API service', () => {
+describe('Topic rights backend API service', () => {
   let topicRightsBackendApiService: TopicRightsBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let topicId = '0';
   let topicName = '';
+  let topicRightsDict = {
+    can_edit_topic: false,
+    can_publish_topic: true,
+    published: true
+  };
+  let topicRightsObject = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -40,6 +44,8 @@ fdescribe('Topic rights backend API service', () => {
 
     topicRightsBackendApiService = TestBed.get(TopicRightsBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
+
+    topicRightsObject = TopicRights.createFromBackendDict(topicRightsDict);
   });
 
   afterEach(function() {
@@ -73,8 +79,8 @@ fdescribe('Topic rights backend API service', () => {
       '/rightshandler/get_topic_rights/' + topicId);
     expect(req.request.method).toEqual('GET');
     req.flush(404, {
-        status: 404, statusText: ''
-      });
+      status: 404, statusText: ''
+    });
 
     flushMicrotasks();
 
@@ -121,8 +127,8 @@ fdescribe('Topic rights backend API service', () => {
       '/rightshandler/change_topic_status/0');
     expect(req.request.method).toEqual('PUT');
     req.flush('Topic does not exist.', {
-        status: 404, statusText: 'Topic does not exist.'
-      });
+      status: 404, statusText: 'Topic does not exist.'
+    });
 
     flushMicrotasks();
 
@@ -130,7 +136,7 @@ fdescribe('Topic rights backend API service', () => {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should report an uncached topic rights after caching it', 
+  it('should report an uncached topic rights after caching it',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -145,11 +151,7 @@ fdescribe('Topic rights backend API service', () => {
       var req = httpTestingController.expectOne(
         '/rightshandler/get_topic_rights/0');
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        topic_id: 0,
-        topic_is_published: true,
-        manager_ids: ['user_id']
-      });
+      req.flush(topicRightsDict);
 
       flushMicrotasks();
 
@@ -157,7 +159,7 @@ fdescribe('Topic rights backend API service', () => {
       expect(failHandler).not.toHaveBeenCalled();
       // It should now be cached.
       expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
-  }));
+    }));
 
   it('should report a cached topic rights after caching it', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -167,11 +169,9 @@ fdescribe('Topic rights backend API service', () => {
     expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
 
     // Cache a topic rights object.
-    topicRightsBackendApiService.cacheTopicRights(topicId, {
-      topic_id: 0,
-      topic_is_published: true,
-      manager_ids: ['user_id']
-    });
+    topicRightsBackendApiService.cacheTopicRights(topicId, topicRightsDict);
+
+    flushMicrotasks();
 
     // It should now be cached.
     expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
@@ -181,11 +181,9 @@ fdescribe('Topic rights backend API service', () => {
     topicRightsBackendApiService.loadTopicRights(topicId).then(
       successHandler, failHandler);
 
-    expect(successHandler).toHaveBeenCalledWith({
-      topic_id: 0,
-      topic_is_published: true,
-      manager_ids: ['user_id']
-    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(topicRightsObject);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -216,8 +214,8 @@ fdescribe('Topic rights backend API service', () => {
       '/rightshandler/send_topic_publish_mail/' + topicId);
     expect(req.request.method).toEqual('PUT');
     req.flush(404, {
-        status: 404, statusText: ''
-      });
+      status: 404, statusText: ''
+    });
 
     flushMicrotasks();
 

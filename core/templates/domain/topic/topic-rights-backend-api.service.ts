@@ -26,6 +26,8 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 import { TopicDomainConstants } from
   'domain/topic/topic-domain.constants';
+import { TopicRightsBackendDict, TopicRights }
+  from 'domain/topic/topic-rights.model.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -47,15 +49,17 @@ export class TopicRightsBackendApiService {
           topic_id: topicId
         });
 
-      this.http.get(topicRightsUrl).toPromise().then(response => {
-        if (successCallback) {
-          successCallback(response);
-        }
-      }, errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      this.http.get<TopicRightsBackendDict>(topicRightsUrl).toPromise().then(
+        response => {
+          let topicRightsObject = TopicRights.createFromBackendDict(response);
+          if (successCallback) {
+            successCallback(topicRightsObject);
+          }
+        }, errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        });
     }
 
     private _setTopicStatus(
@@ -72,10 +76,11 @@ export class TopicRightsBackendApiService {
         publish_status: publishStatus
       };
 
-      this.http.put(changeTopicStatusUrl, putParams).toPromise()
-        .then(response => {
+      this.http.put<TopicRightsBackendDict>(changeTopicStatusUrl, putParams)
+        .toPromise().then(response => {
+          let topicRightsObject = TopicRights.createFromBackendDict(response);
           if (successCallback) {
-            successCallback(response);
+            successCallback(topicRightsObject);
           }
         }, errorResponse => {
           if (errorCallback) {
@@ -98,15 +103,17 @@ export class TopicRightsBackendApiService {
         topic_name: topicName
       };
 
-      this.http.put(sendMailUrl, putParams).toPromise().then(response => {
-        if (successCallback) {
-          successCallback(response);
-        }
-      }, errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      this.http.put<TopicRightsBackendDict>(sendMailUrl, putParams).toPromise()
+        .then(response => {
+          let topicRightsObject = TopicRights.createFromBackendDict(response);
+          if (successCallback) {
+            successCallback(topicRightsObject);
+          }
+        }, errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        });
     }
 
     private _isCached(topicId: string) : boolean {
@@ -116,7 +123,7 @@ export class TopicRightsBackendApiService {
     /**
      * Gets a topic's rights, given its ID.
      */
-    fetchTopicRights(topicId: string) {
+    fetchTopicRights(topicId: string): Promise<TopicRights> {
       return new Promise((resolve, reject) => {
         this._fetchTopicRights(topicId, resolve, reject);
       });
@@ -131,7 +138,7 @@ export class TopicRightsBackendApiService {
      * rights from the backend, it will store it in the cache to avoid
      * requests from the backend in further function calls.
      */
-    loadTopicRights(topicId: string) {
+    loadTopicRights(topicId: string): Promise<TopicRights> {
       return new Promise((resolve, reject) => {
         if (this._isCached(topicId)) {
           if (resolve) {
@@ -153,7 +160,7 @@ export class TopicRightsBackendApiService {
      * local data cache or if it needs to be retrieved from the backend
      * upon a laod.
      */
-    isCached(topicId: string) : boolean {
+    isCached(topicId: string): boolean {
       return this._isCached(topicId);
     }
 
@@ -161,20 +168,22 @@ export class TopicRightsBackendApiService {
      * Replaces the current topic rights in the cache given by the
      * specified topic ID with a new topic rights object.
      */
-    cacheTopicRights(topicId: string, topicRights: any) {
-      this._topicRightsCache[topicId] = cloneDeep(topicRights);
+    cacheTopicRights(
+    	topicId: string, topicRights: TopicRightsBackendDict): void {
+      let topicRightsObject = TopicRights.createFromBackendDict(topicRights);
+      this._topicRightsCache[topicId] = cloneDeep(topicRightsObject);
     }
 
     /**
      * Publishes a topic.
      */
-    publishTopic(topicId: string) {
+    publishTopic(topicId: string): Promise<TopicRights> {
       return new Promise((resolve, reject) => {
         this._setTopicStatus(topicId, true, resolve, reject);
       });
     }
 
-    sendMail(topicId: string, topicName: string) {
+    sendMail(topicId: string, topicName: string): Promise<TopicRights> {
       return new Promise((resolve, reject) => {
         this._sendMail(topicId, topicName, resolve, reject);
       });
@@ -183,7 +192,7 @@ export class TopicRightsBackendApiService {
     /**
      * Unpublishes a topic.
      */
-    unpublishTopic(topicId: string) {
+    unpublishTopic(topicId: string): Promise<TopicRights> {
       return new Promise((resolve, reject) => {
         this._setTopicStatus(topicId, false, resolve, reject);
       });
