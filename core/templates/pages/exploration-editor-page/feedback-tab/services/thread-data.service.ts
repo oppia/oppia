@@ -129,7 +129,7 @@ export class ThreadDataService {
   }
 
   getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
-    // TODO(#8016): Move this $http call to a backend-api.service with unit
+    // TODO(#8016): Move this http call to a backend-api.service with unit
     // tests.
     let suggestionsPromise = this.http.get(this.getSuggestionListHandlerUrl(), {
       params: {
@@ -137,7 +137,7 @@ export class ThreadDataService {
         target_id: this.contextService.getExplorationId()
       }
     });
-    // TODO(#8016): Move this $http call to a backend-api.service with unit
+    // TODO(#8016): Move this http call to a backend-api.service with unit
     // tests.
     let threadsPromise = this.http.get(this.getThreadListHandlerUrl());
 
@@ -159,7 +159,7 @@ export class ThreadDataService {
           dict => this.setFeedbackThreadFromBackendDict(dict)),
         suggestionThreads: suggestionThreadBackendDicts.map(
           dict => this.setSuggestionThreadFromBackendDicts(
-            dict, suggestionBackendDictsByThreadId.get(dict.thread_id)))
+            dict, suggestionBackendDictsByThreadId.get(!dict || dict.thread_id)))
       };
     },
     () => Promise.reject('Error on retrieving feedback threads.'));
@@ -170,7 +170,7 @@ export class ThreadDataService {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
-    // TODO(#8016): Move this $http call to a backend-api.service with unit
+    // TODO(#8016): Move this http call to a backend-api.service with unit
     // tests.
     return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
       .then((response: any) => {
@@ -182,7 +182,7 @@ export class ThreadDataService {
   }
 
   getOpenThreadsCountAsync(): Promise<number> {
-    // TODO(#8016): Move this $http call to a backend-api.service with unit
+    // TODO(#8016): Move this http call to a backend-api.service with unit
     // tests.
     return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
       .then((response: any) => {
@@ -194,9 +194,9 @@ export class ThreadDataService {
     return this.openThreadsCount;
   }
 
-  createNewThreadAsync(newSubject: string, newText: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      // TODO(#8016): Move this $http call to a backend-api.service with unit
+  createNewThreadAsync(newSubject: string, newText: string):
+    Promise<void | SuggestionAndFeedbackThreads> {
+      // TODO(#8016): Move this http call to a backend-api.service with unit
       // tests.
       return this.http.post(this.getThreadListHandlerUrl(), {
         state_name: null,
@@ -209,24 +209,20 @@ export class ThreadDataService {
       error => {
         this.alertsService.addWarning(
           'Error creating new thread: ' + error + '.');
-        reject(error.error.error);
       });
-    });
   }
 
-  markThreadAsSeenAsync(thread: AnyThread): Promise<void> {
+  markThreadAsSeenAsync(thread: AnyThread): Promise<Object> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
 
-    return new Promise((resolve, reject) => {
-      // TODO(#8016): Move this $http call to a backend-api.service with unit
-      // tests.
-      return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
-        thread_id: threadId
-      });
-    });
+    // TODO(#8016): Move this http call to a backend-api.service with unit
+    // tests.
+    return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
+      thread_id: threadId
+    }).toPromise();
   }
 
   addNewMessageAsync(
@@ -238,7 +234,7 @@ export class ThreadDataService {
     let threadId = thread.threadId;
     let oldStatus = thread.status;
     let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
-    // TODO(#8016): Move this $http call to a backend-api.service with unit
+    // TODO(#8016): Move this http call to a backend-api.service with unit
     // tests.
     return this.http.post(this.getThreadHandlerUrl(threadId), {
       updated_status: updatedStatus,
@@ -264,7 +260,7 @@ export class ThreadDataService {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
-    // TODO(#8016): Move this $http call to a backend-api.service with unit
+    // TODO(#8016): Move this http call to a backend-api.service with unit
     // tests.
     return this.http.put(this.getSuggestionActionHandlerUrl(threadId), {
       action: action,
