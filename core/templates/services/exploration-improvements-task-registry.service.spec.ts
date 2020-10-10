@@ -37,7 +37,7 @@ import { NeedsGuidingResponsesTask } from
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
   'domain/statistics/ExplorationStatsObjectFactory';

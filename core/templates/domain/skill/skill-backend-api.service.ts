@@ -25,7 +25,7 @@ import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { Skill, SkillBackendDict, SkillObjectFactory } from
   'domain/skill/SkillObjectFactory';
 import { SkillSummaryBackendDict } from
-  'domain/skill/skill-summary-object.factory';
+  'domain/skill/skill-summary.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 

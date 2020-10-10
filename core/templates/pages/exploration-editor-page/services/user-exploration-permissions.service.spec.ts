@@ -24,14 +24,13 @@ import { ContextService } from
   'services/context.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { ExplorationPermissions, ExplorationPermissionsObjectFactory } from
-  'domain/exploration/exploration-permissions-object.factory';
+import { ExplorationPermissions } from
+  'domain/exploration/exploration-permissions.model';
 
 describe('User Exploration Permissions Service', () => {
   let ueps: UserExplorationPermissionsService = null;
   let contextService: ContextService = null;
   let httpTestingController: HttpTestingController = null;
-  let epof: ExplorationPermissionsObjectFactory;
 
   let sampleExplorationId = 'sample-exploration';
   let samplePermissionsData = {
@@ -49,14 +48,13 @@ describe('User Exploration Permissions Service', () => {
   beforeEach(angular.mock.inject(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ExplorationPermissionsObjectFactory]
     });
 
     httpTestingController = TestBed.get(HttpTestingController);
     ueps = TestBed.get(UserExplorationPermissionsService);
     contextService = TestBed.get(ContextService);
-    epof = TestBed.get(ExplorationPermissionsObjectFactory);
-    permissionsResponse = epof.createFromBackendDict(samplePermissionsData);
+    permissionsResponse =
+      ExplorationPermissions.createFromBackendDict(samplePermissionsData);
     spyOn(contextService, 'getExplorationId').and.returnValue(
       sampleExplorationId);
     UserExplorationPermissionsService.permissionsPromise = null;

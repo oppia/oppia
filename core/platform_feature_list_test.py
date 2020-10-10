@@ -31,7 +31,7 @@ import python_utils
 FRONTEND_FEATURE_NAMES_PATH = os.path.join(
     os.getcwd(),
     'core/templates/domain/platform_feature',
-    'feature-status-summary-object.factory.ts')
+    'feature-status-summary.model.ts')
 
 ENUM_BODY_REGEXP = re.compile(r'enum FeatureNames \{(.+?)\}', flags=re.DOTALL)
 ENUM_MEMBER_REGEXP = re.compile(r'([a-zA-Z0-9_]+?)\s+=\s+\'([a-zA-Z0-9_]+?)\'')
