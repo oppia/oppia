@@ -250,33 +250,27 @@ class BaseModel(datastore_services.Model):
                 update_last_updated_time=update_last_updated_time)
 
     @classmethod
-    def put_multi(cls, entities, update_last_updated_time=True):
+    def put_multi(cls, entities):
         """Stores the given datastore_services.Model instances.
 
         Args:
             entities: list(datastore_services.Model). List of model instances to
                 be stored.
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the entities.
         """
-        datastore_services.put_multi(
-            entities, update_last_updated_time=update_last_updated_time)
+        datastore_services.put_multi(entities)
 
     @classmethod
-    def put_multi_async(cls, entities, update_last_updated_time=True):
+    def put_multi_async(cls, entities):
         """Stores the given datastore_services.Model instances asynchronously.
 
         Args:
             entities: list(datastore_services.Model). The list of model
                 instances to be stored.
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the entities.
 
         Returns:
             list(future). A list of futures.
         """
-        return datastore_services.put_multi_async(
-            entities, update_last_updated_time=update_last_updated_time)
+        return datastore_services.put_multi_async(entities)
 
     @classmethod
     def delete_multi(cls, entities):
