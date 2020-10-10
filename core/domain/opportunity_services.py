@@ -623,7 +623,6 @@ def get_skill_opportunities_by_ids(ids):
         if skill_opportunity_model is not None:
             opportunities[skill_opportunity_model.id] = (
                 get_skill_opportunity_from_model(skill_opportunity_model))
-
     return opportunities
 
 
