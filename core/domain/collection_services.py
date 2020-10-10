@@ -1073,11 +1073,14 @@ def save_collection_summary(collection_summary):
             collection_summary.id))
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)
+        collection_summary_model.update_timestamps()
         collection_summary_model.put()
     else:
         collection_summary_dict['id'] = collection_summary.id
-        collection_models.CollectionSummaryModel(
-            **collection_summary_dict).put()
+        model = collection_models.CollectionSummaryModel(
+            **collection_summary_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def delete_collection_summaries(collection_ids):

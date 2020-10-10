@@ -686,12 +686,14 @@ def _pseudonymize_activity_models_without_associated_rights_models(
             if isinstance(model, snapshot_model_class)]
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_id
+            metadata_model.update_timestamps()
 
         commit_log_models = [
             model for model in activity_related_models
             if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_id
+            commit_log_model.update_timestamps()
         datastore_services.put_multi(metadata_models + commit_log_models)
 
     activity_ids_to_pids = (
@@ -931,6 +933,7 @@ def _remove_user_id_from_contributors_in_summary_models(
             ]
             del summary_model.contributors_summary[user_id]
 
+        summary_model_class.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)
 
     for i in python_utils.RANGE(

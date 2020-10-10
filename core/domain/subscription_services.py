@@ -69,6 +69,7 @@ def subscribe_to_threads(user_id, feedback_thread_ids):
     subscriptions_model.general_feedback_thread_ids.extend(
         feedback_thread_ids_to_add_to_subscriptions_model
     )
+    subscriptions_model.update_timestamps()
     subscriptions_model.put()
 
 
@@ -90,6 +91,7 @@ def subscribe_to_exploration(user_id, exploration_id):
 
     if exploration_id not in subscriptions_model.activity_ids:
         subscriptions_model.activity_ids.append(exploration_id)
+        subscriptions_model.update_timestamps()
         subscriptions_model.put()
 
 
@@ -244,6 +246,7 @@ def subscribe_to_collection(user_id, collection_id):
 
     if collection_id not in subscriptions_model.collection_ids:
         subscriptions_model.collection_ids.append(collection_id)
+        subscriptions_model.update_timestamps()
         subscriptions_model.put()
 
 

@@ -999,6 +999,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             )
         )
         metadata_model.committer_id = self.user_1_id
+        metadata_model.update_timestamps()
         metadata_model.put()
 
         # Run the user deletion again.
@@ -1312,6 +1313,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             )
         )
         metadata_model.committer_id = self.user_1_id
+        metadata_model.update_timestamps()
         metadata_model.put()
 
         # Run the user deletion again.
@@ -2085,6 +2087,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             )
         )
         metadata_model.committer_id = self.user_1_id
+        metadata_model.update_timestamps()
         metadata_model.put()
 
         # Run the user deletion again.
@@ -2468,6 +2471,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_1_ID)
         metadata_model.committer_id = self.user_1_id
+        metadata_model.update_timestamps()
         metadata_model.put()
 
         # Run the user deletion again.
@@ -2777,6 +2781,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_1_ID)
         metadata_model.committer_id = self.user_1_id
+        metadata_model.update_timestamps()
         metadata_model.put()
 
         # Run the user deletion again.
@@ -3102,6 +3107,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
         metadata_model.committer_id = self.user_1_id
+        metadata_model.update_timestamps()
         metadata_model.put()
 
         # Run the user deletion again.
@@ -3672,6 +3678,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             )
         )
         metadata_model.committer_id = self.user_1_id
+        metadata_model.update_timestamps()
         metadata_model.put()
 
         # Run the user deletion again.

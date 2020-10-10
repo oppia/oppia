@@ -92,6 +92,7 @@ def _create_models_for_thread_and_first_message(
     thread.subject = subject
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
+    thread.update_timestamps()
     thread.put()
     create_message(
         thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
@@ -257,6 +258,7 @@ def create_messages(
         if updated_subject:
             message_model.updated_subject = updated_subject
     feedback_models.GeneralFeedbackMessageModel.put_multi(message_models)
+    feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(message_models)
 
     # Update the message data cache of the threads.
     for thread_model in thread_models:
@@ -282,6 +284,7 @@ def create_messages(
                     thread_model.subject = updated_subject
             new_statuses.append(thread_model.status)
     feedback_models.GeneralFeedbackThreadModel.put_multi(thread_models)
+    feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to
     # the thread, so that the last_updated time changes to show that there is

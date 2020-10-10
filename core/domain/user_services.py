@@ -1006,10 +1006,13 @@ def _save_user_settings(user_settings):
     user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
+        user_model.update_timestamps()
         user_model.put()
     else:
         user_settings_dict['id'] = user_settings.user_id
-        user_models.UserSettingsModel(**user_settings_dict).put()
+        model = user_models.UserSettingsModel(**user_settings_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def _get_user_settings_from_model(user_settings_model):
@@ -1337,10 +1340,13 @@ def _save_user_auth_details(user_auth_details):
         user_auth_details.user_id)
     if user_auth_details_model is not None:
         user_auth_details_model.populate(**user_auth_details_dict)
+        user_auth_details_model.update_timestamps()
         user_auth_details_model.put()
     else:
         user_auth_details_dict['id'] = user_auth_details.user_id
-        user_models.UserAuthDetailsModel(**user_auth_details_dict).put()
+        model = user_models.UserAuthDetailsModel(**user_auth_details_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def get_multiple_user_auth_details(user_ids):
@@ -1841,6 +1847,7 @@ def update_email_preferences(
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
+    email_preferences_model.update_timestamps()
     email_preferences_model.put()
 
 

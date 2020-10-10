@@ -1113,10 +1113,13 @@ def save_exploration_summary(exp_summary):
     exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
     if exp_summary_model is not None:
         exp_summary_model.populate(**exp_summary_dict)
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
     else:
         exp_summary_dict['id'] = exp_summary.id
-        exp_models.ExpSummaryModel(**exp_summary_dict).put()
+        model = exp_models.ExpSummaryModel(**exp_summary_dict)
+        model.update_timestamps()
+        model.put()
 
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the

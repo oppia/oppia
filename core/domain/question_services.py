@@ -673,6 +673,7 @@ def save_question_summary(question_summary):
         interaction_id=question_summary.interaction_id
     )
 
+    question_summary_model.update_timestamps()
     question_summary_model.put()
 
 

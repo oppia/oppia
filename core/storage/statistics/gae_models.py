@@ -1162,6 +1162,7 @@ class ExplorationStatsModel(base_models.BaseModel):
             num_completions_v1=num_completions_v1,
             num_completions_v2=num_completions_v2,
             state_stats_mapping=state_stats_mapping)
+        stats_instance.update_timestamps()
         stats_instance.put()
         return instance_id
 
@@ -1321,6 +1322,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             unresolved_issues=unresolved_issues)
+        exp_issues_instance.update_timestamps()
         exp_issues_instance.put()
         return instance_id
 
