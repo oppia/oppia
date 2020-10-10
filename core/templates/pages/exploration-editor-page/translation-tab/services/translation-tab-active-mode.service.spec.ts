@@ -30,7 +30,8 @@ describe('Translation tab active mode service', () => {
   importAllAngularServices();
 
   beforeEach(()=> {
-    translationTabActiveModeService = TestBed.get(TranslationTabActiveModeService);
+    translationTabActiveModeService = TestBed.get(
+      TranslationTabActiveModeService);
   });
 
   it('should correctly activate translation mode', () => {
