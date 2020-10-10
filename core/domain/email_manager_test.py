@@ -2067,8 +2067,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     target_id = 'exp1'
     skill_id = 'skill_123456'
     language_code = 'en'
-    default_question_html = 'What is the meaning of life?'
-    default_translation_html = 'Sample translation'
+    language_description = 'English'
+    default_question_content = 'What is the meaning of life?'
+    default_translation_content = 'Sample translation'
     default_username = (
         email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
             'default_username'])
@@ -2169,28 +2170,28 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             ) for suggestion in suggestions
         ]
 
-    def _create_email_html_for_reviewable_suggestion_email_infos(
-            self, reviewable_suggestion_email_infos, review_wait_times):
-        """Creates the email html for the given reviewable suggestion
-        email infos and expected review wait times.
+    def _create_email_html_for_question_suggestion(
+            self, review_wait_time):
+        """Creates the email html for a question suggestion with the given
+        review wait time.
         """
-        email_html_for_suggestion_infos = []
-        for reviewable_suggestion_email_info, review_wait_time in (
-                python_utils.ZIP(
-                    reviewable_suggestion_email_infos, review_wait_times)):
-            language = utils.get_supported_audio_language_description(
-                reviewable_suggestion_email_info.language_code)
-            if reviewable_suggestion_email_info.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-                language = ''
-            email_html_for_suggestion_infos.append(
-                email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-                    'listing_suggestion_template'][
-                        reviewable_suggestion_email_info.suggestion_type] % (
-                            language, review_wait_time,
-                            reviewable_suggestion_email_info.suggestion_content)
-            )
-        return ''.join(email_html_for_suggestion_infos)
+        return email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+            'listing_suggestion_template'][
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] % (
+                    '', review_wait_time, self.default_question_content)
+
+    def _create_email_html_for_translation_suggestion(
+            self, language_code, review_wait_time, translation_content):
+        """Creates the email html for a translation suggestion with the given
+        review wait time.
+        """
+        language = utils.get_supported_audio_language_description(language_code)
+        return email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+            'listing_suggestion_template'][
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] % (
+                    self.language_description, review_wait_time,
+                    self.default_translation_content)
+
 
     def _assert_created_sent_email_models_are_correct(
             self, expected_email_html_bodies, reviewer_ids, reviewer_emails):
@@ -2246,6 +2247,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
+        self.default_question_html = '<p>%s</p>' % self.default_question_content
+        self.default_translation_html = '<p>%s</p>' % (
+            self.translation_question_content)
         question_suggestion = (
             self._create_question_suggestion_with_submission_datetime(
                 self.mock_review_submission_datetime))
