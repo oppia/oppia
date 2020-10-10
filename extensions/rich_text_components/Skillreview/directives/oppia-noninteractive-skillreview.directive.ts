@@ -34,6 +34,18 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
       restrict: 'E',
       scope: {},
       bindToController: {},
+      link: function(scope, elem, attrs) {
+        // In the editor, this directive is enclosed in a span tag which doesn't
+        // add a whitespace after the element, but when previewing the element,
+        // it is enclosed in a <p> tag, which does add a whitespace, hence the
+        // check.
+        if (
+          elem.find(
+            '.skillreview-rte-element').parent().parent()[0].localName ===
+          'p') {
+          elem.find('.skillreview-rte-element').css('margin-right', '-4px');
+        }
+      },
       template: require('./skillreview.directive.html'),
       controllerAs: '$ctrl',
       controller: [
