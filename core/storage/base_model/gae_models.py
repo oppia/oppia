@@ -711,7 +711,7 @@ class VersionedModel(BaseModel):
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
         models = [snapshot_metadata_instance, snapshot_content_instance, self]
-        BaseModel.update_timestamps_multi(models)
+        self.update_timestamps_multi(models)
         transaction_services.run_in_transaction(BaseModel.put_multi, models)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
