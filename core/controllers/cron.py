@@ -233,7 +233,7 @@ class CronMailContributorDashboardReviewerOpportunitiesHandler(
     """Handler for mailing reviewers review opportunities on the Contributor
     Dashboard.
     """
-  
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Sends each reviewer an email with up to

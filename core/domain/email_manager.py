@@ -1307,7 +1307,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             continue
         elif not reviewer_usernames[index]:
             # If there isn't a username, log it and send the email using the
-            # username 'Reviewer'
+            # default username 'Reviewer'.
             log_new_error(
                 'There was no username for the given reviewer id:%s' % (
                     reviewer_id))
@@ -1320,7 +1320,8 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 language = utils.get_supported_audio_language_description(
                     reviewer_suggestion_email_info.language_code)
                 # Set the language for question suggestions to be the empty
-                # string in order to use the a single suggestion template format.
+                # string in order to use the a single suggestion template
+                # format.
                 if reviewer_suggestion_email_info.suggestion_type == (
                         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
                     language = ''

@@ -2100,7 +2100,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def _create_translation_suggestion_with_submission_datetime(
             self, submission_datetime):
-        """Creates a translation suggestion with the given submission datetime.
+        """Creates a translation suggestion with the given submission
+        datetime.
         """
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
@@ -2187,7 +2188,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     'listing_suggestion_template'][
                         reviewable_suggestion_email_info.suggestion_type] % (
                             language, review_wait_time,
-                            reviewable_suggestion_email_info.suggestion_content))
+                            reviewable_suggestion_email_info.suggestion_content)
+            )
         return ''.join(email_html_for_suggestion_infos)
 
     def _assert_created_sent_email_models_are_correct(
@@ -2253,7 +2255,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 question_suggestion))
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
-
         with self.cannot_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 (
@@ -2267,7 +2268,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_reviewer_notifications_is_not_enabled(self):
-
         with self.can_send_emails_ctx:
             with self.cannot_send_reviewer_emails_ctx:
                 (
@@ -2281,7 +2281,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_reviewer_does_not_exist(self):
-
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 (
@@ -2296,7 +2295,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
             self):
-
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 (
@@ -2329,7 +2327,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2372,7 +2370,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2415,7 +2413,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2458,7 +2456,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2501,7 +2499,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2544,7 +2542,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2586,7 +2584,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2699,7 +2697,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_2_USERNAME,
                 expected_suggestion_info_html_for_email_reviewer_2))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2754,7 +2752,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2797,7 +2795,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2842,7 +2840,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2887,7 +2885,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2932,7 +2930,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -2977,7 +2975,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3022,7 +3020,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3069,7 +3067,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_1_USERNAME,
                 expected_suggestion_info_html_for_email))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3136,7 +3134,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_2_USERNAME,
                 expected_suggestion_info_html_for_email_reviewer_2))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3212,7 +3210,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.expected_email_body_template % (
                 self.REVIEWER_2_USERNAME,
                 expected_suggestion_info_html_for_email_reviewer_2))
-        
+
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3243,6 +3241,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 expected_email_html_body_reviewer_2
             ], [self.reviewer_1_id, self.reviewer_2_id],
             [self.REVIEWER_1_EMAIL, self.REVIEWER_2_EMAIL])
+
 
 class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
     """Test that email is send to submitter when query has completed
