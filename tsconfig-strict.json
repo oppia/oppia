@@ -36,6 +36,8 @@
     "core/templates/domain/collection/CollectionRightsObjectFactorySpec.ts",
     "core/templates/domain/collection/collection-summary-object.factory.ts",
     "core/templates/domain/collection/collection-summary-object.factory.spec.ts",
+    "core/templates/domain/skill/assigned-skill.model.ts",
+    "core/templates/domain/skill/assigned-skill.model.spec.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.spec.ts",
     "core/templates/domain/utilities/audio-file.model.ts",
