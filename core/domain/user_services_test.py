@@ -106,6 +106,24 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(user_services.is_user_id_valid('uid_%s' % ('a' * 31)))
         self.assertFalse(user_services.is_user_id_valid('a' * 36))
 
+    def test_is_user_or_pseudonymous_id(self):
+        self.assertTrue(
+            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 32)))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id(
+                'uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
+        self.assertTrue(
+            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 32)))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id(
+                'pid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
+
     def test_set_and_get_username(self):
         gae_id = 'someUser'
         username = 'username'
@@ -129,17 +147,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_username_for_pseudonymous_id(self):
         self.assertEqual(
-            'UserAaaaaaaa',
+            'User_Aaaaaaaa',
             user_services.get_username('pid_' + 'a' * 32))
         self.assertEqual(
-            'UserBbbbbbbb',
+            'User_Bbbbbbbb',
             user_services.get_username('pid_' + 'b' * 32))
 
     def test_get_usernames_for_pseudonymous_ids(self):
 
         # Handle usernames that exists.
         self.assertEqual(
-            ['UserAaaaaaaa', 'UserBbbbbbbb'],
+            ['User_Aaaaaaaa', 'User_Bbbbbbbb'],
             user_services.get_usernames(['pid_' + 'a' * 32, 'pid_' + 'b' * 32]))
 
     def test_get_usernames_empty_list(self):
