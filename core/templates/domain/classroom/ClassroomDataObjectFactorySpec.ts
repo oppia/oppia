@@ -24,7 +24,7 @@ import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 
 describe('Classroom data object factory', () => {
-  let topicSummaryDicts;
+  let publicTopicSummaryDicts, privateTopicSummaryDicts;
   let classroomDataObjectFactory: ClassroomDataObjectFactory;
   let topicSummaryObjectFactory: TopicSummaryObjectFactory;
 
@@ -32,7 +32,7 @@ describe('Classroom data object factory', () => {
     classroomDataObjectFactory = TestBed.get(ClassroomDataObjectFactory);
     topicSummaryObjectFactory = TestBed.get(TopicSummaryObjectFactory);
 
-    topicSummaryDicts = [{
+    publicTopicSummaryDicts = [{
       id: 'topic1',
       name: 'Topic name',
       description: 'Topic description',
@@ -42,7 +42,8 @@ describe('Classroom data object factory', () => {
       uncategorized_skill_count: 5,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
-    }, {
+    }];
+    privateTopicSummaryDicts = [{
       id: 'topic2',
       name: 'Topic name 2',
       description: 'Topic description 2',
@@ -58,13 +59,16 @@ describe('Classroom data object factory', () => {
   it('should create a new classroom object from a backend dictionary', () => {
     let classroomData = (
       classroomDataObjectFactory.createFromBackendData(
-        'Math', topicSummaryDicts, 'Course Details', 'Topics Covered'));
+        'Math', publicTopicSummaryDicts, privateTopicSummaryDicts,
+        'Course Details', 'Topics Covered'));
     expect(classroomData.getName()).toEqual('Math');
     expect(classroomData.getCourseDetails()).toEqual('Course Details');
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
-    expect(classroomData.getTopicSummaries()[0]).toEqual(
-      topicSummaryObjectFactory.createFromBackendDict(topicSummaryDicts[0]));
-    expect(classroomData.getTopicSummaries()[1]).toEqual(
-      topicSummaryObjectFactory.createFromBackendDict(topicSummaryDicts[1]));
+    expect(classroomData.getPublicTopicSummaries()[0]).toEqual(
+      topicSummaryObjectFactory.createFromBackendDict(
+        publicTopicSummaryDicts[0]));
+    expect(classroomData.getPrivateTopicSummaries()[0]).toEqual(
+      topicSummaryObjectFactory.createFromBackendDict(
+        privateTopicSummaryDicts[0]));
   });
 });

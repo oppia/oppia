@@ -25,15 +25,18 @@ import {
 
 export class ClassroomData {
   _name: string;
-  _topicSummaries: TopicSummary[];
+  _publicTopicSummaries: TopicSummary[];
+  _privateTopicSummaries: TopicSummary[];
   _courseDetails: string;
   _topicListIntro: string;
 
   constructor(
-      name: string, topicSummaries: TopicSummary[], courseDetails: string,
+      name: string, publicTopicSummaries: TopicSummary[],
+      privateTopicSummaries: TopicSummary[], courseDetails: string,
       topicListIntro: string) {
     this._name = name;
-    this._topicSummaries = topicSummaries;
+    this._publicTopicSummaries = publicTopicSummaries;
+    this._privateTopicSummaries = privateTopicSummaries;
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
   }
@@ -42,8 +45,12 @@ export class ClassroomData {
     return this._name;
   }
 
-  getTopicSummaries(): TopicSummary[] {
-    return this._topicSummaries.slice();
+  getPublicTopicSummaries(): TopicSummary[] {
+    return this._publicTopicSummaries.slice();
+  }
+
+  getPrivateTopicSummaries(): TopicSummary[] {
+    return this._privateTopicSummaries.slice();
   }
 
   getCourseDetails(): string {
@@ -63,16 +70,24 @@ export class ClassroomDataObjectFactory {
       private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   createFromBackendData(
-      name: string, topicSummaryDicts: TopicSummaryBackendDict[],
+      name: string, publicTopicSummaryDicts: TopicSummaryBackendDict[],
+      privateTopicSummaryDicts: TopicSummaryBackendDict[],
       courseDetails: string, topicListIntro: string): ClassroomData {
-    let topicSummaries = topicSummaryDicts.map(
+    let publicTopicSummaries = publicTopicSummaryDicts.map(
+      (summaryDict) => {
+        return this.topicSummaryObjectFactory.createFromBackendDict(
+          summaryDict);
+      }
+    );
+    let privateTopicSummaries = privateTopicSummaryDicts.map(
       (summaryDict) => {
         return this.topicSummaryObjectFactory.createFromBackendDict(
           summaryDict);
       }
     );
     return new ClassroomData(
-      name, topicSummaries, courseDetails, topicListIntro
+      name, publicTopicSummaries, privateTopicSummaries, courseDetails,
+      topicListIntro
     );
   }
 }
