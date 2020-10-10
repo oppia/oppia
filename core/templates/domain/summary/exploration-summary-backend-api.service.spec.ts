@@ -25,7 +25,7 @@ import { ExplorationSummaryBackendApiService } from
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Exploration Summary Backend Api Service', () => {
+fdescribe('Exploration Summary Backend Api Service', () => {
   let explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService = null;
   let httpTestingController: HttpTestingController = null;

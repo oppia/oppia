@@ -25,6 +25,21 @@ import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ValidatorsService } from 'services/validators.service';
 
+export interface ExplorationSummaryBackendDict {
+  'summaries': [{
+    'category': string,
+    'community_owned': boolean,
+    'id': string,
+    'language_code': string,
+    'num_views': number,
+    'objective': string,
+    'status': string,
+    'tags': [],
+    'thumbnail_bg_color': string,
+    'thumbnail_icon_url': string,
+    'title': string
+  }]
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -37,7 +52,9 @@ export class ExplorationSummaryBackendApiService {
   private _fetchExpSummaries(
       explorationIds: string[],
       includePrivateExplorations: boolean,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (
+        value?: ExplorationSummaryBackendDict[] |
+        PromiseLike<ExplorationSummaryBackendDict[]>) => void,
       errorCallback: (reason?: string[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
@@ -59,7 +76,7 @@ export class ExplorationSummaryBackendApiService {
         include_private_explorations: JSON.stringify(
           includePrivateExplorations)
       }
-    }).toPromise().then((summaries: Object[]) => {
+    }).toPromise().then((summaries: ExplorationSummaryBackendDict[]) => {
       try {
         if (successCallback) {
           if (summaries === null) {
@@ -87,14 +104,14 @@ export class ExplorationSummaryBackendApiService {
   }
 
   loadPublicAndPrivateExplorationSummaries(
-      explorationIds: string[]): Promise<Object> {
+      explorationIds: string[]): Promise<ExplorationSummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, true, resolve, reject);
     });
   }
 
   loadPublicExplorationSummaries(
-      explorationIds: string[]): Promise<Object> {
+      explorationIds: string[]): Promise<ExplorationSummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, false, resolve, reject);
     });

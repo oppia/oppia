@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ExplorationSummaryBackendApiService } from
+import { ExplorationSummaryBackendApiService, ExplorationSummaryBackendDict } from
   'domain/summary/exploration-summary-backend-api.service';
 
 @Injectable({
@@ -33,7 +33,7 @@ export class ExplorationIdValidationService {
   isExpPublished(explorationId: string): Promise<boolean> {
     return this.explorationSummartBackendApiService.
       loadPublicExplorationSummaries([explorationId]).then(
-        function(response: {summaries:[{}]}) {
+        (response: ExplorationSummaryBackendDict[]) => {
           let summaries = response.summaries;
           return (summaries.length === 1 && summaries[0] !== null);
         });
