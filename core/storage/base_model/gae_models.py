@@ -85,6 +85,11 @@ class BaseModel(datastore_services.Model):
         self._last_updated_timestamp_is_fresh = False
 
     def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage.
+
+        Raises:
+            Exception. The last_updated field has not been updated properly.
+        """
         super(BaseModel, self)._pre_put_hook()
         self._update_empty_timestamps()
         if not self._last_updated_timestamp_is_fresh:

@@ -257,7 +257,8 @@ def create_messages(
                     )
         if updated_subject:
             message_model.updated_subject = updated_subject
-    feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(message_models)
+    feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
+        message_models)
     feedback_models.GeneralFeedbackMessageModel.put_multi(message_models)
 
     # Update the message data cache of the threads.
@@ -283,7 +284,8 @@ def create_messages(
                         updated_subject != thread_model.subject):
                     thread_model.subject = updated_subject
             new_statuses.append(thread_model.status)
-    feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(thread_models)
+    feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
+        thread_models)
     feedback_models.GeneralFeedbackThreadModel.put_multi(thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to

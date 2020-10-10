@@ -390,6 +390,6 @@ def delete_explorations_from_recommendations(exp_ids):
         for exp_id in exp_ids:
             recommending_model.recommended_exploration_ids.remove(exp_id)
 
-    models = list(all_recommending_models.values())
-    recs_model_class.update_timestamps_multi(models)
-    recs_model_class.put_multi(models)
+    entities = list(all_recommending_models.values())
+    recs_model_class.update_timestamps_multi(entities)
+    recs_model_class.put_multi(entities)
