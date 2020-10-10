@@ -23,10 +23,13 @@ from core import jobs
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import activity_jobs_one_off
+from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
+from core.domain import suggestion_services
 from core.domain import user_jobs_one_off
+from core.domain import user_services
 from core.domain import wipeout_jobs_one_off
 from core.platform import models
 import utils
@@ -223,3 +226,25 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
             cron_services.JobModelsCleanupManager.enqueue(
                 cron_services.JobModelsCleanupManager.create_new())
             logging.warning('Deletion jobs for JobModels entities kicked off.')
+
+
+class CronMailContributorDashboardReviewerOpportunitiesHandler(
+        base.BaseHandler):
+    """Handler for mailing reviewers review opportunities on the Contributor
+    Dashboard.
+    """
+  
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Sends each reviewer an email with up to
+        MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER suggestions that have been
+        waiting the longest for review, based on their reviewing permissions.
+        """
+        if config_domain.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED:
+            reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
+            reviewers_suggestion_email_infos = (
+                suggestion_services
+                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                    reviewer_ids))
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                reviewer_ids, reviewers_suggestion_email_infos)

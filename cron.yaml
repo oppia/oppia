@@ -20,3 +20,6 @@ cron:
 - description: weekly exploration search rank computation
   url: /cron/explorations/search_rank
   schedule: every wednesday 9:00
+- description: daily email about review opportunities on Contributor Dashboard
+  url: /cron/mail/contributor_dashboard_reviewers/review_opportunities
+  schedule: every day 16:00

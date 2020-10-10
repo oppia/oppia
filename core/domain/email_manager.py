@@ -227,6 +227,7 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
         '<br><br>%s'
     ),
     'email_subject': 'Contributor Dashboard Reviewer Opportunities',
+    'default_username': 'Reviewer',
     # The templates below are for listing the information for each suggestion
     # type.
     'listing_suggestion_template': {
@@ -1268,6 +1269,8 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         'email_subject']
     email_body_template = NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
         'email_body_template']
+    default_username = NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+        'default_username']
 
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
@@ -1297,16 +1300,18 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 'There were no suggestions to recommend to the reviewer with '
                 'user id:%s' % reviewer_id)
             continue
-        elif not reviewer_usernames[index]:
-            log_new_error(
-                'There was no username for the given reviewer id:%s' % (
-                    reviewer_id))
-            continue
         elif not reviewer_emails[index]:
             log_new_error(
                 'There was no email for the given reviewer id:%s' % (
                     reviewer_id))
             continue
+        elif not reviewer_usernames[index]:
+            # If there isn't a username, log it and send the email using the
+            # username 'Reviewer'
+            log_new_error(
+                'There was no username for the given reviewer id:%s' % (
+                    reviewer_id))
+            reviewer_usernames[index] = default_username
         else:
             list_of_suggestions_to_notify_reviewer_strings = []
             for reviewer_suggestion_email_info in (

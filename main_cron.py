@@ -46,6 +46,8 @@ URLS = [
         cron.CronActivitySearchRankHandler),
     main.get_redirect_route(
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
+    main.get_redirect_route(
+        r'/cron/mail/contributor_dashboard_reviewers/review_opportunities'),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
