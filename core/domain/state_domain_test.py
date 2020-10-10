@@ -1134,46 +1134,66 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
     def test_interaction_validation_for_android(self):
-        exploration = exp_domain.Exploration.create_default_exploration('0')
+        _checked_interaction_ids = set()
 
-        init_state = exploration.states[exploration.init_state_name]
-        # Valid interactions.
-        init_state.update_interaction_id('Continue')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('DragAndDropSortInput')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('EndExploration')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('FractionInput')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('ItemSelectionInput')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('MultipleChoiceInput')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('NumberWithUnits')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('NumericInput')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('TextInput')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('NumericExpressionInput')
-        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        def _create_init_state_for_interaction_verification():
+            """Creates an init state for interaction verification."""
+            exploration = (
+                exp_domain.Exploration.create_default_exploration('0'))
+            return exploration.states[exploration.init_state_name]
 
-        # Invalid interactions.
-        init_state.update_interaction_id('CodeRepl')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('GraphInput')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('InteractiveMap')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('LogicProof')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('MusicNotesInput')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('PencilCodeEditor')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('SetInput')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        def _verify_interaction_supports_android(self, interaction_id):
+            """Checks that the provided interaction is supported on Android."""
+            init_state = _create_init_state_for_interaction_verification()
+            init_state.update_interaction_id(interaction_id)
+            self.assertTrue(
+                init_state.interaction.is_supported_on_android_app())
+            _checked_interaction_ids.add(interaction_id)
+
+        def _verify_interaction_does_not_support_android(self, interaction_id):
+            """Checks that the provided interaction is not supported on
+            Android.
+            """
+            init_state = _create_init_state_for_interaction_verification()
+            init_state.update_interaction_id(interaction_id)
+            self.assertFalse(
+                init_state.interaction.is_supported_on_android_app())
+            _checked_interaction_ids.add(interaction_id)
+
+        def _verify_all_interaction_ids_checked(self):
+            """Verifies that all the interaction ids are checked."""
+            all_interaction_ids = set(
+                interaction_registry.Registry.get_all_interaction_ids())
+            missing_interaction_ids = (
+                all_interaction_ids - _checked_interaction_ids)
+            self.assertFalse(missing_interaction_ids)
+
+        _verify_interaction_supports_android(self, 'AlgebraicExpressionInput')
+        _verify_interaction_supports_android(self, 'Continue')
+        _verify_interaction_supports_android(self, 'DragAndDropSortInput')
+        _verify_interaction_supports_android(self, 'EndExploration')
+        _verify_interaction_supports_android(self, 'FractionInput')
+        _verify_interaction_supports_android(self, 'ImageClickInput')
+        _verify_interaction_supports_android(self, 'ItemSelectionInput')
+        _verify_interaction_supports_android(self, 'MathEquationInput')
+        _verify_interaction_supports_android(self, 'MultipleChoiceInput')
+        _verify_interaction_supports_android(self, 'NumberWithUnits')
+        _verify_interaction_supports_android(self, 'NumericInput')
+        _verify_interaction_supports_android(self, 'TextInput')
+        _verify_interaction_supports_android(self, 'NumericExpressionInput')
+        _verify_interaction_supports_android(self, None)
+
+        _verify_interaction_does_not_support_android(self, 'CodeRepl')
+        _verify_interaction_does_not_support_android(self, 'GraphInput')
+        _verify_interaction_does_not_support_android(self, 'InteractiveMap')
+        _verify_interaction_does_not_support_android(self, 'LogicProof')
+        _verify_interaction_does_not_support_android(self, 'MusicNotesInput')
+        _verify_interaction_does_not_support_android(self, 'PencilCodeEditor')
+        _verify_interaction_does_not_support_android(
+            self, 'RatioExpressionInput')
+        _verify_interaction_does_not_support_android(self, 'SetInput')
+
+        _verify_all_interaction_ids_checked(self)
 
     def test_get_content_html_with_invalid_content_id_raise_error(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
