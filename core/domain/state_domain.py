@@ -156,6 +156,10 @@ class AnswerGroup(python_utils.OBJECT):
     def get_all_html_content_strings(self, interaction_id):
         """Get all html content strings in the AnswerGroup.
 
+        Args:
+            interaction_id: str. The interaction id that the answer group is
+                associated with.
+
         Returns:
             list(str). The list of all html content strings in the interaction.
         """
@@ -178,6 +182,8 @@ class AnswerGroup(python_utils.OBJECT):
         for rule_spec in self.rule_specs:
             for interaction_and_rule_details in (
                     html_field_types_to_rule_specs_dict.values()):
+                # Check that the value corresponds to the answer group's
+                # associated interaction id.
                 if (
                         interaction_and_rule_details['interactionId'] !=
                         interaction_id):

@@ -31,7 +31,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Full exploration editor', function() {
+fdescribe('Full exploration editor', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -240,7 +240,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  it('should handle multiple rules in an answer group and also disallow ' +
+  fit('should handle multiple rules in an answer group and also disallow ' +
       'editing of a read-only exploration', async function() {
     await users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
     await users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
@@ -254,20 +254,19 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('You must be happy!'),
-      null, false, 'Equals', 'happy');
+      null, false, 'Equals', ['happy']);
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('No being sad!'),
-      null, false, 'Contains', 'sad');
+      null, false, 'Contains', ['sad']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText(
       'Okay, now this is just becoming annoying.'));
     await responseEditor.setDestination('final card', true, null);
 
-    // Now, add multiple rules to a single answer group.
+    // Now, set multiple rules to a single answer group.
     responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-    await responseEditor.addRule('TextInput', 'Contains', 'meh');
-    await responseEditor.addRule('TextInput', 'Contains', 'okay');
+    await responseEditor.addRule('TextInput', 'Contains', ['meh', 'okay']);
 
     // Ensure that the only rule for this group cannot be deleted.
     await (
@@ -368,7 +367,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Happy!'), null, false, 'Equals',
-      'happy');
+      ['happy']);
     await explorationEditorMainTab.expectInteractionToMatch('TextInput');
     await explorationEditorPage.saveChanges();
     await explorationEditorMainTab.deleteInteraction();

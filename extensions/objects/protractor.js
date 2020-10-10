@@ -205,6 +205,41 @@ var SanitizedUrlEditor = function(elem) {
   };
 };
 
+var SetOfNormalizedStringEditor = function(elem) {
+  const _getLength = async function() {
+    var items = (
+      await elem.all(by.repeater('item in localValue track by $index')));
+    return items.length;
+  };
+
+  const addItem = async function(value) {
+    var listLength = await _getLength();
+    await elem.element(by.css('.protractor-test-add-list-entry')).click();
+    return await NormalizedStringEditor(
+      elem.element(
+        await by.repeater(
+          'item in localValue track by $index').row(listLength))
+    ).setValue(value);
+  };
+
+  const deleteAllItems = async function() {
+    const entries = await elem.all(
+      await by.repeater('item in localValue track by $index'));
+    for (let entry of entries) {
+      await entry.element(by.css('.protractor-test-delete-list-entry')).click();
+    }
+  };
+
+  return {
+    setValue: async function(normalizedStrings) {
+      await deleteAllItems();
+      for (let normalizedString of normalizedStrings) {
+        await addItem(normalizedString);
+      }
+    }
+  };
+};
+
 var SkillSelector = function(elem) {
   return {
     setValue: async function(skillDescription) {
@@ -246,6 +281,7 @@ var OBJECT_EDITORS = {
   PositionOfTerms: ParameterNameEditor,
   RatioExpression: RatioExpressionEditor,
   SanitizedUrl: SanitizedUrlEditor,
+  SetOfNormalizedString: SetOfNormalizedStringEditor,
   SkillSelector: SkillSelector,
   UnicodeString: UnicodeStringEditor
 };

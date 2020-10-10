@@ -78,7 +78,7 @@ export class TextInputRulesService {
     const normalizedInput = inputs.x.map(
       input => this.nws.transform(input).toLowerCase());
     return normalizedInput.some(
-      input => normalizedAnswer.indexOf(input) !== -1);
+      input => normalizedAnswer.includes(input));
   }
 }
 
