@@ -55,7 +55,7 @@ export class ExplorationSummaryBackendApiService {
       successCallback: (
         value?: ExplorationSummaryBackendDict |
         PromiseLike<ExplorationSummaryBackendDict>) => void,
-      errorCallback: (reason?: string[]) => void): void {
+      errorCallback: (reason?: string | string[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
       this.alertsService.addWarning('Please enter a valid exploration ID.');
@@ -82,7 +82,7 @@ export class ExplorationSummaryBackendApiService {
           const summariesError = (
             'Summaries fetched are null for explorationIds: ' + explorationIds
           );
-          throw new Error(summariesError);
+          errorCallback(summariesError);
         }
         successCallback(summaries);
       }
