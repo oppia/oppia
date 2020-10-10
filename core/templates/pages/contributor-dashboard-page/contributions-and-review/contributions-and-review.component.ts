@@ -79,15 +79,19 @@ angular.module('oppia').component('contributionsAndReview', {
         Object.keys(ctrl.contributions).forEach(function(key) {
           var suggestion = ctrl.contributions[key].suggestion;
           var details = ctrl.contributions[key].details;
-          if (typeof details === 'undefined') {
-            return;
+          var subheading = '';
+          if (details === null) {
+            subheading = '[The corresponding opportunity is deleted.]';
+          } else {
+            subheading = details.skill_description;
           }
+
           var change = suggestion.change;
           var requiredData = {
             id: suggestion.suggestion_id,
             heading: $filter('formatRtePreview')(
               change.question_dict.question_state_data.content.html),
-            subheading: details.skill_description,
+            subheading: subheading,
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
             actionButtonTitle: (
@@ -106,16 +110,20 @@ angular.module('oppia').component('contributionsAndReview', {
         Object.keys(ctrl.contributions).forEach(function(key) {
           var suggestion = ctrl.contributions[key].suggestion;
           var details = ctrl.contributions[key].details;
-          if (typeof details === 'undefined') {
-            return;
+          var subheading = '';
+          if (details === null) {
+            subheading = '[The corresponding opportunity is deleted.]';
+          } else {
+            subheading = (
+              details.topic_name + ' / ' + details.story_title +
+              ' / ' + details.chapter_title);
           }
+
           var change = suggestion.change;
           var requiredData = {
             id: suggestion.suggestion_id,
             heading: $filter('formatRtePreview')(change.translation_html),
-            subheading: (
-              details.topic_name + ' / ' + details.story_title +
-              ' / ' + details.chapter_title),
+            subheading: subheading,
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
             actionButtonTitle: (
