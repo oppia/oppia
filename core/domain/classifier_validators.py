@@ -22,11 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import base_model_validators
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import collection_services
-from core.domain import rights_manager
 from core.platform import models
-
-import python_utils
 
 (base_models, collection_models, exp_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration])
@@ -271,56 +267,3 @@ class TrainingJobExplorationMappingModelValidator(
         return [
             cls._validate_exp_version,
             cls._validate_state_name]
-
-
-class CollectionModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating CollectionModel."""
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        return collection_services.get_collection_from_model(item)
-
-    @classmethod
-    def _get_domain_object_validation_type(cls, item):
-        collection_rights = rights_manager.get_collection_rights(
-            item.id, strict=False)
-
-        if collection_rights is None:
-            return base_model_validators.VALIDATION_MODE_NEUTRAL
-
-        if rights_manager.is_collection_private(item.id):
-            return base_model_validators.VALIDATION_MODE_NON_STRICT
-
-        return base_model_validators.VALIDATION_MODE_STRICT
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        snapshot_model_ids = [
-            '%s-%d' % (item.id, version)
-            for version in python_utils.RANGE(1, item.version + 1)]
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'exploration_ids',
-                exp_models.ExplorationModel,
-                [node['exploration_id'] for node in item.collection_contents[
-                    'nodes']]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'collection_commit_log_entry_ids',
-                collection_models.CollectionCommitLogEntryModel,
-                ['collection-%s-%s'
-                 % (item.id, version) for version in python_utils.RANGE(
-                     1, item.version + 1)]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'collection_summary_ids',
-                collection_models.CollectionSummaryModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'collection_rights_ids',
-                collection_models.CollectionRightsModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'snapshot_metadata_ids',
-                collection_models.CollectionSnapshotMetadataModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'snapshot_content_ids',
-                collection_models.CollectionSnapshotContentModel,
-                snapshot_model_ids)]
