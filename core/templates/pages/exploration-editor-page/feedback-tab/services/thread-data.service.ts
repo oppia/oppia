@@ -212,7 +212,7 @@ export class ThreadDataService {
       });
   }
 
-  markThreadAsSeenAsync(thread: AnyThread): Promise<Object> {
+  markThreadAsSeenAsync(thread: AnyThread): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
@@ -222,7 +222,7 @@ export class ThreadDataService {
     // tests.
     return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
       thread_id: threadId
-    }).toPromise();
+    }).toPromise().then();
   }
 
   addNewMessageAsync(
