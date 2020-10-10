@@ -4486,12 +4486,58 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for author_ids field '
+                '[u\'failed validation check for '
+                'last_nonempty_message_author_ids field '
+                'check of GeneralFeedbackThreadModel\', '
+                '[u"Entity id %s: based on field '
+                'last_nonempty_message_author_ids having value '
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]'
+            ) % (
+                self.model_instance.id, self.owner_id, self.owner_id
+            ),
+            (
+                '[u\'failed validation check for author_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
                 '%s, expected model UserSettingsModel with id %s but it '
-                'doesn\'t exist"]]') % (
-                    self.model_instance.id, self.owner_id, self.owner_id)]
+                'doesn\'t exist"]]'
+            ) % (
+                self.model_instance.id, self.owner_id, self.owner_id
+            ),
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_original_author_id_format_failure(self):
+        self.model_instance.original_author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final author '
+                'check of GeneralFeedbackThreadModel\', [u\'Entity id %s: '
+                'Original author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (
+                self.model_instance.id, self.model_instance.original_author_id)
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_last_nonempty_message_author_id_format_failure(self):
+        self.model_instance.last_nonempty_message_author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final author '
+                'check of GeneralFeedbackThreadModel\', [u\'Entity id %s: '
+                'Last non-empty message author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (
+                self.model_instance.id,
+                self.model_instance.last_nonempty_message_author_id
+            )
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -4609,6 +4655,21 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
                 '%s, expected model UserSettingsModel with id %s but it '
                 'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_author_id_format_failure(self):
+        self.model_instance.author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final author '
+                'check of GeneralFeedbackMessageModel\', [u\'Entity id %s: '
+                'Author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (
+                self.model_instance.id, self.model_instance.author_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -8822,6 +8883,20 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_wrong_final_reviewer_id_format(self):
+        self.model_instance.final_reviewer_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                '[u\'failed validation check for domain object check of '
+                'GeneralSuggestionModel\', [u\'Entity id %s: '
+                'Entity fails domain validation with the error Expected '
+                'final_reviewer_id to be in a valid user ID format, '
+                'received %s\']]'
+            ) % (self.model_instance.id, self.model_instance.final_reviewer_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
     def test_invalid_non_empty_final_reviewer_id(self):
         self.model_instance.status = suggestion_models.STATUS_IN_REVIEW
         self.model_instance.put()
@@ -8832,6 +8907,19 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'Final reviewer id %s is not empty but '
                 'suggestion is in review\']]'
             ) % (self.model_instance.id, self.admin_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_author_id_format(self):
+        self.model_instance.author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                '[u\'failed validation check for domain object check of '
+                'GeneralSuggestionModel\', [u\'Entity id %s: '
+                'Entity fails domain validation with the error Expected '
+                'author_id to be in a valid user ID format, received %s\']]'
+            ) % (self.model_instance.id, self.model_instance.author_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -9053,6 +9141,32 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 '%s, expected model UserSettingsModel with id %s but it '
                 'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_final_reviewer_id_format(self):
+        self.model_instance.final_reviewer_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                '[u\'failed validation check for final reviewer check of '
+                'GeneralVoiceoverApplicationModel\', [u\'Entity id %s: '
+                'Final reviewer ID %s is in a wrong format. It should be '
+                'either pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (self.model_instance.id, self.model_instance.final_reviewer_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_author_id_format(self):
+        self.model_instance.author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                '[u\'failed validation check for final author check of '
+                'GeneralVoiceoverApplicationModel\', [u\'Entity id %s: '
+                'Author ID %s is in a wrong format. It should be either '
+                'pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (self.model_instance.id, self.model_instance.author_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -12302,21 +12416,6 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
-    def test_missing_user_contributions_model_failure(self):
-        user_models.UserContributionsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_contributions_ids '
-                'field check of UserSettingsModel\', '
-                '[u"Entity id %s: based on '
-                'field user_contributions_ids having value '
-                '%s, expected model UserContributionsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserSettingsModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
     def test_model_with_invalid_schema(self):
         self.model_instance_1.email = 'invalid'
         self.model_instance_1.put()
@@ -15251,8 +15350,13 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
+        # Run the full user deletion process as it works when the user
+        # pre-deletes itself via frontend and then is fully deleted via
+        # subsequent cron jobs.
         wipeout_service.pre_delete_user(self.user_id)
-        wipeout_service.delete_user(
+        wipeout_service.run_user_deletion(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+        wipeout_service.run_user_deletion_completion(
             wipeout_service.get_pending_deletion_request(self.user_id))
 
         user_models.DeletedUserModel(id=self.user_id).put()

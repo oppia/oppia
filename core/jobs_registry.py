@@ -61,6 +61,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
     exp_jobs_one_off.PopulateXmlnsAttributeInExplorationMathSvgImagesJob,
+    exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
@@ -118,6 +119,9 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     user_jobs_one_off.RemoveGaeUserIdOneOffJob,
+    user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob,
+    user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
+    user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
