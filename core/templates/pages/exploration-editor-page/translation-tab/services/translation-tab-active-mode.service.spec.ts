@@ -1,4 +1,3 @@
-import { TestBed } from '@angular/core/testing';
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,14 +21,16 @@ import { TestBed } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
+import { TestBed } from '@angular/core/testing';
+import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
+
 describe('Translation tab active mode service', () => {
   let translationTabActiveModeService = null;
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(()=> {
-    translationTabActiveModeService = TestBed.get(
-      'TranslationTabActiveModeService');
+    translationTabActiveModeService = TestBed.get(TranslationTabActiveModeService);
   });
 
   it('should correctly activate translation mode', () => {
