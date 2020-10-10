@@ -198,11 +198,14 @@ describe('Exploration Summary Backend Api Service', () => {
 
     const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush(errorMessage);
+    req.flush(
+      { error: errorMessage },
+      { status: 500, statusText: ''}
+    );
 
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(Error(errorMessage));
+    expect(failHandler).toHaveBeenCalledWith(errorMessage);
   }));
 });

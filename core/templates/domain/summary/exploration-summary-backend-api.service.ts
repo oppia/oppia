@@ -77,24 +77,14 @@ export class ExplorationSummaryBackendApiService {
           includePrivateExplorations)
       }
     }).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
-      try {
-        if (successCallback) {
-          if (summaries === null) {
-            const summariesError = (
-              'Summaries fetched are null for explorationIds: ' + explorationIds
-            );
-            throw new Error(summariesError);
-          } else if (typeof (summaries) === 'string') {
-            const fetchingError = (
-              'Error on loading public exploration summaries.');
-            throw new Error(fetchingError);
-          }
-          successCallback(summaries);
+      if (successCallback) {
+        if (summaries === null) {
+          const summariesError = (
+            'Summaries fetched are null for explorationIds: ' + explorationIds
+          );
+          throw new Error(summariesError);
         }
-      } catch (errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse);
-        }
+        successCallback(summaries);
       }
     }, (errorResponse) =>{
       if (errorCallback) {
