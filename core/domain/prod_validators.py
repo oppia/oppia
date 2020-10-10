@@ -25,7 +25,6 @@ import re
 
 from constants import constants
 from core.domain import base_model_validators
-from core.domain import classifier_domain
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -2592,8 +2591,8 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                             item.target_type,
                             base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s_ids having'
-                        ' value %s, expected model %s with id %s but it doesn\'t'
-                        ' exist' % (
+                        ' value %s, expected model %s with id %s but it '
+                        'doesn\'t exist' % (
                             item.id, item.target_type,
                             model_id, model_class.__name__, model_id))
                     continue
