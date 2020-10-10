@@ -16,15 +16,18 @@
  * @fileoverview Truncate filter for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 import { ConvertToPlainTextPipe } from './convert-to-plain-text.pipe';
 
 // Pipe that truncates long descriptors.
 @Pipe({name: 'truncate'})
+@Injectable({
+  providedIn: 'root'
+})
 export class TruncatePipe implements PipeTransform {
   constructor(private convertToPlainTextPipe: ConvertToPlainTextPipe) {}
 
-  transform(input: string, length: number, suffix: string): string {
+  transform(input: string, length: number, suffix?: string): string {
     if (!input) {
       return '';
     }
