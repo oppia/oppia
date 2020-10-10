@@ -23,21 +23,17 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { ExplorationOpportunitySummaryObjectFactory } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { FeaturedTranslationLanguageObjectFactory} from
-  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let explorationOpportunitySummaryObjectFactory:
-    ExplorationOpportunitySummaryObjectFactory = null;
   let urlInterpolationService:
     UrlInterpolationService = null;
   const skillOpportunityResponse = {
@@ -74,8 +70,6 @@ describe('Contribution Opportunities backend API service', function() {
     });
     contributionOpportunitiesBackendApiService =
       TestBed.get(ContributionOpportunitiesBackendApiService);
-    explorationOpportunitySummaryObjectFactory =
-      TestBed.get(ExplorationOpportunitySummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     sampleSkillOpportunitiesResponse = [
@@ -83,12 +77,12 @@ describe('Contribution Opportunities backend API service', function() {
         skillOpportunityResponse.opportunities[0])
     ];
     sampleTranslationOpportunitiesResponse = [
-      explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+      ExplorationOpportunitySummary.createFromBackendDict(
         skillOpportunity.opportunities[0]
       )
     ];
     sampleVoiceoverOpportunitiesResponse = [
-      explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+      ExplorationOpportunitySummary.createFromBackendDict(
         skillOpportunity.opportunities[0]
       )
     ];
@@ -189,8 +183,6 @@ describe('Contribution Opportunities backend API service', function() {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      const featuredTranslationLanguageObjectFactory = TestBed.get(
-        FeaturedTranslationLanguageObjectFactory);
 
       contributionOpportunitiesBackendApiService
         .fetchFeaturedTranslationLanguages()
@@ -208,7 +200,7 @@ describe('Contribution Opportunities backend API service', function() {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith([
-        featuredTranslationLanguageObjectFactory.createFromBackendDict(
+        FeaturedTranslationLanguage.createFromBackendDict(
           { language_code: 'en', explanation: 'English' }
         )
       ]);
