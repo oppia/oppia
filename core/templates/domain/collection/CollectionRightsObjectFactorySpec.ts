@@ -161,7 +161,7 @@ describe('Collection rights object factory', () => {
       noUnpublishCollectionRightsBackendObject);
 
     var emptyCollectionRightsBackendObject = (
-    CollectionRights.copyFromCollectionRights(sampleCollectionRights));
+      CollectionRights.copyFromCollectionRights(sampleCollectionRights));
     expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
     expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
     expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
