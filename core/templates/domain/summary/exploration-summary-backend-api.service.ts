@@ -53,8 +53,8 @@ export class ExplorationSummaryBackendApiService {
       explorationIds: string[],
       includePrivateExplorations: boolean,
       successCallback: (
-        value?: ExplorationSummaryBackendDict[] |
-        PromiseLike<ExplorationSummaryBackendDict[]>) => void,
+        value?: ExplorationSummaryBackendDict |
+        PromiseLike<ExplorationSummaryBackendDict>) => void,
       errorCallback: (reason?: string[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
@@ -76,7 +76,7 @@ export class ExplorationSummaryBackendApiService {
         include_private_explorations: JSON.stringify(
           includePrivateExplorations)
       }
-    }).toPromise().then((summaries: ExplorationSummaryBackendDict[]) => {
+    }).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
       try {
         if (successCallback) {
           if (summaries === null) {
@@ -104,14 +104,14 @@ export class ExplorationSummaryBackendApiService {
   }
 
   loadPublicAndPrivateExplorationSummaries(
-      explorationIds: string[]): Promise<ExplorationSummaryBackendDict[]> {
+      explorationIds: string[]): Promise<ExplorationSummaryBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, true, resolve, reject);
     });
   }
 
   loadPublicExplorationSummaries(
-      explorationIds: string[]): Promise<ExplorationSummaryBackendDict[]> {
+      explorationIds: string[]): Promise<ExplorationSummaryBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, false, resolve, reject);
     });

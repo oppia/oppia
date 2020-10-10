@@ -33,7 +33,7 @@ export class ExplorationIdValidationService {
   isExpPublished(explorationId: string): Promise<boolean> {
     return this.explorationSummartBackendApiService.
       loadPublicExplorationSummaries([explorationId]).then(
-        (response: ExplorationSummaryBackendDict[]) => {
+        (response: ExplorationSummaryBackendDict) => {
           let summaries = response.summaries;
           return (summaries.length === 1 && summaries[0] !== null);
         });
