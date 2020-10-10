@@ -77,6 +77,8 @@ describe('Drag and Drop Sort Input rules service', () => {
       [['a'], ['b']], RULE_INPUT)).toBe(true);
     expect(ddsrs.HasElementXAtPositionY(
       [['a'], ['d'], ['b', 'c']], RULE_INPUT)).toBe(false);
+    expect(ddsrs.HasElementXAtPositionY(
+      [], RULE_INPUT)).toBe(false);
   });
 
   it('should have a correct \'has element X before element Y\' rule',
