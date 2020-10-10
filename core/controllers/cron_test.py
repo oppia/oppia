@@ -319,6 +319,13 @@ class CronJobTests(test_utils.GenericTestBase):
 class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         test_utils.GenericTestBase):
 
+    def mock_send_emails(self, _):
+            """Mocks email_manager.send_mail_to_admin() as its not possible to
+            send mail with self.testapp_swap, i.e with the URLs defined in
+            main_cron.
+            """
+            pass
+
     def setUp(self):
         super(
             CronMailContributorDashboardReviewerOpportunitiesHandlerTests,
@@ -331,22 +338,15 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
 
         self.email_subjects = []
         self.email_bodies = []
-        def _mock_send_mail_to_admin(email_subject, email_body):
-            """Mocks email_manager.send_mail_to_admin() as its not possible to
-            send mail with self.testapp_swap, i.e with the URLs defined in
-            main_cron.
-            """
-            self.email_subjects.append(email_subject)
-            self.email_bodies.append(email_body)
-
-        self.send_mail_to_admin_swap = self.swap(
-            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
     def test_send_mail_to_admin_on_job_success(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        with self.testapp_swap, self.send_mail_to_admin_swap:
-            self.get_html_response('/cron/mail/admin/job_status')
+        with self.testapp_swap:
+            with self.swap(email_manager, '_send_emails', self.mock_send_emails):
+
+                self.get_html_response(
+                    '/cron/mail/contributor_dashboard_reviewers/review_opportunities')
 
         self.assertEqual(self.email_subjects, ['MapReduce status report'])
         self.assertEqual(
