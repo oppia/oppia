@@ -174,13 +174,6 @@ indexes:
 
 - kind: GeneralSuggestionModel
   properties:
-  - name: author_id
-  - name: suggestion_type
-  - name: created_on
-    direction: desc
-
-- kind: GeneralSuggestionModel
-  properties:
   - name: deleted
   - name: score_category
   - name: status

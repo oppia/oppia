@@ -242,23 +242,6 @@ angular.module('oppia').component('contributionsAndReview', {
           ctrl.activeSuggestionType === suggestionType);
       };
 
-      ctrl.onLoadMoreContributions = function() {
-        if (ctrl.contributionsDataLoading || !ctrl.moreOpportunitiesAvailable) {
-          return;
-        }
-        ctrl.contributionsDataLoading = true;
-
-        var fetchFunction = tabNameToOpportunityFetchFunction[
-          ctrl.activeSuggestionType][ctrl.activeTabType];
-        fetchFunction(function(suggestionIdToSuggestions, more) {
-          ctrl.contributions = Object.assign(
-            ctrl.contributions, suggestionIdToSuggestions);
-          ctrl.moreOpportunitiesAvailable = more;
-          updateContributionSummaries();
-          ctrl.contributionsDataLoading = false;
-        });
-      };
-
       ctrl.onClickViewSuggestion = function(suggestionId) {
         var suggestion = ctrl.contributions[suggestionId].suggestion;
         var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
@@ -305,10 +288,8 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.contributionsDataLoading = true;
         ctrl.contributions = {};
         updateContributionSummaries();
-        ContributionAndReviewService.resetCursor();
-        fetchFunction(function(suggestionIdToSuggestions, more) {
+        fetchFunction(function(suggestionIdToSuggestions) {
           ctrl.contributions = suggestionIdToSuggestions;
-          ctrl.moreOpportunitiesAvailable = more;
           updateContributionSummaries();
           ctrl.contributionsDataLoading = false;
         });
@@ -323,7 +304,6 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.activeTabType = '';
         ctrl.activeSuggestionType = '';
         ctrl.reviewTabs = [];
-        ctrl.moreOpportunitiesAvailable = true;
         ctrl.contributionTabs = [
           {
             suggestionType: SUGGESTION_TYPE_QUESTION,

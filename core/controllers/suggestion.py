@@ -259,35 +259,31 @@ class SuggestionsProviderHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid suggestion_type: %s' % suggestion_type)
 
-    def _render_suggestions(self, target_type, suggestions, next_cursor, more):
+    def _render_suggestions(self, target_type, suggestions):
         """Renders retrieved suggestions.
 
         Args:
             target_type: str. The suggestion type.
             suggestions: list(BaseSuggestion). A list of suggestions to render.
-            next_cursor: str or None. A query cursor pointing to the next
-                batch of results. If there are no more results, this might
-                be None.
-            more: bool. If True, there are (probably) more results after
-                the given batch. If False, there are no further results after
-                the given batch.
         """
         if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
             target_id_to_opportunity_dict = (
                 _get_target_id_to_exploration_opportunity_dict(suggestions))
+            self.render_json({
+                'suggestions': [s.to_dict() for s in suggestions],
+                'target_id_to_opportunity_dict':
+                    target_id_to_opportunity_dict
+            })
         elif target_type == suggestion_models.TARGET_TYPE_SKILL:
             target_id_to_opportunity_dict = (
                 _get_target_id_to_skill_opportunity_dict(suggestions))
+            self.render_json({
+                'suggestions': [s.to_dict() for s in suggestions],
+                'target_id_to_opportunity_dict':
+                    target_id_to_opportunity_dict
+            })
         else:
             self.render_json({})
-            return
-
-        self.render_json({
-            'suggestions': [s.to_dict() for s in suggestions],
-            'target_id_to_opportunity_dict': target_id_to_opportunity_dict,
-            'next_cursor': next_cursor,
-            'more': more
-        })
 
 
 class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
@@ -300,11 +296,9 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         """Handles GET requests."""
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-        search_cursor = self.request.get('cursor', None)
-        suggestions, new_cursor, more = (
-            suggestion_services.get_reviewable_suggestions(
-                self.user_id, suggestion_type, search_cursor))
-        self._render_suggestions(target_type, suggestions, new_cursor, more)
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
@@ -317,11 +311,9 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
         """Handles GET requests."""
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-        search_cursor = self.request.get('cursor', None)
-        suggestions, new_cursor, more = (
-            suggestion_services.get_submitted_suggestions(
-                self.user_id, suggestion_type, search_cursor))
-        self._render_suggestions(target_type, suggestions, new_cursor, more)
+        suggestions = suggestion_services.get_submitted_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class SuggestionListHandler(base.BaseHandler):

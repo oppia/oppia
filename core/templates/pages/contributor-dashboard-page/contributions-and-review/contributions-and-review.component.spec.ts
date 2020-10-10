@@ -76,7 +76,7 @@ describe('Contributions and review component', function() {
             },
             details: 'skill_1'
           }
-        }, true));
+        }));
       spyOn(
         contributionAndReviewService, 'getReviewableQuestionSuggestions')
         .and.callFake(callback => callback({
@@ -159,7 +159,7 @@ describe('Contributions and review component', function() {
               skill_description: 'Skill description'
             }
           }
-        }, false));
+        }));
 
       $scope = $rootScope.$new();
       ctrl = $componentController('contributionsAndReview', {
@@ -348,7 +348,7 @@ describe('Contributions and review component', function() {
             },
             details: 'skill_1'
           }
-        }, false));
+        }));
       spyOn(skillBackendApiService, 'fetchSkill').and.returnValue(
         $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
@@ -401,7 +401,7 @@ describe('Contributions and review component', function() {
               chapter_title: 'Chapter title'
             }
           }
-        }, false));
+        }));
 
       $scope = $rootScope.$new();
       ctrl = $componentController('contributionsAndReview', {

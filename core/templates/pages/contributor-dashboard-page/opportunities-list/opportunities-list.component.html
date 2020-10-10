@@ -1,7 +1,6 @@
 <div class="oppia-opportunities-list">
   <div infinite-scroll="$ctrl.onLoadMoreOpportunities()"
        infinite-scroll-distance="1"
-       infinite-scroll-use-document-bottom="false"
        infinite-scroll-disabled="false">
     <div ng-repeat="opportunity in $ctrl.getOpportunities()">
       <opportunities-list-item opportunity="opportunity"
