@@ -660,6 +660,7 @@ def _update_user_proficiency(user_proficiency):
             user_proficiency.onboarding_email_sent
         )
 
+        user_proficiency_model.update_timestamps()
         user_proficiency_model.put()
 
     else:

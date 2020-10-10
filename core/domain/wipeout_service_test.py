@@ -618,6 +618,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
                 '%s-1' % self.CONFIG_1_ID)
         )
         metadata_model.committer_id = self.user_1_id
+        metadata_model.update_timestamps()
         metadata_model.put()
 
         # Run the user deletion again.
@@ -1641,6 +1642,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                 self.FEEDBACK_1_ID)
         )
         feedback_thread_model.original_author_id = self.user_1_id
+        feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
         # Run the user deletion again.
@@ -1677,6 +1679,8 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                     last_nonempty_message_author_id=self.user_2_id
                 )
             )
+            feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
+                feedback_thread_models)
         feedback_message_models = []
         for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
             feedback_message_models.append(
@@ -1688,6 +1692,8 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                     text='Some text'
                 )
             )
+            feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
+                feedback_message_models)
         datastore_services.put_multi(
             feedback_thread_models + feedback_message_models)
 

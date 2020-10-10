@@ -2201,6 +2201,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self):
         model = user_models.UserStatsModel.get_or_create(self.owner_id)
         model.schema_version = 0
+        model.update_timestamps()
         model.put()
 
         self.assertIsNone(user_services.get_user_impact_score(self.owner_id))

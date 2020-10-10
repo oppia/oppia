@@ -117,6 +117,7 @@ def create_new_question_skill_link(
 
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
         question_id, skill_id, skill_difficulty)
+    question_skill_link_model.update_timestamps()
     question_skill_link_model.put()
 
     if skill_id not in question.linked_skill_ids:
@@ -148,6 +149,7 @@ def update_question_skill_link_difficulty(
     if question_skill_link_model is None:
         raise Exception('The given question and skill are not linked.')
     question_skill_link_model.skill_difficulty = new_difficulty
+    question_skill_link_model.update_timestamps()
     question_skill_link_model.put()
 
 

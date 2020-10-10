@@ -215,6 +215,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
             job_models.append(training_job_instance)
             job_ids.append(instance_id)
+        cls.update_timestamps_multi(job_models)
         cls.put_multi(job_models)
         return job_ids
 

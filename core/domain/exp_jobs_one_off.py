@@ -98,6 +98,7 @@ class RegenerateStringPropertyIndexOneOffJob(
             # Change the method resolution order of model to use BaseModel's
             # implementation of `put`.
             model = super(base_models.VersionedModel, model)
+        model.update_timestamps()
         model.put()
         yield (model_kind, 1)
 
@@ -664,6 +665,7 @@ class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             del exp_summary_model._properties['translator_ids']  # pylint: disable=protected-access
             if 'translator_ids' in exp_summary_model._values:  # pylint: disable=protected-access
                 del exp_summary_model._values['translator_ids']  # pylint: disable=protected-access
+            exp_summary_model.update_timestamps()
             exp_summary_model.put()
             yield ('SUCCESS_REMOVED - ExpSummaryModel', exp_summary_model.id)
         else:

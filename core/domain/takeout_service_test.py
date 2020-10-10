@@ -898,6 +898,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             summary=self.THREAD_SUMMARY,
             message_count=self.THREAD_MESSAGE_COUNT
         )
+        feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
         expected_stats_data = {

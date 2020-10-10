@@ -120,6 +120,8 @@ def _save_multi_exploration_opportunity_summary(
 
         exploration_opportunity_summary_model_list.append(model)
 
+    opportunity_models.ExplorationOpportunitySummaryModel.update_timestamps_multi(
+        exploration_opportunity_summary_model_list)
     opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
         exploration_opportunity_summary_model_list)
 

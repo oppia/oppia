@@ -176,6 +176,7 @@ class SentEmailModel(base_models.BaseModel):
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
 
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
     def _pre_put_hook(self):
@@ -369,6 +370,7 @@ class BulkEmailModel(base_models.BaseModel):
             id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
 
@@ -487,6 +489,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id=thread_id,
             reply_to_id=reply_to_id)
 
+        feedback_email_reply_model_instance.update_timestamps()
         feedback_email_reply_model_instance.put()
         return feedback_email_reply_model_instance
 

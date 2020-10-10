@@ -93,6 +93,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         all_models = [m for m in base_models.BaseModel.get_all()]
         self.assertEqual(len(all_models), 0)
 
+        model.update_timestamps()
         model.put()
         all_models = [m for m in base_models.BaseModel.get_all()]
         self.assertEqual(len(all_models), 1)
@@ -115,6 +116,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(model.last_updated)
 
         # Field last_updated will get updated anyway because it is None.
+        model.update_timestamps()
         model.put()
         model_id = model.id
         self.assertIsNotNone(
@@ -125,6 +127,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
+        model.update_timestamps()
         model.put()
         self.assertEqual(
             base_models.BaseModel.get_by_id(model_id).last_updated,
@@ -132,6 +135,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
+        model.update_timestamps()
         model.put()
         self.assertNotEqual(
             base_models.BaseModel.get_by_id(model_id).last_updated,
@@ -196,6 +200,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
         models_3 = base_models.BaseModel.get_multi(model_ids)
+        base_models.BaseModel.update_timestamps_multi(models_3)
         base_models.BaseModel.put_multi(models_3)
         for model_id, last_updated in python_utils.ZIP(
                 model_ids, last_updated_values):
@@ -248,8 +253,11 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model3 = base_models.BaseModel()
         model2.deleted = True
 
+        model1.update_timestamps()
         model1.put()
+        model2.update_timestamps()
         model2.put()
+        model3.update_timestamps()
         model3.put()
 
         model1_id = model1.id
@@ -269,8 +277,11 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model3 = base_models.BaseModel()
         model2.deleted = True
 
+        model1.update_timestamps()
         model1.put()
+        model2.update_timestamps()
         model2.put()
+        model3.update_timestamps()
         model3.put()
 
         model1_id = model1.id
@@ -342,6 +353,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             commit_cmds_user_ids=[
                 'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
             content_user_ids=['content_user_1_id', 'content_user_2_id'])
+        model1.update_timestamps()
         model1.put()
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
@@ -365,12 +377,14 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
     def test_get_version_string(self):
         model1 = base_models.BaseSnapshotMetadataModel(
             id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.update_timestamps()
         model1.put()
         self.assertEqual(model1.get_version_string(), '1')
 
     def test_get_unversioned_instance_id(self):
         model1 = base_models.BaseSnapshotMetadataModel(
             id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.update_timestamps()
         model1.put()
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
 
@@ -384,10 +398,12 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         version_model = TestVersionedModel(id='version_model')
         model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
             'model_id-1', 'committer_id', 'create', None, None)
+        model1.update_timestamps()
         model1.put()
         model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
             'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
             [{'cmd': 'some_command'}, {'cmd2': 'another_command'}])
+        model2.update_timestamps()
         model2.put()
         user_data = (
             version_model.SNAPSHOT_METADATA_CLASS.export_data('committer_id'))
@@ -408,11 +424,13 @@ class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
 
     def test_get_version_string(self):
         model1 = base_models.BaseSnapshotContentModel(id='model_id-1')
+        model1.update_timestamps()
         model1.put()
         self.assertEqual(model1.get_version_string(), '1')
 
     def test_get_unversioned_instance_id(self):
         model1 = base_models.BaseSnapshotContentModel(id='model_id-1')
+        model1.update_timestamps()
         model1.put()
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
 
@@ -444,6 +462,7 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             commit_message='New commit created.', version=1,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
+        model1.update_timestamps()
         model1.put()
 
         test_model = TestCommitLogEntryModel.get_commit('id', 1)
@@ -468,7 +487,9 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             commit_message='New commit created.', version=2,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
+        model1.update_timestamps()
         model1.put()
+        model2.update_timestamps()
         model2.put()
 
         test_models = TestCommitLogEntryModel.get_all_commits(2, None)
@@ -526,6 +547,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             NotImplementedError,
             r'The put\(\) method is missing from the '
             r'derived class. It should be implemented in the derived class.'):
+            model1.update_timestamps()
             model1.put()
 
     def test_commit_with_invalid_change_list_raises_error(self):

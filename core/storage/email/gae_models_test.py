@@ -241,17 +241,20 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
             reply_to_id='reply_id'
         )
 
+        email_reply_model.update_timestamps()
         email_reply_model.put()
 
         last_updated = email_reply_model.last_updated
 
         # If we do not wish to update the last_updated time, we should set
         # the update_last_updated_time argument to False in the put function.
+        email_reply_model.update_timestamps()
         email_reply_model.put()
         self.assertEqual(email_reply_model.last_updated, last_updated)
 
         # If we do wish to change it however, we can simply use the put function
         # as the default value of update_last_updated_time is True.
+        email_reply_model.update_timestamps()
         email_reply_model.put()
         self.assertNotEqual(email_reply_model.last_updated, last_updated)
 
@@ -270,6 +273,7 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
     def test_get_object(self):
         actual_model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id', 'exploration.exp_id.thread_id')
+        actual_model.update_timestamps()
         actual_model.put()
         expected_model = email_models.GeneralFeedbackEmailReplyToIdModel(
             id='user_id.exploration.exp_id.thread_id',
@@ -287,9 +291,11 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
     def test_get_multi_by_user_ids(self):
         actual_model1 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id_1', 'exploration.exp_id.thread_id')
+        actual_model1.update_timestamps()
         actual_model1.put()
         actual_model2 = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user_id_2', 'exploration.exp_id.thread_id')
+        actual_model2.update_timestamps()
         actual_model2.put()
 
         expected_model_1 = email_models.GeneralFeedbackEmailReplyToIdModel(
@@ -322,6 +328,7 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
         # Test Exception for GeneralFeedbackEmailReplyToIdModel.
         model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
             'user1', 'exploration.exp1.1')
+        model.update_timestamps()
         model.put()
 
         with self.assertRaisesRegexp(
@@ -345,6 +352,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             subject='email_subject',
             html_body='email_html_body',
             sent_datetime=datetime.datetime.utcnow())
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
         email_hash1 = email_model_instance.email_hash
@@ -362,6 +370,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             subject='email_subject',
             html_body='email_html_body',
             sent_datetime=datetime.datetime.utcnow())
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
         email_model_instance2 = email_models.SentEmailModel(
@@ -374,6 +383,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             subject='email_subject',
             html_body='email_html_body2',
             sent_datetime=datetime.datetime.utcnow())
+        email_model_instance2.update_timestamps()
         email_model_instance2.put()
 
         email_hash1 = email_model_instance.email_hash
@@ -390,6 +400,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             subject='email_subject',
             html_body='email_html_body',
             sent_datetime=datetime.datetime.utcnow())
+        email_model_instance2.update_timestamps()
         email_model_instance2.put()
 
         email_hash2 = email_model_instance2.email_hash
@@ -405,6 +416,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             subject='email_subject2',
             html_body='email_html_body',
             sent_datetime=datetime.datetime.utcnow())
+        email_model_instance2.update_timestamps()
         email_model_instance2.put()
 
         email_hash2 = email_model_instance2.email_hash
@@ -420,6 +432,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             subject='email_subject2',
             html_body='email_html_body2',
             sent_datetime=datetime.datetime.utcnow())
+        email_model_instance2.update_timestamps()
         email_model_instance2.put()
 
         email_hash2 = email_model_instance2.email_hash

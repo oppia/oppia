@@ -291,6 +291,7 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_FAILED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = error
+        model.update_timestamps()
         model.put()
 
         cls._post_failure_hook(job_id)
@@ -317,6 +318,7 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_CANCELED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = cancel_message
+        model.update_timestamps()
         model.put()
 
         cls._post_cancel_hook(job_id, cancel_message)
@@ -1288,6 +1290,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             if cc_model is None:
                 cc_model = job_models.ContinuousComputationModel(
                     id=cls.__name__)
+                cc_model.update_timestamps()
                 cc_model.put()
 
             return cc_model.active_realtime_layer_index
@@ -1394,6 +1397,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
                 cc_model.status_code = (
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+                cc_model.update_timestamps()
                 cc_model.put()
 
             return cc_model.status_code

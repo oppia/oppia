@@ -633,6 +633,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'first_hit_count_v2'] = 2
         exploration_stats_model.state_stats_mapping['End'][
             'useful_feedback_count_v2'] = 4
+        exploration_stats_model.update_timestamps()
         exploration_stats_model.put()
 
         # Test deletion, addition and rename.
