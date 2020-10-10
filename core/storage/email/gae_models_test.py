@@ -463,16 +463,20 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
         user_two_fake_hash_one = self.swap(
             utils, 'convert_to_hash', user_two_fake_hash_lambda_one)
         with user_two_fake_hash_one:
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_2, self.THREAD_ID_1).put()
+            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_2, self.THREAD_ID_1)
+            model.update_timestamps()
+            model.put()
 
         user_two_fake_hash_lambda_two = (
             lambda rand_int, reply_to_id_length: self.USER_2_REPLY_TO_ID_2)
         user_two_fake_hash_two = self.swap(
             utils, 'convert_to_hash', user_two_fake_hash_lambda_two)
         with user_two_fake_hash_two:
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_2, self.THREAD_ID_2).put()
+            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_2, self.THREAD_ID_2)
+            model.update_timestamps()
+            model.put()
 
     def test_export_data_on_user_with_data(self):
         """Verify proper export data output on a normal user case."""
