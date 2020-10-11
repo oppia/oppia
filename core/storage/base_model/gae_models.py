@@ -88,8 +88,7 @@ class BaseModel(datastore_services.Model):
         """Operations to perform just before the model is `put` into storage.
 
         Raises:
-            Exception. The current instance has not changed the last_updated
-            value.
+            Exception. The model has not refreshed the value of last_updated.
         """
         super(BaseModel, self)._pre_put_hook()
         self._update_empty_timestamps()
