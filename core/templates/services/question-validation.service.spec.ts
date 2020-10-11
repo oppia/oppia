@@ -19,7 +19,8 @@
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service';
 import { QuestionObjectFactory } from
   'domain/question/QuestionObjectFactory.ts';
 import { QuestionValidationService } from

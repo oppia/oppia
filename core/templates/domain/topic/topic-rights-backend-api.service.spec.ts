@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { TopicRightsBackendApiService } from
   'domain/topic/topic-rights-backend-api.service';
-import { TopicRights } from 'domain/topic/topic-rights.model.ts'
+import { TopicRights } from 'domain/topic/topic-rights.model.ts';
 
 describe('Topic rights backend API service', () => {
   let topicRightsBackendApiService: TopicRightsBackendApiService = null;

@@ -64,7 +64,7 @@ export class Question {
     return this._stateData;
   }
 
-  setStateData(newStateData): void {
+  setStateData(newStateData: State): void {
     this._stateData = angular.copy(newStateData);
   }
 
@@ -72,7 +72,7 @@ export class Question {
     return this._languageCode;
   }
 
-  setLanguageCode(languageCode): void {
+  setLanguageCode(languageCode: string): void {
     this._languageCode = languageCode;
   }
 
@@ -84,7 +84,7 @@ export class Question {
     return this._linkedSkillIds;
   }
 
-  setLinkedSkillIds(linkedSkillIds): void {
+  setLinkedSkillIds(linkedSkillIds: string[]): void {
     this._linkedSkillIds = linkedSkillIds;
   }
 
@@ -92,7 +92,8 @@ export class Question {
     return this._inapplicableSkillMisconceptionIds;
   }
 
-  setInapplicableSkillMisconceptionIds(inapplicableSkillMisconceptionIds): void {
+  setInapplicableSkillMisconceptionIds(
+      inapplicableSkillMisconceptionIds: string[]): void {
     this._inapplicableSkillMisconceptionIds = (
       inapplicableSkillMisconceptionIds);
   }
@@ -124,7 +125,7 @@ export class Question {
     return null;
   }
 
-  getUnaddressedMisconceptionNames(misconceptionsBySkill): string[] {
+  getUnaddressedMisconceptionNames(misconceptionsBySkill: {}): string[] {
     var answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds = {};
     for (var i = 0; i < answerGroups.length; i++) {
@@ -182,13 +183,13 @@ export class QuestionObjectFactory {
   constructor(
     private stateObject: StateObjectFactory) {}
 
-  createDefaultQuestion(skillIds: string[]) {
+  createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
       null, this.stateObject.createDefaultState(null),
       constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 
-  createFromBackendDict(questionBackendDict: QuestionBackendDict) {
+  createFromBackendDict(questionBackendDict: QuestionBackendDict): Question {
     return new Question(
       questionBackendDict.id,
       this.stateObject.createFromBackendDict(

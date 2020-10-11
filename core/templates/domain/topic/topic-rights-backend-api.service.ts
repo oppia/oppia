@@ -169,7 +169,7 @@ export class TopicRightsBackendApiService {
      * specified topic ID with a new topic rights object.
      */
     cacheTopicRights(
-    	topicId: string, topicRights: TopicRightsBackendDict): void {
+        topicId: string, topicRights: TopicRightsBackendDict): void {
       let topicRightsObject = TopicRights.createFromBackendDict(topicRights);
       this._topicRightsCache[topicId] = cloneDeep(topicRightsObject);
     }
