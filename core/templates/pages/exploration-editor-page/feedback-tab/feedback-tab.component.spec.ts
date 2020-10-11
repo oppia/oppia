@@ -43,7 +43,7 @@ describe('Feedback Tab Component', function() {
   var explorationStatesService = null;
   var suggestionModalForExplorationEditorService = null;
   var suggestionThreadObjectFactory = null;
-  var threadDataService = null;
+  var threadDataBackendApiService = null;
   var userService = null;
 
   importAllAngularServices();
@@ -74,13 +74,14 @@ describe('Feedback Tab Component', function() {
     explorationStatesService = $injector.get('ExplorationStatesService');
     suggestionModalForExplorationEditorService = $injector.get(
       'SuggestionModalForExplorationEditorService');
-    threadDataService = $injector.get('ThreadDataService');
+    threadDataBackendApiService = (
+      $injector.get('ThreadDataBackendApiService'));
     userService = $injector.get('UserService');
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));
-    spyOn(threadDataService, 'getThreadsAsync').and.returnValue(
+    spyOn(threadDataBackendApiService, 'getThreadsAsync').and.returnValue(
       $q.resolve({}));
 
     $scope = $rootScope.$new();
@@ -122,8 +123,9 @@ describe('Feedback Tab Component', function() {
       },
       last_updated_msecs: 0
     });
-    spyOn(threadDataService, 'getThread').and.returnValue(thread);
-    spyOn(threadDataService, 'getMessagesAsync').and.returnValue($q.resolve());
+    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
+    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
+      $q.resolve());
 
     ctrl.setActiveThread('1');
     $scope.$apply();
@@ -159,7 +161,7 @@ describe('Feedback Tab Component', function() {
 
   it('should add new message to a thread and then go back to feedback' +
     ' threads list', function() {
-    spyOn(threadDataService, 'getThread').and.returnValue(
+    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
       suggestionThreadObjectFactory.createFromBackendDicts({
         status: 'Open',
         subject: '',
@@ -182,13 +184,13 @@ describe('Feedback Tab Component', function() {
         },
         last_updated_msecs: 0
       }));
-    spyOn(threadDataService, 'getMessagesAsync').and.returnValue(
+    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
       $q.resolve());
 
     ctrl.setActiveThread('1');
     $scope.$apply();
 
-    spyOn(threadDataService, 'addNewMessageAsync').and.returnValue(
+    spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
       $q.resolve());
     ctrl.addNewMessage('1', 'Text', 'Open');
 
@@ -202,12 +204,12 @@ describe('Feedback Tab Component', function() {
     ctrl.onBackButtonClicked();
     $scope.$apply();
 
-    expect(threadDataService.getThread).toHaveBeenCalledWith('1');
+    expect(threadDataBackendApiService.getThread).toHaveBeenCalledWith('1');
   });
 
   it('should use reject handler when trying to add a message in a thread fails',
     function() {
-      spyOn(threadDataService, 'getThread').and.returnValue(
+      spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
         suggestionThreadObjectFactory.createFromBackendDicts({
           status: 'Open',
           subject: '',
@@ -230,12 +232,12 @@ describe('Feedback Tab Component', function() {
           },
           last_updated_msecs: 0
         }));
-      spyOn(threadDataService, 'getMessagesAsync').and.returnValue(
+      spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
         $q.resolve());
       ctrl.setActiveThread('1');
       $scope.$apply();
 
-      spyOn(threadDataService, 'addNewMessageAsync').and.returnValue(
+      spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
         $q.reject());
       ctrl.addNewMessage('1', 'Text', 'Open');
 
@@ -269,8 +271,9 @@ describe('Feedback Tab Component', function() {
       },
       last_updated_msecs: 0
     });
-    spyOn(threadDataService, 'getThread').and.returnValue(thread);
-    spyOn(threadDataService, 'getMessagesAsync').and.returnValue($q.resolve());
+    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
+    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
+      $q.resolve());
 
     ctrl.setActiveThread('1');
     $scope.$apply();
@@ -302,8 +305,9 @@ describe('Feedback Tab Component', function() {
       },
       last_updated_msecs: 0
     });
-    spyOn(threadDataService, 'getThread').and.returnValue(thread);
-    spyOn(threadDataService, 'getMessagesAsync').and.returnValue($q.resolve());
+    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
+    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
+      $q.resolve());
 
     ctrl.setActiveThread('1');
     $scope.$apply();
@@ -322,7 +326,7 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should open show suggestion modal when active thread exists', function() {
-    var getThreadSpy = spyOn(threadDataService, 'getThread');
+    var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
     getThreadSpy.and.returnValue(
       suggestionThreadObjectFactory.createFromBackendDicts({
         status: 'Open',
@@ -348,7 +352,7 @@ describe('Feedback Tab Component', function() {
         },
         last_updated_msecs: 0
       }));
-    spyOn(threadDataService, 'getMessagesAsync').and.returnValue(
+    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
       $q.resolve());
     ctrl.setActiveThread('1');
     $scope.$apply();
@@ -396,8 +400,8 @@ describe('Feedback Tab Component', function() {
   it('should create a new thread when closing create new thread modal',
     function() {
       spyOn(alertsService, 'addSuccessMessage').and.callThrough();
-      spyOn(threadDataService, 'createNewThreadAsync').and.returnValue(
-        $q.resolve());
+      spyOn(threadDataBackendApiService, 'createNewThreadAsync').and.
+        returnValue($q.resolve());
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
           newThreadSubject: 'New subject',
@@ -408,7 +412,7 @@ describe('Feedback Tab Component', function() {
       $scope.$apply();
       $scope.$apply();
 
-      expect(threadDataService.createNewThreadAsync)
+      expect(threadDataBackendApiService.createNewThreadAsync)
         .toHaveBeenCalledWith('New subject', 'New text');
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Feedback thread created.');
@@ -418,14 +422,15 @@ describe('Feedback Tab Component', function() {
 
   it('should not create a new thread when dismissing create new thread modal',
     function() {
-      spyOn(threadDataService, 'createNewThreadAsync');
+      spyOn(threadDataBackendApiService, 'createNewThreadAsync');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
       ctrl.showCreateThreadModal();
       $scope.$apply();
 
-      expect(threadDataService.createNewThreadAsync).not.toHaveBeenCalled();
+      expect(threadDataBackendApiService.createNewThreadAsync).not
+        .toHaveBeenCalled();
     });
 
   it('should get css classes based on status', function() {

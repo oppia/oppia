@@ -22,7 +22,7 @@ import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { ThreadMessage, ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
+import { ThreadMessage, ThreadMessageBackendDict, ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
 import { SuggestionBackendDict } from 'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThread, SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -35,15 +35,32 @@ import { forkJoin } from 'rxjs';
 
 type AnyThread = FeedbackThread | SuggestionThread;
 
+interface NumberOfOpenThreads {
+  "num_open_threads": number;
+}
+
 interface SuggestionAndFeedbackThreads {
   feedbackThreads: FeedbackThread[];
   suggestionThreads: SuggestionThread[];
 }
 
+interface SuggestionData {
+  suggestions: SuggestionBackendDict[];
+}
+
+interface ThreadData {
+  'feedback_thread_dicts': FeedbackThreadBackendDict[];
+  'suggestion_thread_dicts': FeedbackThreadBackendDict[];
+}
+
+interface ThreadMessages {
+  'messages': ThreadMessageBackendDict[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
-export class ThreadDataService {
+export class ThreadDataBackendApiService {
   // Container for all of the threads related to this exploration.
   threadsById: Map<string, AnyThread> = new Map<string, AnyThread>();
 
@@ -143,7 +160,7 @@ export class ThreadDataService {
 
     return forkJoin([suggestionsPromise, threadsPromise])
       .toPromise()
-      .then((response: any) => {
+      .then((response: [SuggestionData, ThreadData]) => {
         let [suggestionData, threadData] = response;
         let suggestionBackendDicts: SuggestionBackendDict[] = (
           suggestionData.suggestions);
@@ -162,7 +179,7 @@ export class ThreadDataService {
           suggestionThreads: suggestionThreadBackendDicts.map(
             dict => this.setSuggestionThreadFromBackendDicts(
               dict, suggestionBackendDictsByThreadId.get(
-                !dict || dict.thread_id)))
+                (dict === null ? null : dict.thread_id))))
         };
       },
       () => Promise.reject('Error on retrieving feedback threads.'));
@@ -176,7 +193,7 @@ export class ThreadDataService {
     // TODO(#8016): Move this http call to a backend-api.service with unit
     // tests.
     return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
-      .then((response: any) => {
+      .then((response: ThreadMessages) => {
         let threadMessageBackendDicts = response.messages;
         thread.setMessages(threadMessageBackendDicts.map(
           m => this.threadMessageObjectFactory.createFromBackendDict(m)));
@@ -188,7 +205,7 @@ export class ThreadDataService {
     // TODO(#8016): Move this http call to a backend-api.service with unit
     // tests.
     return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
-      .then((response: any) => {
+      .then((response: NumberOfOpenThreads) => {
         return this.openThreadsCount = response.num_open_threads;
       });
   }
@@ -243,7 +260,7 @@ export class ThreadDataService {
       updated_status: updatedStatus,
       updated_subject: null,
       text: newMessage
-    }).toPromise().then((response: any) => {
+    }).toPromise().then((response: ThreadMessages) => {
       if (updatedStatus) {
         this.openThreadsCount += (
           (newStatus === ExplorationEditorPageConstants.STATUS_OPEN) ? 1 : -1);
@@ -285,4 +302,5 @@ export class ThreadDataService {
 }
 
 angular.module('oppia').factory(
-  'ThreadDataService', downgradeInjectable(ThreadDataService));
+  'ThreadDataBackendApiService',
+  downgradeInjectable(ThreadDataBackendApiService));

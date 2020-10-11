@@ -24,7 +24,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
@@ -48,13 +49,13 @@ angular.module('oppia').component('feedbackTab', {
     '$q', '$uibModal', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
     'LoaderService', 'SuggestionModalForExplorationEditorService',
-    'ThreadDataService', 'ThreadStatusDisplayService',
+    'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     function(
         $q, $uibModal, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
         LoaderService, SuggestionModalForExplorationEditorService,
-        ThreadDataService, ThreadStatusDisplayService,
+        ThreadDataBackendApiService, ThreadStatusDisplayService,
         UrlInterpolationService, UserService) {
       var ctrl = this;
 
@@ -73,13 +74,14 @@ angular.module('oppia').component('feedbackTab', {
       ctrl.fetchUpdatedThreads = function() {
         let activeThreadId =
           ctrl.activeThread && ctrl.activeThread.threadId;
-        return ThreadDataService.getThreadsAsync().then(data => {
+        return ThreadDataBackendApiService.getThreadsAsync().then(data => {
           ctrl.threadData = data;
           ctrl.threadIsStale = false;
           if (activeThreadId !== null) {
             // Fetching threads invalidates old thread domain objects, so we
             // need to update our reference to the active thread afterwards.
-            ctrl.activeThread = ThreadDataService.getThread(activeThreadId);
+            ctrl.activeThread = ThreadDataBackendApiService.getThread(
+              activeThreadId);
           }
         });
       };
@@ -98,8 +100,9 @@ angular.module('oppia').component('feedbackTab', {
             'create-feedback-thread-modal.template.html'),
           backdrop: true,
           controller: 'CreateFeedbackThreadModalController'
-        }).result.then(result => ThreadDataService.createNewThreadAsync(
-          result.newThreadSubject, result.newThreadText)
+        }).result.then(
+          result => ThreadDataBackendApiService.createNewThreadAsync(
+            result.newThreadSubject, result.newThreadText)
         ).then(() => {
           ctrl.clearActiveThread();
           AlertsService.addSuccessMessage('Feedback thread created.');
@@ -165,30 +168,30 @@ angular.module('oppia').component('feedbackTab', {
         }
         ctrl.threadIsStale = true;
         ctrl.messageSendingInProgress = true;
-        let thread = ThreadDataService.getThread(threadId);
+        let thread = ThreadDataBackendApiService.getThread(threadId);
         if (thread === null) {
           throw new Error(
             'Trying to add message to a non-existent thread.');
         }
-        ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
-          .then((messages) => {
-            _resetTmpMessageFields();
-            ctrl.activeThread.messages = messages;
-            ctrl.messageSendingInProgress = false;
-          },
-          () => {
-            ctrl.messageSendingInProgress = false;
-          });
+        ThreadDataBackendApiService.addNewMessageAsync(
+          thread, tmpText, tmpStatus).then((messages) => {
+          _resetTmpMessageFields();
+          ctrl.activeThread.messages = messages;
+          ctrl.messageSendingInProgress = false;
+        },
+        () => {
+          ctrl.messageSendingInProgress = false;
+        });
       };
 
       ctrl.setActiveThread = function(threadId) {
-        let thread = ThreadDataService.getThread(threadId);
+        let thread = ThreadDataBackendApiService.getThread(threadId);
         if (thread === null) {
           throw new Error('Trying to display a non-existent thread');
         }
-        ThreadDataService.getMessagesAsync(thread).then(() => {
+        ThreadDataBackendApiService.getMessagesAsync(thread).then(() => {
           ctrl.activeThread = thread;
-          ThreadDataService.markThreadAsSeenAsync(ctrl.activeThread);
+          ThreadDataBackendApiService.markThreadAsSeenAsync(ctrl.activeThread);
           ctrl.tmpMessage.status = ctrl.activeThread.status;
         });
       };
