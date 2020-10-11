@@ -21,6 +21,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { forkJoin } from 'rxjs';
+
 import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { ThreadMessage, ThreadMessageBackendDict, ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
 import { SuggestionBackendDict } from 'domain/suggestion/SuggestionObjectFactory';
@@ -31,9 +33,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { SuggestionsService } from 'services/suggestions.service';
 
-import { forkJoin } from 'rxjs';
-
-type AnyThread = FeedbackThread | SuggestionThread;
+type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
 
 interface NumberOfOpenThreads {
   'num_open_threads': number;
@@ -62,7 +62,8 @@ interface ThreadMessages {
 })
 export class ThreadDataBackendApiService {
   // Container for all of the threads related to this exploration.
-  threadsById: Map<string, AnyThread> = new Map<string, AnyThread>();
+  threadsById: Map<string, SuggestionAndFeedbackThread> = (
+    new Map<string, SuggestionAndFeedbackThread>());
 
   // Cached number of open threads requiring action.
   openThreadsCount: number = 0;
@@ -141,24 +142,21 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
-  getThread(threadId: string): AnyThread {
+  getThread(threadId: string): SuggestionAndFeedbackThread {
     return this.threadsById.get(threadId) || null;
   }
 
   getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
-    // TODO(#8016): Move this http call to a backend-api.service with unit
-    // tests.
-    let suggestionsPromise = this.http.get(this.getSuggestionListHandlerUrl(), {
+    let suggestions$ = this.http.get(this.getSuggestionListHandlerUrl(), {
       params: {
         target_type: 'exploration',
         target_id: this.contextService.getExplorationId()
       }
     });
-    // TODO(#8016): Move this http call to a backend-api.service with unit
-    // tests.
-    let threadsPromise = this.http.get(this.getThreadListHandlerUrl());
 
-    return forkJoin([suggestionsPromise, threadsPromise])
+    let threads$ = this.http.get(this.getThreadListHandlerUrl());
+
+    return forkJoin([suggestions$, threads$])
       .toPromise()
       .then((response: [SuggestionData, ThreadData]) => {
         let [suggestionData, threadData] = response;
@@ -185,13 +183,13 @@ export class ThreadDataBackendApiService {
       () => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  getMessagesAsync(thread: AnyThread): Promise<ThreadMessage[]> {
+  getMessagesAsync(thread: SuggestionAndFeedbackThread):
+   Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
-    // TODO(#8016): Move this http call to a backend-api.service with unit
-    // tests.
+
     return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
       .then((response: ThreadMessages) => {
         let threadMessageBackendDicts = response.messages;
@@ -202,8 +200,6 @@ export class ThreadDataBackendApiService {
   }
 
   getOpenThreadsCountAsync(): Promise<number> {
-    // TODO(#8016): Move this http call to a backend-api.service with unit
-    // tests.
     return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
       .then((response: NumberOfOpenThreads) => {
         return this.openThreadsCount = response.num_open_threads;
@@ -216,8 +212,6 @@ export class ThreadDataBackendApiService {
 
   createNewThreadAsync(newSubject: string, newText: string):
     Promise<void | SuggestionAndFeedbackThreads> {
-    // TODO(#8016): Move this http call to a backend-api.service with unit
-    // tests.
     return this.http.post(this.getThreadListHandlerUrl(), {
       state_name: null,
       subject: newSubject,
@@ -232,21 +226,19 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  markThreadAsSeenAsync(thread: AnyThread): Promise<void> {
+  markThreadAsSeenAsync(thread: SuggestionAndFeedbackThread): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
 
-    // TODO(#8016): Move this http call to a backend-api.service with unit
-    // tests.
     return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
       thread_id: threadId
     }).toPromise().then();
   }
 
   addNewMessageAsync(
-      thread: AnyThread, newMessage: string,
+      thread: SuggestionAndFeedbackThread, newMessage: string,
       newStatus: string): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -254,8 +246,7 @@ export class ThreadDataBackendApiService {
     let threadId = thread.threadId;
     let oldStatus = thread.status;
     let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
-    // TODO(#8016): Move this http call to a backend-api.service with unit
-    // tests.
+
     return this.http.post(this.getThreadHandlerUrl(threadId), {
       updated_status: updatedStatus,
       updated_subject: null,
@@ -274,14 +265,13 @@ export class ThreadDataBackendApiService {
   }
 
   resolveSuggestionAsync(
-      thread: AnyThread, action: string, commitMsg: string,
+      thread: SuggestionAndFeedbackThread, action: string, commitMsg: string,
       reviewMsg: string): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
-    // TODO(#8016): Move this http call to a backend-api.service with unit
-    // tests.
+
     return this.http.put(this.getSuggestionActionHandlerUrl(threadId), {
       action: action,
       review_message: reviewMsg,
@@ -294,8 +284,7 @@ export class ThreadDataBackendApiService {
          ExplorationEditorPageConstants.STATUS_FIXED :
           ExplorationEditorPageConstants.STATUS_IGNORED);
       this.openThreadsCount -= 1;
-      // TODO(#8678): Update the cache with the message
-      // instead of fetching the messages every time from the backend.
+
       return this.getMessagesAsync(thread);
     });
   }
