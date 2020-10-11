@@ -461,5 +461,5 @@ CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
     (
         'Enable sending Contributor Dashboard reviewers email notifications.'
-        'The default value is true.'
-    ), True)
+        'The default value is false.'
+    ), False)

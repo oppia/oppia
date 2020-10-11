@@ -2069,9 +2069,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     expected_language_description = 'English'
     expected_default_question = 'What is the meaning of life?'
     expected_default_translation = 'Sample translation'
-    default_username = (
-        email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-            'default_username'])
     mocked_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
     AUTHOR_USERNAME = 'author'
     AUTHOR_EMAIL = 'author@example.com'
@@ -2175,10 +2172,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         """Creates the expected question suggestion information html for the
         email with the given review wait time and expected question content.
         """
-        return email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-            'listing_suggestion_template'][
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] % (
-                    '', review_wait_time, expected_question_content)
+        return (
+            '<li>The following %squestion suggestion was submitted for review '
+            '%s ago:<br>%s</li>' % (
+                '', review_wait_time, expected_question_content))
 
     def _create_expected_translation_suggestion_html_for_email(
             self, expected_language_description, expected_translation_content,
@@ -2187,11 +2184,11 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         email with the given review wait time, expected language description and
         expected translation content.
         """
-        return email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-            'listing_suggestion_template'][
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] % (
-                    expected_language_description, review_wait_time,
-                    expected_translation_content)
+        return (
+            '<li>The following %s translation suggestion was submitted for '
+            'review %s ago:<br>%s</li>' % (
+                expected_language_description, review_wait_time,
+                expected_translation_content))
 
     def _assert_created_sent_email_models_are_correct(
             self, expected_email_html_bodies, reviewer_ids, reviewer_emails):
@@ -2222,6 +2219,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
+    def _log_error_for_tests(self, error_message):
+        """Appends the error message to the logged errors list."""
+        self.logged_errors.append(error_message)
+
     def setUp(self):
         super(NotifyContributionDashboardReviewersEmailTests, self).setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
@@ -2244,6 +2245,11 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.cannot_send_reviewer_emails_ctx = self.swap(
             config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
             False)
+        self.logged_errors = []
+        self.log_new_error_counter = test_utils.CallCounter(
+            self._log_error_for_tests)
+        self.log_new_error_ctx = self.swap(
+            email_manager, 'log_new_error', self.log_new_error_counter)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
@@ -2262,59 +2268,81 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
 
-        with self.can_send_emails_ctx:
-            with self.cannot_send_reviewer_emails_ctx:
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[self.reviewable_suggestion_email_info]])
-                )
+        with self.cannot_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.log_new_error_ctx:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[self.reviewable_suggestion_email_info]])
+                    )
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0], 'This app cannot send emails to users.')
 
     def test_email_not_sent_if_reviewer_notifications_is_not_enabled(self):
 
         with self.can_send_emails_ctx:
             with self.cannot_send_reviewer_emails_ctx:
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id],
-                        [[self.reviewable_suggestion_email_info]])
-                )
+                with self.log_new_error_ctx:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[self.reviewable_suggestion_email_info]])
+                    )
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0],
+            'Contributor Dashboard reviewer emails must be enabled on the '
+            'config page in order to send reviewers the emails.')
 
     def test_email_not_sent_if_reviewer_does_not_exist(self):
 
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        ['invalid_reviewer_id'],
-                        [[self.reviewable_suggestion_email_info]])
-                )
+                with self.log_new_error_ctx:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            ['invalid_reviewer_id'],
+                            [[self.reviewable_suggestion_email_info]])
+                    )
 
         messages = self._get_sent_email_messages('invalid_reviewer_id')
         self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0],
+            'There was no email for the given reviewer id: invalid_reviewer_id.'
+        )
 
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
             self):
 
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
-                (
-                    email_manager
-                    .send_mail_to_notify_contributor_dashboard_reviewers(
-                        [self.reviewer_1_id], [[]])
-                )
+                with self.log_new_error_ctx:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id], [[]])
+                    )
 
         messages = self._get_sent_email_messages(self.reviewer_1_id)
         self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0],
+            'There were no suggestions to recommend to the reviewer with user '
+            'id: %s.' % self.reviewer_1_id)
 
     def test_email_sent_to_question_reviewer_with_review_wait_time_a_day(
             self):
