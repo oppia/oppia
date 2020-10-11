@@ -207,7 +207,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
       req.flush(backendIssues);
       flushMicrotasks();
 
-      // Function resolveIssue does not return a value.
+      // Function resolveIssueAsync does not return a value.
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
