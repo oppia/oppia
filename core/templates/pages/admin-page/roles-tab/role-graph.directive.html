@@ -234,15 +234,18 @@
           <legend class="text-center">Remove Reviewer From Community</legend>
           <div class="d-xl-inline-flex form-group">
             <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
-            <div class="col-md-4 col-lg-4 col-sm-4 ml-auto">
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <input type="text"
                      id="label-target-form-reviewer-username"
                      class="form-control protractor-test-form-reviewer-username"
                      placeholder="Enter username"
                      ng-model="$ctrl.formData.removeContributionReviewer.username">
-            </div>
+            </div> 
+          </div>
+
+            <div class="d-xl-inline-flex form-group">
             <label for="label-target-form-remove-reviewer" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
-            <div class="col-md-4 ml-auto">
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select id="label-target-form-remove-reviewer" ng-model="$ctrl.formData.removeContributionReviewer.method" class="form-control">
                 <option value="<[$ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS]>">Remove all review rights</option>
                 <option value="<[$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS]>">Remove specific review rights</option>
