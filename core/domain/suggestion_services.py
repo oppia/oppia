@@ -624,7 +624,7 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def _get_plain_text_from_html_content_string(html_content_string):
     """Retrieves the plain text from the given html content string. RTE element
-    occurrences in the html are replaced by their corresponding rte name,
+    occurrences in the html are replaced by their corresponding rte tool name,
     capitalized in square brackets.
     eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
         Sample2 </p> will give as output: Sample1 [Math] Sample2.
@@ -640,7 +640,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
 
     def _replace_rte_tag(rte_tag):
         """Replaces all of the <oppia-noninteractive-**> tags with their
-        corresponding rte name in square brackets.
+        corresponding rte tool name in square brackets.
 
         Args:
             rte_tag: MatchObject. A matched object that contins the
@@ -649,23 +649,30 @@ def _get_plain_text_from_html_content_string(html_content_string):
         Returns:
             str. The string to replace the rte tags with.
         """
-        # Convert the MatchObject to a string.
+        # Retrieve the matched string from the MatchObject.
         rte_tag_string = rte_tag.group(0)
-        # Get the name of the rte tag.
+        # Get the name of the rte tag. The hyphen is there as an optional
+        # matching character to cover the case where the name of the rte tool
+        # is more than one word.
         rte_tag_name = re.search(
-            r'oppia-noninteractive-\w+', rte_tag_string)
-        # Convert the MatchObject to a string.
+            r'oppia-noninteractive-(\w|-)+', rte_tag_string)
+        # Retrieve the matched string from the MatchObject.
         rte_tag_name_string = rte_tag_name.group(0)
-        # Get the name of the rte.
-        rte_name_string = rte_tag_name_string.split('-')[2]
-        capitalized_rte_name_string = rte_name_string.capitalize()
-        formatted_rte_name_string = ' [%s] ' % capitalized_rte_name_string
-        return formatted_rte_name_string
+        # Get the name of the rte tool.
+        rte_tool_name_string = rte_tag_name_string.split('-')[2:]
+        # If the tool name is more than word, connect the words with spaces
+        # to create a single string.
+        rte_tool_name_string = ' '.join(rte_tool_name_string)
+        # Captialize each word in the string.
+        capitalized_rte_tool_name_string = rte_tool_name_string.title()
+        formatted_rte_tool_name_string = ' [%s] ' % (
+            capitalized_rte_tool_name_string)
+        return formatted_rte_tool_name_string
 
-    # Replace all the <oppia-noninteractive-**> tags with their rte names
+    # Replace all the <oppia-noninteractive-**> tags with their rte tool names
     # capitalized in square brackets.
     html_content_string_with_rte_tags_replaced = re.sub(
-        r'<(oppia-noninteractive\s*?)[^>]+>(.*?)</oppia-noninteractive.+?>',
+        r'<(oppia-noninteractive-.+?)[^>]+>(.*?)</oppia-noninteractive-.+?>',
         _replace_rte_tag, html_content_string)
     # Get rid of all of the other html tags.
     plain_text = html_cleaner.strip_html_tags(
