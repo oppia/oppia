@@ -31,7 +31,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-fdescribe('Full exploration editor', function() {
+describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -240,7 +240,7 @@ fdescribe('Full exploration editor', function() {
     await users.logout();
   });
 
-  fit('should handle multiple rules in an answer group and also disallow ' +
+  it('should handle multiple rules in an answer group and also disallow ' +
       'editing of a read-only exploration', async function() {
     await users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
     await users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
