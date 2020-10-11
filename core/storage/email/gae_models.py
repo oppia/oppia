@@ -26,10 +26,10 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
-
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class SentEmailModel(base_models.BaseModel):
@@ -43,42 +43,46 @@ class SentEmailModel(base_models.BaseModel):
     # user with a given intent within a given time period.
 
     # The user ID of the email recipient.
-    recipient_id = ndb.StringProperty(required=True, indexed=True)
+    recipient_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The email address of the recipient.
-    recipient_email = ndb.StringProperty(required=True)
+    recipient_email = datastore_services.StringProperty(required=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True, indexed=True)
-    # The email address used to send the notification.
-    sender_email = ndb.StringProperty(required=True)
+    sender_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The email address used to send the notification. This should be either
+    # the noreply address or the system address.
+    sender_email = datastore_services.StringProperty(required=True)
     # The intent of the email.
-    intent = ndb.StringProperty(required=True, indexed=True, choices=[
-        feconf.EMAIL_INTENT_SIGNUP,
-        feconf.EMAIL_INTENT_MARKETING,
-        feconf.EMAIL_INTENT_DAILY_BATCH,
-        feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION,
-        feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
-        feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
-        feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
-        feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
-        feconf.EMAIL_INTENT_DELETE_EXPLORATION,
-        feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
-        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
-        feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
-        feconf.EMAIL_INTENT_REMOVE_REVIEWER,
-        feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
-        feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
-        feconf.EMAIL_INTENT_ACCOUNT_DELETED,
-        feconf.BULK_EMAIL_INTENT_TEST
-    ])
+    intent = datastore_services.StringProperty(
+        required=True, indexed=True, choices=[
+            feconf.EMAIL_INTENT_SIGNUP,
+            feconf.EMAIL_INTENT_MARKETING,
+            feconf.EMAIL_INTENT_DAILY_BATCH,
+            feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION,
+            feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
+            feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
+            feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+            feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
+            feconf.EMAIL_INTENT_DELETE_EXPLORATION,
+            feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
+            feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
+            feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
+            feconf.EMAIL_INTENT_REMOVE_REVIEWER,
+            feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
+            feconf.EMAIL_INTENT_ACCOUNT_DELETED,
+            feconf.BULK_EMAIL_INTENT_TEST
+        ])
     # The subject line of the email.
-    subject = ndb.TextProperty(required=True)
+    subject = datastore_services.TextProperty(required=True)
     # The HTML content of the email body.
-    html_body = ndb.TextProperty(required=True)
+    html_body = datastore_services.TextProperty(required=True)
     # The datetime the email was sent, in UTC.
-    sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
+    sent_datetime = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # The hash of the recipient id, email subject and message body.
-    email_hash = ndb.StringProperty(indexed=True)
+    email_hash = datastore_services.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -112,7 +116,7 @@ class SentEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(ndb.OR(
+        return cls.query(datastore_services.any_of(
             cls.recipient_id == user_id,
             cls.sender_id == user_id,
         )).get(keys_only=True) is not None
@@ -174,12 +178,11 @@ class SentEmailModel(base_models.BaseModel):
 
         email_model_instance.put()
 
-    def put(self, update_last_updated_time=True):
-        """Saves this SentEmailModel instance to the datastore."""
-        email_hash = self._generate_hash(
+    def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage."""
+        super(SentEmailModel, self)._pre_put_hook()
+        self.email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
-        self.email_hash = email_hash
-        super(SentEmailModel, self).put(update_last_updated_time)
 
     @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
@@ -286,26 +289,28 @@ class BulkEmailModel(base_models.BaseModel):
     """
 
     # The user IDs of the email recipients.
-    recipient_ids = ndb.JsonProperty(default=[], compressed=True)
+    recipient_ids = datastore_services.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True, indexed=True)
+    sender_id = datastore_services.StringProperty(required=True, indexed=True)
     # The email address used to send the notification.
-    sender_email = ndb.StringProperty(required=True)
+    sender_email = datastore_services.StringProperty(required=True)
     # The intent of the email.
-    intent = ndb.StringProperty(required=True, indexed=True, choices=[
-        feconf.BULK_EMAIL_INTENT_MARKETING,
-        feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
-        feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
-        feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
-        feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT
-    ])
+    intent = datastore_services.StringProperty(
+        required=True, indexed=True, choices=[
+            feconf.BULK_EMAIL_INTENT_MARKETING,
+            feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
+            feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
+            feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
+            feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT
+        ])
     # The subject line of the email.
-    subject = ndb.TextProperty(required=True)
+    subject = datastore_services.TextProperty(required=True)
     # The HTML content of the email body.
-    html_body = ndb.TextProperty(required=True)
+    html_body = datastore_services.TextProperty(required=True)
     # The datetime the email was sent, in UTC.
-    sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
+    sent_datetime = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -340,8 +345,8 @@ class BulkEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.sender_id == user_id).get(
-            keys_only=True) is not None
+        return (
+            cls.query(cls.sender_id == user_id).get(keys_only=True) is not None)
 
     @classmethod
     def create(
@@ -379,10 +384,10 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     [user_id].[thread_id]
     """
 
-    user_id = ndb.StringProperty(required=True, indexed=True)
-    thread_id = ndb.StringProperty(required=False, indexed=True)
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
+    thread_id = datastore_services.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
-    reply_to_id = ndb.StringProperty(indexed=True, required=True)
+    reply_to_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -409,6 +414,16 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of GeneralFeedbackEmailReplyToIdModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):

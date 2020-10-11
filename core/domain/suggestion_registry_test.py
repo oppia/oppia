@@ -29,6 +29,7 @@ from core.domain import question_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
+from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -314,6 +315,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        suggestion.author_id = self.PSEUDONYMOUS_ID
+        suggestion.validate()
+
         suggestion.author_id = ''
         with self.assertRaisesRegexp(
             Exception, 'Expected author_id to be in a valid user ID format'):
@@ -348,6 +352,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
 
+        suggestion.validate()
+
+        suggestion.final_reviewer_id = self.PSEUDONYMOUS_ID
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
@@ -1303,6 +1310,31 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.')
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+
+        self.assertEqual(exploration.get_translation_counts(), {
+            'hi': 1
+        })
+
+    def test_accept_suggestion_with_psedonymous_author_adds_translation(self):
+        self.save_new_default_exploration('exp1', self.author_id)
+
+        exploration = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(exploration.get_translation_counts(), {})
+
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.PSEUDONYMOUS_ID,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
@@ -2382,3 +2414,373 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.assertEqual(self.voiceover_application.status, 'rejected')
         self.assertEqual(
             self.voiceover_application.rejection_message, 'rejection message')
+
+
+class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the CommunityContributionStats class."""
+
+    translation_reviewer_counts_by_lang_code = {
+        'hi': 0,
+        'en': 1
+    }
+
+    translation_suggestion_counts_by_lang_code = {
+        'fr': 6,
+        'en': 5
+    }
+
+    question_reviewer_count = 1
+    question_suggestion_count = 4
+
+    negative_count = -1
+    non_integer_count = 'non_integer_count'
+    sample_language_code = 'en'
+    invalid_language_code = 'invalid'
+
+    def test_initialize_community_contribution_stats(self):
+        community_contribution_stats = (
+            suggestion_registry.CommunityContributionStats(
+                self.translation_reviewer_counts_by_lang_code,
+                self.translation_suggestion_counts_by_lang_code,
+                self.question_reviewer_count,
+                self.question_suggestion_count
+            )
+        )
+        community_contribution_stats.validate()
+
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code
+            ),
+            self.translation_reviewer_counts_by_lang_code)
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code
+            ),
+            self.translation_suggestion_counts_by_lang_code
+        )
+        self.assertEqual(
+            community_contribution_stats.question_reviewer_count,
+            self.question_reviewer_count
+        )
+        self.assertEqual(
+            community_contribution_stats.question_suggestion_count,
+            self.question_suggestion_count
+        )
+
+    def test_set_translation_reviewer_count_for_lang_code_updates_empty_dict(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.validate()
+        (
+            community_contribution_stats
+            .translation_reviewer_counts_by_lang_code
+        ) = {}
+
+        (
+            community_contribution_stats
+            .set_translation_reviewer_count_for_language_code(
+                self.sample_language_code, 2)
+        )
+
+        self.assertDictEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code
+            ),
+            {self.sample_language_code: 2}
+        )
+
+    def test_set_translation_reviewer_count_for_lang_code_updates_count_value(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.validate()
+        (
+            community_contribution_stats
+            .translation_reviewer_counts_by_lang_code
+        ) = {self.sample_language_code: 1}
+
+        (
+            community_contribution_stats
+            .set_translation_reviewer_count_for_language_code(
+                self.sample_language_code, 2)
+        )
+
+        self.assertDictEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code
+            ),
+            {self.sample_language_code: 2}
+        )
+
+    def test_set_translation_reviewer_count_for_lang_code_adds_new_lang_key(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.validate()
+        (
+            community_contribution_stats
+            .translation_reviewer_counts_by_lang_code
+        ) = {'en': 1}
+
+        (
+            community_contribution_stats
+            .set_translation_reviewer_count_for_language_code('hi', 2)
+        )
+
+        self.assertDictEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code
+            ),
+            {'en': 1, 'hi': 2}
+        )
+
+    def test_set_translation_suggestion_count_for_lang_code_updates_empty_dict(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.validate()
+        (
+            community_contribution_stats
+            .translation_suggestion_counts_by_lang_code
+        ) = {}
+
+        (
+            community_contribution_stats
+            .set_translation_suggestion_count_for_language_code(
+                self.sample_language_code, 2)
+        )
+
+        self.assertDictEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code
+            ), {self.sample_language_code: 2}
+        )
+
+    def test_set_translation_suggestion_count_for_lang_code_updates_count_value(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.validate()
+        (
+            community_contribution_stats
+            .translation_suggestion_counts_by_lang_code
+        ) = {self.sample_language_code: 1}
+
+        (
+            community_contribution_stats
+            .set_translation_suggestion_count_for_language_code(
+                self.sample_language_code, 2)
+        )
+
+        self.assertDictEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code
+            ),
+            {self.sample_language_code: 2}
+        )
+
+    def test_set_translation_suggestion_count_for_lang_code_adds_new_lang_key(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.validate()
+        (
+            community_contribution_stats
+            .translation_suggestion_counts_by_lang_code
+        ) = {'en': 1}
+
+        (
+            community_contribution_stats
+            .set_translation_suggestion_count_for_language_code('hi', 2)
+        )
+
+        self.assertDictEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code
+            ),
+            {'en': 1, 'hi': 2}
+        )
+
+    def test_validate_translation_reviewer_counts_fails_for_negative_counts(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        (
+            community_contribution_stats
+            .set_translation_reviewer_count_for_language_code(
+                self.sample_language_code, self.negative_count)
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the translation reviewer count to be non-negative for '
+            '%s language code, received: %s.' % (
+                self.sample_language_code, self.negative_count)):
+            community_contribution_stats.validate()
+
+    def test_validate_translation_suggestion_counts_fails_for_negative_counts(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        (
+            community_contribution_stats
+            .set_translation_suggestion_count_for_language_code(
+                self.sample_language_code, self.negative_count)
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the translation suggestion count to be non-negative for '
+            '%s language code, received: %s.' % (
+                self.sample_language_code, self.negative_count)):
+            community_contribution_stats.validate()
+
+    def test_validate_question_reviewer_count_fails_for_negative_count(self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.question_reviewer_count = (
+            self.negative_count
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the question reviewer count to be non-negative, '
+            'received: %s.' % (
+                community_contribution_stats.question_reviewer_count)):
+            community_contribution_stats.validate()
+
+    def test_validate_question_suggestion_count_fails_for_negative_count(self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.question_suggestion_count = (
+            self.negative_count
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the question suggestion count to be non-negative, '
+            'received: %s.' % (
+                community_contribution_stats.question_suggestion_count)):
+            community_contribution_stats.validate()
+
+    def test_validate_translation_reviewer_counts_fails_for_non_integer_counts(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        (
+            community_contribution_stats
+            .set_translation_reviewer_count_for_language_code(
+                self.sample_language_code, self.non_integer_count)
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the translation reviewer count to be an integer for '
+            '%s language code, received: %s.' % (
+                self.sample_language_code, self.non_integer_count)):
+            community_contribution_stats.validate()
+
+    def test_validate_translation_suggestion_counts_fails_for_non_integer_count(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        (
+            community_contribution_stats
+            .set_translation_suggestion_count_for_language_code(
+                self.sample_language_code, self.non_integer_count)
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the translation suggestion count to be an integer for '
+            '%s language code, received: %s.' % (
+                self.sample_language_code, self.non_integer_count)):
+            community_contribution_stats.validate()
+
+    def test_validate_question_reviewer_count_fails_for_non_integer_count(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.question_reviewer_count = (
+            self.non_integer_count
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the question reviewer count to be an integer, '
+            'received: %s.' % (
+                community_contribution_stats.question_reviewer_count)):
+            community_contribution_stats.validate()
+
+    def test_validate_question_suggestion_count_fails_for_non_integer_count(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        community_contribution_stats.question_suggestion_count = (
+            self.non_integer_count
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the question suggestion count to be an integer, '
+            'received: %s.' % (
+                community_contribution_stats.question_suggestion_count)):
+            community_contribution_stats.validate()
+
+    def test_validate_translation_reviewer_counts_fails_for_invalid_lang_code(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        (
+            community_contribution_stats
+            .set_translation_reviewer_count_for_language_code(
+                self.invalid_language_code, 1)
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid language code for the translation reviewer counts: '
+            '%s.' % self.invalid_language_code):
+            community_contribution_stats.validate()
+
+    def test_validate_translation_suggestion_counts_fails_for_invalid_lang_code(
+            self):
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        (
+            community_contribution_stats
+            .set_translation_suggestion_count_for_language_code(
+                self.invalid_language_code, 1)
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid language code for the translation suggestion counts: '
+            '%s.' % self.invalid_language_code):
+            community_contribution_stats.validate()

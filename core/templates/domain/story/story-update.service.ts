@@ -19,12 +19,14 @@
  * undo/redo service.
  */
 
-require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+import { Change } from
+  'domain/editor/undo_redo/change.model';
+
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('StoryUpdateService', [
-  'AlertsService', 'ChangeObjectFactory', 'StoryEditorStateService',
+  'AlertsService', 'StoryEditorStateService',
   'UndoRedoService', 'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',
   'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_PROPERTY',
@@ -39,7 +41,7 @@ angular.module('oppia').factory('StoryUpdateService', [
   'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_THUMBNAIL_BG_COLOR',
   'STORY_PROPERTY_THUMBNAIL_FILENAME', 'STORY_PROPERTY_TITLE',
   'STORY_PROPERTY_URL_FRAGMENT', function(
-      AlertsService, ChangeObjectFactory, StoryEditorStateService,
+      AlertsService, StoryEditorStateService,
       UndoRedoService, CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
       CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_PROPERTY,
@@ -60,7 +62,7 @@ angular.module('oppia').factory('StoryUpdateService', [
     var _applyChange = function(story, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       try {
         UndoRedoService.applyChange(changeObj, story);
       } catch (err) {
