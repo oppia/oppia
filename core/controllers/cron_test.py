@@ -23,12 +23,17 @@ import logging
 
 from core import jobs
 from core.controllers import cron
+from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
+from core.domain import exp_domain
+from core.domain import suggestion_services
 from core.domain import taskqueue_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import main_cron
+import feconf
 import utils
 
 from mapreduce import model as mapreduce_model
@@ -326,15 +331,9 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@community.org'
-    mock_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
-    reviewers_suggestion_email_infos = [[]]
-    reviewer_ids = []
 
-    def _create_translation_suggestion_with_submission_datetime(
-            self, submission_datetime):
-        """Creates a translation suggestion with the given submission
-        datetime.
-        """
+    def _create_translation_suggestion(self):
+        """Creates a translation suggestion."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -344,15 +343,31 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
             'translation_html': self.default_translation_html
         }
 
-        translation_suggestion = suggestion_services.create_suggestion(
+        return suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description')
 
-        translation_suggestion.last_updated = submission_datetime
-        return translation_suggestion
+    def _assert_reviewable_suggestion_email_infos_are_equal(
+            self, reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info):
+        """Asserts that the reviewable suggestion email info is equal to the
+        expected reviewable suggestion email info.
+        """
+        self.assertEqual(
+            reviewable_suggestion_email_info.suggestion_type,
+            expected_reviewable_suggestion_email_info.suggestion_type)
+        self.assertEqual(
+            reviewable_suggestion_email_info.language_code,
+            expected_reviewable_suggestion_email_info.language_code)
+        self.assertEqual(
+            reviewable_suggestion_email_info.suggestion_content,
+            expected_reviewable_suggestion_email_info.suggestion_content)
+        self.assertEqual(
+            reviewable_suggestion_email_info.submission_datetime,
+            expected_reviewable_suggestion_email_info.submission_datetime)
 
     def _mock_send_contributor_dashboard_reviewers_emails(
             self, reviewer_ids, reviewers_suggestion_email_infos):
@@ -361,17 +376,20 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         its not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
-        self.reviewer_ids.append(eviewer_ids)
-        self.reviewers_suggestion_email_infos.append(
-            reviewers_suggestion_email_infos)
+        self.reviewer_ids = reviewer_ids
+        self.reviewers_suggestion_email_infos = reviewers_suggestion_email_infos
 
     def setUp(self):
         super(
             CronMailContributorDashboardReviewerOpportunitiesHandlerTests,
             self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
         self.save_new_valid_exploration(self.target_id, self.author_id)
@@ -387,63 +405,64 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
             False)
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main_cron.app))
-        self.send_mail_to_reviewers_swap = self.swap(
-            email_manager,
-            'send_mail_to_notify_contributor_dashboard_reviewers',
-            contributor_dashboard_reviewers_emails)
+
+        self.reviewers_suggestion_email_infos = []
+        self.reviewer_ids = []
 
     def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        with (
-            self.can_send_emails, self.cannot_send_reviewer_emails,
-            self.send_mail_to_reviewers_swap, self.testapp_swap):
+        with self.cannot_send_reviewer_emails, self.testapp_swap:
             self.get_html_response(
                 '/cron/mail/contributor_dashboard_reviewers/'
                 'review_opportunities')
 
-        self.assertListEqual(self.reviewer_ids, [])
-        self.assertListEqual(self.reviewers_suggestion_email_infos, [[]])
+        self.assertEqual(len(self.reviewer_ids), 0)
+        self.assertEqual(len(self.reviewers_suggestion_email_infos), 0)
+
+        self.logout()
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        with (
-            self.cannot_send_emails, self.can_send_reviewer_emails,
-            self.send_mail_to_reviewers_swap, self.testapp_swap):
+        with self.cannot_send_emails, self.testapp_swap:
             self.get_html_response(
                 '/cron/mail/contributor_dashboard_reviewers/'
                 'review_opportunities')
 
-        self.assertListEqual(self.reviewer_ids, [])
-        self.assertListEqual(self.reviewers_suggestion_email_infos, [[]])
+        self.assertEqual(len(self.reviewer_ids), 0)
+        self.assertEqual(len(self.reviewers_suggestion_email_infos), 0)
+
+        self.logout()
 
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, self.language_code)
-        translation_suggestion = (
-            self._create_translation_suggestion_with_submission_datetime(
-                self.mock_review_submission_datetime))
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(days=1, hours=2, minutes=5))
+        translation_suggestion = self._create_translation_suggestion()
         expected_reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
-        expected_reviewer_ids = [self.reviewer_id]
 
-        with (
-            self.can_send_emails, self.can_send_reviewer_emails,
-            self.send_mail_to_reviewers_swap, self.testapp_swap,
-            self.mock_datetime_utcnow(mocked_datetime_for_utcnow)):
-            self.get_html_response(
-                '/cron/mail/contributor_dashboard_reviewers/'
-                'review_opportunities')
+        with self.can_send_emails:
+            with self.can_send_reviewer_emails:
+                with self.testapp_swap:
+                    with self.swap(
+                        email_manager,
+                        'send_mail_to_notify_contributor_dashboard_reviewers',
+                        self._mock_send_contributor_dashboard_reviewers_emails):
+                        self.get_html_response(
+                            '/cron/mail/contributor_dashboard_reviewers/'
+                            'review_opportunities')
 
-        self.assertListEqual(self.reviewer_ids, expected_reviewer_ids)
-        self.assertListEqual(
-            self.reviewers_suggestion_email_infos,
-            [[expected_reviewable_suggestion_email_info]])
-
+        self.assertEqual(len(self.reviewer_ids), 1)
+        self.assertEqual(self.reviewer_ids[0], self.reviewer_id)
+        self.assertEqual(len(self.reviewers_suggestion_email_infos), 1)
+        self.assertEqual(len(self.reviewers_suggestion_email_infos[0]), 1)
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            self.reviewers_suggestion_email_infos[0][0],
+            expected_reviewable_suggestion_email_info)
 
 class JobModelsCleanupManagerTests(test_utils.GenericTestBase):
 
