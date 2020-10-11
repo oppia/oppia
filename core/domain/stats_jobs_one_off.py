@@ -151,7 +151,7 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         '%s.%s: %s' % (exp.id, exp.version, state_name)
                         ).encode('utf-8'))
 
-            stats_services.save_stats_model_transactional(stats)
+            stats_services.save_stats_model(stats)
 
     @staticmethod
     def reduce(reduce_key, values):

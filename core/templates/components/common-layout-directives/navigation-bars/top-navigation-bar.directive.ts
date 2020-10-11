@@ -220,8 +220,12 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
             ctrl.logoutUrl = LOGOUT_URL;
             ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
+            ctrl.inClassroomPage = false;
             ctrl.standardNavIsShown = (
               NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);
+            if (ctrl.currentUrl === 'learn') {
+              ctrl.inClassroomPage = true;
+            }
             ctrl.googleSignInIconUrl = (
               UrlInterpolationService.getStaticImageUrl(
                 '/google_signin_buttons/google_signin.svg'));

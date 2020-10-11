@@ -33,7 +33,7 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.api import urlfetch
+import requests
 
 current_user_services = models.Registry.import_current_user_services()
 (user_models, audit_models) = models.Registry.import_models(
@@ -499,6 +499,23 @@ def is_user_id_valid(user_id):
         len(user_id) == feconf.USER_ID_LENGTH))
 
 
+def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
+    """Verify that the user ID is in a correct format or it is in correct
+    pseudonymous ID format.
+
+    Args:
+        user_or_pseudonymous_id: str. The user or pseudonymous ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct user ID or pseudonymous ID
+        format, False otherwise.
+    """
+    return (
+        is_user_id_valid(user_or_pseudonymous_id) or
+        utils.is_pseudonymous_id(user_or_pseudonymous_id)
+    )
+
+
 def is_username_taken(username):
     """Returns whether the given username has already been taken.
 
@@ -664,20 +681,19 @@ def fetch_gravatar(email):
     """
     gravatar_url = get_gravatar_url(email)
     try:
-        result = urlfetch.fetch(
-            gravatar_url,
-            headers={'Content-Type': 'image/png'},
-            follow_redirects=False)
-    except (urlfetch.InvalidURLError, urlfetch.DownloadError):
-        logging.error('Failed to fetch Gravatar from %s' % gravatar_url)
+        response = requests.get(
+            gravatar_url, headers={b'Content-Type': b'image/png'},
+            allow_redirects=False)
+    except Exception:
+        logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
-        if result.status_code == 200:
-            if imghdr.what(None, h=result.content) == 'png':
-                return utils.convert_png_binary_to_data_url(result.content)
+        if response.ok:
+            if imghdr.what(None, h=response.content) == 'png':
+                return utils.convert_png_binary_to_data_url(response.content)
         else:
             logging.error(
                 '[Status %s] Failed to fetch Gravatar from %s' %
-                (result.status_code, gravatar_url))
+                (response.status_code, gravatar_url))
 
     return DEFAULT_IDENTICON_DATA_URL
 
@@ -1393,7 +1409,7 @@ def _get_user_auth_details_from_model(user_auth_details_model):
     )
 
 
-def _get_pseudonymous_username(pseudonymous_id):
+def get_pseudonymous_username(pseudonymous_id):
     """Get the username from pseudonymous ID.
 
     Args:
@@ -1404,7 +1420,7 @@ def _get_pseudonymous_username(pseudonymous_id):
         str. The pseudonymous username, starting with 'User' and ending with
         the last eight letters from the pseudonymous_id.
     """
-    return 'User%s%s' % (
+    return 'User_%s%s' % (
         pseudonymous_id[-8].upper(), pseudonymous_id[-7:])
 
 
@@ -1440,7 +1456,7 @@ def get_usernames(user_ids, strict=False):
         if user_id in feconf.SYSTEM_USERS:
             usernames[index] = feconf.SYSTEM_USERS[user_id]
         elif utils.is_pseudonymous_id(user_id):
-            usernames[index] = _get_pseudonymous_username(user_id)
+            usernames[index] = get_pseudonymous_username(user_id)
         else:
             non_system_user_indices.append(index)
             non_system_user_ids.append(user_id)

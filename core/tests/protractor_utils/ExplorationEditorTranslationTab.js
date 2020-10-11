@@ -381,6 +381,9 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this._isAudioPlaying = async function() {
+    await waitFor.visibilityOf(
+      audioMaterialSliderDiv,
+      'Audio progress slider bar is taking too long to appear');
     var firstValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
     try {
