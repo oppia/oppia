@@ -32,8 +32,8 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import main_cron
 import feconf
+import main_cron
 import utils
 
 from mapreduce import model as mapreduce_model
@@ -393,7 +393,6 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
         self.save_new_valid_exploration(self.target_id, self.author_id)
-        mock_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
 
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
@@ -463,6 +462,7 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         self._assert_reviewable_suggestion_email_infos_are_equal(
             self.reviewers_suggestion_email_infos[0][0],
             expected_reviewable_suggestion_email_info)
+
 
 class JobModelsCleanupManagerTests(test_utils.GenericTestBase):
 

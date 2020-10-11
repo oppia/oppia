@@ -36,7 +36,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
@@ -2073,7 +2072,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     default_username = (
         email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
             'default_username'])
-    mock_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
+    mocked_review_submission_datetime = datetime.datetime(2020, 6, 15, 5)
     AUTHOR_USERNAME = 'author'
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_1_USERNAME = 'reviewer1'
@@ -2099,7 +2098,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         '<a href="https://www.example.com">Preferences</a> page.'
     )
 
-    def _create_translation_suggestion_with_submission_datetime(
+    def _create_translation_suggestion_in_lang_with_html_and_datetime(
             self, language_code, translation_html, submission_datetime):
         """Creates a translation suggestion in the given language_code with the
         given translation html and submission datetime.
@@ -2123,7 +2122,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         translation_suggestion.last_updated = submission_datetime
         return translation_suggestion
 
-    def _create_question_suggestion_with_submission_datetime(
+    def _create_question_suggestion_with_question_html_and_datetime(
             self, question_html, submission_datetime):
         """Creates a question suggestion with the given question html and
         submission datetime.
@@ -2194,7 +2193,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     expected_language_description, review_wait_time,
                     expected_translation_content)
 
-
     def _assert_created_sent_email_models_are_correct(
             self, expected_email_html_bodies, reviewer_ids, reviewer_emails):
         """Asserts that the sent email models that were created from the emails
@@ -2254,9 +2252,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.default_translation_html = '<p>%s</p>' % (
             self.expected_default_translation)
         question_suggestion = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 self.default_question_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         self.reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2321,9 +2319,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_question_reviewer_with_review_wait_time_a_day(
             self):
         question_suggestion = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 self.default_question_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2365,9 +2363,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_question_reviewer_with_review_wait_time_in_days(
             self):
         question_suggestion = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 self.default_question_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2409,9 +2407,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_question_reviewer_with_review_wait_time_a_hour(
             self):
         question_suggestion = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 self.default_question_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2453,9 +2451,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_question_reviewer_with_review_wait_time_in_hours(
             self):
         question_suggestion = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 self.default_question_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2497,9 +2495,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_question_reviewer_with_review_wait_time_a_minute(
             self):
         question_suggestion = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 self.default_question_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2541,9 +2539,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_question_reviewer_with_review_wait_time_in_mins(
             self):
         question_suggestion = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 self.default_question_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2585,9 +2583,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_question_reviewer_with_review_wait_time_in_secs(
             self):
         question_suggestion = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 self.default_question_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2627,19 +2625,19 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_sent_to_question_reviewer_multi_question_suggestions(self):
         mocked_datetime_for_utcnow = (
-            self.mock_review_submission_datetime + datetime.timedelta(
+            self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1))
         # Question suggestion 1 has waited 1 day for review.
         question_suggestion_1 = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 1</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     hours=1)))
         # Question suggestion 2 has waited 1 hour for review.
         question_suggestion_2 = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 2</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1)))
         reviewable_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
@@ -2681,31 +2679,31 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_multi_question_reviewers_multi_question_suggestions(
             self):
         mocked_datetime_for_utcnow = (
-            self.mock_review_submission_datetime + datetime.timedelta(
+            self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1))
         # Question suggestion 1 has waited 1 day for review.
         question_suggestion_1 = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 1 for reviewer 1</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     hours=1)))
         # Question suggestion 2 has waited 1 hour for review.
         question_suggestion_2 = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 2 for reviewer 1</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1)))
         # Question suggestion 3 has waited 1 minute for review.
         question_suggestion_3 = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 1 for reviewer 2</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1, hours=1)))
         # Question suggestion 4 has waited 1 minute for review.
         question_suggestion_4 = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 2 for reviewer 2</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1, hours=1)))
         reviewer_1_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
@@ -2772,16 +2770,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_translation_reviewer_with_review_wait_time_a_day(
             self):
         translation_suggestion = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 self.language_code, self.default_translation_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 1
         reviewable_suggestion_email_info.submission_datetime = (
-            self.mock_review_submission_datetime)
+            self.mocked_review_submission_datetime)
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(days=review_wait_time))
@@ -2818,9 +2816,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_translation_reviewer_with_review_wait_time_in_days(
             self):
         translation_suggestion = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 self.language_code, self.default_translation_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2863,16 +2861,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_translation_reviewer_with_review_wait_time_a_hour(
             self):
         translation_suggestion = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 self.language_code, self.default_translation_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 1
         reviewable_suggestion_email_info.submission_datetime = (
-            self.mock_review_submission_datetime)
+            self.mocked_review_submission_datetime)
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(hours=review_wait_time))
@@ -2910,16 +2908,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_translation_reviewer_with_review_wait_time_in_hours(
             self):
         translation_suggestion = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 self.language_code, self.default_translation_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 5
         reviewable_suggestion_email_info.submission_datetime = (
-            self.mock_review_submission_datetime)
+            self.mocked_review_submission_datetime)
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(hours=review_wait_time))
@@ -2957,16 +2955,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_translation_reviewer_with_review_wait_time_a_min(
             self):
         translation_suggestion = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 self.language_code, self.default_translation_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 1
         reviewable_suggestion_email_info.submission_datetime = (
-            self.mock_review_submission_datetime)
+            self.mocked_review_submission_datetime)
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(minutes=review_wait_time))
@@ -3004,16 +3002,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_translation_reviewer_with_review_wait_time_in_mins(
             self):
         translation_suggestion = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 self.language_code, self.default_translation_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 5
         reviewable_suggestion_email_info.submission_datetime = (
-            self.mock_review_submission_datetime)
+            self.mocked_review_submission_datetime)
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(minutes=review_wait_time))
@@ -3051,16 +3049,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_translation_reviewer_with_review_wait_time_in_secs(
             self):
         translation_suggestion = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 self.language_code, self.default_translation_html,
-                self.mock_review_submission_datetime))
+                self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 1
         reviewable_suggestion_email_info.submission_datetime = (
-            self.mock_review_submission_datetime)
+            self.mocked_review_submission_datetime)
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(seconds=review_wait_time))
@@ -3098,19 +3096,19 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_translation_reviewer_multi_translation_suggestions(
             self):
         mocked_datetime_for_utcnow = (
-            self.mock_review_submission_datetime + datetime.timedelta(
+            self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1))
         # Translation suggestion 1 has waited 1 day for review.
         translation_suggestion_1 = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'en', '<p>Translation 1</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     hours=1)))
         # Translation suggestion 2 has waited 1 hour for review.
         translation_suggestion_2 = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'fr', '<p>Translation 2</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1)))
         reviewable_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
@@ -3152,31 +3150,31 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_sent_to_multi_translation_reviewers_multi_translations(
             self):
         mocked_datetime_for_utcnow = (
-            self.mock_review_submission_datetime + datetime.timedelta(
+            self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1))
         # Translation suggestion 1 has waited 1 day for review.
         translation_suggestion_1 = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'en', '<p>Translation 1 for reviewer 1</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     hours=1)))
         # Translation suggestion 2 has waited 1 hour for review.
         translation_suggestion_2 = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'fr', '<p>Translation 2 for reviewer 1</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1)))
         # Translation suggestion 3 has waited 1 minute for review.
         translation_suggestion_3 = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'hi', '<p>Translation 1 for reviewer 2</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1, hours=1)))
         # Translation suggestion 4 has waited 1 minute for review.
         translation_suggestion_4 = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'fr', '<p>Translation 2 for reviewer 2</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1, hours=1)))
         reviewer_1_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
@@ -3242,31 +3240,31 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_sent_to_multi_reviewers_multi_suggestions(self):
         mocked_datetime_for_utcnow = (
-            self.mock_review_submission_datetime + datetime.timedelta(
+            self.mocked_review_submission_datetime + datetime.timedelta(
                 days=1, hours=1, minutes=1))
         # Suggestion 1 has waited 1 day for review.
         suggestion_1 = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'en', '<p>Translation 1</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     hours=1, minutes=1)))
         # Suggestion 2 has waited 1 hour for review.
         suggestion_2 = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 1</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1, minutes=1)))
         # Suggestion 3 has waited 1 minute for review.
         suggestion_3 = (
-            self._create_translation_suggestion_with_submission_datetime(
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'fr', '<p>Translation 2</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1, hours=1)))
         # Suggestion 4 has waited 1 minute for review.
         suggestion_4 = (
-            self._create_question_suggestion_with_submission_datetime(
+            self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 2</p>',
-                self.mock_review_submission_datetime + datetime.timedelta(
+                self.mocked_review_submission_datetime + datetime.timedelta(
                     days=1, hours=1)))
         reviewer_1_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
