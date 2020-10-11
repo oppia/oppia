@@ -1101,7 +1101,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
                 voiceover_application_model.final_reviewer_id = (
                     suggestion_ids_to_pids[voiceover_application_model.id]
                 )
-        voiceover_application_class.update_timestamps_multi(voiceover_application_models)
+        voiceover_application_class.update_timestamps_multi(
+            voiceover_application_models)
         voiceover_application_class.put_multi(voiceover_application_models)
 
     suggestion_ids_to_pids = (

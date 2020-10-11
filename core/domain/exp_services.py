@@ -802,7 +802,8 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     for model in subscription_models:
         model.activity_ids = [
             id_ for id_ in model.activity_ids if id_ not in exploration_ids]
-    user_models.UserSubscriptionsModel.update_timestamps_multi(subscription_models)
+    user_models.UserSubscriptionsModel.update_timestamps_multi(
+        subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 

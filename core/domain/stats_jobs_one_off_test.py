@@ -1645,6 +1645,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
                 return 'exploration-%s-%s' % (exp_id, exp_version)
 
             def put(self):
+                """Cancels the put operation."""
                 return
 
         with self.swap(

@@ -187,7 +187,8 @@ class CollectionModel(base_models.VersionedModel):
                 )
                 collection_commit_log.collection_id = model.id
                 commit_log_models.append(collection_commit_log)
-            CollectionCommitLogEntryModel.update_timestamps_multi(commit_log_models)
+            CollectionCommitLogEntryModel.update_timestamps_multi(
+                commit_log_models)
             datastore_services.put_multi_async(commit_log_models)
 
 

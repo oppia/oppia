@@ -160,7 +160,8 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids)))
-        snapshot_metadata_model.update_timestamps(update_last_updated_time=False)
+        snapshot_metadata_model.update_timestamps(
+            update_last_updated_time=False)
         snapshot_metadata_model.put()
 
     @staticmethod
@@ -181,7 +182,8 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids)))
-        snapshot_metadata_model.update_timestamps(update_last_updated_time=False)
+        snapshot_metadata_model.update_timestamps(
+            update_last_updated_time=False)
         snapshot_metadata_model.put()
 
     @staticmethod
@@ -196,7 +198,8 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
                 snapshot_content_model.id))
         snapshot_metadata_model.content_user_ids = list(sorted(set(
             reconstituted_rights_model.manager_ids)))
-        snapshot_metadata_model.update_timestamps(update_last_updated_time=False)
+        snapshot_metadata_model.update_timestamps(
+            update_last_updated_time=False)
         snapshot_metadata_model.put()
 
     @classmethod
