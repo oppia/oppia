@@ -2248,9 +2248,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
             self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
-                '<p><oppia-noninteractive-link-test text-with-value="&amp;quot;Test '
-                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
-                'quot;"><p>text</p></oppia-noninteractive-link-test></p>'))
+                '<p><oppia-noninteractive-link-test text-with-value='
+                '"&amp;quot;Test a tag&amp;quot;" url-with-value="&amp;quot;'
+                'somelink&amp;quot;"><p>text</p>'
+                '</oppia-noninteractive-link-test></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
