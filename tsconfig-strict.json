@@ -54,6 +54,8 @@
     "core/templates/services/math-interactions.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
     "core/templates/services/stateful/background-mask.service.spec.ts",
+    "extensions/classifiers/count-vectorizer.service.ts",
+    "extensions/classifiers/count-vectorizer.service.spec.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.spec.ts",
   ],
