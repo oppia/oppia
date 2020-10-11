@@ -124,6 +124,11 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.story_id = self.id
         story_commit_log_entry.put()
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -191,6 +196,13 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the story id and version number.
         """
         return 'story-%s-%s' % (story_id, version)
+
+    @staticmethod
+    def get_export_method():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -263,6 +275,11 @@ class StorySummaryModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):

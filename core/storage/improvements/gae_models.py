@@ -131,6 +131,11 @@ class TaskEntryModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         cls.delete_multi(cls.query(cls.resolver_id == user_id))
+        
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single unshared instance."""
+        return base_models.EXPORT_METHOD.SHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -148,6 +153,15 @@ class TaskEntryModel(base_models.BaseModel):
             'resolver_id': base_models.EXPORT_POLICY.EXPORTED,
             'resolved_on': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as a shared instance.
+        """
+        return {
+            'resolver_id': 'task_ids_resolved_by_user'
+        }
 
     @staticmethod
     def export_data(user_id):

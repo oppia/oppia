@@ -88,6 +88,13 @@ class SentEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+    
+    @staticmethod
+    def get_export_method():
+        """Users already have access to this data since emails were sent
+        to them.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -316,6 +323,13 @@ class BulkEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+    
+    @staticmethod
+    def get_export_method():
+        """Users already have access to this data since the emails were sent
+        to them.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -393,13 +407,18 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     def get_deletion_policy():
         """Feedback email reply to id should be deleted."""
         return base_models.DELETION_POLICY.DELETE
+    
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single unshared instance."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thread_id': base_models.EXPORT_POLICY.EXPORTED,
+            'thread_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'reply_to_id': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -562,5 +581,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         user_data = {}
         email_reply_models = cls.get_all().filter(cls.user_id == user_id)
         for model in email_reply_models:
-            user_data[model.thread_id] = model.reply_to_id
+            user_data[model.thread_id] = {
+                'reply_to_id': model.reply_to_id
+            }
         return user_data

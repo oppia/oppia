@@ -36,17 +36,17 @@ import python_utils
 import utils
 
 (
-    collection_models, config_models, email_models,
+    base_models, collection_models, config_models, email_models,
     exploration_models, feedback_models, improvements_models,
     question_models, skill_models, story_models,
     subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
-    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
-    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 
 
@@ -828,7 +828,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         subscriptions_data = {
             'activity_ids': [],
             'collection_ids': [],
-            'creator_usernames': [],
+            'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked': None
         }
@@ -909,6 +909,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
+        self.maxDiff = None
         self.assertEqual(expected_user_data, observed_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_user_data)
@@ -916,8 +917,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_images = []
         self.assertEqual(expected_images, observed_images)
 
-    def test_direct_exports(self):
-        """Nontrivial test of direct export."""
+    def test_exports_follow_export_policies(self):
+        """Nontrivial test to ensure that all fields that should be exported
+        per the export policy are exported, and exported in the proper format.
+        """
         self.set_up_non_trivial()
 
         # We set up the feedback_thread_model here so that we can easily
@@ -949,55 +952,65 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             self.MESSAGE_TEXT
         )
 
+        # Retrieve all models for export.
         all_models = [
             clazz
             for clazz in self._get_model_classes()
             if not clazz.__name__ in self.BASE_CLASSES
         ]
+
+        # Iterate over models and test export policies.
         for model in all_models:
+            export_method = model.get_export_method()
             export_policy = model.get_export_policy()
-            if 'export_method' in export_policy and export_policy['export_method'] != base_models.EXPORT_METHOD.NOT_EXPORTED:
-                per_field_policy = export_policy['per_field_policy']
-                exported_props = [
-                    prop for prop in model._properties
-                    if (per_field_policy[prop] ==
-                    base_models.EXPORT_POLICY.EXPORTED)
-                ]
-                if (
-                    export_policy['export_method'] ==
-                    base_models.EXPORT_METHOD.DIRECT_EXPORT):
-                    exported_data = model.export_data(self.USER_ID_1)
-                    self.assertEqual(
-                        sorted([python_utils.UNICODE(key) for key in exported_data.keys()]),
-                        sorted(exported_props)
-                    )
-                elif (
-                    export_policy['export_method'] ==
-                    base_models.EXPORT_METHOD.LIST_OF_IDS):
-                    exported_data = model.export_data(self.USER_ID_1)
-                    self.assertEqual(
-                        sorted(exported_props),
-                        sorted(export_policy['list_of_ids_mapping'].keys())
-                    )
-                    self.assertEqual(
-                        sorted(exported_data.keys()),
-                        sorted(export_policy['list_of_ids_mapping'].values())
-                    )
-                elif (
-                    export_policy['export_method'] ==
-                    base_models.EXPORT_METHOD.EXPORT_BY_MODEL_ID):
-                    exported_data = model.export_data(self.USER_ID_1)
-                    
-                    # Retrieve the first ID.
-                    model_id = exported_data.keys()[0]
-                    self.assertEqual(
-                        sorted(exported_data[model_id].keys()),
-                        sorted(exported_props)
-                    )
+            exported_props = [
+                prop for prop in model._properties
+                if (export_policy[prop] ==
+                base_models.EXPORT_POLICY.EXPORTED)
+            ]
+
+            if export_method == base_models.EXPORT_METHOD.NOT_EXPORTED:
+                self.assertEqual(len(exported_props), 0)
+            elif (export_method ==
+                base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE):
+                exported_data = model.export_data(self.USER_ID_1)
+                self.assertEqual(
+                    sorted([python_utils.UNICODE(key) for key in exported_data.keys()]),
+                    sorted(exported_props)
+                )
+            elif (export_method == 
+                base_models.EXPORT_METHOD.SHARED_INSTANCE):
+                self.assertIsNotNone(
+                    model.get_field_name_mapping_to_takeout_keys)
+                exported_data = model.export_data(self.USER_ID_1)
+                field_mapping = model.get_field_name_mapping_to_takeout_keys()
+                self.assertEqual(
+                    sorted(exported_props),
+                    sorted(field_mapping.keys())
+                )
+                self.assertEqual(
+                    sorted(exported_data.keys()),
+                    sorted(field_mapping.values())
+                )
+            elif (export_method ==
+                base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES):
+                exported_data = model.export_data(self.USER_ID_1)
+
+                # Retrieve the first ID.
+                model_id = exported_data.keys()[0]
+                print(exported_data)
+                self.assertEqual(
+                    sorted([
+                        python_utils.UNICODE(key)
+                        for key in exported_data[model_id].keys()]),
+                    sorted(exported_props)
+                )
+                
 
     def test_export_data_for_full_user_nontrivial_is_correct(self):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
+        self.maxDiff = None
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -1099,14 +1112,16 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated': utils.get_time_in_millisecs(
                     feedback_models.
                     GeneralFeedbackThreadModel.
                     get_by_id(thread_id).last_updated)
             }
         }
         expected_general_feedback_thread_user_data = {
-            thread_id: self.MESSAGE_IDS_READ_BY_USER
+            thread_id: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_BY_USER
+            }
         }
         expected_general_feedback_message_data = {
             thread_id + '.0': {
@@ -1180,8 +1195,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
 
         expected_reply_to_data = {
-            self.THREAD_ID_1: self.USER_1_REPLY_TO_ID_1,
-            self.THREAD_ID_2: self.USER_1_REPLY_TO_ID_2
+            self.THREAD_ID_1: {
+                'reply_to_id': self.USER_1_REPLY_TO_ID_1
+            },
+            self.THREAD_ID_2: {
+                'reply_to_id': self.USER_1_REPLY_TO_ID_2
+            }
         }
 
         expected_subscriptions_data = {

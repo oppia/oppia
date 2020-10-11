@@ -58,9 +58,9 @@ EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 )
 
 EXPORT_METHOD = utils.create_enum(  # pylint: disable=invalid-name
-    'DIRECT_EXPORT',
-    'LIST_OF_IDS',
-    'EXPORT_BY_MODEL_ID',
+    'SINGLE_UNSHARED_INSTANCE',
+    'SHARED_INSTANCE',
+    'MULTIPLE_UNSHARED_INSTANCES',
     'NOT_EXPORTED'
 )
 
@@ -145,6 +145,11 @@ class BaseModel(datastore_services.Model):
         raise NotImplementedError(
             'The export_data() method is missing from the '
             'derived class. It should be implemented in the derived class.')
+    
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single unshared instance."""
+        return EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -423,6 +428,13 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = datastore_services.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = datastore_services.IntegerProperty()
+
+    @staticmethod
+    def get_export_method():
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -1110,6 +1122,13 @@ class VersionedModel(BaseModel):
             'version_number': version_numbers[ind],
             'created_on_ms': utils.get_time_in_millisecs(model.created_on),
         } for (ind, model) in enumerate(returned_models)]
+    
+    @staticmethod
+    def get_export_method():
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -1152,6 +1171,11 @@ class BaseSnapshotMetadataModel(BaseModel):
         their parent models.
         """
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_method():
+        """This model is exported as a single unshared instance."""
+        return EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
     def get_export_policy(cls):
@@ -1270,6 +1294,13 @@ class BaseSnapshotContentModel(BaseModel):
         ExplorationRightsSnapshotContentModel.
         """
         return DELETION_POLICY.NOT_APPLICABLE
+    
+    @staticmethod
+    def get_export_method():
+        """The contents of snapshots are not relevant to the user for
+        Takeout.
+        """
+        return EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):

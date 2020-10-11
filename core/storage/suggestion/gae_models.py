@@ -173,6 +173,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """General suggestion needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single unshared instance."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
@@ -183,11 +188,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'target_version_at_submission':
                 base_models.EXPORT_POLICY.EXPORTED,
             'status': base_models.EXPORT_POLICY.EXPORTED,
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
-            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
-            'score_category': base_models.EXPORT_POLICY.EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.EXPORTED
+            'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -456,7 +461,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd
+                'change_cmd': suggestion_model.change_cmd                
             }
 
         return user_data
@@ -573,6 +578,11 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single unshared instance."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
@@ -583,8 +593,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             'status': base_models.EXPORT_POLICY.EXPORTED,
             'content': base_models.EXPORT_POLICY.EXPORTED,
             'filename': base_models.EXPORT_POLICY.EXPORTED,
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
-            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rejection_message': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -678,6 +688,13 @@ class CommunityContributionStatsModel(base_models.BaseModel):
         information because the data is aggregated.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_method():
+        """This model does not directly contain user
+        information because the data is aggregated.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):

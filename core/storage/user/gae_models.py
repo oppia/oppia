@@ -137,49 +137,50 @@ class UserSettingsModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
-        return {
-            'export_method': base_models.EXPORT_METHOD.DIRECT_EXPORT,
-            'per_field_policy': 
-                dict(super(cls, cls).get_export_policy(),
-                **{
-                    'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                    'email': base_models.EXPORT_POLICY.EXPORTED,
-                    'role': base_models.EXPORT_POLICY.EXPORTED,
-                    'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
-                    'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
-                    'display_alias': base_models.EXPORT_POLICY.EXPORTED,
-                    'user_bio': base_models.EXPORT_POLICY.EXPORTED,
-                    'profile_picture_data_url':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
-                    'preferred_language_codes':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'preferred_site_language_code':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'preferred_audio_language_code':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'username': base_models.EXPORT_POLICY.EXPORTED,
-                    'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
-                    'last_started_state_editor_tutorial':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'last_started_state_translation_tutorial':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'last_edited_an_exploration':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'last_created_an_exploration':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'default_dashboard': base_models.EXPORT_POLICY.EXPORTED,
-                    'creator_dashboard_display_pref':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'first_contribution_msec':
-                        base_models.EXPORT_POLICY.EXPORTED,
-                    'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                    'pin': base_models.EXPORT_POLICY.EXPORTED
-                })
-        }
+        return dict(super(cls, cls).get_export_policy(),
+            **{
+                'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'email': base_models.EXPORT_POLICY.EXPORTED,
+                'role': base_models.EXPORT_POLICY.EXPORTED,
+                'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
+                'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
+                'display_alias': base_models.EXPORT_POLICY.EXPORTED,
+                'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+                'profile_picture_data_url':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
+                'preferred_language_codes':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'preferred_site_language_code':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'preferred_audio_language_code':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'username': base_models.EXPORT_POLICY.EXPORTED,
+                'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
+                'last_started_state_editor_tutorial':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'last_started_state_translation_tutorial':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'last_edited_an_exploration':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'last_created_an_exploration':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'default_dashboard': base_models.EXPORT_POLICY.EXPORTED,
+                'creator_dashboard_display_pref':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'first_contribution_msec':
+                    base_models.EXPORT_POLICY.EXPORTED,
+                'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'pin': base_models.EXPORT_POLICY.EXPORTED
+            })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -360,6 +361,11 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
@@ -408,8 +414,8 @@ class CompletedActivitiesModel(base_models.BaseModel):
             return {}
 
         return {
-            'completed_exploration_ids': user_model.exploration_ids,
-            'completed_collection_ids': user_model.collection_ids
+            'exploration_ids': user_model.exploration_ids,
+            'collection_ids': user_model.collection_ids
         }
 
 
@@ -438,6 +444,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
 
     @classmethod
     def get_export_policy(cls):
@@ -487,8 +498,8 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             return {}
 
         return {
-            'incomplete_exploration_ids': user_model.exploration_ids,
-            'incomplete_collection_ids': user_model.collection_ids
+            'exploration_ids': user_model.exploration_ids,
+            'collection_ids': user_model.collection_ids
         }
 
 
@@ -522,12 +533,17 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES  
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_played_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_played_state_name': base_models.EXPORT_POLICY.EXPORTED
@@ -622,8 +638,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         user_data = {}
         for user_model in found_models:
             user_data[user_model.exploration_id] = {
-                'exp_version': user_model.last_played_exp_version,
-                'state_name': user_model.last_played_state_name
+                'last_played_exp_version': user_model.last_played_exp_version,
+                'last_played_state_name': user_model.last_played_state_name
             }
 
         return user_data
@@ -654,6 +670,11 @@ class LearnerPlaylistModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
 
     @classmethod
     def get_export_policy(cls):
@@ -703,8 +724,8 @@ class LearnerPlaylistModel(base_models.BaseModel):
             return {}
 
         return {
-            'playlist_exploration_ids': user_model.exploration_ids,
-            'playlist_collection_ids': user_model.collection_ids
+            'exploration_ids': user_model.exploration_ids,
+            'collection_ids': user_model.collection_ids
         }
 
 
@@ -730,6 +751,11 @@ class UserContributionsModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
 
     @classmethod
     def get_export_policy(cls):
@@ -834,6 +860,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -880,6 +911,11 @@ class UserSubscriptionsModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
@@ -888,7 +924,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'creator_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'creator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_checked': base_models.EXPORT_POLICY.EXPORTED,
             'feedback_thread_ids': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -937,15 +973,14 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         creator_user_models = UserSettingsModel.get_multi(
             user_model.creator_ids)
-        creator_usernames = [
-            creator.username for creator in creator_user_models]
 
         user_data = {
             'activity_ids': user_model.activity_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
-            'creator_usernames': creator_usernames,
+            'feedback_thread_ids': (
+                user_model.feedback_thread_ids),
             'last_checked':
                 None if user_model.last_checked is None else
                 utils.get_time_in_millisecs(user_model.last_checked)
@@ -999,6 +1034,11 @@ class UserSubscribersModel(base_models.BaseModel):
             ).get(keys_only=True) is not None or
             cls.get_by_id(user_id) is not None)
 
+    @staticmethod
+    def get_export_method():
+        """Model is not included because it contains data about other users."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def get_export_policy(cls):
         """This model is not included because it contains data about other
@@ -1049,6 +1089,11 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED    
 
     @classmethod
     def get_export_policy(cls):
@@ -1116,6 +1161,11 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
 
     @classmethod
     def get_export_policy(cls):
@@ -1261,12 +1311,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
         datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rating': base_models.EXPORT_POLICY.EXPORTED,
             'rated_on': base_models.EXPORT_POLICY.EXPORTED,
             'draft_change_list': base_models.EXPORT_POLICY.EXPORTED,
@@ -1438,12 +1493,17 @@ class CollectionProgressModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a multiple unshared instances."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'collection_id': base_models.EXPORT_POLICY.EXPORTED,
+            'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'completed_explorations': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1576,8 +1636,9 @@ class CollectionProgressModel(base_models.BaseModel):
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
         for user_model in found_models:
-            user_data[user_model.collection_id] = (
-                user_model.completed_explorations)
+            user_data[user_model.collection_id] = {
+                'completed_explorations': user_model.completed_explorations
+            }
 
         return user_data
 
@@ -1612,12 +1673,17 @@ class StoryProgressModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'story_id': base_models.EXPORT_POLICY.EXPORTED,
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'completed_node_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1752,7 +1818,9 @@ class StoryProgressModel(base_models.BaseModel):
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
         for user_model in found_models:
-            user_data[user_model.story_id] = user_model.completed_node_ids
+            user_data[user_model.story_id] = {
+                'completed_node_ids': user_model.completed_node_ids
+            }
         return user_data
 
 
@@ -1809,6 +1877,13 @@ class UserQueryModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_method():
+        """Model is not exported since this is a computed model
+        and the information already exists in other exported models.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED    
 
     @classmethod
     def get_export_policy(cls):
@@ -1912,6 +1987,11 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -1948,12 +2028,17 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as multiple unshared instances. """
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES    
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_id': base_models.EXPORT_POLICY.EXPORTED,
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'degree_of_mastery': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -2009,7 +2094,9 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
         for mastery_model in mastery_models:
             mastery_model_skill_id = mastery_model.skill_id
-            user_data[mastery_model_skill_id] = mastery_model.degree_of_mastery
+            user_data[mastery_model_skill_id] = {
+                'degree_of_mastery': mastery_model.degree_of_mastery
+            }
 
         return user_data
 
@@ -2040,12 +2127,17 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as multiple unshared instances."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES    
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'score_category': base_models.EXPORT_POLICY.EXPORTED,
+            'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'score': base_models.EXPORT_POLICY.EXPORTED,
             'onboarding_email_sent': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -2268,6 +2360,11 @@ class UserContributionRightsModel(base_models.BaseModel):
             'can_review_questions': rights_model.can_review_questions
         }
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single shared instance."""
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
@@ -2380,6 +2477,14 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
+    @staticmethod
+    def get_export_method():
+        """Model does not need to exported as it temporarily holds user
+        requests for data deletion, and does not contain any information
+        relevant to the user for data export.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+
     @classmethod
     def get_export_policy(cls):
         """Model does not need to exported as it temporarily holds user
@@ -2426,6 +2531,11 @@ class DeletedUserModel(base_models.BaseModel):
         """DeletedUserModel contains only IDs that were deleted."""
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def get_export_policy(cls):
         """DeletedUserModel contains only IDs that were deleted."""
@@ -2451,6 +2561,11 @@ class PseudonymizedUserModel(base_models.BaseModel):
     def get_deletion_policy():
         """PseudonymizedUserModel contains only pseudonymous ids."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_method():
+        """PseudonymizedUserModel contains only pseudonymous ids."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED   
 
     @classmethod
     def get_export_policy(cls):
@@ -2513,6 +2628,14 @@ class UserAuthDetailsModel(base_models.BaseModel):
         relevant to one user account.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
+
+    @staticmethod
+    def get_export_method():
+        """Currently, the model holds authentication details relevant only for
+        backend, and no exportable user data. It may contain user data in
+        the future.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED    
 
     @classmethod
     def get_export_policy(cls):

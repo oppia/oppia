@@ -46,6 +46,11 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -90,6 +95,11 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         codebase.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):

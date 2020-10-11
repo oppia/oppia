@@ -82,6 +82,11 @@ class QuestionModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Question should be kept but the creator should be anonymized."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+    
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -229,6 +234,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         anonymized and are not deleted whe user is deleted.
         """
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -654,6 +664,13 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_method():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
@@ -720,6 +737,14 @@ class QuestionSummaryModel(base_models.BaseModel):
         anonymized.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_method():
+        """Model data has already been exported as a part of the QuestionModel
+        export_data function, and thus a new export_data function does not
+        need to be defined here.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):

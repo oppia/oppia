@@ -85,6 +85,11 @@ class CollectionModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Collection is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+    
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -253,19 +258,28 @@ class CollectionRightsModel(base_models.VersionedModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+    
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a shared instance."""
+        return base_models.EXPORT_METHOD.SHARED_INSTANCE
+    
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as a shared instance.
+        """
+        return {
+            'owner_ids': 'owned_collection_ids',
+            'editor_ids': 'editable_collection_ids',
+            'voice_artist_ids': 'voiced_collection_ids',
+            'viewer_ids': 'viewable_collection_ids'
+        }
 
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
-        return {
-            'export_method': base_models.EXPORT_METHOD.LIST_OF_IDS,
-            'list_of_ids_mapping': {
-                'owner_ids': 'owned_collection_ids',
-                'editor_ids': 'editable_collection_ids',
-                'voice_artist_ids': 'voiced_collection_ids',
-                'viewer_ids': 'viewable_collection_ids'
-            },
-            'per_field_policy': dict(super(cls, cls).get_export_policy(), **{
+        return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -277,7 +291,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             # DEPRECATED in v2.8.3.
             'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -490,6 +503,13 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+    
+    @staticmethod
+    def get_export_method():
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -642,6 +662,14 @@ class CollectionSummaryModel(base_models.BaseModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+    
+    @staticmethod
+    def get_export_method():
+        """Model data has already been exported as a part of the
+        CollectionRightsModel, and thus does not need an export_data
+        function.
+        """
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):

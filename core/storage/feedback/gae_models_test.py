@@ -143,7 +143,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                 'has_suggestion': self.HAS_SUGGESTION,
                 'summary': self.SUMMARY,
                 'message_count': self.MESSAGE_COUNT,
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated': utils.get_time_in_millisecs(
                     self.feedback_thread_model.last_updated)
             }
         }
@@ -456,9 +456,15 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         user_data = feedback_models.GeneralFeedbackThreadUserModel.export_data(
             self.USER_ID_A)
         expected_data = {
-            self.THREAD_ID_A: self.MESSAGE_IDS_READ_IN_THREAD_A,
-            self.THREAD_ID_B: self.MESSAGE_IDS_READ_IN_THREAD_B,
-            self.THREAD_ID_C: self.MESSAGE_IDS_READ_IN_THREAD_C
+            self.THREAD_ID_A: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_A
+            },
+            self.THREAD_ID_B: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_B
+            },
+            self.THREAD_ID_C: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_C
+            }
         }
         self.assertDictEqual(expected_data, user_data)
 

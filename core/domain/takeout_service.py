@@ -44,8 +44,8 @@ def get_models_which_should_be_exported():
     """
     return [model_class for model_class in
             models.Registry.get_all_storage_model_classes()
-            if base_models.EXPORT_POLICY.EXPORTED in
-            model_class.get_export_policy().values()]
+            if base_models.EXPORT_METHOD.NOT_EXPORTED !=
+            model_class.get_export_method()]
 
 
 def export_data_for_user(user_id):
@@ -72,6 +72,7 @@ def export_data_for_user(user_id):
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name])
+        print(final_name)
         exported_data[final_name] = model.export_data(user_id)
 
     # Separate out images. We store the images that need to be separated here

@@ -467,8 +467,12 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
             email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
                 self.USER_ID_2))
         expected_data = {
-            self.THREAD_ID_1: self.USER_2_REPLY_TO_ID_1,
-            self.THREAD_ID_2: self.USER_2_REPLY_TO_ID_2
+            self.THREAD_ID_1: {
+                'reply_to_id': self.USER_2_REPLY_TO_ID_1
+            },
+            self.THREAD_ID_2: {
+                'reply_to_id': self.USER_2_REPLY_TO_ID_2
+            }
         }
         self.assertEqual(expected_data, user_data)
 

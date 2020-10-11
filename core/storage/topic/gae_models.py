@@ -187,6 +187,11 @@ class TopicModel(base_models.VersionedModel):
             cls.url_fragment == url_fragment).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -247,6 +252,11 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the topic id and version number.
         """
         return 'topic-%s-%s' % (topic_id, version)
+
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -336,6 +346,11 @@ class TopicSummaryModel(base_models.BaseModel):
         """
         return False
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -357,6 +372,152 @@ class TopicSummaryModel(base_models.BaseModel):
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
+class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a subtopic page snapshot."""
+
+    pass
+
+
+class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of a subtopic page snapshot."""
+
+    pass
+
+
+class SubtopicPageModel(base_models.VersionedModel):
+    """Model for storing Subtopic pages.
+
+    This stores the HTML data for a subtopic page.
+    """
+
+    SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
+    ALLOW_REVERT = False
+
+    # The topic id that this subtopic is a part of.
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The json data of the subtopic consisting of subtitled_html,
+    # recorded_voiceovers and written_translations fields.
+    page_contents = datastore_services.JsonProperty(required=True)
+    # The schema version for the page_contents field.
+    page_contents_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The ISO 639-1 code for the language this subtopic page is written in.
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Subtopic should be kept if associated topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether SubtopicPageModel snapshots references the given user.
+
+        Args:
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(SubtopicPageModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
+        )
+        subtopic_page_commit_log_entry.subtopic_page_id = self.id
+        subtopic_page_commit_log_entry.put()
+
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model does not contain user data."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_contents_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
+class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to subtopic pages.
+
+    A new instance of this model is created and saved every time a commit to
+    SubtopicPageModel occurs.
+
+    The id for this model is of the form
+    'subtopicpage-[subtopic_page_id]-[version]'.
+    """
+
+    # The id of the subtopic page being edited.
+    subtopic_page_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Subtopic page commit log is deleted only if the corresponding
+        topic is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def _get_instance_id(cls, subtopic_page_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            subtopic_page_id: str. The id of the subtopic page being edited.
+            version: int. The version number of the subtopic page after the
+                commit.
+
+        Returns:
+            str. The commit id with the subtopic page id and version number.
+        """
+        return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
+
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
+    @classmethod
+    def get_export_policy(cls):
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -484,6 +645,11 @@ class TopicRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model.put()
 
+    @staticmethod
+    def get_export_method():
+        """Model is exported as a single unshared instance."""
+        return base_models.EXPORT_METHOD.SHARED_INSTANCE
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
@@ -491,6 +657,15 @@ class TopicRightsModel(base_models.VersionedModel):
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+    
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as a shared instance.
+        """
+        return {
+            'manager_ids': 'managed_topic_ids'
+        }
 
     @classmethod
     def export_data(cls, user_id):

@@ -53,6 +53,11 @@ class RoleQueryAuditModel(base_models.BaseModel):
         """Audit logs are kept for investigation purposes."""
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -99,6 +104,11 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     def get_deletion_policy():
         """Audit logs are kept for investigation purposes."""
         return base_models.DELETION_POLICY.KEEP
+    
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
