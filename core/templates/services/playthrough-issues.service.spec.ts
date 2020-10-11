@@ -105,7 +105,7 @@ describe('Playthrough Issues Service', function() {
 
   it('should get playthrough from backend', function() {
     var backendCallSpy = spyOn(
-      PlaythroughIssuesBackendApiService, 'fetchPlaythrough').and
+      PlaythroughIssuesBackendApiService, 'fetchPlaythroughAsync').and
       .returnValue($q.resolve(PlaythroughObjectFactory.createFromBackendDict(
         backendPlaythrough)));
     var playthroughId = 'exp_id1';
