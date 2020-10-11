@@ -96,7 +96,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
           explorationId, explorationVersion);
       },
       getPlaythrough: function(playthroughId) {
-        return PlaythroughIssuesBackendApiService.fetchPlaythrough(
+        return PlaythroughIssuesBackendApiService.fetchPlaythroughAsync(
           explorationId, playthroughId);
       },
       renderIssueStatement: function(issue) {
