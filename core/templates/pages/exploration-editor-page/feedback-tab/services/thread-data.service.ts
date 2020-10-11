@@ -141,28 +141,31 @@ export class ThreadDataService {
     // tests.
     let threadsPromise = this.http.get(this.getThreadListHandlerUrl());
 
-    return forkJoin([suggestionsPromise, threadsPromise]).toPromise().then((response: any) => {
-      let [suggestionData, threadData] = response;
-      let suggestionBackendDicts: SuggestionBackendDict[] = (
-        suggestionData.suggestions);
-      let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
-      let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
+    return forkJoin([suggestionsPromise, threadsPromise])
+      .toPromise()
+      .then((response: any) => {
+        let [suggestionData, threadData] = response;
+        let suggestionBackendDicts: SuggestionBackendDict[] = (
+          suggestionData.suggestions);
+        let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
+        let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
-      let suggestionBackendDictsByThreadId = new Map(
-        suggestionBackendDicts.map(dict => [
-          this.suggestionsService.getThreadIdFromSuggestionBackendDict(dict),
-          dict
-        ]));
+        let suggestionBackendDictsByThreadId = new Map(
+          suggestionBackendDicts.map(dict => [
+            this.suggestionsService.getThreadIdFromSuggestionBackendDict(dict),
+            dict
+          ]));
 
-      return {
-        feedbackThreads: feedbackThreadBackendDicts.map(
-          dict => this.setFeedbackThreadFromBackendDict(dict)),
-        suggestionThreads: suggestionThreadBackendDicts.map(
-          dict => this.setSuggestionThreadFromBackendDicts(
-            dict, suggestionBackendDictsByThreadId.get(!dict || dict.thread_id)))
-      };
-    },
-    () => Promise.reject('Error on retrieving feedback threads.'));
+        return {
+          feedbackThreads: feedbackThreadBackendDicts.map(
+            dict => this.setFeedbackThreadFromBackendDict(dict)),
+          suggestionThreads: suggestionThreadBackendDicts.map(
+            dict => this.setSuggestionThreadFromBackendDicts(
+              dict, suggestionBackendDictsByThreadId.get(
+                !dict || dict.thread_id)))
+        };
+      },
+      () => Promise.reject('Error on retrieving feedback threads.'));
   }
 
   getMessagesAsync(thread: AnyThread): Promise<ThreadMessage[]> {
@@ -187,7 +190,7 @@ export class ThreadDataService {
     return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
       .then((response: any) => {
         return this.openThreadsCount = response.num_open_threads;
-    });
+      });
   }
 
   getOpenThreadsCount(): number {
@@ -196,20 +199,20 @@ export class ThreadDataService {
 
   createNewThreadAsync(newSubject: string, newText: string):
     Promise<void | SuggestionAndFeedbackThreads> {
-      // TODO(#8016): Move this http call to a backend-api.service with unit
-      // tests.
-      return this.http.post(this.getThreadListHandlerUrl(), {
-        state_name: null,
-        subject: newSubject,
-        text: newText
-      }).toPromise().then(() => {
-        this.openThreadsCount += 1;
-        return this.getThreadsAsync();
-      },
-      error => {
-        this.alertsService.addWarning(
-          'Error creating new thread: ' + error + '.');
-      });
+    // TODO(#8016): Move this http call to a backend-api.service with unit
+    // tests.
+    return this.http.post(this.getThreadListHandlerUrl(), {
+      state_name: null,
+      subject: newSubject,
+      text: newText
+    }).toPromise().then(() => {
+      this.openThreadsCount += 1;
+      return this.getThreadsAsync();
+    },
+    error => {
+      this.alertsService.addWarning(
+        'Error creating new thread: ' + error + '.');
+    });
   }
 
   markThreadAsSeenAsync(thread: AnyThread): Promise<void> {

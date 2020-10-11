@@ -42,13 +42,13 @@ describe('retrieving threads service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
-    })
+    });
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
   afterEach(() => {
     httpTestingController.verify();
-  })
+  });
 
   beforeEach(() => {
     mockFeedbackThreads = [
@@ -257,8 +257,8 @@ describe('retrieving threads service', () => {
       req = httpTestingController.expectOne('/threadlisthandler/exp1');
       expect(req.request.method).toEqual('GET');
       req.flush('Error on retrieving feedback threads.', {
-         status: 500,
-         statusText: 'Error on retrieving feedback threads.'
+        status: 500,
+        statusText: 'Error on retrieving feedback threads.'
       });
 
       flushMicrotasks();
@@ -336,20 +336,22 @@ describe('retrieving threads service', () => {
     flushMicrotasks();
   }));
 
-  it('should use reject handler when fetching feedback stats fails', fakeAsync(() => {
-    threadDataService.getOpenThreadsCountAsync().then(
-      Promise.reject,
-      () => {
-        expect(threadDataService.getOpenThreadsCount()).toEqual(0);
-        Promise.resolve();
-      });
+  it(
+    'should use reject handler when fetching feedback stats fails',
+    fakeAsync(() => {
+      threadDataService.getOpenThreadsCountAsync().then(
+        Promise.reject,
+        () => {
+          expect(threadDataService.getOpenThreadsCount()).toEqual(0);
+          Promise.resolve();
+        });
 
-    let req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush('Error on fetch feedback stats', {status: 500, statusText: ''});
+      let req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error on fetch feedback stats', {status: 500, statusText: ''});
 
-    flushMicrotasks();
-  }));
+      flushMicrotasks();
+    }));
 
   it('should successfully create a new thread', fakeAsync(() => {
     let subject = 'New Subject';
@@ -431,7 +433,8 @@ describe('retrieving threads service', () => {
     'should use reject handler when marking thread as seen fails',
     fakeAsync(() => {
       let mockThread = mockFeedbackThreads[0];
-      let thread = feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+      let thread = feedbackThreadObjectFactory.createFromBackendDict(
+        mockThread);
 
       threadDataService.markThreadAsSeenAsync(thread).then(
         Promise.reject,
@@ -446,7 +449,7 @@ describe('retrieving threads service', () => {
       req.flush(null, { status: 500, statusText: '' });
 
       flushMicrotasks();
-  }));
+    }));
 
   it('should use reject handler when passing a null thread', () => {
     expect(() => threadDataService.addNewMessageAsync(null, 'Message', 'open'))
