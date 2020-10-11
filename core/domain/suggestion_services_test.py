@@ -1707,6 +1707,30 @@ class ReviewableSuggestionEmailInfoUnitTests(
             'test description'
         )
 
+    def _create_edit_state_content_suggestion(self):
+        """Creates an "edit state content" suggestion."""
+
+        edit_state_content_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new html content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'old html content'
+            }
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, edit_state_content_change_dict,
+            'test description')
+
     def _assert_reviewable_suggestion_email_infos_are_equal(
             self, reviewable_suggestion_email_info,
             expected_reviewable_suggestion_email_info):
@@ -1736,6 +1760,37 @@ class ReviewableSuggestionEmailInfoUnitTests(
         self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
+
+    def test_create_raises_for_suggestion_type_not_on_contributor_dashboard(
+            self):
+        edit_state_content_suggestion = (
+            self._create_edit_state_content_suggestion())
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected suggestion type to be offered on the Contributor '
+            'Dashboard, received: %s.' % (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    edit_state_content_suggestion)
+            )
+
+    def test_contributor_suggestion_types_are_in_suggestion_text_getter_dict(
+            self):
+        # This test will fail if a new suggestion type is added to the
+        # Contributor Dashboard but hasn't been added to
+        # SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.
+        sorted_text_getter_dict_suggestion_types = sorted(
+            suggestion_services
+            .SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys())
+        sorted_contributor_dashboard_suggestion_types = sorted(
+            suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)
+
+        self.assertListEqual(
+            sorted_text_getter_dict_suggestion_types,
+            sorted_contributor_dashboard_suggestion_types)
 
     def test_create_from_suggestion_returns_info_for_question_suggestion(self):
         question_suggestion = (
@@ -1958,33 +2013,6 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def test_create_returns_info_for_translation_suggestion_if_html_nested_rte(
-            self):
-        translation_suggestion = (
-            self._create_translation_suggestion_with_translation_html(
-                '<p> translation with rte'
-                '<oppia-noninteractive-link>'
-                '<oppia-noninteractive-math></oppia-noninteractive-math>'
-                '</oppia-noninteractive-link></p>'))
-        expected_reviewable_suggestion_email_info = (
-            suggestion_registry.ReviewableSuggestionEmailInfo(
-                translation_suggestion.suggestion_type,
-                translation_suggestion.language_code,
-                'translation with rte [Link] [Math]',
-                translation_suggestion.last_updated
-            ))
-
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion)
-        )
-
-        self._assert_reviewable_suggestion_email_infos_are_equal(
-            reviewable_suggestion_email_info,
-            expected_reviewable_suggestion_email_info
-        )
-
     def test_create_returns_info_for_translation_suggestion_if_html_rte_value(
             self):
         translation_suggestion = (
@@ -2138,19 +2166,18 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def test_create_returns_info_for_question_suggestion_if_html_has_nested_rte(
+    def test_create_returns_info_for_question_suggestion_if_html_has_rte_value(
             self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
-                '<p> question with rte'
-                '<oppia-noninteractive-link>'
-                '<oppia-noninteractive-math></oppia-noninteractive-math>'
-                '</oppia-noninteractive-link></p>'))
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
+                'quot;"></oppia-noninteractive-link></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
-                'question with rte [Link] [Math]',
+                '[Link]',
                 question_suggestion.last_updated
             ))
 
@@ -2165,18 +2192,71 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info
         )
 
-    def test_create_returns_info_for_question_suggestion_if_html_has_rte_value(
+    def test_create_returns_info_for_suggestion_if_html_has_rte_with_text(
             self):
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
                 'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
-                'quot;"></oppia-noninteractive-link></p>'))
+                'quot;">text</oppia-noninteractive-link></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
                 question_suggestion.language_code,
                 '[Link]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_suggestion_if_html_has_rte_with_html(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
+                'quot;"><p>text</p></oppia-noninteractive-link></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                '[Link]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_suggestion_if_html_has_rte_with_multi_word(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p><oppia-noninteractive-link-test text-with-value='
+                '"&amp;quot;Test a tag&amp;quot;" url-with-value="&amp;quot;'
+                'somelink&amp;quot;"><p>text</p>'
+                '</oppia-noninteractive-link-test></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                '[Link Test]',
                 question_suggestion.last_updated
             ))
 

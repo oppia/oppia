@@ -51,15 +51,12 @@ MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = 5
 # suggestion opportunities. For instance, for translation suggestions the
 # emphasized text is the translation. Similarly, for question suggestions the
 # emphasized text is the question being asked.
-HTML_FOR_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
-    # The translation html is always the first element in the list of
-    # translation suggestion html content strings.
+SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-        lambda html_content_strings: html_content_strings[0]),
-    # The question content html is always the last element in the list of
-    # question suggestion html content strings.
+        lambda suggestion: suggestion.change.translation_html),
     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-        lambda html_content_strings: html_content_strings[-1])
+        lambda suggestion: suggestion.change.question_dict[
+            'question_state_data']['content']['html'])
 }
 
 
@@ -627,10 +624,10 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def _get_plain_text_from_html_content_string(html_content_string):
     """Retrieves the plain text from the given html content string. RTE element
-    occurrences in the html are replaced by their corresponding name,
+    occurrences in the html are replaced by their corresponding rte tool name,
     capitalized in square brackets.
     eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
-        Sample2 </p> will give as output: Sample1 [MATH] Sample2.
+        Sample2 </p> will give as output: Sample1 [Math] Sample2.
     Note: similar logic exists in the frontend in format-rte-preview.filter.ts.
 
     Args:
@@ -642,38 +639,48 @@ def _get_plain_text_from_html_content_string(html_content_string):
     """
 
     def _replace_rte_tag(rte_tag):
-        """Replaces all of the <oppia-noninteractive-**> tags.
+        """Replaces all of the <oppia-noninteractive-**> tags with their
+        corresponding rte tool name in square brackets.
 
         Args:
-            rte_tag: MatchObject. The matched oppia-noninteractive rte tag.
+            rte_tag: MatchObject. A matched object that contins the
+                oppia-noninteractive rte tags.
 
         Returns:
-            str. The string to replace the rte tag with.
+            str. The string to replace the rte tags with.
         """
-        # Convert the MatchObject to a string.
+        # Retrieve the matched string from the MatchObject.
         rte_tag_string = rte_tag.group(0)
-        # Get the name of the noninteractive tag (ex. math).
-        replace_string = rte_tag_string.split('-')[2].split(' ')[0]
-        if replace_string[-1] == '>':
-            replace_string = replace_string[:-1]
-        replace_string = replace_string.capitalize()
-        replace_string = ' [%s] ' % replace_string
-        return replace_string
+        # Get the name of the rte tag. The hyphen is there as an optional
+        # matching character to cover the case where the name of the rte tool
+        # is more than one word.
+        rte_tag_name = re.search(
+            r'oppia-noninteractive-(\w|-)+', rte_tag_string)
+        # Retrieve the matched string from the MatchObject.
+        rte_tag_name_string = rte_tag_name.group(0)
+        # Get the name of the rte tool.
+        rte_tool_name_string = rte_tag_name_string.split('-')[2:]
+        # If the tool name is more than word, connect the words with spaces
+        # to create a single string.
+        rte_tool_name_string = ' '.join(rte_tool_name_string)
+        # Captialize each word in the string.
+        capitalized_rte_tool_name_string = rte_tool_name_string.title()
+        formatted_rte_tool_name_string = ' [%s] ' % (
+            capitalized_rte_tool_name_string)
+        return formatted_rte_tool_name_string
 
-    # Replace all the opening <oppia-noninteractive-**> tags with their names
+    # Replace all the <oppia-noninteractive-**> tags with their rte tool names
     # capitalized in square brackets.
-    html_content_string_with_noninteractive_tag_replaced = re.sub(
-        r'<(oppia-noninteractive\s*?)[^>]+>', _replace_rte_tag,
-        html_content_string)
-    # Get rid of all of the other html tags, including closing tags and
-    # malformed html tags if they exist.
+    html_content_string_with_rte_tags_replaced = re.sub(
+        r'<(oppia-noninteractive-.+?)[^>]+>(.*?)</oppia-noninteractive-.+?>',
+        _replace_rte_tag, html_content_string)
+    # Get rid of all of the other html tags.
     plain_text = html_cleaner.strip_html_tags(
-        html_content_string_with_noninteractive_tag_replaced
-    )
+        html_content_string_with_rte_tags_replaced)
     # Remove trailing and leading whitespace and ensure that all words are
     # separated by a single space.
-    plain_text_without_whitespace_issues = ' '.join(plain_text.split())
-    return plain_text_without_whitespace_issues
+    plain_text_without_contiguous_whitespace = ' '.join(plain_text.split())
+    return plain_text_without_contiguous_whitespace
 
 
 def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
@@ -688,17 +695,26 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     Returns:
         ReviewableSuggestionEmailInfo. The corresponding reviewable suggestion
         email info.
+
+    Raises:
+        Exception. The suggestion type must be offered on the Contributor
+            Dashboard.
     """
-    html_content_strings = suggestion.get_all_html_content_strings()
+    if suggestion.suggestion_type not in (
+            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS):
+        raise Exception(
+            'Expected suggestion type to be offered on the Contributor '
+            'Dashboard, received: %s.' % suggestion.suggestion_type)
+
     # Retrieve the html content that is emphasized on the Contributor Dashboard
     # pages. This content is what stands out for each suggestion when a user
     # views a list of suggestions.
-    get_html_content_for_emphasized_text = (
-        HTML_FOR_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+    get_html_representing_suggestion = (
+        SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
             suggestion.suggestion_type]
     )
     plain_text = _get_plain_text_from_html_content_string(
-        get_html_content_for_emphasized_text(html_content_strings))
+        get_html_representing_suggestion(suggestion))
     return suggestion_registry.ReviewableSuggestionEmailInfo(
         suggestion.suggestion_type, suggestion.language_code, plain_text,
         suggestion.last_updated
