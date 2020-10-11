@@ -41,9 +41,9 @@ angular.module('oppia').component('cyclicTransitionsIssue', {
       };
 
       var issueResolved = false;
-      $scope.resolveIssue = function() {
+      $scope.resolveIssueAsync = function() {
         if (!issueResolved) {
-          PlaythroughIssuesService.resolveIssue(issue);
+          PlaythroughIssuesService.resolveIssueAsync(issue);
           AlertsService.addSuccessMessage(
             'Issue resolved. Refresh the page to view changes.');
           issueResolved = true;
