@@ -94,24 +94,24 @@ describe('Early Quit Issue Component', function() {
   });
 
   it('should resolve issue if it\'s not resolved yet', function() {
-    spyOn(playthroughIssuesService, 'resolveIssue').and.callFake(() => {});
+    spyOn(playthroughIssuesService, 'resolveIssueAsync').and.callFake(() => {});
     spyOn(alertsService, 'addSuccessMessage');
-    $scope.resolveIssue();
+    $scope.resolveIssueAsync();
 
-    expect(playthroughIssuesService.resolveIssue).toHaveBeenCalled();
+    expect(playthroughIssuesService.resolveIssueAsync).toHaveBeenCalled();
     expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
       'Issue resolved. Refresh the page to view changes.');
   });
 
   it('should not resolve issue if it\'s already resolved', function() {
     // Resolve issue.
-    $scope.resolveIssue();
+    $scope.resolveIssueAsync();
 
-    spyOn(playthroughIssuesService, 'resolveIssue').and.callFake(() => {});
+    spyOn(playthroughIssuesService, 'resolveIssueAsync').and.callFake(() => {});
     spyOn(alertsService, 'addSuccessMessage');
-    $scope.resolveIssue();
+    $scope.resolveIssueAsync();
 
-    expect(playthroughIssuesService.resolveIssue).not.toHaveBeenCalled();
+    expect(playthroughIssuesService.resolveIssueAsync).not.toHaveBeenCalled();
     expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
       'Issue has already been resolved. No need to resolve again. ' +
       'Refresh the page to view changes.');
