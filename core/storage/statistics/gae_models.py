@@ -1427,13 +1427,11 @@ class PlaythroughModel(base_models.BaseModel):
             str. ID of the new PlaythroughModel instance.
         """
         instance_id = cls._generate_id(exp_id)
-        playthrough_instance = cls(
+        cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             issue_type=issue_type,
             issue_customization_args=issue_customization_args,
-            actions=actions)
-        playthrough_instance.update_timestamps()
-        playthrough_instance.put()
+            actions=actions).put()
         return instance_id
 
     @classmethod
@@ -1444,6 +1442,7 @@ class PlaythroughModel(base_models.BaseModel):
             playthrough_ids: list(str). List of playthrough IDs to be deleted.
         """
         instances = cls.get_multi(playthrough_ids)
+        cls.update_timestamps_multi(instances)
         cls.delete_multi(instances)
 
     @classmethod

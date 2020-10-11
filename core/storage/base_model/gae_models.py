@@ -91,19 +91,20 @@ class BaseModel(datastore_services.Model):
             Exception. The model has not refreshed the value of last_updated.
         """
         super(BaseModel, self)._pre_put_hook()
-        self._update_empty_timestamps()
-        if not self._last_updated_timestamp_is_fresh:
-            raise Exception('Did not call self.update_timestamps() yet')
-        self._last_updated_timestamp_is_fresh = False
 
-    def _update_empty_timestamps(self):
-        """Update the created_on and last_updated fields if they're empty."""
         if self.created_on is None:
             self.created_on = datetime.datetime.utcnow()
 
         if self.last_updated is None:
-            self._last_updated_timestamp_is_fresh = True
             self.last_updated = datetime.datetime.utcnow()
+            self._last_updated_timestamp_is_fresh = True
+
+        print(self.id, ': ', self._last_updated_timestamp_is_fresh)
+
+        if not self._last_updated_timestamp_is_fresh:
+            raise Exception('Did not call self.update_timestamps() yet')
+
+        self._last_updated_timestamp_is_fresh = False
 
     @property
     def id(self):
@@ -295,8 +296,7 @@ class BaseModel(datastore_services.Model):
             entities: list(datastore_services.Model). The list of model
                 instances to be deleted.
         """
-        keys = [entity.key for entity in entities]
-        datastore_services.delete_multi(keys)
+        datastore_services.delete_multi([entity.key for entity in entities])
 
     @classmethod
     def delete_by_id(cls, instance_id):
@@ -309,7 +309,7 @@ class BaseModel(datastore_services.Model):
 
     def delete(self):
         """Deletes this instance."""
-        super(BaseModel, self).key.delete()
+        self.key.delete()
 
     @classmethod
     def get_all(cls, include_deleted=False):
@@ -322,10 +322,9 @@ class BaseModel(datastore_services.Model):
         Returns:
             iterable. Filterable iterable of all entities of this class.
         """
-        query = cls.query()
-        if not include_deleted:
-            query = query.filter(cls.deleted == False)  # pylint: disable=singleton-comparison
-        return query
+        return (
+            cls.query() if include_deleted else
+            cls.query().filter(cls.deleted == False)) # pylint: disable=singleton-comparison
 
     @classmethod
     def get_new_id(cls, entity_name):
