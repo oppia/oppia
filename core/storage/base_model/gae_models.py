@@ -99,8 +99,6 @@ class BaseModel(datastore_services.Model):
             self.last_updated = datetime.datetime.utcnow()
             self._last_updated_timestamp_is_fresh = True
 
-        print(self.id, ': ', self._last_updated_timestamp_is_fresh)
-
         if not self._last_updated_timestamp_is_fresh:
             raise Exception('Did not call self.update_timestamps() yet')
 

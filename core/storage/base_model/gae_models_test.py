@@ -148,13 +148,13 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.put()
 
         with self.assertRaisesRegexp(
-                Exception, 'Did not call self.update_timestamps\(\) yet'):
+            Exception, r'Did not call self.update_timestamps\(\) yet'):
             model.put()
 
         model = base_models.BaseModel.get_by_id(model.id)
 
         with self.assertRaisesRegexp(
-                Exception, 'Did not call self.update_timestamps\(\) yet'):
+            Exception, r'Did not call self.update_timestamps\(\) yet'):
             model.put()
 
     def test_put_async(self):
