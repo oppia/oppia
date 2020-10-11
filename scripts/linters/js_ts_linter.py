@@ -1115,12 +1115,9 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         eslint_path = os.path.join(
             'node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
-            python_utils.PRINT(
-                '         and its dependencies.')
-            sys.exit(1)
+            raise Exception(
+                'ERROR    Please run start.sh first to install node-eslint '
+                'and its dependencies.')
 
         files_to_lint = self.all_filepaths
         num_files_with_errors = 0
@@ -1140,9 +1137,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
             linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
             if linter_stderr:
-                python_utils.PRINT('LINTER FAILED')
-                python_utils.PRINT(linter_stderr)
-                sys.exit(1)
+                raise Exception(linter_stderr)
 
             if linter_stdout:
                 num_files_with_errors += 1

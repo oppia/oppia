@@ -25,10 +25,10 @@ import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 import { QuestionBackendDict } from
   'domain/question/QuestionObjectFactory';
-import { QuestionSummaryBackendDict } from
-  'domain/question/QuestionSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { QuestionSummaryForOneSkillBackendDict } from
+  'domain/question/QuestionSummaryForOneSkillObjectFactory';
 
 interface QuestionCountBackendResponse {
   'total_question_count': number;
@@ -38,20 +38,13 @@ interface QuestionsBackendResponse {
   'question_dicts': QuestionBackendDict[];
 }
 
-interface AugmentedQuestionSummaryBackendDict {
-  'summary': QuestionSummaryBackendDict[];
-  'skill_ids': string[];
-  'skill_descriptions': string[];
-  'skill_difficulties': number[];
-}
-
 interface QuestionSummariesBackendResponse {
-  'question_summary_dicts': AugmentedQuestionSummaryBackendDict[];
+  'question_summary_dicts': QuestionSummaryForOneSkillBackendDict[];
   'next_start_cursor': string;
 }
 
 interface QuestionSummariesResponse {
-  questionSummaries: AugmentedQuestionSummaryBackendDict[];
+  questionSummaries: QuestionSummaryForOneSkillBackendDict[];
   nextCursor: string;
 }
 
@@ -113,17 +106,15 @@ export class QuestionBackendApiService {
   }
 
   private _fetchQuestionSummaries(
-      skillIds: string[], cursor: string,
+      skillId: string, cursor: string,
       successCallback: (value: QuestionSummariesResponse) => void,
       errorCallback: (reason: string) => void): void|boolean {
-    if (!this.isListOfStrings(skillIds)) {
-      errorCallback('Skill ids should be a list of strings');
-      return false;
-    }
+    const skillIds = [skillId];
+
     var questionsDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(','),
-        cursor: cursor ? cursor : ''
+        cursor: cursor
       });
     this.http.get<QuestionSummariesBackendResponse>(
       questionsDataUrl
@@ -207,9 +198,10 @@ export class QuestionBackendApiService {
   }
 
   fetchQuestionSummaries(
-      skillIds: string[], cursor: string): Promise<QuestionSummariesResponse> {
+      skillId: string,
+      cursor: string = ''): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestionSummaries(skillIds, cursor, resolve, reject);
+      this._fetchQuestionSummaries(skillId, cursor, resolve, reject);
     });
   }
 }

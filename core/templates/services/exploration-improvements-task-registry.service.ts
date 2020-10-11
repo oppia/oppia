@@ -24,7 +24,7 @@ import { group } from 'd3-array';
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { States } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import {
   ExplorationTask,
   ExplorationTaskObjectFactory,
