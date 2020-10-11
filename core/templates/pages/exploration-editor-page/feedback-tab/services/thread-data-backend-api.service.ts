@@ -36,7 +36,7 @@ import { forkJoin } from 'rxjs';
 type AnyThread = FeedbackThread | SuggestionThread;
 
 interface NumberOfOpenThreads {
-  "num_open_threads": number;
+  'num_open_threads': number;
 }
 
 interface SuggestionAndFeedbackThreads {
