@@ -107,27 +107,27 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
-        self.item = MockModel(id='mockmodel')
-        self.item.put()
+        self.invalid_model = MockModel(id='mockmodel')
+        self.invalid_model.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_id_relationships\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
-            MockBaseModelValidator().validate(self.item)
+            MockBaseModelValidator().validate(self.invalid_model)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_model_properties\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
-            MockSummaryModelValidator().validate(self.item)
+            MockSummaryModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
         with self.assertRaisesRegexp(
             Exception, 'External model name should be specified'):
-            MockSnapshotContentModelValidator().validate(self.item)
+            MockSnapshotContentModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
         with self.assertRaisesRegexp(
@@ -151,7 +151,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_error_is_raised_with_invalid_validation_type_for_domain_objects(
             self):
-        MockModelValidatorWithInvalidValidationType.validate(self.item)
+        MockModelValidatorWithInvalidValidationType.validate(self.invalid_model)
         expected_errors = {
             'domain object check': [
                 'Entity id mockmodel: Entity fails domain validation with '
