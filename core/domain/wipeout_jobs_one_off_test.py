@@ -76,8 +76,6 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
 
         self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.user_1_id))
@@ -145,6 +143,9 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
 
     def test_verification_when_user_is_wrongly_deleted_fails(self):
         pending_deletion_request = (
