@@ -1336,7 +1336,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     if not config_domain.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED:
         log_new_error(
-            'Contributor Dashboard reviewer emails must be enabled on the '
+            'Notifying Contributor Dashboard reviewers must be enabled on the '
             'config page in order to send reviewers the emails.'
         )
         return

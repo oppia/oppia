@@ -2335,7 +2335,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
-            'Contributor Dashboard reviewer emails must be enabled on the '
+            'Notifying Contributor Dashboard reviewers must be enabled on the '
             'config page in order to send reviewers the emails.')
 
     def test_email_not_sent_if_reviewer_does_not_exist(self):
