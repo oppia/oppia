@@ -499,6 +499,23 @@ def is_user_id_valid(user_id):
         len(user_id) == feconf.USER_ID_LENGTH))
 
 
+def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
+    """Verify that the user ID is in a correct format or it is in correct
+    pseudonymous ID format.
+
+    Args:
+        user_or_pseudonymous_id: str. The user or pseudonymous ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct user ID or pseudonymous ID
+        format, False otherwise.
+    """
+    return (
+        is_user_id_valid(user_or_pseudonymous_id) or
+        utils.is_pseudonymous_id(user_or_pseudonymous_id)
+    )
+
+
 def is_username_taken(username):
     """Returns whether the given username has already been taken.
 
@@ -1403,7 +1420,7 @@ def get_pseudonymous_username(pseudonymous_id):
         str. The pseudonymous username, starting with 'User' and ending with
         the last eight letters from the pseudonymous_id.
     """
-    return 'User%s%s' % (
+    return 'User_%s%s' % (
         pseudonymous_id[-8].upper(), pseudonymous_id[-7:])
 
 
