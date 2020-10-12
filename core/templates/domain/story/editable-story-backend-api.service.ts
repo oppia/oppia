@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
-import { SkillSummaryBackendDict } from 'domain/skill/skill-summary-object.factory';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { StoryBackendDict } from 'domain/story/StoryObjectFactory';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -35,7 +35,7 @@ interface FetchStoryBackendResponse {
   'classroom_url_fragment': string;
 }
 
-interface StoryBackendResponse {
+interface FetchStoryResponse {
   story: StoryBackendDict;
   topicName: string;
   storyIsPublished: boolean;
@@ -48,6 +48,10 @@ interface UpdateStoryBackendResponse {
   story: StoryBackendDict;
 }
 
+interface StoryUrlFragmentExists {
+  story_url_fragment: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -58,7 +62,7 @@ export class EditableStoryBackendApiService {
 
   private _fetchStory(
       storyId: string,
-      successCallback: (value: StoryBackendResponse) => void,
+      successCallback: (value: FetchStoryResponse) => void,
       errorCallback: (reason: string) => void): void {
     const editableStoryDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
@@ -88,7 +92,7 @@ export class EditableStoryBackendApiService {
       storyId: string, storyVersion: string,
       commitMessage: string,
       changeList: StoryChange[],
-      successCallback: (value: StoryBackendDict) =>void,
+      successCallback: (value: StoryBackendDict) => void,
       errorCallback: (reason: string) => void): void {
     const editableStoryDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
@@ -117,7 +121,7 @@ export class EditableStoryBackendApiService {
       StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
         story_id: storyId
       });
-    var putData = {
+    const putData = {
       new_story_status_is_public: newStoryStatusIsPublic
     };
     // eslint-disable-next-line max-len
@@ -126,19 +130,20 @@ export class EditableStoryBackendApiService {
       errorResponse => errorCallback(errorResponse.error.error));
   }
 
-  private _validateExplorations = function(
+  private _validateExplorations(
       storyId: string,
       expIds: string[],
-      successCallback: (value?: string | PromiseLike<Object>) =>void,
-      errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      successCallback: (value: number) => void,
+      errorCallback: (reason: string) => void): void {
     const validateExplorationsUrl =
       this.urlInterpolationService.interpolateUrl(
         StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
           story_id: storyId
         });
 
-    this.http.get(
+    this.http.get<void>(
       validateExplorationsUrl, {
+        observe: 'response',
         params: {
           comma_separated_exp_ids: expIds.join(',')
         }
@@ -146,53 +151,53 @@ export class EditableStoryBackendApiService {
     ).toPromise().then(
       response => successCallback(response.status),
       errorResponse => errorCallback(errorResponse.error.error));
-  };
+  }
 
-  private _deleteStory = function(
+  private _deleteStory(
       storyId: string,
-      successCallback: (value?: string | PromiseLike<Object>) =>void,
-      errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      successCallback: (value:number ) =>void,
+      errorCallback: (reason: string) => void): void {
     const storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
       });
 
-    this.http.request(
-      'delete',
-      storyDataUrl).toPromise().then(
+    // eslint-disable-next-line
+    this.http.delete(
+      storyDataUrl, {observe: 'response'}).toPromise().then(
       (response) => {
         if (successCallback) {
           successCallback(response.status);
         }
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         if (errorCallback) {
           errorCallback(errorResponse.error.error);
         }
       });
-  };
+  }
 
-  private _doesStoryWithUrlFragmentExist = function(
+  private _doesStoryWithUrlFragmentExist(
       storyUrlFragment: string,
-      successCallback: (value?: string | PromiseLike<Object>) =>void,
-      errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      successCallback: (value: StoryUrlFragmentExists) => void,
+      errorCallback: (reason: string) => void): void {
     const storyUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
         story_url_fragment: storyUrlFragment
       });
-    this.http.get(
-      storyUrlFragmentUrl).toPromise().then(
+    this.http.get<StoryUrlFragmentExists>(
+      storyUrlFragmentUrl, {observe: 'response'}).toPromise().then(
       (response) => {
         if (successCallback) {
           successCallback(response.status);
         }
-      }, function(errorResponse) {
+      },(errorResponse) => {
         if (errorCallback) {
           errorCallback(errorResponse.error.error);
         }
       });
-  };
+  }
 
-  fetchStory(storyId: string): Promise<Object> {
+  fetchStory(storyId: string): Promise<FetchStoryResponse> {
     return new Promise((resolve, reject) => {
       this._fetchStory(storyId, resolve, reject);
     });
@@ -212,7 +217,7 @@ export class EditableStoryBackendApiService {
       storyId: string, storyVersion: string,
       commitMessage: string,
       changeList: StoryChange[]):
-    Promise<Object> {
+    Promise<StoryBackendDict> {
     return new Promise((resolve, reject) => {
       this._updateStory(
         storyId, storyVersion, commitMessage, changeList,
@@ -223,28 +228,28 @@ export class EditableStoryBackendApiService {
   changeStoryPublicationStatus(
       storyId: string,
       newStoryStatusIsPublic: boolean):
-  Promise<Object> {
+  Promise<number> {
     return new Promise((resolve, reject) => {
       this._changeStoryPublicationStatus(
         storyId, newStoryStatusIsPublic, resolve, reject);
     });
   }
 
-  validateExplorations(storyId: string, expIds: string[]): Promise<Object> {
+  validateExplorations(storyId: string, expIds: string[]): Promise<number> {
     return new Promise((resolve, reject) => {
       this._validateExplorations(
         storyId, expIds, resolve, reject);
     });
   }
 
-  deleteStory(storyId: string): Promise<Object> {
+  deleteStory(storyId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this._deleteStory(storyId, resolve, reject);
     });
   }
 
   async doesStoryWithUrlFragmentExistAsync(storyUrlFragment: string):
-  Promise<Object> {
+  Promise<StoryUrlFragmentExists> {
     return new Promise((resolve, reject) => {
       this._doesStoryWithUrlFragmentExist(
         storyUrlFragment, resolve, reject);
