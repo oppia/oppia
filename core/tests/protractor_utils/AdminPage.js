@@ -413,7 +413,7 @@ var AdminPage = function() {
     var reviewRight = await _getUserReviewRightsElement(
       username, REVIEW_CATEGORY_QUESTION);
     await waitFor.visibilityOf(
-      reviewRight, 'Review Right taking too long to appear');
+      reviewRight, 'Review right taking too long to appear');
     expect(await reviewRight.getText()).toBe('Allowed');
   };
 };
