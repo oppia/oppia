@@ -108,7 +108,8 @@ var ExplorationEditorPage = function() {
   var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
-
+  var selectExplorationLanguage = element(
+    by.css('.protractor-test-exploration-language-select'));
   /*
    * Workflows
    */
@@ -119,7 +120,7 @@ var ExplorationEditorPage = function() {
     await waitFor.elementToBeClickable(
       publishExplorationButton,
       'Publish button taking too long to be clickable.');
-    await publishExplorationButton.click();
+    await action.click('Publish Exploration Button',publishExplorationButton);
 
     var expTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
@@ -138,18 +139,19 @@ var ExplorationEditorPage = function() {
     await expTitle.sendKeys(title);
     await expObjective.sendKeys(objective);
 
-    await element(by.css('.select2-container')).click();
+    var dropdown = element(by.css('.select2-container'));
+    await action.click('Dropdown', dropdown);
     await element(by.css('.select2-dropdown')).element(
       by.css('.select2-search input')).sendKeys(category + '\n');
 
-    await element(by.css('.protractor-test-exploration-language-select'))
-      .click();
+    await action.click(
+      'Exploration Language Selection', selectExplorationLanguage);
     await element(by.css('.protractor-test-exploration-language-select'))
       .sendKeys(language + '\n');
 
 
-    await expTags.click();
-    await expInput.click();
+    await action.click('Exploration Tags', expTags);
+    await action.click('Exploration Input', expInput);
 
     for (var elem of tags) {
       await expInput.sendKeys(elem, protractor.Key.ENTER);
@@ -159,7 +161,7 @@ var ExplorationEditorPage = function() {
       '.protractor-test-confirm-pre-publication'));
     await waitFor.elementToBeClickable(
       saveChangesButton, 'Save changes button taking too long to be clickable');
-    await saveChangesButton.click();
+    await action.click('Save Changes Button', saveChangesButton);
 
     await waitFor.visibilityOf(
       element(by.css('.modal-content')),
@@ -168,7 +170,7 @@ var ExplorationEditorPage = function() {
     const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
     await waitFor.elementToBeClickable(
       confirmPublish, 'Confirm publish button taking too long to appear');
-    await confirmPublish.click();
+    await action.click('Confirm Publish', confirmPublish);
 
     await waitFor.visibilityOf(element(by.css(
       '.protractor-test-share-publish-modal')),
@@ -177,7 +179,7 @@ var ExplorationEditorPage = function() {
     const closeButton = element(by.css('.protractor-test-share-publish-close'));
     await waitFor.elementToBeClickable(
       closeButton, 'Close button taking too long to be clickable');
-    await closeButton.click();
+    await action.click('Close Button', closeButton);
     await waitFor.invisibilityOf(
       closeButton, 'Close button taking too long to disappear');
   };
@@ -213,13 +215,13 @@ var ExplorationEditorPage = function() {
   this.saveChanges = async function(commitMessage) {
     var toastSuccessElement = element(by.css('.toast-success'));
     expect(await saveChangesButton.isDisplayed()).toBe(true);
-    await saveChangesButton.click();
+    await action.click('Save Changes Button', saveChangesButton);
     if (commitMessage) {
       await commitMessageInput.sendKeys(commitMessage);
     }
     await waitFor.elementToBeClickable(
       saveDraftButton, 'Save Draft button is not clickable');
-    await saveDraftButton.click();
+    await action.click('Save Drafts Button', saveDraftButton);
 
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
@@ -230,9 +232,12 @@ var ExplorationEditorPage = function() {
   };
 
   this.discardChanges = async function() {
-    await saveDiscardToggleButton.click();
-    await discardChangesButton.click();
-    await confirmDiscardChangesButton.click();
+    await action.click(
+      'Save Discard Toggle Button', saveDiscardToggleButton);
+    await action.click(
+      'Discard Changes Button', discardChangesButton);
+    await action.click(
+      'Confirm Discard Changes Button', confirmDiscardChangesButton);
     await waitFor.invisibilityOf(
       loadingModal, 'Loading modal taking too long to disappear');
     await waitFor.invisibilityOfInfoToast(
