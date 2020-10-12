@@ -17,19 +17,40 @@
  * state editor.
  */
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-param-changes.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
+// require(
+//   'components/state-editor/state-editor-properties-services/' +
+//   'state-param-changes.service.ts');
+// require(
+//   'components/state-editor/state-editor-properties-services/' +
+//   'state-property.service.ts');
 
-angular.module('oppia').component('stateParamChangesEditor', {
-  template: require('./state-param-changes-editor.component.html'),
-  controller: [
-    '$scope', 'StateParamChangesService',
-    function($scope, StateParamChangesService) {
-      $scope.StateParamChangesService = StateParamChangesService;
-    }
-  ]
-});
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static'
+import { StateParamChangesService } from 
+  'components/state-editor/state-editor-properties-services/state-param-changes.service'
+
+
+@Component({
+  selector: 'state-param-changes-editor',
+  templateUrl: './state-param-changes-editor.component.html',
+  styleUrls: []
+})
+export class StateParamChangesEditorComponent {
+  constructor(
+    private stateParamChangesService: StateParamChangesService,
+  ){}
+}
+
+angular.module('oppia').directive(
+  'stateParamChangesEditor', downgradeComponent(
+    {component: StateParamChangesEditorComponent}));
+
+// angular.module('oppia').component('stateParamChangesEditor', {
+//   template: require('./state-param-changes-editor.component.html'),
+//   controller: [
+//     '$scope', 'StateParamChangesService',
+//     function($scope, StateParamChangesService) {
+//       $scope.StateParamChangesService = StateParamChangesService;
+//     }
+//   ]
+// });
