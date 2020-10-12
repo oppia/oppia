@@ -2386,7 +2386,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [self.reviewer_1_id], [[]])
                     )
 
-        messages = self._get_sent_email_messages(self.reviewer_1_id)
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
