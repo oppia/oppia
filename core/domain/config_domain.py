@@ -460,6 +460,6 @@ CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
 NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED = ConfigProperty(
     'notify_contributor_dashboard_reviewers_is_enabled', BOOL_SCHEMA,
     (
-        'Enable sending Contributor Dashboard reviewers email notifications 
+        'Enable sending Contributor Dashboard reviewers email notifications '
         'about suggestions that need review. The default value is false.'
     ), False)
