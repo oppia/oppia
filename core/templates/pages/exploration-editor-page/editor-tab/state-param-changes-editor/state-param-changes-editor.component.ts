@@ -23,7 +23,6 @@ import { StateParamChangesService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-param-changes.service';
 
-
 @Component({
   selector: 'state-param-changes-editor',
   templateUrl: './state-param-changes-editor.component.html',
