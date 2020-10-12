@@ -2294,7 +2294,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [[self.reviewable_suggestion_email_info]])
                     )
 
-        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertTrue(self.logged_errors[0].startswith(
@@ -2312,7 +2312,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [[self.reviewable_suggestion_email_info]])
                     )
 
-        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
@@ -2330,7 +2330,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [[self.reviewable_suggestion_email_info]])
                     )
 
-        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
@@ -2350,6 +2350,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [[self.reviewable_suggestion_email_info]])
                     )
 
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
@@ -2367,6 +2369,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [], [[self.reviewable_suggestion_email_info]])
                     )
 
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
@@ -2384,7 +2388,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [self.reviewer_1_id], [[]])
                     )
 
-        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
