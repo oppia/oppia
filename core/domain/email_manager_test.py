@@ -2394,6 +2394,231 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'There were no suggestions to recommend to the reviewer with user '
             'id: %s.' % self.reviewer_1_id)
 
+
+class NotifyAdminsContributionDashboardReviewersNeededTests(
+        test_utils.EmailTestBase):
+    """Test emailing admins that Contributor Dashboard reviewers are needed in
+    specific suggestion types.
+    """
+
+    ADMIN_1_USERNAME = 'admin1'
+    ADMIN_1_EMAIL = 'admin1@community.org'
+    ADMIN_2_USERNAME = 'admin2'
+    ADMIN_2_EMAIL = 'admin2@community.org'
+
+    expected_email_body_template = (
+        'Hi %s,<br><br>'
+        'In the <a href="https://www.oppia.org/admin#/roles">admin '
+        'roles page,</a> please add reviewers to the Contributor Dashboard '
+        'Community by entering their username(s) and allow reviewing for the '
+        'suggestion types that need more reviewers bolded below.'
+        '<br>%s<br>'
+        'Thanks so much - we appreciate your help!<br>'
+        'Best Wishes!<br><br>'
+        '- The Oppia Contributor Dashboard Team'
+        '<br><br>%s'
+    )
+
+    def _create_expected_email_html_if_question_reviewers_needed(self):
+        """Creates the expected email html for notifying admins that question
+        suggestions need more reviewers.
+        """
+        return (
+            'There have been <b>quesiton suggestions</b> created on the '
+            '<a href="https://www.oppia.org/contributor-dashboard">Contributor '
+            'Dashboard page</a> where there are not enough '
+            'reviewers')
+
+    def _create_expected_email_html_if_translation_reviewers_needed(
+            self, languages):
+        """Creates the expected email html for notifying admins that translation
+        suggestions, in the given list of languages, need more reviewers.
+        """
+        languages_html_list = ['<li><b>%s</b></li>' % language in languages]
+        return (
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="https://www.oppia.org/contributor-dashboard">Contributor '
+            'Dashboard page</a> in languages where there are not enough '
+            'reviewers. The languages that need more reviewers are:'
+            '<br>%s<br>' % ''.join(languages_html_list))
+
+    def _assert_created_sent_email_models_are_correct(
+            self, expected_email_html_bodies, admin_ids, admin_emails):
+        """Asserts that the sent email models that were created from the emails
+        that were sent contains the right information.
+        """
+        sent_email_models = email_models.SentEmailModel.get_all().filter(
+            email_models.SentEmailModel.recipient_id.IN(admin_ids)).fetch()
+        self.assertEqual(len(sent_email_models), len(admin_ids))
+        for index, admin_id in enumerate(admin_ids):
+            sent_email_model = sent_email_models[index]
+            self.assertEqual(
+                sent_email_model.subject,
+                email_manager.NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+                    'email_subject'])
+            self.assertEqual(
+                sent_email_model.recipient_id, admin_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, admin_emails[index])
+            self.assertEqual(
+                sent_email_model.html_body, expected_email_html_bodies[index])
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS)
+
+    def _log_error_for_tests(self, error_message):
+        """Appends the error message to the logged errors list."""
+        self.logged_errors.append(error_message)
+
+    def setUp(self):
+        super(NotifyContributionDashboardReviewersEmailTests, self).setUp()
+        self.signup(self.ADMIN_1_EMAIL, self.ADMIN_1_USERNAME)
+        self.admin_1_id = self.get_user_id_from_email(self.ADMIN_1_EMAIL)
+        self.signup(self.ADMIN_2_EMAIL, self.ADMIN_2_USERNAME)
+        self.admin_2_id = self.get_user_id_from_email(self.ADMIN_2_EMAIL)
+
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+        self.can_send_admin_emails_ctx = self.swap(
+            config_domain, 'NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED', True)
+        self.cannot_send_admin_emails_ctx = self.swap(
+            config_domain, 'NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED', False)
+        self.logged_errors = []
+        self.log_new_error_counter = test_utils.CallCounter(
+            self._log_error_for_tests)
+        self.log_new_error_ctx = self.swap(
+            email_manager, 'log_new_error', self.log_new_error_counter)
+
+        self.suggestion_types_need_reviewers = {
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
+                constants.DEFAULT_LANGUAGE_CODE}
+        }
+
+    def test_email_not_sent_if_email_html_is_malformatted(self):
+        # Change the email body template to have malformatted html.
+        mocked_email_info_dict = {
+            'email_body_template': '</p>Hi %s%s',
+            'email_subject': 'Reviewers Needed for Contributor Dashboard',
+            'suggestion_types_need_reviewers_template': {
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+                    'There have been <b>translation suggestions</b> created on the '
+                    '<a href="https://www.oppia.org/contributor-dashboard">Contributor '
+                    'Dashboard page</a> in languages where there are not enough '
+                    'reviewers. The languages that need more reviewers are:'
+                    '<br>%s<br>'),
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+                    'There have been <b>quesiton suggestions</b> created on the '
+                    '<a href="https://www.oppia.org/contributor-dashboard">Contributor '
+                    'Dashboard page</a> where there are not enough '
+                    'reviewers')
+            }
+        }
+
+        with self.can_send_emails_ctx, self.can_send_admin_emails_ctx:
+            with self.log_new_error_ctx:
+                with self.swap(
+                    email_manager, 'NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO',
+                    mocked_email_info_dict):
+                    email_manager.send_mail_to_notify_admins_reviewers_needed(
+                        [self.admin_1_id],
+                        self.suggestion_types_need_more_reviewers)
+
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertTrue(self.logged_errors[0].startswith(
+            'Original email HTML body does not match cleaned HTML body'))
+
+    def test_email_not_sent_if_can_send_emails_is_false(self):
+
+        with self.cannot_send_emails_ctx:
+            with self.can_send_admins_emails_ctx:
+                with self.log_new_error_ctx:
+                    email_manager.send_mail_to_notify_admins_reviewers_needed(
+                        [self.admin_1_id],
+                        self.suggestion_types_need_more_reviewers)
+
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0], 'This app cannot send emails to users.')
+
+    def test_email_not_sent_if_reviewer_notifications_is_not_enabled(self):
+
+        with self.can_send_emails_ctx:
+            with self.cannot_send_admin_emails_ctx:
+                with self.log_new_error_ctx:
+                    email_manager.send_mail_to_notify_admins_reviewers_needed(
+                        [self.admin_1_id],
+                        self.suggestion_types_need_more_reviewers)
+
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0],
+            'Notifying admins that Contributor Dashboard reviewers are needed '
+            'must be enabled on the config page in order to send the admins '
+            'the emails.')
+
+    def test_email_not_sent_if_no_admins_to_notify(self):
+
+        with self.can_send_emails_ctx:
+            with self.can_send_admins_emails_ctx:
+                with self.log_new_error_ctx:
+                    email_manager.send_mail_to_notify_admins_reviewers_needed(
+                        [], self.suggestion_types_need_more_reviewers)
+
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0],
+            'No admins to notify that Contributor Dashboard reviewers are '
+            'needed.')
+
+    def test_email_not_sent_if_no_suggestion_types_that_need_more_reviewers(
+            self):
+
+        with self.can_send_emails_ctx:
+            with self.can_send_admin_emails_ctx:
+                with self.log_new_error_ctx:
+                    email_manager.send_mail_to_notify_admins_reviewers_needed(
+                        [self.admin_1_id], {})
+
+        messages = self._get_sent_email_messages(self.reviewer_1_id)
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0],
+            'There were no suggestions to recommend to the reviewer with user '
+            'id: %s.' % self.reviewer_1_id)
+
+    def test_email_not_sent_if_admin_email_does_not_exist(self):
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.log_new_error_ctx:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            ['invalid_reviewer_id'],
+                            [[self.reviewable_suggestion_email_info]])
+                    )
+
+        messages = self._get_sent_email_messages('invalid_reviewer_id')
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0],
+            'There was no email for the given reviewer id: invalid_reviewer_id.'
+        )
+
     def test_email_sent_to_question_reviewer_with_review_wait_time_a_day(
             self):
         question_suggestion = (

@@ -239,7 +239,7 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
     }
 }
 
-NEED_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
+NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
     'email_body_template': (
         'Hi %s,<br><br>'
         'In the <a href="https://www.oppia.org/admin#/roles">admin '
@@ -1280,9 +1280,10 @@ def send_mail_to_notify_admins_reviewers_needed(
     """Sends an email to admins to notify them that there are specific
     suggestion types on the Contributor Dashboard that need more reviewers.
 
-    Note: it assumes that all admins are super admins because only super admins
-    have access to the admin page where reviewers can be added to the
-    Contributor Dashboard.
+    Note: it is assumed that all admins are super admins because only super
+    admins have access to the admin page where reviewers can be added to the
+    Contributor Dashboard. Also note that these emails are sent out regardless
+    of the admins email preferenecs.
 
     Args:
         admin_ids: list(str). The user ids of the admins to notify.
@@ -1293,9 +1294,8 @@ def send_mail_to_notify_admins_reviewers_needed(
             would be a set of language codes that translations are offered in
             that need more reviewers.
     """
-    email_subject = NEED_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-        'email_subject']
-    email_body_template = NEED_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+    email_subject = NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO['email_subject']
+    email_body_template = NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
         'email_body_template']
 
     if not feconf.CAN_SEND_EMAILS:
@@ -1316,11 +1316,43 @@ def send_mail_to_notify_admins_reviewers_needed(
             'Contributor Dashboard.')
         return
 
-    # Create the html for the email for the suggestion types that need more
-    # reviewers.
-    suggestion_types_need_reviewers_html_for_email = ''
-    
+    if not admin_ids:
+        log_new_error(
+            'No admins to notify that Contributor Dashboard reviewers are '
+            'needed.')
+        return
 
+    # Create the html for the suggestion types that need more reviewers for the
+    # email body html.
+    suggestion_types_need_reviewers_html_list = []
+    if suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
+            suggestion_types_need_more_reviewers):
+        html_for_languages_that_need_more_reviewers_list = []
+        for language_code in suggestion_types_need_more_reviewers[
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT]:
+            language = utils.get_supported_audio_language_description(
+                language_code)
+            html_for_languages_that_need_more_reviewers_list.append(
+                '<li><b>%s</b></li>' % language)
+        html_for_languages_that_need_more_reviewers = ''.join(
+            html_for_languages_that_need_more_reviewers_list)
+        suggestion_types_need_reviewers_html_list.append(
+            NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+                'suggestion_types_need_reviewers_template'][
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] % (
+                        html_for_languages_that_need_more_reviewers))
+
+    if suggestion_models.SUGGESTION_TYPE_ADD_QUESTION in (
+            suggestion_types_need_more_reviewers):
+        suggestion_types_need_reviewers_html_list.append(
+            NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+                'suggestion_types_need_reviewers_template'][
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION])
+
+    suggestion_types_need_reviewers_html = ''.join(
+        suggestion_types_need_reviewers_html_list)   
+
+    # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
     admin_usernames = [
         admin_user_setting.username if admin_user_setting is not None else
@@ -1330,13 +1362,24 @@ def send_mail_to_notify_admins_reviewers_needed(
         admin_user_setting.email if admin_user_setting is not None else
         None for admin_user_setting in admin_user_settings
     ]
+
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
             log_new_error(
-                'There was no email for the given admin id: %s.' % (
-                    admin_id))
+                'There was no email for the given admin id: %s.' % admin_id)
             continue
         else:
+            email_body = email_body_template % (
+                admin_usernames[index], suggestion_types_need_reviewers_html)
+
+            send_email_infos.append(email_domain.SendEmailInfo(
+                admin_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+                admin_emails[index]))
+
+    _send_emails(send_email_infos)
+
 
 def send_mail_to_notify_contributor_dashboard_reviewers(
         reviewer_ids, reviewers_suggestion_email_infos):
