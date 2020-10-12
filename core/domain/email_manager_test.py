@@ -2591,32 +2591,27 @@ class NotifyAdminsContributionDashboardReviewersNeededTests(
                     email_manager.send_mail_to_notify_admins_reviewers_needed(
                         [self.admin_1_id], {})
 
-        messages = self._get_sent_email_messages(self.reviewer_1_id)
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
-            'There were no suggestions to recommend to the reviewer with user '
-            'id: %s.' % self.reviewer_1_id)
+            'There were no suggestion types that needed more reviewers on the '
+            'Contributor Dashboard.')
 
     def test_email_not_sent_if_admin_email_does_not_exist(self):
 
         with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
+            with self.can_send_admin_emails_ctx:
                 with self.log_new_error_ctx:
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            ['invalid_reviewer_id'],
-                            [[self.reviewable_suggestion_email_info]])
-                    )
+                    email_manager.send_mail_to_notify_admins_reviewers_needed(
+                        ['admin_id_without_email'],
+                        self.suggestion_types_need_more_reviewers)
 
-        messages = self._get_sent_email_messages('invalid_reviewer_id')
-        self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
-            'There was no email for the given reviewer id: invalid_reviewer_id.'
+            'There was no email for the given admin id: admin_id_without_email.'
         )
 
     def test_email_sent_to_question_reviewer_with_review_wait_time_a_day(
