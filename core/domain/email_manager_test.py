@@ -2338,7 +2338,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Notifying Contributor Dashboard reviewers must be enabled on the '
             'config page in order to send reviewers the emails.')
 
-    def test_email_not_sent_if_reviewer_does_not_exist(self):
+    def test_email_not_sent_if_reviewer_email_does_not_exist(self):
 
         with self.can_send_emails_ctx:
             with self.can_send_reviewer_emails_ctx:
@@ -2357,6 +2357,22 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self.logged_errors[0],
             'There was no email for the given reviewer id: invalid_reviewer_id.'
         )
+
+    def test_email_not_sent_if_no_reviewers_to_notify(self):
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.log_new_error_ctx:
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [], [[self.reviewable_suggestion_email_info]])
+                    )
+
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertEqual(
+            self.logged_errors[0],
+            'No Contributor Dashboard reviewers to notify.')
 
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
             self):
