@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import inspect
 import json
 
 from constants import constants
@@ -31,7 +32,6 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import inspect
 import python_utils
 import utils
 
@@ -1007,7 +1007,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         for key in exported_data[model_id].keys()]),
                     sorted(exported_props)
                 )
-
 
     def test_export_data_for_full_user_nontrivial_is_correct(self):
         """Nontrivial test of export_data functionality."""

@@ -145,7 +145,7 @@ class BaseModel(datastore_services.Model):
         raise NotImplementedError(
             'The export_data() method is missing from the '
             'derived class. It should be implemented in the derived class.')
- 
+
     @staticmethod
     def get_export_method():
         """Model is exported as a single unshared instance."""

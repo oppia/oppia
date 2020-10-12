@@ -112,7 +112,7 @@ class ExplorationModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Exploration is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
- 
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""

@@ -140,7 +140,7 @@ class UserSettingsModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -365,7 +365,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -449,7 +449,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -537,7 +537,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES  
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
     def get_export_policy(cls):
@@ -675,7 +675,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -756,7 +756,7 @@ class UserContributionsModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -864,7 +864,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -915,7 +915,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -971,9 +971,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         if user_model is None:
             return {}
-
-        creator_user_models = UserSettingsModel.get_multi(
-            user_model.creator_ids)
 
         user_data = {
             'activity_ids': user_model.activity_ids,
@@ -1094,7 +1091,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -1166,7 +1163,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -1884,7 +1881,7 @@ class UserQueryModel(base_models.BaseModel):
         """Model is not exported since this is a computed model
         and the information already exists in other exported models.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -1991,7 +1988,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -2031,8 +2028,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as multiple unshared instances. """
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES    
+        """Model is exported as multiple unshared instances."""
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
     def get_export_policy(cls):
@@ -2131,7 +2128,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as multiple unshared instances."""
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES    
+        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
     def get_export_policy(cls):
@@ -2364,7 +2361,7 @@ class UserContributionRightsModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model is exported as a single shared instance."""
-        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE    
+        return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
     def get_export_policy(cls):
@@ -2484,7 +2481,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         requests for data deletion, and does not contain any information
         relevant to the user for data export.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -2566,7 +2563,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """PseudonymizedUserModel contains only pseudonymous ids."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED   
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -2636,7 +2633,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         backend, and no exportable user data. It may contain user data in
         the future.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED    
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
