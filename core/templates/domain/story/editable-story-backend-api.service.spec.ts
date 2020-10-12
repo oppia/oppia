@@ -23,7 +23,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { EditableStoryBackendApiService, PublishedStoryModel } from
+import { EditableStoryBackendApiService, PublishedStoryBackendDict } from
   'domain/story/editable-story-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
@@ -156,7 +156,7 @@ describe('Editable story backend API service', () => {
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.fetchStory('storyId').then(
-        (data: PublishedStoryModel) => {
+        (data: PublishedStoryBackendDict) => {
           story = data.story;
         });
       let requestUrl = '/story_editor_handler/data/storyId';

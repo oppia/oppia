@@ -28,7 +28,7 @@ import {
   StoryContentsObjectFactory
 } from 'domain/story/StoryContentsObjectFactory';
 
-interface StoryBackendDict {
+export interface StoryBackendDict {
   'id': string;
   'title': string;
   'description': string;

@@ -21,30 +21,13 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { StoryBackendDict } from
+  'domain/story/StoryObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-export interface PublishedStoryModel {
-    'story': {
-      'id': string,
-      'title': string,
-      'description': string,
-      'notes': string,
-      'version': number,
-      'story_contents': {
-        'initial_node_id': string,
-        'nodes': [{
-          'id': string,
-          'prerequisite_skill_ids': string[],
-          'acquired_skill_ids': string[],
-          'destination_node_ids': string[],
-          'outline': string,
-          'exploration_id': string,
-          'outline_is_finalized': boolean
-        }],
-        'next_node_id': string
-      },
-      'language_code': string
-    },
+export interface PublishedStoryBackendDict {
+    'story': StoryBackendDict,
     'topic_name': string,
     'story_is_published': boolean,
     'skill_summaries': [{
@@ -70,27 +53,23 @@ export class EditableStoryBackendApiService {
       });
 
     this.httpClient.get(storyDataUrl).toPromise().then(
-      (response: PublishedStoryModel) => {
+      (response: PublishedStoryBackendDict) => {
         let story = response.story;
         let topicName = response.topic_name;
         let storyIsPublished = response.story_is_published;
         let skillSummaries = response.skill_summaries;
         let topicUrlFragment = response.topic_url_fragment;
         let classroomUrlFragment = response.classroom_url_fragment;
-        if (successCallback) {
-          successCallback({
-            story: story,
-            topicName: topicName,
-            storyIsPublished: storyIsPublished,
-            skillSummaries: skillSummaries,
-            topicUrlFragment: topicUrlFragment,
-            classroomUrlFragment: classroomUrlFragment
-          });
-        }
+        successCallback({
+          story: story,
+          topicName: topicName,
+          storyIsPublished: storyIsPublished,
+          skillSummaries: skillSummaries,
+          topicUrlFragment: topicUrlFragment,
+          classroomUrlFragment: classroomUrlFragment
+        });
       }, (errorResponse) => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
+        errorCallback(errorResponse.error.error);
       });
   };
 
@@ -109,15 +88,11 @@ export class EditableStoryBackendApiService {
     };
     this.httpClient.put(
       editableStoryDataUrl, putData).toPromise().then(
-      (response: PublishedStoryModel) => {
+      (response: PublishedStoryBackendDict) => {
         // The returned data is an updated story dict.
-        if (successCallback) {
-          successCallback(response.story);
-        }
+        successCallback(response.story);
       }, (errorResponse) => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
+        errorCallback(errorResponse.error.error);
       });
   };
 
@@ -133,13 +108,9 @@ export class EditableStoryBackendApiService {
     };
     this.httpClient.put(
       storyPublishUrl, putData).toPromise().then((response) => {
-      if (successCallback) {
-        successCallback();
-      }
+      successCallback();
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
+      errorCallback(errorResponse.error.error);
     });
   };
 
@@ -155,13 +126,9 @@ export class EditableStoryBackendApiService {
         comma_separated_exp_ids: expIds.join(',')
       }
     }).toPromise().then((response) => {
-      if (successCallback) {
-        successCallback(response);
-      }
+      successCallback(response);
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
+      errorCallback(errorResponse.error.error);
     });
   };
 
@@ -173,13 +140,9 @@ export class EditableStoryBackendApiService {
       });
     this.httpClient['delete'](
       storyDataUrl).toPromise().then((response) => {
-      if (successCallback) {
-        successCallback(response);
-      }
+      successCallback(response);
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
+      errorCallback(errorResponse.error.error);
     });
   };
 
@@ -191,17 +154,13 @@ export class EditableStoryBackendApiService {
       });
     this.httpClient.get(
       storyUrlFragmentUrl).toPromise().then((response) => {
-      if (successCallback) {
-        successCallback(response);
-      }
+      successCallback(response);
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
+      errorCallback(errorResponse.error.error);
     });
   };
 
-  fetchStory(storyId:string): Promise<PublishedStoryModel> {
+  fetchStory(storyId:string): Promise<PublishedStoryBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchStory(storyId, resolve, reject);
     });
@@ -220,7 +179,7 @@ export class EditableStoryBackendApiService {
   updateStory(
       storyId: string, storyVersion: number,
       commitMessage: string, changeList: string[]):
-      Promise<PublishedStoryModel> {
+      Promise<PublishedStoryBackendDict> {
     return new Promise ((resolve, reject) => {
       this._updateStory(
         storyId, storyVersion, commitMessage, changeList,
