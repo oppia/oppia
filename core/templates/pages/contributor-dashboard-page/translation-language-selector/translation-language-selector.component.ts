@@ -25,7 +25,7 @@ import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from
-  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+  'domain/opportunity/featured-translation-language.model';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
 @Component({
