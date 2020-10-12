@@ -140,11 +140,10 @@ var ExplorationEditorPage = function() {
     await action.sendKeys('Exploration Objective', expObjective, objective);
 
     var container = element(by.css('.select2-container'));
-    var dropdown = element(by.css('.select2-dropdown'));
-    var searchInput = element(by.css('.select2-search input'));
     await action.click('Container', container);
     await action.sendKeys(
-      'Input search', dropdown.searchInput, category + '\n');
+      'Input search', element(by.css('.select2-dropdown')).element(by.css(
+        '.select2-search input')), category + '\n');
 
     await action.click(
       'Exp Language Select', selectExplorationLanguage);
