@@ -1304,10 +1304,39 @@ def send_mail_to_notify_admins_reviewers_needed(
 
     if not config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED:
         log_new_error(
-            'Contributor Dashboard reviewer emails must be enabled on the '
-            'config page in order to send reviewers the emails.'
+            'Notifying admins that Contributor Dashboard reviewers are needed '
+            'must be enabled on the config page in order to send the admins '
+            'the emails.'
         )
         return
+
+    if suggestion_types_need_more_reviewers == {}:
+        log_new_error(
+            'There were no suggestion types that needed more reviewers on the '
+            'Contributor Dashboard.')
+        return
+
+    # Create the html for the email for the suggestion types that need more
+    # reviewers.
+    suggestion_types_need_reviewers_html_for_email = ''
+    
+
+    admin_user_settings = user_services.get_users_settings(admin_ids)
+    admin_usernames = [
+        admin_user_setting.username if admin_user_setting is not None else
+        None for admin_user_setting in admin_user_settings
+    ]
+    admin_emails = [
+        admin_user_setting.email if admin_user_setting is not None else
+        None for admin_user_setting in admin_user_settings
+    ]
+    for index, admin_id in enumerate(admin_ids):
+        if not admin_emails[index]:
+            log_new_error(
+                'There was no email for the given admin id: %s.' % (
+                    admin_id))
+            continue
+        else:
 
 def send_mail_to_notify_contributor_dashboard_reviewers(
         reviewer_ids, reviewers_suggestion_email_infos):
