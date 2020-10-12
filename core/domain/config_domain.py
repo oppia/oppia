@@ -463,3 +463,11 @@ CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
         'Enable sending Contributor Dashboard reviewers email notifications.'
         'The default value is false.'
     ), False)
+
+MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
+    'max_number_of_suggestions_per_reviewer',
+    FLOAT_SCHEMA,
+    'The maximum number of Contributor Dashboard suggestions per reviewer. If '
+    'the number of suggestions per reviewer surpasses this maximum, for any '
+    'given suggestion type, the admins are notified by email.', 5.0)
+

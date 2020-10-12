@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import os
 
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -2437,6 +2438,29 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     sample_language_code = 'en'
     invalid_language_code = 'invalid'
 
+    def _assert_community_contribution_stats_is_in_default_state(self):
+        """Checks if the community contribution stats is in its default
+        state.
+        """
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            community_contribution_stats.question_reviewer_count, 0)
+        self.assertEqual(
+            community_contribution_stats.question_suggestion_count, 0)
+
     def test_initial_object_with_valid_arguments_has_correct_properties(self):
         community_contribution_stats = (
             suggestion_registry.CommunityContributionStats(
@@ -2475,11 +2499,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        community_contribution_stats.validate()
-        (
-            community_contribution_stats
-            .translation_reviewer_counts_by_lang_code
-        ) = {}
+        self._assert_community_contribution_stats_is_in_default_state()
 
         (
             community_contribution_stats
@@ -2500,7 +2520,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        community_contribution_stats.validate()
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .translation_reviewer_counts_by_lang_code
@@ -2525,7 +2545,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        community_contribution_stats.validate()
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .translation_reviewer_counts_by_lang_code
@@ -2549,11 +2569,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        community_contribution_stats.validate()
-        (
-            community_contribution_stats
-            .translation_suggestion_counts_by_lang_code
-        ) = {}
+        self._assert_community_contribution_stats_is_in_default_state()
 
         (
             community_contribution_stats
@@ -2573,7 +2589,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        community_contribution_stats.validate()
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .translation_suggestion_counts_by_lang_code
@@ -2598,7 +2614,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        community_contribution_stats.validate()
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .translation_suggestion_counts_by_lang_code
@@ -2617,11 +2633,165 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             {'en': 1, 'hi': 2}
         )
 
+    def test_translation_reviewers_are_needed_if_suggestions_but_no_reviewers(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.set_translation_suggestion_count_for_language_code(
+            self.sample_language_code, 1)
+
+        self.assertTrue(
+            stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                self.sample_language_code))
+
+    def test_translation_reviewers_are_needed_if_suggestions_zero_reviewers(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.set_translation_suggestion_count_for_language_code(
+            self.sample_language_code, 1)
+        stats.set_translation_reviewer_count_for_language_code(
+            self.sample_language_code, 0)
+
+        self.assertTrue(
+            stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                self.sample_language_code))
+
+    def test_translation_reviewers_are_needed_if_num_suggestions_past_max(self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.set_translation_suggestion_count_for_language_code(
+            self.sample_language_code, 2)
+        stats.set_translation_reviewer_count_for_language_code(
+            self.sample_language_code, 1)
+
+        with self.swap(
+            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewers_are_needed = (
+                stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                    self.sample_language_code))
+
+
+        self.assertTrue(reviewers_are_needed)
+
+    def test_translation_reviewers_not_needed_if_num_suggestions_eqs_max(self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.set_translation_suggestion_count_for_language_code(
+            self.sample_language_code, 2)
+        stats.set_translation_reviewer_count_for_language_code(
+            self.sample_language_code, 2)
+
+        with self.swap(
+            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewers_are_needed = (
+                stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                    self.sample_language_code))
+
+
+        self.assertFalse(reviewers_are_needed)
+
+    def test_translation_reviewers_not_needed_if_num_suggestions_less_max(self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.set_translation_suggestion_count_for_language_code(
+            self.sample_language_code, 1)
+        stats.set_translation_reviewer_count_for_language_code(
+            self.sample_language_code, 2)
+
+        with self.swap(
+            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewers_are_needed = (
+                stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                    self.sample_language_code))
+
+
+        self.assertFalse(reviewers_are_needed)
+
+    def test_translation_reviewers_not_needed_if_reviewers_and_no_sugestions(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.set_translation_reviewer_count_for_language_code(
+            self.sample_language_code, 1)
+
+        self.assertFalse(
+            stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                self.sample_language_code))
+
+    def test_translation_reviewers_not_needed_if_no_reviewers_no_sugestions(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        self.assertFalse(
+            stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                self.sample_language_code))
+
+    def test_question_reviewers_are_needed_if_suggestions_zero_reviewers(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.question_suggestion_count = 1
+
+        self.assertTrue(stats.are_reviewers_needed_for_question_suggestions())
+
+    def test_question_reviewers_are_needed_if_num_suggestions_past_max(self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.question_suggestion_count = 2
+        stats.question_reviewer_count = 1
+
+        with self.swap(
+            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewers_are_needed = (
+                stats.are_reviewers_needed_for_question_suggestions())
+
+
+        self.assertTrue(reviewers_are_needed)
+
+    def test_question_reviewers_not_needed_if_num_suggestions_eqs_max(self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.question_suggestion_count = 2
+        stats.question_reviewer_count = 2
+
+        with self.swap(
+            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewers_are_needed = (
+                stats.are_reviewers_needed_for_question_suggestions())
+
+
+        self.assertFalse(reviewers_are_needed)
+
+    def test_question_reviewers_not_needed_if_num_suggestions_less_max(self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+        stats.question_suggestion_count = 1
+        stats.question_reviewer_count = 2
+
+        with self.swap(
+            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewers_are_needed = (
+                stats.are_reviewers_needed_for_question_suggestions())
+
+
+        self.assertFalse(reviewers_are_needed)
+
+    def test_question_reviewers_not_needed_if_no_reviewers_no_sugestions(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        self.assertFalse(
+            stats.are_reviewers_needed_for_question_suggestions())
+
     def test_validate_translation_reviewer_counts_fails_for_negative_counts(
             self):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_reviewer_count_for_language_code(
@@ -2640,6 +2810,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_suggestion_count_for_language_code(
@@ -2657,6 +2828,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         community_contribution_stats.question_reviewer_count = (
             self.negative_count
         )
@@ -2672,6 +2844,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         community_contribution_stats.question_suggestion_count = (
             self.negative_count
         )
@@ -2688,6 +2861,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_reviewer_count_for_language_code(
@@ -2706,6 +2880,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_suggestion_count_for_language_code(
@@ -2724,6 +2899,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         community_contribution_stats.question_reviewer_count = (
             self.non_integer_count
         )
@@ -2740,6 +2916,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         community_contribution_stats.question_suggestion_count = (
             self.non_integer_count
         )
@@ -2756,6 +2933,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_reviewer_count_for_language_code(
@@ -2773,6 +2951,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
+        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_suggestion_count_for_language_code(

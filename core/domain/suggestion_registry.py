@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -1222,6 +1223,66 @@ class CommunityContributionStats(python_utils.OBJECT):
                 that are currently in review.
         """
         self.translation_suggestion_counts_by_lang_code[language_code] = count
+
+    def are_reviewers_needed_for_translation_suggestions_in_lang(
+            self, lang_code):
+        """Returns whether or not more reviewers are needed to review
+        translation suggestions in the given language code.
+
+        Args:
+            lang_code: str. The language code of the translation
+                suggestions.
+
+        Returns:
+            Bool. Whether or not more reviewers are needed to review
+            translation suggestions in the given language.
+       """
+        if lang_code in self.translation_reviewer_counts_by_lang_code and (
+                lang_code in self.translation_suggestion_counts_by_lang_code):
+            number_of_reviewers = (
+                self.translation_reviewer_counts_by_lang_code[lang_code]
+            )
+            number_of_suggestions = (
+                self.translation_suggestion_counts_by_lang_code[
+                    lang_code]
+            )
+            if number_of_reviewers == 0:
+                return True
+            else:
+                return python_utils.divide(
+                    number_of_suggestions, number_of_reviewers) > (
+                        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER)
+        elif lang_code in self.translation_reviewer_counts_by_lang_code:
+            # There are no translation suggestions in this language
+            # currently in review, but there are reviewers. Therefore,
+            # there is not a shortage of reviewers.
+            return False
+        elif lang_code in self.translation_suggestion_counts_by_lang_code:
+            # There are no reviewers but there are translation suggestions that
+            # need review. Therefore, there is a shortage of reviewers.
+            return True
+        else:
+            # There are neither translation suggestions nor reviewers.
+            return False
+
+    def are_reviewers_needed_for_question_suggestions(self):
+        """Returns whether or not more reviewers are needed to review question
+        suggestions.
+
+        Returns:
+            Bool. Whether or not more reviewers are needed to review
+            question suggestions.
+       """
+        if self.question_reviewer_count == 0 and (
+                self.question_suggestion_count == 0):
+            return False
+        elif self.question_reviewer_count == 0:
+            return True
+        else:
+            return python_utils.divide(
+                self.question_suggestion_count,
+                self.question_reviewer_count) > (
+                    config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER)
 
 
 class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
