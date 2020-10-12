@@ -91,11 +91,12 @@ var AdminPage = function() {
         by.css('.protractor-test-reload-exploration-button')
       );
     };
+
     this.reloadCollection = async function(collectionId) {
-      this.get();
-      var ReloadCollectionButtons = await (
-        await reloadCollectionButtons.get(collectionId));
-      await action.click('reloadCollectionButtons', ReloadCollectionButtons);
+      await this.get();
+      var reloadCollectionButton = await (
+        reloadCollectionButtons.get(collectionId));
+      await action.click('reloadCollectionButtons', reloadCollectionButton);
       await general.acceptAlert();
       // Time is needed for the reloading to complete.
       await waitFor.textToBePresentInElement(
@@ -109,16 +110,16 @@ var AdminPage = function() {
     this.reloadExploration = async function(name) {
       await this.get();
       explorationElements.map(async function(explorationElement) {
-        var title = await waitFor.visibilityOf(
-          getExplorationTitleElement(explorationElement).getText());
+        await waitFor.visibilityOf(getExplorationTitleElement(explorationElement));
+        var title = await getExplorationTitleElement(explorationElement).getText();
 
         // We use match here in case there is whitespace around the name.
         if (title.match(name)) {
-          var getExplorationElementReloadBtn =
+          var explorationElementReloadButton =
             getExplorationElementReloadButton(explorationElement);
           await action.click(
             'GetExplorationElementReloadButton',
-            getExplorationElementReloadBtn);
+            explorationElementReloadButton);
           await general.acceptAlert();
           // Time is needed for the reloading to complete.
           await waitFor.textToBePresentInElement(
@@ -134,30 +135,30 @@ var AdminPage = function() {
     await action.click('Admin roles tab button', adminRolesTab);
     await waitFor.pageToFullyLoad();
 
-    expect(await adminRolesTab.getAttribute('class')).toMatch('active');
+    await waitFor.visibilityOf(
+      expect(adminRolesTab.getAttribute('class')).toMatch('active'));
     await waitFor.visibilityOf(
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
-  var saveConfigProperty = async function(
+    var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
-    await waitFor.visibilityOf(
-      configProperty.element(
-        by.css('.protractor-test-config-title')));
-    var title = await configProperty.element(
-      by.css('.protractor-test-config-title')).getText();
-    if (title.match(propertyName)) {
-      await editingInstructions(
-        await forms.getEditor(objectType)(configProperty));
-      await action.click('Saves All Configs', saveAllConfigs);
-      await general.acceptAlert();
-      // Waiting for success message.
-      await waitFor.textToBePresentInElement(
-        statusMessage, 'saved successfully',
-        'New config could not be saved');
-      return true;
-    }
-  };
+        await this.get();
+        var title = await waitFor.visibilityOf(
+        configProperty.element(
+          by.css('.protractor-test-config-title')).getText());
+        if (title.match(propertyName)) {
+          await editingInstructions(
+            await forms.getEditor(objectType)(configProperty));
+          await action.click('Save All Configs Button', saveAllConfigs);
+          await general.acceptAlert();
+          // Waiting for success message.
+          await waitFor.textToBePresentInElement(
+            statusMessage, 'saved successfully',
+            'New config could not be saved');
+            return true;
+            }
+      };
 
   this.get = async function() {
     await browser.get(ADMIN_URL_SUFFIX);
@@ -171,6 +172,7 @@ var AdminPage = function() {
 
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
+    await this.get();
     await action.click('Config Tab', configTab);
     await waitFor.elementToBeClickable(saveAllConfigs);
 
@@ -198,8 +200,8 @@ var AdminPage = function() {
     await waitFor.visibilityOf(
       await oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
-    await waitFor.visibilityOf(oneOffJobRows.get(i));
-    var text = await oneOffJobRows.get(i).getText();
+      await waitFor.visibilityOf(oneOffJobRows.get(i));
+      var text = await oneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var oneOffJobRowsButton = oneOffJobRows.get(i).element(
         by.css('.protractor-test-one-off-jobs-start-btn'));
@@ -214,11 +216,11 @@ var AdminPage = function() {
   };
 
   this._stopOneOffJob = async function(jobName, i) {
-    await waitFor.visibilityOf(unfinishedOneOffJobRows.get(i));
-    var text = await unfinishedOneOffJobRows.get(i).getText();
+      await waitFor.visibilityOf(unfinishedOneOffJobRows.get(i));
+      var text = await unfinishedOneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var unfinishedOffJobRowsButton = (
-        await unfinishedOneOffJobRows.get(i)
+        unfinishedOneOffJobRows.get(i)
       ).element(
         by.css('.protractor-test-one-off-jobs-stop-btn'));
       await action.click(
@@ -254,12 +256,9 @@ var AdminPage = function() {
     await action.click('Admin Roles Tab', adminRolesTab);
 
     // Change values for "update role" form, and submit it.
-    await waitFor.visibilityOf(
-      updateFormName, 'Update Form Name is not visible');
     await action.sendKeys('Update Form Name', updateFormName, name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
-    await waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
     await action.click('Role Option', roleOption);
     await action.click('Update Form Submit', updateFormSubmit);
     await waitFor.visibilityOf(
@@ -270,8 +269,6 @@ var AdminPage = function() {
   };
 
   this.getUsersAsssignedToRole = async function(role) {
-    await waitFor.visibilityOf(
-      roleDropdown, 'View role dropdown taking too long to be visible');
     await action.sendKeys('Role Drop Down', roleDropdown, 'By Role');
 
     await action.click('Role Value Option', roleValueOption);
@@ -281,8 +278,6 @@ var AdminPage = function() {
   };
 
   this.viewRolesbyUsername = async function(username) {
-    await waitFor.visibilityOf(
-      roleDropdown, 'View role dropdown taking too long to be visible');
     await action.sendKeys('Role Drop Down', roleDropdown, 'By Username');
 
     await action.click('Role Username Option', roleUsernameOption);
@@ -416,7 +411,7 @@ var AdminPage = function() {
     var reviewRight = await _getUserReviewRightsElement(
       username, REVIEW_CATEGORY_QUESTION);
     await waitFor.visibilityOf(
-      reviewRight, 'Allowed taking too long to appear');
+      reviewRight, 'Review Right taking too long to appear');
     expect(await reviewRight.getText()).toBe('Allowed');
   };
 };
