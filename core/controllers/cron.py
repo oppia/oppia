@@ -243,7 +243,7 @@ class CronMailContributorDashboardReviewerOpportunitiesHandler(
         """
         # Only execute this job if it's possible to send the emails.
         if feconf.CAN_SEND_EMAILS and (
-                config_domain.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED):
+                config_domain.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED):
             reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
             reviewers_suggestion_email_infos = (
                 suggestion_services

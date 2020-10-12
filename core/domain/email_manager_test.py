@@ -2240,10 +2240,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
         self.can_send_reviewer_emails_ctx = self.swap(
-            config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
+            config_domain, 'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED',
             True)
         self.cannot_send_reviewer_emails_ctx = self.swap(
-            config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
+            config_domain, 'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED',
             False)
         self.logged_errors = []
         self.log_new_error_counter = test_utils.CallCounter(
