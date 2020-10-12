@@ -70,15 +70,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserServicesUnitTests, self).setUp()
-        schema_version = 1
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version, 'user_id'
-        )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': 'user_id',
+        }
+        new_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias3',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        self.modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
+        self.modifiable_new_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
     def test_is_user_id_valid(self):
         self.assertTrue(
@@ -92,6 +105,24 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
         self.assertFalse(user_services.is_user_id_valid('uid_%s' % ('a' * 31)))
         self.assertFalse(user_services.is_user_id_valid('a' * 36))
+
+    def test_is_user_or_pseudonymous_id(self):
+        self.assertTrue(
+            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 32)))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id(
+                'uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
+        self.assertTrue(
+            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 32)))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id(
+                'pid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
 
     def test_set_and_get_username(self):
         gae_id = 'someUser'
@@ -116,17 +147,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_username_for_pseudonymous_id(self):
         self.assertEqual(
-            'UserAaaaaaaa',
+            'User_Aaaaaaaa',
             user_services.get_username('pid_' + 'a' * 32))
         self.assertEqual(
-            'UserBbbbbbbb',
+            'User_Bbbbbbbb',
             user_services.get_username('pid_' + 'b' * 32))
 
     def test_get_usernames_for_pseudonymous_ids(self):
 
         # Handle usernames that exists.
         self.assertEqual(
-            ['UserAaaaaaaa', 'UserBbbbbbbb'],
+            ['User_Aaaaaaaa', 'User_Bbbbbbbb'],
             user_services.get_usernames(['pid_' + 'a' * 32, 'pid_' + 'b' * 32]))
 
     def test_get_usernames_empty_list(self):
@@ -779,7 +810,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 gae_id, email, [self.modifiable_new_user_data])
 
     def test_create_multiple_new_profiles_for_same_user_works_correctly(self):
-        schema_version = 1
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
@@ -799,10 +829,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
-        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
-            display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        new_user_data_dict_2 = {
+            'schema_version': 1,
+            'display_alias': display_alias_3,
+            'pin': None,
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        modifiable_new_user_data_2 = (
+            user_domain.ModifiableUserData.from_raw_dict(
+                new_user_data_dict_2))
         user_settings_list = user_services.create_new_profiles(
             gae_id, email, [
                 self.modifiable_new_user_data, modifiable_new_user_data_2
@@ -937,7 +975,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_users_data_for_multiple_users_works_correctly(self):
         # Preparing for the test.
-        schema_version = 1
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
@@ -957,10 +994,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
-        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
-            display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        new_user_data_dict_2 = {
+            'schema_version': 1,
+            'display_alias': display_alias_3,
+            'pin': None,
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        modifiable_new_user_data_2 = (
+            user_domain.ModifiableUserData.from_raw_dict(
+                new_user_data_dict_2))
         user_settings_list = user_services.create_new_profiles(
             gae_id, email, [
                 self.modifiable_new_user_data, modifiable_new_user_data_2
@@ -1766,15 +1811,28 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
-        schema_version = 1
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version, 'user_id'
-        )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': 'user_id',
+        }
+        self.modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
+        new_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias_3',
+            'pin': None,
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        self.modifiable_new_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
     def test_validate_non_str_user_id_raises_exception(self):
         self.user_settings.user_id = 0

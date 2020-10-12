@@ -19,14 +19,14 @@
 require('services/external-rte-save.service.ts');
 
 angular.module('oppia').controller('RteHelperModalController', [
-  '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
+  '$q', '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
   'AssetsBackendApiService', 'ContextService',
   'ExternalRteSaveService', 'FocusManagerService',
   'ImageLocalStorageService', 'ImageUploadHelperService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
-      $scope, $timeout, $uibModalInstance, AlertsService,
+      $q, $scope, $timeout, $uibModalInstance, AlertsService,
       AssetsBackendApiService, ContextService,
       ExternalRteSaveService, FocusManagerService,
       ImageLocalStorageService, ImageUploadHelperService,
@@ -149,9 +149,11 @@ angular.module('oppia').controller('RteHelperModalController', [
           $uibModalInstance.close(customizationArgsDict);
           return;
         }
-        AssetsBackendApiService.saveMathExpresionImage(
-          resampledFile, svgFileName, ContextService.getEntityType(),
-          ContextService.getEntityId()).then(function(response) {
+        $q.when(
+          AssetsBackendApiService.saveMathExpresionImage(
+            resampledFile, svgFileName, ContextService.getEntityType(),
+            ContextService.getEntityId())
+        ).then(function(response) {
           var mathContentDict = {
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: response.filename

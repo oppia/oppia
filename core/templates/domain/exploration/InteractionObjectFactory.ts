@@ -61,7 +61,8 @@ import {
   SetInputCustomizationArgs,
   SetInputCustomizationArgsBackendDict,
   TextInputCustomizationArgs,
-  TextInputCustomizationArgsBackendDict
+  TextInputCustomizationArgsBackendDict,
+  NumericExpressionInputCustomizationArgsBackendDict
 } from 'interactions/customization-args-defs';
 import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
@@ -343,6 +344,18 @@ export class InteractionObjectFactory {
     };
   }
 
+  _createFromNumericExpressionInputCustomizationArgsBackendDict(
+      caBackendDict: NumericExpressionInputCustomizationArgsBackendDict
+  ): NumericExpressionInputCustomizationArgs {
+    const { placeholder } = caBackendDict;
+    return {
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      }
+    };
+  }
+
   _createFromRatioExpressionInputCustomizationArgsBackendDict(
       caBackendDict: RatioExpressionInputCustomizationArgsBackendDict
   ): RatioExpressionInputCustomizationArgs {
@@ -403,7 +416,9 @@ export class InteractionObjectFactory {
         return <NumberWithUnitsCustomizationArgs> cloneDeep(caBackendDict);
       case 'NumericExpressionInput':
         return (
-          <NumericExpressionInputCustomizationArgs> cloneDeep(caBackendDict));
+          this._createFromNumericExpressionInputCustomizationArgsBackendDict(
+            <NumericExpressionInputCustomizationArgsBackendDict> caBackendDict)
+        );
       case 'NumericInput':
         return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'PencilCodeEditor':
