@@ -137,8 +137,7 @@ var AdminPage = function() {
     await action.click('Admin roles tab button', adminRolesTab);
     await waitFor.pageToFullyLoad();
 
-    await waitFor.visibilityOf(
-      expect(adminRolesTab.getAttribute('class')).toMatch('active'));
+    expect(await adminRolesTab.getAttribute('class')).toMatch('active');
     await waitFor.visibilityOf(
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
