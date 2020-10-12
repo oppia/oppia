@@ -120,7 +120,7 @@ var ExplorationEditorPage = function() {
     await waitFor.elementToBeClickable(
       publishExplorationButton,
       'Publish button taking too long to be clickable.');
-    await action.click('Publish Exploration Button',publishExplorationButton);
+    await action.click('Publish Exploration Button', publishExplorationButton);
 
     var expTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
@@ -143,12 +143,13 @@ var ExplorationEditorPage = function() {
     var dropdown = element(by.css('.select2-dropdown'));
     var searchInput = element(by.css('.select2-search input'));
     await action.click('Container', container);
-    await action.sendKeys('Input search', dropdown.searchInput, category + '\n');
+    await action.sendKeys(
+      'Input search', dropdown.searchInput, category + '\n');
 
     await action.click(
-      'Exploration Language Select', selectExplorationLanguage);
+      'Exp Language Select', selectExplorationLanguage);
     await action.sendKeys(
-      'Exploration Language Select', selectExplorationLanguage, language + '\n');
+      'Exp Language Select', selectExplorationLanguage, language + '\n');
 
     await action.click('Exploration Tags', expTags);
     await action.click('Exploration Input', expInput);
