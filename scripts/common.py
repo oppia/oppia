@@ -28,10 +28,12 @@ import subprocess
 import sys
 import time
 
+import constants
 import feconf
 import python_utils
-import release_constants
 
+
+AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable
 
@@ -45,6 +47,11 @@ PYLINT_VERSION = '1.9.5'
 PYLINT_QUOTES_VERSION = '0.1.8'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
+PIP_TOOLS_VERSION = '5.3.1'
+GRPCIO_VERSION = '1.0.0'
+ENUM_VERSION = '1.1.10'
+PROTOBUF_VERSION = '3.13.0'
+SETUPTOOLS_VERSION = '36.6.0'
 
 # Node version.
 NODE_VERSION = '12.16.2'
@@ -81,6 +88,7 @@ CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
@@ -119,6 +127,16 @@ REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
 # used by the Redis server.
 REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
+# The requirements.txt file is auto-generated and contains a deterministic list
+# of all libraries and versions that should exist in the
+# 'third_party/python_libs' directory.
+# NOTE: Developers should NOT modify this file.
+COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
+# The precompiled requirements file is the one that developers should be
+# modifying. It is the file that we use to recompile the
+# "requirements.txt" file so that all installations using "requirements.txt"
+# will be identical.
+REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
 
 
 def is_windows_os():
@@ -333,48 +351,6 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
-def ensure_release_scripts_folder_exists_and_is_up_to_date():
-    """Checks that the release-scripts folder exists and is up-to-date."""
-    parent_dirpath = os.path.join(os.getcwd(), os.pardir)
-    release_scripts_dirpath = os.path.join(parent_dirpath, 'release-scripts')
-
-    # If the release-scripts folder does not exist, set it up.
-    if not os.path.isdir(release_scripts_dirpath):
-        with CD(parent_dirpath):
-            # Taken from the "Check your SSH section" at
-            # https://help.github.com/articles/error-repository-not-found/
-            _, stderr = subprocess.Popen(
-                ['ssh', '-T', 'git@github.com'],
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE).communicate()
-            if 'You\'ve successfully authenticated' not in stderr:
-                raise Exception(
-                    'You need SSH access to GitHub. See the '
-                    '"Check your SSH access" section here and follow the '
-                    'instructions: '
-                    'https://help.github.com/articles/'
-                    'error-repository-not-found/#check-your-ssh-access')
-            subprocess.check_call([
-                'git', 'clone',
-                'git@github.com:oppia/release-scripts.git'])
-
-    with CD(release_scripts_dirpath):
-        ask_user_to_confirm(
-            'Please make sure that the ../release-scripts repo is clean and '
-            'you are on master branch in ../release-scripts repo.')
-        python_utils.PRINT('Verifying that ../release-scripts repo is clean...')
-        verify_local_repo_is_clean()
-        python_utils.PRINT(
-            'Verifying that user is on master branch in '
-            '../release-scripts repo...')
-        verify_current_branch_name('master')
-
-        # Update the local repo.
-        remote_alias = get_remote_alias(
-            'git@github.com:oppia/release-scripts.git')
-        subprocess.check_call(['git', 'pull', remote_alias])
-
-
 def is_port_open(port):
     """Checks if a process is listening to the port.
 
@@ -460,7 +436,7 @@ def ask_user_to_confirm(message):
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
         answer = python_utils.INPUT().lower()
-        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
 
@@ -497,7 +473,7 @@ def check_blocking_bug_issue_count(repo):
         Exception. The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
-        number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
+        number=constants.release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
     if blocking_bugs_milestone.state == 'closed':
         raise Exception('The blocking bug milestone is closed.')
     if blocking_bugs_milestone.open_issues:
@@ -522,12 +498,13 @@ def check_prs_for_current_release_are_released(repo):
             "PR: released" label.
     """
     current_release_label = repo.get_label(
-        release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
+        constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
     current_release_prs = repo.get_issues(
         state='all', labels=[current_release_label])
     for pr in current_release_prs:
         label_names = [label.name for label in pr.labels]
-        if release_constants.LABEL_FOR_RELEASED_PRS not in label_names:
+        if constants.release_constants.LABEL_FOR_RELEASED_PRS not in (
+                label_names):
             open_new_tab_in_browser_if_possible(
                 'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
                 '+label%3A%22PR%3A+for+current+release%22+')
@@ -680,6 +657,40 @@ def stop_redis_server():
     python_utils.PRINT('Cleaning up the redis_servers.')
     # Shutdown the redis server before exiting.
     subprocess.call([REDIS_CLI_PATH, 'shutdown'])
+
+
+def fix_third_party_imports():
+    """Sets up up the environment variables and corrects the system paths so
+    that the backend tests and imports work correctly.
+    """
+    # These environmental variables are required to allow Google Cloud Tasks to
+    # operate in a local development environment without connecting to the
+    # internet. These environment variables allow Cloud APIs to be instantiated.
+    os.environ['CLOUDSDK_CORE_PROJECT'] = 'dummy-cloudsdk-project-id'
+    os.environ['APPLICATION_ID'] = 'dummy-cloudsdk-project-id'
+
+    # The devappserver function fixes the system path by adding certain google
+    # appengine libraries that we need in oppia to the python system path. The
+    # Google Cloud SDK comes with certain packages preinstalled including
+    # webapp2, jinja2, and pyyaml so this function makes sure that those
+    # libraries are installed.
+    import dev_appserver
+    dev_appserver.fix_sys_path()
+    # In the process of migrating Oppia from Python 2 to Python 3, we are using
+    # both google app engine apis that are contained in the Google Cloud SDK
+    # folder, and also google cloud apis that are installed in our
+    # 'third_party/python_libs' directory. Therefore, there is a confusion of
+    # where the google module is located and which google module to import from.
+    # The following code ensures that the google module that python looks at
+    # imports from the 'third_party/python_libs' folder so that the imports are
+    # correct.
+    if 'google' in sys.modules:
+        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_module = sys.modules['google']
+        google_module.__path__ = [google_path]
+        google_module.__file__ = os.path.join(google_path, '__init__.py')
+
+    sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
 
 
 class CD(python_utils.OBJECT):

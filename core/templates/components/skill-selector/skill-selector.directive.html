@@ -1,5 +1,5 @@
-<div class="skill-selector-parent skill-container" style="display:flex;  flex-direction: row;">
-  <div class="list-group" style="width:70%">
+<div class="skill-selector-parent skill-container oppia-skill-container protractor-test-skill-container">
+  <div class="list-group oppia-list-group">
     <md-card layout="row" class="list-view-item protractor-test-skill-select-header">
       Search By Skill
       <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
@@ -8,12 +8,12 @@
       <md-radio-group ng-model="selectedSkill" ng-change="setSelectedSkillId()">
         <md-card ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item" ng-if="checkIfTopicIsEmpty(topicName)">
           <md-card layout="row" class="list-view-item">
-            <h2><label style="padding-left:10px"><[topicName]></label></h2>
+            <h2><label class="oppia-topic-name-text"><[topicName]></label></h2>
           </md-card>
           <div ng-if="!checkIfEmpty(skills)" ng-repeat="(subtopicName, skills) in subtopics" class="list-view-item ">
             <md-card class="list-view-item">
-              <label style="padding-top:20px;padding-bottom:20px;padding-left:10px"><[subtopicName]></label>
-              <md-radio-button style="margin-left:10px" class="protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.id" aria-label="<[skill.description]>">
+              <label class="oppia-subtopic-name-text"><[subtopicName]></label>
+              <md-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.id" aria-label="<[skill.description]>">
                 <[skill.description]>
               </md-radio-button>
             </md-card>
@@ -21,11 +21,11 @@
         </md-card>
         <md-card ng-if="untriagedSkillSummaries.length" class="list-view-item">
           <md-card layout="row" class="list-view-item">
-            <h2><label style="padding-left:10px">Untriaged Skills</label></h2>
+            <h2><label class="oppia-heading-text">Untriaged Skills</label></h2>
           </md-card>
           <div ng-if="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
             <md-card class="list-view-item">
-              <md-radio-button style="margin-left:10px" class="protractor-test-skills-list-item" ng-repeat="skill in untriagedSkillSummaries | filter:skillFilterText" ng-value="skill.id" aria-label="<[skill.description]>">
+              <md-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" ng-repeat="skill in untriagedSkillSummaries | filter:skillFilterText" ng-value="skill.id" aria-label="<[skill.description]>">
                 <[skill.description]>
               </md-radio-button>
             </md-card>
@@ -34,25 +34,25 @@
       </md-radio-group>
     </div>
   </div>
-  <div class="list-group" style="width:30%; padding-left:20px">
-    <md-card ng-if="canAllowSkillsFromOtherTopics()" style="padding-left:10px" layout="row" class="list-view-item">
+  <div class="list-group oppia-filter-list-group">
+    <md-card ng-if="canAllowSkillsFromOtherTopics()" layout="row" class="list-view-item oppia-list-view-item">
       <label>Filter By Topics</label>
     </md-card>
-    <div ng-if="canAllowSkillsFromOtherTopics()" style="max-height: 25vh; overflow-y: auto;">
+    <div ng-if="canAllowSkillsFromOtherTopics()" class="oppia-list-view-item-container">
       <md-card class="list-view-item ">
-        <md-checkbox style="margin-left:10px" ng-repeat="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()"><[topic.topicName]></md-checkbox>
+        <md-checkbox class="oppia-skills-list-item" ng-repeat="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()"><[topic.topicName]></md-checkbox>
       </md-card>
     </div>
     <br>
-    <md-card style="padding-left:10px" layout="row" class="list-view-item">
+    <md-card layout="row" class="list-view-item oppia-list-view-item">
       <label>Filter By Subtopic</label>
     </md-card>
-    <div style="max-height: 25vh; overflow-y: auto;">
+    <div class="oppia-list-view-item-container">
       <md-card class="list-view-item">
         <div ng-repeat="(topicName, subtopics) in subTopicFilterDict">
-          <h3><label class="list-group-item-heading" style="padding-left:10px"><[topicName]></label></h3>
+          <h3><label class="list-group-item-heading oppia-heading-text"><[topicName]></label></h3>
           <md-card class="list-view-item">
-            <md-checkbox style="margin-left:10px" ng-repeat="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateSkillsListOnSubtopicFilterChange()"><[subtopic.subTopicName]></md-checkbox>
+            <md-checkbox class="oppia-skills-list-item" ng-repeat="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateSkillsListOnSubtopicFilterChange()"><[subtopic.subTopicName]></md-checkbox>
           </md-card>
         </div>
       </md-card>
@@ -62,12 +62,42 @@
   </div>
 </div>
 <style>
-  .skill-selector-parent .skill-list-box {
+  select-skill .skill-selector-parent,
+  select-skill .skill-list-box {
     max-height: 50vh;
     overflow-y: auto;
   }
+  select-skill .oppia-skill-container {
+    display: flex;
+    flex-direction: row;
+  }
+  select-skill .oppia-list-group {
+    width: 70%;
+  }
+  select-skill .oppia-topic-name-text,
+  select-skill .oppia-heading-text,
+  select-skill .oppia-list-view-item {
+    padding-left: 10px;
+  }
+  select-skill .oppia-subtopic-name-text {
+    padding-bottom: 20px;
+    padding-left: 10px;
+    padding-top: 20px;
+  }
+  select-skill .oppia-skills-list-item {
+    margin-left: 10px;
+  }
+  select-skill .oppia-filter-list-group {
+    padding-left: 20px;
+    width: 30%;
+  }
+  select-skill .oppia-list-view-item-container {
+    max-height: 25vh;
+    overflow-y: auto;
+  }
   @media screen and (max-width: 768px) {
-    .skill-selector-parent .skill-list-box {
+    select-skill .skill-selector-parent,
+    select-skill .skill-list-box {
       max-height: initial;
     }
   }

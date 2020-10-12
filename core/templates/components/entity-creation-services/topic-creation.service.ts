@@ -21,9 +21,6 @@ require(
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 require('domain/topic/topic-update.service.ts');
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardFilterObjectFactory');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
@@ -59,7 +56,7 @@ angular.module('oppia').factory('TopicCreationService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
             'create-new-topic-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           windowClass: 'create-new-topic',
           controller: 'CreateNewTopicModalController'
         }).result.then(function(newlyCreatedTopic) {

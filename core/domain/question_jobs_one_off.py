@@ -140,3 +140,30 @@ class RegenerateQuestionSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class MissingQuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to delete question commit log models for which question
+    models are missing.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10808 is fixed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionCommitLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        question = question_services.get_question_by_id(
+            item.question_id, strict=False)
+        if question is None:
+            yield ('Question Commit Model deleted', item.id)
+            item.delete()
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

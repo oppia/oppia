@@ -29,11 +29,11 @@ require('services/questions-list.service.ts');
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('SkillEditorStateService', [
-  'AlertsService', 'QuestionsListService',
+  '$rootScope', 'AlertsService', 'QuestionsListService',
   'SkillBackendApiService', 'SkillObjectFactory',
   'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
   function(
-      AlertsService, QuestionsListService,
+      $rootScope, AlertsService, QuestionsListService,
       SkillBackendApiService, SkillObjectFactory,
       SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
@@ -54,9 +54,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
       _skillIsInitialized = true;
     };
 
-    var _updateSkill = function(newBackendSkillObject) {
-      _setSkill(SkillObjectFactory.createFromBackendDict(
-        newBackendSkillObject));
+    var _updateSkill = function(skill) {
+      _setSkill(skill);
     };
 
     var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
@@ -115,9 +114,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
             QuestionsListService.getQuestionSummariesAsync(
-              [skillId], true, false
+              skillId, true, false
             );
             _skillIsBeingLoaded = false;
+            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning();
             _skillIsBeingLoaded = false;
@@ -187,13 +187,14 @@ angular.module('oppia').factory('SkillEditorStateService', [
         SkillBackendApiService.updateSkill(
           _skill.getId(), _skill.getVersion(), commitMessage,
           UndoRedoService.getCommittableChangeList()).then(
-          function(skillBackendObject) {
-            _updateSkill(skillBackendObject);
+          function(skill) {
+            _updateSkill(skill);
             UndoRedoService.clearChanges();
             _skillIsBeingSaved = false;
             if (successCallback) {
               successCallback();
             }
+            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the skill');

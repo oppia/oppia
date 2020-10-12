@@ -19,13 +19,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from core.domain import taskqueue_services
 from core.domain import wipeout_jobs_one_off
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
-taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
 
@@ -40,9 +40,9 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
         job_id = wipeout_jobs_one_off.UserDeletionOneOffJob.create_new()
         wipeout_jobs_one_off.UserDeletionOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             wipeout_jobs_one_off.UserDeletionOneOffJob.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item)
@@ -63,7 +63,7 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_repeated_deletion_is_successful(self):
         output = self._run_one_off_job()
@@ -75,8 +75,6 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
 
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
         self.assertIsNone(
@@ -99,15 +97,15 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         job_id = (
             wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
             .create_new())
         wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
             .get_output(job_id))
@@ -129,7 +127,7 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_verification_when_user_is_not_deleted(self):
         output = self._run_one_off_job()
@@ -140,17 +138,22 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         wipeout_service.delete_user(pending_deletion_request)
         pending_deletion_request.deletion_complete = True
-        wipeout_service.save_pending_deletion_request(pending_deletion_request)
+        wipeout_service.save_pending_deletion_requests(
+            [pending_deletion_request])
 
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
 
     def test_verification_when_user_is_wrongly_deleted_fails(self):
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         wipeout_service.delete_user(pending_deletion_request)
         pending_deletion_request.deletion_complete = True
-        wipeout_service.save_pending_deletion_request(pending_deletion_request)
+        wipeout_service.save_pending_deletion_requests(
+            [pending_deletion_request])
 
         user_models.CompletedActivitiesModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]

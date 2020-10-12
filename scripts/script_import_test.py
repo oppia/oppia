@@ -30,20 +30,6 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-from scripts import common
-
-
-class GcloudAdapterImportTests(test_utils.GenericTestBase):
-    """Tests import of gcloud adapter."""
-
-    def test_import_with_missing_gae_dir(self):
-        def mock_exists(unused_path):
-            return False
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        gae_dir = os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME)
-        with exists_swap, self.assertRaisesRegexp(
-            Exception, 'Directory %s does not exist.' % gae_dir):
-            from scripts.release_scripts import gcloud_adapter # pylint: disable=unused-variable
 
 
 class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
@@ -81,5 +67,6 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 '--target', '../oppia_tools/pyyaml-5.1.2',
                 '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
-                'future==0.17.1', '--target', 'third_party/future-0.17.1',
+                'future==0.18.2', '--target',
+                'third_party/python_libs',
                 '--user', '--prefix=', '--system'])

@@ -61,8 +61,9 @@ angular.module('oppia').directive('skillEditorMainTab', [
           };
 
           $scope.getAssignedSkillTopicData = function() {
-            if ($scope.assignedSkillTopicData) {
+            if (!$scope.topicName && $scope.assignedSkillTopicData) {
               $scope.topicName = Object.keys($scope.assignedSkillTopicData)[0];
+              $scope.changeSelectedTopic($scope.topicName);
               return $scope.assignedSkillTopicData;
             }
             $scope.assignedSkillTopicData = (
@@ -89,6 +90,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
           ctrl.$onInit = function() {
             $scope.selectedTopic = null;
             $scope.assignedSkillTopicData = null;
+            $scope.topicName = null;
             $scope.subtopicName = null;
             PageTitleService.setPageTitleForMobileView('Skill Editor');
           };

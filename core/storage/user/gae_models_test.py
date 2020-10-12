@@ -88,7 +88,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
             gae_id=self.USER_3_GAE_ID,
-            gae_user_id=self.USER_3_GAE_ID,
             email=self.USER_3_EMAIL,
             role=self.USER_3_ROLE,
             username=self.GENERIC_USERNAME,
@@ -112,10 +111,16 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             pin=self.GENERIC_PIN
         ).put()
 
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.UserSettingsModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
+
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_users_deletes_them(self):
         # Case for a full user.
@@ -175,9 +180,10 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
-        for user in user_models.UserSettingsModel.get_by_role(
-                feconf.ROLE_ID_ADMIN):
-            self.assertIn(user, actual_users)
+        self.assertItemsEqual(
+            user_models.UserSettingsModel.get_by_role(feconf.ROLE_ID_ADMIN),
+            actual_users
+        )
 
     def test_export_data_for_nonexistent_user_raises_exception(self):
         with self.assertRaisesRegexp(
@@ -248,6 +254,18 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
 
+    def test_get_new_id_with_deleted_user_model(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.DeletedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.DeletedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.UserSettingsModel.get_new_id('exploration')
+
     def test_get_new_id_for_too_many_collisions_raises_error(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
@@ -285,6 +303,12 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -356,6 +380,12 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -448,6 +478,12 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             last_played_state_name=self.STATE_NAME_2,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -568,6 +604,12 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.LearnerPlaylistModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1374,6 +1416,12 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CollectionProgressModel.get_deletion_policy(),
@@ -1476,6 +1524,12 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             completed_node_ids=self.COMPLETED_NODE_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.StoryProgressModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1787,6 +1841,12 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             degree_of_mastery=self.DEGREE_OF_MASTERY,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -2252,6 +2312,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_1_EMAIL = 'email@email.com'
+    USER_1_ROLE = feconf.ROLE_ID_LEARNER
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2260,6 +2321,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE,
             exploration_ids=[],
             collection_ids=[],
         ).put()
@@ -2267,7 +2329,20 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AT_END)
+
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.USER_1_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.NONEXISTENT_USER_ID))
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -2280,13 +2355,22 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         )
 
 
+class DeletedUserModelTests(test_utils.GenericTestBase):
+    """Tests for DeletedUserModelTests."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.DeletedUserModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+
 class PseudonymizedUserModelTests(test_utils.GenericTestBase):
     """Tests for PseudonymizedUserModel."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_create_raises_error_when_many_id_collisions_occur(self):
         # Swap dependent method get_by_id to simulate collision every time.
@@ -2310,6 +2394,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     USER_ID = 'user_id'
     USER_GAE_ID = 'gae_id'
     PROFILE_ID = 'profile_id'
+    PROFILE_2_ID = 'profile_2_id'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2324,11 +2409,22 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             gae_id=None,
             parent_user_id=self.USER_ID
         ).put()
+        user_models.UserAuthDetailsModel(
+            id=self.PROFILE_2_ID,
+            gae_id=None,
+            parent_user_id=self.USER_ID
+        ).put()
 
-    def test_get_deletion_policy_is_delete(self):
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.UserAuthDetailsModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
+
+    def test_get_deletion_policy_is_delete_after_verification(self):
         self.assertEqual(
             user_models.UserAuthDetailsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.
@@ -2397,3 +2493,14 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             user_models.UserAuthDetailsModel.get_by_auth_id(
                 feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )
+
+    def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
+        user_auth_details_models = [
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
+        ]
+        fetched_output = (
+            user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
+                self.USER_ID)
+        )
+        self.assertItemsEqual(user_auth_details_models, fetched_output)

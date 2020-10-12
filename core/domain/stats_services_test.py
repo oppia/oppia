@@ -31,8 +31,8 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -71,9 +71,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         exploration_stats.state_stats_mapping = {
-            'Home': stats_domain.StateStats.create_default()
+            'Home': stats_domain.StateStats.create_default(),
+            '🙂': stats_domain.StateStats.create_default(),
         }
-        stats_services.save_stats_model_transactional(exploration_stats)
+        stats_services.save_stats_model(exploration_stats)
 
         # Pass in exploration start event to stats model created in setup
         # function.
@@ -89,12 +90,19 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                     'useful_feedback_count': 1,
                     'num_times_solution_viewed': 1,
                     'num_completions': 1
-                }
+                },
+                '🙂': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
             }
         }
 
-        stats_services.update_stats(
-            'exp_id1', 1, aggregated_stats)
+        stats_services.update_stats('exp_id1', 1, aggregated_stats)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(exploration_stats.num_starts_v2, 1)
@@ -118,6 +126,118 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].num_times_solution_viewed_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].total_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].first_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].total_answers_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].useful_feedback_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].num_completions_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].num_times_solution_viewed_v2, 1)
+
+    def test_update_stats_throws_if_model_is_missing_entirely(self):
+        """Test the update_stats method."""
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'id="nullid.1" does not exist'):
+            stats_services.update_stats('nullid', 1, aggregated_stats)
+
+    def test_update_stats_throws_if_model_is_missing_state_stats(self):
+        """Test the update_stats method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        exploration_stats.state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default()
+        }
+        stats_services.save_stats_model(exploration_stats)
+
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+                'Away from Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'does not exist'):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
+
+    def test_update_stats_throws_if_model_is_using_unicode_state_name(self):
+        """Test the update_stats method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        exploration_stats.state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default(),
+            # No stats for '🙂'.
+        }
+        stats_services.save_stats_model(exploration_stats)
+
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+                '🙂': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'does not exist'):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_calls_to_stats_methods(self):
         """Test that calls are being made to the
@@ -331,7 +451,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats.num_starts_v2 = 3
         exploration_stats.num_actual_starts_v2 = 2
         exploration_stats.num_completions_v2 = 1
-        stats_services.save_stats_model_transactional(exploration_stats)
+        stats_services.save_stats_model(exploration_stats)
 
         # Update exploration to next version 2 and its stats.
         exp_services.update_exploration(
@@ -341,7 +461,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats.num_starts_v2 = 4
         exploration_stats.num_actual_starts_v2 = 3
         exploration_stats.num_completions_v2 = 2
-        stats_services.save_stats_model_transactional(exploration_stats)
+        stats_services.save_stats_model(exploration_stats)
 
         # Revert to an older version.
         exp_services.revert_exploration(
@@ -968,14 +1088,14 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             model.unresolved_issues[0],
             exp_issues.unresolved_issues[0].to_dict())
 
-    def test_save_stats_model_transactional(self):
-        """Test the save_stats_model_transactional method."""
+    def test_save_stats_model(self):
+        """Test the save_stats_model method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         exploration_stats.num_starts_v2 += 15
         exploration_stats.num_actual_starts_v2 += 5
         exploration_stats.num_completions_v2 += 2
-        stats_services.save_stats_model_transactional(exploration_stats)
+        stats_services.save_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
@@ -1854,11 +1974,11 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
         """Runs the MockInteractionAnswerSummariesAggregator."""
         MockInteractionAnswerSummariesAggregator.start_computation()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
     def _rerun_answer_summaries_aggregator(self):
@@ -2237,11 +2357,11 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         """Runs the MockInteractionAnswerSummariesAggregator."""
         MockInteractionAnswerSummariesAggregator.start_computation()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         MockInteractionAnswerSummariesAggregator.stop_computation(
             feconf.SYSTEM_COMMITTER_ID)

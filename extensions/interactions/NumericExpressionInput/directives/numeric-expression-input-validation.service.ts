@@ -39,6 +39,11 @@ export class NumericExpressionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  getCustomizationArgsWarnings(
+      customizationArgs: NumericExpressionInputCustomizationArgs): Warning[] {
+    return [];
+  }
+
   getAllWarnings(
       stateName: string,
       customizationArgs: NumericExpressionInputCustomizationArgs,
@@ -46,6 +51,9 @@ export class NumericExpressionInputValidationService {
     let warningsList = [];
     let algebraicRulesService = (
       new NumericExpressionInputRulesService());
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(

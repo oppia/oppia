@@ -18,6 +18,8 @@
 
 
 import { TestBed } from '@angular/core/testing';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
@@ -37,7 +39,6 @@ describe('Library controller', function() {
   var classroomBackendApiService = null;
   var csrfTokenService = null;
   var i18nLanguageCodeService = null;
-  var pageTitleService = null;
   var userService = null;
 
   var logErrorSpy = null;
@@ -50,7 +51,9 @@ describe('Library controller', function() {
 
     classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
-    pageTitleService = TestBed.get(PageTitleService);
+    OppiaAngularRootComponent.pageTitleService = (
+      TestBed.get(PageTitleService)
+    );
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -93,7 +96,7 @@ describe('Library controller', function() {
         $q.resolve('sample-csrf-token'));
 
       logErrorSpy = spyOn($log, 'error');
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
@@ -127,8 +130,7 @@ describe('Library controller', function() {
       $scope = $rootScope.$new();
       ctrl = $componentController('libraryPage', {
         $scope: $scope,
-        I18nLanguageCodeService: i18nLanguageCodeService,
-        PageTitleService: pageTitleService
+        I18nLanguageCodeService: i18nLanguageCodeService
       });
 
       // This approach was choosen because spyOn() doesn't work on properties
@@ -161,8 +163,9 @@ describe('Library controller', function() {
         expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
         expect(logErrorSpy.calls.allArgs()).toContain(
           ['INVALID URL PATH: /invalid']);
-        expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
-          'Community Library Lessons | Oppia');
+        expect(
+          OppiaAngularRootComponent.pageTitleService.setPageTitle
+        ).toHaveBeenCalledWith('Community Library Lessons | Oppia');
         expect(ctrl.activitiesOwned).toEqual({
           explorations: {
             exp1: false,
@@ -358,7 +361,7 @@ describe('Library controller', function() {
         $q.resolve('sample-csrf-token'));
 
       logErrorSpy = spyOn($log, 'error');
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => false
       }));
@@ -376,8 +379,7 @@ describe('Library controller', function() {
       $scope = $rootScope.$new();
       ctrl = $componentController('libraryPage', {
         $scope: $scope,
-        I18nLanguageCodeService: i18nLanguageCodeService,
-        PageTitleService: pageTitleService
+        I18nLanguageCodeService: i18nLanguageCodeService
       });
 
       // This approach was choosen because spyOn() doesn't work on properties
@@ -410,8 +412,9 @@ describe('Library controller', function() {
         expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
         expect(logErrorSpy.calls.allArgs()).toContain(
           ['INVALID URL PATH: /invalid']);
-        expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
-          'Community Library Lessons | Oppia');
+        expect(
+          OppiaAngularRootComponent.pageTitleService.setPageTitle
+        ).toHaveBeenCalledWith('Community Library Lessons | Oppia');
         expect(ctrl.activitiesOwned).toEqual({
           explorations: {},
           collections: {}
@@ -466,7 +469,7 @@ describe('Library controller', function() {
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
@@ -481,8 +484,7 @@ describe('Library controller', function() {
       $scope = $rootScope.$new();
       ctrl = $componentController('libraryPage', {
         $scope: $scope,
-        I18nLanguageCodeService: i18nLanguageCodeService,
-        PageTitleService: pageTitleService
+        I18nLanguageCodeService: i18nLanguageCodeService
       });
 
       // This approach was choosen because spyOn() doesn't work on properties
@@ -513,8 +515,9 @@ describe('Library controller', function() {
         expect(ctrl.bannerImageFileUrl).toBe(
           '/assets/images/library/' + ctrl.bannerImageFilename);
         expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
-        expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
-          'Find explorations to learn from - Oppia');
+        expect(
+          OppiaAngularRootComponent.pageTitleService.setPageTitle
+        ).toHaveBeenCalledWith('Find explorations to learn from - Oppia');
         expect(ctrl.activitiesOwned).toBe(undefined);
         expect(ctrl.activityList).toEqual([]);
         expect(ctrl.groupHeaderI18nId).toEqual('');

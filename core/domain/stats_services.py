@@ -118,9 +118,10 @@ def get_exploration_stats(exp_id, exp_version):
     return exploration_stats
 
 
-def update_stats(exp_id, exp_version, aggregated_stats):
-    """Updates ExplorationStatsModel according to the dict containing aggregated
-    stats.
+def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
+    """Updates ExplorationStatsModel according to the dict containing
+    aggregated stats. The model GET and PUT must be done in a transaction to
+    avoid loss of updates that come in rapid succession.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -128,35 +129,39 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
     """
-    exploration_stats = get_exploration_stats_by_id(
-        exp_id, exp_version)
+    exp_stats = get_exploration_stats_by_id(exp_id, exp_version)
+    if exp_stats is None:
+        raise Exception(
+            'ExplorationStatsModel id="%s.%s" does not exist' % (
+                exp_id, exp_version))
 
-    exploration_stats.num_starts_v2 += aggregated_stats['num_starts']
-    exploration_stats.num_completions_v2 += aggregated_stats['num_completions']
-    exploration_stats.num_actual_starts_v2 += aggregated_stats[
-        'num_actual_starts']
+    exp_stats.num_starts_v2 += aggregated_stats['num_starts']
+    exp_stats.num_completions_v2 += aggregated_stats['num_completions']
+    exp_stats.num_actual_starts_v2 += aggregated_stats['num_actual_starts']
 
-    for state_name in aggregated_stats['state_stats_mapping']:
-        exploration_stats.state_stats_mapping[
-            state_name].total_answers_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['total_answers_count']
-        exploration_stats.state_stats_mapping[
-            state_name].useful_feedback_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['useful_feedback_count']
-        exploration_stats.state_stats_mapping[
-            state_name].total_hit_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['total_hit_count']
-        exploration_stats.state_stats_mapping[
-            state_name].first_hit_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['first_hit_count']
-        exploration_stats.state_stats_mapping[
-            state_name].num_times_solution_viewed_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['num_times_solution_viewed']
-        exploration_stats.state_stats_mapping[
-            state_name].num_completions_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['num_completions']
+    for state_name, stats in aggregated_stats['state_stats_mapping'].items():
+        if state_name not in exp_stats.state_stats_mapping:
+            raise Exception(
+                'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
+                'does not exist' % (exp_id, exp_version, state_name))
+        exp_stats.state_stats_mapping[state_name].aggregate_from(
+            stats_domain.SessionStateStats.from_dict(stats))
 
-    save_stats_model_transactional(exploration_stats)
+    save_stats_model(exp_stats)
+
+
+def update_stats(exp_id, exp_version, aggregated_stats):
+    """Updates ExplorationStatsModel according to the dict containing
+    aggregated stats.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+        aggregated_stats: dict. Dict representing an ExplorationStatsModel
+            instance with stats aggregated in the frontend.
+    """
+    transaction_services.run_in_transaction(
+        _update_stats_transactional, exp_id, exp_version, aggregated_stats)
 
 
 def get_stats_for_new_exploration(exp_id, exp_version, state_names):
@@ -642,7 +647,7 @@ def create_stats_model(exploration_stats):
     return instance_id
 
 
-def _save_stats_model(exploration_stats):
+def save_stats_model(exploration_stats):
     """Updates the ExplorationStatsModel datastore instance with the passed
     ExplorationStats domain object.
 
@@ -671,18 +676,6 @@ def _save_stats_model(exploration_stats):
     exploration_stats_model.state_stats_mapping = new_state_stats_mapping
 
     exploration_stats_model.put()
-
-
-def save_stats_model_transactional(exploration_stats):
-    """Updates the ExplorationStatsModel datastore instance with the passed
-    ExplorationStats domain object in a transaction.
-
-    Args:
-        exploration_stats: ExplorationStats. The exploration statistics domain
-            object.
-    """
-    transaction_services.run_in_transaction(
-        _save_stats_model, exploration_stats)
 
 
 def create_exp_issues_model(exp_issues):

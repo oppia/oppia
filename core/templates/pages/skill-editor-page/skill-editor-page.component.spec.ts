@@ -17,8 +17,8 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+// Skill editor page is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/skill-editor-page/skill-editor-page.component.ts');
@@ -32,12 +32,7 @@ describe('Skill editor page', function() {
   var $uibModal = null;
   var UrlService = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
@@ -46,7 +41,6 @@ describe('Skill editor page', function() {
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
-
     ctrl = $componentController('skillEditorPage');
   }));
 
@@ -58,6 +52,15 @@ describe('Skill editor page', function() {
       ctrl.$onInit();
       expect(SkillEditorStateService.loadSkill).toHaveBeenCalledWith('skill_1');
     });
+
+  it('should call confirm before leaving', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    spyOn(window, 'addEventListener');
+    ctrl.setUpBeforeUnload();
+    ctrl.confirmBeforeLeaving({returnValue: ''});
+    expect(window.addEventListener).toHaveBeenCalledWith(
+      'beforeunload', ctrl.confirmBeforeLeaving);
+  });
 
   it('should get active tab name from skill editor routing service',
     function() {

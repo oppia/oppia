@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AnswerStatsBackendDict } from
-  'domain/exploration/visualization-info-object.factory';
+  'domain/exploration/visualization-info.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { StateTopAnswersStats } from
@@ -219,7 +219,7 @@ describe('StateTopAnswersStatsService', () => {
       expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBeFalse();
     }));
 
-  it('only returns state names with stats', fakeAsync(async() => {
+  it('should only returns state names with stats', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);

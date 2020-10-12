@@ -613,7 +613,7 @@ describe('State translation component', function() {
       });
     });
 
-    it('should change active hint index ', function() {
+    it('should change active hint index', function() {
       $scope.onTabClick('hint');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -634,7 +634,7 @@ describe('State translation component', function() {
           .toHaveBeenCalled();
       });
 
-    it('should change active answer group index ', function() {
+    it('should change active answer group index', function() {
       $scope.onTabClick('feedback');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -827,7 +827,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when trying to change' +
-      ' active hint index ', function() {
+      ' active hint index', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveHintIndex(1);
@@ -838,7 +838,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when trying to change' +
-      ' active answer group index ', function() {
+      ' active answer group index', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(1);
@@ -1053,7 +1053,7 @@ describe('State translation component', function() {
       expect($scope.isDisabled('solution')).toBe(true);
     });
 
-    it('should change active customization argument index ', function() {
+    it('should change active customization argument index', function() {
       $scope.onTabClick('ca');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
 
