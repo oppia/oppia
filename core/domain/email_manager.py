@@ -1302,7 +1302,7 @@ def send_mail_to_notify_admins_reviewers_needed(
         log_new_error('This app cannot send emails to users.')
         return
 
-    if not config_domain.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED:
+    if not config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED:
         log_new_error(
             'Contributor Dashboard reviewer emails must be enabled on the '
             'config page in order to send reviewers the emails.'

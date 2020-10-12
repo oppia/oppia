@@ -464,7 +464,14 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED = ConfigProperty(
         'about suggestions that need review. The default value is false.'
     ), False)
 
-
+NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED = ConfigProperty(
+    'notify_admins_contributor_dashboard_reviewers_needed_is_enabled',
+    BOOL_SCHEMA,
+    (
+        'Enable sending admins email notifications if Contributor Dashboard '
+        'reviewers are needed in specific suggestion types. The default value '
+        'is false.'
+    ), False)
 
 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
     'max_number_of_suggestions_per_reviewer',
