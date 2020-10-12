@@ -2346,17 +2346,15 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     (
                         email_manager
                         .send_mail_to_notify_contributor_dashboard_reviewers(
-                            ['invalid_reviewer_id'],
+                            ['reviewer_id_with_no_email'],
                             [[self.reviewable_suggestion_email_info]])
                     )
 
-        messages = self._get_sent_email_messages('invalid_reviewer_id')
-        self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
-            'There was no email for the given reviewer id: invalid_reviewer_id.'
-        )
+            'There was no email for the given reviewer id: '
+            'reviewer_id_with_no_email.')
 
     def test_email_not_sent_if_no_reviewers_to_notify(self):
 
