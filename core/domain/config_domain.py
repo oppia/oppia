@@ -464,6 +464,8 @@ CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
         'The default value is false.'
     ), False)
 
+
+
 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
     'max_number_of_suggestions_per_reviewer',
     FLOAT_SCHEMA,

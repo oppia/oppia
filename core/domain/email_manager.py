@@ -239,6 +239,37 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
     }
 }
 
+NEED_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
+    'email_body_template': (
+        'Hi %s,<br><br>'
+        'In the <a href="https://www.oppia.org/admin#/roles">admin '
+        'roles page,</a> please add reviewers to the Contributor Dashboard '
+        'Community by entering their username(s) and allow reviewing for the '
+        'suggestion types that need more reviewers bolded below.'
+        '<br>%s<br>'
+        'Thanks so much - we appreciate your help!<br>'
+        'Best Wishes!<br><br>'
+        '- The Oppia Contributor Dashboard Team'
+        '<br><br>%s'
+    ),
+    'email_subject': 'Reviewers Needed for Contributor Dashboard',
+    # The templates below are for listing the information for each suggestion
+    # type that needs more reviewers.
+    'suggestion_types_need_reviewers_template': {
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="https://www.oppia.org/contributor-dashboard">Contributor '
+            'Dashboard page</a> in languages where there are not enough '
+            'reviewers. The languages that need more reviewers are:'
+            '<br>%s<br>'),
+        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+            'There have been <b>quesiton suggestions</b> created on the '
+            '<a href="https://www.oppia.org/contributor-dashboard">Contributor '
+            'Dashboard page</a> where there are not enough '
+            'reviewers')
+    }
+}
+
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
@@ -267,6 +298,8 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1248,6 +1281,40 @@ def send_mail_to_notify_users_to_review(user_id, category):
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
+def send_mail_to_notify_admins_reviewers_needed(
+        admin_ids, suggestion_types_need_more_reviewers):
+    """Sends an email to admins to notify them that there are specific
+    suggestion types on the Contributor Dashboard that need more reviewers.
+
+    Note: it assumes that all admins are super admins because only super admins
+    have access to the admin page where reviewers can be added to the
+    Contributor Dashboard.
+
+    Args:
+        admin_ids: list(str). The user ids of the admins to notify.
+        suggestion_types_need_more_reviewers: dict. A dictionary where the keys
+            are suggestion types and each value corresponds to a set that
+            contains the language codes within the suggestion type that need
+            more reviewers. For example, for translation suggestions, the value
+            would be a set of language codes that translations are offered in
+            that need more reviewers.
+    """
+    email_subject = NEED_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+        'email_subject']
+    email_body_template = NEED_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+        'email_body_template']
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not config_domain.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED:
+        log_new_error(
+            'Contributor Dashboard reviewer emails must be enabled on the '
+            'config page in order to send reviewers the emails.'
+        )
+        return
+
 def send_mail_to_notify_contributor_dashboard_reviewers(
         reviewer_ids, reviewers_suggestion_email_infos):
     """Sends an email to each Contributor Dashboard reviewer notifying them of
@@ -1273,7 +1340,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         log_new_error('This app cannot send emails to users.')
         return
 
-    if not config_domain.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED:
+    if not config_domain.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED:
         log_new_error(
             'Contributor Dashboard reviewer emails must be enabled on the '
             'config page in order to send reviewers the emails.'
