@@ -1087,7 +1087,7 @@ def get_community_contribution_stats():
         community_contribution_stats_model)
 
 
-def get_suggestion_types_that_need_more_reviewers():
+def get_suggestion_types_that_need_reviewers():
     """Uses the community contribution stats to determine which suggestion
     types need more reviewers.
 

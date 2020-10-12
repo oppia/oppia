@@ -2294,7 +2294,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [[self.reviewable_suggestion_email_info]])
                     )
 
-        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertTrue(self.logged_errors[0].startswith(
@@ -2312,7 +2312,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [[self.reviewable_suggestion_email_info]])
                     )
 
-        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
@@ -2330,7 +2330,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [[self.reviewable_suggestion_email_info]])
                     )
 
-        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
@@ -2350,6 +2350,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [[self.reviewable_suggestion_email_info]])
                     )
 
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
@@ -2367,6 +2369,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [], [[self.reviewable_suggestion_email_info]])
                     )
 
+        messages = self._get_all_sent_email_messages()
+        self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
@@ -2384,13 +2388,1025 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                             [self.reviewer_1_id], [[]])
                     )
 
-        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
             'There were no suggestions to recommend to the reviewer with user '
             'id: %s.' % self.reviewer_1_id)
+
+    def test_email_sent_to_question_reviewer_with_review_wait_time_a_day(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                self.default_question_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 1
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_question_suggestion_html_for_email(
+                self.expected_default_question,
+                '%s day' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_question_reviewer_with_review_wait_time_in_days(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                self.default_question_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 5
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_question_suggestion_html_for_email(
+                self.expected_default_question,
+                '%s days' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_question_reviewer_with_review_wait_time_a_hour(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                self.default_question_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 1
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(hours=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_question_suggestion_html_for_email(
+                self.expected_default_question,
+                '%s hour' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_question_reviewer_with_review_wait_time_in_hours(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                self.default_question_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 5
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(hours=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_question_suggestion_html_for_email(
+                self.expected_default_question,
+                '%s hours' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_question_reviewer_with_review_wait_time_a_minute(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                self.default_question_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 1
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(minutes=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_question_suggestion_html_for_email(
+                self.expected_default_question,
+                '%s minute' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_question_reviewer_with_review_wait_time_in_mins(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                self.default_question_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 5
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(minutes=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_question_suggestion_html_for_email(
+                self.expected_default_question,
+                '%s minutes' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_question_reviewer_with_review_wait_time_in_secs(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                self.default_question_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion))
+        review_wait_time = 5
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(seconds=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_question_suggestion_html_for_email(
+                self.expected_default_question, '1 minute'))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_question_reviewer_multi_question_suggestions(self):
+        mocked_datetime_for_utcnow = (
+            self.mocked_review_submission_datetime + datetime.timedelta(
+                days=1, hours=1))
+        # Question suggestion 1 has waited 1 day for review.
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    hours=1)))
+        # Question suggestion 2 has waited 1 hour for review.
+        question_suggestion_2 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1)))
+        reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_1, question_suggestion_2]))
+        expected_suggestion_info_html_for_email = (
+            ''.join(
+                [
+                    self._create_expected_question_suggestion_html_for_email(
+                        'Question 1', '1 day'),
+                    self._create_expected_question_suggestion_html_for_email(
+                        'Question 2', '1 hour')
+                ]))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [reviewable_suggestion_email_infos])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_multi_question_reviewers_multi_question_suggestions(
+            self):
+        mocked_datetime_for_utcnow = (
+            self.mocked_review_submission_datetime + datetime.timedelta(
+                days=1, hours=1))
+        # Question suggestion 1 has waited 1 day for review.
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 1 for reviewer 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    hours=1)))
+        # Question suggestion 2 has waited 1 hour for review.
+        question_suggestion_2 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 2 for reviewer 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1)))
+        # Question suggestion 3 has waited 1 minute for review.
+        question_suggestion_3 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 1 for reviewer 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1, hours=1)))
+        # Question suggestion 4 has waited 1 minute for review.
+        question_suggestion_4 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 2 for reviewer 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1, hours=1)))
+        reviewer_1_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_1, question_suggestion_2]))
+        reviewer_2_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_3, question_suggestion_4]))
+        expected_suggestion_info_html_for_email_reviewer_1 = (
+            ''.join(
+                [
+                    self._create_expected_question_suggestion_html_for_email(
+                        'Question 1 for reviewer 1', '1 day'),
+                    self._create_expected_question_suggestion_html_for_email(
+                        'Question 2 for reviewer 1', '1 hour')
+                ]))
+        expected_email_html_body_reviewer_1 = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email_reviewer_1))
+        expected_suggestion_info_html_for_email_reviewer_2 = (
+            ''.join(
+                [
+                    self._create_expected_question_suggestion_html_for_email(
+                        'Question 1 for reviewer 2', '1 minute'),
+                    self._create_expected_question_suggestion_html_for_email(
+                        'Question 2 for reviewer 2', '1 minute')
+                ]))
+        expected_email_html_body_reviewer_2 = (
+            self.expected_email_body_template % (
+                self.REVIEWER_2_USERNAME,
+                expected_suggestion_info_html_for_email_reviewer_2))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id, self.reviewer_2_id],
+                            [
+                                reviewer_1_suggestion_email_infos,
+                                reviewer_2_suggestion_email_infos
+                            ])
+                    )
+
+        # Make sure correct emails are sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_reviewer_1)
+        messages = self._get_sent_email_messages(self.REVIEWER_2_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_reviewer_2)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [
+                expected_email_html_body_reviewer_1,
+                expected_email_html_body_reviewer_2
+            ], [self.reviewer_1_id, self.reviewer_2_id],
+            [self.REVIEWER_1_EMAIL, self.REVIEWER_2_EMAIL])
+
+    def test_email_sent_to_translation_reviewer_with_review_wait_time_a_day(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                self.language_code, self.default_translation_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 1
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mocked_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_translation_suggestion_html_for_email(
+                self.expected_language_description,
+                self.expected_default_translation, '%s day' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_translation_reviewer_with_review_wait_time_in_days(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                self.language_code, self.default_translation_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 5
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_translation_suggestion_html_for_email(
+                self.expected_language_description,
+                self.expected_default_translation,
+                '%s days' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_translation_reviewer_with_review_wait_time_a_hour(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                self.language_code, self.default_translation_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 1
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mocked_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(hours=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_translation_suggestion_html_for_email(
+                self.expected_language_description,
+                self.expected_default_translation,
+                '%s hour' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_translation_reviewer_with_review_wait_time_in_hours(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                self.language_code, self.default_translation_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 5
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mocked_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(hours=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_translation_suggestion_html_for_email(
+                self.expected_language_description,
+                self.expected_default_translation,
+                '%s hours' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_translation_reviewer_with_review_wait_time_a_min(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                self.language_code, self.default_translation_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 1
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mocked_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(minutes=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_translation_suggestion_html_for_email(
+                self.expected_language_description,
+                self.expected_default_translation,
+                '%s minute' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_translation_reviewer_with_review_wait_time_in_mins(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                self.language_code, self.default_translation_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 5
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mocked_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(minutes=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_translation_suggestion_html_for_email(
+                self.expected_language_description,
+                self.expected_default_translation,
+                '%s minutes' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_translation_reviewer_with_review_wait_time_in_secs(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                self.language_code, self.default_translation_html,
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 1
+        reviewable_suggestion_email_info.submission_datetime = (
+            self.mocked_review_submission_datetime)
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(seconds=review_wait_time))
+        expected_suggestion_info_html_for_email = (
+            self._create_expected_translation_suggestion_html_for_email(
+                self.expected_language_description,
+                self.expected_default_translation,
+                '%s minute' % review_wait_time))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[reviewable_suggestion_email_info]])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_translation_reviewer_multi_translation_suggestions(
+            self):
+        mocked_datetime_for_utcnow = (
+            self.mocked_review_submission_datetime + datetime.timedelta(
+                days=1, hours=1))
+        # Translation suggestion 1 has waited 1 day for review.
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'en', '<p>Translation 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    hours=1)))
+        # Translation suggestion 2 has waited 1 hour for review.
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'fr', '<p>Translation 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1)))
+        reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1, translation_suggestion_2]))
+        expected_suggestion_info_html_for_email = (
+            ''.join(
+                [
+                    self._create_expected_translation_suggestion_html_for_email(
+                        'English', 'Translation 1', '1 day'),
+                    self._create_expected_translation_suggestion_html_for_email(
+                        'French', 'Translation 2', '1 hour')
+                ]))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [reviewable_suggestion_email_infos])
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.reviewer_1_id],
+            [self.REVIEWER_1_EMAIL])
+
+    def test_email_sent_to_multi_translation_reviewers_multi_translations(
+            self):
+        mocked_datetime_for_utcnow = (
+            self.mocked_review_submission_datetime + datetime.timedelta(
+                days=1, hours=1))
+        # Translation suggestion 1 has waited 1 day for review.
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'en', '<p>Translation 1 for reviewer 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    hours=1)))
+        # Translation suggestion 2 has waited 1 hour for review.
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'fr', '<p>Translation 2 for reviewer 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1)))
+        # Translation suggestion 3 has waited 1 minute for review.
+        translation_suggestion_3 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'hi', '<p>Translation 1 for reviewer 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1, hours=1)))
+        # Translation suggestion 4 has waited 1 minute for review.
+        translation_suggestion_4 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'fr', '<p>Translation 2 for reviewer 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1, hours=1)))
+        reviewer_1_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1, translation_suggestion_2]))
+        reviewer_2_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_3, translation_suggestion_4]))
+        expected_suggestion_info_html_for_email_reviewer_1 = (
+            ''.join(
+                [
+                    self._create_expected_translation_suggestion_html_for_email(
+                        'English', 'Translation 1 for reviewer 1', '1 day'),
+                    self._create_expected_translation_suggestion_html_for_email(
+                        'French', 'Translation 2 for reviewer 1', '1 hour')
+                ]))
+        expected_email_html_body_reviewer_1 = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email_reviewer_1))
+        expected_suggestion_info_html_for_email_reviewer_2 = (
+            ''.join(
+                [
+                    self._create_expected_translation_suggestion_html_for_email(
+                        'Hindi', 'Translation 1 for reviewer 2', '1 minute'),
+                    self._create_expected_translation_suggestion_html_for_email(
+                        'French', 'Translation 2 for reviewer 2', '1 minute')
+                ]))
+        expected_email_html_body_reviewer_2 = (
+            self.expected_email_body_template % (
+                self.REVIEWER_2_USERNAME,
+                expected_suggestion_info_html_for_email_reviewer_2))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id, self.reviewer_2_id],
+                            [
+                                reviewer_1_suggestion_email_infos,
+                                reviewer_2_suggestion_email_infos
+                            ])
+                    )
+
+        # Make sure correct emails are sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_reviewer_1)
+        messages = self._get_sent_email_messages(self.REVIEWER_2_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_reviewer_2)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [
+                expected_email_html_body_reviewer_1,
+                expected_email_html_body_reviewer_2
+            ], [self.reviewer_1_id, self.reviewer_2_id],
+            [self.REVIEWER_1_EMAIL, self.REVIEWER_2_EMAIL])
+
+    def test_email_sent_to_multi_reviewers_multi_suggestions(self):
+        mocked_datetime_for_utcnow = (
+            self.mocked_review_submission_datetime + datetime.timedelta(
+                days=1, hours=1, minutes=1))
+        # Suggestion 1 has waited 1 day for review.
+        suggestion_1 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'en', '<p>Translation 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    hours=1, minutes=1)))
+        # Suggestion 2 has waited 1 hour for review.
+        suggestion_2 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1, minutes=1)))
+        # Suggestion 3 has waited 1 minute for review.
+        suggestion_3 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'fr', '<p>Translation 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1, hours=1)))
+        # Suggestion 4 has waited 1 minute for review.
+        suggestion_4 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    days=1, hours=1)))
+        reviewer_1_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [suggestion_1, suggestion_2]))
+        reviewer_2_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [suggestion_3, suggestion_4]))
+        expected_suggestion_info_html_for_email_reviewer_1 = (
+            ''.join(
+                [
+                    self._create_expected_translation_suggestion_html_for_email(
+                        'English', 'Translation 1', '1 day'),
+                    self._create_expected_question_suggestion_html_for_email(
+                        'Question 1', '1 hour')
+                ]))
+        expected_email_html_body_reviewer_1 = (
+            self.expected_email_body_template % (
+                self.REVIEWER_1_USERNAME,
+                expected_suggestion_info_html_for_email_reviewer_1))
+        expected_suggestion_info_html_for_email_reviewer_2 = (
+            ''.join(
+                [
+                    self._create_expected_translation_suggestion_html_for_email(
+                        'French', 'Translation 2', '1 minute'),
+                    self._create_expected_question_suggestion_html_for_email(
+                        'Question 2', '1 minute')
+                ]))
+        expected_email_html_body_reviewer_2 = (
+            self.expected_email_body_template % (
+                self.REVIEWER_2_USERNAME,
+                expected_suggestion_info_html_for_email_reviewer_2))
+
+        with self.can_send_emails_ctx:
+            with self.can_send_reviewer_emails_ctx:
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id, self.reviewer_2_id],
+                            [
+                                reviewer_1_suggestion_email_infos,
+                                reviewer_2_suggestion_email_infos
+                            ])
+                    )
+
+        # Make sure correct emails are sent.
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_reviewer_1)
+        messages = self._get_sent_email_messages(self.REVIEWER_2_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_reviewer_2)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [
+                expected_email_html_body_reviewer_1,
+                expected_email_html_body_reviewer_2
+            ], [self.reviewer_1_id, self.reviewer_2_id],
+            [self.REVIEWER_1_EMAIL, self.REVIEWER_2_EMAIL])
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(
@@ -2403,6 +3419,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     ADMIN_1_EMAIL = 'user1@community.org'
     ADMIN_2_USERNAME = 'user2'
     ADMIN_2_EMAIL = 'user2@community.org'
+    sample_language_code = 'hi'
+    sample_language = 'Hindi'
 
     expected_email_body_template = (
         'Hi %s,<br><br>'
@@ -2416,7 +3434,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         '- The Oppia Contributor Dashboard Team'
     )
 
-    def _create_expected_email_html_if_question_reviewers_needed(self):
+    def _create_expected_html_if_question_reviewers_needed(self):
         """Creates the expected email html for notifying admins that question
         suggestions need more reviewers.
         """
@@ -2426,12 +3444,13 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Dashboard page</a> where there are not enough '
             'reviewers')
 
-    def _create_expected_email_html_if_translation_reviewers_needed(
+    def _create_expected_html_if_translation_reviewers_needed(
             self, languages):
         """Creates the expected email html for notifying admins that translation
         suggestions, in the given list of languages, need more reviewers.
         """
-        languages_html_list = ['<li><b>%s</b></li>' % language in languages]
+        languages_html_list = [
+            '<li><b>%s</b></li>' % language for language in languages]
         return (
             'There have been <b>translation suggestions</b> created on the '
             '<a href="https://www.oppia.org/contributor-dashboard">Contributor '
@@ -2601,7 +3620,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'No admins to notify that Contributor Dashboard reviewers are '
             'needed.')
 
-    def test_email_not_sent_if_no_suggestion_types_that_need_more_reviewers(
+    def test_email_not_sent_if_no_suggestion_types_that_need_reviewers(
             self):
 
         with self.can_send_emails_ctx:
@@ -2635,7 +3654,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'There was no email for the given admin id: admin_id_without_email.'
         )
 
-    def test_email_sent_to_admin_if_question_suggestions_need_more_reviewers(
+    def test_email_sent_to_admin_if_question_suggestions_need_reviewers(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         self._assert_community_contribution_stats_model_is_in_default_state(
@@ -2643,18 +3662,17 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         stats_model.question_suggestion_count = 1
         stats_model.put()
         suggestion_types_need_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_need_reviewers,
             {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}})
-        expected_html_for_suggestion_types_need_more_reviewers = (
-            self._create_expected_email_html_if_question_reviewers_needed()
-        )
+        expected_html_for_suggestion_types_need_reviewers = (
+            self._create_expected_html_if_question_reviewers_needed())
         expected_email_html_body = (
             self.expected_email_body_template % (
                 self.ADMIN_1_USERNAME,
-                expected_html_for_suggestion_types_need_more_reviewers))
+                expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx, self.can_send_admin_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
@@ -2666,7 +3684,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
 
-    def test_email_sent_to_admins_if_question_suggestions_need_more_reviewers(
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.admin_1_id], [self.ADMIN_1_EMAIL])
+
+    def test_email_sent_to_admins_if_question_suggestions_need_reviewers(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         self._assert_community_contribution_stats_model_is_in_default_state(
@@ -2674,18 +3696,21 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         stats_model.question_suggestion_count = 1
         stats_model.put()
         suggestion_types_need_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_need_reviewers,
             {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}})
-        expected_html_for_suggestion_types_need_more_reviewers = (
-            self._create_expected_email_html_if_question_reviewers_needed()
-        )
-        expected_email_html_body = (
+        expected_html_for_suggestion_types_need_reviewers = (
+            self._create_expected_html_if_question_reviewers_needed())
+        expected_email_html_body_for_admin_1 = (
             self.expected_email_body_template % (
                 self.ADMIN_1_USERNAME,
-                expected_html_for_suggestion_types_need_more_reviewers))
+                expected_html_for_suggestion_types_need_reviewers))
+        expected_email_html_body_for_admin_2 = (
+            self.expected_email_body_template % (
+                self.ADMIN_2_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx, self.can_send_admin_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
@@ -2696,7 +3721,239 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_for_admin_1)
+        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_for_admin_2)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [
+                expected_email_html_body_for_admin_1,
+                expected_email_html_body_for_admin_2
+            ], [self.admin_1_id, self.admin_2_id],
+            [self.ADMIN_1_EMAIL, self.ADMIN_2_EMAIL])
+
+    def test_admin_email_sent_if_translations_need_reviewers_for_a_lang(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        suggestion_types_need_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_reviewers())
+        self.assertDictEqual(
+            suggestion_types_need_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                self.sample_language_code}})
+        expected_html_for_suggestion_types_need_reviewers = (
+            self._create_expected_html_if_translation_reviewers_needed(
+                [self.sample_language]))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.ADMIN_1_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
+
+        with self.can_send_emails_ctx, self.can_send_admin_emails_ctx:
+            email_manager.send_mail_to_notify_admins_reviewers_needed(
+                [self.admin_1_id], suggestion_types_need_reviewers)
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.admin_1_id], [self.ADMIN_1_EMAIL])
+
+    def test_admin_emails_sent_if_translations_need_reviewers_for_a_lang(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        suggestion_types_need_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_reviewers())
+        self.assertDictEqual(
+            suggestion_types_need_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                self.sample_language_code}})
+        expected_html_for_suggestion_types_need_reviewers = (
+            self._create_expected_html_if_translation_reviewers_needed(
+                [self.sample_language]
+            )
+        )
+        expected_email_html_body_for_admin_1 = (
+            self.expected_email_body_template % (
+                self.ADMIN_1_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
+        expected_email_html_body_for_admin_2 = (
+            self.expected_email_body_template % (
+                self.ADMIN_2_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
+
+        with self.can_send_emails_ctx, self.can_send_admin_emails_ctx:
+            email_manager.send_mail_to_notify_admins_reviewers_needed(
+                [self.admin_1_id, self.admin_2_id],
+                suggestion_types_need_reviewers)
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_for_admin_1)
+        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_for_admin_2)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [
+                expected_email_html_body_for_admin_1,
+                expected_email_html_body_for_admin_2
+            ], [self.admin_1_id, self.admin_2_id],
+            [self.ADMIN_1_EMAIL, self.ADMIN_2_EMAIL])
+
+    def test_admin_email_sent_if_translations_need_reviewers_for_multi_lang(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            'fr': 1, 'hi': 1}
+        stats_model.put()
+        suggestion_types_need_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_reviewers())
+        self.assertDictEqual(
+            suggestion_types_need_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                'fr', 'hi'}})
+        expected_html_for_suggestion_types_need_reviewers = (
+            self._create_expected_html_if_translation_reviewers_needed(
+                ['French', 'Hindi']))
+        expected_email_html_body = (
+            self.expected_email_body_template % (
+                self.ADMIN_1_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
+
+        with self.can_send_emails_ctx, self.can_send_admin_emails_ctx:
+            email_manager.send_mail_to_notify_admins_reviewers_needed(
+                [self.admin_1_id],
+                suggestion_types_need_reviewers)
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [expected_email_html_body], [self.admin_1_id], [self.ADMIN_1_EMAIL])
+
+    def test_admin_emails_sent_if_translations_need_reviewers_for_multi_lang(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            'fr': 1, 'hi': 1}
+        stats_model.put()
+        suggestion_types_need_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_reviewers())
+        self.assertDictEqual(
+            suggestion_types_need_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                'fr', 'hi'}})
+        expected_html_for_suggestion_types_need_reviewers = (
+            self._create_expected_html_if_translation_reviewers_needed(
+                ['French', 'Hindi']))
+        expected_email_html_body_for_admin_1 = (
+            self.expected_email_body_template % (
+                self.ADMIN_1_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
+        expected_email_html_body_for_admin_2 = (
+            self.expected_email_body_template % (
+                self.ADMIN_2_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
+
+        with self.can_send_emails_ctx, self.can_send_admin_emails_ctx:
+            email_manager.send_mail_to_notify_admins_reviewers_needed(
+                [self.admin_1_id, self.admin_2_id],
+                suggestion_types_need_reviewers)
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_for_admin_1)
+        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_for_admin_2)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_models_are_correct(
+            [
+                expected_email_html_body_for_admin_1,
+                expected_email_html_body_for_admin_2
+            ], [self.admin_1_id, self.admin_2_id],
+            [self.ADMIN_1_EMAIL, self.ADMIN_2_EMAIL])
+
+    def test_email_sent_to_admins_if_mutli_suggestion_types_need_reviewers(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            'fr': 1, 'hi': 1}
+        stats_model.question_suggestion_count = 1
+        stats_model.put()
+        suggestion_types_need_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_reviewers())
+        self.assertDictEqual(
+            suggestion_types_need_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'fr', 'hi'},
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
+                constants.DEFAULT_LANGUAGE_CODE}})
+        expected_html_for_suggestion_types_need_reviewers = ''.join(
+            [
+                self._create_expected_html_if_translation_reviewers_needed(
+                ['French', 'Hindi']),
+                self._create_expected_html_if_question_reviewers_needed()
+            ]
+        )
+        expected_email_html_body_for_admin_1 = (
+            self.expected_email_body_template % (
+                self.ADMIN_1_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
+        expected_email_html_body_for_admin_2 = (
+            self.expected_email_body_template % (
+                self.ADMIN_2_USERNAME,
+                expected_html_for_suggestion_types_need_reviewers))
+
+        with self.can_send_emails_ctx, self.can_send_admin_emails_ctx:
+            email_manager.send_mail_to_notify_admins_reviewers_needed(
+                [self.admin_1_id, self.admin_2_id],
+                suggestion_types_need_reviewers)
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_for_admin_1)
+        messages = self._get_sent_email_messages(self.ADMIN_2_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body_for_admin_2)
 
 
 class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):

@@ -2871,7 +2871,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
 
 
 class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
-    """Tests for the get_suggestion_types_that_need_more_reviewers method."""
+    """Tests for the get_suggestion_types_that_need_reviewers method."""
 
     sample_language_code = 'en'
 
@@ -2901,7 +2901,7 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
             stats_model)
 
         suggestion_types_need_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+            suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(suggestion_types_need_reviewers, {})
 
@@ -2913,7 +2913,7 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
         stats_model.put()
 
         suggestion_types_need_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+            suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
             suggestion_types_need_reviewers,
@@ -2931,7 +2931,7 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
         stats_model.put()
 
         suggestion_types_need_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+            suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
             suggestion_types_need_reviewers,
@@ -2948,7 +2948,7 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
         stats_model.put()
 
         suggestion_types_need_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+            suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
             suggestion_types_need_reviewers,
@@ -2963,7 +2963,7 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
         stats_model.put()
 
         suggestion_types_need_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+            suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
             suggestion_types_need_reviewers,
