@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -2867,3 +2868,105 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
             reviewable_suggestion_email_infos[0],
             expected_reviewable_suggestion_email_infos)
+
+
+class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
+    """Tests for the get_suggestion_types_that_need_more_reviewers method."""
+
+    sample_language_code = 'en'
+
+    def _assert_community_contribution_stats_model_is_in_default_state(
+            self, community_contribution_stats_model):
+        """Checks if the community contribution stats model is in its default
+        state.
+        """
+        self.assertEqual(
+            (
+                community_contribution_stats_model
+                .translation_reviewer_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            (
+                community_contribution_stats_model
+                .translation_suggestion_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            community_contribution_stats_model.question_reviewer_count, 0)
+        self.assertEqual(
+            community_contribution_stats_model.question_suggestion_count, 0)
+
+    def test_get_returns_no_reviewers_needed_for_any_suggestion_types(self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+
+        suggestion_types_needs_more_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+
+        self.assertDictEqual(suggestion_types_needs_more_reviewers, {})
+
+    def test_get_returns_question_reviewers_needed(self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.question_suggestion_count = 1
+        stats_model.put()
+
+        suggestion_types_needs_more_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+
+        self.assertDictEqual(
+            suggestion_types_needs_more_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
+                constants.DEFAULT_LANGUAGE_CODE}})
+
+    def test_get_returns_translations_need_more_reviewers_for_one_lang_code(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: 1
+        }
+        stats_model.put()
+
+        suggestion_types_needs_more_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+
+        self.assertDictEqual(
+            suggestion_types_needs_more_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                self.sample_language_code}})
+
+    def test_get_returns_translations_need_more_reviewers_for_mutli_lang_code(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            'en': 1, 'fr': 1}
+        stats_model.put()
+
+        suggestion_types_needs_more_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+
+        self.assertDictEqual(
+            suggestion_types_needs_more_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'}})
+
+    def test_get_returns_translations_and_questions_need_more_reviewers(self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        self._assert_community_contribution_stats_model_is_in_default_state(
+            stats_model)
+        stats_model.translation_suggestion_counts_by_lang_code = {'en': 1, 'fr': 1}
+        stats_model.question_suggestion_count = 1
+        stats_model.put()
+
+        suggestion_types_needs_more_reviewers = (
+            suggestion_services.get_suggestion_types_that_need_more_reviewers())
+
+        self.assertDictEqual(
+            suggestion_types_needs_more_reviewers,
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'},
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
+                constants.DEFAULT_LANGUAGE_CODE}})

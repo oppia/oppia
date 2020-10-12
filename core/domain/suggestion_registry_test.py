@@ -2641,7 +2641,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 1)
 
         self.assertTrue(
-            stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+            stats.are_translation_reviewers_needed_in_lang_code(
                 self.sample_language_code))
 
     def test_translation_reviewers_are_needed_if_suggestions_zero_reviewers(
@@ -2654,7 +2654,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 0)
 
         self.assertTrue(
-            stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+            stats.are_translation_reviewers_needed_in_lang_code(
                 self.sample_language_code))
 
     def test_translation_reviewers_are_needed_if_num_suggestions_past_max(self):
@@ -2668,7 +2668,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.swap(
             config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
             reviewers_are_needed = (
-                stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                stats.are_translation_reviewers_needed_in_lang_code(
                     self.sample_language_code))
 
 
@@ -2685,7 +2685,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.swap(
             config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
             reviewers_are_needed = (
-                stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                stats.are_translation_reviewers_needed_in_lang_code(
                     self.sample_language_code))
 
 
@@ -2702,7 +2702,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.swap(
             config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
             reviewers_are_needed = (
-                stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+                stats.are_translation_reviewers_needed_in_lang_code(
                     self.sample_language_code))
 
 
@@ -2716,7 +2716,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 1)
 
         self.assertFalse(
-            stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+            stats.are_translation_reviewers_needed_in_lang_code(
                 self.sample_language_code))
 
     def test_translation_reviewers_not_needed_if_no_reviewers_no_sugestions(
@@ -2725,7 +2725,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self._assert_community_contribution_stats_is_in_default_state()
 
         self.assertFalse(
-            stats.are_reviewers_needed_for_translation_suggestions_in_lang(
+            stats.are_translation_reviewers_needed_in_lang_code(
                 self.sample_language_code))
 
     def test_question_reviewers_are_needed_if_suggestions_zero_reviewers(
@@ -2734,7 +2734,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self._assert_community_contribution_stats_is_in_default_state()
         stats.question_suggestion_count = 1
 
-        self.assertTrue(stats.are_reviewers_needed_for_question_suggestions())
+        self.assertTrue(stats.are_question_reviewers_needed())
 
     def test_question_reviewers_are_needed_if_num_suggestions_past_max(self):
         stats = suggestion_services.get_community_contribution_stats()
@@ -2744,8 +2744,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = (
-                stats.are_reviewers_needed_for_question_suggestions())
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
 
         self.assertTrue(reviewers_are_needed)
@@ -2758,8 +2757,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = (
-                stats.are_reviewers_needed_for_question_suggestions())
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
 
         self.assertFalse(reviewers_are_needed)
@@ -2772,8 +2770,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = (
-                stats.are_reviewers_needed_for_question_suggestions())
+            reviewers_are_needed = stats.are_question_reviewers_needed()
 
 
         self.assertFalse(reviewers_are_needed)
@@ -2783,8 +2780,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         self._assert_community_contribution_stats_is_in_default_state()
 
-        self.assertFalse(
-            stats.are_reviewers_needed_for_question_suggestions())
+        self.assertFalse(stats.are_question_reviewers_needed())
 
     def test_validate_translation_reviewer_counts_fails_for_negative_counts(
             self):

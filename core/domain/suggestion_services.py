@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import heapq
 import re
 
+from constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -1084,3 +1085,37 @@ def get_community_contribution_stats():
 
     return create_community_contribution_stats_from_model(
         community_contribution_stats_model)
+
+
+def get_suggestion_types_that_need_more_reviewers():
+    """Uses the community contribution stats to determine which suggestion
+    types need more reviewers.
+
+    Returns:
+        dict. A dictionary where the keys are suggestion types and each value
+        corresponds to a set that contains language codes within the suggestion
+        type that need more reviewers. For example, for translation suggestions,
+        the value would be a set of language codes that translations are offered
+        in that need more reviewers.
+    """
+    stats = get_community_contribution_stats()
+
+    suggestion_types_needs_more_reviewers = {}
+    for language_code in stats.translation_suggestion_counts_by_lang_code:
+        if stats.are_translation_reviewers_needed_in_lang_code(language_code):
+            if suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
+                    suggestion_types_needs_more_reviewers):
+                suggestion_types_needs_more_reviewers[
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT].add(
+                                language_code)
+            else:
+                suggestion_types_needs_more_reviewers[
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = {
+                        language_code}
+
+    if stats.are_question_reviewers_needed():
+        suggestion_types_needs_more_reviewers[
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] = {
+                constants.DEFAULT_LANGUAGE_CODE}
+
+    return suggestion_types_needs_more_reviewers

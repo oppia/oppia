@@ -1224,7 +1224,7 @@ class CommunityContributionStats(python_utils.OBJECT):
         """
         self.translation_suggestion_counts_by_lang_code[language_code] = count
 
-    def are_reviewers_needed_for_translation_suggestions_in_lang(
+    def are_translation_reviewers_needed_in_lang_code(
             self, lang_code):
         """Returns whether or not more reviewers are needed to review
         translation suggestions in the given language code.
@@ -1265,7 +1265,7 @@ class CommunityContributionStats(python_utils.OBJECT):
             # There are neither translation suggestions nor reviewers.
             return False
 
-    def are_reviewers_needed_for_question_suggestions(self):
+    def are_question_reviewers_needed(self):
         """Returns whether or not more reviewers are needed to review question
         suggestions.
 
