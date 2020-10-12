@@ -1274,6 +1274,10 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         )
         return
 
+    if not reviewer_ids:
+        log_new_error('No Contributor Dashboard reviewers to notify.')
+        return
+
     reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
     reviewer_usernames = [
         reviewer_user_setting.username if reviewer_user_setting is not None else
