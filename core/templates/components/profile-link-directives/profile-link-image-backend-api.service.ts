@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { map } from 'rxjs/operators';
 
 interface ProfileDict {
-  'profile_picture_data_url_for_username': string;
+  'profile_picture_data_url_for_username': string | null;
 }
 
 @Injectable({
@@ -42,8 +42,11 @@ export class ProfileLinkImageBackendApiService {
       // "data:image/png;base64,". But URL encoded data contains "%" (%2B for
       // "+" and "%3D" for ="). Hence the image is decoded here to conform to
       // the security restrictions imposed by angular.
-      map(response => decodeURIComponent(
-        response.profile_picture_data_url_for_username))).toPromise();
+      map(response => {
+        return (
+          response.profile_picture_data_url_for_username &&
+          decodeURIComponent(response.profile_picture_data_url_for_username));
+        })).toPromise();
   }
 }
 
