@@ -406,7 +406,8 @@ class SubtopicPageModel(base_models.VersionedModel):
     page_contents_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
-    language_code = datastore_services.StringProperty(required=True, indexed=True)
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -482,7 +483,8 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the subtopic page being edited.
-    subtopic_page_id = datastore_services.StringProperty(indexed=True, required=True)
+    subtopic_page_id = datastore_services.StringProperty(
+        indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -657,7 +659,7 @@ class TopicRightsModel(base_models.VersionedModel):
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-    
+
     @classmethod
     def get_field_name_mapping_to_takeout_keys(cls):
         """Defines the mapping of field names to takeout keys since this model

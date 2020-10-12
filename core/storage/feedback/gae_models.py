@@ -92,7 +92,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     def get_deletion_policy():
         """General feedback thread needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-    
+
     @staticmethod
     def get_export_method():
         """Model is exported as a single unshared instance."""
@@ -261,7 +261,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def get_deletion_policy():
         """General feedback message needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-    
+
     @staticmethod
     def get_export_method():
         """Model is exported as a single unshared instance."""
@@ -549,7 +549,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
-    
+
     @staticmethod
     def get_export_method():
         """Model is exported as a single unshared instance."""
@@ -716,7 +716,7 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         is public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-    
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
@@ -788,7 +788,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Unsent feedback email is kept until sent."""
         return base_models.DELETION_POLICY.KEEP
-    
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""

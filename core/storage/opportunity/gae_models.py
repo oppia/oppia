@@ -55,7 +55,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         exploration is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-    
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
@@ -213,7 +213,7 @@ class SkillOpportunityModel(base_models.BaseModel):
         public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-    
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""

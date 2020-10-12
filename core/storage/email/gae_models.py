@@ -88,7 +88,7 @@ class SentEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
-    
+
     @staticmethod
     def get_export_method():
         """Users already have access to this data since emails were sent
@@ -323,7 +323,7 @@ class BulkEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
-    
+
     @staticmethod
     def get_export_method():
         """Users already have access to this data since the emails were sent
@@ -407,7 +407,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     def get_deletion_policy():
         """Feedback email reply to id should be deleted."""
         return base_models.DELETION_POLICY.DELETE
-    
+
     @staticmethod
     def get_export_method():
         """Model is exported as a single unshared instance."""

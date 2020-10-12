@@ -145,7 +145,8 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
-        return dict(super(cls, cls).get_export_policy(),
+        return dict(
+            super(cls, cls).get_export_policy(),
             **{
                 'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'email': base_models.EXPORT_POLICY.EXPORTED,

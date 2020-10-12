@@ -964,22 +964,25 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             export_method = model.get_export_method()
             export_policy = model.get_export_policy()
             exported_props = [
-                prop for prop in model._properties
+                prop
+                for prop in model._properties # pylint: disable=protected-access
                 if (export_policy[prop] ==
-                base_models.EXPORT_POLICY.EXPORTED)
+                    base_models.EXPORT_POLICY.EXPORTED)
             ]
 
             if export_method == base_models.EXPORT_METHOD.NOT_EXPORTED:
                 self.assertEqual(len(exported_props), 0)
             elif (export_method ==
-                base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE):
+                  base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE):
                 exported_data = model.export_data(self.USER_ID_1)
                 self.assertEqual(
-                    sorted([python_utils.UNICODE(key) for key in exported_data.keys()]),
+                    sorted([
+                        python_utils.UNICODE(key)
+                        for key in exported_data.keys()]),
                     sorted(exported_props)
                 )
-            elif (export_method == 
-                base_models.EXPORT_METHOD.SHARED_INSTANCE):
+            elif (export_method ==
+                  base_models.EXPORT_METHOD.SHARED_INSTANCE):
                 self.assertIsNotNone(
                     model.get_field_name_mapping_to_takeout_keys)
                 exported_data = model.export_data(self.USER_ID_1)
@@ -993,19 +996,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted(field_mapping.values())
                 )
             elif (export_method ==
-                base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES):
+                  base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES):
                 exported_data = model.export_data(self.USER_ID_1)
 
                 # Retrieve the first ID.
                 model_id = exported_data.keys()[0]
-                print(exported_data)
                 self.assertEqual(
                     sorted([
                         python_utils.UNICODE(key)
                         for key in exported_data[model_id].keys()]),
                     sorted(exported_props)
                 )
-                
+
 
     def test_export_data_for_full_user_nontrivial_is_correct(self):
         """Nontrivial test of export_data functionality."""

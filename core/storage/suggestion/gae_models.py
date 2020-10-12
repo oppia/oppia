@@ -461,7 +461,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd                
+                'change_cmd': suggestion_model.change_cmd
             }
 
         return user_data

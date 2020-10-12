@@ -131,7 +131,7 @@ class TaskEntryModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         cls.delete_multi(cls.query(cls.resolver_id == user_id))
-        
+
     @staticmethod
     def get_export_method():
         """Model is exported as a single unshared instance."""

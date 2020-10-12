@@ -82,7 +82,7 @@ class QuestionModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Question should be kept but the creator should be anonymized."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-    
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""

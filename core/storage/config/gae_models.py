@@ -54,7 +54,7 @@ class ConfigPropertyModel(base_models.VersionedModel):
     def get_deletion_policy():
         """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-    
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
@@ -103,7 +103,7 @@ class PlatformParameterModel(base_models.VersionedModel):
     def get_deletion_policy():
         """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-    
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""

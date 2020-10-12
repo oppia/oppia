@@ -112,7 +112,7 @@ class ExplorationModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Exploration is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-    
+ 
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
@@ -248,7 +248,7 @@ class ExplorationContextModel(base_models.BaseModel):
         published.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-    
+
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
@@ -342,7 +342,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-    
+
     @staticmethod
     def get_export_method():
         """Model is exported as a single unshared instance."""
@@ -363,7 +363,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-    
+
     @classmethod
     def get_field_name_mapping_to_takeout_keys(cls):
         """Defines the mapping of field names to takeout keys since this model
@@ -599,7 +599,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         exploration is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-    
+
     @staticmethod
     def get_export_method():
         """This model is only stored for archive purposes. The commit log of
@@ -894,7 +894,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).order(
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
-    
+
     @staticmethod
     def get_export_method():
         """Model data has already been exported as a part of the

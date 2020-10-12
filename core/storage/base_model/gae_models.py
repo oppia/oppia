@@ -145,7 +145,7 @@ class BaseModel(datastore_services.Model):
         raise NotImplementedError(
             'The export_data() method is missing from the '
             'derived class. It should be implemented in the derived class.')
-    
+ 
     @staticmethod
     def get_export_method():
         """Model is exported as a single unshared instance."""
@@ -155,9 +155,9 @@ class BaseModel(datastore_services.Model):
     def get_export_policy(cls):
         """Model creation time is not relevant to user data."""
         return {
-                'created_on': EXPORT_POLICY.NOT_APPLICABLE,
-                'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
-                'deleted': EXPORT_POLICY.NOT_APPLICABLE
+            'created_on': EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': EXPORT_POLICY.NOT_APPLICABLE
         }
 
     @classmethod
@@ -1122,7 +1122,7 @@ class VersionedModel(BaseModel):
             'version_number': version_numbers[ind],
             'created_on_ms': utils.get_time_in_millisecs(model.created_on),
         } for (ind, model) in enumerate(returned_models)]
-    
+
     @staticmethod
     def get_export_method():
         """The history of commits is not relevant for the purposes of
@@ -1294,7 +1294,7 @@ class BaseSnapshotContentModel(BaseModel):
         ExplorationRightsSnapshotContentModel.
         """
         return DELETION_POLICY.NOT_APPLICABLE
-    
+
     @staticmethod
     def get_export_method():
         """The contents of snapshots are not relevant to the user for

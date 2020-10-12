@@ -101,7 +101,7 @@ class JobModel(base_models.BaseModel):
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED       
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
