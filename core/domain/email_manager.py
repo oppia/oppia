@@ -250,7 +250,6 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
         'Thanks so much - we appreciate your help!<br>'
         'Best Wishes!<br><br>'
         '- The Oppia Contributor Dashboard Team'
-        '<br><br>%s'
     ),
     'email_subject': 'Reviewers Needed for Contributor Dashboard',
     # The templates below are for listing the information for each suggestion
@@ -1363,6 +1362,7 @@ def send_mail_to_notify_admins_reviewers_needed(
         None for admin_user_setting in admin_user_settings
     ]
 
+    send_email_infos = []
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
             log_new_error(
