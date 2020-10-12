@@ -110,8 +110,10 @@ var AdminPage = function() {
     this.reloadExploration = async function(name) {
       await this.get();
       explorationElements.map(async function(explorationElement) {
-        await waitFor.visibilityOf(getExplorationTitleElement(explorationElement));
-        var title = await getExplorationTitleElement(explorationElement).getText();
+        await waitFor.visibilityOf(
+          getExplorationTitleElement(explorationElement));
+        var title = await getExplorationTitleElement(
+          explorationElement).getText();
 
         // We use match here in case there is whitespace around the name.
         if (title.match(name)) {
@@ -141,10 +143,10 @@ var AdminPage = function() {
       adminRolesTabContainer, 'Roles tab page is not visible.');
   };
 
-    var saveConfigProperty = async function(
-      configProperty, propertyName, objectType, editingInstructions) {
-        await this.get();
-        var title = await waitFor.visibilityOf(
+  var saveConfigProperty = async function(
+    configProperty, propertyName, objectType, editingInstructions) {
+      await this.get();
+      var title = await waitFor.visibilityOf(
         configProperty.element(
           by.css('.protractor-test-config-title')).getText());
         if (title.match(propertyName)) {
@@ -157,7 +159,7 @@ var AdminPage = function() {
             statusMessage, 'saved successfully',
             'New config could not be saved');
             return true;
-            }
+        }
       };
 
   this.get = async function() {
