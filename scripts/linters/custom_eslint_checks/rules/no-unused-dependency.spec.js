@@ -58,6 +58,11 @@ ruleTester.run('no-unused-dependency', rule, {
           }
         ]
       };
+    }`,
+    `function test() {
+      return {
+        controller: []
+      };
     }`
   ],
 

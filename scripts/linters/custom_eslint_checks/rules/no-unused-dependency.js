@@ -40,16 +40,6 @@ module.exports = {
     const sourceCode = context.getSourceCode();
 
     var isEquals = function(sortedImports, params) {
-      if (sortedImports === params) {
-        return true;
-      }
-      if (sortedImports === null || params === null) {
-        return false;
-      }
-      if (sortedImports.length !== params.length) {
-        return false;
-      }
-
       for (var i = 0; i < sortedImports.length; ++i) {
         if (sortedImports[i] !== params[i]) {
           return false;
