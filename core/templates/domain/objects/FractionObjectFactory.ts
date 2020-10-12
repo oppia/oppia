@@ -24,6 +24,7 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { FractionAnswer } from
   'interactions/answer-defs';
+import { number } from 'mathjs';
 
 export class Fraction {
   isNegative: boolean;
@@ -76,7 +77,7 @@ export class Fraction {
   }
 
   convertToSimplestForm(): Fraction {
-    var gcd:any = (x: number, y: number) => {
+    var gcd = (x: number, y: number): number => {
       return y === 0 ? x : gcd(y, x % y);
     };
     var g = gcd(this.numerator, this.denominator);
