@@ -433,12 +433,6 @@ def _send_emails(send_email_infos):
         require_sender_id_is_valid(
             send_email_info.intent, send_email_info.sender_id)
 
-        if send_email_info.recipient_email is None:
-            send_email_info.recipient_email = (
-                user_services.get_email_from_user_id(
-                    send_email_info.recipient_id)
-            )
-
         cleaned_html_body = html_cleaner.clean(send_email_info.email_html_body)
         if cleaned_html_body != send_email_info.email_html_body:
             log_new_error(

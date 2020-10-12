@@ -2240,10 +2240,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
         self.can_send_reviewer_emails_ctx = self.swap(
-            config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
+            config_domain, 'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED',
             True)
         self.cannot_send_reviewer_emails_ctx = self.swap(
-            config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
+            config_domain, 'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED',
             False)
         self.logged_errors = []
         self.log_new_error_counter = test_utils.CallCounter(
@@ -2265,6 +2265,40 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
+
+    def test_email_not_sent_if_email_html_is_malformatted(self):
+        # Change the email body template to have malformatted html.
+        mocked_email_info_dict = {
+            'email_body_template': '</p>Hi %s%s%s',
+            'email_subject': 'Contributor Dashboard Reviewer Opportunities',
+            'listing_suggestion_template': {
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+                    '<li>The following %s translation suggestion was submitted '
+                    'for review %s ago:<br>%s</li>'),
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+                    '<li>The following %squestion suggestion was submitted for '
+                    'review %s ago:<br>%s</li>')
+            }
+        }
+
+        with self.can_send_emails_ctx, self.can_send_reviewer_emails_ctx:
+            with self.log_new_error_ctx:
+                with self.swap(
+                    email_manager,
+                    'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO',
+                    mocked_email_info_dict):
+                    (
+                        email_manager
+                        .send_mail_to_notify_contributor_dashboard_reviewers(
+                            [self.reviewer_1_id],
+                            [[self.reviewable_suggestion_email_info]])
+                    )
+
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 0)
+        self.assertEqual(self.log_new_error_counter.times_called, 1)
+        self.assertTrue(self.logged_errors[0].startswith(
+            'Original email HTML body does not match cleaned HTML body'))
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
 

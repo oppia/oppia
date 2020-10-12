@@ -397,10 +397,10 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
         self.can_send_reviewer_emails = self.swap(
-            config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
+            config_domain, 'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED',
             True)
         self.cannot_send_reviewer_emails = self.swap(
-            config_domain, 'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED',
+            config_domain, 'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED',
             False)
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main_cron.app))
