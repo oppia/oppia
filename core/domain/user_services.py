@@ -2085,8 +2085,9 @@ def create_user_contributions(
             user has edited.
 
     Returns:
-        UserContributions. The domain object representing the newly-created
-        UserContributionsModel.
+        UserContributions|None. The domain object representing the newly-created
+        UserContributionsModel. If the user id is for oppia migration bot, None
+        is returned.
 
     Raises:
         Exception. The UserContributionsModel for the given user_id already
