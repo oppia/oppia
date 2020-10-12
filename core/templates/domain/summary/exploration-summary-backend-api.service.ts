@@ -54,7 +54,7 @@ export class ExplorationSummaryBackendApiService {
       includePrivateExplorations: boolean,
       successCallback: (
         value?: ExplorationSummaryBackendDict |
-        PromiseLike<ExplorationSummaryBackendDict>) => void,
+        Promise<ExplorationSummaryBackendDict>) => void,
       errorCallback: (reason?: string | string[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
@@ -63,9 +63,7 @@ export class ExplorationSummaryBackendApiService {
       for (let i = 0; i < explorationIds.length; i++) {
         returnValue.push(null);
       }
-      if (errorCallback) {
-        errorCallback(returnValue);
-      }
+      errorCallback(returnValue);
       return;
     }
     const explorationSummaryDataUrl =
@@ -77,19 +75,15 @@ export class ExplorationSummaryBackendApiService {
           includePrivateExplorations)
       }
     }).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
-      if (successCallback) {
-        if (summaries === null) {
-          const summariesError = (
-            'Summaries fetched are null for explorationIds: ' + explorationIds
-          );
-          errorCallback(summariesError);
-        }
-        successCallback(summaries);
+      if (summaries === null) {
+        const summariesError = (
+          'Summaries fetched are null for explorationIds: ' + explorationIds
+        );
+        errorCallback(summariesError);
       }
+      successCallback(summaries);
     }, (errorResponse) =>{
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
+      errorCallback(errorResponse.error.error);
     });
   }
 
