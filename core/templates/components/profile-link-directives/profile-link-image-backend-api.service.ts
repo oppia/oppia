@@ -46,7 +46,7 @@ export class ProfileLinkImageBackendApiService {
         return (
           response.profile_picture_data_url_for_username &&
           decodeURIComponent(response.profile_picture_data_url_for_username));
-        })).toPromise();
+      })).toPromise();
   }
 }
 
