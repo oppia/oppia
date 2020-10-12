@@ -18,10 +18,10 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static'
-import { StateParamChangesService } from 
+import { downgradeComponent } from '@angular/upgrade/static';
+import { StateParamChangesService } from
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-param-changes.service'
+  'components/state-editor/state-editor-properties-services/state-param-changes.service';
 
 
 @Component({
@@ -32,7 +32,7 @@ import { StateParamChangesService } from
 export class StateParamChangesEditorComponent {
   constructor(
     private stateParamChangesService: StateParamChangesService,
-  ){}
+  ) {}
 }
 
 angular.module('oppia').directive(
