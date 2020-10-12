@@ -664,7 +664,8 @@ def _get_plain_text_from_html_content_string(html_content_string):
         # to create a single string.
         rte_component_name_string = ' '.join(rte_component_name_string)
         # Captialize each word in the string.
-        capitalized_rte_component_name_string = rte_component_name_string.title()
+        capitalized_rte_component_name_string = (
+            rte_component_name_string.title())
         formatted_rte_component_name_string = ' [%s] ' % (
             capitalized_rte_component_name_string)
         return formatted_rte_component_name_string

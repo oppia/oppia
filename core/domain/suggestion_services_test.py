@@ -1769,7 +1769,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         # suggestion services so that this test still passes if the
         # "edit state content" suggestion type is added to the Contributor
         # Dashboard in the future.
-        mocked_SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
+        suggestion_emphasized_text_getter_functions_mock = {
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
                 lambda suggestion: suggestion.change.translation_html),
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
@@ -1779,7 +1779,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
 
         with self.swap(
             suggestion_services, 'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS',
-            mocked_SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS):
+            suggestion_emphasized_text_getter_functions_mock):
             with self.assertRaisesRegexp(
                 Exception,
                 'Expected suggestion type to be offered on the Contributor '
