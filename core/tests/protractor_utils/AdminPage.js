@@ -160,7 +160,7 @@ var AdminPage = function() {
         'New config could not be saved');
       return true;
     }
-    };
+  };
 
   this.get = async function() {
     await browser.get(ADMIN_URL_SUFFIX);
