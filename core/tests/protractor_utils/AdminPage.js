@@ -144,22 +144,24 @@ var AdminPage = function() {
   };
 
   var saveConfigProperty = async function(
-    configProperty, propertyName, objectType, editingInstructions) {
-      var title = await waitFor.visibilityOf(
-        configProperty.element(
-          by.css('.protractor-test-config-title')).getText());
-        if (title.match(propertyName)) {
-          await editingInstructions(
-            await forms.getEditor(objectType)(configProperty));
-          await action.click('Save All Configs Button', saveAllConfigs);
-          await general.acceptAlert();
-          // Waiting for success message.
-          await waitFor.textToBePresentInElement(
-            statusMessage, 'saved successfully',
-            'New config could not be saved');
-            return true;
-        }
-      };
+      configProperty, propertyName, objectType, editingInstructions) {
+    await waitFor.visibilityOf(
+      configProperty.element(
+        by.css('.protractor-test-config-title')));
+    var title = await configProperty.element(
+      by.css('.protractor-test-config-title')).getText();
+    if (title.match(propertyName)) {
+      await editingInstructions(
+        await forms.getEditor(objectType)(configProperty));
+      await action.click('Save All Configs Button', saveAllConfigs);
+      await general.acceptAlert();
+      // Waiting for success message.
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'saved successfully',
+        'New config could not be saved');
+      return true;
+    }
+    };
 
   this.get = async function() {
     await browser.get(ADMIN_URL_SUFFIX);
@@ -201,8 +203,8 @@ var AdminPage = function() {
     await waitFor.visibilityOf(
       await oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
-      await waitFor.visibilityOf(oneOffJobRows.get(i));
-      var text = await oneOffJobRows.get(i).getText();
+    await waitFor.visibilityOf(oneOffJobRows.get(i));
+    var text = await oneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var oneOffJobRowsButton = oneOffJobRows.get(i).element(
         by.css('.protractor-test-one-off-jobs-start-btn'));
@@ -217,8 +219,8 @@ var AdminPage = function() {
   };
 
   this._stopOneOffJob = async function(jobName, i) {
-      await waitFor.visibilityOf(unfinishedOneOffJobRows.get(i));
-      var text = await unfinishedOneOffJobRows.get(i).getText();
+    await waitFor.visibilityOf(unfinishedOneOffJobRows.get(i));
+    var text = await unfinishedOneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var unfinishedOffJobRowsButton = (
         unfinishedOneOffJobRows.get(i)
