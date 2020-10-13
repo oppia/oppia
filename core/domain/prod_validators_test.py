@@ -8181,8 +8181,11 @@ class CommunityContributionStatsModelValidatorTests(
     sample_language_code = 'hi'
     invalid_language_code = 'invalid'
 
-    def _create_translation_suggestion_with_language_code(self, language_code):
-        """Creates a translation suggestion in the given language_code."""
+    def _create_translation_suggestion_model_with_language_code(
+            self, language_code):
+        """Creates a GeneralSuggestionModel for a translation suggestion in the
+        given language_code.
+        """
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -8197,8 +8200,8 @@ class CommunityContributionStatsModelValidatorTests(
             self.reviewer_id, self.change_cmd, score_category,
             self.EXPLORATION_THREAD_ID, language_code)
 
-    def _create_question_suggestion(self):
-        """Creates a question suggestion."""
+    def _create_question_suggestion_model(self):
+        """Creates a GeneralSuggestionModel for a question suggestion."""
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_QUESTION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -8212,6 +8215,13 @@ class CommunityContributionStatsModelValidatorTests(
             suggestion_models.STATUS_IN_REVIEW, self.author_id,
             self.reviewer_id, self.change_cmd, score_category,
             self.SKILL_THREAD_ID, 'en')
+
+    def _update_users_contribution_rights_model(self, langa):
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
 
     def setUp(self):
         super(CommunityContributionStatsModelValidatorTests, self).setUp()
