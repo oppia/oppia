@@ -2276,7 +2276,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'suggestion_template_values_getter_functions': {
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
                     lambda values_dict: (
-                        values_dict['language'], values_dict['review_wait_time'],
+                        values_dict['language'],
+                        values_dict['review_wait_time'],
                         values_dict['suggestion_content'])
                 ),
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (

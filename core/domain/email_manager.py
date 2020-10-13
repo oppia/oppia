@@ -1291,7 +1291,9 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         log_new_error('This app cannot send emails to users.')
         return
 
-    if not config_domain.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED.value:
+    if not (
+            config_domain
+            .NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED.value):
         log_new_error(
             'Notifying Contributor Dashboard reviewers must be enabled on the '
             'config page in order to send reviewers the emails.'
@@ -1347,7 +1349,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                         reviewer_suggestion_email_info.suggestion_content)
                 }
                 get_values_to_populate_suggestion_template = (
-                     NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+                    NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
                         'suggestion_template_values_getter_functions'][
                             reviewer_suggestion_email_info.suggestion_type])
                 suggestion_template = (

@@ -83,7 +83,7 @@ class SendEmailInfo(python_utils.OBJECT):
         sender_id: str. The user ID of the sender.
         intent: str. The intent string for the email, i.e. the purpose/type.
             The intent options are defined using variables with the prefix
-            'EMAIL_INTENT' in feconf.py. 
+            'EMAIL_INTENT' in feconf.py.
         email_subject: str. The subject of the email.
         email_html_body: str. The body (message) of the email.
         sender_email: str. The sender's email address.

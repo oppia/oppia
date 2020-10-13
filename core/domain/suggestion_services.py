@@ -763,7 +763,8 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         if user_contribution_rights.can_review_questions:
             for question_suggestion in question_suggestions:
                 # Break early because we only want the top
-                # MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER number of suggestions.
+                # MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER number of
+                # suggestions.
                 if len(suggestions_waiting_longest_heap) == (
                         MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
                     break
@@ -816,7 +817,8 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         # Get the key information from each suggestion that will be used to
         # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-        for _ in python_utils.RANGE(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
+        for _ in python_utils.RANGE(
+                MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
             if len(suggestions_waiting_longest_heap) == 0:
                 break
             _, suggestion = heapq.heappop(suggestions_waiting_longest_heap)

@@ -2570,7 +2570,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 [translation_suggestion_1]))
 
         with self.swap(
-            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER', 1):
+            suggestion_services,
+            'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER', 1):
             reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
@@ -2607,7 +2608,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 [translation_suggestion_1, translation_suggestion_2]))
 
         with self.swap(
-            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER', 2):
+            suggestion_services,
+            'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER', 2):
             reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
@@ -2764,7 +2766,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 [question_suggestion_1]))
 
         with self.swap(
-            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER', 1):
+            suggestion_services,
+            'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER', 1):
             reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
@@ -2844,8 +2847,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             self._create_translation_suggestion_with_language_code_and_author(
                 'hi', self.author_id))
         # Create additional suggestions so that we pass the
-        # MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER limit regardless of suggestion
-        # type.
+        # MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER limit regardless of
+        # suggestion type.
         self._create_question_suggestion_with_skill_id_and_author_id(
             'skill_1', self.author_id)
         self._create_translation_suggestion_with_language_code_and_author(
@@ -2857,7 +2860,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                 [translation_suggestion_1]))
 
         with self.swap(
-            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER', 1):
+            suggestion_services,
+            'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER', 1):
             reviewable_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(

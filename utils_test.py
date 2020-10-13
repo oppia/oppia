@@ -273,7 +273,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 timedelta_object.total_seconds())):
             utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
 
-    def test_create_string_from_largest_unit_in_timedelta_raises_for_zero_diff(
+    def test_create_string_from_largest_unit_in_timedelta_raises_for_neg_diff(
             self):
         timedelta_object = datetime.timedelta(days=-40)
 
@@ -353,7 +353,6 @@ class UtilsTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(time_string, '1 minute')
-
 
     def test_create_string_from_largest_unit_in_timedelta_returns_minute_if_sec(
             self):

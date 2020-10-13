@@ -484,7 +484,8 @@ def create_string_from_largest_unit_in_timedelta(timedelta_obj):
 
     Args:
         timedelta_obj: datetime.timedelta. A datetime timedelta object. Datetime
-            timedelta objects are created when you subtract two datetime objects.
+            timedelta objects are created when you subtract two datetime
+            objects.
 
     Returns:
         str. A human readable string representing the value of largest non zero
