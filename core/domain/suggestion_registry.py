@@ -1222,3 +1222,27 @@ class CommunityContributionStats(python_utils.OBJECT):
                 that are currently in review.
         """
         self.translation_suggestion_counts_by_lang_code[language_code] = count
+
+
+class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
+    """Stores key information that is used to create the email content for
+    notifying admins and reviewers that there are suggestions that need to be
+    reviewed.
+
+    Attributes:
+        suggestion_type: str. The type of the suggestion.
+        language_code: str. The language code of the suggestion.
+        suggestion_content: str. The suggestion content that is emphasized for
+            a user when they are viewing a list of suggestions on the
+            Contributor Dashboard.
+        submission_datetime: datetime.datetime. Date and time when the
+            suggestion was submitted for review.
+    """
+
+    def __init__(
+            self, suggestion_type, language_code, suggestion_content,
+            submission_datetime):
+        self.suggestion_type = suggestion_type
+        self.language_code = language_code
+        self.suggestion_content = suggestion_content
+        self.submission_datetime = submission_datetime

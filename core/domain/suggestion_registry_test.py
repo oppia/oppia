@@ -2437,7 +2437,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     sample_language_code = 'en'
     invalid_language_code = 'invalid'
 
-    def test_initialize_community_contribution_stats(self):
+    def test_initial_object_with_valid_arguments_has_correct_properties(self):
         community_contribution_stats = (
             suggestion_registry.CommunityContributionStats(
                 self.translation_reviewer_counts_by_lang_code,
@@ -2784,3 +2784,33 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'Invalid language code for the translation suggestion counts: '
             '%s.' % self.invalid_language_code):
             community_contribution_stats.validate()
+
+
+class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
+    """Tests for the ReviewableSuggestionEmailInfo class."""
+
+    suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
+    language_code = 'en'
+    suggestion_content = 'sample question'
+    submission_datetime = datetime.datetime.utcnow()
+
+    def test_initial_object_with_valid_arguments_has_correct_properties(self):
+        reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                self.suggestion_type, self.language_code,
+                self.suggestion_content, self.submission_datetime
+            )
+        )
+
+        self.assertEqual(
+            reviewable_suggestion_email_info.suggestion_type,
+            self.suggestion_type)
+        self.assertEqual(
+            reviewable_suggestion_email_info.language_code,
+            self.language_code)
+        self.assertEqual(
+            reviewable_suggestion_email_info.suggestion_content,
+            self.suggestion_content)
+        self.assertEqual(
+            reviewable_suggestion_email_info.submission_datetime,
+            self.submission_datetime)
