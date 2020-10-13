@@ -325,6 +325,7 @@ def update_exp_issues_for_new_exp_version(
 
         playthrough_model.populate(**playthrough.to_dict())
 
+    stats_models.PlaythroughModel.update_timestamps_multi(playthrough_models)
     transaction_services.run_in_transaction(
         stats_models.PlaythroughModel.put_multi, playthrough_models)
 
