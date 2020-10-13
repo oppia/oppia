@@ -55,7 +55,7 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         yield (
             '%d suggestions have Math components in them, with IDs: %s' % (
-                count_value, values))
+                key, values))
 
 
 class SuggestionSvgFilenameValidationOneOffJob(
@@ -238,7 +238,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        yield (key, count_value)
+        yield (key, values)
 
 
 class PopulateContributionStatsOneOffJob(
@@ -318,15 +318,19 @@ class PopulateContributionStatsOneOffJob(
                 key: str. A key containing the information regarding which count
                     to update.
                 count_value: int. The count value for the given key.
+
+            Yields:
+                tuple(str, int). The key and the count value for the given key.
             """
-            raise Exception('here {} {}'.format(key, count_value))
             item_type, item_category, language_code = key.split(
                 PopulateContributionStatsOneOffJob.KEY_DELIMITER)
 
-            stats_model = suggestion_models.CommunityContributionStatsModel.get()
+            stats_model = (
+                suggestion_models.CommunityContributionStatsModel.get())
 
             # Update the reviewer counts.
-            if item_type == PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER:
+            if item_type == (
+                    PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER):
                 if item_category == (
                         PopulateContributionStatsOneOffJob
                         .ITEM_CATEGORY_QUESTION):
@@ -340,13 +344,15 @@ class PopulateContributionStatsOneOffJob(
                     ) = count_value
             # Update the suggestion counts.
             else:
-                if item_category == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+                if item_category == (
+                        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
                     stats_model.question_suggestion_count = count_value
                 elif item_category == (
                         suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                     (
                         stats_model
-                        .translation_suggestion_counts_by_lang_code[language_code]
+                        .translation_suggestion_counts_by_lang_code[
+                            language_code]
                     ) = count_value
 
             stats_model.put()
