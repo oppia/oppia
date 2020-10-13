@@ -145,17 +145,27 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model = base_models.BaseModel()
         self.assertIsNone(model.created_on)
         self.assertIsNone(model.last_updated)
+
+        # First `put` does not raise an Exception because it sets last_updated
+        # automatically since it is None.
         model.put()
 
+        # Immediately calling `put` again fails, because update_timestamps needs
+        # to be called first.
         with self.assertRaisesRegexp(
-            Exception, r'Did not call self.update_timestamps\(\) yet'):
+            Exception, r'did not call update_timestamps\(\)'):
             model.put()
 
         model = base_models.BaseModel.get_by_id(model.id)
 
+        # Getting a fresh model requires update_timestamps too.
         with self.assertRaisesRegexp(
-            Exception, r'Did not call self.update_timestamps\(\) yet'):
+            Exception, r'did not call update_timestamps\(\)'):
             model.put()
+
+        model.update_timestamps()
+        # OK, update_timestamps called before put.
+        model.put()
 
     def test_put_async(self):
         model = base_models.BaseModel()
