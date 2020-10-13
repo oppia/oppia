@@ -1192,6 +1192,19 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'state_name']['value'],
             'Renamed state')
 
+    def test_delete_playthroughs_multi(self):
+        playthrough_ids = [
+            stats_models.PlaythroughModel.create(
+                'exp_id1', 1, 'EarlyQuit', {}, []),
+            stats_models.PlaythroughModel.create(
+                'exp_id1', 1, 'EarlyQuit', {}, []),
+        ]
+
+        stats_services.delete_playthroughs_multi(playthrough_ids)
+
+        instances = stats_models.PlaythroughModel.get_multi(playthrough_ids)
+        self.assertEqual(instances, [None, None])
+
     def test_get_multiple_exploration_stats_by_version_with_invalid_exp_id(
             self):
         exp_stats = stats_services.get_multiple_exploration_stats_by_version(
