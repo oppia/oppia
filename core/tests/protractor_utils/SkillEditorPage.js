@@ -215,9 +215,7 @@ var SkillEditorPage = function() {
   };
 
   this.changeSkillDescription = async function(description) {
-    //await skillDescriptionField.clear();
     await action.clear('Skill Description field', skillDescriptionField);
-    //await skillDescriptionField.sendKeys(description);
     await action.sendKeys(
       'Skill Description field', skillDescriptionField, description);
   };

@@ -86,7 +86,8 @@ var ContributorDashboardTranslateTextTab = function() {
   };
 
   this.expectSelectedLanguageToBe = async function(language) {
-    await waitFor.visibilityOf(selectedLanguageElement,
+    await waitFor.visibilityOf(
+      selectedLanguageElement,
       'Selected language element taking too long to show up.');
     expect(await selectedLanguageElement.getText()).toMatch(language);
   };

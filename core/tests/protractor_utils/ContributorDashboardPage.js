@@ -50,14 +50,11 @@ var ContributorDashboardPage = function() {
     by.css('.protractor-test-suggestion-review-message'));
   var questionReviewModalHeader = element(by.css(
     '.protractor-test-question-suggestion-review-modal-header'));
-  var usernameContainer = element(by.css('.protractor-test-username'));
 
   var reviewRightsDiv = element(by.css('.protractor-test-review-rights'));
 
   this.get = async function() {
     await browser.get('/contributor-dashboard');
-    /*await waitFor.visibilityOf(
-      usernameContainer, 'Username takes too much time to load');*/
     await waitFor.pageToFullyLoad();
   };
 
