@@ -465,8 +465,7 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED = ConfigProperty(
     ), False)
 
 NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED = ConfigProperty(
-    'notify_admins_contributor_dashboard_reviewers_needed_is_enabled',
-    BOOL_SCHEMA,
+    'notify_admins_reviewers_needed_is_enabled', BOOL_SCHEMA,
     (
         'Enable sending admins email notifications if Contributor Dashboard '
         'reviewers are needed in specific suggestion types. The default value '

@@ -73,11 +73,17 @@ class FeedbackThreadReplyInfo(python_utils.OBJECT):
 
 
 class SendEmailInfo(python_utils.OBJECT):
-    """The information needed to send an email.
+    """The information needed to send an email. This domain object makes it
+    easier to keep track of an individual email's information when sending
+    multiple emails. This domain object is also used to store the email's
+    information in a SentEmailModel, after the email has been sent.
+
     Attributes:
         recipient_id: str. The user ID of the email recipient.
         sender_id: str. The user ID of the sender.
         intent: str. The intent string for the email, i.e. the purpose/type.
+            The intent options are defined using variables with the prefix
+            'EMAIL_INTENT' in feconf.py.
         email_subject: str. The subject of the email.
         email_html_body: str. The body (message) of the email.
         sender_email: str. The sender's email address.
@@ -85,9 +91,10 @@ class SendEmailInfo(python_utils.OBJECT):
         bcc_admin: bool. Whether to send a copy of the email to the admin's
             email address.
         sender_name: str|None. The name to be shown in the "sender" field of
-            the email.
+            the email. If the sender_name is None, it is updated to the value of
+            EMAIL_SENDER_NAME in email_manager.py.
         reply_to_id: str or None. The unique reply-to id used in reply-to email
-            address sent to recipient.
+            address sent to recipients.
     """
 
     def __init__(

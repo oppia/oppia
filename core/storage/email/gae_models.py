@@ -206,9 +206,7 @@ class SentEmailModel(base_models.BaseModel):
                 id=instance_id, recipient_id=send_email_info.recipient_id,
                 recipient_email=send_email_info.recipient_email,
                 sender_id=send_email_info.sender_id,
-                # Sender emails are stored in the following format.
-                sender_email='%s <%s>' % (
-                    send_email_info.sender_name, send_email_info.sender_email),
+                sender_email=send_email_info.sender_email,
                 intent=send_email_info.intent,
                 subject=send_email_info.email_subject,
                 html_body=send_email_info.email_html_body,

@@ -23,3 +23,6 @@ cron:
 - description: daily email about review opportunities on Contributor Dashboard
   url: /cron/mail/contributor_dashboard_reviewers/review_opportunities
   schedule: every day 16:00
+- description: daily email about issues creating a long review turnaround time
+  url: /cron/mail/admins/contributor_dashboard_review_issues
+  schedule: every day 16:00
