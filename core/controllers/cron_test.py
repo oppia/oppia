@@ -393,7 +393,8 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
         self.save_new_valid_exploration(self.target_id, self.author_id)
-        # Give reviewer rights to review translations in the language code.
+        # Give reviewer rights to review translations in the given language
+        # code.
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, self.language_code)
         # Create a translation suggestion so that the reviewer has something

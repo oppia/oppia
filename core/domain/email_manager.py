@@ -237,8 +237,8 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
             '<li>The following question suggestion was submitted for review '
             '%s ago:<br>%s</li>')
     },
-    # Each suggestion type has a lambda function to populate the above
-    # suggestion template with values.
+    # Each suggestion type has a lambda function to retrieve the values needed
+    # to populate the above suggestion template.
     'suggestion_template_values_getter_functions': {
         suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
             lambda values_dict: (
@@ -398,9 +398,8 @@ def _send_email(
 
 
 def _send_emails(send_email_infos):
-    """Sends emails to the given recipients.
-
-    Note: does not check for duplicates.
+    """Sends emails to the given recipients. Note that this method does not
+    consider whether the emails are duplicates.
 
     Args:
         send_email_infos: list(SendEmailInfo). Each SendEmailInfo object
@@ -409,9 +408,9 @@ def _send_emails(send_email_infos):
     Raises:
         Exception. A sender_id is not appropriate for an intent.
     """
-    # Keep track of the send email infos that represent the information
-    # for emails that were successfully sent in transaction.
-    successful_send_email_infos = []
+    # Keep track the email information for emails that were successfully sent
+    # in transaction so that SentEmailModels can be created.
+    successfully_sent_in_transaction_email_infos = []
     for send_email_info in send_email_infos:
         if send_email_info.sender_name is None:
             send_email_info.sender_name = EMAIL_SENDER_NAME.value
@@ -450,11 +449,12 @@ def _send_emails(send_email_infos):
             # This is done to maintain consistency with the _send_email and
             # _send_bulk_email.
             send_email_info.sender_email = sender_name_email
-            successful_send_email_infos.append(send_email_info)
+            successfully_sent_in_transaction_email_infos.append(send_email_info)
 
         transaction_services.run_in_transaction(_send_email_in_transaction)
 
-    email_models.SentEmailModel.create_multi(successful_send_email_infos)
+    email_models.SentEmailModel.create_multi(
+        successfully_sent_in_transaction_email_infos)
 
 
 def _send_bulk_mail(
