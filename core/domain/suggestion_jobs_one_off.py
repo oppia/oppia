@@ -238,7 +238,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        yield (len(values), values)
+        yield (key, len(values))
 
 
 class PopulateContributionStatsOneOffJob(
