@@ -24,10 +24,15 @@ import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backen
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { Job } from 'domain/admin/job.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
+import { PlatformParameterFilterType } from
+  'domain/platform_feature/platform-parameter-filter-object.factory';
+import { FeatureStage, PlatformParameterObjectFactory } from
+  'domain/platform_feature/platform-parameter-object.factory';
 import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
+  let ppof: PlatformParameterObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   let adminBackendResponse = {
@@ -99,7 +104,23 @@ describe('Admin backend api service', () => {
     ],
     viewable_roles: {
       TOPIC_MANAGER: 'topic manager'
-    }
+    },
+    feature_flags: [{
+      name: 'dummy_feature',
+      description: 'this is a dummy feature',
+      data_type: 'bool',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [<[string, string]>['=', 'dev']]
+        }],
+        value_when_matched: true
+      }],
+      rule_schema_version: 1,
+      default_value: false,
+      is_feature: true,
+      feature_stage: FeatureStage.DEV
+    }]
   };
   let adminDataObject: AdminPageData;
 
@@ -109,6 +130,7 @@ describe('Admin backend api service', () => {
     });
 
     abas = TestBed.get(AdminBackendApiService);
+    ppof = TestBed.get(PlatformParameterObjectFactory);
     tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataObject = {
@@ -135,7 +157,10 @@ describe('Admin backend api service', () => {
         adminBackendResponse.continuous_computations_data.map(
           ComputationData.createFromBackendDict),
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        tsof.createFromBackendDict)
+        tsof.createFromBackendDict),
+      featureFlags: adminBackendResponse.feature_flags.map(
+        dict => ppof.createFromBackendDict(dict)
+      )
     };
   });
 
