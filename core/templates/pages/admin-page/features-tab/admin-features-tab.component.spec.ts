@@ -31,17 +31,14 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformParameterFilterType, ServerMode } from
-  'domain/platform_feature/platform-parameter-filter-object.factory';
-import { PlatformParameterObjectFactory, FeatureStage, PlatformParameter } from
-  'domain/platform_feature/platform-parameter-object.factory';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { PlatformParameterFilterType, ServerMode } from
+  'domain/platform_feature/platform-parameter-filter.model';
+import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 
 describe('Admin page feature tab', function() {
   let component: AdminFeaturesTabComponent;
   let fixture: ComponentFixture<AdminFeaturesTabComponent>;
-
-  let paramFactory: PlatformParameterObjectFactory;
   let adminDataService: AdminDataService;
   let featureApiService: PlatformFeatureAdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
@@ -62,8 +59,6 @@ describe('Admin page feature tab', function() {
 
     fixture = TestBed.createComponent(AdminFeaturesTabComponent);
     component = fixture.componentInstance;
-
-    paramFactory = TestBed.get(PlatformParameterObjectFactory);
     adminDataService = TestBed.get(AdminDataService);
     featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
     windowRef = TestBed.get(WindowRef);
@@ -79,9 +74,9 @@ describe('Admin page feature tab', function() {
     mockConfirmResult = val => confirmResult = val;
     mockPromptResult = msg => promptResult = msg;
 
-    spyOn(adminDataService, 'getDataAsync').and.resolveTo(<AdminPageData>{
+    spyOn(adminDataService, 'getDataAsync').and.resolveTo({
       featureFlags: [
-        paramFactory.createFromBackendDict({
+        PlatformParameter.createFromBackendDict({
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy feature flag.',
@@ -97,13 +92,13 @@ describe('Admin page feature tab', function() {
               }
             ],
             // This does not match the data type of feature flags, but this is
-            // intended as string values are more suitable for identifying rules
-            // in the following tests.
+            // intended as string values are more suitable for
+            // identifying rules in the following tests.
             value_when_matched: 'original',
           }],
         })
       ]
-    });
+    } as AdminPageData);
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
       .and.resolveTo(null);
@@ -513,7 +508,7 @@ describe('Admin page feature tab', function() {
   describe('.validateFeatureFlag', () => {
     it('should return empty array if no issue', () => {
       const issues = component.validateFeatureFlag(
-        paramFactory.createFromBackendDict({
+        PlatformParameter.createFromBackendDict({
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy feature flag.',
@@ -548,7 +543,7 @@ describe('Admin page feature tab', function() {
 
     it('should return issues if there are identical rules', () => {
       const issues = component.validateFeatureFlag(
-        paramFactory.createFromBackendDict({
+        PlatformParameter.createFromBackendDict({
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy feature flag.',
@@ -574,7 +569,7 @@ describe('Admin page feature tab', function() {
 
     it('should return issues if there are identical filters', () => {
       const issues = component.validateFeatureFlag(
-        paramFactory.createFromBackendDict({
+        PlatformParameter.createFromBackendDict({
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy feature flag.',
@@ -606,7 +601,7 @@ describe('Admin page feature tab', function() {
 
     it('should return issues if there are identical conditions', () => {
       const issues = component.validateFeatureFlag(
-        paramFactory.createFromBackendDict({
+        PlatformParameter.createFromBackendDict({
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy feature flag.',
