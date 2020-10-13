@@ -32,7 +32,10 @@ export class HintsAndSolutionManagerService {
   timeout = null;
   ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 60000;
+
   _solutionViewedEventEmitter = new EventEmitter();
+  private _timeoutElapsedEventEmitter = new EventEmitter();
+  onTimeoutElapsed$ = this._timeoutElapsedEventEmitter.asObservable();
 
   numHintsReleased: number = 0;
   numHintsConsumed: number = 0;
@@ -75,6 +78,7 @@ export class HintsAndSolutionManagerService {
   showTooltip(): void {
     this.tooltipIsOpen = true;
     this.hintsDiscovered = true;
+    this._timeoutElapsedEventEmitter.next();
   }
 
   releaseHint(): void {
@@ -85,6 +89,7 @@ export class HintsAndSolutionManagerService {
           this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
     }
+    this._timeoutElapsedEventEmitter.next();
   }
   releaseSolution(): void {
     this.solutionReleased = true;
