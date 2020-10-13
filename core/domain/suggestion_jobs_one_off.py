@@ -31,6 +31,7 @@ import feconf
 
 (suggestion_models, user_models,) = models.Registry.import_models(
     [models.NAMES.suggestion, models.NAMES.user])
+transaction_services = models.Registry.import_transaction_services()
 
 
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -54,7 +55,7 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         yield (
             '%d suggestions have Math components in them, with IDs: %s' % (
-                len(values), values))
+                count_value, values))
 
 
 class SuggestionSvgFilenameValidationOneOffJob(
@@ -237,7 +238,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        yield (key, count_value)
 
 
 class PopulateContributionStatsOneOffJob(
@@ -304,35 +305,54 @@ class PopulateContributionStatsOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
-        item_type, item_category, language_code = key.split(
-            PopulateContributionStatsOneOffJob.KEY_DELIMITER)
+        def _update_community_contribution_stats_transactional(
+                key, count_value):
+            """Updates the CommunityContributionStatsModel according to the
+            given key and count. The key contains the information for which
+            count to update with the given count value. The model GET and PUT
+            must be done in a transaction to avoid loss of updates that come in
+            rapid succession.
 
-        # Update the reviewer counts.
-        if item_type == PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER:
-            if item_category == (
-                    PopulateContributionStatsOneOffJob
-                    .ITEM_CATEGORY_QUESTION):
-                stats_model.question_reviewer_count = len(values)
-            elif item_category == (
-                    PopulateContributionStatsOneOffJob
-                    .ITEM_CATEGORY_TRANSLATION):
-                (
-                    stats_model
-                    .translation_reviewer_counts_by_lang_code[language_code]
-                ) = len(values)
-        # Update the suggestion counts.
-        else:
-            if item_category == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
-                stats_model.question_suggestion_count = len(values)
-            elif item_category == (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-                (
-                    stats_model
-                    .translation_suggestion_counts_by_lang_code[language_code]
-                ) = len(values)
+            Args:
+                key: str. A key containing the information regarding which count
+                    to update.
+                count_value: int. The count value for the given key.
+            """
+            raise Exception('here {} {}'.format(key, count_value))
+            item_type, item_category, language_code = key.split(
+                PopulateContributionStatsOneOffJob.KEY_DELIMITER)
 
-        stats_model.put()
+            stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
-        yield (key, len(values))
+            # Update the reviewer counts.
+            if item_type == PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER:
+                if item_category == (
+                        PopulateContributionStatsOneOffJob
+                        .ITEM_CATEGORY_QUESTION):
+                    stats_model.question_reviewer_count = count_value
+                elif item_category == (
+                        PopulateContributionStatsOneOffJob
+                        .ITEM_CATEGORY_TRANSLATION):
+                    (
+                        stats_model
+                        .translation_reviewer_counts_by_lang_code[language_code]
+                    ) = count_value
+            # Update the suggestion counts.
+            else:
+                if item_category == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+                    stats_model.question_suggestion_count = count_value
+                elif item_category == (
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                    (
+                        stats_model
+                        .translation_suggestion_counts_by_lang_code[language_code]
+                    ) = count_value
+
+            stats_model.put()
+            # Yield the results of the transactions that were successful.
+            yield (key, count_value)
+
+        transaction_services.run_in_transaction(
+            _update_community_contribution_stats_transactional, key,
+            len(values))
