@@ -22,16 +22,14 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationOpportunitySummaryObjectFactory } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { EventEmitter } from '@angular/core';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 describe('Voiceover opportunities component', function() {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
   var contributionOpportunitiesService = null;
-  var explorationOpportunitySummaryObjectFactory = null;
   var translationLanguageService = null;
 
   var activeLanguageChangedEmitter = new EventEmitter();
@@ -49,9 +47,6 @@ describe('Voiceover opportunities component', function() {
         HttpClientTestingModule
       ],
     });
-
-    explorationOpportunitySummaryObjectFactory = TestBed.get(
-      ExplorationOpportunitySummaryObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -64,7 +59,7 @@ describe('Voiceover opportunities component', function() {
       .returnValue(activeLanguageChangedEmitter);
     spyOn(contributionOpportunitiesService, 'getVoiceoverOpportunities').and
       .callFake((languageCode, callback) => callback([
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict({
+        ExplorationOpportunitySummary.createFromBackendDict({
           id: '1',
           topic_name: 'topic_1',
           story_title: 'Story title 1',
@@ -74,7 +69,7 @@ describe('Voiceover opportunities component', function() {
             en: 1
           }
         }),
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict({
+        ExplorationOpportunitySummary.createFromBackendDict({
           id: '2',
           topic_name: 'topic_2',
           story_title: 'Story title 2',
@@ -87,7 +82,7 @@ describe('Voiceover opportunities component', function() {
       ], true));
     spyOn(contributionOpportunitiesService, 'getMoreVoiceoverOpportunities').and
       .callFake((languageCode, callback) => callback([
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict({
+        ExplorationOpportunitySummary.createFromBackendDict({
           id: '3',
           topic_name: 'topic_3',
           story_title: 'Story title 3',
