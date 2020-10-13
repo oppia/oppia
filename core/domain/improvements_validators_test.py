@@ -37,11 +37,8 @@ USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
-(
-    improvements_models
-) = models.Registry.import_models([
-    models.NAMES.improvements
-])
+(improvements_models,) = models.Registry.import_models([
+    models.NAMES.improvements])
 
 
 class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
