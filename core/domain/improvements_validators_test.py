@@ -21,8 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import time
-import types
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -31,7 +29,6 @@ from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
