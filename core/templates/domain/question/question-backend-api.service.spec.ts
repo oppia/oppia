@@ -319,7 +319,7 @@ describe('Question backend Api service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       questionBackendApiService.fetchQuestionSummaries(
-        ['1']).then(successHandler, failHandler);
+        '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/questions_list_handler/1?cursor=');
       expect(req.request.method).toEqual('GET');
@@ -341,7 +341,7 @@ describe('Question backend Api service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       questionBackendApiService.fetchQuestionSummaries(
-        ['1']).then(successHandler, failHandler);
+        '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/questions_list_handler/1?cursor=');
       expect(req.request.method).toEqual('GET');
@@ -364,7 +364,7 @@ describe('Question backend Api service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       questionBackendApiService.fetchQuestionSummaries(
-        ['1'], '1').then(successHandler, failHandler);
+        '1', '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/questions_list_handler/1?cursor=1');
       expect(req.request.method).toEqual('GET');
@@ -377,45 +377,6 @@ describe('Question backend Api service', () => {
         nextCursor: null
       });
       expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should use the fail handler if skill ids is not a list',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestionSummaries(
-        'x', 1, true).then(successHandler, failHandler);
-      flushMicrotasks();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of strings');
-    })
-  );
-
-  it('should use the fail handler if skill ids is not a list of strings',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestionSummaries(
-        [1, 2], 2, true).then(successHandler, failHandler);
-      flushMicrotasks();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of strings');
-    })
-  );
-
-  it('should use the fail handler if skill ids is sent as null',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      questionBackendApiService.fetchQuestionSummaries(
-        null, 1, true).then(successHandler, failHandler);
-      flushMicrotasks();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of strings');
     })
   );
 });

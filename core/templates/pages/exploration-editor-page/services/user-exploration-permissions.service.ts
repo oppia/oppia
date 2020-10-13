@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissions } from
-  'domain/exploration/exploration-permissions-object.factory';
+  'domain/exploration/exploration-permissions.model';
 
 @Injectable({
   providedIn: 'root'
