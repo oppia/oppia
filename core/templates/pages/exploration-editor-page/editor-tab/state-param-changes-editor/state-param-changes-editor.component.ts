@@ -22,9 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import { StatePropertyService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service.ts'
 
 @Component({
   selector: 'state-param-changes-editor',
@@ -33,11 +30,9 @@ import { StatePropertyService } from
 })
 export class StateParamChangesEditorComponent {
 
-  private stateParamChangesService: StateParamChangesService;
   
-  constructor( stateParamChangesService: StateParamChangesService ){
-    this.stateParamChangesService = stateParamChangesService;
-  }
+  constructor(public stateParamChangesService: StateParamChangesService)
+  {}
     
 }
 

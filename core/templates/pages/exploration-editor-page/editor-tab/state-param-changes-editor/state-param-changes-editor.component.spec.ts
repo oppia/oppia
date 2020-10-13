@@ -20,9 +20,6 @@ import { TestBed } from '@angular/core/testing';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import { StateParamChangesEditorComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component.ts'
 
 describe('State Param Changes Editor directive', function() {
   var $scope = null;
@@ -38,7 +35,7 @@ describe('State Param Changes Editor directive', function() {
     var $rootScope = $injector.get('$rootScope');
 
     $scope = $rootScope.$new();
-    $componentController('StateParamChangesEditorComponent', {
+    $componentController('stateParamChangesEditor', {
       $scope: $scope,
       StateParamChangesService: stateParamChangesService
     });

@@ -270,3 +270,18 @@ angular.module('oppia').component('paramChangesEditor', {
     }
   ]
 });
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+selector: 'param-changes-editor'
+})
+export class ParamChangesEditorDirective extends UpgradeComponent {
+  @Input() paramChangesService: unknown;
+  @Input() postSaveHook: () => void;
+  @Input() currentlyInSettingsTab: string;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('paramChangesEditor', elementRef, injector);
+}
+}
