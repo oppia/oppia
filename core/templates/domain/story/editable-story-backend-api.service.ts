@@ -49,7 +49,7 @@ interface UpdateStoryBackendResponse {
 }
 
 interface StoryUrlFragmentExists {
-  story_url_fragment: number;
+  storyUrlFragmentExists: StoryUrlFragmentExists;
 }
 
 @Injectable({
@@ -155,7 +155,7 @@ export class EditableStoryBackendApiService {
 
   private _deleteStory(
       storyId: string,
-      successCallback: (value:number ) =>void,
+      successCallback: (value:number) =>void,
       errorCallback: (reason: string) => void): void {
     const storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
@@ -185,12 +185,12 @@ export class EditableStoryBackendApiService {
         story_url_fragment: storyUrlFragment
       });
     this.http.get<StoryUrlFragmentExists>(
-      storyUrlFragmentUrl, {observe: 'response'}).toPromise().then(
+      storyUrlFragmentUrl).toPromise().then(
       (response) => {
         if (successCallback) {
-          successCallback(response.status);
+          successCallback(response.storyUrlFragmentExists);
         }
-      },(errorResponse) => {
+      }, (errorResponse) => {
         if (errorCallback) {
           errorCallback(errorResponse.error.error);
         }
