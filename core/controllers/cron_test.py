@@ -21,6 +21,7 @@ import ast
 import datetime
 import logging
 
+from constants import constants
 from core import jobs
 from core.controllers import cron
 from core.domain import config_services
@@ -496,7 +497,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        # This sets the role of the user to admin.
+        # This sets the role of the user to admin.f
         self.set_admins([self.ADMIN_USERNAME])
         self.expected_suggestion_types_need_reviewers = {
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
@@ -552,7 +553,8 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
 
         self.logout()
 
-    def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self):
+    def test_email_sent_to_admin_if_sending_admin_need_reviewers_emails_enabled(
+            self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         with self.can_send_emails, self.testapp_swap:
