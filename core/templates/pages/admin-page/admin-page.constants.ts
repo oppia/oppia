@@ -28,6 +28,7 @@ export const AdminPageConstants = {
     ACTIVITIES: '#activities',
     JOBS: '#jobs',
     CONFIG: '#config',
+    FEATURES: '#features',
     ROLES: '#roles',
     MISC: '#misc'
   },

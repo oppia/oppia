@@ -24,6 +24,10 @@ import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminPageData } from
   'domain/admin/admin-backend-api.service';
+import { PlatformParameterFilterType } from
+  'domain/platform_feature/platform-parameter-filter-object.factory';
+import { FeatureStage, PlatformParameterObjectFactory } from
+  'domain/platform_feature/platform-parameter-object.factory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { ComputationData } from 'domain/admin/computation-data.model';
@@ -33,6 +37,7 @@ import { Job } from 'domain/admin/job.model';
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService = null;
+  let ppof: PlatformParameterObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   var sampleAdminData = {
@@ -104,7 +109,23 @@ describe('Admin Data Service', () => {
     ],
     viewable_roles: {
       TOPIC_MANAGER: 'topic manager'
-    }
+    },
+    feature_flags: [{
+      name: 'dummy_feature',
+      description: 'this is a dummy feature',
+      data_type: 'bool',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [<[string, string]>['=', 'dev']]
+        }],
+        value_when_matched: true
+      }],
+      rule_schema_version: 1,
+      default_value: false,
+      is_feature: true,
+      feature_stage: FeatureStage.DEV
+    }]
   };
   let adminDataResponse: AdminPageData;
 
@@ -114,6 +135,7 @@ describe('Admin Data Service', () => {
       providers: [AdminDataService]
     });
     adminDataService = TestBed.get(AdminDataService);
+    ppof = TestBed.get(PlatformParameterObjectFactory);
     tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataResponse = {
@@ -140,7 +162,9 @@ describe('Admin Data Service', () => {
         sampleAdminData.continuous_computations_data.map(
           ComputationData.createFromBackendDict),
       topicSummaries: sampleAdminData.topic_summaries.map(
-        tsof.createFromBackendDict)
+        tsof.createFromBackendDict),
+      featureFlags: sampleAdminData.feature_flags.map(
+        dict => ppof.createFromBackendDict(dict))
     };
   });
 
