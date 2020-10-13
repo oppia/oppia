@@ -32,7 +32,7 @@ import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactor
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
-let ppof: PlatformParameterObjectFactory;
+  let ppof: PlatformParameterObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   let adminBackendResponse = {
