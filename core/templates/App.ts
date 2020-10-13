@@ -113,7 +113,7 @@ angular.module('oppia').config([
       'CurrentInteractionService', 'DateTimeFormatService', 'DebouncerService',
       'DeviceInfoService', 'DocumentAttributeCustomizationService',
       'EditabilityService', 'EditorFirstTimeEventsService',
-      'EmailDashboardDataService', 'ExplorationFeaturesBackendApiService',
+      'ExplorationFeaturesBackendApiService',
       'ExplorationFeaturesService', 'ExplorationHtmlFormatterService',
       'ExplorationImprovementsBackendApiService',
       'ExplorationImprovementsService', 'ExplorationObjectFactory',
