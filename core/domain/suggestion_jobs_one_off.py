@@ -55,7 +55,7 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         yield (
             '%d suggestions have Math components in them, with IDs: %s' % (
-                key, values))
+                len(values), values))
 
 
 class SuggestionSvgFilenameValidationOneOffJob(
@@ -238,7 +238,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        yield (len(values), values)
 
 
 class PopulateContributionStatsOneOffJob(
