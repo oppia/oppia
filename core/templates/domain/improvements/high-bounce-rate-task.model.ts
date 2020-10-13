@@ -17,7 +17,7 @@
  */
 
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { ExplorationStats } from

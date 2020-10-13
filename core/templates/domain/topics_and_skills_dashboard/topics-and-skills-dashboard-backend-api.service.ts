@@ -24,20 +24,18 @@ import { EventEmitter, Injectable } from '@angular/core';
 import {
   AssignedSkill,
   AssignedSkillBackendDict,
-  AssignedSkillObjectFactory
-} from 'domain/skill/assigned-skill-object.factory';
+} from 'domain/skill/assigned-skill.model';
 import {
   AugmentedSkillSummary,
   AugmentedSkillSummaryBackendDict,
-  AugmentedSkillSummaryObjectFactory
-} from 'domain/skill/augmented-skill-summary-object.factory';
+} from 'domain/skill/augmented-skill-summary.model';
 import {
   ShortSkillSummary,
   ShortSkillSummaryBackendDict,
   ShortSkillSummaryObjectFactory
 } from 'domain/skill/ShortSkillSummaryObjectFactory';
-import { SkillSummary, SkillSummaryBackendDict, SkillSummaryObjectFactory } from
-  'domain/skill/skill-summary-object.factory';
+import { SkillSummary, SkillSummaryBackendDict } from
+  'domain/skill/skill-summary.model';
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
@@ -112,12 +110,8 @@ interface AssignedSkillDataBackendDict {
 
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(
-    private assignedSkillObjectFactory: AssignedSkillObjectFactory,
-    private augmentedSkillSummaryObjectFactory:
-    AugmentedSkillSummaryObjectFactory,
     private http: HttpClient,
     private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
-    private skillSummaryObjectFactory: SkillSummaryObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _topicsAndSkillsDashboardReinitializedEventEmitter =
@@ -147,11 +141,11 @@ export class TopicsAndSkillsDashboardBackendApiService {
         canDeleteTopic: response.can_delete_topic,
         untriagedSkillSummaries: (
           response.untriaged_skill_summary_dicts.map(
-            backendDict => this.skillSummaryObjectFactory
+            backendDict => SkillSummary
               .createFromBackendDict(backendDict))),
         mergeableSkillSummaries: (
           response.mergeable_skill_summary_dicts.map(
-            backendDict => this.skillSummaryObjectFactory
+            backendDict => SkillSummary
               .createFromBackendDict(backendDict))),
         totalSkillCount: response.total_skill_count,
         topicSummaries: (
@@ -172,7 +166,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     return this.http.get<AssignedSkillDataBackendDict>(
       assignSkillDataUrl).toPromise().then(dict => {
       return dict.topic_assignment_dicts.map(
-        backendDict => this.assignedSkillObjectFactory
+        backendDict => AssignedSkill
           .createFromBackendDict(backendDict));
     }, errorResponse => {
       throw new Error(errorResponse.error.error);
@@ -193,7 +187,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
       }).toPromise().then(response => {
       return {
         skillSummaries: response.skill_summary_dicts.map(
-          backendDict => this.augmentedSkillSummaryObjectFactory
+          backendDict => AugmentedSkillSummary
             .createFromBackendDict(backendDict)),
         nextCursor: response.next_cursor,
         more: response.more

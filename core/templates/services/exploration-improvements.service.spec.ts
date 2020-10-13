@@ -19,10 +19,11 @@ import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { StateObjectsBackendDict } from
   'domain/exploration/StatesObjectFactory';
 import { ExplorationPermissions } from
-  'domain/exploration/exploration-permissions-object.factory';
+  'domain/exploration/exploration-permissions.model';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
-import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
+  'domain/improvements/exploration-improvements-config.model';
+import { HighBounceRateTask } from
+  'domain/improvements/high-bounce-rate-task.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';

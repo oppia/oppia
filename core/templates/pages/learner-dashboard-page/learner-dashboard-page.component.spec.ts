@@ -23,6 +23,9 @@ import { LearnerExplorationSummary, LearnerExplorationSummaryBackendDict } from 
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
+import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 
@@ -37,13 +40,10 @@ describe('Learner dashboard page', function() {
   var $scope = null;
   var $uibModal = null;
   var AlertsService = null;
-  var collectionSummaryObjectFactory = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
   var ExplorationObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
-  var nonExistentActivitiesObjectFactory = null;
-  var profileSummaryObjectFactory = null;
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
 
@@ -66,17 +66,11 @@ describe('Learner dashboard page', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
-      collectionSummaryObjectFactory = $injector.get(
-        'CollectionSummaryObjectFactory');
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
-      nonExistentActivitiesObjectFactory = $injector.get(
-        'NonExistentActivitiesObjectFactory');
-      profileSummaryObjectFactory = $injector.get(
-        'ProfileSummaryObjectFactory');
       SuggestionModalForLearnerDashboardService = $injector.get(
         'SuggestionModalForLearnerDashboardService');
       UserService = $injector.get('UserService');
@@ -236,7 +230,7 @@ describe('Learner dashboard page', function() {
         $q.resolve(profilePictureDataUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
+      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.resolve({
           completedExplorationsList: (
             learnerDashboardData.completed_explorations_list.map(
@@ -252,15 +246,15 @@ describe('Learner dashboard page', function() {
                 expSummary))),
           completedCollectionsList: (
             learnerDashboardData.completed_collections_list.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           incompleteCollectionsList: (
             learnerDashboardData.incomplete_collections_list.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           numberOfUnreadThreads: learnerDashboardData.number_of_unread_threads,
           threadSummaries: (
@@ -270,11 +264,11 @@ describe('Learner dashboard page', function() {
           completedToIncompleteCollections: (
             learnerDashboardData.completed_to_incomplete_collections),
           numberOfNonexistentActivities: (
-            nonExistentActivitiesObjectFactory.createFromBackendDict(
+            NonExistentActivities.createFromBackendDict(
               learnerDashboardData.number_of_nonexistent_activities)),
           subscriptionList: (
             learnerDashboardData.subscription_list.map(
-              profileSummary => profileSummaryObjectFactory
+              profileSummary => ProfileSummary
                 .createFromCreatorBackendDict(profileSummary)))
         }));
 
@@ -774,7 +768,7 @@ describe('Learner dashboard page', function() {
       var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 11.
 
-      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+      var activity = CollectionSummary.createFromBackendDict(
         learnerDashboardData.incomplete_collections_list[2]);
 
       ctrl.openRemoveActivityModal(
@@ -817,7 +811,7 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
       var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 2.
-      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+      var activity = CollectionSummary.createFromBackendDict(
         learnerDashboardData.collection_playlist[1]);
 
       ctrl.openRemoveActivityModal(
@@ -869,7 +863,7 @@ describe('Learner dashboard page', function() {
         $q.resolve(profilePictureDataUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
+      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404
         }));

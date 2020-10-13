@@ -20,7 +20,7 @@
 import { merge } from 'd3-array';
 
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { HighBounceRateTask } from
   'domain/improvements/high-bounce-rate-task.model';
 import { NeedsGuidingResponsesTask } from
