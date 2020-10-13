@@ -45,13 +45,6 @@ import { StateSolicitAnswerDetailsService } from 'components/state-editor/state-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-<<<<<<< HEAD
-import { ComputationDataObjectFactory } from 'domain/admin/computation-data-object.factory';
-import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';
-import { JobStatusSummaryObjectFactory } from 'domain/admin/job-status-summary-object.factory';
-=======
-import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObjectFactory';
->>>>>>> upstream/develop
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsObjectFactory } from 'domain/collection/CollectionRightsObjectFactory';
 import { GuestCollectionProgressObjectFactory } from 'domain/collection/GuestCollectionProgressObjectFactory';
@@ -137,11 +130,6 @@ import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOn
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionObjectFactory } from 'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
-<<<<<<< HEAD
-import { CreatorExplorationSummaryObjectFactory } from 'domain/summary/creator-exploration-summary-object.factory';
-=======
-import { LearnerExplorationSummaryObjectFactory } from 'domain/summary/learner-exploration-summary-object.factory';
->>>>>>> upstream/develop
 import { NewlyCreatedStoryObjectFactory } from 'domain/topic/NewlyCreatedStoryObjectFactory';
 import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -153,11 +141,6 @@ import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-<<<<<<< HEAD
-import { ProfileSummaryObjectFactory } from 'domain/user/profile-summary-object.factory';
-=======
-import { UserProfileObjectFactory } from 'domain/user/user-profile-object.factory';
->>>>>>> upstream/develop
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -351,11 +334,6 @@ export const angularServices: [string, unknown][] = [
   ['CapitalizePipe', CapitalizePipe],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
-<<<<<<< HEAD
-  ['ClientContextObjectFactory', ClientContextObjectFactory],
-=======
-  ['ClassroomDataObjectFactory', ClassroomDataObjectFactory],
->>>>>>> upstream/develop
   ['CodeNormalizerService', CodeNormalizerService],
   ['CodeReplPredictionService', CodeReplPredictionService],
   ['CodeReplRulesService', CodeReplRulesService],
