@@ -32,9 +32,13 @@ import { StatePropertyService } from
   styleUrls: []
 })
 export class StateParamChangesEditorComponent {
-  constructor(
-    private stateParamChangesService: StateParamChangesService,
-  ) {}
+
+  private stateParamChangesService: StateParamChangesService;
+  
+  constructor( stateParamChangesService: StateParamChangesService ){
+    this.stateParamChangesService = stateParamChangesService;
+  }
+    
 }
 
 angular.module('oppia').directive(

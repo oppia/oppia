@@ -38,7 +38,7 @@ describe('State Param Changes Editor directive', function() {
     var $rootScope = $injector.get('$rootScope');
 
     $scope = $rootScope.$new();
-    $componentController('stateParamChangesEditor', {
+    $componentController('StateParamChangesEditorComponent', {
       $scope: $scope,
       StateParamChangesService: stateParamChangesService
     });
