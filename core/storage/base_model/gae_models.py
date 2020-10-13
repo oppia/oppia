@@ -100,7 +100,7 @@ class BaseModel(datastore_services.Model):
             self._last_updated_timestamp_is_fresh = True
 
         if not self._last_updated_timestamp_is_fresh:
-            raise Exception('Did not call self.update_timestamps() yet')
+            raise Exception('%r did not call update_timestamps() yet' % self)
 
         self._last_updated_timestamp_is_fresh = False
 
