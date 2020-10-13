@@ -132,10 +132,10 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserSettingsModel can be deleted since it only contains information
-        relevant to the one user.
+        """UserSettingsModel should be deleted after all the other models
+        belonging to the user are deleted or pseudonymized.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):
@@ -2364,10 +2364,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """PendingDeletionRequestModel should be deleted after the user is
-        deleted.
+        """PendingDeletionRequestModel should be deleted after all the other
+        models belonging to the user are deleted or pseudonymized.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):
@@ -2384,6 +2384,15 @@ class PendingDeletionRequestModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of PendingDeletionRequestModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2492,7 +2501,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """The model can be deleted since it only contains information
         relevant to one user account.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):
