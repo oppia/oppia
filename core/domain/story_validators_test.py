@@ -1123,8 +1123,4 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             'CompletedActivitiesModel [u\'1\']."]]') % (
                 self.model_instance.id)]
         self.run_job_and_check_output(
-<<<<<<< HEAD
             expected_output, sort=False, literal_eval=False)
-=======
-            expected_output, sort=False, literal_eval=False)
->>>>>>> af5bb9dce448ff6cd6ede040dd32880b23954163
