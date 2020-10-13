@@ -1098,6 +1098,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
 
 class PlaythroughServicesTest(test_utils.GenericTestBase):
+    """Unit tests focused on services related to playthroughs and exploration
+    issues.
+    """
 
     def setUp(self):
         super(PlaythroughServicesTest, self).setUp()
