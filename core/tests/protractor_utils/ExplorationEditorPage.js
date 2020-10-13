@@ -154,8 +154,7 @@ var ExplorationEditorPage = function() {
     await action.click('Exploration Input', expInput);
 
     for (var elem of tags) {
-      await action.sendKeys(
-        'Exploration Input', expInput, elem, protractor.Key.ENTER);
+      await expInput.sendKeys(elem, protractor.Key.ENTER);
     }
 
     const saveChangesButton = element(by.css(
