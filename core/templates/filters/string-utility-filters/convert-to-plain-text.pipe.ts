@@ -16,9 +16,12 @@
  * @fileoverview ConvertToPlainText pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({name: 'convertToPlainText'})
+@Injectable({
+  providedIn: 'root'
+})
 export class ConvertToPlainTextPipe implements PipeTransform {
   transform(input: string): string {
     let strippedText = input.replace(/(<([^>]+)>)/ig, '');
