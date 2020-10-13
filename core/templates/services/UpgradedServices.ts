@@ -1120,7 +1120,8 @@ export class UpgradedServices {
     // Topological level: 3.
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
       upgradedServices['HttpClient'],
-      upgradedServices['TopicSummaryObjectFactory']);
+      upgradedServices['TopicSummaryObjectFactory'],
+      upgradedServices['PlatformParameterObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
     upgradedServices['AssetsBackendApiService'] =
