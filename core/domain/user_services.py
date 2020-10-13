@@ -901,11 +901,14 @@ def _update_user_contribution_rights(user_contribution_rights):
 def _update_reviewer_counts_in_community_contribution_stats_transactional(
         future_user_contribution_rights):
     """Updates the reviewer counts in the community contribution stats based
-    on the updates to the given user contribution rights.
+    on the given user contribution rights with the most up-to-date values.
+    This method is intended to be called right before the new updates to the
+    user contribution rights have been saved in the datastore. Note that this
+    method should only ever be called in a transaction.
 
     Args:
-        future_user_contribution_rights: UserContributionRights. The most up to
-            date user contribution rights.
+        future_user_contribution_rights: UserContributionRights. The most
+            up-to-date user contribution rights. 
     """
     past_user_contribution_rights = get_user_contribution_rights(
         future_user_contribution_rights.id)
@@ -935,6 +938,12 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
     for language_code in languages_that_reviewer_can_no_longer_review:
         stats_model.translation_reviewer_counts_by_lang_code[
             language_code] -= 1
+            # Remove the language code from the dict if the count reaches
+            # zero.
+        if stats_model.translation_reviewer_counts_by_lang_code[
+                language_code] == 0:
+            del stats_model.translation_reviewer_counts_by_lang_code[
+                language_code]
     for language_code in new_languages_that_reviewer_can_review:
         if language_code not in (
                 stats_model.translation_reviewer_counts_by_lang_code):

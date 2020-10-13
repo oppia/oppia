@@ -879,7 +879,8 @@ def get_community_contribution_stats():
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given
-    suggestions by the given amount.
+    suggestions by the given amount. Note that this method should only ever be
+    called in a transaction.
 
     Args:
         suggestions: list(Suggestion). Suggestions that may update the counts
@@ -899,6 +900,12 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
             else:
                 stats_model.translation_suggestion_counts_by_lang_code[
                     suggestion.language_code] += amount
+                # Remove the language code from the dict if the count reaches
+                # zero.
+                if stats_model.translation_suggestion_counts_by_lang_code[
+                        suggestion.language_code] == 0:
+                    del stats_model.translation_suggestion_counts_by_lang_code[
+                        suggestion.language_code]
         elif suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
             stats_model.question_suggestion_count += amount
