@@ -141,6 +141,22 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.get_by_id(model_id).last_updated,
             last_updated)
 
+    def test_put_without_update_timestamps(self):
+        model = base_models.BaseModel()
+        self.assertIsNone(model.created_on)
+        self.assertIsNone(model.last_updated)
+        model.put()
+
+        with self.assertRaisesRegexp(
+            Exception, r'Did not call self.update_timestamps\(\) yet'):
+            model.put()
+
+        model = base_models.BaseModel.get_by_id(model.id)
+
+        with self.assertRaisesRegexp(
+            Exception, r'Did not call self.update_timestamps\(\) yet'):
+            model.put()
+
     def test_put_async(self):
         model = base_models.BaseModel()
         self.assertIsNone(model.created_on)

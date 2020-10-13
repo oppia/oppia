@@ -101,7 +101,6 @@ class CronJobTests(test_utils.GenericTestBase):
         recent_job_models = shard_state_model_class.all()
         for job_model in recent_job_models:
             job_model.retries += 1
-            job_model.update_timestamps()
             job_model.put()
 
         with self.testapp_swap, self.send_mail_to_admin_swap:
