@@ -264,6 +264,24 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.convert_string_to_naive_datetime_object(time_string),
             initial_time)
 
+    def test_create_string_from_largest_unit_in_timedelta_raises_for_zero_diff(
+            self):
+        timedelta_object = datetime.timedelta(days=0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected a positive timedelta, received: %s.' % (
+                timedelta_object.total_seconds())):
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+
+    def test_create_string_from_largest_unit_in_timedelta_raises_for_zero_diff(
+            self):
+        timedelta_object = datetime.timedelta(days=-40)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected a positive timedelta, received: %s.' % (
+                timedelta_object.total_seconds())):
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+
     def test_create_string_from_largest_unit_in_timedelta_returns_days(self):
         timedelta_object = datetime.timedelta(
             days=4, hours=1, minutes=1, seconds=1)
@@ -294,7 +312,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(time_string, '2 hours')
 
-    def test_create_string_from_largest_unit_in_timedelta_returns_a_hour(self):
+    def test_create_string_from_largest_unit_in_timedelta_returns_an_hour(self):
         timedelta_object = datetime.timedelta(
             days=0, hours=1, minutes=1, seconds=1)
 
@@ -324,6 +342,18 @@ class UtilsTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(time_string, '1 minute')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_a_min_for_min(
+            self):
+        timedelta_object = datetime.timedelta(
+            days=0, hours=0, minutes=1, seconds=0)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '1 minute')
+
 
     def test_create_string_from_largest_unit_in_timedelta_returns_minute_if_sec(
             self):

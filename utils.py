@@ -479,22 +479,30 @@ def get_human_readable_time_string(time_msec):
 
 def create_string_from_largest_unit_in_timedelta(timedelta_obj):
     """Given the timedelta object, find the largest non zero time unit and
-    return that value, along with the time unit, as a string.
+    return that value, along with the time unit, as a human readable string.
+    The returned string is not localized.
 
     Args:
-        timedelta_obj: A datetime timedelta object. Datetime timedelta
-            objects are created when you subtract two datetime objects.
+        timedelta_obj: datetime.timedelta. A datetime timedelta object. Datetime
+            timedelta objects are created when you subtract two datetime objects.
 
     Returns:
-        str. A string representing the value of largest non zero time unit,
-        along with the time units. If the largest time unit is seconds, 1 minute
-        is returned. The value is represented as an integer in the string.
+        str. A human readable string representing the value of largest non zero
+        time unit, along with the time units. If the largest time unit is
+        seconds, 1 minute is returned. The value is represented as an integer in
+        the string.
+
+    Raises:
+        Exception. Timedelta must be positive.
     """
-    if timedelta_obj.days != 0:
+    total_seconds = timedelta_obj.total_seconds()
+    if total_seconds <= 0:
+        raise Exception(
+            'Expected a positive timedelta, received: %s.' % total_seconds)
+    elif timedelta_obj.days != 0:
         return '%s day%s' % (
             int(timedelta_obj.days), 's' if timedelta_obj.days > 1 else '')
     else:
-        total_seconds = timedelta_obj.total_seconds()
         number_of_hours, remainder = divmod(total_seconds, SECONDS_IN_HOUR)
         number_of_minutes, _ = divmod(remainder, SECONDS_IN_MINUTE)
         if number_of_hours != 0:

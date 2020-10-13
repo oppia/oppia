@@ -2082,7 +2082,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         'Hi %s,<br><br>'
         'There are new review opportunities that we think you might be '
         'interested in on the '
-        '<a href="https://www.oppia.org/contributor-dashboard/">'
+        '<a href="%s%s">'
         'Contributor Dashboard</a>. Here are some examples of contributions '
         'that have been waiting the longest for review:'
         '<br>%s<br>'
@@ -2239,12 +2239,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.can_send_reviewer_emails_ctx = self.swap(
-            config_domain, 'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED',
-            True)
-        self.cannot_send_reviewer_emails_ctx = self.swap(
-            config_domain, 'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED',
-            False)
         self.logged_errors = []
         self.log_new_error_counter = test_utils.CallCounter(
             self._log_error_for_tests)
@@ -2269,30 +2263,44 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_email_html_is_malformatted(self):
         # Change the email body template to have malformatted html.
         mocked_email_info_dict = {
-            'email_body_template': '</p>Hi %s%s%s',
+            'email_body_template': '</p>Hi %s%s%s%s%s',
             'email_subject': 'Contributor Dashboard Reviewer Opportunities',
-            'listing_suggestion_template': {
+            'suggestion_template': {
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
                     '<li>The following %s translation suggestion was submitted '
                     'for review %s ago:<br>%s</li>'),
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-                    '<li>The following %squestion suggestion was submitted for '
+                    '<li>The following question suggestion was submitted for '
                     'review %s ago:<br>%s</li>')
+            },
+            'suggestion_template_values_getter_functions': {
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+                    lambda values_dict: (
+                        values_dict['language'], values_dict['review_wait_time'],
+                        values_dict['suggestion_content'])
+                ),
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+                    lambda values_dict: (
+                        values_dict['review_wait_time'],
+                        values_dict['suggestion_content'])
+                )
             }
         }
 
-        with self.can_send_emails_ctx, self.can_send_reviewer_emails_ctx:
-            with self.log_new_error_ctx:
-                with self.swap(
-                    email_manager,
-                    'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO',
-                    mocked_email_info_dict):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[self.reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.swap(
+                email_manager,
+                'NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO',
+                mocked_email_info_dict):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[self.reviewable_suggestion_email_info]])
+                )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -2302,15 +2310,13 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
 
-        with self.cannot_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.log_new_error_ctx:
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[self.reviewable_suggestion_email_info]])
-                    )
+        with self.cannot_send_emails_ctx, self.log_new_error_ctx:
+            config_services.set_property(
+                'committer_id',
+                'notify_contributor_dashboard_reviewers_is_enabled', True)
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                [self.reviewer_1_id], [[self.reviewable_suggestion_email_info]]
+            )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -2320,15 +2326,13 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_if_reviewer_notifications_is_not_enabled(self):
 
-        with self.can_send_emails_ctx:
-            with self.cannot_send_reviewer_emails_ctx:
-                with self.log_new_error_ctx:
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[self.reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            config_services.set_property(
+                'committer_id',
+                'notify_contributor_dashboard_reviewers_is_enabled', False)
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                [self.reviewer_1_id], [[self.reviewable_suggestion_email_info]]
+            )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -2340,15 +2344,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_if_reviewer_email_does_not_exist(self):
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.log_new_error_ctx:
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            ['reviewer_id_with_no_email'],
-                            [[self.reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            config_services.set_property(
+                'committer_id',
+                'notify_contributor_dashboard_reviewers_is_enabled', True)
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                ['reviewer_id_with_no_email'],
+                [[self.reviewable_suggestion_email_info]]
+            )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -2360,14 +2363,13 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_if_no_reviewers_to_notify(self):
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.log_new_error_ctx:
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [], [[self.reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            config_services.set_property(
+                'committer_id',
+                'notify_contributor_dashboard_reviewers_is_enabled', True)
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                [], [[self.reviewable_suggestion_email_info]]
+            )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -2379,14 +2381,13 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
             self):
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.log_new_error_ctx:
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id], [[]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            config_services.set_property(
+                'committer_id',
+                'notify_contributor_dashboard_reviewers_is_enabled', True)
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                [self.reviewer_1_id], [[]]
+            )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -2416,18 +2417,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s day' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2460,18 +2464,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s days' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2504,18 +2511,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s hour' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2548,18 +2558,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s hours' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2592,18 +2605,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s minute' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2636,18 +2652,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s minutes' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2679,18 +2698,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 self.expected_default_question, '1 minute'))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2732,18 +2754,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 ]))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [reviewable_suggestion_email_infos])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [reviewable_suggestion_email_infos])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2801,7 +2826,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 ]))
         expected_email_html_body_reviewer_1 = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email_reviewer_1))
         expected_suggestion_info_html_for_email_reviewer_2 = (
             ''.join(
@@ -2813,21 +2839,24 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 ]))
         expected_email_html_body_reviewer_2 = (
             self.expected_email_body_template % (
-                self.REVIEWER_2_USERNAME,
+                self.REVIEWER_2_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email_reviewer_2))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id, self.reviewer_2_id],
-                            [
-                                reviewer_1_suggestion_email_infos,
-                                reviewer_2_suggestion_email_infos
-                            ])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id, self.reviewer_2_id],
+                        [
+                            reviewer_1_suggestion_email_infos,
+                            reviewer_2_suggestion_email_infos
+                        ])
+                )
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2869,18 +2898,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 self.expected_default_translation, '%s day' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2914,18 +2946,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s days' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -2961,18 +2996,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s hour' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3008,18 +3046,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s hours' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3055,18 +3096,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s minute' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3102,18 +3146,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s minutes' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3149,18 +3196,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '%s minute' % review_wait_time))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [[reviewable_suggestion_email_info]])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [[reviewable_suggestion_email_info]])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3203,18 +3253,21 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 ]))
         expected_email_html_body = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id],
-                            [reviewable_suggestion_email_infos])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id],
+                        [reviewable_suggestion_email_infos])
+                )
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3272,7 +3325,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 ]))
         expected_email_html_body_reviewer_1 = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email_reviewer_1))
         expected_suggestion_info_html_for_email_reviewer_2 = (
             ''.join(
@@ -3284,21 +3338,24 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 ]))
         expected_email_html_body_reviewer_2 = (
             self.expected_email_body_template % (
-                self.REVIEWER_2_USERNAME,
+                self.REVIEWER_2_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email_reviewer_2))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id, self.reviewer_2_id],
-                            [
-                                reviewer_1_suggestion_email_infos,
-                                reviewer_2_suggestion_email_infos
-                            ])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id, self.reviewer_2_id],
+                        [
+                            reviewer_1_suggestion_email_infos,
+                            reviewer_2_suggestion_email_infos
+                        ])
+                )
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
@@ -3362,7 +3419,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 ]))
         expected_email_html_body_reviewer_1 = (
             self.expected_email_body_template % (
-                self.REVIEWER_1_USERNAME,
+                self.REVIEWER_1_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email_reviewer_1))
         expected_suggestion_info_html_for_email_reviewer_2 = (
             ''.join(
@@ -3374,21 +3432,24 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 ]))
         expected_email_html_body_reviewer_2 = (
             self.expected_email_body_template % (
-                self.REVIEWER_2_USERNAME,
+                self.REVIEWER_2_USERNAME, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
                 expected_suggestion_info_html_for_email_reviewer_2))
 
-        with self.can_send_emails_ctx:
-            with self.can_send_reviewer_emails_ctx:
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_contributor_dashboard_reviewers(
-                            [self.reviewer_1_id, self.reviewer_2_id],
-                            [
-                                reviewer_1_suggestion_email_infos,
-                                reviewer_2_suggestion_email_infos
-                            ])
-                    )
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                config_services.set_property(
+                    'committer_id',
+                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                (
+                    email_manager
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
+                        [self.reviewer_1_id, self.reviewer_2_id],
+                        [
+                            reviewer_1_suggestion_email_infos,
+                            reviewer_2_suggestion_email_infos
+                        ])
+                )
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
