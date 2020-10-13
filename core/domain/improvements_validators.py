@@ -26,13 +26,9 @@ from core.platform import models
 
 
 (
-    exp_models,
-    improvements_models,
-    user_models
+    exp_models, improvements_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration,
-    models.NAMES.improvements,
-    models.NAMES.user
+    models.NAMES.exploration, models.NAMES.improvements, models.NAMES.user
 ])
 
 
