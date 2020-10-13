@@ -39,6 +39,11 @@ import {
   JobStatusSummary,
   JobStatusSummaryBackendDict,
 } from 'domain/admin/job-status-summary.model';
+import {
+  PlatformParameterBackendDict,
+  PlatformParameter,
+  PlatformParameterObjectFactory
+} from 'domain/platform_feature/platform-parameter-object.factory';
 
 
 interface UserRoles {
@@ -74,6 +79,7 @@ export interface AdminPageDataBackendDict {
   'recent_job_data': JobDataBackendDict[];
   'continuous_computations_data': ComputationDataBackendDict[];
   'topic_summaries': TopicSummaryBackendDict[];
+  'feature_flags': PlatformParameterBackendDict[];
 }
 
 export interface AdminPageData {
@@ -91,6 +97,7 @@ export interface AdminPageData {
   recentJobData: Job[];
   continuousComputationsData: ComputationData[];
   topicSummaries: TopicSummary[];
+  featureFlags: PlatformParameter[];
 }
 
 @Injectable({
@@ -99,7 +106,8 @@ export interface AdminPageData {
 export class AdminBackendApiService {
   constructor(
     private http: HttpClient,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
+    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
+    private platformParameterObjectFactory: PlatformParameterObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
@@ -125,7 +133,11 @@ export class AdminBackendApiService {
           continuousComputationsData: response.continuous_computations_data.map(
             ComputationData.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
-            this.topicSummaryObjectFactory.createFromBackendDict)
+            this.topicSummaryObjectFactory.createFromBackendDict),
+          featureFlags: response.feature_flags.map(
+            dict => this.platformParameterObjectFactory.createFromBackendDict(
+              dict)
+          )
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
