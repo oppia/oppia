@@ -2786,19 +2786,19 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self):
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
-                days=1, hours=1))
+                days=1, hours=1, minutes=1))
         # Question suggestion 1 has waited 1 day for review.
         question_suggestion_1 = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 1 for reviewer 1</p>',
                 self.mocked_review_submission_datetime + datetime.timedelta(
-                    hours=1)))
+                    hours=1, minutes=1)))
         # Question suggestion 2 has waited 1 hour for review.
         question_suggestion_2 = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 2 for reviewer 1</p>',
                 self.mocked_review_submission_datetime + datetime.timedelta(
-                    days=1)))
+                    days=1, minutes=1)))
         # Question suggestion 3 has waited 1 minute for review.
         question_suggestion_3 = (
             self._create_question_suggestion_with_question_html_and_datetime(
@@ -3285,19 +3285,19 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self):
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
-                days=1, hours=1))
+                days=1, hours=1, minutes=1))
         # Translation suggestion 1 has waited 1 day for review.
         translation_suggestion_1 = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'en', '<p>Translation 1 for reviewer 1</p>',
                 self.mocked_review_submission_datetime + datetime.timedelta(
-                    hours=1)))
+                    hours=1, minutes=1)))
         # Translation suggestion 2 has waited 1 hour for review.
         translation_suggestion_2 = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'fr', '<p>Translation 2 for reviewer 1</p>',
                 self.mocked_review_submission_datetime + datetime.timedelta(
-                    days=1)))
+                    days=1, minutes=1)))
         # Translation suggestion 3 has waited 1 minute for review.
         translation_suggestion_3 = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
