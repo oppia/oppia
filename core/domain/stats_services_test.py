@@ -909,36 +909,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(playthroughs[1].issue_customization_args, {})
         self.assertEqual(playthroughs[1].actions, [])
 
-    def test_update_playthroughs_multi(self):
-        """Test the update_playthroughs_multi method."""
-        playthrough_id1 = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'EarlyQuit', {}, [])
-        playthrough_id2 = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'EarlyQuit', {}, [])
-        playthroughs = stats_services.get_playthroughs_multi(
-            [playthrough_id1, playthrough_id2])
-
-        playthroughs[0].issue_type = 'MultipleIncorrectSubmissions'
-        playthroughs[1].issue_type = 'CyclicStateTransitions'
-        stats_services.update_playthroughs_multi(
-            [playthrough_id1, playthrough_id2], playthroughs)
-
-        playthroughs = stats_services.get_playthroughs_multi(
-            [playthrough_id1, playthrough_id2])
-
-        self.assertEqual(playthroughs[0].exp_id, self.exp_id)
-        self.assertEqual(playthroughs[0].exp_version, 1)
-        self.assertEqual(
-            playthroughs[0].issue_type, 'MultipleIncorrectSubmissions')
-        self.assertEqual(playthroughs[0].issue_customization_args, {})
-        self.assertEqual(playthroughs[0].actions, [])
-
-        self.assertEqual(playthroughs[1].exp_id, self.exp_id)
-        self.assertEqual(playthroughs[1].exp_version, 1)
-        self.assertEqual(playthroughs[1].issue_type, 'CyclicStateTransitions')
-        self.assertEqual(playthroughs[1].issue_customization_args, {})
-        self.assertEqual(playthroughs[1].actions, [])
-
     def test_create_exp_issues_model(self):
         """Test the create_exp_issues_model method."""
         exp_issues = stats_domain.ExplorationIssues(self.exp_id, 1, [])
