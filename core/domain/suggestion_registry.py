@@ -182,10 +182,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if (
-                self.author_id is not None and
-                not user_services.is_user_id_valid(self.author_id)
-        ):
+        if not user_services.is_user_or_pseudonymous_id(self.author_id):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
                 'received %s' % self.author_id)
@@ -196,7 +193,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
             if (
-                    not user_services.is_user_id_valid(
+                    not user_services.is_user_or_pseudonymous_id(
                         self.final_reviewer_id) and
                     self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
             ):
@@ -879,7 +876,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 conversion_fn,
                 state_uses_old_interaction_cust_args_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 37)
+                        'question_state_data_schema_version'] < 38)
             )
         )
 

@@ -30,18 +30,20 @@ import {
 import {
   ComputationData,
   ComputationDataBackendDict,
-  ComputationDataObjectFactory
-} from 'domain/admin/computation-data-object.factory';
+} from 'domain/admin/computation-data.model';
 import {
   Job,
   JobDataBackendDict,
-  JobDataObjectFactory
-} from 'domain/admin/job-data-object.factory';
+} from 'domain/admin/job.model';
 import {
   JobStatusSummary,
   JobStatusSummaryBackendDict,
-  JobStatusSummaryObjectFactory
-} from 'domain/admin/job-status-summary-object.factory';
+} from 'domain/admin/job-status-summary.model';
+import {
+  PlatformParameterBackendDict,
+  PlatformParameter,
+  PlatformParameterObjectFactory
+} from 'domain/platform_feature/platform-parameter-object.factory';
 
 
 interface UserRoles {
@@ -77,6 +79,7 @@ export interface AdminPageDataBackendDict {
   'recent_job_data': JobDataBackendDict[];
   'continuous_computations_data': ComputationDataBackendDict[];
   'topic_summaries': TopicSummaryBackendDict[];
+  'feature_flags': PlatformParameterBackendDict[];
 }
 
 export interface AdminPageData {
@@ -94,6 +97,7 @@ export interface AdminPageData {
   recentJobData: Job[];
   continuousComputationsData: ComputationData[];
   topicSummaries: TopicSummary[];
+  featureFlags: PlatformParameter[];
 }
 
 @Injectable({
@@ -102,10 +106,8 @@ export interface AdminPageData {
 export class AdminBackendApiService {
   constructor(
     private http: HttpClient,
-    private computationDataObjectFactory: ComputationDataObjectFactory,
-    private jobDataObjectFactory: JobDataObjectFactory,
-    private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
+    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
+    private platformParameterObjectFactory: PlatformParameterObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
@@ -116,22 +118,26 @@ export class AdminBackendApiService {
           demoCollections: response.demo_collections,
           demoExplorationIds: response.demo_exploration_ids,
           oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
-            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+            JobStatusSummary.createFromBackendDict),
           humanReadableCurrentTime: response.human_readable_current_time,
           auditJobStatusSummaries: response.audit_job_status_summaries.map(
-            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+            JobStatusSummary.createFromBackendDict),
           updatableRoles: response.updatable_roles,
           roleGraphData: response.role_graph_data,
           configProperties: response.config_properties,
           viewableRoles: response.viewable_roles,
           unfinishedJobData: response.unfinished_job_data.map(
-            this.jobDataObjectFactory.createFromBackendDict),
+            Job.createFromBackendDict),
           recentJobData: response.recent_job_data.map(
-            this.jobDataObjectFactory.createFromBackendDict),
+            Job.createFromBackendDict),
           continuousComputationsData: response.continuous_computations_data.map(
-            this.computationDataObjectFactory.createFromBackendDict),
+            ComputationData.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
-            this.topicSummaryObjectFactory.createFromBackendDict)
+            this.topicSummaryObjectFactory.createFromBackendDict),
+          featureFlags: response.feature_flags.map(
+            dict => this.platformParameterObjectFactory.createFromBackendDict(
+              dict)
+          )
         });
       }, errorResponse => {
         reject(errorResponse.error.error);

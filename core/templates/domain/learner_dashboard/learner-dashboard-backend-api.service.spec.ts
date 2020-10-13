@@ -209,7 +209,7 @@ describe('Learner Dashboard Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      learnerDashboardBackendApiService.fetchLearnerDashboardData()
+      learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
@@ -230,7 +230,7 @@ describe('Learner Dashboard Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      learnerDashboardBackendApiService.fetchLearnerDashboardData()
+      learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);

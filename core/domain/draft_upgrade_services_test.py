@@ -377,6 +377,38 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v38_dict_to_v39_dict(self):
+        draft_change_list_v38 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        # Migrate exploration to state schema version 39.
+        self.create_and_migrate_new_exploration('38', '39')
+        # Migrate the draft change list's state schema to the migrated
+        # exploration's schema. In this case there are no changes to the
+        # draft change list since version 39 adds a customization arg
+        # for modifying the placeholder text in the Numeric Expression Input
+        # interaction, for which there should be no changes to drafts.
+        migrated_draft_change_list_v39 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v38, 1, 2, self.EXP_ID)
+        )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v38_dict_list = [
+            change.to_dict() for change in draft_change_list_v38
+        ]
+        migrated_draft_change_list_v39_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v39
+        ]
+        self.assertEqual(
+            draft_change_list_v38_dict_list,
+            migrated_draft_change_list_v39_dict_list)
+
     def test_convert_states_v37_dict_to_v38_dict(self):
         draft_change_list_v37 = [
             exp_domain.ExplorationChange({
