@@ -296,57 +296,63 @@ def update_exp_issues_for_new_exp_version(
 
     playthrough_ids = list(itertools.chain.from_iterable(
         i.playthrough_ids for i in exp_issues.unresolved_issues))
-    playthroughs = stats_models.PlaythroughModel.get_multi(playthrough_ids)
+    playthrough_models = (
+        stats_models.PlaythroughModel.get_multi(playthrough_ids))
 
-    for playthrough in playthroughs:
-        issue_customization_args = playthrough.issue_customization_args
+    for playthrough_model in playthrough_models:
+        playthrough = get_playthrough_from_model(playthrough_model)
 
-        if 'state_names' in issue_customization_args:
-            state_names = issue_customization_args['state_names']['value']
-            issue_customization_args['state_names']['value'] = [
+        if 'state_names' in playthrough.issue_customization_args:
+            state_names = (
+                playthrough.issue_customization_args['state_names']['value'])
+            playthrough.issue_customization_args['state_names']['value'] = [
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name] for state_name in state_names
             ]
 
-        if 'state_name' in issue_customization_args:
-            state_name = issue_customization_args['state_name']['value']
-            issue_customization_args['state_name']['value'] = (
+        if 'state_name' in playthrough.issue_customization_args:
+            state_name = (
+                playthrough.issue_customization_args['state_name']['value'])
+            playthrough.issue_customization_args['state_name']['value'] = (
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name])
 
         for action in playthrough.actions:
             state_name = (
-                action['action_customization_args']['state_name']['value'])
-            action['action_customization_args']['state_name']['value'] = (
+                action.action_customization_args['state_name']['value'])
+            action.action_customization_args['state_name']['value'] = (
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name])
 
-    stats_models.PlaythroughModel.put_multi(playthroughs)
+        playthrough_model.populate(**playthrough.to_dict())
+
+    transaction_services.run_in_transaction(
+        stats_models.PlaythroughModel.put_multi, playthrough_models)
 
     for exp_issue in exp_issues.unresolved_issues:
-        issue_customization_args = exp_issue.issue_customization_args
-
-        if 'state_names' in issue_customization_args:
-            state_names = issue_customization_args['state_names']['value']
+        if 'state_names' in exp_issue.issue_customization_args:
+            state_names = (
+                exp_issue.issue_customization_args['state_names']['value'])
 
             if any(n in deleted_state_names for n in state_names):
                 exp_issue.is_valid = False
-            else:
-                issue_customization_args['state_names']['value'] = [
-                    state_name if state_name not in old_to_new_state_names else
-                    old_to_new_state_names[state_name]
-                    for state_name in state_names
-                ]
+
+            exp_issue.issue_customization_args['state_names']['value'] = [
+                state_name if state_name not in old_to_new_state_names else
+                old_to_new_state_names[state_name]
+                for state_name in state_names
+            ]
 
         if 'state_name' in exp_issue.issue_customization_args:
-            state_name = issue_customization_args['state_name']['value']
+            state_name = (
+                exp_issue.issue_customization_args['state_name']['value'])
 
             if state_name in deleted_state_names:
                 exp_issue.is_valid = False
-            else:
-                issue_customization_args['state_name']['value'] = (
-                    state_name if state_name not in old_to_new_state_names else
-                    old_to_new_state_names[state_name])
+
+            exp_issue.issue_customization_args['state_name']['value'] = (
+                state_name if state_name not in old_to_new_state_names else
+                old_to_new_state_names[state_name])
 
     exp_issues.exp_version += 1
 
@@ -382,29 +388,9 @@ def get_playthrough_by_id(playthrough_id):
         Playthrough|None. The domain object for the playthrough or None if the
         playthrough_id is invalid.
     """
-    playthrough = None
-    playthrough_model = stats_models.PlaythroughModel.get(
-        playthrough_id, strict=False)
-    if playthrough_model is not None:
-        playthrough = get_playthrough_from_model(playthrough_model)
-    return playthrough
-
-
-def get_playthroughs_multi(playthrough_ids):
-    """Retrieves multiple Playthrough domain objects.
-
-    Args:
-        playthrough_ids: list(str). List of playthrough IDs.
-
-    Returns:
-        list(Playthrough). List of playthrough domain objects.
-    """
-    playthrough_instances = stats_models.PlaythroughModel.get_multi(
-        playthrough_ids)
-    playthroughs = [
-        get_playthrough_from_model(playthrough_instance)
-        for playthrough_instance in playthrough_instances]
-    return playthroughs
+    playthrough_model = (
+        stats_models.PlaythroughModel.get(playthrough_id, strict=False))
+    return playthrough_model and get_playthrough_from_model(playthrough_model)
 
 
 def get_exploration_stats_by_id(exp_id, exp_version):
@@ -623,8 +609,7 @@ def save_exp_issues_model_transactional(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
-    transaction_services.run_in_transaction(
-        _save_exp_issues_model, exp_issues)
+    transaction_services.run_in_transaction(_save_exp_issues_model, exp_issues)
 
 
 def get_exploration_stats_multi(exp_version_references):
@@ -662,7 +647,8 @@ def delete_playthroughs_multi(playthrough_ids):
     Args:
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
-    stats_models.PlaythroughModel.delete_playthroughs_multi(playthrough_ids)
+    stats_models.PlaythroughModel.delete_multi(
+        stats_models.PlaythroughModel.get_multi(playthrough_ids))
 
 
 def get_visualizations_info(exp_id, state_name, interaction_id):

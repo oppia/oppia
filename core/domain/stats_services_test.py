@@ -888,27 +888,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'state_name']['value'],
             'End')
 
-    def test_get_playthroughs_multi(self):
-        """Test the get_playthroughs_multi method."""
-        playthrough_id1 = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'EarlyQuit', {}, [])
-        playthrough_id2 = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'EarlyQuit', {}, [])
-        playthroughs = stats_services.get_playthroughs_multi(
-            [playthrough_id1, playthrough_id2])
-
-        self.assertEqual(playthroughs[0].exp_id, self.exp_id)
-        self.assertEqual(playthroughs[0].exp_version, 1)
-        self.assertEqual(playthroughs[0].issue_type, 'EarlyQuit')
-        self.assertEqual(playthroughs[0].issue_customization_args, {})
-        self.assertEqual(playthroughs[0].actions, [])
-
-        self.assertEqual(playthroughs[1].exp_id, self.exp_id)
-        self.assertEqual(playthroughs[1].exp_version, 1)
-        self.assertEqual(playthroughs[1].issue_type, 'EarlyQuit')
-        self.assertEqual(playthroughs[1].issue_customization_args, {})
-        self.assertEqual(playthroughs[1].actions, [])
-
     def test_create_exp_issues_model(self):
         """Test the create_exp_issues_model method."""
         exp_issues = stats_domain.ExplorationIssues(self.exp_id, 1, [])
@@ -1168,6 +1147,36 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
         self.assertEqual(exp_issues.exp_version, 2)
+        self.assertEqual(
+            exp_issues.unresolved_issues[0].issue_customization_args[
+                'state_names']['value'], [
+                    'Renamed state', 'End', 'Renamed state'])
+
+        playthrough_instance = stats_models.PlaythroughModel.get(
+            playthrough_id)
+        self.assertEqual(
+            playthrough_instance.issue_customization_args['state_names'][
+                'value'], ['Renamed state', 'End', 'Renamed state'])
+        self.assertEqual(
+            playthrough_instance.actions[0]['action_customization_args'][
+                'state_name']['value'],
+            'Renamed state')
+
+        # Test deleting of states.
+        exploration.delete_state('End')
+        exploration.version += 1
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'End',
+        })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration, exp_versions_diff, False)
+
+        exp_issues = stats_services.get_exp_issues(
+            exploration.id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, 3)
+        self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
         self.assertEqual(
             exp_issues.unresolved_issues[0].issue_customization_args[
                 'state_names']['value'], [
