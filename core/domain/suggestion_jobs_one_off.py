@@ -305,7 +305,7 @@ class PopulateContributionStatsOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-
+        values_to_yield_after_transaction = []
         def _update_community_contribution_stats_transactional(
                 key, count_value):
             """Updates the CommunityContributionStatsModel according to the
@@ -318,9 +318,6 @@ class PopulateContributionStatsOneOffJob(
                 key: str. A key containing the information regarding which count
                     to update.
                 count_value: int. The count value for the given key.
-
-            Yields:
-                tuple(str, int). The key and the count value for the given key.
             """
             item_type, item_category, language_code = key.split(
                 PopulateContributionStatsOneOffJob.KEY_DELIMITER)
@@ -356,9 +353,13 @@ class PopulateContributionStatsOneOffJob(
                     ) = count_value
 
             stats_model.put()
-            # Yield the results of the transactions that were successful.
-            yield (key, count_value)
+            values_to_yield_after_transaction.append([key, count_value])
 
         transaction_services.run_in_transaction(
             _update_community_contribution_stats_transactional, key,
             len(values))
+
+        # Only yield the values of the transactions that were successful.
+        if values_to_yield_after_transaction:
+            key, count_value = values_to_yield_after_transaction[0]
+            yield (key, count_value)
