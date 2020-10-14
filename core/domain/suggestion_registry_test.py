@@ -20,7 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import os
 
-from core.domain import config_domain
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -2714,6 +2714,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_translation_reviewers_not_needed_if_no_reviewers_no_sugestions(
             self):
+        stats = suggestion_services.get_community_contribution_stats()
         self._assert_community_contribution_stats_is_in_default_state()
 
         self.assertFalse(
@@ -2722,6 +2723,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_question_reviewers_are_needed_if_suggestions_zero_reviewers(
             self):
+        stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 1
 
         self.assertTrue(stats.are_question_reviewers_needed())
@@ -2764,6 +2766,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_question_reviewers_not_needed_if_no_reviewers_no_sugestions(
             self):
+        stats = suggestion_services.get_community_contribution_stats()
         self._assert_community_contribution_stats_is_in_default_state()
 
         self.assertFalse(stats.are_question_reviewers_needed())
@@ -2773,7 +2776,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_reviewer_count_for_language_code(
@@ -2792,7 +2794,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_suggestion_count_for_language_code(
@@ -2810,7 +2811,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         community_contribution_stats.question_reviewer_count = (
             self.negative_count
         )
@@ -2826,7 +2826,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         community_contribution_stats.question_suggestion_count = (
             self.negative_count
         )
@@ -2843,7 +2842,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_reviewer_count_for_language_code(
@@ -2862,7 +2860,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_suggestion_count_for_language_code(
@@ -2881,7 +2878,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         community_contribution_stats.question_reviewer_count = (
             self.non_integer_count
         )
@@ -2898,7 +2894,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         community_contribution_stats.question_suggestion_count = (
             self.non_integer_count
         )
@@ -2915,7 +2910,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_reviewer_count_for_language_code(
@@ -2933,7 +2927,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         (
             community_contribution_stats
             .set_translation_suggestion_count_for_language_code(

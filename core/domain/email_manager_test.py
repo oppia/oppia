@@ -3481,13 +3481,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     ADMIN_1_EMAIL = 'user1@community.org'
     ADMIN_2_USERNAME = 'user2'
     ADMIN_2_EMAIL = 'user2@community.org'
+    AUTHOR_EMAIL = 'author@example.com'
     sample_language_code = 'hi'
     sample_language = 'Hindi'
-    sample_language_code = 'en'
     target_id = 'exp1'
     skill_id = 'skill_123456'
-    language_code = 'en'
-    AUTHOR_EMAIL = 'author@example.com'
 
     expected_email_body_template = (
         'Hi %s,<br><br>'
@@ -3516,7 +3514,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            author_id, add_translation_change_dict,
+            self.author_id, add_translation_change_dict,
             'test description'
         )
 
@@ -3527,7 +3525,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
-                'language_code': self.language_code,
+                'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
@@ -3541,7 +3539,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            author_id, add_question_change_dict,
+            self.author_id, add_question_change_dict,
             'test description'
         )
 
@@ -3572,54 +3570,33 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 ''.join(languages_html_list)))
 
-    def _assert_community_contribution_stats_model_is_in_default_state(
-            self, community_contribution_stats_model):
-        """Checks if the community contribution stats model is in its default
-        state.
-        """
-        self.assertEqual(
-            (
-                community_contribution_stats_model
-                .translation_reviewer_counts_by_lang_code
-            ), {})
-        self.assertEqual(
-            (
-                community_contribution_stats_model
-                .translation_suggestion_counts_by_lang_code
-            ), {})
-        self.assertEqual(
-            community_contribution_stats_model.question_reviewer_count, 0)
-        self.assertEqual(
-            community_contribution_stats_model.question_suggestion_count, 0)
-
-    def _assert_created_sent_email_models_are_correct(
-            self, expected_email_html_bodies, admin_ids, admin_emails):
-        """Asserts that the sent email models that were created from the emails
-        that were sent contains the right information.
+    def _assert_created_sent_email_model_is_correct(
+            self, expected_email_html_body, admin_id, admin_email):
+        """Asserts that the sent email model that was created from the email
+        that was sent contains the right information.
         """
         sent_email_models = email_models.SentEmailModel.get_all().filter(
-            email_models.SentEmailModel.recipient_id.IN(admin_ids)).fetch()
-        self.assertEqual(len(sent_email_models), len(admin_ids))
-        for index, admin_id in enumerate(admin_ids):
-            sent_email_model = sent_email_models[index]
-            self.assertEqual(
-                sent_email_model.subject,
-                email_manager.NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
-                    'email_subject'])
-            self.assertEqual(
-                sent_email_model.recipient_id, admin_id)
-            self.assertEqual(
-                sent_email_model.recipient_email, admin_emails[index])
-            self.assertEqual(
-                sent_email_model.html_body, expected_email_html_bodies[index])
-            self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
-            self.assertEqual(
-                sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(
-                sent_email_model.intent,
-                feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS)
+            email_models.SentEmailModel.recipient_id == admin_id).fetch()
+        self.assertEqual(len(sent_email_models), 1)
+        sent_email_model = sent_email_models[0]
+        self.assertEqual(
+            sent_email_model.subject,
+            email_manager.NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+                'email_subject'])
+        self.assertEqual(
+            sent_email_model.recipient_id, admin_id)
+        self.assertEqual(
+            sent_email_model.recipient_email, admin_email)
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_html_body)
+        self.assertEqual(
+            sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS)
 
     def _log_error_for_tests(self, error_message):
         """Appends the error message to the logged errors list."""
@@ -3702,7 +3679,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertEqual(
             self.logged_errors[0], 'This app cannot send emails to users.')
 
-    def test_email_not_sent_if_notifying_admins_reviewers_needed_is_not_enabled(
+    def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
             self):
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', False)
@@ -3798,9 +3775,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
 
-        # Make sure correct email models are stored.
-        self._assert_created_sent_email_models_are_correct(
-            [expected_email_html_body], [self.admin_1_id], [self.ADMIN_1_EMAIL])
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
 
     def test_email_sent_to_admins_if_question_suggestions_need_reviewers(
             self):
@@ -3829,7 +3806,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_need_reviewers)
 
-        # Make sure correct email is sent.
+        # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(
@@ -3840,14 +3817,14 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_created_sent_email_models_are_correct(
-            [
-                expected_email_html_body_for_admin_1,
-                expected_email_html_body_for_admin_2
-            ], [self.admin_1_id, self.admin_2_id],
-            [self.ADMIN_1_EMAIL, self.ADMIN_2_EMAIL])
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body_for_admin_1, self.admin_1_id,
+            self.ADMIN_1_EMAIL)
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body_for_admin_2, self.admin_2_id,
+            self.ADMIN_2_EMAIL)
 
-    def test_admin_email_sent_if_translations_need_reviewers_for_a_lang(
+    def test_admin_email_sent_if_translations_need_reviewers_for_one_lang(
             self):
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
@@ -3877,11 +3854,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
 
-        # Make sure correct email models are stored.
-        self._assert_created_sent_email_models_are_correct(
-            [expected_email_html_body], [self.admin_1_id], [self.ADMIN_1_EMAIL])
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
 
-    def test_admin_emails_sent_if_translations_need_reviewers_for_a_lang(
+    def test_admin_emails_sent_if_translations_need_reviewers_for_one_lang(
             self):
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
@@ -3895,9 +3872,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 self.sample_language_code}})
         expected_html_for_suggestion_types_need_reviewers = (
             self._create_expected_html_if_translation_reviewers_needed(
-                [self.sample_language]
-            )
-        )
+                [self.sample_language]))
         expected_email_html_body_for_admin_1 = (
             self.expected_email_body_template % (
                 self.ADMIN_1_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
@@ -3912,7 +3887,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_need_reviewers)
 
-        # Make sure correct email is sent.
+        # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(
@@ -3923,12 +3898,12 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_created_sent_email_models_are_correct(
-            [
-                expected_email_html_body_for_admin_1,
-                expected_email_html_body_for_admin_2
-            ], [self.admin_1_id, self.admin_2_id],
-            [self.ADMIN_1_EMAIL, self.ADMIN_2_EMAIL])
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body_for_admin_1, self.admin_1_id,
+            self.ADMIN_1_EMAIL)
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body_for_admin_2, self.admin_2_id,
+            self.ADMIN_2_EMAIL)
 
     def test_admin_email_sent_if_translations_need_reviewers_for_multi_lang(
             self):
@@ -3960,9 +3935,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
 
-        # Make sure correct email models are stored.
-        self._assert_created_sent_email_models_are_correct(
-            [expected_email_html_body], [self.admin_1_id], [self.ADMIN_1_EMAIL])
+        # Make sure correct email model is stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
 
     def test_admin_emails_sent_if_translations_need_reviewers_for_multi_lang(
             self):
@@ -3993,7 +3968,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_need_reviewers)
 
-        # Make sure correct email is sent.
+        # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(
@@ -4004,12 +3979,12 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_created_sent_email_models_are_correct(
-            [
-                expected_email_html_body_for_admin_1,
-                expected_email_html_body_for_admin_2
-            ], [self.admin_1_id, self.admin_2_id],
-            [self.ADMIN_1_EMAIL, self.ADMIN_2_EMAIL])
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body_for_admin_1, self.admin_1_id,
+            self.ADMIN_1_EMAIL)
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body_for_admin_2, self.admin_2_id,
+            self.ADMIN_2_EMAIL)
 
     def test_email_sent_to_admins_if_mutli_suggestion_types_need_reviewers(
             self):
@@ -4017,6 +3992,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
+        self._create_question_suggestion()
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
@@ -4045,7 +4021,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_need_reviewers)
 
-        # Make sure correct email is sent.
+        # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(
@@ -4054,6 +4030,14 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
+
+        # Make sure correct email models are stored.
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body_for_admin_1, self.admin_1_id,
+            self.ADMIN_1_EMAIL)
+        self._assert_created_sent_email_model_is_correct(
+            expected_email_html_body_for_admin_2, self.admin_2_id,
+            self.ADMIN_2_EMAIL)
 
 
 class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):

@@ -1235,7 +1235,7 @@ class CommunityContributionStats(python_utils.OBJECT):
 
         Returns:
             Bool. Whether or not more reviewers are needed to review
-            translation suggestions in the given language.
+            translation suggestions in the given language code.
        """
         if lang_code in self.translation_reviewer_counts_by_lang_code and (
                 lang_code in self.translation_suggestion_counts_by_lang_code):

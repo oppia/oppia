@@ -28,6 +28,7 @@ from core.domain import config_services
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import exp_domain
+from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
@@ -501,7 +502,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            author_id, add_translation_change_dict,
+            self.author_id, add_translation_change_dict,
             'test description'
         )
 
@@ -526,7 +527,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            author_id, add_question_change_dict,
+            self.author_id, add_question_change_dict,
             'test description'
         )
 
@@ -537,7 +538,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
-        self.admin = admin_ids
+        self.admin_ids = admin_ids
         self.suggestion_types_need_reviewers = suggestion_types_need_reviewers
 
     def setUp(self):
@@ -546,7 +547,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        # This sets the role of the user to admin.f
+        # This sets the role of the user to admin.
         self.set_admins([self.ADMIN_USERNAME])
 
         self.signup(self.AUTHOR_EMAIL, 'author')
@@ -574,15 +575,14 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
-                config_services.set_property(
-                    'committer_id',
-                    'notify_admins_reviewers_needed_is_enabled', False)
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_review_issues')
 
@@ -593,15 +593,14 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
 
     def test_email_not_sent_if_sending_emails_is_disabled(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.cannot_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
-                config_services.set_property(
-                    'committer_id',
-                    'notify_admins_reviewers_needed_is_enabled', True)
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_review_issues')
 
@@ -613,15 +612,14 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
     def test_email_sent_to_admin_if_sending_admin_need_reviewers_emails_enabled(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
-                config_services.set_property(
-                    'committer_id',
-                    'notify_admins_reviewers_needed_is_enabled', True)
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_review_issues')
 

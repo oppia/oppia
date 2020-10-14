@@ -278,4 +278,4 @@ class CronMailAdminContributorDashboardReviewIssuesHandler(
                     .get_suggestion_types_that_need_reviewers()
                 )
                 email_manager.send_mail_to_notify_admins_reviewers_needed(
-                    admin_ids, suggestion_types_need_more_reviewers)
+                    admin_ids, suggestion_types_that_need_reviewers)

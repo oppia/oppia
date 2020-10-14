@@ -2885,6 +2885,10 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
     stats.
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/develop
     TODO(#10957): It is currently not possible to resubmit a rejected
     translation suggestion for review. As a result, there isn't a test for
     that case in this test class. If the functionality is added, a new test
@@ -3389,7 +3393,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             {'hi': 1, 'en': 1})
 
 
-class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
+class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
     """Tests for the get_suggestion_types_that_need_reviewers method."""
 
     sample_language_code = 'en'
@@ -3414,7 +3418,7 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            author_id, add_translation_change_dict,
+            self.author_id, add_translation_change_dict,
             'test description'
         )
 
@@ -3439,7 +3443,7 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
-            author_id, add_question_change_dict,
+            self.author_id, add_question_change_dict,
             'test description'
         )
 
@@ -3465,32 +3469,30 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
 
     def setUp(self):
         super(
-            GetSuggestionTypesThatNeedMoreReviewersUnitTests,
+            GetSuggestionTypesThatNeedReviewersUnitTests,
             self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.signup(self.REVIEWER_EMAIL, 'reviewer1')
-        self.reviewer_id = self.get_user_id_from_email(
-            self.REVIEWER_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
 
-    def test_get_returns_no_reviewers_needed_for_any_suggestion_types(self):
+    def test_get_returns_no_reviewers_needed_if_no_suggestions_exist(self):
+        self._assert_community_contribution_stats_is_in_default_state()
+
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(suggestion_types_need_reviewers, {})
 
     def test_get_returns_question_reviewers_needed(self):
-        user_services.allow_user_to_review_question(self.reviewer_id)
+        self._create_question_suggestion()
         stats = suggestion_services.get_community_contribution_stats()
-        self.assertEqual(stats.question_reviewer_count, 1)
-        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 1)
         self.assertDictEqual(
             stats.translation_reviewer_counts_by_lang_code, {})
         self.assertDictEqual(
             stats.translation_suggestion_counts_by_lang_code, {})
-
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -3502,16 +3504,16 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
 
     def test_get_returns_translations_need_more_reviewers_for_one_lang_code(
             self):
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, self.sample_language_code)
+        self._create_translation_suggestion_with_language_code(
+            self.sample_language_code)
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code, {
-                self.sample_language_code: 1})
+            stats.translation_reviewer_counts_by_lang_code, {})
         self.assertDictEqual(
-            stats.translation_suggestion_counts_by_lang_code, {})
+            stats.translation_suggestion_counts_by_lang_code, {
+                self.sample_language_code: 1})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -3523,17 +3525,16 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
 
     def test_get_returns_translations_need_more_reviewers_for_mutli_lang_code(
             self):
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, 'en')
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, 'fr')
+        self._create_translation_suggestion_with_language_code('en')
+        self._create_translation_suggestion_with_language_code('fr')
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code, {'en': 1, 'fr': 1})
+            stats.translation_reviewer_counts_by_lang_code, {})
         self.assertDictEqual(
-            stats.translation_suggestion_counts_by_lang_code, {})
+            stats.translation_suggestion_counts_by_lang_code, {
+                'en': 1, 'fr': 1})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -3543,18 +3544,17 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'}})
 
     def test_get_returns_translations_and_questions_need_more_reviewers(self):
-        user_services.allow_user_to_review_question(self.reviewer_id)
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, 'en')
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, 'fr')
+        self._create_question_suggestion()
+        self._create_translation_suggestion_with_language_code('en')
+        self._create_translation_suggestion_with_language_code('fr')
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
-        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 1)
         self.assertDictEqual(
-            stats.translation_reviewer_counts_by_lang_code, {'en': 1, 'fr': 1})
+            stats.translation_reviewer_counts_by_lang_code, {})
         self.assertDictEqual(
-            stats.translation_suggestion_counts_by_lang_code, {})
+            stats.translation_suggestion_counts_by_lang_code,
+            {'en': 1, 'fr': 1})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
