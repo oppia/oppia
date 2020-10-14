@@ -322,6 +322,8 @@ def update_exp_issues_for_new_exp_version(
 
         playthrough_model.populate(**playthrough.to_dict())
 
+    # Run in transaction to help prevent data-races between concurrent
+    # operations that may update the playthroughs concurrently.
     transaction_services.run_in_transaction(
         stats_models.PlaythroughModel.put_multi, playthrough_models)
 
@@ -605,6 +607,8 @@ def save_exp_issues_model_transactional(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
+    # Run in transaction to help prevent data-races between concurrent learners
+    # who may have a playthrough recorded at the same time.
     transaction_services.run_in_transaction(_save_exp_issues_model, exp_issues)
 
 
@@ -643,6 +647,8 @@ def delete_playthroughs_multi(playthrough_ids):
     Args:
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
+    # Run in transaction to help prevent data-races between concurrent
+    # operations that may update the playthroughs being deleted.
     stats_models.PlaythroughModel.delete_multi(
         stats_models.PlaythroughModel.get_multi(playthrough_ids))
 
