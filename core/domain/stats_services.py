@@ -657,11 +657,15 @@ def delete_playthroughs_multi(playthrough_ids):
     Args:
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
+
+    def _delete_playthroughs_multi():
+        """Implementation to be run in a transaction."""
+        stats_models.PlaythroughModel.delete_multi(
+            stats_models.PlaythroughModel.get_multi(playthrough_ids))
+
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
-    transaction_services.run_in_transaction(
-        stats_models.PlaythroughModel.delete_multi,
-        stats_models.PlaythroughModel.get_multi(playthrough_ids))
+    transaction_services.run_in_transaction(_delete_playthroughs_multi)
 
 
 def get_visualizations_info(exp_id, state_name, interaction_id):

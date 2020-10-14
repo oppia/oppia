@@ -761,7 +761,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             'action_customization_args': {
                 'state_name': {'value': state_names[0]},
             },
-            'schema_version': 1,
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
         }]
         actions.extend(
             {
@@ -774,7 +774,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     'feedback': {'value': ''},
                     'time_spent_in_exp_in_msecs': {'value': 1000},
                 },
-                'schema_version': 1,
+                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
             }
             for state_name, dest_state_name in python_utils.ZIP(
                 state_names[:-1], state_names[1:]))
@@ -784,7 +784,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 'state_name': {'value': state_names[-1]},
                 'time_spent_in_state_in_msecs': {'value': 1000},
             },
-            'schema_version': 1,
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
         })
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, 'CyclicStateTransitions',
@@ -806,14 +806,14 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         actions = [{
             'action_type': 'ExplorationStart',
             'action_customization_args': {'state_name': {'value': state_name}},
-            'schema_version': 1,
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
         }, {
             'action_type': 'ExplorationQuit',
             'action_customization_args': {
                 'state_name': {'value': state_name},
                 'time_spent_in_state_in_msecs': {'value': 1000},
             },
-            'schema_version': 1,
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
         }]
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, 'EarlyQuit',
@@ -841,7 +841,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         actions = [{
             'action_type': 'ExplorationStart',
             'action_customization_args': {'state_name': {'value': state_name}},
-            'schema_version': 1,
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
         }]
         actions.extend(
             {
@@ -854,7 +854,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     'feedback': {'value': ''},
                     'time_spent_in_exp_in_msecs': {'value': 1000},
                 },
-                'schema_version': 1,
+                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
             }
             for _ in python_utils.RANGE(num_times_answered_incorrectly))
         actions.append({
@@ -863,7 +863,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 'state_name': {'value': state_name},
                 'time_spent_in_state_in_msecs': {'value': 1000},
             },
-            'schema_version': 1,
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
         })
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, 'MultipleIncorrectSubmissions',
@@ -883,9 +883,10 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             stats_domain.ExplorationIssue. The new issue.
         """
         issue_customization_args = {'state_names': {'value': state_names}}
+        is_valid = True
         return stats_domain.ExplorationIssue(
             'CyclicStateTransitions', issue_customization_args, playthrough_ids,
-            1, True)
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION, is_valid)
 
     def _create_eq_exp_issue(self, playthrough_ids, state_name):
         """Returns a new Early Quit issue domain object.
@@ -902,8 +903,10 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             'state_name': {'value': state_name},
             'time_spent_in_exp_in_msecs': {'value': 200},
         }
+        is_valid = True
         return stats_domain.ExplorationIssue(
-            'EarlyQuit', issue_customization_args, playthrough_ids, 1, True)
+            'EarlyQuit', issue_customization_args, playthrough_ids,
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION, is_valid)
 
     def _create_mis_exp_issue(
             self, playthrough_ids, state_name, num_times_answered_incorrectly):
@@ -925,19 +928,23 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 'value': num_times_answered_incorrectly
             },
         }
+        is_valid = True
         return stats_domain.ExplorationIssue(
             'MultipleIncorrectSubmissions', issue_customization_args,
-            playthrough_ids, 1, True)
+            playthrough_ids, stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
+            is_valid)
 
     def test_create_exp_issues_model(self):
-        exp_issues = stats_domain.ExplorationIssues(self.exp.id, 1, [])
+        exp_issues = stats_domain.ExplorationIssues(self.exp.id,
+                stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
 
         stats_services.create_exp_issues_model(exp_issues)
 
         exp_issues = (
-            stats_models.ExplorationIssuesModel.get_model(self.exp.id, 1))
+            stats_models.ExplorationIssuesModel.get_model(self.exp.id,
+                self.exp.version))
         self.assertEqual(exp_issues.exp_id, self.exp.id)
-        self.assertEqual(exp_issues.exp_version, 1)
+        self.assertEqual(exp_issues.exp_version, self.exp.version)
         self.assertEqual(exp_issues.unresolved_issues, [])
 
     def test_get_exp_issues_creates_new_empty_exp_issues_when_missing(self):
