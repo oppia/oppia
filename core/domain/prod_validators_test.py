@@ -8216,30 +8216,6 @@ class CommunityContributionStatsModelValidatorTests(
             self.reviewer_id, self.change_cmd, score_category,
             self.SKILL_THREAD_ID, 'en')
 
-    def _update_users_contribution_rights_model_with_reviewer_rights(
-            self, reviewer_id, can_review_translation_for_language_codes,
-            can_review_questions):
-        """Updates the UserContributionRightsModel with given reviewer user id
-        and reviewer rights. Note that the reviewer does not have the rights to
-        review voiceovers because voiceover suggestions are not accounted for in
-        the community contribution stats because they are not offered on the
-        Contributor Dashboard.
-
-        Args:
-            reviewer_id: str. The user id of the reviewer.
-            can_review_translation_for_language_codes: list(str). A list of
-                language codes that correspond to the languages of translation
-                suggestions that the user can review.
-            can_review_questions: bool. Whether the reviewer can review question
-                suggestions.
-        """
-        user_models.UserContributionRightsModel(
-            id=reviewer_id,
-            can_review_translation_for_language_codes=(
-                can_review_translation_for_language_codes),
-            can_review_voiceover_for_language_codes=[],
-            can_review_questions=can_review_questions).put()
-
     def setUp(self):
         super(CommunityContributionStatsModelValidatorTests, self).setUp()
 
@@ -8262,8 +8238,11 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
-        self._update_users_contribution_rights_model_with_reviewer_rights(
-            self.reviewer_id, ['hi'], True)
+        user_models.UserContributionRightsModel(
+            id=self.reviewer_id,
+            can_review_translation_for_language_codes=['hi'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=True).put()
         self._create_translation_suggestion_model_with_language_code('hi')
         self._create_question_suggestion_model()
         translation_reviewer_counts_by_lang_code = {
@@ -8584,8 +8563,11 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_if_translation_reviewer_lang_not_in_dict(
             self):
         missing_language_code = 'hi'
-        self._update_users_contribution_rights_model_with_reviewer_rights(
-            self.reviewer_id, [missing_language_code], False)
+        user_models.UserContributionRightsModel(
+            id=self.reviewer_id,
+            can_review_translation_for_language_codes=[missing_language_code],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
         expected_output = [
