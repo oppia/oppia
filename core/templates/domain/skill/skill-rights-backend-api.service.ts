@@ -75,7 +75,7 @@ export class SkillRightsBackendApiService {
   /**
     * Gets a skill's rights, given its ID.
     */
-  fetchSkillRights(skillId: string): Promise<SkillRights> {
+  async fetchSkillRightsAsync(skillId: string): Promise<SkillRights> {
     return new Promise((resolve, reject) => {
       this._fetchSkillRights(skillId, resolve, reject);
     });
@@ -90,7 +90,7 @@ export class SkillRightsBackendApiService {
     * rights from the backend, it will store it in the cache to avoid
     * requests from the backend in further function calls.
     */
-  loadSkillRights(skillId: string): Promise<SkillRights> {
+  async loadSkillRightsAsync(skillId: string): Promise<SkillRights> {
     return new Promise((resolve, reject) => {
       if (this._isCached(skillId)) {
         if (resolve) {

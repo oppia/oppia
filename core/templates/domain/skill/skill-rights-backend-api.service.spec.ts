@@ -56,7 +56,7 @@ describe('Skill rights backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      skillRightsBackendApiService.fetchSkillRights('0').then(
+      skillRightsBackendApiService.fetchSkillRightsAsync('0').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/skill_editor_handler/rights/0');
@@ -72,7 +72,7 @@ describe('Skill rights backend API service', () => {
   ' fails', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    skillRightsBackendApiService.fetchSkillRights('0').then(
+    skillRightsBackendApiService.fetchSkillRightsAsync('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/skill_editor_handler/rights/0');
@@ -87,7 +87,7 @@ describe('Skill rights backend API service', () => {
     'cached', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    skillRightsBackendApiService.loadSkillRights('0').then(
+    skillRightsBackendApiService.loadSkillRightsAsync('0').then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/skill_editor_handler/rights/0');
@@ -114,7 +114,7 @@ describe('Skill rights backend API service', () => {
 
       // A new skill should not have been fetched from the backend. Also,
       // the returned skill should match the expected skill object.
-      skillRightsBackendApiService.loadSkillRights('0').then(
+      skillRightsBackendApiService.loadSkillRightsAsync('0').then(
         successHandler, failHandler);
       flushMicrotasks();
 
