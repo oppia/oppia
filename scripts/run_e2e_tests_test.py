@@ -109,6 +109,133 @@ class MockProcessClass(python_utils.OBJECT):
         return
 
 
+class MockGoogleSheetResourceValuesGetter(python_utils.OBJECT):
+
+    def __init__(self, sheet_values):
+        '''Create a mock values getter object.
+
+        Args:
+            sheet_values: list(list). The values of the sheet, with one
+                list per row.
+        '''
+        self.sheet_values = sheet_values
+        self.execute_called = False
+
+    def execute(self):
+        """Get the sheet values.
+
+        Returns:
+            dict. A dictionary with a single key, values, whose value is
+            the sheet values.
+        """
+        self.execute_called = True
+        return {'values': self.sheet_values}
+
+
+class MockGoogleSheetResourceValuesUpdater(python_utils.OBJECT):
+
+    def __init__(self):
+        """Create a values updater object."""
+        self.execute_called = False
+
+    def execute(self):
+        """Dummy function that only stores that it was called."""
+        self.execute_called = True
+
+
+class MockGoogleSheetResourceValues(python_utils.OBJECT):
+
+    def __init__(self, expected_sheet_id, expected_range,
+            sheet_values=None, expected_value_input_option=None,
+            expected_body=None):
+        """Create a resource values object.
+
+        Args:
+            expected_sheet_id: str. The expected spreadsheetId argument
+                to either get() or update().
+            expected_range: str. The expected range argument to either
+                get() or update().
+            sheet_values: list(list). The sheet values to return from
+                get().
+            expected_value_input_option: str. The expected
+                valueInputOption argument to update().
+            expected_body: dict. The expected body argument to update().
+        """
+        self.expected_sheet_id = expected_sheet_id
+        self.expected_range = expected_range
+        self.sheet_values = sheet_values
+        self.expected_value_input_option = expected_value_input_option
+        self.expected_body = expected_body
+        self.get_called = False
+        self.update_called = False
+        self.getter = None
+        self.updater = None
+
+    def get(self, spreadsheetId, range):
+        """Get data from the spreadsheet.
+
+        Args:
+            spreadsheetId: str. ID of the spreadsheet to retrieve data
+                from.
+            range: str. The spreadsheet range to query.
+
+        Returns:
+            MockGoogleSheetResourceValuesGetter. A getter object for the
+            values.
+        """
+        self.get_called = True
+        assert spreadsheetId == self.expected_sheet_id
+        assert range == self.expected_range
+        self.getter = MockGoogleSheetResourceValuesGetter(self.sheet_values)
+        return self.getter
+
+    def update(self, spreadsheetId, range, valueInputOption, body):
+        """Update the spreadsheet data.
+
+        Args:
+            spreadsheetId: str. ID of the spreadsheet to retrieve data
+                from.
+            range: str. The spreadsheet range to query.
+            valueInputOption: str. The type of input to perform.
+            body: dict. The body of the update.
+
+        Returns:
+            MockGoogleSheetResourceValuesUpdater. An updater object to
+            update the sheet.
+        """
+        self.update_called = True
+        assert spreadsheetId == self.expected_sheet_id
+        assert range == self.expected_range
+        assert valueInputOption == self.expected_value_input_option
+        assert body == self.expected_body
+        self.updater = MockGoogleSheetResourceValuesUpdater()
+        return self.updater
+
+
+class MockGoogleSheetResource(python_utils.OBJECT):
+
+    def __init__(self, values_return_value):
+        """Create a new sheet resource.
+
+        Args:
+            values_return_value:
+                MockGoogleSheetResourceValuesUpdater|MockGoogleSheetResourceValuesGetter.
+                The updater or getter to return from values().
+        """
+        self.values_return_value = values_return_value
+        self.values_called = False
+
+    def values(self):
+        """Get the sheet's updater or getter.
+
+        Returns:
+            MockGoogleSheetResourceValuesGetter|MockGoogleSheetResourceValuesUpdater.
+            The updater or getter.
+        """
+        self.values_called = True
+        return self.values_return_value
+
+
 class RunE2ETestsTests(test_utils.GenericTestBase):
     """Test the run_e2e_tests methods."""
 
@@ -159,6 +286,61 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.mock_constant_file_path = 'constant.ts'
         self.constant_file_path_swap = self.swap(
             run_e2e_tests, 'CONSTANT_FILE_PATH', self.mock_constant_file_path)
+
+    def test_get_flaky_tests_from_sheet(self):
+        sheet_values = [
+            [
+                'suite1', 'test1', 'error1', 'CircleCI',
+                'https://example.com', 5, 2,
+            ],
+            [
+                'suite2', 'test2', 'error2', 'CircleCI',
+                'https://example.com',
+            ],
+            [
+                'suite1', 'test1', 'error2', 'CircleCI',
+                'https://example.com', 0,
+            ],
+            ['short', 'row'],
+        ]
+        sheet_id = 'sheet_id'
+        os.environ['FLAKY_E2E_TEST_SHEET_ID'] = sheet_id
+        resource_values = MockGoogleSheetResourceValues(
+            expected_sheet_id=sheet_id,
+            expected_range='Log!A5:T1000',
+            sheet_values=sheet_values,
+        )
+        sheet = MockGoogleSheetResource(resource_values)
+        data = run_e2e_tests.get_flaky_tests_data_from_sheets(sheet)
+        expected_data = [
+            ('suite1', 'test1', 'error1', 5),
+            ('suite2', 'test2', 'error2', 0),
+            ('suite1', 'test1', 'error2', 0),
+        ]
+        assert data == expected_data
+        assert sheet.values_called
+        assert resource_values.get_called
+        assert resource_values.getter.execute_called
+
+    def test_update_flaky_tests_sheet(self):
+        sheet_id = 'sheet_id'
+        os.environ['FLAKY_E2E_TEST_SHEET_ID'] = sheet_id
+
+        resource_values = MockGoogleSheetResourceValues(
+            expected_sheet_id=sheet_id,
+            expected_range='Log!F15',
+            expected_value_input_option='USER_ENTERED',
+            expected_body={
+                'values': [
+                    [6],
+                ],
+            },
+        )
+        sheet = MockGoogleSheetResource(resource_values)
+        run_e2e_tests.update_flaky_tests_count(sheet, 10, 5)
+        assert sheet.values_called
+        assert resource_values.update_called
+        assert resource_values.updater.execute_called
 
     def test_check_screenhost_when_not_exist(self):
         def mock_isdir(unused_path):
