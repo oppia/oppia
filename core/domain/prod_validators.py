@@ -69,8 +69,8 @@ import utils
     models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
     models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
     models.NAMES.improvements, models.NAMES.job, models.NAMES.question,
-    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.story, 
-    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic, 
+    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
     models.NAMES.user
 ])
 

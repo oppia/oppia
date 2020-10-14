@@ -29,6 +29,7 @@ from core.platform import models
 (base_models, exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
 
+
 class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating PlaythroughModel."""
 

@@ -28,6 +28,7 @@ from core.tests import test_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
+
 class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(PlaythroughModelValidatorTests, self).setUp()

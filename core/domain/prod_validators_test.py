@@ -29,7 +29,6 @@ import types
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -65,7 +64,6 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-gae_search_services = models.Registry.import_search_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
@@ -76,16 +74,16 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
-    recommendations_models, skill_models, story_models, 
-    subtopic_models, suggestion_models, topic_models, 
+    recommendations_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
     models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
     models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
     models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
     models.NAMES.opportunity, models.NAMES.question,
-    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.story, 
-    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic, 
+    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
     models.NAMES.user
 ])
 
