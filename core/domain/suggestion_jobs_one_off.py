@@ -306,7 +306,8 @@ class PopulateContributionStatsOneOffJob(
     @staticmethod
     def reduce(key, values):
 
-        values_to_yield_after_transaction = []
+        key_from_transaction = 'transaction never ran'
+        count_value_from_transaction = ''
 
         def _update_community_contribution_stats_transactional(
                 key, count_value):
