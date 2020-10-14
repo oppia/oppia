@@ -45,13 +45,9 @@ import { ParamSpecsObjectFactory } from
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
-
 import { destroyPlatform } from '@angular/core';
 import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
-import { StateParamChangesEditorComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component';
-import { async } from '@angular/core/testing';  
+import { async } from '@angular/core/testing';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
 describe('Param Changes Editor Component', function() {
@@ -412,14 +408,13 @@ describe('Param Changes Editor Component', function() {
 describe('Upgraded component', () => {
   beforeEach(() => destroyPlatform());
   afterEach(() => destroyPlatform());
-  
   it('should create the upgraded component', async(() => {
     setupAndGetUpgradedComponent(
       'param-changes-editor',
       'paramChangesEditor',
       [ParamChangesEditorDirective]
     ).then(
-        textContext => expect(textContext).toBe('Hello Oppia!')
+      textContext => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });
