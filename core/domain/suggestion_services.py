@@ -37,6 +37,7 @@ import python_utils
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
         [models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user]))
+transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -130,6 +131,11 @@ def create_suggestion(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
         None, change, score_category, thread_id, suggestion.language_code)
+
+    # Update the community contribution stats so that the number of suggestions
+    # of this type that are in review increases by one.
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], 1)
+
     return get_suggestion_by_id(thread_id)
 
 
@@ -359,6 +365,11 @@ def accept_suggestion(
 
     _update_suggestion(suggestion)
 
+    # Update the community contribution stats so that the number of suggestions
+    # of this type that are in review decreases by one, since this
+    # suggestion is no longer in review.
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], -1)
+
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
@@ -444,6 +455,11 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
 
     _update_suggestions(suggestions)
 
+    # Update the community contribution stats so that the number of suggestions
+    # that are in review decreases, since these suggestions are no longer in
+    # review.
+    _update_suggestion_counts_in_community_contribution_stats(suggestions, -1)
+
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message
@@ -523,6 +539,11 @@ def resubmit_rejected_suggestion(
     suggestion.change = change
     suggestion.set_suggestion_status_to_in_review()
     _update_suggestion(suggestion)
+
+    # Update the community contribution stats so that the number of suggestions
+    # of this type that are in review increases by one, since this suggestion is
+    # now back in review.
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], 1)
 
     feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
@@ -1088,3 +1109,62 @@ def get_community_contribution_stats():
 
     return create_community_contribution_stats_from_model(
         community_contribution_stats_model)
+
+
+def _update_suggestion_counts_in_community_contribution_stats_transactional(
+        suggestions, amount):
+    """Updates the community contribution stats counts associated with the given
+    suggestions by the given amount. Note that this method should only ever be
+    called in a transaction.
+
+    Args:
+        suggestions: list(Suggestion). Suggestions that may update the counts
+            stored in the community contribution stats model. Only suggestion
+            types that are tracked in the community contribution stats model
+            trigger count updates.
+        amount: int. The amount to adjust the counts by.
+    """
+    stats_model = suggestion_models.CommunityContributionStatsModel.get()
+    for suggestion in suggestions:
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if suggestion.language_code not in (
+                    stats_model.translation_suggestion_counts_by_lang_code):
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code] = amount
+            else:
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code] += amount
+                # Remove the language code from the dict if the count reaches
+                # zero.
+                if stats_model.translation_suggestion_counts_by_lang_code[
+                        suggestion.language_code] == 0:
+                    del stats_model.translation_suggestion_counts_by_lang_code[
+                        suggestion.language_code]
+        elif suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            stats_model.question_suggestion_count += amount
+
+    # Create a community contribution stats object to validate the updates.
+    stats = create_community_contribution_stats_from_model(stats_model)
+    stats.validate()
+
+    stats_model.put()
+
+
+def _update_suggestion_counts_in_community_contribution_stats(
+        suggestions, amount):
+    """Updates the community contribution stats counts associated with the given
+    suggestions by the given amount. The GET and PUT is done in a single
+    transaction to avoid loss of updates that come in rapid succession.
+
+    Args:
+        suggestions: list(Suggestion). Suggestions that may update the counts
+            stored in the community contribution stats model. Only suggestion
+            types that are tracked in the community contribution stats model
+            trigger count updates.
+        amount: int. The amount to adjust the counts by.
+    """
+    transaction_services.run_in_transaction(
+        _update_suggestion_counts_in_community_contribution_stats_transactional,
+        suggestions, amount)

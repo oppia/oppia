@@ -36,8 +36,8 @@ import utils
 import requests
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models, audit_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.audit])
+(user_models, audit_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.audit, models.NAMES.suggestion])
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -889,6 +889,8 @@ def _save_user_contribution_rights(user_contribution_rights):
     # TODO(#8794): Add limitation on number of reviewers allowed in any
     # category.
     user_contribution_rights.validate()
+    _update_reviewer_counts_in_community_contribution_stats(
+        user_contribution_rights)
     user_models.UserContributionRightsModel(
         id=user_contribution_rights.id,
         can_review_translation_for_language_codes=(
@@ -911,6 +913,79 @@ def _update_user_contribution_rights(user_contribution_rights):
         _save_user_contribution_rights(user_contribution_rights)
     else:
         remove_contribution_reviewer(user_contribution_rights.id)
+
+
+def _update_reviewer_counts_in_community_contribution_stats_transactional(
+        future_user_contribution_rights):
+    """Updates the reviewer counts in the community contribution stats based
+    on the given user contribution rights with the most up-to-date values.
+    This method is intended to be called right before the new updates to the
+    user contribution rights have been saved in the datastore. Note that this
+    method should only ever be called in a transaction.
+
+    Args:
+        future_user_contribution_rights: UserContributionRights. The most
+            up-to-date user contribution rights.
+    """
+    past_user_contribution_rights = get_user_contribution_rights(
+        future_user_contribution_rights.id)
+    stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+    future_languages_that_reviewer_can_review = set(
+        future_user_contribution_rights
+        .can_review_translation_for_language_codes)
+    past_languages_that_reviewer_can_review = set(
+        past_user_contribution_rights.can_review_translation_for_language_codes)
+
+    languages_that_reviewer_can_no_longer_review = (
+        past_languages_that_reviewer_can_review.difference(
+            future_languages_that_reviewer_can_review))
+    new_languages_that_reviewer_can_review = (
+        future_languages_that_reviewer_can_review.difference(
+            past_languages_that_reviewer_can_review))
+
+    # Update question reviewer counts.
+    if past_user_contribution_rights.can_review_questions and not (
+            future_user_contribution_rights.can_review_questions):
+        stats_model.question_reviewer_count -= 1
+    if not past_user_contribution_rights.can_review_questions and (
+            future_user_contribution_rights.can_review_questions):
+        stats_model.question_reviewer_count += 1
+    # Update translation reviewer counts.
+    for language_code in languages_that_reviewer_can_no_longer_review:
+        stats_model.translation_reviewer_counts_by_lang_code[
+            language_code] -= 1
+        # Remove the language code from the dict if the count reaches zero.
+        if stats_model.translation_reviewer_counts_by_lang_code[
+                language_code] == 0:
+            del stats_model.translation_reviewer_counts_by_lang_code[
+                language_code]
+    for language_code in new_languages_that_reviewer_can_review:
+        if language_code not in (
+                stats_model.translation_reviewer_counts_by_lang_code):
+            stats_model.translation_reviewer_counts_by_lang_code[
+                language_code] = 1
+        else:
+            stats_model.translation_reviewer_counts_by_lang_code[
+                language_code] += 1
+
+    stats_model.put()
+
+
+def _update_reviewer_counts_in_community_contribution_stats(
+        user_contribution_rights):
+    """Updates the reviewer counts in the community contribution stats based
+    on the updates to the given user contribution rights. The GET and PUT is
+    done in a transaction to avoid loss of updates that come in rapid
+    succession.
+
+    Args:
+        user_contribution_rights: UserContributionRights. The user contribution
+            rights.
+    """
+    transaction_services.run_in_transaction(
+        _update_reviewer_counts_in_community_contribution_stats_transactional,
+        user_contribution_rights)
 
 
 def get_usernames_by_role(role):
@@ -2569,6 +2644,14 @@ def remove_contribution_reviewer(user_id):
     user_contribution_rights_model = (
         user_models.UserContributionRightsModel.get_by_id(user_id))
     if user_contribution_rights_model is not None:
+        user_contribution_rights = _create_user_contribution_rights_from_model(
+            user_contribution_rights_model)
+        # Clear the user contribution rights fields before passing them into the
+        # update community contribution stats function.
+        user_contribution_rights.can_review_questions = False
+        user_contribution_rights.can_review_translation_for_language_codes = []
+        _update_reviewer_counts_in_community_contribution_stats(
+            user_contribution_rights)
         user_contribution_rights_model.delete()
 
 
