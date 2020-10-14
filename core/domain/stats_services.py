@@ -281,11 +281,8 @@ def update_exp_issues_for_new_exp_version(
 
     if revert_to_version:
         old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
-        # If the old exploration issues model doesn't exist, the current model
-        # is carried over (this is a fallback case for some tests, and can
-        # never happen in production.)
-        if old_exp_issues:
-            exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
+        exp_issues.unresolved_issues = (
+            [] if old_exp_issues is None else old_exp_issues.unresolved_issues)
         exp_issues.exp_version = exploration.version + 1
         create_exp_issues_model(exp_issues)
         return
@@ -325,6 +322,8 @@ def update_exp_issues_for_new_exp_version(
 
         playthrough_model.populate(**playthrough.to_dict())
 
+    # Run in transaction to help prevent data-races between operations that may
+    # update the playthroughs concurrently.
     transaction_services.run_in_transaction(
         stats_models.PlaythroughModel.put_multi, playthrough_models)
 
@@ -608,6 +607,8 @@ def save_exp_issues_model_transactional(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
+    # Run in transaction to help prevent data-races between concurrent learners
+    # who may have a playthrough recorded at the same time.
     transaction_services.run_in_transaction(_save_exp_issues_model, exp_issues)
 
 
@@ -646,7 +647,10 @@ def delete_playthroughs_multi(playthrough_ids):
     Args:
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
-    stats_models.PlaythroughModel.delete_multi(
+    # Run in transaction to help prevent data-races between concurrent
+    # operations that may update the playthroughs being deleted.
+    transaction_services.run_in_transaction(
+        stats_models.PlaythroughModel.delete_multi,
         stats_models.PlaythroughModel.get_multi(playthrough_ids))
 
 
