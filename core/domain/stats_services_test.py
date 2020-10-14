@@ -800,11 +800,11 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
     def _create_mis_playthrough(
             self, state_name, num_times_answered_incorrectly):
-        """Creates an Multiple Incorrect Submissions playthrough and returns its
+        """Creates a Multiple Incorrect Submissions playthrough and returns its
         id.
 
         Args:
-            state_name: str. The state the early quit occurred from.
+            state_name: str. The state the answers were submitted to.
             num_times_answered_incorrectly: int. Number of times incorrect
                 answers were submitted.
 
@@ -837,8 +837,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         """Returns a new Cyclic State Transitions issue domain object.
 
         Args:
-            playthrough_ids: list(str). List of playthrough IDs stored for this
-                issue.
+            playthrough_ids: list(str). List of playthrough IDs demonstrating a
+                Cyclic State Transitions issue.
             state_names: list(str). The states of the cycle, where only the
                 first and last values are the same. Requires at least 2 distinct
                 values.
@@ -855,8 +855,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         """Returns a new Early Quit issue domain object.
 
         Args:
-            playthrough_ids: list(str). List of playthrough IDs stored for this
-                issue.
+            playthrough_ids: list(str). List of playthrough IDs demonstrating an
+                Early Quit issue.
             state_name: str. The state the early quit occurred from.
 
         Returns:
@@ -874,9 +874,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         """Returns a new Multiple Incorrect Submissions issue domain object.
 
         Args:
-            playthrough_ids: list(str). List of playthrough IDs stored for this
-                issue.
-            state_name: str. The state the early quit occurred from.
+            playthrough_ids: list(str). List of playthrough IDs demonstrating a
+                Multiple Incorrect Submissions issue.
+            state_name: str. The state the answers were submitted to.
             num_times_answered_incorrectly: int. Number of times incorrect
                 answers were submitted.
 
