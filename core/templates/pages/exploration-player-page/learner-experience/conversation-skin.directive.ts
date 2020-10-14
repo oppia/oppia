@@ -1342,6 +1342,7 @@ angular.module('oppia').directive('conversationSkin', [
             ctrl.directiveSubscriptions.add(
               LearnerViewRatingService.onRatingUpdated.subscribe(() => {
                 $scope.userRating = LearnerViewRatingService.getUserRating();
+                AlertsService.addSuccessMessage('Rating saved!', 1000);
               })
             );
             $window.addEventListener('beforeunload', function(e) {
