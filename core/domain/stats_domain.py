@@ -745,7 +745,7 @@ class Playthrough(python_utils.OBJECT):
         """Returns a dict representation of the Playthrough domain object.
 
         The keys of the dict **must** correspond to the properties of the
-        actual PlaythroughModel properties.
+        actual PlaythroughModel.
 
         Returns:
             dict. A dict mapping of all fields of Playthrough object.
