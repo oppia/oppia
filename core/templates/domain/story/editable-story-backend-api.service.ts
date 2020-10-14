@@ -49,7 +49,13 @@ interface UpdateStoryBackendResponse {
 }
 
 interface StoryUrlFragmentExists {
-  storyUrlFragmentExists: StoryUrlFragmentExists;
+  // eslint-disable-next-line
+  story_url_fragment_exists: StoryUrlFragmentExists;
+}
+
+interface ValidationErrorMessages {
+  // eslint-disable-next-line
+  validation_error_messages: ValidationErrorMessages;
 }
 
 @Injectable({
@@ -133,7 +139,7 @@ export class EditableStoryBackendApiService {
   private _validateExplorations(
       storyId: string,
       expIds: string[],
-      successCallback: (value: number) => void,
+      successCallback: (value: ValidationErrorMessages) => void,
       errorCallback: (reason: string) => void): void {
     const validateExplorationsUrl =
       this.urlInterpolationService.interpolateUrl(
@@ -141,21 +147,20 @@ export class EditableStoryBackendApiService {
           story_id: storyId
         });
 
-    this.http.get<void>(
+    this.http.get<ValidationErrorMessages>(
       validateExplorationsUrl, {
-        observe: 'response',
         params: {
           comma_separated_exp_ids: expIds.join(',')
         }
       }
     ).toPromise().then(
-      response => successCallback(response.status),
+      response => successCallback(response.validation_error_messages),
       errorResponse => errorCallback(errorResponse.error.error));
   }
 
   private _deleteStory(
       storyId: string,
-      successCallback: (value:number) =>void,
+      successCallback: (value: void) =>void,
       errorCallback: (reason: string) => void): void {
     const storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
@@ -163,11 +168,11 @@ export class EditableStoryBackendApiService {
       });
 
     // eslint-disable-next-line
-    this.http.delete(
+    this.http.delete<void>(
       storyDataUrl, {observe: 'response'}).toPromise().then(
       (response) => {
         if (successCallback) {
-          successCallback(response.status);
+          successCallback();
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -188,7 +193,7 @@ export class EditableStoryBackendApiService {
       storyUrlFragmentUrl).toPromise().then(
       (response) => {
         if (successCallback) {
-          successCallback(response.storyUrlFragmentExists);
+          successCallback(response.story_url_fragment_exists);
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -235,14 +240,15 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  validateExplorations(storyId: string, expIds: string[]): Promise<number> {
+  // eslint-disable-next-line max-len
+  validateExplorations(storyId: string, expIds: string[]): Promise<ValidationErrorMessages> {
     return new Promise((resolve, reject) => {
       this._validateExplorations(
         storyId, expIds, resolve, reject);
     });
   }
 
-  deleteStory(storyId: string): Promise<number> {
+  deleteStory(storyId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this._deleteStory(storyId, resolve, reject);
     });
