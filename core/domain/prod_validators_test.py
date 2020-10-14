@@ -8181,7 +8181,7 @@ class CommunityContributionStatsModelValidatorTests(
     sample_language_code = 'hi'
     invalid_language_code = 'invalid'
 
-    def _create_translation_suggestion_model_with_language_code(
+    def _create_model_for_translation_suggestion_with_language_code(
             self, language_code):
         """Creates a GeneralSuggestionModel for a translation suggestion in the
         given language_code.
@@ -8200,7 +8200,7 @@ class CommunityContributionStatsModelValidatorTests(
             self.reviewer_id, self.change_cmd, score_category,
             self.EXPLORATION_THREAD_ID, language_code)
 
-    def _create_question_suggestion_model(self):
+    def _create_model_for_question_suggestion(self):
         """Creates a GeneralSuggestionModel for a question suggestion."""
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_QUESTION,
@@ -8243,8 +8243,8 @@ class CommunityContributionStatsModelValidatorTests(
             can_review_translation_for_language_codes=['hi'],
             can_review_voiceover_for_language_codes=[],
             can_review_questions=True).put()
-        self._create_translation_suggestion_model_with_language_code('hi')
-        self._create_question_suggestion_model()
+        self._create_model_for_translation_suggestion_with_language_code('hi')
+        self._create_model_for_question_suggestion()
         translation_reviewer_counts_by_lang_code = {
             'hi': 1
         }
@@ -8543,7 +8543,7 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_if_translation_suggestion_lang_not_in_dict(
             self):
         missing_language_code = 'hi'
-        self._create_translation_suggestion_model_with_language_code(
+        self._create_model_for_translation_suggestion_with_language_code(
             missing_language_code)
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
