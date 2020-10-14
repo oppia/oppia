@@ -353,6 +353,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(
                     cls.suggestion_type.IN(
                         CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
+            .order(cls.last_updated)
             .fetch(
                 MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
 
