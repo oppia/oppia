@@ -2881,7 +2881,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
     stats.
 
-    TODO(kaylahardie): It is currently not possible to resubmit a rejected
+    TODO(#10957): It is currently not possible to resubmit a rejected
     translation suggestion for review. As a result, there isn't a test for
     that case in this test class. If the functionality is added, a new test
     should be added here to cover that case. If the functionality is not going
