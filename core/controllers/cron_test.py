@@ -513,7 +513,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
-                'language_code': self.language_code,
+                'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
@@ -544,7 +544,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
     def setUp(self):
         super(
             CronMailAdminContributorDashboardReviewIssuesHandlerTests,
-                self).setUp()
+            self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         # This sets the role of the user to admin.
@@ -563,7 +563,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}
         }
-        
+
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
         self.testapp_swap = self.swap(

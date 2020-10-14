@@ -2885,10 +2885,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
     stats.
-<<<<<<< HEAD
-=======
 
->>>>>>> upstream/develop
     TODO(#10957): It is currently not possible to resubmit a rejected
     translation suggestion for review. As a result, there isn't a test for
     that case in this test class. If the functionality is added, a new test
@@ -3429,7 +3426,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
-                'language_code': self.language_code,
+                'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
@@ -3448,7 +3445,8 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
         )
 
     def _assert_community_contribution_stats_is_in_default_state(self):
-        """Checks if the community contribution stats is in its default state.
+        """Checks if the community contribution stats is in its default
+        state.
         """
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats())
@@ -3561,6 +3559,9 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(
             suggestion_types_need_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'},
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
-                constants.DEFAULT_LANGUAGE_CODE}})
+            {
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                    'en', 'fr'},
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
+                    constants.DEFAULT_LANGUAGE_CODE}
+            })

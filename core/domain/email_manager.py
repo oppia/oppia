@@ -1356,8 +1356,8 @@ def send_mail_to_notify_admins_reviewers_needed(
                 '<li><b>%s</b></li>' % (
                     utils.get_supported_audio_language_description(
                         language_code)) for language_code in
-                        suggestion_types_need_more_reviewers[
-                            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT]
+                suggestion_types_need_more_reviewers[
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT]
             ]
         )
         suggestion_types_need_reviewers_html_list.append(
@@ -1375,7 +1375,7 @@ def send_mail_to_notify_admins_reviewers_needed(
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION])
 
     suggestion_types_need_reviewers_html = ''.join(
-        suggestion_types_need_reviewers_html_list)   
+        suggestion_types_need_reviewers_html_list)
 
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)

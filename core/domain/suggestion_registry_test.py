@@ -2668,7 +2668,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             stats.are_translation_reviewers_needed_in_lang_code(
                 self.sample_language_code))
 
-
         self.assertTrue(reviewers_are_needed)
 
     def test_translation_reviewers_not_needed_if_num_suggestions_eqs_max(self):
@@ -2683,7 +2682,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         reviewers_are_needed = (
             stats.are_translation_reviewers_needed_in_lang_code(
                 self.sample_language_code))
-
 
         self.assertFalse(reviewers_are_needed)
 
@@ -2737,7 +2735,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         reviewers_are_needed = stats.are_question_reviewers_needed()
 
-
         self.assertTrue(reviewers_are_needed)
 
     def test_question_reviewers_not_needed_if_num_suggestions_eqs_max(self):
@@ -2749,7 +2746,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         reviewers_are_needed = stats.are_question_reviewers_needed()
 
-
         self.assertFalse(reviewers_are_needed)
 
     def test_question_reviewers_not_needed_if_num_suggestions_less_max(self):
@@ -2760,7 +2756,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
         reviewers_are_needed = stats.are_question_reviewers_needed()
-
 
         self.assertFalse(reviewers_are_needed)
 

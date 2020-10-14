@@ -1132,7 +1132,7 @@ def get_suggestion_types_that_need_reviewers():
                     suggestion_types_need_more_reviewers):
                 suggestion_types_need_more_reviewers[
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT].add(
-                                language_code)
+                        language_code)
             else:
                 suggestion_types_need_more_reviewers[
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = {
@@ -1144,6 +1144,8 @@ def get_suggestion_types_that_need_reviewers():
                 constants.DEFAULT_LANGUAGE_CODE}
 
     return suggestion_types_need_more_reviewers
+
+
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given

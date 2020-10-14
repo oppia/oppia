@@ -3603,7 +3603,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.logged_errors.append(error_message)
 
     def setUp(self):
-        super(NotifyAdminsContributorDashboardReviewersNeededTests, self).setUp()
+        super(
+            NotifyAdminsContributorDashboardReviewersNeededTests,
+            self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.ADMIN_1_EMAIL, self.ADMIN_1_USERNAME)
@@ -3635,17 +3637,18 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'email_subject': 'Reviewers Needed for Contributor Dashboard',
             'suggestion_types_need_reviewers_template': {
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-                    'There have been <b>translation suggestions</b> created on the '
-                    '<a href=%s%s">Contributor '
-                    'Dashboard page</a> in languages where there are not enough '
-                    'reviewers. The languages that need more reviewers are:'
-                    '<br>%s<br>'),
+                    'There have been <b>translation suggestions</b> created on '
+                    'the <a href=%s%s">Contributor '
+                    'Dashboard page</a> in languages where there are not '
+                    'enough reviewers. The languages that need more reviewers '
+                    'are:<br>%s<br>'),
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-                    'There have been <b>quesiton suggestions</b> created on the '
-                    '<a href="%s%s">Contributor '
+                    'There have been <b>quesiton suggestions</b> created on '
+                    'the <a href="%s%s">Contributor '
                     'Dashboard page</a> where there are not enough '
                     'reviewers' % (
-                        feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
+                        feconf.OPPIA_SITE_URL,
+                        feconf.CONTRIBUTOR_DASHBOARD_URL))
             }
         }
         config_services.set_property(
@@ -3997,13 +4000,16 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_need_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'fr', 'hi'},
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
-                constants.DEFAULT_LANGUAGE_CODE}})
+            {
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                    'fr', 'hi'},
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
+                    constants.DEFAULT_LANGUAGE_CODE}
+            })
         expected_html_for_suggestion_types_need_reviewers = ''.join(
             [
                 self._create_expected_html_if_translation_reviewers_needed(
-                ['French', 'Hindi']),
+                    ['French', 'Hindi']),
                 self._create_expected_html_if_question_reviewers_needed()
             ]
         )

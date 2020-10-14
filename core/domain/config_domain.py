@@ -477,5 +477,5 @@ MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
     FLOAT_SCHEMA,
     'The maximum number of Contributor Dashboard suggestions per reviewer. If '
     'the number of suggestions per reviewer surpasses this maximum, for any '
-    'given suggestion type, the admins are notified by email.', 5.0)
-
+    'given suggestion type on the dashboard, the admins are notified by email.',
+    5.0)
