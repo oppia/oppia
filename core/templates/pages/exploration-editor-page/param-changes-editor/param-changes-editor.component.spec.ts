@@ -52,6 +52,7 @@ import { StateParamChangesEditorComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { async } from '@angular/core/testing';  
+import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
@@ -408,15 +409,15 @@ describe('Param Changes Editor Component', function() {
   });
 });
 
-describe('Upgraded component', () => {
+fdescribe('Upgraded component', () => {
   beforeEach(() => destroyPlatform());
   afterEach(() => destroyPlatform());
   
-  it('should create the upgraded component', async(() => {
+  fit('should create the upgraded component', async(() => {
     setupAndGetUpgradedComponent(
       'state-param-changes-editor',
       'stateParamChangesEditor',
-      [StateParamChangesEditorComponent]
+      [ParamChangesEditorDirective]
     ).then(
         textContext => expect(textContext).toBe('Hello Oppia!')
     );
