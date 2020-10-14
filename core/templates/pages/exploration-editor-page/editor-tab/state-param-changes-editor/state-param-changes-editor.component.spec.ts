@@ -33,9 +33,7 @@ describe('State Param Changes Editor directive', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [StateParamChangesEditorComponent],
-      providers: [
-        StateParamChangesService
-      ],
+      providers: [],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     stateParamChangesService =

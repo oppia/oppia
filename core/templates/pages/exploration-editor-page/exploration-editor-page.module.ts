@@ -61,8 +61,8 @@ import { ParamChangesEditorDirective } from './param-changes-editor/param-change
   declarations: [
     CkEditorCopyToolbarComponent,
     OppiaAngularRootComponent,
-    StateParamChangesEditorComponent,
-    ParamChangesEditorDirective
+    ParamChangesEditorDirective,
+    StateParamChangesEditorComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
