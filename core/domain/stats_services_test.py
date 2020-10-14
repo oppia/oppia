@@ -1083,8 +1083,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('A', 2)], 'A', 2)
             ]))
 
-        exp_services.update_exploration(
-            self.owner_id, self.exp.id, [
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': 'A',
