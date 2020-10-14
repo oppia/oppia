@@ -197,7 +197,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           setExplorationMode();
           initializeExplorationServices(explorationData, false, callback);
         }
-        $rootScope.$apply();
       });
     };
 
