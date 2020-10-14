@@ -308,7 +308,12 @@ class BaseModelValidator(python_utils.OBJECT):
         Args:
             item: datastore_services.Model. Entity to validate.
         """
-        if item.created_on > item.last_updated:
+        # We add a tolerance of 1 second because, for some models, created_on
+        # and last_updated are the same time, and occur within milliseconds of
+        # each other. In such cases, created_on might end up being very slightly
+        # greater than last_updated.
+        if item.created_on > (
+                item.last_updated + datetime.timedelta(seconds=1)):
             cls._add_error(
                 ERROR_CATEGORY_TIME_FIELD_CHECK,
                 'Entity id %s: The created_on field has a value %s which '
