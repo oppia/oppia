@@ -1654,11 +1654,12 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
     stats.
 
-    Note: testing whether resubmiting a rejected translation increases the
-    translation suggestion count could not be tested because the
-    pre_update_validate method in suggestion_registry.py is not implemented for
-    translation suggestions. As a result, rejected translation suggestions
-    cannot be resubmitted for review.
+    TODO(#10957): can't resubmit rejected translation suggestions for review.
+    Note that it is currently not possible to resubmit a rejected translation
+    for review. As a result, there isn't a test for that case in this test
+    class. If the functionality is added, a new test should be added here to
+    cover that case. If the functionality is not going to be added then this
+    can be removed.
     """
 
     target_id = 'exp1'
