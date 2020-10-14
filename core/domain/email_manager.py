@@ -284,6 +284,52 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
     }
 }
 
+NOTIFY_ADMINS_SUGGESTIONS_WAITING_LONG_EMAIL_INFO = {
+    'email_body_template': (
+        'Hi %s,<br><br>'
+        'There are suggestions on the <a href="%s%s">Contributor Dashboard</a> '
+        'that have been waiting for more than %s days for review. Please take '
+        'a look at the suggestions mentioned below and help them by going to '
+        'the <a href="%s%s#/roles">admin roles page</a> and either:'
+        'interested in on the '
+        '<a href="%s%s">Contributor '
+        'Dashboard</a>. Here are some examples of contributions that have been '
+        'waiting the longest for review:'
+        '<br>%s<br>'
+        'Please take some time to review any of the above contributions (if '
+        'they still need a review) or any other contributions on the dashboard.'
+        ' We appreciate your help!<br>'
+        'Thanks again, and happy reviewing!<br><br>'
+        '- The Oppia Contributor Dashboard Team'
+        '<br><br>%s'
+    ),
+    'email_subject': 'Contributor Dashboard Reviewer Opportunities',
+    # The templates below are for listing the information for each suggestion
+    # type.
+    'suggestion_template': {
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+            '<li>The following %s translation suggestion was submitted for '
+            'review %s ago:<br>%s</li>'),
+        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+            '<li>The following question suggestion was submitted for review '
+            '%s ago:<br>%s</li>')
+    },
+    # Each suggestion type has a lambda function to retrieve the values needed
+    # to populate the above suggestion template.
+    'suggestion_template_values_getter_functions': {
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+            lambda values_dict: (
+                values_dict['language'], values_dict['review_wait_time'],
+                values_dict['suggestion_content'])
+        ),
+        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+            lambda values_dict: (
+                values_dict['review_wait_time'],
+                values_dict['suggestion_content'])
+        )
+    }
+}
+
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
@@ -1297,6 +1343,29 @@ def send_mail_to_notify_users_to_review(user_id, category):
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_mail_to_notify_admins_suggestions_waiting_too_long_for_review(
+    admin_ids, reviewable_suggestion_email_infos):
+    """Sends an email to admins to inform them about the suggestions that have
+    been waiting longer than
+    suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for
+    review on the Contributor Dashboard. Admins can be informed about at most
+    suggestion_models.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN suggestions.
+    The information about the suggestions is organized in descending order
+    by the suggestion's review wait time.
+ 
+    Args:
+        admin_ids: list(str). The user ids of the admins to notify.
+        reviewable_suggestion_email_infos: list(ReviewableSuggestionEmailInfo).
+            list(ReviewableSuggestionEmailContentInfo). A list of reviewable
+            suggestion email content info objects that represent suggestions
+            that have been waiting too long for review. Each object contains the
+            type of the suggestion, the language of the suggestion, the
+            suggestion content (question/translation), and the date that the
+            suggestion was submitted for review. The objects are sorted in
+            descending order based on review wait time.
+    """
 
 
 def send_mail_to_notify_admins_reviewers_needed(
