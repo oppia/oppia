@@ -113,7 +113,7 @@ angular.module('oppia').config([
       'CurrentInteractionService', 'DateTimeFormatService', 'DebouncerService',
       'DeviceInfoService', 'DocumentAttributeCustomizationService',
       'EditabilityService', 'EditorFirstTimeEventsService',
-      'EmailDashboardDataService', 'ExplorationFeaturesBackendApiService',
+      'ExplorationFeaturesBackendApiService',
       'ExplorationFeaturesService', 'ExplorationHtmlFormatterService',
       'ExplorationImprovementsBackendApiService',
       'ExplorationImprovementsService', 'ExplorationObjectFactory',
@@ -255,8 +255,15 @@ angular.module('oppia').config([
             // an error.
             if (rejection.status !== -1) {
               $log.error(rejection.data);
-              var warningMessage = 'Error communicating with server.';
-              if (rejection.data && rejection.data.error) {
+              var warningMessage = (
+                'Error communicating with server. Please try again.');
+              // When the status is >= 500 it is usually related to some outage
+              // and we do not want to resurface the error to the user.
+              if (
+                rejection.data &&
+                rejection.data.error &&
+                rejection.status < 500
+              ) {
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
