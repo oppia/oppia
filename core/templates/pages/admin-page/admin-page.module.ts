@@ -29,12 +29,15 @@ angular.module('oppia', [
 ]);
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { AdminFeaturesTabComponent } from
+  'pages/admin-page/features-tab/admin-features-tab.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
@@ -43,14 +46,17 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 @NgModule({
   imports: [
     BrowserModule,
+    FormsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    AdminFeaturesTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    AdminFeaturesTabComponent
   ],
   providers: [
     {
