@@ -1650,6 +1650,1240 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
                 self.voiceover_application_model.id)
 
 
+class ReviewableSuggestionEmailInfoUnitTests(
+        test_utils.GenericTestBase):
+    """Tests the methods related to the ReviewableSuggestionEmailInfo class.
+    """
+
+    target_id = 'exp1'
+    skill_id = 'skill1'
+    language_code = 'en'
+    AUTHOR_EMAIL = 'author1@example.com'
+    REVIEWER_EMAIL = 'reviewer@community.org'
+    COMMIT_MESSAGE = 'commit message'
+
+    def _create_translation_suggestion_with_translation_html(
+            self, translation_html):
+        """Creates a translation suggestion with the given translation_html."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': self.language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': translation_html
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description'
+        )
+
+    def _create_question_suggestion_with_question_html_content(
+            self, question_html_content):
+        """Creates a question suggestion with the html content used for the
+        question in the question suggestion.
+        """
+        with self.swap(
+            feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html_content):
+            add_question_change_dict = {
+                'cmd': (
+                    question_domain
+                    .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                'question_dict': {
+                    'question_state_data': self._create_valid_question_data(
+                        'default_state').to_dict(),
+                    'language_code': self.language_code,
+                    'question_state_data_schema_version': (
+                        feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': ['skill_1'],
+                    'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                },
+                'skill_id': self.skill_id,
+                'skill_difficulty': 0.3
+            }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_question_change_dict,
+            'test description'
+        )
+
+    def _create_edit_state_content_suggestion(self):
+        """Creates an "edit state content" suggestion."""
+
+        edit_state_content_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new html content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'old html content'
+            }
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, edit_state_content_change_dict,
+            'test description')
+
+    def _assert_reviewable_suggestion_email_infos_are_equal(
+            self, reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info):
+        """Asserts that the reviewable suggestion email info is equal to the
+        expected reviewable suggestion email info.
+        """
+        self.assertEqual(
+            reviewable_suggestion_email_info.suggestion_type,
+            expected_reviewable_suggestion_email_info.suggestion_type)
+        self.assertEqual(
+            reviewable_suggestion_email_info.language_code,
+            expected_reviewable_suggestion_email_info.language_code)
+        self.assertEqual(
+            reviewable_suggestion_email_info.suggestion_content,
+            expected_reviewable_suggestion_email_info.suggestion_content)
+        self.assertEqual(
+            reviewable_suggestion_email_info.submission_datetime,
+            expected_reviewable_suggestion_email_info.submission_datetime)
+
+    def setUp(self):
+        super(
+            ReviewableSuggestionEmailInfoUnitTests, self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(
+            self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email(
+            self.REVIEWER_EMAIL)
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+
+    def test_create_raises_for_suggestion_type_not_on_contributor_dashboard(
+            self):
+        edit_state_content_suggestion = (
+            self._create_edit_state_content_suggestion())
+        # Mocking the SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS dict in
+        # suggestion services so that this test still passes if the
+        # "edit state content" suggestion type is added to the Contributor
+        # Dashboard in the future.
+        suggestion_emphasized_text_getter_functions_mock = {}
+
+        with self.swap(
+            suggestion_services, 'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS',
+            suggestion_emphasized_text_getter_functions_mock):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Expected suggestion type to be offered on the Contributor '
+                'Dashboard, received: %s.' % (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
+                (
+                    suggestion_services
+                    .create_reviewable_suggestion_email_info_from_suggestion(
+                        edit_state_content_suggestion)
+                )
+
+    def test_contributor_suggestion_types_are_in_suggestion_text_getter_dict(
+            self):
+        # This test will fail if a new suggestion type is added to the
+        # Contributor Dashboard but hasn't been added to
+        # SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.
+        sorted_text_getter_dict_suggestion_types = sorted(
+            suggestion_services
+            .SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys())
+        sorted_contributor_dashboard_suggestion_types = sorted(
+            suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)
+
+        self.assertListEqual(
+            sorted_text_getter_dict_suggestion_types,
+            sorted_contributor_dashboard_suggestion_types)
+
+    def test_create_from_suggestion_returns_info_for_question_suggestion(self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p>default question content</p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                'default question content',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_from_suggestion_returns_info_for_translation_suggestion(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                '<p>default translation content</p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code,
+                'default translation content',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_from_suggestion_returns_info_for_empty_html(self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                ''))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code, '',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_from_suggestion_returns_info_with_no_trailing_whitespace(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                ' <p>          test whitespace     </p>    '))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code,
+                'test whitespace',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_translation_suggestion_if_html_math_rte(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                '<p>translation with rte'
+                '<oppia-noninteractive-math></oppia-noninteractive-math></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code,
+                'translation with rte [Math]',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_translation_suggestion_if_html_image_rte(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                '<p>translation with rte'
+                '<oppia-noninteractive-image></oppia-noninteractive-image>'
+                '</p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code,
+                'translation with rte [Image]',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_translation_suggestion_if_html_link_rte(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                '<p> translation with rte'
+                '<oppia-noninteractive-link></oppia-noninteractive-link> </p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code,
+                'translation with rte [Link]',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_translation_suggestion_if_html_rte_repeats(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                '<p> translation with rte'
+                '<oppia-noninteractive-link></oppia-noninteractive-link>'
+                '</p><oppia-noninteractive-link></oppia-noninteractive-link>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code,
+                'translation with rte [Link] [Link]',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_translation_suggestion_if_html_multi_rte(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                '<p> translation with rte'
+                '<oppia-noninteractive-link></oppia-noninteractive-link>'
+                '</p><oppia-noninteractive-math></oppia-noninteractive-math>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code,
+                'translation with rte [Link] [Math]',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_translation_suggestion_if_html_rte_value(
+            self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_translation_html(
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
+                'quot;"></oppia-noninteractive-link></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                translation_suggestion.suggestion_type,
+                translation_suggestion.language_code,
+                '[Link]',
+                translation_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_question_suggestion_if_html_has_math_rte(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p> question with rte'
+                '<oppia-noninteractive-math></oppia-noninteractive-math> </p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                'question with rte [Math]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_question_suggestion_if_html_has_image_rte(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p> question with rte'
+                '<oppia-noninteractive-image></oppia-noninteractive-image>'
+                '</p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                'question with rte [Image]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info)
+
+    def test_create_returns_info_for_question_suggestion_if_html_has_link_rte(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p> question with rte'
+                '<oppia-noninteractive-link></oppia-noninteractive-link> </p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                'question with rte [Link]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_question_suggestion_if_html_has_repeat_rte(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p> question with rte'
+                '<oppia-noninteractive-link></oppia-noninteractive-link>'
+                '</p><oppia-noninteractive-link></oppia-noninteractive-link>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                'question with rte [Link] [Link]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_question_suggestion_if_html_has_multi_rte(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p> question with rte'
+                '<oppia-noninteractive-link></oppia-noninteractive-link>'
+                '</p><oppia-noninteractive-math></oppia-noninteractive-math>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                'question with rte [Link] [Math]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_question_suggestion_if_html_has_rte_value(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
+                'quot;"></oppia-noninteractive-link></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                '[Link]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_suggestion_if_html_has_rte_with_text(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
+                'quot;">text</oppia-noninteractive-link></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                '[Link]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_suggestion_if_html_has_rte_with_html(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+                'a tag&amp;quot;" url-with-value="&amp;quot;somelink&amp;'
+                'quot;"><p>text</p></oppia-noninteractive-link></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                '[Link]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+    def test_create_returns_info_for_suggestion_if_html_has_rte_with_multi_word(
+            self):
+        question_suggestion = (
+            self._create_question_suggestion_with_question_html_content(
+                '<p><oppia-noninteractive-link-test text-with-value='
+                '"&amp;quot;Test a tag&amp;quot;" url-with-value="&amp;quot;'
+                'somelink&amp;quot;"><p>text</p>'
+                '</oppia-noninteractive-link-test></p>'))
+        expected_reviewable_suggestion_email_info = (
+            suggestion_registry.ReviewableSuggestionEmailInfo(
+                question_suggestion.suggestion_type,
+                question_suggestion.language_code,
+                '[Link Test]',
+                question_suggestion.last_updated
+            ))
+
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                question_suggestion)
+        )
+
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info
+        )
+
+
+class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
+        test_utils.GenericTestBase):
+    """Test the ability of the
+    get_suggestions_waitng_for_review_info_to_notify_reviewers method
+    in suggestion services, which is used to retrieve the information required
+    to notify reviewers that there are suggestions that need review.
+    """
+
+    target_id = 'exp1'
+    language_code = 'en'
+    AUTHOR_EMAIL = 'author1@example.com'
+    REVIEWER_1_EMAIL = 'reviewer1@community.org'
+    REVIEWER_2_EMAIL = 'reviewer2@community.org'
+    COMMIT_MESSAGE = 'commit message'
+
+    def _create_translation_suggestion_with_language_code_and_author(
+            self, language_code, author_id):
+        """Creates a translation suggestion in the given language_code with the
+        given author id.
+        """
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>'
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_translation_change_dict,
+            'test description'
+        )
+
+    def _create_question_suggestion_with_skill_id_and_author_id(
+            self, skill_id, author_id):
+        """Creates a question suggestion with the given skill_id."""
+        add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': self.language_code,
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_question_change_dict,
+            'test description'
+        )
+
+    def _create_reviewable_suggestion_email_infos_from_suggestions(
+            self, suggestions):
+        """Creates a list of ReviewableSuggestionEmailInfo objects from
+        the given suggestions.
+        """
+
+        return [
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion)
+            ) for suggestion in suggestions
+        ]
+
+    def _assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            self, reviewable_suggestion_email_infos,
+            expected_reviewable_suggestion_email_infos):
+        """Asserts that the reviewable suggestion email infos are equal to the
+        expected reviewable suggestion email infos and that the reviewable
+        suggestion email infos are sorted in descending order according to
+        review wait time.
+        """
+        self.assertEqual(
+            len(reviewable_suggestion_email_infos),
+            len(expected_reviewable_suggestion_email_infos)
+        )
+        for index, reviewable_suggestion_email_info in enumerate(
+                reviewable_suggestion_email_infos):
+            self.assertEqual(
+                reviewable_suggestion_email_info.suggestion_type,
+                expected_reviewable_suggestion_email_infos[
+                    index].suggestion_type)
+            self.assertEqual(
+                reviewable_suggestion_email_info.language_code,
+                expected_reviewable_suggestion_email_infos[
+                    index].language_code)
+            self.assertEqual(
+                reviewable_suggestion_email_info.suggestion_content,
+                expected_reviewable_suggestion_email_infos[
+                    index].suggestion_content)
+            self.assertEqual(
+                reviewable_suggestion_email_info.submission_datetime,
+                expected_reviewable_suggestion_email_infos[
+                    index].submission_datetime)
+        for index in python_utils.RANGE(
+                len(reviewable_suggestion_email_infos) - 1):
+            self.assertLess(
+                reviewable_suggestion_email_infos[index].submission_datetime,
+                reviewable_suggestion_email_infos[
+                    index + 1].submission_datetime
+            )
+
+    def setUp(self):
+        super(
+            GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests,
+            self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
+        self.reviewer_1_id = self.get_user_id_from_email(
+            self.REVIEWER_1_EMAIL)
+        self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
+        self.reviewer_2_id = self.get_user_id_from_email(
+            self.REVIEWER_2_EMAIL)
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+
+    def test_get_returns_empty_for_reviewers_who_authored_the_suggestions(self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.reviewer_1_id)
+        self._create_translation_suggestion_with_language_code_and_author(
+            'hi', self.reviewer_1_id)
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
+
+    def test_get_returns_empty_for_question_reviewers_if_only_translation_exist(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        self._create_translation_suggestion_with_language_code_and_author(
+            'hi', self.author_id)
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
+
+    def test_get_returns_empty_for_translation_reviewers_if_only_question_exist(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.reviewer_1_id)
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
+
+    def test_get_returns_empty_for_accepted_suggestions(self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        translation_suggestion = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        suggestion_services.accept_suggestion(
+            translation_suggestion.suggestion_id, self.reviewer_1_id,
+            self.COMMIT_MESSAGE, 'review message')
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
+
+    def test_get_returns_empty_for_rejected_suggestions(self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        translation_suggestion = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        suggestion_services.reject_suggestion(
+            translation_suggestion.suggestion_id, self.reviewer_1_id,
+            'review message')
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
+
+    def test_get_returns_suggestion_infos_for_a_translation_reviewer_same_lang(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1, translation_suggestion_2]))
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_empty_for_a_translation_reviewer_with_diff_lang_rights(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        self._create_translation_suggestion_with_language_code_and_author(
+            'hi', self.author_id)
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self.assertEqual(reviewable_suggestion_email_infos, [[]])
+
+    def test_get_returns_suggestion_infos_for_translation_reviewer_multi_lang(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'en', self.author_id))
+        translation_suggestion_3 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    translation_suggestion_1, translation_suggestion_2,
+                    translation_suggestion_3]))
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_infos_for_translation_reviewer_past_limit_same_lang(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        # Create another translation suggestion so that we pass the
+        # MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER limit.
+        self._create_translation_suggestion_with_language_code_and_author(
+            'hi', self.author_id)
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1]))
+
+        with self.swap(
+            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewable_suggestion_email_infos = (
+                suggestion_services
+                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                    [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_infos_for_translation_reviewer_past_limit_diff_lang(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'en', self.author_id))
+        # Create another hindi and english translation suggestion so that we
+        # reach the MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER limit for each
+        # language code but continue to update which suggestions have been
+        # waiting the longest (since the top two suggestions waiting the
+        # longest are from different language codes).
+        self._create_translation_suggestion_with_language_code_and_author(
+            'en', self.author_id)
+        self._create_translation_suggestion_with_language_code_and_author(
+            'hi', self.author_id)
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1, translation_suggestion_2]))
+
+        with self.swap(
+            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 2):
+            reviewable_suggestion_email_infos = (
+                suggestion_services
+                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                    [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_suggestion_infos_for_multiple_translation_reviewers(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'hi')
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'en', self.author_id))
+        translation_suggestion_3 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        expected_reviewable_suggestion_email_infos_reviewer_1 = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    translation_suggestion_1, translation_suggestion_2,
+                    translation_suggestion_3]))
+        expected_reviewable_suggestion_email_infos_reviewer_2 = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1, translation_suggestion_3]))
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id, self.reviewer_2_id]
+            )
+        )
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 2)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos_reviewer_1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[1],
+            expected_reviewable_suggestion_email_infos_reviewer_2)
+
+    def test_get_returns_suggestion_infos_for_reviewer_with_multi_review_rights(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id))
+        suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        suggestion_3 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id))
+        suggestion_4 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        suggestion_5 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'en', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    suggestion_1, suggestion_2, suggestion_3, suggestion_4,
+                    suggestion_5]))
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_suggestion_infos_for_a_question_reviewer(self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id))
+        question_suggestion_2 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_1, question_suggestion_2]))
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id]
+            )
+        )
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_suggestion_infos_for_multi_question_reviewers(self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_question(self.reviewer_2_id)
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id))
+        question_suggestion_2 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id))
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_1, question_suggestion_2]))
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id, self.reviewer_2_id]
+            )
+        )
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 2)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[1],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_suggestion_infos_for_question_reviewer_past_limit(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        question_suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id))
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_2', self.author_id)
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [question_suggestion_1]))
+
+        with self.swap(
+            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewable_suggestion_email_infos = (
+                suggestion_services
+                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                    [self.reviewer_1_id]
+                )
+            )
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+    def test_get_returns_suggestion_infos_for_multi_reviewers_with_multi_rights(
+            self):
+        # Reviewer 1's permissions.
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        # Reviewer 2's permissions.
+        user_services.allow_user_to_review_question(self.reviewer_2_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'fr')
+        suggestion_1 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_1', self.author_id))
+        suggestion_2 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        suggestion_3 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'fr', self.author_id))
+        suggestion_4 = (
+            self._create_question_suggestion_with_skill_id_and_author_id(
+                'skill_2', self.author_id))
+        suggestion_5 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        suggestion_6 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'en', self.author_id))
+        expected_reviewable_suggestion_email_infos_reviewer_1 = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    suggestion_1, suggestion_2, suggestion_4, suggestion_5,
+                    suggestion_6]))
+        expected_reviewable_suggestion_email_infos_reviewer_2 = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [
+                    suggestion_1, suggestion_2, suggestion_3, suggestion_4,
+                    suggestion_5]))
+
+        reviewable_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                [self.reviewer_1_id, self.reviewer_2_id]
+            )
+        )
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 2)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos_reviewer_1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[1],
+            expected_reviewable_suggestion_email_infos_reviewer_2)
+
+    def test_get_returns_infos_for_reviewer_with_multi_rights_past_limit(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code_and_author(
+                'hi', self.author_id))
+        # Create additional suggestions so that we pass the
+        # MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER limit regardless of suggestion
+        # type.
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.author_id)
+        self._create_translation_suggestion_with_language_code_and_author(
+            'hi', self.author_id)
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.author_id)
+        expected_reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [translation_suggestion_1]))
+
+        with self.swap(
+            suggestion_services, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
+            reviewable_suggestion_email_infos = (
+                suggestion_services
+                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                    [self.reviewer_1_id]))
+
+        self.assertEqual(len(reviewable_suggestion_email_infos), 1)
+        self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
+            reviewable_suggestion_email_infos[0],
+            expected_reviewable_suggestion_email_infos)
+
+
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
     stats.
