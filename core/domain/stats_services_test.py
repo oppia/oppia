@@ -843,7 +843,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 values.
 
         Returns:
-            str. The ID of the new playthrough.
+            stats_domain.ExplorationIssue. The new issue.
         """
         issue_customization_args = {'state_names': {'value': state_names}}
         return stats_domain.ExplorationIssue(
@@ -932,7 +932,6 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         mis_playthrough_ids = [
             self._create_mis_playthrough('End', 3),
         ]
-
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_eq_exp_issue(eq_playthrough_ids, 'End'),
