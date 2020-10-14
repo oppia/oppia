@@ -47,7 +47,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';  
+import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 
