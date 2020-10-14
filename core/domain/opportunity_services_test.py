@@ -795,12 +795,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'new_value': '0'
             })], 'Changes.')
 
-    def test_get_exploration_opportunity_summaries_by_ids_returns_list_of_objects(self): # pylint: disable=line-too-long
+    def test_get_exploration_opportunity_summaries_by_ids(self):
         output = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 []))
 
-        self.assertEqual(output, [])
+        self.assertEqual(output, {})
 
         opportunities = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
@@ -808,38 +808,17 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(opportunities), 1)
         self.assertIsInstance(
-            opportunities[0],
+            opportunities['0'],
             opportunity_domain.ExplorationOpportunitySummary)
-        self.assertEqual(opportunities[0].id, '0')
+        self.assertEqual(opportunities['0'].id, '0')
 
-    def test_get_exploration_opportunity_summaries_by_ids_warns_if_invalid_id(
-            self):
-        """Tests that a warning is logged if there is no
-        ExplorationOpportunitySummaryModel associated with one of the ids.
-        """
-        observed_log_messages = []
+    def test_get_exploration_opportunity_summaries_by_ids_for_invalid_id(self):
+        opportunities = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['badID']))
 
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
-
-        with logging_swap:
-            opportunities = (
-                opportunity_services.
-                get_exploration_opportunity_summaries_by_ids(
-                    ['badID'])
-            )
-
-        self.assertEqual(len(opportunities), 0)
-        self.assertEqual(
-            observed_log_messages,
-            [
-                'When getting the exploration opportunity summary models for '
-                'ids: [u\'badID\'], one of the models was None.'
-            ]
-        )
+        self.assertEqual(len(opportunities), 1)
+        self.assertEqual(opportunities['badID'], None)
 
     def test_get_exploration_opportunity_summary_from_model_populates_new_lang(
             self):
@@ -854,7 +833,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 ['0']))
         self.assertEqual(len(opportunities), 1)
 
-        opportunity = opportunities[0]
+        opportunity = opportunities['0']
 
         self.assertFalse(
             'new_lang' in opportunity.incomplete_translation_language_codes)
@@ -874,7 +853,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 .get_exploration_opportunity_summaries_by_ids(['0']))
             self.assertEqual(len(opportunities), 1)
 
-            opportunity = opportunities[0]
+            opportunity = opportunities['0']
 
             self.assertTrue(
                 'new_lang' in opportunity.incomplete_translation_language_codes)
