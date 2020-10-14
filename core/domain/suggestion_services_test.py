@@ -3048,16 +3048,11 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
-    def test_get_suggestions_with_long_review_wait_if_no_suggestions_waited_long(
+    def test_get_returns_empty_if_suggestions_have_waited_less_than_threshold(
             self):
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
-            suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp4', self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_9', self.translation_language_code)
+            self._create_translation_suggestion()
+            self._create_question_suggestion()
         mocked_threshold_review_wait_time_in_days = 2
         mocked_datetime_less_than_review_wait_time_threshold = (
             self.mocked_datetime_utcnow + datetime.timedelta(days=1))
@@ -3075,20 +3070,16 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
-    def test_get_suggestions_with_long_review_wait_if_suggestions_waited_long(
-            self):
+    def test_get_returns_empty_if_suggestions_have_waited_threshold_review_time(
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
-            suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp4', self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_9', self.translation_language_code)
+            suggestion_1 = self._create_translation_suggestion()
+        with self.mock_datetime_utcnow(
+            self.mocked_datetime_utcnow + datetime.timedelta(minutes=1)):
+            suggestion_2 = self._create_translation_suggestion()
         mocked_threshold_review_wait_time_in_days = 2
         mocked_datetime_eq_review_wait_time_threshold = (
-            self.mocked_datetime_utcnow + datetime.timedelta(days=
-                mocked_threshold_review_wait_time_in_days))
+            self.mocked_datetime_utcnow + datetime.timedelta(
+                days=mocked_threshold_review_wait_time_in_days))
 
         with self.mock_datetime_utcnow(
             mocked_datetime_eq_review_wait_time_threshold):
@@ -3103,16 +3094,11 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
-    def test_get_suggestions_with_long_review_wait_if_suggestions_waited_v_long(
+    def test_get_returns_suggestions_waited_long_if_wait_time_past_threshold(
             self):
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
-            suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp4', self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_9', self.translation_language_code)
+            self._create_translation_suggestion()
+            self._create_question_suggestion()
         mocked_threshold_review_wait_time_in_days = 1
         mocked_datetime_past_review_wait_time_threshold = (
             self.mocked_datetime_utcnow + datetime.timedelta(days=2))
@@ -3128,7 +3114,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                     .get_suggestions_waiting_too_long_for_review()
                 )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review), 1)
+        self.assertEqual(len(suggestions_waiting_too_long_for_review), 2)
 
     def test_get_suggestions_with_long_review_wait_if_suggestions_waited_a_long(
             self):
