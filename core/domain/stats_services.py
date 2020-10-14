@@ -290,7 +290,7 @@ def update_exp_issues_for_new_exp_version(
     old_to_new_state_names = exp_versions_diff.old_to_new_state_names
 
     playthrough_ids = list(itertools.chain.from_iterable(
-        i.playthrough_ids for i in exp_issues.unresolved_issues))
+        issue.playthrough_ids for issue in exp_issues.unresolved_issues))
     playthrough_models = (
         stats_models.PlaythroughModel.get_multi(playthrough_ids))
 
@@ -313,13 +313,25 @@ def update_exp_issues_for_new_exp_version(
                 old_to_new_state_names[state_name])
 
         for action in playthrough.actions:
-            state_name = (
-                action.action_customization_args['state_name']['value'])
-            action.action_customization_args['state_name']['value'] = (
-                state_name if state_name not in old_to_new_state_names else
-                old_to_new_state_names[state_name])
+            action_customization_args = action.action_customization_args
 
-        playthrough_model.populate(**playthrough.to_dict())
+            if 'state_name' in action_customization_args:
+                state_name = action_customization_args['state_name']['value']
+                action_customization_args['state_name']['value'] = (
+                    state_name if state_name not in old_to_new_state_names else
+                    old_to_new_state_names[state_name])
+
+            if 'dest_state_name' in action_customization_args:
+                dest_state_name = (
+                    action_customization_args['dest_state_name']['value'])
+                action_customization_args['dest_state_name']['value'] = (
+                    dest_state_name
+                    if dest_state_name not in old_to_new_state_names else
+                    old_to_new_state_names[dest_state_name])
+
+        playthrough_model.issue_customization_args = (
+            playthrough.issue_customization_args)
+        playthrough_model.actions = [a.to_dict() for a in playthrough.actions]
 
     # Run in transaction to help prevent data-races between operations that may
     # update the playthroughs concurrently.
@@ -331,7 +343,7 @@ def update_exp_issues_for_new_exp_version(
             state_names = (
                 exp_issue.issue_customization_args['state_names']['value'])
 
-            if any(n in deleted_state_names for n in state_names):
+            if any(name in deleted_state_names for name in state_names):
                 exp_issue.is_valid = False
 
             exp_issue.issue_customization_args['state_names']['value'] = [
@@ -352,7 +364,6 @@ def update_exp_issues_for_new_exp_version(
                 old_to_new_state_names[state_name])
 
     exp_issues.exp_version += 1
-
     create_exp_issues_model(exp_issues)
 
 

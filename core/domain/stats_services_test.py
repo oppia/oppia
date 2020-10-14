@@ -740,8 +740,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         super(ExplorationIssuesTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.exp = self.save_new_valid_exploration(
-            'exp_id', self.owner_id, end_state_name='End')
+        self.exp = self.save_new_linear_exp_with_state_names_and_interactions(
+            'exp_id', self.owner_id,
+            ['A', 'B'], ['TextInput', 'EndExploration'])
 
     def _create_cst_playthrough(self, state_names):
         """Creates a Cyclic State Transitions playthrough and returns its id.
@@ -814,7 +815,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             'state_name': {'value': state_name},
             'num_times_answered_incorrectly': {
                 'value': num_times_answered_incorrectly
-            }
+            },
         }
         actions = [{
             'action_type': 'AnswerSubmit',
@@ -886,7 +887,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             'state_name': {'value': state_name},
             'num_times_answered_incorrectly': {
                 'value': num_times_answered_incorrectly
-            }
+            },
         }
         return stats_domain.ExplorationIssue(
             'MultipleIncorrectSubmissions', issue_customization_args,
@@ -918,27 +919,19 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         stats_services.delete_playthroughs_multi(playthrough_ids)
 
-        instances = stats_models.PlaythroughModel.get_multi(playthrough_ids)
-        self.assertEqual(instances, [None, None, None])
+        self.assertEqual(
+            stats_models.PlaythroughModel.get_multi(playthrough_ids),
+            [None, None, None])
 
     def test_save_exp_issues_model_transactional(self):
-        eq_playthrough_ids = [
-            self._create_eq_playthrough('End'),
-        ]
-        cst_playthrough_ids = [
-            self._create_cst_playthrough(
-                ['Introduction', 'End', 'Introduction']),
-        ]
-        mis_playthrough_ids = [
-            self._create_mis_playthrough('End', 3),
-        ]
+        eq_playthrough_ids = [self._create_eq_playthrough('A')]
+        cst_playthrough_ids = [self._create_cst_playthrough(['A', 'B', 'A'])]
+        mis_playthrough_ids = [self._create_mis_playthrough('A', 3)]
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
-                self._create_eq_exp_issue(eq_playthrough_ids, 'End'),
-                self._create_cst_exp_issue(
-                    cst_playthrough_ids,
-                    ['Introduction', 'End', 'Introduction']),
-                self._create_mis_exp_issue(mis_playthrough_ids, 'End', 3),
+                self._create_eq_exp_issue(eq_playthrough_ids, 'A'),
+                self._create_mis_exp_issue(mis_playthrough_ids, 'A', 3),
+                self._create_cst_exp_issue(cst_playthrough_ids, ['A', 'B', 'A'])
             ]))
 
         exp_issues = (
@@ -949,28 +942,23 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             eq_playthrough_ids)
         self.assertEqual(
             exp_issues.unresolved_issues[1].playthrough_ids,
-            cst_playthrough_ids)
+            mis_playthrough_ids)
         self.assertEqual(
             exp_issues.unresolved_issues[2].playthrough_ids,
-            mis_playthrough_ids)
+            cst_playthrough_ids)
 
     def test_cst_exp_issue_is_invalidated_when_state_is_deleted(self):
-        state_names = ['Introduction', 'End', 'Introduction']
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_cst_exp_issue(
-                    [self._create_cst_playthrough(state_names)],
-                    state_names)
+                    [self._create_cst_playthrough(['A', 'B', 'A'])],
+                    ['A', 'B', 'A'])
             ]))
 
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': 'delete_state',
-                'state_name': 'End',
-            })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.exp.id, change_list, 'change')
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange(
+                {'cmd': 'delete_state', 'state_name': 'B'})
+        ], 'change')
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -978,62 +966,58 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
 
     def test_cst_exp_issue_is_updated_when_state_is_renamed(self):
-        old_state_name, new_state_name = 'Introduction', 'foobar'
-        old_state_names = [old_state_name, 'End', old_state_name]
-        new_state_names = [new_state_name, 'End', new_state_name]
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_cst_exp_issue(
-                    [self._create_cst_playthrough(old_state_names)],
-                    old_state_names)
+                    [self._create_cst_playthrough(['A', 'B', 'A'])],
+                    ['A', 'B', 'A'])
             ]))
 
-        change_list = [
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
-                'old_state_name': old_state_name,
-                'new_state_name': new_state_name,
+                'old_state_name': 'A',
+                'new_state_name': 'Z',
             })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.exp.id, change_list, 'change')
+        ], 'change')
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
         self.assertEqual(len(exp_issues.unresolved_issues), 1)
+
         exp_issue = exp_issues.unresolved_issues[0]
         self.assertTrue(exp_issue.is_valid)
         self.assertEqual(
             exp_issue.issue_customization_args['state_names']['value'],
-            new_state_names)
+            ['Z', 'B', 'Z'])
         self.assertEqual(len(exp_issue.playthrough_ids), 1)
+
         playthrough = stats_models.PlaythroughModel.get_by_id(
             exp_issue.playthrough_ids[0])
         self.assertEqual(
             playthrough.issue_customization_args['state_names']['value'],
-            new_state_names)
+            ['Z', 'B', 'Z'])
         self.assertEqual(len(playthrough.actions), 2)
-        updated_action = playthrough.actions[0]
+
+        actions = playthrough.actions
         self.assertEqual(
-            updated_action['action_customization_args']['state_name']['value'],
-            new_state_name)
+            actions[0]['action_customization_args']['state_name']['value'],
+            'Z')
+        self.assertEqual(
+            actions[1]['action_customization_args']['dest_state_name']['value'],
+            'Z')
 
     def test_eq_exp_issue_is_invalidated_when_state_is_deleted(self):
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_eq_exp_issue(
-                    [self._create_eq_playthrough('End')],
-                    'End')
+                    [self._create_eq_playthrough('B')], 'B')
             ]))
 
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': 'delete_state',
-                'state_name': 'End',
-            })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.exp.id, change_list, 'change')
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange(
+                {'cmd': 'delete_state', 'state_name': 'B'})
+        ], 'change')
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1041,60 +1025,51 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
 
     def test_eq_exp_issue_is_updated_when_state_is_renamed(self):
-        old_state_name, new_state_name = 'Introduction', 'foobar'
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_eq_exp_issue(
-                    [self._create_eq_playthrough(old_state_name)],
-                    old_state_name)
+                    [self._create_eq_playthrough('A')], 'A')
             ]))
 
-        change_list = [
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
-                'old_state_name': old_state_name,
-                'new_state_name': new_state_name,
+                'old_state_name': 'A',
+                'new_state_name': 'Z',
             })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.exp.id, change_list, 'change')
+        ], 'change')
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
         self.assertEqual(len(exp_issues.unresolved_issues), 1)
+
         exp_issue = exp_issues.unresolved_issues[0]
         self.assertTrue(exp_issue.is_valid)
         self.assertEqual(
-            exp_issue.issue_customization_args['state_name']['value'],
-            new_state_name)
+            exp_issue.issue_customization_args['state_name']['value'], 'Z')
         self.assertEqual(len(exp_issue.playthrough_ids), 1)
+
         playthrough = stats_models.PlaythroughModel.get_by_id(
             exp_issue.playthrough_ids[0])
         self.assertEqual(
-            playthrough.issue_customization_args['state_name']['value'],
-            new_state_name)
+            playthrough.issue_customization_args['state_name']['value'], 'Z')
         self.assertEqual(len(playthrough.actions), 1)
-        updated_action = playthrough.actions[0]
+
+        actions = playthrough.actions
         self.assertEqual(
-            updated_action['action_customization_args']['state_name']['value'],
-            new_state_name)
+            actions[0]['action_customization_args']['state_name']['value'], 'Z')
 
     def test_mis_exp_issue_is_invalidated_when_state_is_deleted(self):
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_mis_exp_issue(
-                    [self._create_mis_playthrough('End', 2)],
-                    'End', 2)
+                    [self._create_mis_playthrough('B', 2)], 'B', 2)
             ]))
 
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': 'delete_state',
-                'state_name': 'End',
-            }),
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.exp.id, change_list, 'Delete End')
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange(
+                {'cmd': 'delete_state', 'state_name': 'B'}),
+        ], 'Delete B')
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1102,68 +1077,59 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
 
     def test_mis_exp_issue_is_updated_when_state_is_renamed(self):
-        old_state_name, new_state_name = 'Introduction', 'foobar'
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_mis_exp_issue(
-                    [self._create_mis_playthrough(old_state_name, 2)],
-                    old_state_name, 2)
+                    [self._create_mis_playthrough('A', 2)], 'A', 2)
             ]))
 
-        change_list = [
+        exp_services.update_exploration(
+            self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
-                'old_state_name': old_state_name,
-                'new_state_name': new_state_name,
+                'old_state_name': 'A',
+                'new_state_name': 'Z',
             })
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.exp.id, change_list, 'change')
+        ], 'change')
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
         self.assertEqual(len(exp_issues.unresolved_issues), 1)
+
         exp_issue = exp_issues.unresolved_issues[0]
         self.assertTrue(exp_issue.is_valid)
         self.assertEqual(
-            exp_issue.issue_customization_args['state_name']['value'],
-            new_state_name)
+            exp_issue.issue_customization_args['state_name']['value'], 'Z')
         self.assertEqual(len(exp_issue.playthrough_ids), 1)
+
         playthrough = stats_models.PlaythroughModel.get_by_id(
             exp_issue.playthrough_ids[0])
         self.assertEqual(
-            playthrough.issue_customization_args['state_name']['value'],
-            new_state_name)
+            playthrough.issue_customization_args['state_name']['value'], 'Z')
         self.assertEqual(len(playthrough.actions), 2)
+
         actions = playthrough.actions
         self.assertEqual(
-            actions[0]['action_customization_args']['state_name']['value'],
-            new_state_name)
+            actions[0]['action_customization_args']['state_name']['value'], 'Z')
         self.assertEqual(
-            actions[1]['action_customization_args']['state_name']['value'],
-            new_state_name)
+            actions[1]['action_customization_args']['state_name']['value'], 'Z')
 
     def test_revert_exploration_recovers_exp_issues(self):
         stats_services.save_exp_issues_model_transactional(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_eq_exp_issue(
-                    [self._create_eq_playthrough('End')],
-                    'End'),
+                    [self._create_eq_playthrough('B')], 'B'),
                 self._create_cst_exp_issue(
-                    [self._create_cst_playthrough(
-                        ['Introduction', 'End', 'Introduction'])],
-                    ['Introduction', 'End', 'Introduction']),
+                    [self._create_cst_playthrough(['A', 'B', 'A'])],
+                    ['A', 'B', 'A']),
                 self._create_mis_exp_issue(
-                    [self._create_mis_playthrough('End', 3)],
-                    'End', 3),
+                    [self._create_mis_playthrough('B', 3)], 'B', 3),
             ]))
 
-        change_list = [
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'End'}),
-        ]
-        exp_services.update_exploration(
-            self.owner_id, self.exp.id, change_list, 'commit')
+                {'cmd': 'delete_state', 'state_name': 'B'}),
+        ], 'commit')
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
