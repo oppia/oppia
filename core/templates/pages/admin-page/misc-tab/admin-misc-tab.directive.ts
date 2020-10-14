@@ -55,7 +55,7 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
 
-        ctrl.clearSearchIndex = function() {
+        ctrl.clearSearchIndexAsync = async function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -78,7 +78,7 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
-        ctrl.regenerateOpportunitiesRelatedToTopic = function() {
+        ctrl.regenerateOpportunitiesRelatedToTopicAsync = async function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -99,7 +99,7 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
-        ctrl.uploadTopicSimilaritiesFile = function() {
+        ctrl.uploadTopicSimilaritiesFileAsync = async function() {
           var file = (
             <HTMLInputElement>document.getElementById(
               'topicSimilaritiesFile')).files[0];
@@ -129,7 +129,7 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.dataExtractionQueryStatusMessage = message;
         };
 
-        ctrl.sendDummyMailToAdmin = function() {
+        ctrl.sendDummyMailToAdminAsync = async function() {
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
             .then(function(response) {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
@@ -139,7 +139,7 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
-        ctrl.flushMemoryCache = function() {
+        ctrl.flushMemoryCacheAsync = async function() {
           $http.post(MEMORY_CACHE_HANDLER_URL)
             .then(function(response) {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
@@ -149,7 +149,7 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
-        ctrl.getMemoryCacheProfile = function() {
+        ctrl.getMemoryCacheProfileAsync = async function() {
           $http.get(MEMORY_CACHE_HANDLER_URL)
             .then(function(response) {
               ctrl.result = {
@@ -165,7 +165,7 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
-        ctrl.updateUsername = function() {
+        ctrl.updateUsernameAsync = async function() {
           ctrl.setStatusMessage('Updating username...');
           $http.put(
             UPDATE_USERNAME_HANDLER_URL, {
@@ -183,7 +183,7 @@ angular.module('oppia').directive('adminMiscTab', [
           );
         };
 
-        ctrl.getNumberOfPendingDeletionRequestModels = function() {
+        ctrl.getNumberOfPendingDeletionRequestModelsAsync = async function() {
           ctrl.setStatusMessage(
             'Getting the number of users that are being deleted...');
           $http.get(NUMBER_OF_DELETION_REQUEST_HANDLER_URL).then(

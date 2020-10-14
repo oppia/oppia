@@ -4,14 +4,14 @@
     Upload a csv file:<br>
     The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
     <input type="file" id="topicSimilaritiesFile">
-    <button ng-click="$ctrl.uploadTopicSimilaritiesFile()">Upload</button>
+    <button ng-click="$ctrl.uploadTopicSimilaritiesFileAsync()">Upload</button>
     <button ng-click="$ctrl.downloadTopicSimilaritiesFile()">Download current topic similarities</button>
   </div>
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Search Index</h3>
-  <button ng-click="$ctrl.clearSearchIndex()">Clear Search Index</button>
+  <button ng-click="$ctrl.clearSearchIndexAsync()">Clear Search Index</button>
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
@@ -43,7 +43,7 @@
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Regenerate contribution opportunities for a topic:</h3>
   <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.regenerateOpportunitiesRelatedToTopic()">
+    <form class="form" ng-submit="$ctrl.regenerateOpportunitiesRelatedToTopicAsync()">
       <div class="form-group row">
         <label>Topic ID:</label> <input type="text" ng-model="$ctrl.topicIdForRegeneratingOpportunities" required="true">
       </div>
@@ -59,7 +59,7 @@
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Send a Test Mail to Admin</h3>
   <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.sendDummyMailToAdmin()">
+    <form class="form" ng-submit="$ctrl.sendDummyMailToAdminAsync()">
       <div class="form-group row">
         <input type="submit" value="Send">
       </div>
@@ -70,12 +70,12 @@
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Flush the Memory Cache</h3>
   <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.flushMemoryCache()">
+    <form class="form" ng-submit="$ctrl.flushMemoryCacheAsync()">
       <div class="form-group row">
         <input type="submit" value="Flush Cache">
       </div>
     </form>
-    <form class="form" ng-submit="$ctrl.getMemoryCacheProfile()">
+    <form class="form" ng-submit="$ctrl.getMemoryCacheProfileAsync()">
       <div class="form-group row">
         <input type="submit" value="Get Memory Cache Profile">
       </div>
@@ -104,7 +104,7 @@
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Update username</h3>
   <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.updateUsername()">
+    <form class="form" ng-submit="$ctrl.updateUsernameAsync()">
       <div class="form-group row">
         <label>Old username:</label>
         <input type="text" ng-model="$ctrl.oldUsername" required="true">
@@ -124,7 +124,7 @@
   <h3>Number of pending deletion requests</h3>
   <div class="oppia-query-form">
     <form class="form"
-          ng-submit="$ctrl.getNumberOfPendingDeletionRequestModels()">
+          ng-submit="$ctrl.getNumberOfPendingDeletionRequestModelsAsync()">
       <div class="form-group row">
         <input type="submit"
                value="Get number of users whose deletion is currently in-progress">
