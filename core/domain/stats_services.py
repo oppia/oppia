@@ -322,8 +322,8 @@ def update_exp_issues_for_new_exp_version(
 
         playthrough_model.populate(**playthrough.to_dict())
 
-    # Run in transaction to help prevent data-races between concurrent
-    # operations that may update the playthroughs concurrently.
+    # Run in transaction to help prevent data-races between operations that may
+    # update the playthroughs concurrently.
     transaction_services.run_in_transaction(
         stats_models.PlaythroughModel.put_multi, playthrough_models)
 
@@ -649,7 +649,8 @@ def delete_playthroughs_multi(playthrough_ids):
     """
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
-    stats_models.PlaythroughModel.delete_multi(
+    transaction_services.run_in_transaction(
+        stats_models.PlaythroughModel.delete_multi,
         stats_models.PlaythroughModel.get_multi(playthrough_ids))
 
 
