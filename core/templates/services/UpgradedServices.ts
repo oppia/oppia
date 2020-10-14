@@ -379,6 +379,10 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
+import { QuestionValidationService } from
+  'services/question-validation.service.ts';
+import { QuestionObjectFactory } from
+  'domain/question/QuestionObjectFactory';
 import { QuestionSummaryForOneSkillObjectFactory }
   from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from
@@ -552,6 +556,8 @@ import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service.ts';
+import { TopicRightsBackendApiService } from
+  'domain/topic/topic-rights-backend-api.service.ts';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
@@ -1063,6 +1069,9 @@ export class UpgradedServices {
     upgradedServices['PlatformParameterObjectFactory'] =
       new PlatformParameterObjectFactory(
         upgradedServices['PlatformParameterRuleObjectFactory']);
+    upgradedServices['QuestionValidationService'] =
+      new QuestionValidationService(
+        upgradedServices['StateEditorService']);
     upgradedServices['SidebarStatusService'] = new SidebarStatusService(
       upgradedServices['WindowDimensionsService']);
     upgradedServices['StateContentService'] = new StateContentService(
@@ -1361,6 +1370,10 @@ export class UpgradedServices {
         upgradedServices['ShortSkillSummaryObjectFactory'],
         upgradedServices['TopicSummaryObjectFactory'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['TopicRightsBackendApiService'] =
+      new TopicRightsBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['TopicViewerBackendApiService'] =
       new TopicViewerBackendApiService(
         upgradedServices['HttpClient'],
@@ -1501,6 +1514,8 @@ export class UpgradedServices {
 
     // Topological level: 9.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
+      upgradedServices['StateObjectFactory']);
+    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
       upgradedServices['StateObjectFactory']);
 
     // Topological level: 10.

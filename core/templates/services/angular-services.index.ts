@@ -112,6 +112,8 @@ import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/Questio
 import { QuestionSummaryObjectFactory } from 'domain/question/QuestionSummaryObjectFactory';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service.ts';
+import { QuestionValidationService } from 'services/question-validation.service';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
@@ -156,6 +158,7 @@ import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactor
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
+import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -542,6 +545,8 @@ export const angularServices: [string, unknown][] = [
   ['ProfilePageBackendApiService', ProfilePageBackendApiService],
   ['PythonProgramTokenizer', PythonProgramTokenizer],
   ['QuestionBackendApiService', QuestionBackendApiService],
+  ['QuestionValidationService', QuestionValidationService],
+  ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionsListService', QuestionsListService],
   ['QuestionSummaryForOneSkillObjectFactory',
     QuestionSummaryForOneSkillObjectFactory],
@@ -638,6 +643,7 @@ export const angularServices: [string, unknown][] = [
   ['ThreadMessageSummaryObjectFactory', ThreadMessageSummaryObjectFactory],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
+  ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicSummaryObjectFactory', TopicSummaryObjectFactory],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],

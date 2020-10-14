@@ -80,7 +80,7 @@ export class Question {
     return this._version;
   }
 
-  getLinkedSkillIds(): string[] {
+  getLinkedSkillIds(): string[] {
     return this._linkedSkillIds;
   }
 
