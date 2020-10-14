@@ -143,8 +143,6 @@ import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
-import { EmailDashboardDataService } from
-  'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EmailDashboardQueryObjectFactory } from
   'domain/email-dashboard/email-dashboard-query-object.factory';
 import { EmailDashboardQueryResultsObjectFactory } from
@@ -1122,7 +1120,8 @@ export class UpgradedServices {
     // Topological level: 3.
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
       upgradedServices['HttpClient'],
-      upgradedServices['TopicSummaryObjectFactory']);
+      upgradedServices['TopicSummaryObjectFactory'],
+      upgradedServices['PlatformParameterObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
     upgradedServices['AssetsBackendApiService'] =
@@ -1206,8 +1205,6 @@ export class UpgradedServices {
         upgradedServices['ContextService'],
         upgradedServices['PlayerPositionService'],
         upgradedServices['PlayerTranscriptService']);
-    upgradedServices['EmailDashboardDataService'] =
-      new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationFeaturesBackendApiService'] =
       new ExplorationFeaturesBackendApiService(
         upgradedServices['HttpClient'],
@@ -1384,12 +1381,6 @@ export class UpgradedServices {
         upgradedServices['ReadOnlyCollectionBackendApiService'],
         upgradedServices['CollectionObjectFactory'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['EmailDashboardDataService'] =
-        new EmailDashboardDataService(
-          upgradedServices['HttpClient']);
-    upgradedServices['EmailDashboardDataService'] =
-        new EmailDashboardDataService(
-          upgradedServices['EmailDashboardBackendApiService']);
     upgradedServices['ExplorationRecommendationsService'] =
       new ExplorationRecommendationsService(
         upgradedServices['ContextService'],
