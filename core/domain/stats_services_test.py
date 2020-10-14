@@ -935,14 +935,13 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             is_valid)
 
     def test_create_exp_issues_model(self):
-        exp_issues = stats_domain.ExplorationIssues(self.exp.id,
-                stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
+        exp_issues = stats_domain.ExplorationIssues(
+            self.exp.id, stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
 
         stats_services.create_exp_issues_model(exp_issues)
 
-        exp_issues = (
-            stats_models.ExplorationIssuesModel.get_model(self.exp.id,
-                self.exp.version))
+        exp_issues = stats_models.ExplorationIssuesModel.get_model(
+            self.exp.id, self.exp.version)
         self.assertEqual(exp_issues.exp_id, self.exp.id)
         self.assertEqual(exp_issues.exp_version, self.exp.version)
         self.assertEqual(exp_issues.unresolved_issues, [])
@@ -1055,7 +1054,6 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertEqual(
             actions[3]['action_customization_args']['state_name']['value'],
             'Z')
-
 
     def test_eq_exp_issue_is_invalidated_when_state_is_deleted(self):
         stats_services.save_exp_issues_model_transactional(
