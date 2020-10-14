@@ -409,14 +409,14 @@ describe('Param Changes Editor Component', function() {
   });
 });
 
-fdescribe('Upgraded component', () => {
+describe('Upgraded component', () => {
   beforeEach(() => destroyPlatform());
   afterEach(() => destroyPlatform());
   
-  fit('should create the upgraded component', async(() => {
+  it('should create the upgraded component', async(() => {
     setupAndGetUpgradedComponent(
-      'state-param-changes-editor',
-      'stateParamChangesEditor',
+      'param-changes-editor',
+      'paramChangesEditor',
       [ParamChangesEditorDirective]
     ).then(
         textContext => expect(textContext).toBe('Hello Oppia!')
