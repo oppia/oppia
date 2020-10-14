@@ -24,7 +24,6 @@ import logging
 
 from constants import constants
 from core.domain import config_domain
-from core.domain import email_domain
 from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_domain
@@ -1253,7 +1252,6 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         for reviewer_user_setting in reviewer_user_settings
     ]))
 
-    send_email_infos = []
     for index, reviewer_id in enumerate(reviewer_ids):
         if not reviewers_suggestion_email_infos[index]:
             log_new_error(
