@@ -481,6 +481,55 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
 class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
         test_utils.GenericTestBase):
 
+    target_id = 'exp1'
+    skill_id = 'skill_123456'
+    language_code = 'en'
+    AUTHOR_EMAIL = 'author@example.com'
+
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>'
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_translation_change_dict,
+            'test description'
+        )
+
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
+        add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': self.language_code,
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': self.skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_question_change_dict,
+            'test description'
+        )
+
     def _mock_send_mail_to_notify_admins_reviewers_needed(
             self, admin_ids, suggestion_types_need_reviewers):
         """Mocks
@@ -499,6 +548,14 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         # This sets the role of the user to admin.f
         self.set_admins([self.ADMIN_USERNAME])
+
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
+        self._create_translation_suggestion_with_language_code('en')
+        self._create_translation_suggestion_with_language_code('fr')
+        self._create_question_suggestion()
         self.expected_suggestion_types_need_reviewers = {
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
@@ -514,7 +571,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
         self.admin_ids = []
         self.suggestion_types_need_reviewers = {}
 
-    def test_email_not_sent_if_notifying_admins_reviewers_needed_is_not_enabled(
+    def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -534,7 +591,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
 
         self.logout()
 
-    def test_email_not_sent_if_sending_emails_is_not_enabled(self):
+    def test_email_not_sent_if_sending_emails_is_disabled(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         with self.cannot_send_emails, self.testapp_swap:
@@ -567,10 +624,6 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                     'notify_admins_reviewers_needed_is_enabled', True)
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_review_issues')
-
-        self.assertEqual(len(self.admin_ids), 0)
-        self.assertDictEqual(self.suggestion_types_need_reviewers, {})
-
 
         self.assertEqual(len(self.admin_ids), 1)
         self.assertEqual(self.admin_ids[0], self.admin_id)

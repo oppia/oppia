@@ -2636,7 +2636,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def test_translation_reviewers_are_needed_if_suggestions_but_no_reviewers(
             self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 1)
 
@@ -2647,7 +2646,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def test_translation_reviewers_are_needed_if_suggestions_zero_reviewers(
             self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 1)
         stats.set_translation_reviewer_count_for_language_code(
@@ -2659,59 +2657,54 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_translation_reviewers_are_needed_if_num_suggestions_past_max(self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 1)
+        config_services.set_property(
+            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
-        with self.swap(
-            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_in_lang_code(
-                    self.sample_language_code))
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_in_lang_code(
+                self.sample_language_code))
 
 
         self.assertTrue(reviewers_are_needed)
 
     def test_translation_reviewers_not_needed_if_num_suggestions_eqs_max(self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
+        config_services.set_property(
+            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
-        with self.swap(
-            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_in_lang_code(
-                    self.sample_language_code))
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_in_lang_code(
+                self.sample_language_code))
 
 
         self.assertFalse(reviewers_are_needed)
 
     def test_translation_reviewers_not_needed_if_num_suggestions_less_max(self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 1)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
+        config_services.set_property(
+            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
-        with self.swap(
-            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_in_lang_code(
-                    self.sample_language_code))
-
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_in_lang_code(
+                self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
     def test_translation_reviewers_not_needed_if_reviewers_and_no_sugestions(
             self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 1)
 
@@ -2721,7 +2714,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_translation_reviewers_not_needed_if_no_reviewers_no_sugestions(
             self):
-        stats = suggestion_services.get_community_contribution_stats()
         self._assert_community_contribution_stats_is_in_default_state()
 
         self.assertFalse(
@@ -2730,54 +2722,48 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_question_reviewers_are_needed_if_suggestions_zero_reviewers(
             self):
-        stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.question_suggestion_count = 1
 
         self.assertTrue(stats.are_question_reviewers_needed())
 
     def test_question_reviewers_are_needed_if_num_suggestions_past_max(self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 1
+        config_services.set_property(
+            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
-        with self.swap(
-            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
 
         self.assertTrue(reviewers_are_needed)
 
     def test_question_reviewers_not_needed_if_num_suggestions_eqs_max(self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 2
+        config_services.set_property(
+            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
-        with self.swap(
-            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
 
         self.assertFalse(reviewers_are_needed)
 
     def test_question_reviewers_not_needed_if_num_suggestions_less_max(self):
         stats = suggestion_services.get_community_contribution_stats()
-        self._assert_community_contribution_stats_is_in_default_state()
         stats.question_suggestion_count = 1
         stats.question_reviewer_count = 2
+        config_services.set_property(
+            'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
-        with self.swap(
-            config_domain, 'MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER', 1):
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
 
         self.assertFalse(reviewers_are_needed)
 
     def test_question_reviewers_not_needed_if_no_reviewers_no_sugestions(
             self):
-        stats = suggestion_services.get_community_contribution_stats()
         self._assert_community_contribution_stats_is_in_default_state()
 
         self.assertFalse(stats.are_question_reviewers_needed())

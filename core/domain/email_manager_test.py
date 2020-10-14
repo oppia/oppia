@@ -3483,6 +3483,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     ADMIN_2_EMAIL = 'user2@community.org'
     sample_language_code = 'hi'
     sample_language = 'Hindi'
+    sample_language_code = 'en'
+    target_id = 'exp1'
+    skill_id = 'skill_123456'
+    language_code = 'en'
+    AUTHOR_EMAIL = 'author@example.com'
 
     expected_email_body_template = (
         'Hi %s,<br><br>'
@@ -3495,6 +3500,50 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         'Best Wishes!<br><br>'
         '- The Oppia Contributor Dashboard Team'
     )
+
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>'
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_translation_change_dict,
+            'test description'
+        )
+
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
+        add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': self.language_code,
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': self.skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_question_change_dict,
+            'test description'
+        )
 
     def _create_expected_html_if_question_reviewers_needed(self):
         """Creates the expected email html for notifying admins that question
@@ -3578,10 +3627,15 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def setUp(self):
         super(NotifyAdminsContributorDashboardReviewersNeededTests, self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.ADMIN_1_EMAIL, self.ADMIN_1_USERNAME)
         self.admin_1_id = self.get_user_id_from_email(self.ADMIN_1_EMAIL)
         self.signup(self.ADMIN_2_EMAIL, self.ADMIN_2_USERNAME)
         self.admin_2_id = self.get_user_id_from_email(self.ADMIN_2_EMAIL)
+
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
 
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
@@ -3617,14 +3671,13 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                         feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
             }
         }
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap(
                 email_manager, 'NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO',
                 mocked_email_info_dict):
-                config_services.set_property(
-                    'committer_id',
-                    'notify_admins_reviewers_needed_is_enabled', True)
                 email_manager.send_mail_to_notify_admins_reviewers_needed(
                     [self.admin_1_id],
                     self.suggestion_types_need_reviewers)
@@ -3636,11 +3689,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Original email HTML body does not match cleaned HTML body'))
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id], self.suggestion_types_need_reviewers)
 
@@ -3652,10 +3704,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_not_enabled(
             self):
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', False)
+
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', False)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id], self.suggestion_types_need_reviewers)
 
@@ -3669,11 +3721,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'the emails.')
 
     def test_email_not_sent_if_no_admins_to_notify(self):
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [], self.suggestion_types_need_reviewers)
 
@@ -3687,11 +3738,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_email_not_sent_if_no_suggestion_types_that_need_reviewers(
             self):
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id], {})
 
@@ -3704,11 +3754,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Contributor Dashboard.')
 
     def test_email_not_sent_if_admin_email_does_not_exist(self):
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 ['admin_id_without_email'],
                 self.suggestion_types_need_reviewers)
@@ -3723,11 +3772,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_email_sent_to_admin_if_question_suggestions_need_reviewers(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.question_suggestion_count = 1
-        stats_model.put()
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+        self._create_question_suggestion()
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
@@ -3742,9 +3789,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id], self.suggestion_types_need_reviewers)
 
@@ -3760,11 +3804,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_email_sent_to_admins_if_question_suggestions_need_reviewers(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.question_suggestion_count = 1
-        stats_model.put()
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+        self._create_question_suggestion()
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
@@ -3783,9 +3825,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_need_reviewers)
@@ -3810,12 +3849,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_admin_email_sent_if_translations_need_reviewers_for_a_lang(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            self.sample_language_code: 1}
-        stats_model.put()
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+        self._create_translation_suggestion_with_language_code(
+            self.sample_language_code)
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
@@ -3831,9 +3868,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id], suggestion_types_need_reviewers)
 
@@ -3849,12 +3883,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_admin_emails_sent_if_translations_need_reviewers_for_a_lang(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            self.sample_language_code: 1}
-        stats_model.put()
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+        self._create_translation_suggestion_with_language_code(
+            self.sample_language_code)
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
@@ -3876,9 +3908,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_need_reviewers)
@@ -3903,12 +3932,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_admin_email_sent_if_translations_need_reviewers_for_multi_lang(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            'fr': 1, 'hi': 1}
-        stats_model.put()
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+        self._create_translation_suggestion_with_language_code('fr')
+        self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
@@ -3924,9 +3951,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id], suggestion_types_need_reviewers)
 
@@ -3942,12 +3966,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_admin_emails_sent_if_translations_need_reviewers_for_multi_lang(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            'fr': 1, 'hi': 1}
-        stats_model.put()
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+        self._create_translation_suggestion_with_language_code('fr')
+        self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
@@ -3967,9 +3989,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_need_reviewers)
@@ -3994,13 +4013,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_email_sent_to_admins_if_mutli_suggestion_types_need_reviewers(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            'fr': 1, 'hi': 1}
-        stats_model.question_suggestion_count = 1
-        stats_model.put()
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+        self._create_translation_suggestion_with_language_code('fr')
+        self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
@@ -4025,9 +4041,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 expected_html_for_suggestion_types_need_reviewers))
 
         with self.can_send_emails_ctx:
-            config_services.set_property(
-                'committer_id',
-                'notify_admins_reviewers_needed_is_enabled', True)
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_need_reviewers)

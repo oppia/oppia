@@ -2878,43 +2878,104 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
     """Tests for the get_suggestion_types_that_need_reviewers method."""
 
     sample_language_code = 'en'
+    target_id = 'exp1'
+    skill_id = 'skill_123456'
+    language_code = 'en'
+    AUTHOR_EMAIL = 'author@example.com'
+    REVIEWER_EMAIL = 'reviewer@community.org'
 
-    def _assert_community_contribution_stats_model_is_in_default_state(
-            self, community_contribution_stats_model):
-        """Checks if the community contribution stats model is in its default
-        state.
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>'
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_translation_change_dict,
+            'test description'
+        )
+
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
+        add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': self.language_code,
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': self.skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id, add_question_change_dict,
+            'test description'
+        )
+
+    def _assert_community_contribution_stats_is_in_default_state(self):
+        """Checks if the community contribution stats is in its default state.
         """
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats())
         self.assertEqual(
             (
-                community_contribution_stats_model
+                community_contribution_stats
                 .translation_reviewer_counts_by_lang_code
             ), {})
         self.assertEqual(
             (
-                community_contribution_stats_model
+                community_contribution_stats
                 .translation_suggestion_counts_by_lang_code
             ), {})
         self.assertEqual(
-            community_contribution_stats_model.question_reviewer_count, 0)
+            community_contribution_stats.question_reviewer_count, 0)
         self.assertEqual(
-            community_contribution_stats_model.question_suggestion_count, 0)
+            community_contribution_stats.question_suggestion_count, 0)
+
+    def setUp(self):
+        super(
+            GetSuggestionTypesThatNeedMoreReviewersUnitTests,
+            self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_EMAIL, 'reviewer1')
+        self.reviewer_id = self.get_user_id_from_email(
+            self.REVIEWER_EMAIL)
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
 
     def test_get_returns_no_reviewers_needed_for_any_suggestion_types(self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(suggestion_types_need_reviewers, {})
 
     def test_get_returns_question_reviewers_needed(self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.question_suggestion_count = 1
-        stats_model.put()
+        user_services.allow_user_to_review_question(self.reviewer_id)
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -2926,13 +2987,16 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
 
     def test_get_returns_translations_need_more_reviewers_for_one_lang_code(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            self.sample_language_code: 1
-        }
-        stats_model.put()
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, self.sample_language_code)
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {
+                self.sample_language_code: 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -2944,12 +3008,17 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
 
     def test_get_returns_translations_need_more_reviewers_for_mutli_lang_code(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            'en': 1, 'fr': 1}
-        stats_model.put()
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'en')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'fr')
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'en': 1, 'fr': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -2959,12 +3028,18 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'}})
 
     def test_get_returns_translations_and_questions_need_more_reviewers(self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {'en': 1, 'fr': 1}
-        stats_model.question_suggestion_count = 1
-        stats_model.put()
+        user_services.allow_user_to_review_question(self.reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'en')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'fr')
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'en': 1, 'fr': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())

@@ -1251,7 +1251,8 @@ class CommunityContributionStats(python_utils.OBJECT):
             else:
                 return python_utils.divide(
                     number_of_suggestions, number_of_reviewers) > (
-                        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER)
+                        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER
+                        .value)
         elif lang_code in self.translation_reviewer_counts_by_lang_code:
             # There are no translation suggestions in this language
             # currently in review, but there are reviewers. Therefore,
@@ -1282,7 +1283,7 @@ class CommunityContributionStats(python_utils.OBJECT):
             return python_utils.divide(
                 self.question_suggestion_count,
                 self.question_reviewer_count) > (
-                    config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER)
+                    config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value)
 
 
 class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
