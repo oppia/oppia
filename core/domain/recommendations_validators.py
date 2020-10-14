@@ -87,14 +87,14 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
                 to validate.
         """
 
-        topics = list(item.content.keys())
-        data = '%s\n' % ','.join(topics)
+        all_topics = list(item.content.keys())
+        data = '%s\n' % ','.join(all_topics)
 
-        for topic1 in topics:
+        for topics_to_compare in all_topics:
             similarity_list = []
-            for topic2 in item.content[topic1]:
+            for topic in item.content[topics_to_compare]:
                 similarity_list.append(
-                    python_utils.UNICODE(item.content[topic1][topic2]))
+                    python_utils.UNICODE(item.content[topics_to_compare][topic]))
             if len(similarity_list):
                 data = data + '%s\n' % ','.join(similarity_list)
 
