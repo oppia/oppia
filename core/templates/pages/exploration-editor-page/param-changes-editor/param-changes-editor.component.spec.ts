@@ -46,6 +46,13 @@ import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 
+import { destroyPlatform } from '@angular/core';
+import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { StateParamChangesEditorComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component';
+import { async } from '@angular/core/testing';  
+
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
   var $rootScope = null;
@@ -399,4 +406,19 @@ describe('Param Changes Editor Component', function() {
       text: 'y'
     }]);
   });
+});
+
+describe('Upgraded component', () => {
+  beforeEach(() => destroyPlatform());
+  afterEach(() => destroyPlatform());
+  
+  it('should create the upgraded component', async(() => {
+    setupAndGetUpgradedComponent(
+      'state-param-changes-editor',
+      'stateParamChangesEditor',
+      [StateParamChangesEditorComponent]
+    ).then(
+        textContext => expect(textContext).toBe('Hello Oppia!')
+    );
+  }));
 });
