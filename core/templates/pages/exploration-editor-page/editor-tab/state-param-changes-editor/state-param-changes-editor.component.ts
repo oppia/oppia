@@ -17,7 +17,7 @@
  * state editor.
  */
 
-import { Component,OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
@@ -30,11 +30,11 @@ import { StateParamChangesService } from
 })
 export class StateParamChangesEditorComponent implements OnInit {
   public spcs: StateParamChangesService;
-  constructor(public stateParamChangesService: StateParamChangesService)
-  {}
+  constructor(public stateParamChangesService: StateParamChangesService) {}
+
   ngOnInit(): void {
-    this.spcs=this.stateParamChangesService;
-  }  
+    this.spcs = this.stateParamChangesService;
+  }
 }
 angular.module('oppia').directive(
   'stateParamChangesEditor', downgradeComponent(

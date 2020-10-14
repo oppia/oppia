@@ -17,7 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture,async, TestBed } from '@angular/core/testing';
+import { ComponentFixture, async, TestBed } from '@angular/core/testing';
 
 import { StateParamChangesEditorComponent } from
   // eslint-disable-next-line max-len
@@ -32,7 +32,7 @@ let fixture: ComponentFixture<StateParamChangesEditorComponent>;
 describe('State Param Changes Editor directive', () => {
 
   let stateParamChangesService: StateParamChangesService = null;
-  
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [StateParamChangesEditorComponent],
