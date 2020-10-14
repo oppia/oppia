@@ -20,26 +20,18 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AdminPageData, AdminBackendApiService } from
-  'domain/admin/admin-backend-api.service';
-import { ComputationDataObjectFactory } from
-  'domain/admin/computation-data-object.factory';
-import { JobDataObjectFactory } from
-  'domain/admin/job-data-object.factory';
-import { JobStatusSummaryObjectFactory } from
-  'domain/admin/job-status-summary-object.factory';
+import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { ComputationData } from 'domain/admin/computation-data.model';
+import { Job } from 'domain/admin/job.model';
+import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { PlatformParameterFilterType } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
 import { FeatureStage, PlatformParameterObjectFactory } from
   'domain/platform_feature/platform-parameter-object.factory';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
-  let cdof: ComputationDataObjectFactory;
-  let jdof: JobDataObjectFactory;
-  let jsof: JobStatusSummaryObjectFactory;
   let ppof: PlatformParameterObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
@@ -138,9 +130,6 @@ describe('Admin backend api service', () => {
     });
 
     abas = TestBed.get(AdminBackendApiService);
-    cdof = TestBed.get(ComputationDataObjectFactory);
-    jdof = TestBed.get(JobDataObjectFactory);
-    jsof = TestBed.get(JobStatusSummaryObjectFactory);
     ppof = TestBed.get(PlatformParameterObjectFactory);
     tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
@@ -150,23 +139,23 @@ describe('Admin backend api service', () => {
       demoExplorationIds: adminBackendResponse.demo_exploration_ids,
       oneOffJobStatusSummaries:
         adminBackendResponse.one_off_job_status_summaries.map(
-          jsof.createFromBackendDict),
+          JobStatusSummary.createFromBackendDict),
       humanReadableCurrentTime:
         adminBackendResponse.human_readable_current_time,
       auditJobStatusSummaries:
         adminBackendResponse.audit_job_status_summaries.map(
-          jsof.createFromBackendDict),
+          JobStatusSummary.createFromBackendDict),
       updatableRoles: adminBackendResponse.updatable_roles,
       roleGraphData: adminBackendResponse.role_graph_data,
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
       unfinishedJobData: adminBackendResponse.unfinished_job_data.map(
-        jdof.createFromBackendDict),
+        Job.createFromBackendDict),
       recentJobData: adminBackendResponse.recent_job_data.map(
-        jdof.createFromBackendDict),
+        Job.createFromBackendDict),
       continuousComputationsData:
         adminBackendResponse.continuous_computations_data.map(
-          cdof.createFromBackendDict),
+          ComputationData.createFromBackendDict),
       topicSummaries: adminBackendResponse.topic_summaries.map(
         tsof.createFromBackendDict),
       featureFlags: adminBackendResponse.feature_flags.map(
@@ -189,146 +178,6 @@ describe('Admin backend api service', () => {
     expect(req.request.method).toEqual('GET');
     req.flush(adminBackendResponse);
 
-    flushMicrotasks();
-  }));
-
-  it('should send SVGs to the backend.', fakeAsync(() => {
-    var successResponse = {
-      result: 'successfully updated'
-    };
-    var latexToSvgMapping = {
-      exp_id1: {
-        latex_string1: {
-          file: new Blob(),
-          dimensions: {
-            encoded_height_string: '4d456',
-            encoded_width_string: '3d467',
-            encoded_vertical_padding_string: '0d234'
-          },
-          latexId: '3rmYki9MyZ'
-        }
-      },
-      exp_id2: {
-        latex_string2: {
-          file: new Blob(),
-          dimensions: {
-            encoded_height_string: '3d456',
-            encoded_width_string: '5d467',
-            encoded_vertical_padding_string: '0d234'
-          },
-          latexId: '4rm6ki9MsZ'
-        }
-      }
-    };
-    var expectedPayload = {
-      latexMapping: {
-        exp_id1: {
-          latex_string1: {
-            dimensions: {
-              encoded_height_string: '4d456',
-              encoded_width_string: '3d467',
-              encoded_vertical_padding_string: '0d234'
-            },
-            latexId: '3rmYki9MyZ'
-          }
-        },
-        exp_id2: {
-          latex_string2: {
-            dimensions: {
-              encoded_height_string: '3d456',
-              encoded_width_string: '5d467',
-              encoded_vertical_padding_string: '0d234'
-            },
-            latexId: '4rm6ki9MsZ'
-          }
-        }
-      }
-    };
-
-    abas.sendMathSvgsToBackend(latexToSvgMapping);
-    let req = httpTestingController.expectOne(
-      '/explorationslatexsvghandler');
-    var requestBody = req.request.body;
-    expect(requestBody instanceof FormData).toBeTruthy();
-    var rawImageSentToBackend = null;
-    var image1 = requestBody.get('3rmYki9MyZ');
-    var image2 = requestBody.get('4rm6ki9MsZ');
-    var payLoadSentoBackend = requestBody.get('payload');
-    expect(image1 instanceof File).toBeTruthy();
-    expect(image2 instanceof File).toBeTruthy();
-    expect(payLoadSentoBackend).toEqual(JSON.stringify(expectedPayload));
-    expect(req.request.method).toEqual('POST');
-    req.flush(successResponse);
-    flushMicrotasks();
-  }));
-
-  it('should send suggestion SVGs to the backend.', fakeAsync(() => {
-    var successResponse = {
-      result: 'successfully updated'
-    };
-    var suggestionLatexToSvgMapping = {
-      suggestionId1: {
-        latex_string1: {
-          file: new Blob(),
-          dimensions: {
-            encoded_height_string: '4d456',
-            encoded_width_string: '3d467',
-            encoded_vertical_padding_string: '0d234'
-          },
-          latexId: '3rmYki9MyZ'
-        }
-      },
-      suggestionId2: {
-        latex_string2: {
-          file: new Blob(),
-          dimensions: {
-            encoded_height_string: '3d456',
-            encoded_width_string: '5d467',
-            encoded_vertical_padding_string: '0d234'
-          },
-          latexId: '4rm6ki9MsZ'
-        }
-      }
-    };
-    var expectedPayload = {
-      latexMapping: {
-        suggestionId1: {
-          latex_string1: {
-            dimensions: {
-              encoded_height_string: '4d456',
-              encoded_width_string: '3d467',
-              encoded_vertical_padding_string: '0d234'
-            },
-            latexId: '3rmYki9MyZ'
-          }
-        },
-        suggestionId2: {
-          latex_string2: {
-            dimensions: {
-              encoded_height_string: '3d456',
-              encoded_width_string: '5d467',
-              encoded_vertical_padding_string: '0d234'
-            },
-            latexId: '4rm6ki9MsZ'
-          }
-        }
-      }
-    };
-
-    abas.sendSuggestionMathSvgsToBackend(suggestionLatexToSvgMapping);
-    let req = httpTestingController.expectOne(
-      '/suggestionslatexsvghandler');
-    var requestBody = req.request.body;
-    expect(requestBody instanceof FormData).toBeTruthy();
-    var rawImageSentToBackend = null;
-    var image1 = requestBody.get('3rmYki9MyZ');
-    var image2 = requestBody.get('4rm6ki9MsZ');
-    var payLoadSentoBackend = requestBody.get('payload');
-    expect(image1 instanceof File).toBeTruthy();
-    expect(image2 instanceof File).toBeTruthy();
-    expect(payLoadSentoBackend).toEqual(JSON.stringify(expectedPayload));
-    expect(req.request.method).toEqual('POST');
-    req.flush(successResponse);
     flushMicrotasks();
   }));
 

@@ -28,7 +28,7 @@ require(
 
 require(
   'pages/story-viewer-page/navbar-breadcrumb/' +
-  'story-viewer-navbar-breadcrumb.directive.ts');
+  'story-viewer-navbar-breadcrumb.component.ts');
 require(
   'pages/story-viewer-page/navbar-pre-logo-action/' +
   'story-viewer-navbar-pre-logo-action.component.ts');
@@ -37,25 +37,25 @@ require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
-require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 
 angular.module('oppia').component('storyViewerPage', {
   template: require('./story-viewer-page.component.html'),
   controller: [
     '$rootScope', 'AlertsService', 'AssetsBackendApiService',
-    'PageTitleService', 'LoaderService',
+    'LoaderService', 'StoryViewerBackendApiService',
     'UrlInterpolationService', 'UrlService', 'ENTITY_TYPE',
     'FATAL_ERROR_CODES',
     function(
         $rootScope, AlertsService, AssetsBackendApiService,
-        PageTitleService, LoaderService,
+        LoaderService, StoryViewerBackendApiService,
         UrlInterpolationService, UrlService, ENTITY_TYPE,
         FATAL_ERROR_CODES) {
       var ctrl = this;
 
       ctrl.storyViewerBackendApiService = (
         OppiaAngularRootComponent.storyViewerBackendApiService);
+      ctrl.pageTitleService = OppiaAngularRootComponent.pageTitleService;
 
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -140,12 +140,14 @@ angular.module('oppia').component('storyViewerPage', {
             ctrl.storyPlaythroughObject = storyDataDict;
             ctrl.storyId = ctrl.storyPlaythroughObject.getStoryId();
             var topicName = ctrl.storyPlaythroughObject.topicName;
-            PageTitleService.setPageTitle(
+            ctrl.pageTitleService.setPageTitle(
               `Learn ${topicName} | ${storyDataDict.title} | Oppia`);
+            ctrl.pageTitleService.updateMetaTag(
+              storyDataDict.getMetaTagContent());
             ctrl.storyTitle = storyDataDict.title;
             ctrl.storyDescription = storyDataDict.description;
 
-            $rootScope.$broadcast('storyData', {
+            StoryViewerBackendApiService.onSendStoryData.emit({
               topicName: topicName,
               storyTitle: ctrl.storyTitle
             });

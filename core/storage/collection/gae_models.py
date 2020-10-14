@@ -22,11 +22,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
+from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import feconf
 import python_utils
+import utils
 
-from google.appengine.ext import ndb
+datastore_services = models.Registry.import_datastore_services()
 
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -53,40 +55,50 @@ class CollectionModel(base_models.VersionedModel):
     ALLOW_REVERT = True
 
     # What this collection is called.
-    title = ndb.StringProperty(required=True)
+    title = datastore_services.StringProperty(required=True)
     # The category this collection belongs to.
-    category = ndb.StringProperty(required=True, indexed=True)
+    category = datastore_services.StringProperty(required=True, indexed=True)
     # The objective of this collection.
-    objective = ndb.TextProperty(default='', indexed=False)
+    objective = datastore_services.TextProperty(default='', indexed=False)
     # The language code of this collection.
-    language_code = ndb.StringProperty(
+    language_code = datastore_services.StringProperty(
         default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
     # Tags associated with this collection.
-    tags = ndb.StringProperty(repeated=True, indexed=True)
+    tags = datastore_services.StringProperty(repeated=True, indexed=True)
 
     # The version of all property blob schemas.
-    schema_version = ndb.IntegerProperty(
+    schema_version = datastore_services.IntegerProperty(
         required=True, default=1, indexed=True)
     # DEPRECATED in v2.4.2. Do not use.
-    nodes = ndb.JsonProperty(default={}, indexed=False)
+    nodes = datastore_services.JsonProperty(default={}, indexed=False)
 
     # A dict representing the contents of a collection. Currently, this
     # contains the list of nodes. This dict should contain collection data
     # whose structure might need to be changed in the future.
-    collection_contents = ndb.JsonProperty(default={}, indexed=False)
+    collection_contents = (
+        datastore_services.JsonProperty(default={}, indexed=False))
 
     # DEPRECATED in v2.4.2. Do not use.
-    nodes = ndb.JsonProperty(default={}, indexed=False)
+    nodes = datastore_services.JsonProperty(default={}, indexed=False)
 
     @staticmethod
     def get_deletion_policy():
         """Collection is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'nodes': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -98,7 +110,7 @@ class CollectionModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def get_collection_count(cls):
@@ -174,7 +186,7 @@ class CollectionModel(base_models.VersionedModel):
                 )
                 collection_commit_log.collection_id = model.id
                 commit_log_models.append(collection_commit_log)
-            ndb.put_multi_async(commit_log_models)
+            datastore_services.put_multi_async(commit_log_models)
 
 
 class CollectionRightsSnapshotMetadataModel(
@@ -202,25 +214,29 @@ class CollectionRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of owners of this collection.
-    owner_ids = ndb.StringProperty(indexed=True, repeated=True)
+    owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this collection.
-    editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this collection.
-    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
+    voice_artist_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
     # The user_ids of users who are allowed to view this collection.
-    viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
+    viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     # Whether this collection is owned by the community.
-    community_owned = ndb.BooleanProperty(indexed=True, default=False)
+    community_owned = (
+        datastore_services.BooleanProperty(indexed=True, default=False))
     # For private collections, whether this collection can be viewed
     # by anyone who has the URL. If the collection is not private, this
     # setting is ignored.
-    viewable_if_private = ndb.BooleanProperty(indexed=True, default=False)
+    viewable_if_private = (
+        datastore_services.BooleanProperty(indexed=True, default=False))
     # Time, in milliseconds, when the collection was first published.
-    first_published_msec = ndb.FloatProperty(indexed=True, default=None)
+    first_published_msec = (
+        datastore_services.FloatProperty(indexed=True, default=None))
 
     # The publication status of this collection.
-    status = ndb.StringProperty(
+    status = datastore_services.StringProperty(
         default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
             constants.ACTIVITY_STATUS_PRIVATE,
@@ -228,7 +244,8 @@ class CollectionRightsModel(base_models.VersionedModel):
         ]
     )
     # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    translator_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -237,10 +254,21 @@ class CollectionRightsModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            # DEPRECATED in v2.8.3.
+            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -252,14 +280,12 @@ class CollectionRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (
-            cls.query(ndb.OR(
-                cls.owner_ids == user_id,
-                cls.editor_ids == user_id,
-                cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id
-            )).get(keys_only=True) is not None
-            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return cls.query(datastore_services.any_of(
+            cls.owner_ids == user_id,
+            cls.editor_ids == user_id,
+            cls.voice_artist_ids == user_id,
+            cls.viewer_ids == user_id
+        )).get(keys_only=True) is not None
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
@@ -278,6 +304,47 @@ class CollectionRightsModel(base_models.VersionedModel):
         super(CollectionRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    @staticmethod
+    def convert_to_valid_dict(model_dict):
+        """Replace invalid fields and values in the CollectionRightsModel dict.
+
+        Some old CollectionRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a CollectionRightsModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the CollectionRightsModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+        # The status field could historically take the value 'publicized', this
+        # value is now equivalent to 'public'.
+        if model_dict['status'] == 'publicized':
+            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+
+        # The voice_artist_ids field was previously named translator_ids. We
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if 'translator_ids' in model_dict and model_dict['translator_ids']:
+            model_dict['voice_artist_ids'] = model_dict['translator_ids']
+            model_dict['translator_ids'] = []
+
+        # We need to remove pseudonymous IDs from all the fields that contain
+        # user IDs.
+        for field_name in (
+                'owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'):
+            model_dict[field_name] = [
+                user_id for user_id in model_dict[field_name]
+                if not utils.is_pseudonymous_id(user_id)
+            ]
+
+        return model_dict
+
     def _reconstitute(self, snapshot_dict):
         """Populates the model instance with the snapshot.
 
@@ -294,21 +361,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             VersionedModel. The instance of the VersionedModel class populated
             with the the snapshot.
         """
-        # The status field could historically take the value 'publicized', this
-        # value is now equivalent to 'public'.
-        if snapshot_dict['status'] == 'publicized':
-            snapshot_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
-        # The voice_artist_ids field was previously named translator_ids. We
-        # need to move the values from translator_ids field to voice_artist_ids
-        # and delete translator_ids.
-        if (
-                'translator_ids' in snapshot_dict and
-                snapshot_dict['translator_ids']
-        ):
-            snapshot_dict['voice_artist_ids'] = snapshot_dict['translator_ids']
-            snapshot_dict['translator_ids'] = []
-
-        self.populate(**snapshot_dict)
+        self.populate(
+            **CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
     def _trusted_commit(
@@ -352,6 +406,30 @@ class CollectionRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+
+        snapshot_metadata_model.content_user_ids = list(sorted(
+            set(self.owner_ids) |
+            set(self.editor_ids) |
+            set(self.voice_artist_ids) |
+            set(self.viewer_ids)
+        ))
+
+        commit_cmds_user_ids = set()
+        for commit_cmd in commit_cmds:
+            user_id_attribute_names = python_utils.NEXT(
+                cmd['user_id_attribute_names']
+                for cmd in feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                if cmd['name'] == commit_cmd['cmd']
+            )
+            for user_id_attribute_name in user_id_attribute_names:
+                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+        snapshot_metadata_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+
+        snapshot_metadata_model.put()
+
     @classmethod
     def export_data(cls, user_id):
         """(Takeout) Export user-relevant properties of CollectionRightsModel.
@@ -394,7 +472,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the collection being edited.
-    collection_id = ndb.StringProperty(indexed=True, required=True)
+    collection_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -403,12 +482,14 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """The history of commits is not relevant for the purposes of
         Takeout.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):
@@ -484,30 +565,33 @@ class CollectionSummaryModel(base_models.BaseModel):
     """
 
     # What this collection is called.
-    title = ndb.StringProperty(required=True)
+    title = datastore_services.StringProperty(required=True)
     # The category this collection belongs to.
-    category = ndb.StringProperty(required=True, indexed=True)
+    category = datastore_services.StringProperty(required=True, indexed=True)
     # The objective of this collection.
-    objective = ndb.TextProperty(required=True, indexed=False)
+    objective = datastore_services.TextProperty(required=True, indexed=False)
     # The ISO 639-1 code for the language this collection is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # Tags associated with this collection.
-    tags = ndb.StringProperty(repeated=True, indexed=True)
+    tags = datastore_services.StringProperty(repeated=True, indexed=True)
 
     # Aggregate user-assigned ratings of the collection.
-    ratings = ndb.JsonProperty(default=None, indexed=False)
+    ratings = datastore_services.JsonProperty(default=None, indexed=False)
 
     # Time when the collection model was last updated (not to be
     # confused with last_updated, which is the time when the
     # collection *summary* model was last updated).
-    collection_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    collection_model_last_updated = (
+        datastore_services.DateTimeProperty(indexed=True))
     # Time when the collection model was created (not to be confused
     # with created_on, which is the time when the collection *summary*
     # model was created).
-    collection_model_created_on = ndb.DateTimeProperty(indexed=True)
+    collection_model_created_on = (
+        datastore_services.DateTimeProperty(indexed=True))
 
     # The publication status of this collection.
-    status = ndb.StringProperty(
+    status = datastore_services.StringProperty(
         default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
             constants.ACTIVITY_STATUS_PRIVATE,
@@ -516,29 +600,32 @@ class CollectionSummaryModel(base_models.BaseModel):
     )
 
     # Whether this collection is owned by the community.
-    community_owned = ndb.BooleanProperty(required=True, indexed=True)
+    community_owned = (
+        datastore_services.BooleanProperty(required=True, indexed=True))
 
     # The user_ids of owners of this collection.
-    owner_ids = ndb.StringProperty(indexed=True, repeated=True)
+    owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this collection.
-    editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this collection.
-    viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
+    viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the collection's content).
     # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
     # synchronized, meaning that the keys in contributors_summary need be
     # equal to the contributor_ids list.
-    contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    contributor_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
     # A dict representing the contributors of non-trivial commits to this
     # collection. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
-    contributors_summary = ndb.JsonProperty(default={}, indexed=False)
+    contributors_summary = (
+        datastore_services.JsonProperty(default={}, indexed=False))
     # The version number of the collection after this commit. Only populated
     # for commits to an collection (as opposed to its rights, etc.).
-    version = ndb.IntegerProperty()
+    version = datastore_services.IntegerProperty()
     # The number of nodes(explorations) that are within this collection.
-    node_count = ndb.IntegerProperty()
+    node_count = datastore_services.IntegerProperty()
 
     @staticmethod
     def get_deletion_policy():
@@ -547,13 +634,33 @@ class CollectionSummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model data has already been exported as a part of the
         CollectionRightsModel, and thus does not need an export_data
         function.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ratings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_model_created_on':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'owner_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'editor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'node_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -565,7 +672,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(ndb.OR(
+        return cls.query(datastore_services.any_of(
             cls.owner_ids == user_id,
             cls.editor_ids == user_id,
             cls.viewer_ids == user_id,
@@ -599,7 +706,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(
+            datastore_services.any_of(
                 CollectionSummaryModel.owner_ids == user_id,
                 CollectionSummaryModel.editor_ids == user_id,
                 CollectionSummaryModel.viewer_ids == user_id)
@@ -620,7 +727,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            ndb.OR(
+            datastore_services.any_of(
                 CollectionSummaryModel.owner_ids == user_id,
                 CollectionSummaryModel.editor_ids == user_id)
         ).filter(

@@ -17,136 +17,127 @@
  * questions list in editors.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { AppConstants } from 'app.constants';
 import { EventEmitter } from '@angular/core';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service';
+import { QuestionSummaryForOneSkill, QuestionSummaryForOneSkillObjectFactory } from
+  'domain/question/QuestionSummaryForOneSkillObjectFactory';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 
-require('domain/question/question-backend-api.service.ts');
-require('domain/question/QuestionSummaryForOneSkillObjectFactory.ts');
-require('services/context.service.ts');
-require('services/services.constants.ajs.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionsListService {
+  private _questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
+  private _nextCursorForQuestions: string = '';
+  private _currentPage: number = 0;
+  private _questionSummartiesInitializedEventEmitter: EventEmitter<void> = (
+    new EventEmitter<void>());
 
-angular.module('oppia').factory('QuestionsListService', [
-  '$filter', '$rootScope', 'QuestionBackendApiService',
-  'QuestionSummaryForOneSkillObjectFactory',
-  'NUM_QUESTIONS_PER_PAGE', function(
-      $filter, $rootScope, QuestionBackendApiService,
+  constructor(
+    private formatRtePreviewPipe: FormatRtePreviewPipe,
+    private questionBackendApiService: QuestionBackendApiService,
+    private questionSummaryForOneSkillObjectFactory:
       QuestionSummaryForOneSkillObjectFactory,
-      NUM_QUESTIONS_PER_PAGE) {
-    var _questionSummaries = [];
-    var _questionSummariesForOneSkill = [];
-    var _nextCursorForQuestions = '';
-    var _currentPage = 0;
-    var _questionSummartiesInitializedEventEmitter = new EventEmitter();
+    private truncatePipe: TruncatePipe) {}
 
-    var _setQuestionSummaries = function(newQuestionSummaries) {
-      if (_questionSummaries.length > 0) {
-        newQuestionSummaries = _deduplicateQuestionSummaries(
-          newQuestionSummaries);
-      }
-      _questionSummaries = _questionSummaries.concat(
-        angular.copy(newQuestionSummaries));
-      _questionSummartiesInitializedEventEmitter.emit();
-    };
+  private _setQuestionSummariesForOneSkill(
+      newQuestionSummaries: QuestionSummaryForOneSkill[],
+      resetHistory: boolean): void {
+    if (resetHistory) {
+      this._questionSummariesForOneSkill = [];
+    }
 
-    var _setQuestionSummariesForOneSkill = function(newQuestionSummaries) {
-      _questionSummariesForOneSkill = _questionSummariesForOneSkill.concat(
-        angular.copy(newQuestionSummaries));
-      _questionSummartiesInitializedEventEmitter.emit();
-    };
-    var _setNextQuestionsCursor = function(nextCursor) {
-      _nextCursorForQuestions = nextCursor;
-    };
-    var _deduplicateQuestionSummaries = function(newQuestionSummaries) {
-      // If the first id of newQuestionSummaries is equal to the last id of
-      // _questionSummaries, deduplicate by merging them to solve the page
-      // boundary issue.
-      if (newQuestionSummaries[0].summary.id ===
-          _questionSummaries.slice(-1)[0].summary.id) {
-        _questionSummaries.slice(-1)[0].skill_descriptions =
-          newQuestionSummaries[0].skill_descriptions.concat(
-            _questionSummaries.slice(-1)[0].skill_descriptions
-          );
-        newQuestionSummaries = newQuestionSummaries.slice(1);
-      }
-      return newQuestionSummaries;
-    };
+    this._questionSummariesForOneSkill = (
+      this._questionSummariesForOneSkill.concat(newQuestionSummaries));
 
-    return {
-      isLastQuestionBatch: function() {
-        return (
-          _nextCursorForQuestions === null &&
-          (_currentPage + 1) * NUM_QUESTIONS_PER_PAGE >=
-            _questionSummariesForOneSkill.length);
-      },
-
-      getQuestionSummariesAsync: function(
-          skillIds, fetchMore, resetHistory) {
-        if (resetHistory) {
-          _questionSummariesForOneSkill = [];
-          _nextCursorForQuestions = '';
-        }
-        var num = NUM_QUESTIONS_PER_PAGE;
-
-        if (skillIds === undefined || skillIds.length === 0) {
-          return;
-        }
-        if ((_currentPage + 1) * num > _questionSummariesForOneSkill.length &&
-            _nextCursorForQuestions !== null && fetchMore) {
-          QuestionBackendApiService.fetchQuestionSummaries(
-            skillIds, _nextCursorForQuestions).then(
-            function(returnObject) {
-              if (skillIds.length === 1) {
-                var questionSummaries = returnObject.questionSummaries.map(
-                  function(summary) {
-                    return (
-                      QuestionSummaryForOneSkillObjectFactory.
-                        createFromBackendDict(summary));
-                  });
-                _setQuestionSummariesForOneSkill(questionSummaries);
-              } else {
-                _setQuestionSummaries(returnObject.questionSummaries);
-              }
-              _setNextQuestionsCursor(returnObject.nextCursor);
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$apply();
-            }
-          );
-        }
-      },
-
-      getCachedQuestionSummaries: function() {
-        var num = NUM_QUESTIONS_PER_PAGE;
-        return _questionSummariesForOneSkill.slice(
-          _currentPage * num, (_currentPage + 1) * num).map(
-          function(question) {
-            var summary = $filter(
-              'formatRtePreview')(
-              question.getQuestionSummary().getQuestionContent());
-            question.getQuestionSummary().setQuestionContent(
-              $filter('truncate')(summary, 100));
-            return question;
-          });
-      },
-
-      incrementPageNumber: function() {
-        _currentPage++;
-      },
-
-      decrementPageNumber: function() {
-        _currentPage--;
-      },
-
-      resetPageNumber: function() {
-        _currentPage = 0;
-      },
-
-      getCurrentPageNumber: function() {
-        return _currentPage;
-      },
-
-      get onQuestionSummariesInitialized() {
-        return _questionSummartiesInitializedEventEmitter;
-      }
-    };
+    this._questionSummartiesInitializedEventEmitter.emit();
   }
-]);
+
+  private _setNextQuestionsCursor(nextCursor: string): void {
+    this._nextCursorForQuestions = nextCursor;
+  }
+
+  isLastQuestionBatch(): boolean {
+    return (
+      this._nextCursorForQuestions === null &&
+      (this._currentPage + 1) * AppConstants.NUM_QUESTIONS_PER_PAGE >=
+        this._questionSummariesForOneSkill.length);
+  }
+
+  getQuestionSummariesAsync(
+      skillId: string, fetchMore: boolean, resetHistory: boolean): void {
+    if (resetHistory) {
+      this._questionSummariesForOneSkill = [];
+      this._nextCursorForQuestions = '';
+    }
+
+    const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
+
+    if (!skillId) {
+      return;
+    }
+
+    if (
+      (this._currentPage + 1) * num >
+       this._questionSummariesForOneSkill.length &&
+       this._nextCursorForQuestions !== null && fetchMore) {
+      this.questionBackendApiService.fetchQuestionSummaries(
+        skillId, this._nextCursorForQuestions).then(response => {
+        let questionSummaries = response.questionSummaries.map(summary => {
+          return (
+            this.questionSummaryForOneSkillObjectFactory.
+              createFromBackendDict(summary));
+        });
+
+        this._setNextQuestionsCursor(response.nextCursor);
+        this._setQuestionSummariesForOneSkill(
+          questionSummaries, resetHistory);
+      });
+    }
+  }
+
+  getCachedQuestionSummaries(): QuestionSummaryForOneSkill[] {
+    const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
+
+    return this._questionSummariesForOneSkill.slice(
+      this._currentPage * num, (this._currentPage + 1) * num).map(question => {
+      const summary = this.formatRtePreviewPipe.transform(
+        question.getQuestionSummary().getQuestionContent());
+
+      question.getQuestionSummary().setQuestionContent(
+        this.truncatePipe.transform(summary, 100));
+
+      return question;
+    });
+  }
+
+  incrementPageNumber(): void {
+    this._currentPage++;
+  }
+
+  decrementPageNumber(): void {
+    this._currentPage--;
+  }
+
+  resetPageNumber(): void {
+    this._currentPage = 0;
+  }
+
+  getCurrentPageNumber(): number {
+    return this._currentPage;
+  }
+
+  get onQuestionSummariesInitialized(): EventEmitter<void> {
+    return this._questionSummartiesInitializedEventEmitter;
+  }
+}
+
+angular.module('oppia').factory(
+  'QuestionsListService',
+  downgradeInjectable(QuestionsListService));

@@ -20,14 +20,8 @@
 // translation-status.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -39,16 +33,11 @@ import { ParamChangesObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -84,15 +73,9 @@ describe('Translation status service', function() {
     });
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
         new RuleObjectFactory()));
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
@@ -110,8 +93,7 @@ describe('Translation status service', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
+      'StateClassifierMappingService', new StateClassifierMappingService());
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
@@ -232,14 +214,10 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Second'
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 0
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 0}
+              }],
               training_data: []
             },
             {
@@ -255,14 +233,10 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'First'
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 1
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 1}
+              }],
               training_data: []
             }],
             solution: null,
@@ -324,14 +298,10 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Third'
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 0
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 0}
+              }],
               training_data: []
             }],
             solution: null,
@@ -542,7 +512,7 @@ describe('Translation status service', function() {
       expect(stateWiseStatusColor.Second).toBe(NO_ASSETS_AVAILABLE_COLOR);
       expect(stateWiseStatusColor.Third).toBe(NO_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'content');
+      swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'content');
       ess.saveWrittenTranslations('Second', swts.displayed);
 
       tss.refresh();
@@ -595,7 +565,7 @@ describe('Translation status service', function() {
         tss.getActiveStateComponentStatusColor('feedback'));
       expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'Content');
+      swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'Content');
 
       activeStateComponentStatus = (
         tss.getActiveStateComponentStatusColor('content'));
@@ -696,7 +666,8 @@ describe('Translation status service', function() {
       expect(activeStateContentIdStatusColor).toBe(
         ALL_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', '<p>Content</p>');
+      swts.displayed.addWrittenTranslation(
+        'content', 'hi', 'html', '<p>Content</p>');
 
       activeStateContentIdStatusColor = (
         tss.getActiveStateContentIdStatusColor('content'));

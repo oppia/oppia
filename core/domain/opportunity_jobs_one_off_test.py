@@ -21,14 +21,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from constants import constants
 from core.domain import caching_services
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -36,7 +38,6 @@ from core.tests import test_utils
 import python_utils
 
 
-taskqueue_services = models.Registry.import_taskqueue_services()
 (opportunity_models, story_models, exp_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])
 
@@ -48,9 +49,13 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
     def setUp(self):
         super(
             ExplorationOpportunitySummaryModelRegenerationJobTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.topic_id_1 = 'topic1'
         self.topic_id_2 = 'topic2'
@@ -58,23 +63,64 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         story_id_1 = 'story1'
         story_id_2 = 'story2'
 
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(2)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
             self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'topic', 'abbrev-one', 'description')
+        topic_1.thumbnail_filename = 'thumbnail.svg'
+        topic_1.thumbnail_bg_color = '#C6DCDA'
+        topic_1.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic_1.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.topic_id_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
         topic_services.save_new_topic(self.owner_id, topic_1)
+        topic_services.publish_topic(self.topic_id_1, self.admin_id)
 
         topic_2 = topic_domain.Topic.create_default_topic(
             self.topic_id_2, 'topic2', 'abbrev-two', 'description')
+        topic_2.thumbnail_filename = 'thumbnail.svg'
+        topic_2.thumbnail_bg_color = '#C6DCDA'
+        topic_2.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.topic_id_2))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_2.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic_2)
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
 
         story_1 = story_domain.Story.create_default_story(
             story_id_1, 'A story', 'description', self.topic_id_1,
@@ -87,8 +133,10 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         story_services.save_new_story(self.owner_id, story_2)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_1, story_id_1)
+        topic_services.publish_story(self.topic_id_1, story_id_1, self.admin_id)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_2, story_id_2)
+        topic_services.publish_story(self.topic_id_2, story_id_2, self.admin_id)
         story_services.update_story(
             self.owner_id, story_id_1, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
@@ -130,9 +178,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -165,9 +213,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -188,9 +236,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -217,9 +265,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['SUCCESS', 2]]
@@ -251,9 +299,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (2)', [
@@ -288,9 +336,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (1)', [
@@ -324,9 +372,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (1)', [
@@ -353,9 +401,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])
@@ -396,9 +444,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
 
@@ -431,9 +479,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
         expected = [['SUCCESS', 2]]
@@ -458,9 +506,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])

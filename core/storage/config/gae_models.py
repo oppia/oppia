@@ -19,9 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from google.appengine.ext import ndb
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ConfigPropertySnapshotMetadataModel(
@@ -47,17 +48,19 @@ class ConfigPropertyModel(base_models.VersionedModel):
     SNAPSHOT_CONTENT_CLASS = ConfigPropertySnapshotContentModel
 
     # The property value.
-    value = ndb.JsonProperty(indexed=False)
+    value = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
     def get_deletion_policy():
         """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
@@ -87,18 +90,22 @@ class PlatformParameterModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
-    rules = ndb.JsonProperty(repeated=True)
-    rule_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    rules = datastore_services.JsonProperty(repeated=True)
+    rule_schema_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
         """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def create(cls, param_name, rule_dicts, rule_schema_version):

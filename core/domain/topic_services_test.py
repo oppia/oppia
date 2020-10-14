@@ -21,11 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import exp_services
+from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -35,7 +37,11 @@ from core.tests import test_utils
 
 import feconf
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(
+    topic_models, suggestion_models
+) = models.Registry.import_models([
+    models.NAMES.topic, models.NAMES.suggestion
+])
 
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
@@ -706,6 +712,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
             'old_value': '',
             'new_value': '#C6DCDA'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT,
+            'old_value': '',
+            'new_value': 'topic meta tag content'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED),
+            'old_value': False,
+            'new_value': True
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -718,6 +735,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
+        self.assertEqual(topic.practice_tab_is_displayed, True)
+        self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
@@ -1048,7 +1067,30 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Added story_id_4 to additional story ids')
 
     def test_delete_topic(self):
-        # Test whether an admin can delete a topic.
+        # Add suggestion for the topic to test if it is deleted too.
+        question = self.save_new_question(
+            'question_id',
+            self.user_id_admin,
+            self._create_valid_question_data('dest'),
+            [self.skill_id_1])
+        suggestion = suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_TOPIC,
+            self.TOPIC_ID,
+            1,
+            self.user_id_admin,
+            {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                'skill_difficulty': 0.3,
+                'skill_id': self.skill_id_1,
+                'question_dict': question.to_dict()
+            },
+            'change'
+        )
+
+        self.assertIsNotNone(
+            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
+
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
         self.assertIsNone(
             topic_fetchers.get_topic_by_id(self.TOPIC_ID, strict=False))
@@ -1057,6 +1099,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             subtopic_page_services.get_subtopic_page_by_id(
                 self.TOPIC_ID, 1, strict=False))
+        self.assertIsNone(
+            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
 
     def test_delete_subtopic_with_skill_ids(self):
         changelist = [topic_domain.TopicChange({
@@ -1208,7 +1252,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'Updated subtopic skill ids.')
 
     def test_admin_can_manage_topic(self):
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_admin, topic_rights))
@@ -1233,7 +1277,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(published_topic_ids[0], self.TOPIC_ID)
 
     def test_publish_and_unpublish_topic(self):
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
@@ -1251,11 +1295,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'The user does not have enough rights to unpublish the topic.'):
             topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_a)
 
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_rights.topic_is_published)
 
         topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_admin)
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
 
         with self.assertRaisesRegexp(
@@ -1268,7 +1312,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_admin, self.user_a,
             topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
@@ -1283,7 +1327,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_b, self.user_a,
                 topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
@@ -1309,20 +1353,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_a, self.user_b,
                 topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
-
-    def test_get_all_topic_rights_of_user(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-        topic_rights = topic_services.get_topic_rights_with_user(self.user_id_a)
-        self.assertEqual(len(topic_rights), 1)
-        self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
-        self.assertEqual(topic_rights[0].manager_ids, [self.user_id_a])
 
     def test_cannot_save_new_topic_with_existing_name(self):
         with self.assertRaisesRegexp(
@@ -1532,7 +1567,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.publish_topic('invalid_topic_id', self.user_id_admin)
 
     def test_cannot_publish_a_published_topic(self):
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
@@ -1544,7 +1579,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_rights.topic_is_published)
 
         with self.assertRaisesRegexp(
@@ -1558,7 +1593,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'invalid_topic_id', self.user_id_admin)
 
     def test_cannot_unpublish_an_unpublished_topic(self):
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
 
         with self.assertRaisesRegexp(
@@ -1611,7 +1646,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_admin, self.user_a,
                 topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
@@ -1622,7 +1657,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_admin, self.user_a,
             topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))

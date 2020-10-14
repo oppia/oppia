@@ -26,7 +26,6 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_jobs_one_off
 from core.domain import skill_services
-from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -54,7 +53,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_skill(self):
         """Tests that the skill migration job does not convert a
@@ -79,7 +78,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the skill is exactly the same after migration.
         updated_skill = (
@@ -122,7 +121,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted skill is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the skill is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -178,7 +177,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify that the skill migrates correctly.
         updated_skill = (
@@ -216,7 +215,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             job_id = (
                 skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(
             job_id)
@@ -231,7 +230,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             expected, [ast.literal_eval(x) for x in output])
 
 
-class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
+class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -239,205 +238,221 @@ class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
     SKILL_ID = 'skill_id'
 
     def setUp(self):
-        super(SkillMathRteAuditOneOffJobTests, self).setUp()
+        super(SkillCommitCmdMigrationOneOffJobTests, self).setUp()
 
-        # Setup user who will own the test skills.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.set_admins([self.ALBERT_NAME])
 
-    def test_job_when_skills_have_math_rich_text_components(self):
-        valid_html_1 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-            'e&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
-        )
-        valid_html_2 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-        valid_html_3 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', valid_html_1),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
-        skill_contents1 = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict({
-                'voiceovers_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            }),
-            state_domain.WrittenTranslations.from_dict({
-                'translations_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            })
-        )
-        misconceptions1 = [skill_domain.Misconception(
-            0, 'name', valid_html_1,
-            valid_html_2, True)]
-        rubrics1 = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], [valid_html_1]),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], [valid_html_3])]
-        skill1 = skill_domain.Skill(
-            'skill_id1', 'Description', misconceptions1, rubrics1,
-            skill_contents1, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
-            None, False, ['skill_id_2']
-        )
-        skill_services.save_new_skill(self.albert_id, skill1)
-        job_id = (
-            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
-        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
-            job_id)
-
-        overall_result = ast.literal_eval(output[0])
-        expected_overall_result = {
-            'total_number_skills_requiring_svgs': 1,
-            'total_number_of_latex_strings_without_svg': 3
-        }
-
-        self.assertEqual(overall_result[1], expected_overall_result)
-        detailed_result = ast.literal_eval(output[1])
-        expected_skill1_info = {
-            'skill_id': 'skill_id1',
-            'latex_strings_without_svg_in_skill': [
-                '+,+,+,+', '-,-,-,-',
-                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
-        }
-        skill_latex_info = detailed_result[1]
-        self.assertEqual(skill_latex_info[0], expected_skill1_info)
-
-    def test_job_when_skills_do_not_have_math_rich_text_components(self):
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
 
         skill = skill_domain.Skill.create_default_skill(
-            'valid_skill', 'A description', rubrics)
+            self.SKILL_ID, 'A description', rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
-        job_id = (
-            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
-        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
 
-        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
+        skill_services.update_skill(
+            self.albert_id, 'skill_id', [skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'explanations': ['New explanation'],
+            }), skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': 'description',
+                'old_value': '',
+                'new_value': 'Test description'
+            })], 'Changes.')
+
+        self.model_instance_0 = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-skill_id-1'))
+        self.model_instance_1 = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-skill_id-2'))
+
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_standard_operation(self):
+        self.assertEqual(
+            self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
+        self.assertEqual(
+            self.model_instance_1.commit_cmds,
+            [{
+                'difficulty': 'Easy', 'cmd': 'update_rubrics',
+                'explanations': ['New explanation']
+            }, {
+                'cmd': 'update_skill_property', 'new_value': 'Test description',
+                'old_value': '', 'property_name': 'description'
+            }])
+        job_id = (
+            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
+        skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])
+        self.assertEqual(
+            self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
+        self.assertEqual(
+            self.model_instance_1.commit_cmds,
+            [{
+                'difficulty': 'Easy', 'cmd': 'update_rubrics',
+                'explanations': ['New explanation']
+            }, {
+                'cmd': 'update_skill_property', 'new_value': 'Test description',
+                'old_value': '', 'property_name': 'description'
+            }])
+
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance_1.commit_cmds = [{
+            'difficulty': 'Easy', 'cmd': 'update_rubrics',
+            'explanation': ['New explanation']
+        }, {
+            'cmd': 'update_skill_property', 'new_value': 'Test description',
+            'old_value': '', 'property_name': 'description'
+        }]
+        self.model_instance_1.deleted = True
+        self.model_instance_1.put()
+        job_id = (
+            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
+        skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
             job_id)
         self.assertEqual(output, [])
 
-    def test_job_when_skills_have_math_rich_text_components_with_svgs(self):
-        valid_html_1 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-            'e&amp;quot;: &amp;quot;file1.svg&amp;quot;}"></oppia-noninte'
-            'ractive-math>'
-        )
-        valid_html_2 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;file2.svg&amp;quot;}">'
-            '</oppia-noninteractive-math>'
-        )
+    def test_migration_job_updates_invalid_command(self):
+        self.model_instance_1.commit_cmds = [{
+            'difficulty': 'Easy', 'cmd': 'update_rubrics',
+            'explanation': ['New explanation']
+        }, {
+            'cmd': 'update_skill_property', 'new_value': 'Test description',
+            'old_value': '', 'property_name': 'description'
+        }]
+        self.model_instance_1.put()
 
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', valid_html_1),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
-        skill_contents1 = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict({
-                'voiceovers_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            }),
-            state_domain.WrittenTranslations.from_dict({
-                'translations_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            })
-        )
-        misconceptions1 = [skill_domain.Misconception(
-            0, 'name', '<p>misconception html1</p>',
-            '<p>misconception html2</p>', True)]
-        rubrics1 = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], [valid_html_2]),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
-        skill1 = skill_domain.Skill(
-            'skill_id1', 'Description', misconceptions1, rubrics1,
-            skill_contents1, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
-            None, False, ['skill_id_2']
-        )
-        skill_services.save_new_skill(self.albert_id, skill1)
+        self.assertEqual(
+            self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
+        self.assertEqual(
+            self.model_instance_1.commit_cmds,
+            [{
+                'difficulty': 'Easy', 'cmd': 'update_rubrics',
+                'explanation': ['New explanation']
+            }, {
+                'cmd': 'update_skill_property', 'new_value': 'Test description',
+                'old_value': '', 'property_name': 'description'
+            }])
         job_id = (
-            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
-        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
+        skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
 
-        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
+        output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
             job_id)
-        overall_result = ast.literal_eval(output[0])
-        expected_skill1_info = {
-            'skill_id': 'skill_id1',
-            'latex_strings_with_svg': [
-                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)', '+,+,+,+']
-        }
-        skill_latex_info = overall_result[1]
-        self.assertEqual(skill_latex_info[0], expected_skill1_info)
+        self.assertEqual(
+            output, ['[u\'Commit Commands Updated\', [u\'skill-skill_id-2\']]'])
+        self.assertEqual(
+            self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
+        self.model_instance_1 = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-skill_id-2'))
+        self.assertEqual(
+            self.model_instance_1.commit_cmds,
+            [{
+                'difficulty': 'Easy', 'cmd': 'update_rubrics',
+                'explanations': ['New explanation']
+            }, {
+                'cmd': 'update_skill_property', 'new_value': 'Test description',
+                'old_value': '', 'property_name': 'description'
+            }])
 
-    def test_job_skips_deleted_skills(self):
+
+class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    SKILL_ID = 'skill_id'
+
+    def setUp(self):
+        super(MissingSkillMigrationOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.set_admins([self.ALBERT_NAME])
+
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
 
         skill = skill_domain.Skill.create_default_skill(
-            'valid_skill', 'A description', rubrics)
+            self.SKILL_ID, 'A description', rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
-        skill_services.delete_skill(
-            self.albert_id, skill.id)
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            skill_fetchers.get_skill_by_id(skill.id)
+        self.model_instance = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-skill_id-1'))
 
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_standard_operation(self):
         job_id = (
-            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
-        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
+        skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
 
-        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
+        output = skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
             job_id)
         self.assertEqual(output, [])
+        self.assertFalse(self.model_instance.deleted)
+
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance.deleted = True
+        self.model_instance.put()
+
+        def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument
+            return None
+
+        with self.swap(skill_fetchers, 'get_skill_by_id', mock_get_skill_by_id):
+            job_id = (
+                skill_jobs_one_off
+                .MissingSkillMigrationOneOffJob.create_new())
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+            output = (
+                skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
+                    job_id))
+            self.assertEqual(output, [])
+
+    def test_migration_job_removes_commit_log_model_if_skill_model_is_missing(
+            self):
+        def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument
+            return None
+        with self.swap(skill_fetchers, 'get_skill_by_id', mock_get_skill_by_id):
+            job_id = (
+                skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+            output = (
+                skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
+                    job_id))
+            self.assertEqual(
+                output,
+                ['[u\'Skill Commit Model deleted\', [u\'skill-skill_id-1\']]'])
+            self.model_instance = (
+                skill_models.SkillCommitLogEntryModel.get_by_id(
+                    'skill-skill_id-1'))
+            self.assertIsNone(self.model_instance)

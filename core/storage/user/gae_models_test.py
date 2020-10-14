@@ -50,6 +50,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     USER_3_GAE_ID = 'gae3_id'
     USER_3_EMAIL = 'user3@example.com'
     USER_3_ROLE = feconf.ROLE_ID_ADMIN
+    GENERIC_PIN = '12345'
     PROFILE_1_ID = 'profile_id'
     PROFILE_1_GAE_ID = 'gae_id'
     PROFILE_1_EMAIL = 'user@example.com'
@@ -87,7 +88,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
             gae_id=self.USER_3_GAE_ID,
-            gae_user_id=self.USER_3_GAE_ID,
             email=self.USER_3_EMAIL,
             role=self.USER_3_ROLE,
             username=self.GENERIC_USERNAME,
@@ -107,13 +107,20 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
             preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
-            display_alias=self.GENERIC_DISPLAY_ALIAS
+            display_alias=self.GENERIC_DISPLAY_ALIAS,
+            pin=self.GENERIC_PIN
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.UserSettingsModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_users_deletes_them(self):
         # Case for a full user.
@@ -173,9 +180,10 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
-        for user in user_models.UserSettingsModel.get_by_role(
-                feconf.ROLE_ID_ADMIN):
-            self.assertIn(user, actual_users)
+        self.assertItemsEqual(
+            user_models.UserSettingsModel.get_by_role(feconf.ROLE_ID_ADMIN),
+            actual_users
+        )
 
     def test_export_data_for_nonexistent_user_raises_exception(self):
         with self.assertRaisesRegexp(
@@ -205,7 +213,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'display_alias': None
+            'display_alias': None,
+            'pin': None
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -231,7 +240,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'display_alias': self.GENERIC_DISPLAY_ALIAS
+            'display_alias': self.GENERIC_DISPLAY_ALIAS,
+            'pin': self.GENERIC_PIN
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -243,6 +253,18 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel(
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
+
+    def test_get_new_id_with_deleted_user_model(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.DeletedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.DeletedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.UserSettingsModel.get_new_id('exploration')
 
     def test_get_new_id_for_too_many_collisions_raises_error(self):
         # Swap dependent method get_by_id to simulate collision every time.
@@ -281,6 +303,12 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -352,6 +380,12 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -444,6 +478,12 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             last_played_state_name=self.STATE_NAME_2,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -564,6 +604,12 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.LearnerPlaylistModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1370,6 +1416,12 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CollectionProgressModel.get_deletion_policy(),
@@ -1472,6 +1524,12 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             completed_node_ids=self.COMPLETED_NODE_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.StoryProgressModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1784,6 +1842,12 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_lowest_supported_role(self):
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserSkillMasteryModel.get_deletion_policy(),
@@ -1877,8 +1941,8 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
 
-class UserContributionsScoringModelTests(test_utils.GenericTestBase):
-    """Tests for UserContributionScoringModel."""
+class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
+    """Tests for UserContributionProficiencyModel."""
 
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
@@ -1890,47 +1954,47 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
-        super(UserContributionsScoringModelTests, self).setUp()
+        super(UserContributionProficiencyModelTests, self).setUp()
 
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_1_ID),
             user_id=self.USER_1_ID,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
-            has_email_been_sent=False
+            onboarding_email_sent=False
         ).put()
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_1_ID),
             user_id=self.USER_1_ID,
             score_category=self.SCORE_CATEGORY_2,
             score=2,
-            has_email_been_sent=False
+            onboarding_email_sent=False
         ).put()
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_2_ID),
             user_id=self.USER_2_ID,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
-            has_email_been_sent=False,
+            onboarding_email_sent=False,
             deleted=True
         ).put()
 
     def test_export_data_trivial(self):
-        user_data = user_models.UserContributionScoringModel.export_data(
+        user_data = user_models.UserContributionProficiencyModel.export_data(
             'USER_WITHOUT_DATA')
         expected_data = {}
         self.assertEqual(user_data, expected_data)
 
     def test_export_data_nontrivial(self):
-        user_data = user_models.UserContributionScoringModel.export_data(
+        user_data = user_models.UserContributionProficiencyModel.export_data(
             self.USER_1_ID)
         expected_data = {
             self.SCORE_CATEGORY_1: {
-                'has_email_been_sent': False,
+                'onboarding_email_sent': False,
                 'score': 1.5
             },
             self.SCORE_CATEGORY_2: {
-                'has_email_been_sent': False,
+                'onboarding_email_sent': False,
                 'score': 2
             }
         }
@@ -1938,41 +2002,42 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            user_models.UserContributionScoringModel.get_deletion_policy(),
+            user_models.UserContributionProficiencyModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
-        user_models.UserContributionScoringModel.apply_deletion_policy(
+        user_models.UserContributionProficiencyModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
-            user_models.UserContributionScoringModel.query(
-                user_models.UserContributionScoringModel.user_id ==
+            user_models.UserContributionProficiencyModel.query(
+                user_models.UserContributionProficiencyModel.user_id ==
                 self.USER_1_ID
             ).get()
         )
         # Test that calling apply_deletion_policy with no existing model
         # doesn't fail.
-        user_models.UserContributionScoringModel.apply_deletion_policy(
+        user_models.UserContributionProficiencyModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
-            user_models.UserContributionScoringModel
+            user_models.UserContributionProficiencyModel
             .has_reference_to_user_id(self.USER_1_ID)
         )
         self.assertTrue(
-            user_models.UserContributionScoringModel
+            user_models.UserContributionProficiencyModel
             .has_reference_to_user_id(self.USER_2_ID)
         )
         self.assertFalse(
-            user_models.UserContributionScoringModel
+            user_models.UserContributionProficiencyModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
     def test_create_model(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category1', 1)
         score_models = (
-            user_models.UserContributionScoringModel
+            user_models.UserContributionProficiencyModel
             .get_all_scores_of_user('user1'))
         self.assertEqual(len(score_models), 1)
         self.assertEqual(score_models[0].id, 'category1.user1')
@@ -1981,96 +2046,120 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertEqual(score_models[0].score, 1)
 
     def test_create_entry_already_exists_failure(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category1', 1)
         with self.assertRaisesRegexp(
-            Exception, 'There is already an entry with the given id:'
-                       ' category1.user1'):
-            user_models.UserContributionScoringModel.create(
+            Exception, 'There is already a UserContributionProficiencyModel '
+            'entry with the given id: category1.user1'):
+            user_models.UserContributionProficiencyModel.create(
                 'user1', 'category1', 2)
 
     def test_get_all_users_with_score_above_minimum_for_category(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        user_models.UserContributionScoringModel.create(
+        # User scoring models for category 1.
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category1', 1)
+        user_models.UserContributionProficiencyModel.create(
             'user2', 'category1', 21)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             'user3', 'category1', 11)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             'user4', 'category1', 11)
-        user_models.UserContributionScoringModel.create(
-            'user1', 'category2', 11)
-        user_models.UserContributionScoringModel.create('user2', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user3', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user4', 'category2', 1)
 
-        score_models = (
-            user_models.UserContributionScoringModel
+        # User scoring models for category 2.
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category2', 11)
+        user_models.UserContributionProficiencyModel.create(
+            'user2', 'category2', 1)
+        user_models.UserContributionProficiencyModel.create(
+            'user3', 'category2', 1)
+        user_models.UserContributionProficiencyModel.create(
+            'user4', 'category2', 1)
+
+        # Get the user score models that have a score high enough for review
+        # for category 1.
+        user_score_models = (
+            user_models.UserContributionProficiencyModel
             .get_all_users_with_score_above_minimum_for_category('category1'))
 
-        self.assertEqual(len(score_models), 3)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category1.user2'), score_models)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category1.user3'), score_models)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category1.user4'), score_models)
+        self.assertEqual(len(user_score_models), 3)
+        self.assertIn(user_models.UserContributionProficiencyModel.get(
+            'user2', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionProficiencyModel.get(
+            'user3', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionProficiencyModel.get(
+            'user4', 'category1'), user_score_models)
 
-        score_models = (
-            user_models.UserContributionScoringModel
+        # Get the user score models that have a score high enough for review
+        # for category 2.
+        user_score_models = (
+            user_models.UserContributionProficiencyModel
             .get_all_users_with_score_above_minimum_for_category('category2'))
 
-        self.assertEqual(len(score_models), 1)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category2.user1'), score_models)
+        self.assertEqual(len(user_score_models), 1)
+        self.assertIn(user_models.UserContributionProficiencyModel.get(
+            'user1', 'category2'), user_score_models)
 
-    def test_get_score_of_user_for_category(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+    def test_get_all_users_with_score_above_minimum_for_category_invalid_input(
+            self):
+        user_score_models = (
+            user_models.UserContributionProficiencyModel
+            .get_all_users_with_score_above_minimum_for_category(
+                'invalid_category'))
 
-        score = (
-            user_models.UserContributionScoringModel
-            .get_score_of_user_for_category('user1', 'category1'))
+        self.assertEqual(user_score_models, [])
 
-        self.assertEqual(score, 1)
+    def test_get_all_scores_of_user_with_multiple_scores(self):
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category1', 1)
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category2', 1)
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category3', 1)
 
-    def test_increment_score_for_user(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-
-        user_models.UserContributionScoringModel.increment_score_for_user(
-            'user1', 'category1', 2)
-
-        score = (
-            user_models.UserContributionScoringModel
-            .get_score_of_user_for_category('user1', 'category1'))
-
-        self.assertEqual(score, 3)
-
-    def test_get_all_scores_of_user(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        user_models.UserContributionScoringModel.create('user1', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user1', 'category3', 1)
-
-        score_models = (
-            user_models.UserContributionScoringModel
+        user_score_models = (
+            user_models.UserContributionProficiencyModel
             .get_all_scores_of_user('user1'))
-        self.assertEqual(len(score_models), 3)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category1.user1'), score_models)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category2.user1'), score_models)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category3.user1'), score_models)
+
+        self.assertEqual(len(user_score_models), 3)
+        self.assertIn(user_models.UserContributionProficiencyModel.get(
+            'user1', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionProficiencyModel.get(
+            'user1', 'category2'), user_score_models)
+        self.assertIn(user_models.UserContributionProficiencyModel.get(
+            'user1', 'category3'), user_score_models)
+
+    def test_get_all_scores_of_user_with_an_invalid_user_id_is_empty(self):
+        user_score_models = (
+            user_models.UserContributionProficiencyModel
+            .get_all_scores_of_user('invalid_user_id'))
+
+        self.assertEqual(user_score_models, [])
 
     def test_get_categories_where_user_can_review(self):
-        user_models.UserContributionScoringModel.create(
-            'user1', 'category1', 15)
-        user_models.UserContributionScoringModel.create('user1', 'category2', 1)
-        user_models.UserContributionScoringModel.create(
-            'user1', 'category3', 15)
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category1', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+        )
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category3', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+        )
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category2', 0
+        )
+
         score_categories = (
-            user_models.UserContributionScoringModel
+            user_models.UserContributionProficiencyModel
             .get_all_categories_where_user_can_review('user1'))
+
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+    def test_get_categories_where_user_can_review_with_invalid_user_id(self):
+        score_categories = (
+            user_models.UserContributionProficiencyModel
+            .get_all_categories_where_user_can_review('invalid_user_id'))
+
+        self.assertEqual(score_categories, [])
 
 
 class UserContributionRightsModelTests(test_utils.GenericTestBase):
@@ -2223,6 +2312,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_1_EMAIL = 'email@email.com'
+    USER_1_ROLE = feconf.ROLE_ID_LEARNER
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2231,6 +2321,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE,
             exploration_ids=[],
             collection_ids=[],
         ).put()
@@ -2238,7 +2329,20 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AT_END)
+
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.USER_1_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.NONEXISTENT_USER_ID))
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -2251,13 +2355,22 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         )
 
 
+class DeletedUserModelTests(test_utils.GenericTestBase):
+    """Tests for DeletedUserModelTests."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.DeletedUserModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+
 class PseudonymizedUserModelTests(test_utils.GenericTestBase):
     """Tests for PseudonymizedUserModel."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_create_raises_error_when_many_id_collisions_occur(self):
         # Swap dependent method get_by_id to simulate collision every time.
@@ -2280,11 +2393,8 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     NONREGISTERED_GAE_ID = 'gae_id_x'
     USER_ID = 'user_id'
     USER_GAE_ID = 'gae_id'
-    USER_PIN = '12345'
     PROFILE_ID = 'profile_id'
-    PROFILE_PIN = '123'
-    PROFILE_2_ID = 'profile2_id'
-    PROFILE_2_PIN = None
+    PROFILE_2_ID = 'profile_2_id'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2293,30 +2403,28 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         user_models.UserAuthDetailsModel(
             id=self.USER_ID,
             gae_id=self.USER_GAE_ID,
-            pin=self.USER_PIN
         ).put()
         user_models.UserAuthDetailsModel(
             id=self.PROFILE_ID,
             gae_id=None,
-            pin=self.PROFILE_PIN,
             parent_user_id=self.USER_ID
         ).put()
         user_models.UserAuthDetailsModel(
             id=self.PROFILE_2_ID,
             gae_id=None,
-            pin=self.PROFILE_2_PIN,
             parent_user_id=self.USER_ID
         ).put()
 
-    def test_get_export_policy_is_not_applicable(self):
+    def test_get_lowest_supported_role(self):
         self.assertEqual(
-            user_models.UserAuthDetailsModel.get_export_policy(),
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            user_models.UserAuthDetailsModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_LEARNER
+        )
 
-    def test_get_deletion_policy_is_delete(self):
+    def test_get_deletion_policy_is_delete_after_verification(self):
         self.assertEqual(
             user_models.UserAuthDetailsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.
@@ -2385,3 +2493,14 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             user_models.UserAuthDetailsModel.get_by_auth_id(
                 feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )
+
+    def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
+        user_auth_details_models = [
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
+        ]
+        fetched_output = (
+            user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
+                self.USER_ID)
+        )
+        self.assertItemsEqual(user_auth_details_models, fetched_output)

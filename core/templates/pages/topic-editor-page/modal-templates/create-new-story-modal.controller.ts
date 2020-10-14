@@ -33,7 +33,8 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
   'ImageLocalStorageService', 'NewlyCreatedStoryObjectFactory',
   'StoryEditorStateService', 'TopicEditorStateService', 'WindowRef',
   'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
-  function($controller, $rootScope, $scope, $uibModalInstance,
+  function(
+      $controller, $rootScope, $scope, $uibModalInstance,
       ImageLocalStorageService, NewlyCreatedStoryObjectFactory,
       StoryEditorStateService, TopicEditorStateService, WindowRef,
       MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
@@ -41,6 +42,8 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    $scope.validUrlFragmentRegex = new RegExp(
+      newStoryConstants.VALID_URL_FRAGMENT_REGEX);
     $scope.story = NewlyCreatedStoryObjectFactory.createDefault();
     $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
     $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = MAX_CHARS_IN_STORY_URL_FRAGMENT;
@@ -65,9 +68,10 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
     };
 
     $scope.isValid = function() {
-      return Boolean($scope.story.isValid() &&
-          ImageLocalStorageService.getStoredImagesData().length > 0 &&
-          !$scope.storyUrlFragmentExists);
+      return Boolean(
+        $scope.story.isValid() &&
+        ImageLocalStorageService.getStoredImagesData().length > 0 &&
+        !$scope.storyUrlFragmentExists);
     };
   }
 ]);

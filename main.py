@@ -217,10 +217,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
         r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
-    get_redirect_route(
-        r'/explorationslatexsvghandler', admin.ExplorationsLatexSvgHandler),
-    get_redirect_route(
-        r'/suggestionslatexsvghandler', admin.SuggestionsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -764,7 +760,8 @@ URLS = MAPREDUCE_HANDLERS + [
         story_editor.ValidateExplorationsHandler),
 
     get_redirect_route(
-        '/classroom_page_status_handler', classroom.ClassroomPageStatusHandler),
+        '/classroom_promos_status_handler',
+        classroom.ClassroomPromosStatusHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
@@ -789,6 +786,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/senddummymailtoadminhandler', admin.SendDummyMailToAdminHandler),
     get_redirect_route(r'/updateusernamehandler', admin.UpdateUsernameHandler),
+    get_redirect_route(
+        r'/numberofdeletionrequestshandler',
+        admin.NumberOfDeletionRequestsHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 

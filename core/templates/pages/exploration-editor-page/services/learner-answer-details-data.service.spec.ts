@@ -18,12 +18,12 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-answer-details-data.service.ts is upgraded to Angular 8.
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 
-require('pages/exploration-editor-page/services/' +
+require(
+  'pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
 require('services/csrf-token.service.ts');
 
@@ -34,7 +34,6 @@ describe('Learner answer details service', function() {
   var $httpBackend = null;
   var CsrfService = null;
   var $q = null;
-  var LearnerAnswerInfoObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -42,9 +41,6 @@ describe('Learner answer details service', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
-      $provide.value(
-        'LearnerAnswerDetailsObjectFactory',
-        new LearnerAnswerDetailsObjectFactory());
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -58,8 +54,6 @@ describe('Learner answer details service', function() {
     LearnerAnswerDetailsDataService = $injector.get(
       'LearnerAnswerDetailsDataService');
     $q = _$q_;
-    LearnerAnswerInfoObjectFactory = $injector.get(
-      'LearnerAnswerInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
@@ -98,10 +92,11 @@ describe('Learner answer details service', function() {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
-        var createFromBackendDictSpy = spyOn(LearnerAnswerInfoObjectFactory,
-          'createFromBackendDict');
+        var createFromBackendDictSpy = spyOn(
+          LearnerAnswerInfo, 'createFromBackendDict');
 
-        $httpBackend.expect('GET', '/learneranswerinfohandler/' +
+        $httpBackend.expect(
+          'GET', '/learneranswerinfohandler/' +
           'learner_answer_details/exploration/12345').respond(
           sampleDataResults);
         LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
@@ -122,10 +117,11 @@ describe('Learner answer details service', function() {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
-        var createFromBackendDictSpy = spyOn(LearnerAnswerInfoObjectFactory,
-          'createFromBackendDict');
+        var createFromBackendDictSpy = spyOn(
+          LearnerAnswerInfo, 'createFromBackendDict');
 
-        $httpBackend.expect('GET', '/learneranswerinfohandler/' +
+        $httpBackend.expect(
+          'GET', '/learneranswerinfohandler/' +
           'learner_answer_details/exploration/12345').respond(
           sampleDataResults);
         LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
@@ -144,7 +140,8 @@ describe('Learner answer details service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      $httpBackend.expect('DELETE', '/learneranswerinfohandler/' +
+      $httpBackend.expect(
+        'DELETE', '/learneranswerinfohandler/' +
       'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
       'learner_answer_info_id=fakeId').respond(200);
       LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
@@ -161,7 +158,8 @@ describe('Learner answer details service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      $httpBackend.expect('DELETE', '/learneranswerinfohandler/' +
+      $httpBackend.expect(
+        'DELETE', '/learneranswerinfohandler/' +
       'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
       'learner_answer_info_id=fakeId').respond(404);
       LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(

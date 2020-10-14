@@ -21,21 +21,89 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
+import re
 
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_validation_service
+from core.domain import image_validation_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
 import utils
 
-(exp_models,) = models.Registry.import_models([
-    models.NAMES.exploration])
+(
+    base_models,
+    exp_models,
+    feedback_models,
+    improvements_models,
+    skill_models,
+    stats_models,
+    story_models,
+) = models.Registry.import_models([
+    models.NAMES.base_model,
+    models.NAMES.exploration,
+    models.NAMES.feedback,
+    models.NAMES.improvements,
+    models.NAMES.skill,
+    models.NAMES.statistics,
+    models.NAMES.story,
+])
+
+
+class RegenerateStringPropertyIndexOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for regenerating the index of models changed to use an
+    indexed StringProperty.
+
+    Cloud NDB dropped support for StringProperty(indexed=False) and
+    TextProperty(indexed=True). Therefore, to prepare for the migration to Cloud
+    NDB, we need to regenerate the indexes for every model that has been changed
+    in this way.
+
+    https://cloud.google.com/appengine/docs/standard/python/datastore/indexes#unindexed-properties:
+    > changing a property from unindexed to indexed does not affect any existing
+    > entities that may have been created before the change. Queries filtering
+    > on the property will not return such existing entities, because the
+    > entities weren't written to the query's index when they were created. To
+    > make the entities accessible by future queries, you must rewrite them to
+    > Datastore so that they will be entered in the appropriate indexes. That
+    > is, you must do the following for each such existing entity:
+    > 1.  Retrieve (get) the entity from Datastore.
+    > 2.  Write (put) the entity back to Datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationModel,
+            feedback_models.GeneralFeedbackMessageModel,
+            improvements_models.TaskEntryModel,
+            skill_models.SkillModel,
+            stats_models.ExplorationAnnotationsModel,
+            story_models.StoryModel,
+            story_models.StorySummaryModel,
+        ]
+
+    @staticmethod
+    def map(model):
+        model_kind = type(model).__name__
+        if isinstance(model, base_models.VersionedModel):
+            # Change the method resolution order of model to use BaseModel's
+            # implementation of `put`.
+            model = super(base_models.VersionedModel, model)
+        model.put(update_last_updated_time=False)
+        yield (model_kind, 1)
+
+    @staticmethod
+    def reduce(key, counts):
+        yield (key, len(counts))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -49,7 +117,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if item.content['status'] == rights_domain.ACTIVITY_STATUS_PUBLIC:
             yield (
                 item.get_unversioned_instance_id(),
                 utils.get_time_in_millisecs(item.created_on))
@@ -88,7 +156,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         exp_rights = rights_manager.get_exploration_rights(item.id)
 
         try:
-            if exp_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            if exp_rights.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                 exploration.validate()
             else:
                 exploration.validate(strict=True)
@@ -267,12 +335,10 @@ class ExplorationMathSvgFilenameValidationOneOffJob(
         yield ('Detailed information on invalid tags. ', invalid_tags_info)
 
 
-class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that migrates all the math tags in the exploration to the new schema
-    but does not save the migrated exploration. The new schema has the attribute
-    math-content-with-value which includes a field for storing reference to
-    SVGs. This job is used to verify that the actual migration will be possible
-    for all the explorations.
+class ExplorationRteMathContentValidationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates the
+    Math content object for each math rich-text components.
     """
 
     @classmethod
@@ -285,152 +351,40 @@ class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        exploration_status = (
-            rights_manager.get_exploration_rights(
-                item.id).status)
+        invalid_tags_info_in_exp = []
         for state_name, state in exploration.states.items():
-            html_string = ''.join(
-                state.get_all_html_content_strings())
-
-            converted_html_string = (
-                html_validation_service.add_math_content_to_math_rte_components(
-                    html_string))
-
+            html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
                 html_validation_service.
-                validate_math_tags_in_html_with_attribute_math_content(
-                    converted_html_string))
+                validate_math_content_attribute_in_html(html_string))
             if len(error_list) > 0:
-                key = (
-                    'exp_id: %s, exp_status: %s failed validation after '
-                    'migration' % (
-                        item.id, exploration_status))
-                value_dict = {
+                invalid_tags_info_in_state = {
                     'state_name': state_name,
                     'error_list': error_list,
                     'no_of_invalid_tags': len(error_list)
                 }
-                yield (key, value_dict)
+                invalid_tags_info_in_exp.append(invalid_tags_info_in_state)
+        if len(invalid_tags_info_in_exp) > 0:
+            yield ('Found invalid tags', (item.id, invalid_tags_info_in_exp))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        no_of_invalid_tags = 0
+        invalid_tags_info = {}
+        for exp_id, invalid_tags_info_in_exp in final_values:
+            invalid_tags_info[exp_id] = []
+            for value in invalid_tags_info_in_exp:
+                no_of_invalid_tags += value['no_of_invalid_tags']
+                del value['no_of_invalid_tags']
+                invalid_tags_info[exp_id].append(value)
 
-
-class ExplorationMathRichTextInfoModelGenerationOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that finds all the explorations with math rich text components and
-    creates a temporary storage model with all the information required for
-    generating math rich text component SVG images.
-    """
-
-    # A constant that will be yielded as a key by this job in the map function,
-    # When it finds an exploration with math rich text components without SVGs.
-    _SUCCESS_KEY = 'exploration-with-math-tags'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        try:
-            exploration.validate()
-        except Exception as e:
-            logging.error(
-                'Exploration %s failed non-strict validation: %s' %
-                (item.id, e))
-            yield (
-                'validation_error',
-                'Exploration %s failed non-strict validation: %s' %
-                (item.id, e))
-            return
-        html_strings_in_exploration = ''
-        for state in exploration.states.values():
-            html_strings_in_exploration += (
-                ''.join(state.get_all_html_content_strings()))
-        list_of_latex_strings_without_svg = (
-            html_validation_service.
-            get_latex_strings_without_svg_from_html(
-                html_strings_in_exploration))
-        if len(list_of_latex_strings_without_svg) > 0:
-            yield (
-                ExplorationMathRichTextInfoModelGenerationOneOffJob.
-                _SUCCESS_KEY,
-                (item.id, list_of_latex_strings_without_svg))
-
-    @staticmethod
-    def reduce(key, values):
-        if key == (
-                ExplorationMathRichTextInfoModelGenerationOneOffJob.
-                _SUCCESS_KEY):
-            final_values = [ast.literal_eval(value) for value in values]
-            estimated_no_of_batches = 1
-            approx_size_of_math_svgs_bytes_in_current_batch = 0
-            exploration_math_rich_text_info_list = []
-            longest_raw_latex_string = ''
-            total_number_of_svgs_required = 0
-            for exp_id, list_of_latex_strings_without_svg in final_values:
-                math_rich_text_info = (
-                    exp_domain.ExplorationMathRichTextInfo(
-                        exp_id, True, list_of_latex_strings_without_svg))
-                exploration_math_rich_text_info_list.append(
-                    math_rich_text_info)
-
-                approx_size_of_math_svgs_bytes = (
-                    math_rich_text_info.get_svg_size_in_bytes())
-                total_number_of_svgs_required += len(
-                    list_of_latex_strings_without_svg)
-                longest_raw_latex_string = max(
-                    math_rich_text_info.get_longest_latex_expression(),
-                    longest_raw_latex_string, key=len)
-                approx_size_of_math_svgs_bytes_in_current_batch += int(
-                    approx_size_of_math_svgs_bytes)
-                if approx_size_of_math_svgs_bytes_in_current_batch > (
-                        feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
-                    approx_size_of_math_svgs_bytes_in_current_batch = 0
-                    estimated_no_of_batches += 1
-
-            exp_services.save_multi_exploration_math_rich_text_info_model(
-                exploration_math_rich_text_info_list)
-
-            final_value_dict = {
-                'estimated_no_of_batches': estimated_no_of_batches,
-                'longest_raw_latex_string': longest_raw_latex_string,
-                'number_of_explorations_having_math': (
-                    len(final_values)),
-                'total_number_of_svgs_required': total_number_of_svgs_required
-            }
-            yield (key, final_value_dict)
-        else:
-            yield (key, values)
-
-
-class ExplorationMathRichTextInfoModelDeletionOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes all instances of the ExplorationMathRichTextInfoModel
-    from the datastore.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationMathRichTextInfoModel]
-
-    @staticmethod
-    def map(item):
-        item.delete()
-        yield ('model_deleted', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        no_of_models_deleted = (
-            sum(ast.literal_eval(v) for v in values))
-        yield (key, ['%d models successfully delelted.' % (
-            no_of_models_deleted)])
+        final_value_dict = {
+            'no_of_explorations_with_no_svgs': len(final_values),
+            'no_of_invalid_tags': no_of_invalid_tags,
+        }
+        yield ('Overall result.', final_value_dict)
+        yield ('Detailed information on invalid tags.', invalid_tags_info)
 
 
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
@@ -589,3 +543,135 @@ class RTECustomizationArgsValidationOneOffJob(
             index += 2
         output_values.sort()
         yield (key, output_values)
+
+
+class PopulateXmlnsAttributeInExplorationMathSvgImagesJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate xmlns attribute in the math-expression svg
+    images.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, item.id))
+        filepaths = fs.listdir('image')
+        count_of_unchanged_svgs = 0
+        filenames_of_modified_svgs = []
+        for filepath in filepaths:
+            filename = filepath.split('/')[-1]
+            if not re.match(constants.MATH_SVG_FILENAME_REGEX, filename):
+                continue
+            old_svg_image = fs.get(filepath)
+            new_svg_image = (
+                html_validation_service.get_svg_with_xmlns_attribute(
+                    old_svg_image))
+            if new_svg_image == old_svg_image:
+                count_of_unchanged_svgs += 1
+                continue
+            try:
+                image_validation_services.validate_image_and_filename(
+                    new_svg_image, filename)
+            except Exception as e:
+                yield (
+                    'FAILED validation',
+                    'Exploration with id %s failed image validation for the '
+                    'filename %s with following error: %s' % (
+                        item.id, filename, e))
+            else:
+                fs.commit(
+                    filepath.encode('utf-8'), new_svg_image,
+                    mimetype='image/svg+xml')
+                filenames_of_modified_svgs.append(filename)
+        if count_of_unchanged_svgs:
+            yield ('UNCHANGED', count_of_unchanged_svgs)
+        if len(filenames_of_modified_svgs) > 0:
+            yield (
+                'SUCCESS - CHANGED Exp Id: %s' % item.id,
+                filenames_of_modified_svgs)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'UNCHANGED':
+            final_values = [ast.literal_eval(value) for value in values]
+            yield (key, sum(final_values))
+        else:
+            exp_id_index = key.find('Exp Id:')
+            if exp_id_index == -1:
+                yield (key, values)
+            else:
+                final_values = [ast.literal_eval(value) for value in values]
+                output_values = list(set().union(*final_values))
+                output_values.append(key[exp_id_index:])
+                yield (key[:exp_id_index - 1], output_values)
+
+
+class XmlnsAttributeInExplorationMathSvgImagesAuditJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to audit math SVGs on the server that do not have xmlns
+    attribute.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, item.id))
+        filepaths = fs.listdir('image')
+        for filepath in filepaths:
+            filename = filepath.split('/')[-1]
+            if not re.match(constants.MATH_SVG_FILENAME_REGEX, filename):
+                continue
+            old_svg_image = fs.get(filepath)
+            xmlns_attribute_is_present = (
+                html_validation_service.does_svg_tag_contains_xmlns_attribute(
+                    old_svg_image))
+            if not xmlns_attribute_is_present:
+                yield (item.id, filename)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the translator_ids from the ExpSummaryModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExpSummaryModel]
+
+    @staticmethod
+    def map(exp_summary_model):
+        # This is the only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'translator_ids' in exp_summary_model._properties:  # pylint: disable=protected-access
+            del exp_summary_model._properties['translator_ids']  # pylint: disable=protected-access
+            if 'translator_ids' in exp_summary_model._values:  # pylint: disable=protected-access
+                del exp_summary_model._values['translator_ids']  # pylint: disable=protected-access
+            exp_summary_model.put(update_last_updated_time=False)
+            yield ('SUCCESS_REMOVED - ExpSummaryModel', exp_summary_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - ExpSummaryModel',
+                exp_summary_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))

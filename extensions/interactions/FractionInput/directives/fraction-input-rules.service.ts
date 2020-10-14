@@ -31,10 +31,11 @@ import {
   providedIn: 'root'
 })
 export class FractionInputRulesService {
-  constructor(private fractionObjectFactory: FractionObjectFactory,
+  constructor(
+    private fractionObjectFactory: FractionObjectFactory,
     private utilsService: UtilsService) {}
 
-  toFloat(fractionDict: FractionAnswer) {
+  toFloat(fractionDict: FractionAnswer): number {
     return this.fractionObjectFactory.fromDict(fractionDict).toFloat();
   }
   IsEquivalentTo(

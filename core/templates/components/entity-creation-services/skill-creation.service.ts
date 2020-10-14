@@ -18,7 +18,8 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
-require('domain/topics_and_skills_dashboard/' +
+require(
+  'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/image-local-storage.service.ts');
@@ -92,7 +93,7 @@ angular.module('oppia').factory('SkillCreationService', [
           // fetched from the backend.
           var newTab = $window.open();
           var imagesData = ImageLocalStorageService.getStoredImagesData();
-          SkillCreationBackendApiService.createSkill(
+          SkillCreationBackendApiService.createSkillAsync(
             result.description, rubrics, result.explanation,
             topicIds || [], imagesData).then(function(response) {
             $timeout(function() {

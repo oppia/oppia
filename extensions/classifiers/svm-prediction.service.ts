@@ -29,15 +29,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { PredictionResult, PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
+import { PredictionResult } from 'domain/classifier/prediction-result.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SVMPredictionService {
-  constructor(
-      private predictionResultObjectFactory: PredictionResultObjectFactory) {}
+  constructor() {}
   kernel(
       kernelParams: KernelParams, supportVectors: number[][],
       input: number[]): number[] {
@@ -46,7 +44,6 @@ export class SVMPredictionService {
 
     if (kernel === 'rbf') {
       var gamma = kernelParams.gamma;
-      var vectorLength = input.length;
       for (var i = 0; i < supportVectors.length; i++) {
         var sum = 0;
         for (var j = 0; j < input.length; j++) {
@@ -55,7 +52,6 @@ export class SVMPredictionService {
         kvalues.push(Math.exp(-gamma * sum));
       }
     } else if (kernel === 'linear') {
-      var vectorLength = input.length;
       for (var i = 0; i < supportVectors.length; i++) {
         var sum = 0;
         for (var j = 0; j < input.length; j++) {
@@ -252,7 +248,7 @@ export class SVMPredictionService {
     }
 
     var predictedLabel = classes[maxProbIdx];
-    var prediction = this.predictionResultObjectFactory.createNew(
+    var prediction = new PredictionResult(
       predictedLabel, probabilities[maxProbIdx]);
     return prediction;
   }

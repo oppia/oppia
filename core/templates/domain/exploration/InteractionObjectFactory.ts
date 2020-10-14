@@ -49,7 +49,6 @@ import {
   ItemSelectionInputCustomizationArgsBackendDict,
   LogicProofCustomizationArgs,
   MathEquationInputCustomizationArgs,
-  MathExpressionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgsBackendDict,
   MusicNotesInputCustomizationArgs,
@@ -57,10 +56,13 @@ import {
   NumericExpressionInputCustomizationArgs,
   NumericInputCustomizationArgs,
   PencilCodeEditorCustomizationArgs,
+  RatioExpressionInputCustomizationArgs,
+  RatioExpressionInputCustomizationArgsBackendDict,
   SetInputCustomizationArgs,
   SetInputCustomizationArgsBackendDict,
   TextInputCustomizationArgs,
-  TextInputCustomizationArgsBackendDict
+  TextInputCustomizationArgsBackendDict,
+  NumericExpressionInputCustomizationArgsBackendDict
 } from 'interactions/customization-args-defs';
 import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
@@ -148,8 +150,8 @@ export class Interaction {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         result = value.toBackendDict();
       } else if (value instanceof Array) {
-        result = value.map(element =>
-          traverseSchemaAndConvertSubtitledToDicts(element));
+        result = value.map(
+          element => traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
         result = {};
         Object.keys(value).forEach(key => {
@@ -193,8 +195,8 @@ export class Interaction {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         contentIds.push(value.getContentId());
       } else if (value instanceof Array) {
-        value.forEach(element =>
-          traverseValueAndRetrieveContentIdsFromSubtitled(element));
+        value.forEach(
+          element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
       } else if (value instanceof Object) {
         Object.keys(value).forEach(key => {
           traverseValueAndRetrieveContentIdsFromSubtitled(value[key]);
@@ -202,9 +204,9 @@ export class Interaction {
       }
     };
 
-    Object.keys(customizationArgs).forEach(caName =>
-      traverseValueAndRetrieveContentIdsFromSubtitled(
-        customizationArgs[caName])
+    Object.keys(customizationArgs).forEach(
+      caName => traverseValueAndRetrieveContentIdsFromSubtitled(
+        customizationArgs[caName].value)
     );
 
     return contentIds;
@@ -261,8 +263,9 @@ export class InteractionObjectFactory {
     return {
       allowMultipleItemsInSamePosition,
       choices: {
-        value: choices.value.map(subtitledHtmlDict =>
-          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+        value: choices.value.map(
+          subtitledHtmlDict =>
+            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -293,8 +296,9 @@ export class InteractionObjectFactory {
       minAllowableSelectionCount,
       maxAllowableSelectionCount,
       choices: {
-        value: choices.value.map(subtitledHtmlDict =>
-          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+        value: choices.value.map(
+          subtitledHtmlDict =>
+            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -308,8 +312,9 @@ export class InteractionObjectFactory {
     return {
       showChoicesInShuffledOrder,
       choices: {
-        value: choices.value.map(subtitledHtmlDict =>
-          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+        value: choices.value.map(
+          subtitledHtmlDict =>
+            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -332,6 +337,31 @@ export class InteractionObjectFactory {
     const { rows, placeholder } = caBackendDict;
     return {
       rows,
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      }
+    };
+  }
+
+  _createFromNumericExpressionInputCustomizationArgsBackendDict(
+      caBackendDict: NumericExpressionInputCustomizationArgsBackendDict
+  ): NumericExpressionInputCustomizationArgs {
+    const { placeholder } = caBackendDict;
+    return {
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      }
+    };
+  }
+
+  _createFromRatioExpressionInputCustomizationArgsBackendDict(
+      caBackendDict: RatioExpressionInputCustomizationArgsBackendDict
+  ): RatioExpressionInputCustomizationArgs {
+    const { numberOfTerms, placeholder } = caBackendDict;
+    return {
+      numberOfTerms,
       placeholder: {
         value: this.subtitledUnicodeFactory.createFromBackendDict(
           placeholder.value)
@@ -377,8 +407,6 @@ export class InteractionObjectFactory {
         return <LogicProofCustomizationArgs> cloneDeep(caBackendDict);
       case 'MathEquationInput':
         return <MathEquationInputCustomizationArgs> cloneDeep(caBackendDict);
-      case 'MathExpressionInput':
-        return <MathExpressionInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'MultipleChoiceInput':
         return this._createFromIMultipleChoiceInputCustomizationArgsBackendDict(
           <MultipleChoiceInputCustomizationArgsBackendDict> caBackendDict);
@@ -388,11 +416,16 @@ export class InteractionObjectFactory {
         return <NumberWithUnitsCustomizationArgs> cloneDeep(caBackendDict);
       case 'NumericExpressionInput':
         return (
-          <NumericExpressionInputCustomizationArgs> cloneDeep(caBackendDict));
+          this._createFromNumericExpressionInputCustomizationArgsBackendDict(
+            <NumericExpressionInputCustomizationArgsBackendDict> caBackendDict)
+        );
       case 'NumericInput':
         return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'PencilCodeEditor':
         return <PencilCodeEditorCustomizationArgs> cloneDeep(caBackendDict);
+      case 'RatioExpressionInput':
+        return this._createFromRatioExpressionInputCustomizationArgsBackendDict(
+          <RatioExpressionInputCustomizationArgsBackendDict> caBackendDict);
       case 'SetInput':
         return this._createFromSetInputCustomizationArgsBackendDict(
           <SetInputCustomizationArgsBackendDict> caBackendDict);
@@ -428,7 +461,7 @@ export class InteractionObjectFactory {
   }
 
   generateAnswerGroupsFromBackend(
-      answerGroupBackendDicts: AnswerGroupBackendDict[]) {
+      answerGroupBackendDicts: AnswerGroupBackendDict[]): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
       return this.answerGroupFactory.createFromBackendDict(
@@ -436,13 +469,14 @@ export class InteractionObjectFactory {
     });
   }
 
-  generateHintsFromBackend(hintBackendDicts: HintBackendDict[]) {
+  generateHintsFromBackend(hintBackendDicts: HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
   }
 
-  generateSolutionFromBackend(solutionBackendDict: SolutionBackendDict) {
+  generateSolutionFromBackend(
+      solutionBackendDict: SolutionBackendDict): Solution {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }
 }

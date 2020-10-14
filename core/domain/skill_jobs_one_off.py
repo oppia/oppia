@@ -23,7 +23,6 @@ import ast
 import logging
 
 from core import jobs
-from core.domain import html_validation_service
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
@@ -119,70 +118,65 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class SkillMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks for existence of math components in the skills."""
+class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to migrate the old commit cmds in skill commit log
+    model to the latest cmd format.
 
-    _LATEX_STRINGS_WITHOUT_SVG = 'latex-strings-without-svg'
-    _LATEX_STRINGS_HAVING_SVG = 'latex-strings-having-svg'
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10807 is fixed.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [skill_models.SkillModel]
+        return [skill_models.SkillCommitLogEntryModel]
 
     @staticmethod
     def map(item):
         if item.deleted:
             return
-        skill = skill_fetchers.get_skill_by_id(item.id)
-        html_string = ''.join(skill.get_all_html_content_strings())
-        list_of_latex_strings_without_svg = (
-            html_validation_service.get_latex_strings_without_svg_from_html(
-                html_string))
-        latex_string_to_filename_mapping = (
-            html_validation_service.
-            extract_svg_filename_latex_mapping_in_math_rte_components(
-                html_string))
-        if len(latex_string_to_filename_mapping) > 0:
-            latex_strings_with_svg = [
-                latex_string_to_filename[1] for latex_string_to_filename in (
-                    latex_string_to_filename_mapping)]
-            yield (
-                SkillMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG,
-                (item.id, latex_strings_with_svg))
-        if len(list_of_latex_strings_without_svg) > 0:
-            yield (
-                SkillMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG,
-                (item.id, list_of_latex_strings_without_svg))
+
+        updated_commit_cmds = []
+        update_required = False
+        for commit_cmd_dict in item.commit_cmds:
+            updated_commit_cmd_dict = {}
+            for cmd_key, cmd_val in commit_cmd_dict.items():
+                if cmd_key == 'explanation':
+                    update_required = True
+                    updated_commit_cmd_dict['explanations'] = cmd_val
+                else:
+                    updated_commit_cmd_dict[cmd_key] = cmd_val
+            updated_commit_cmds.append(updated_commit_cmd_dict)
+
+        if update_required:
+            item.commit_cmds = updated_commit_cmds
+            item.put(update_last_updated_time=False)
+            yield ('Commit Commands Updated', item.id)
 
     @staticmethod
     def reduce(key, values):
-        if key == SkillMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG:
-            final_values = [ast.literal_eval(value) for value in values]
-            total_number_of_latex_strings_without_svg = 0
-            skills_latex_strings_count = []
-            for skill_id, latex_strings in final_values:
-                total_number_of_latex_strings_without_svg += len(latex_strings)
-                skills_latex_strings_count.append({
-                    'skill_id': skill_id,
-                    'latex_strings_without_svg_in_skill': latex_strings
-                })
-            yield (
-                'Overall result.', {
-                    'total_number_skills_requiring_svgs': len(final_values),
-                    'total_number_of_latex_strings_without_svg': (
-                        total_number_of_latex_strings_without_svg)
-                })
-            yield (
-                'Latex strings without SVGs in each skill',
-                skills_latex_strings_count)
-        elif key == SkillMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG:
-            final_values = [ast.literal_eval(value) for value in values]
-            skills_latex_strings_count = []
-            for skill_id, latex_strings in final_values:
-                skills_latex_strings_count.append({
-                    'skill_id': skill_id,
-                    'latex_strings_with_svg': latex_strings
-                })
-            yield (
-                'Latex strings with SVGs in each skill',
-                skills_latex_strings_count)
+        yield (key, values)
+
+
+class MissingSkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to delete skill commit log models for which skill models
+    are missing.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10808 is fixed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillCommitLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        skill = skill_fetchers.get_skill_by_id(item.skill_id, strict=False)
+        if skill is None:
+            yield ('Skill Commit Model deleted', item.id)
+            item.delete()
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

@@ -19,10 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import feconf
 
-from google.appengine.ext import ndb
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ActivityReferencesModel(base_models.BaseModel):
@@ -34,17 +35,19 @@ class ActivityReferencesModel(base_models.BaseModel):
 
     # The types and ids of activities to show in the library page. Each item
     # in this list is a dict with two keys: 'type' and 'id'.
-    activity_references = ndb.JsonProperty(repeated=True)
+    activity_references = datastore_services.JsonProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():
         """ActivityReferencesModel are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'activity_references': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def get_or_create(cls, list_name):

@@ -18,7 +18,7 @@
 
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.directive.ts');
+  'opportunities-list.component.ts');
 
 require(
   'pages/contributor-dashboard-page/services/' +
@@ -34,9 +34,9 @@ angular.module('oppia').component('voiceoverOpportunities', {
     './../translation-opportunities/' +
     'translation-opportunities.component.html'),
   controller: [
-    '$rootScope', '$scope', 'ContributionOpportunitiesService',
+    '$rootScope', 'ContributionOpportunitiesService',
     'TranslationLanguageService', function(
-        $rootScope, $scope, ContributionOpportunitiesService,
+        $rootScope, ContributionOpportunitiesService,
         TranslationLanguageService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

@@ -138,14 +138,10 @@ describe('Question object factory', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 10
-                }
-              ]
-            }
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 10}
+            }],
           }],
           confirmed_unclassified_answers: [],
           customization_args: {
@@ -205,6 +201,7 @@ describe('Question object factory', function() {
         },
         solicit_answer_details: false
       },
+      inapplicable_skill_misconception_ids: ['a-1', 'b-2'],
       language_code: 'en',
       version: 1
     };
@@ -221,6 +218,11 @@ describe('Question object factory', function() {
     sampleQuestion.setLinkedSkillIds(['skill_id1', 'skill_id2']);
     expect(sampleQuestion.getLinkedSkillIds()).toEqual(
       ['skill_id1', 'skill_id2']);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      ['a-1', 'b-2']);
+    sampleQuestion.setInapplicableSkillMisconceptionIds(['abc-123']);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      ['abc-123']);
     var stateData = sampleQuestion.getStateData();
     expect(stateData.name).toEqual('question');
     expect(stateData.content.getHtml()).toEqual('Question 1');
@@ -240,6 +242,8 @@ describe('Question object factory', function() {
     var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
     expect(newQuestionBackendDict.id).toEqual(null);
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
+    expect(newQuestionBackendDict.inapplicable_skill_misconception_ids).toEqual(
+      ['a-1', 'b-2']);
     expect(newQuestionBackendDict.version).toEqual(0);
     expect(sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
@@ -259,7 +263,7 @@ describe('Question object factory', function() {
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     interaction.answerGroups[0].taggedSkillMisconceptionId = 'skillId1-id';
     expect(sampleQuestion.getUnaddressedMisconceptionNames(
-      misconceptionsDict)).toEqual(['name_2']);
+      misconceptionsDict)).toEqual(['name_2', 'name_3']);
   });
 
   it('should correctly validate question', function() {
@@ -295,5 +299,7 @@ describe('Question object factory', function() {
     expect(sampleQuestion1.getStateData()).toEqual(state);
     expect(sampleQuestion1.getLinkedSkillIds()).toEqual(
       ['skill_id3', 'skill_id4']);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      ['a-1', 'b-2']);
   });
 });

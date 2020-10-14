@@ -72,10 +72,8 @@ angular.module('oppia').directive('topNavigationBar', [
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
-          var truncateNavbarDebounced =
-            DebouncerService.debounce(truncateNavbar, 500);
 
-          ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
+          ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -222,8 +220,12 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
             ctrl.logoutUrl = LOGOUT_URL;
             ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
+            ctrl.inClassroomPage = false;
             ctrl.standardNavIsShown = (
               NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);
+            if (ctrl.currentUrl === 'learn') {
+              ctrl.inClassroomPage = true;
+            }
             ctrl.googleSignInIconUrl = (
               UrlInterpolationService.getStaticImageUrl(
                 '/google_signin_buttons/google_signin.svg'));
@@ -234,12 +236,10 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.navElementsVisibilityStatus = {};
 
-            var classroomPageIsShownPromise = (
-              ClassroomBackendApiService.fetchClassroomPageIsShownStatusAsync()
-            );
-            classroomPageIsShownPromise.then(
-              function(classroomIsShown) {
-                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+            let service = ClassroomBackendApiService;
+            service.fetchClassroomPromosAreEnabledStatusAsync().then(
+              function(classroomPromosAreEnabled) {
+                ctrl.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
               });
 
             // Close the submenu if focus or click occurs anywhere outside of

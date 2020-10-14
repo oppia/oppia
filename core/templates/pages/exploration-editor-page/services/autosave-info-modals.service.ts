@@ -20,9 +20,11 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/local-storage.service.ts');
-require('pages/exploration-editor-page/modal-templates/' +
+require(
+  'pages/exploration-editor-page/modal-templates/' +
   'save-validation-fail-modal.controller.ts');
-require('pages/exploration-editor-page/modal-templates/' +
+require(
+  'pages/exploration-editor-page/modal-templates/' +
   'save-version-mismatch-modal.controller.ts');
 require(
   'pages/exploration-editor-page/modal-templates/' +

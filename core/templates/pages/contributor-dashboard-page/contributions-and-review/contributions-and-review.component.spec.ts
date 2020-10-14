@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ContextService } from 'services/context.service';
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 describe('Contributions and review component', function() {
   var ctrl = null;
@@ -32,14 +32,12 @@ describe('Contributions and review component', function() {
   var csrfTokenService = null;
   var misconceptionObjectFactory = null;
   var skillBackendApiService = null;
+  var skillObjectFactory = null;
   var userService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(function() {
-    contextService = TestBed.get(ContextService);
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
-  });
+
+  importAllAngularServices();
 
   describe('when user is allowed to review questions', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -49,6 +47,10 @@ describe('Contributions and review component', function() {
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       userService = $injector.get('UserService');
+      contextService = $injector.get('ContextService');
+      skillBackendApiService = $injector.get('SkillBackendApiService');
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
@@ -104,8 +106,7 @@ describe('Contributions and review component', function() {
                           param_changes: [],
                           refresher_exploration_id: null
                         },
-                        rule_input_translations: {},
-                        rule_types_to_inputs: {}
+                        rule_specs: [],
                       }],
                       confirmed_unclassified_answers: [],
                       customization_args: {
@@ -249,8 +250,12 @@ describe('Contributions and review component', function() {
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       csrfTokenService = $injector.get('CsrfTokenService');
-      skillBackendApiService = $injector.get('SkillBackendApiService');
       userService = $injector.get('UserService');
+      contextService = $injector.get('ContextService');
+      skillBackendApiService = $injector.get('SkillBackendApiService');
+      skillObjectFactory = $injector.get('SkillObjectFactory');
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
@@ -292,8 +297,7 @@ describe('Contributions and review component', function() {
                           param_changes: [],
                           refresher_exploration_id: null
                         },
-                        rule_input_translations: {},
-                        rule_types_to_inputs: {}
+                        rule_specs: [],
                       }],
                       confirmed_unclassified_answers: [],
                       customization_args: {
@@ -347,7 +351,7 @@ describe('Contributions and review component', function() {
         }));
       spyOn(skillBackendApiService, 'fetchSkill').and.returnValue(
         $q.resolve({
-          skill: {
+          skill: skillObjectFactory.createFromBackendDict({
             id: 'skill1',
             description: 'test description 1',
             misconceptions: [{
@@ -374,7 +378,7 @@ describe('Contributions and review component', function() {
             language_code: 'en',
             version: 3,
             prerequisite_skill_ids: ['skill_1']
-          }
+          })
         }));
 
       $scope = $rootScope.$new();

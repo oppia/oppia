@@ -169,8 +169,9 @@ describe('Profile page', function() {
     };
 
     beforeEach(function() {
-      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(
+      spyOn(
+        OppiaAngularRootComponent.profilePageBackendApiService,
+        'fetchProfileDataAsync').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
@@ -263,8 +264,9 @@ describe('Profile page', function() {
       profileData.edited_exp_summary_dicts[9].num_views = 5;
       profileData.edited_exp_summary_dicts[10].num_views = 15;
 
-      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(
+      spyOn(
+        OppiaAngularRootComponent.profilePageBackendApiService,
+        'fetchProfileDataAsync').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
@@ -307,8 +309,9 @@ describe('Profile page', function() {
     };
 
     beforeEach(function() {
-      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(
+      spyOn(
+        OppiaAngularRootComponent.profilePageBackendApiService,
+        'fetchProfileDataAsync').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
@@ -363,8 +366,9 @@ describe('Profile page', function() {
     };
 
     beforeEach(function() {
-      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileData').and.returnValue($q.resolve(
+      spyOn(
+        OppiaAngularRootComponent.profilePageBackendApiService,
+        'fetchProfileDataAsync').and.returnValue($q.resolve(
         UserProfileObjectFactory.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
@@ -372,8 +376,9 @@ describe('Profile page', function() {
 
     it('should subscribe and unsubscribe from a profile', function() {
       expect(ctrl.isAlreadySubscribed).toBe(false);
-      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'subscribe').and.returnValue($q.resolve());
+      spyOn(
+        OppiaAngularRootComponent.profilePageBackendApiService,
+        'subscribeAsync').and.returnValue($q.resolve());
       ctrl.changeSubscriptionStatus();
       $scope.$apply();
 
@@ -383,8 +388,9 @@ describe('Profile page', function() {
         ' explorations published by ' + profileData.username_of_viewed_profile +
         '.');
 
-      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
-        'unsubscribe').and.returnValue($q.resolve());
+      spyOn(
+        OppiaAngularRootComponent.profilePageBackendApiService,
+        'unsubscribeAsync').and.returnValue($q.resolve());
       ctrl.changeSubscriptionStatus();
       $scope.$apply();
 

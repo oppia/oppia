@@ -42,7 +42,6 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/alerts.service.ts');
-require('services/context.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
@@ -64,12 +63,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         onSaveTaggedMisconception: '=',
         outcome: '=',
-        // Answer group editor takes in a list of rules. Note that the actual
-        // stored rules are not in this format -- see the AnswerGroup domain
-        // object for the actual format of how rules are stored. AnswerGroup
-        // contains a method updateRuleTypesToInputs() which accepts a list of
-        // rules. This method should be used to update the rule structure.
-        getRules: '&rules',
+        rules: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
@@ -78,17 +72,15 @@ angular.module('oppia').directive('answerGroupEditor', [
         'answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'ExternalSaveService',
-        'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ExternalSaveService', 'ResponsesService',
+        'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
-        'ResponsesService',
+        'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, ExternalSaveService,
-            INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
+            AlertsService, ExternalSaveService, ResponsesService,
+            RuleObjectFactory, StateEditorService, StateInteractionIdService,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
-            ResponsesService) {
+            INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
 
@@ -139,6 +131,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   getDefaultInputValue('Real')];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
+              case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
                 return [];
@@ -295,7 +288,17 @@ angular.module('oppia').directive('answerGroupEditor', [
             ctrl.directiveSubscriptions.add(
               ExternalSaveService.onExternalSave.subscribe(() => {
                 if (ctrl.isRuleEditorOpen()) {
-                  ctrl.saveRules();
+                  if (StateEditorService.checkCurrentRuleInputIsValid()) {
+                    ctrl.saveRules();
+                  } else {
+                    var messageContent = (
+                      'There was an unsaved rule input which was invalid and ' +
+                      'has been discarded.');
+                    if (!AlertsService.messages.some(messageObject => (
+                      messageObject.content === messageContent))) {
+                      AlertsService.addInfoMessage(messageContent);
+                    }
+                  }
                 }
               })
             );
@@ -310,12 +313,10 @@ angular.module('oppia').directive('answerGroupEditor', [
                   if (ctrl.isRuleEditorOpen()) {
                     ctrl.saveRules();
                   }
-                  $scope.$broadcast('updateAnswerGroupInteractionId');
                   ctrl.answerChoices = ctrl.getAnswerChoices();
                 }
               )
             );
-            ctrl.rules = ctrl.getRules();
             ctrl.rulesMemento = null;
             ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
             ctrl.editAnswerGroupForm = {};

@@ -16,9 +16,6 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require(
@@ -31,7 +28,6 @@ require(
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/context.service.ts');
-require('services/contextual/device-info.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
@@ -49,21 +45,17 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         'hint-and-solution-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', 'HintsAndSolutionManagerService',
-        'PlayerTranscriptService', 'ExplorationPlayerStateService',
-        'HintAndSolutionModalService', 'DeviceInfoService', 'ContextService',
-        'PlayerPositionService', 'INTERACTION_SPECS',
+        'ContextService', 'ExplorationPlayerStateService',
+        'HintAndSolutionModalService', 'HintsAndSolutionManagerService',
+        'PlayerPositionService', 'PlayerTranscriptService',
         'StatsReportingService',
         function(
-            $scope, $rootScope, HintsAndSolutionManagerService,
-            PlayerTranscriptService, ExplorationPlayerStateService,
-            HintAndSolutionModalService, DeviceInfoService, ContextService,
-            PlayerPositionService, INTERACTION_SPECS,
+            ContextService, ExplorationPlayerStateService,
+            HintAndSolutionModalService, HintsAndSolutionManagerService,
+            PlayerPositionService, PlayerTranscriptService,
             StatsReportingService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          StatsReportingService = (
-            OppiaAngularRootComponent.statsReportingService);
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           var resetLocalHintsArray = function() {
             ctrl.hintIndexes = [];

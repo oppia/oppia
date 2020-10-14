@@ -57,14 +57,12 @@ require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -77,8 +75,6 @@ angular.module('oppia').directive('questionsList', [
         skillDescriptionsAreShown: '&skillDescriptionsAreShown',
         selectSkillModalIsShown: '&selectSkillModalIsShown',
         getSkillIds: '&skillIds',
-        getQuestionSummariesAsync: '=',
-        isLastPage: '=isLastQuestionBatch',
         getAllSkillSummaries: '&allSkillSummaries',
         canEditQuestion: '&',
         getSkillIdToRubricsObject: '&skillIdToRubricsObject',
@@ -92,38 +88,29 @@ angular.module('oppia').directive('questionsList', [
         'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'ContextService',
-        'EditableQuestionBackendApiService', 'ImageLocalStorageService',
-        'MisconceptionObjectFactory', 'QuestionCreationService',
-        'QuestionObjectFactory', 'QuestionsListService',
-        'QuestionUndoRedoService', 'SkillBackendApiService',
-        'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
-        'StateEditorService', 'UndoRedoService',
-        'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
-        'MODE_SELECT_DIFFICULTY',
-        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
+        '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
+        'ContextService', 'EditableQuestionBackendApiService',
+        'ImageLocalStorageService', 'MisconceptionObjectFactory',
+        'QuestionCreationService', 'QuestionObjectFactory',
+        'QuestionUndoRedoService', 'QuestionValidationService',
+        'QuestionsListService', 'ShortSkillSummaryObjectFactory',
+        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
+        'UtilsService', 'WindowDimensionsService', 'INTERACTION_SPECS',
+        'NUM_QUESTIONS_PER_PAGE',
         function(
-            $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, ContextService,
-            EditableQuestionBackendApiService, ImageLocalStorageService,
-            MisconceptionObjectFactory, QuestionCreationService,
-            QuestionObjectFactory, QuestionsListService,
-            QuestionUndoRedoService, SkillBackendApiService,
-            SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
-            StateEditorService, UndoRedoService,
-            UrlService, DEFAULT_SKILL_DIFFICULTY,
-            MODE_SELECT_DIFFICULTY,
-            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
+            $location, $rootScope, $timeout, $uibModal, AlertsService,
+            ContextService, EditableQuestionBackendApiService,
+            ImageLocalStorageService, MisconceptionObjectFactory,
+            QuestionCreationService, QuestionObjectFactory,
+            QuestionUndoRedoService, QuestionValidationService,
+            QuestionsListService, ShortSkillSummaryObjectFactory,
+            SkillBackendApiService, SkillDifficultyObjectFactory,
+            UtilsService, WindowDimensionsService, INTERACTION_SPECS,
+            NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
-            if (ctrl.selectedSkillId !== null) {
-              ctrl.selectedSkillIds = [ctrl.selectedSkillId];
-            } else {
-              ctrl.selectedSkillIds = [];
-            }
           };
 
           var _initTab = function(resetHistoryAndFetch) {
@@ -131,12 +118,23 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionEditorIsShown = false;
             ctrl.question = null;
             _reInitializeSelectedSkillIds();
-            ctrl.getQuestionSummariesAsync(
-              ctrl.selectedSkillIds, resetHistoryAndFetch,
+            QuestionsListService.getQuestionSummariesAsync(
+              ctrl.selectedSkillId, resetHistoryAndFetch,
               resetHistoryAndFetch
             );
             ctrl.questionIsBeingUpdated = false;
             ctrl.misconceptionsBySkill = {};
+            ctrl.misconceptionIdsForSelectedSkill = [];
+            if (ctrl.getSelectedSkillId()) {
+              SkillBackendApiService.fetchSkill(
+                ctrl.getSelectedSkillId()
+              ).then(responseObject => {
+                ctrl.misconceptionIdsForSelectedSkill = (
+                  responseObject.skill.getMisconceptions().map(
+                    misconception => misconception.getId()));
+                $rootScope.$apply();
+              });
+            }
           };
 
           ctrl.getQuestionIndex = function(index) {
@@ -148,17 +146,32 @@ angular.module('oppia').directive('questionsList', [
           ctrl.goToNextPage = function() {
             _reInitializeSelectedSkillIds();
             QuestionsListService.incrementPageNumber();
-            ctrl.getQuestionSummariesAsync(
-              ctrl.selectedSkillIds, true, false
+            QuestionsListService.getQuestionSummariesAsync(
+              ctrl.selectedSkillId, true, false
             );
           };
 
           ctrl.goToPreviousPage = function() {
             _reInitializeSelectedSkillIds();
             QuestionsListService.decrementPageNumber();
-            ctrl.getQuestionSummariesAsync(
-              ctrl.selectedSkillIds, false, false
+            QuestionsListService.getQuestionSummariesAsync(
+              ctrl.selectedSkillId, false, false
             );
+          };
+
+          ctrl.showUnaddressedSkillMisconceptionWarning = function(
+              skillMisconceptionIds) {
+            var skillId = ctrl.getSelectedSkillId();
+            var expectedMisconceptionIds = (
+              ctrl.misconceptionIdsForSelectedSkill);
+            var actualMisconceptionIds = (
+              skillMisconceptionIds.map(skillMisconceptionId => {
+                if (skillMisconceptionId.startsWith(skillId)) {
+                  return parseInt(skillMisconceptionId.split('-')[1]);
+                }
+              }));
+            return UtilsService.isEquivalent(
+              actualMisconceptionIds.sort(), expectedMisconceptionIds.sort());
           };
 
           ctrl.getDifficultyString = (
@@ -187,10 +200,14 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.question.toBackendDict(true), imagesData
               ).then(function() {
                 QuestionsListService.resetPageNumber();
-                ctrl.getQuestionSummariesAsync(
-                  ctrl.selectedSkillIds, true, true
+                QuestionsListService.getQuestionSummariesAsync(
+                  ctrl.selectedSkillId, true, true
                 );
                 ctrl.questionIsBeingSaved = false;
+                ctrl.editorIsOpen = false;
+                AlertsService.addSuccessMessage(
+                  'Question created successfully.');
+                _initTab(true);
               });
             } else {
               if (QuestionUndoRedoService.hasChanges()) {
@@ -201,22 +218,53 @@ angular.module('oppia').directive('questionsList', [
                     QuestionUndoRedoService.getCommittableChangeList()).then(
                     function() {
                       QuestionUndoRedoService.clearChanges();
+                      ctrl.editorIsOpen = false;
                       ctrl.questionIsBeingSaved = false;
-                      ctrl.getQuestionSummariesAsync(
-                        ctrl.selectedSkillIds, true, true
+                      QuestionsListService.getQuestionSummariesAsync(
+                        ctrl.selectedSkillId, true, true
                       );
                     }, function(error) {
                       AlertsService.addWarning(
                         error || 'There was an error saving the question.');
                       ctrl.questionIsBeingSaved = false;
+                      ctrl.editorIsOpen = false;
                     });
                 } else {
                   AlertsService.addWarning(
                     'Please provide a valid commit message.');
                   ctrl.questionIsBeingSaved = false;
+                  ctrl.editorIsOpen = false;
                 }
               }
             }
+          };
+
+          ctrl.getSkillEditorUrl = function(skillId) {
+            return `/skill_editor/${skillId}`;
+          };
+
+          ctrl.isLastPage = function() {
+            return QuestionsListService.isLastQuestionBatch();
+          };
+
+          ctrl.cancel = function() {
+            $uibModal.open({
+              templateUrl:
+                  UrlInterpolationService.getDirectiveTemplateUrl(
+                    '/components/question-directives' +
+                      '/modal-templates/' +
+                      'confirm-question-modal-exit-modal.directive.html'),
+              backdrop: true,
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
+              ContextService.resetImageSaveDestination();
+              ctrl.editorIsOpen = false;
+              $location.hash(null);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
+            });
           };
 
           ctrl.initializeNewQuestionCreation = function(skillIds) {
@@ -226,16 +274,13 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionStateData = ctrl.question.getStateData();
             ctrl.questionIsBeingUpdated = false;
             ctrl.newQuestionIsBeingCreated = true;
-            ctrl.openQuestionEditor(ctrl.newQuestionSkillDifficulties[0]);
           };
 
           ctrl.createQuestion = function() {
             ctrl.newQuestionSkillIds = [];
-            var currentMode = MODE_SELECT_SKILL;
             ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              currentMode = MODE_SELECT_DIFFICULTY;
             } else {
               ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
             }
@@ -243,50 +288,93 @@ angular.module('oppia').directive('questionsList', [
             ctrl.newQuestionSkillIds.forEach(function(skillId) {
               ctrl.linkedSkillsWithDifficulty.push(
                 SkillDifficultyObjectFactory.create(
-                  skillId, '', DEFAULT_SKILL_DIFFICULTY));
+                  skillId, '', null));
             });
             ctrl.showDifficultyChoices = true;
+            ctrl.editorIsOpen = true;
+            ctrl.initiateQuestionCreation();
           };
 
-          ctrl.initiateQuestionCreation = function(linkedSkillsWithDifficulty) {
-            ctrl.showDifficultyChoices = false;
+          ctrl.changeLinkedSkillDifficulty = function() {
+            if (ctrl.newQuestionSkillIds.length === 1) {
+              ctrl.newQuestionSkillDifficulties = (
+                [ctrl.linkedSkillsWithDifficulty[0].getDifficulty()]);
+            } else {
+              ctrl.linkedSkillsWithDifficulty.forEach(
+                (linkedSkillWithDifficulty) => {
+                  if (!ctrl.newQuestionSkillIds.includes(
+                    linkedSkillWithDifficulty.getId())) {
+                    ctrl.newQuestionSkillIds.push(
+                      linkedSkillWithDifficulty.getId());
+                    ctrl.newQuestionSkillDifficulties.push(
+                      linkedSkillWithDifficulty.getDifficulty());
+                  }
+                });
+            }
+          };
+
+          ctrl.initiateQuestionCreation = function() {
+            ctrl.showDifficultyChoices = true;
             ctrl.newQuestionSkillIds = [];
+            ctrl.associatedSkillSummaries = [];
             ctrl.newQuestionSkillDifficulties = [];
-            linkedSkillsWithDifficulty.forEach((linkedSkillWithDifficulty) => {
-              ctrl.newQuestionSkillIds.push(
-                linkedSkillWithDifficulty.getId());
-              ctrl.newQuestionSkillDifficulties.push(
-                linkedSkillWithDifficulty.getDifficulty());
-            });
+            ctrl.linkedSkillsWithDifficulty.forEach(
+              (linkedSkillWithDifficulty) => {
+                ctrl.newQuestionSkillIds.push(
+                  linkedSkillWithDifficulty.getId());
+                if (linkedSkillWithDifficulty.getDifficulty()) {
+                  ctrl.newQuestionSkillDifficulties.push(
+                    linkedSkillWithDifficulty.getDifficulty());
+                }
+              });
             ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
             if (AlertsService.warnings.length === 0) {
               ctrl.initializeNewQuestionCreation(
                 ctrl.newQuestionSkillIds);
+              ctrl.editorIsOpen = true;
             }
+            ctrl.skillLinkageModificationsArray = [];
           };
 
           ctrl.populateMisconceptions = function(skillIds) {
             ctrl.misconceptionsBySkill = {};
             SkillBackendApiService.fetchMultiSkills(
               skillIds).then(
-              function(skillDicts) {
-                skillDicts.forEach(function(skillDict) {
-                  ctrl.misconceptionsBySkill[skillDict.id] =
-                    skillDict.misconceptions.map(
-                      function(misconceptionsBackendDict) {
-                        return MisconceptionObjectFactory
-                          .createFromBackendDict(misconceptionsBackendDict);
-                      });
+              function(skills) {
+                skills.forEach(function(skill) {
+                  ctrl.misconceptionsBySkill[skill.getId()] =
+                    skill.getMisconceptions();
                 });
+                $rootScope.$apply();
               }, function(error) {
                 AlertsService.addWarning();
               });
           };
 
-          ctrl.editQuestion = function(questionSummaryForOneSkill, difficulty) {
+          ctrl.editQuestion = function(
+              questionSummaryForOneSkill, skillDescription, difficulty) {
             if (ctrl.editorIsOpen) {
               return;
             }
+            if (!ctrl.canEditQuestion()) {
+              AlertsService.addWarning(
+                'User does not have enough rights to delete the question');
+              return;
+            }
+            ctrl.newQuestionSkillIds = [];
+            ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
+            if (!ctrl.selectSkillModalIsShown()) {
+              ctrl.newQuestionSkillIds = ctrl.skillIds;
+            } else {
+              ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
+            }
+            ctrl.linkedSkillsWithDifficulty = [];
+            ctrl.newQuestionSkillIds.forEach(function(skillId) {
+              ctrl.linkedSkillsWithDifficulty.push(
+                SkillDifficultyObjectFactory.create(
+                  skillId, skillDescription, difficulty));
+            });
+            ctrl.difficulty = difficulty;
             ctrl.misconceptionsBySkill = {};
             ctrl.associatedSkillSummaries = [];
             EditableQuestionBackendApiService.fetchQuestion(
@@ -309,11 +397,21 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.questionStateData = ctrl.question.getStateData();
                 ctrl.questionIsBeingUpdated = true;
                 ctrl.newQuestionIsBeingCreated = false;
-                ctrl.openQuestionEditor(difficulty);
+                ctrl.openQuestionEditor();
               }, function(errorResponse) {
                 AlertsService.addWarning(
                   errorResponse.error || 'Failed to fetch question.');
               });
+          };
+
+          ctrl.openQuestionEditor = function() {
+            QuestionUndoRedoService.clearChanges();
+            ctrl.editorIsOpen = true;
+            ImageLocalStorageService.flushStoredImagesData();
+            if (ctrl.newQuestionIsBeingCreated) {
+              ContextService.setImageSaveDestinationToLocalStorage();
+            }
+            $location.hash(ctrl.questionId);
           };
 
           ctrl.deleteQuestionFromSkill = function(
@@ -324,15 +422,14 @@ angular.module('oppia').directive('questionsList', [
               return;
             }
             _reInitializeSelectedSkillIds();
-            var skillId = null;
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
               EditableQuestionBackendApiService.editQuestionSkillLinks(
                 questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
               ).then(function() {
                 QuestionsListService.resetPageNumber();
-                ctrl.getQuestionSummariesAsync(
-                  ctrl.selectedSkillIds, true, true
+                QuestionsListService.getQuestionSummariesAsync(
+                  ctrl.selectedSkillId, true, true
                 );
                 AlertsService.addSuccessMessage('Deleted Question');
               });
@@ -343,8 +440,8 @@ angular.module('oppia').directive('questionsList', [
                     questionId, [{id: summary.getId(), task: 'remove'}]
                   ).then(function() {
                     QuestionsListService.resetPageNumber();
-                    ctrl.getQuestionSummariesAsync(
-                      ctrl.selectedSkillIds, true, true
+                    QuestionsListService.getQuestionSummariesAsync(
+                      ctrl.selectedSkillId, true, true
                     );
                     AlertsService.addSuccessMessage('Deleted Question');
                   });
@@ -416,8 +513,8 @@ angular.module('oppia').directive('questionsList', [
                       if (count === changedDifficultyCount) {
                         $timeout(function() {
                           QuestionsListService.resetPageNumber();
-                          ctrl.getQuestionSummariesAsync(
-                            ctrl.selectedSkillIds, true, true
+                          QuestionsListService.getQuestionSummariesAsync(
+                            ctrl.selectedSkillId, true, true
                           );
                           AlertsService.addSuccessMessage('Updated Difficulty');
                         }, 100 * count);
@@ -432,93 +529,130 @@ angular.module('oppia').directive('questionsList', [
             });
           };
 
-          ctrl.openQuestionEditor = function(questionDifficulty) {
-            var question = ctrl.question;
-            var questionStateData = ctrl.questionStateData;
-            var questionId = ctrl.questionId;
-            var canEditQuestion = ctrl.canEditQuestion();
-            var misconceptionsBySkill = ctrl.misconceptionsBySkill;
-            var associatedSkillSummaries = ctrl.associatedSkillSummaries;
-            var newQuestionIsBeingCreated = ctrl.newQuestionIsBeingCreated;
-            var categorizedSkills = ctrl.getSkillsCategorizedByTopics;
-            var untriagedSkillSummaries = ctrl.getUntriagedSkillSummaries;
-            QuestionUndoRedoService.clearChanges();
-            ctrl.editorIsOpen = true;
-            var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
-            var selectedSkillId = ctrl.selectedSkillId;
-            ImageLocalStorageService.flushStoredImagesData();
-            if (newQuestionIsBeingCreated) {
-              ContextService.setImageSaveDestinationToLocalStorage();
+          ctrl.removeSkill = function(skillId) {
+            if (ctrl.associatedSkillSummaries.length === 1) {
+              AlertsService.addInfoMessage(
+                'A question should be linked to at least one skill.');
+              return;
             }
-            $location.hash(questionId);
-            var skillIdToNameMapping = (
-              ctrl.getAllSkillSummaries().reduce((obj, skill) => (
-                obj[skill.getId()] = skill.getDescription(), obj), {}));
-            var skillIdToRubricMapping = ctrl.getSkillIdToRubricsObject();
-            var skillNames = [];
-            var rubrics = [];
-            if (ctrl.newQuestionIsBeingCreated &&
-                ctrl.selectSkillModalIsShown()) {
-              skillNames = ctrl.newQuestionSkillIds.map(
-                skillId => skillIdToNameMapping[skillId]);
-              rubrics = ctrl.newQuestionSkillIds.map(
-                (skillId, index) => skillIdToRubricMapping[skillId].find(
-                  rubric => rubric.getDifficulty() === ctrl.getDifficultyString(
-                    parseFloat(ctrl.newQuestionSkillDifficulties[index]))));
-            } else {
-              skillNames = [skillIdToNameMapping[ctrl.selectedSkillId]];
-              rubrics = [skillIdToRubricMapping[ctrl.selectedSkillId].find(
-                rubric => rubric.getDifficulty() === ctrl.getDifficultyString(
-                  parseFloat(questionDifficulty)))];
-            }
+            ctrl.skillLinkageModificationsArray.push({
+              id: skillId,
+              task: 'remove'
+            });
+            ctrl.associatedSkillSummaries =
+                ctrl.associatedSkillSummaries.filter(function(summary) {
+                  return summary.getId() !== skillId;
+                });
+          };
+          ctrl.isQuestionValid = function() {
+            return Boolean(QuestionValidationService.isQuestionValid(
+              ctrl.question, ctrl.misconceptionsBySkill) &&
+                ctrl.newQuestionSkillDifficulties &&
+                ctrl.newQuestionSkillDifficulties.length);
+          };
+
+          ctrl.showSolutionCheckpoint = function() {
+            const interactionId = ctrl.question.getStateData().interaction.id;
+            return (
+              interactionId && INTERACTION_SPECS[
+                interactionId].can_have_solution);
+          };
+
+          ctrl.addSkill = function() {
+            var skillsInSameTopicCount =
+                ctrl.getGroupedSkillSummaries().current.length;
+            var sortedSkillSummaries =
+                ctrl.getGroupedSkillSummaries().current.concat(
+                  ctrl.getGroupedSkillSummaries().others);
+            var allowSkillsFromOtherTopics = true;
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/question-directives/modal-templates/' +
-                'question-editor-modal.directive.html'),
-              backdrop: 'static',
-              keyboard: false,
+              templateUrl:
+                  UrlInterpolationService.getDirectiveTemplateUrl(
+                    '/components/skill-selector/' +
+                      'select-skill-modal.template.html'),
+              backdrop: true,
               resolve: {
-                untriagedSkillSummaries: () => untriagedSkillSummaries,
-                associatedSkillSummaries: () => associatedSkillSummaries,
-                canEditQuestion: () => canEditQuestion,
-                categorizedSkills: () => categorizedSkills,
-                groupedSkillSummaries: () => groupedSkillSummaries,
-                misconceptionsBySkill: () => misconceptionsBySkill,
-                newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,
-                question: () => question,
-                questionId: () => questionId,
-                questionStateData: () => questionStateData,
-                rubrics: () => rubrics,
-                skillNames: () => skillNames
+                skillsInSameTopicCount: () => skillsInSameTopicCount,
+                sortedSkillSummaries: () => sortedSkillSummaries,
+                categorizedSkills: () => ctrl.getSkillsCategorizedByTopics,
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => ctrl.getUntriagedSkillSummaries
               },
-              controller: 'QuestionEditorModalController',
-            }).result.then(function(modalObject) {
-              ContextService.resetImageSaveDestination();
-              $location.hash(null);
-              ctrl.editorIsOpen = false;
-              if (modalObject.skillLinkageModificationsArray.length > 0) {
-                EditableQuestionBackendApiService.editQuestionSkillLinks(
-                  questionId, modalObject.skillLinkageModificationsArray,
-                  questionDifficulty).then(
-                  data => {
-                    $timeout(function() {
-                      QuestionsListService.resetPageNumber();
-                      _reInitializeSelectedSkillIds();
-                      ctrl.getQuestionSummariesAsync(
-                        ctrl.selectedSkillIds, true, true
-                      );
-                      ctrl.saveAndPublishQuestion(modalObject.commitMessage);
-                    }, 500);
-                  });
+              controller: 'SelectSkillModalController',
+              windowClass: 'skill-select-modal',
+              size: 'xl'
+            }).result.then(function(summary) {
+              for (var idx in ctrl.associatedSkillSummaries) {
+                if (
+                  ctrl.associatedSkillSummaries[idx].getId() ===
+                    summary.id) {
+                  AlertsService.addInfoMessage(
+                    'Skill already linked to question');
+                  return;
+                }
+              }
+
+              ctrl.associatedSkillSummaries.push(
+                ShortSkillSummaryObjectFactory.create(
+                  summary.id, summary.description));
+              ctrl.skillLinkageModificationsArray = [];
+              ctrl.skillLinkageModificationsArray.push({
+                id: summary.id,
+                task: 'add'
+              });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
+            });
+          };
+
+          ctrl.updateSkillLinkage = function(commitMsg) {
+            EditableQuestionBackendApiService.editQuestionSkillLinks(
+              ctrl.questionId, ctrl.skillLinkageModificationsArray,
+              ctrl.difficulty).then(
+              data => {
+                $timeout(function() {
+                  QuestionsListService.resetPageNumber();
+                  _reInitializeSelectedSkillIds();
+                  QuestionsListService.getQuestionSummariesAsync(
+                    ctrl.selectedSkillId, true, true
+                  );
+                  ctrl.editorIsOpen = false;
+                  ctrl.saveAndPublishQuestion(commitMsg);
+                }, 500);
+              });
+          };
+
+          ctrl.saveQuestion = function() {
+            ContextService.resetImageSaveDestination();
+            $location.hash(null);
+            if (ctrl.questionIsBeingUpdated) {
+              $uibModal.open({
+                templateUrl:
+                      UrlInterpolationService.getDirectiveTemplateUrl(
+                        '/components/question-directives' +
+                          '/modal-templates/' +
+                          'question-editor-save-modal.template.html'),
+                backdrop: true,
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(function(commitMessage) {
+                if (ctrl.skillLinkageModificationsArray &&
+                    ctrl.skillLinkageModificationsArray.length > 0) {
+                  ctrl.updateSkillLinkage(commitMessage);
+                } else {
+                  ContextService.resetImageSaveDestination();
+                  ctrl.saveAndPublishQuestion(commitMessage);
+                }
+              });
+            } else {
+              if (ctrl.skillLinkageModificationsArray.length > 0) {
+                ctrl.updateSkillLinkage(null);
               } else {
                 ContextService.resetImageSaveDestination();
-                ctrl.saveAndPublishQuestion(modalObject.commitMessage);
+                ctrl.saveAndPublishQuestion(null);
               }
-            }, function() {
-              ContextService.resetImageSaveDestination();
-              ctrl.editorIsOpen = false;
-              $location.hash(null);
-            });
+            }
           };
 
           ctrl.getQuestionSummariesForOneSkill = function() {
@@ -528,12 +662,24 @@ angular.module('oppia').directive('questionsList', [
             return QuestionsListService.getCurrentPageNumber();
           };
 
+          ctrl.toggleDifficultyCard = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            ctrl.difficultyCardIsShown = !ctrl.difficultyCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               QuestionsListService.onQuestionSummariesInitialized.subscribe(
-                () => _initTab(false)));
+                () => {
+                  _initTab(false);
+                  $rootScope.$apply();
+                }));
+            ctrl.showDifficultyChoices = false;
+            ctrl.difficultyCardIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             ctrl.skillIds = [];
-            ctrl.selectedSkillIds = [];
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             ctrl.editorIsOpen = false;

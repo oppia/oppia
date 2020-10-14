@@ -30,10 +30,10 @@ import utils
 # are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'accessibility', 'adminPage', 'classroomPage',
-    'classroomPageFileUploadFeatures', 'collections', 'featureGating',
-    'fileUploadExtensions', 'fileUploadFeatures', 'library', 'navigation',
-    'playVoiceovers', 'preferences', 'profileFeatures', 'profileMenu',
-    'publication', 'subscriptions', 'topicsAndSkillsDashboard',
+    'classroomPageFileUploadFeatures', 'collections', 'contributorDashboard',
+    'featureGating', 'fileUploadExtensions', 'fileUploadFeatures', 'library',
+    'navigation', 'playVoiceovers', 'preferences', 'profileFeatures',
+    'profileMenu', 'publication', 'subscriptions', 'topicsAndSkillsDashboard',
     'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users']
 
 

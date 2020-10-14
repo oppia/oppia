@@ -28,10 +28,7 @@ import { AppConstants } from 'app.constants';
 })
 export class MathInteractionsService {
   private warningText = '';
-  // TODO(#7434): Use dot notation after we find a way to get
-  // rid of the TS2339 error on AppConstants.
-  // eslint-disable-next-line dot-notation
-  private mathFunctionNames = AppConstants['MATH_FUNCTION_NAMES'];
+  private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
 
   private cleanErrorMessage(
       errorMessage: string, expressionString: string): string {
@@ -81,11 +78,22 @@ export class MathInteractionsService {
         'Your answer has two symbols next to each other: "' + symbol1 +
         '" and "' + symbol2 + '".');
     }
+    if (
+      errorMessage === 'Cannot read property \'parent\' of undefined.') {
+      let emptyFunctionNames = [];
+      for (let functionName of this.mathFunctionNames) {
+        if (expressionString.includes(functionName + '()')) {
+          emptyFunctionNames.push(functionName);
+        }
+      }
+      errorMessage = (
+        'The ' + emptyFunctionNames.join(', ') +
+        ' function(s) cannot be empty. Please enter a variable/number in it.');
+    }
     return errorMessage;
   }
 
-  _validateExpression(
-      expressionString: string, validVariablesList: string[]): boolean {
+  _validateExpression(expressionString: string): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -118,13 +126,29 @@ export class MathInteractionsService {
   }
 
   validateAlgebraicExpression(
-      expressionString: string, validVariablesList: string[]) {
-    if (!this._validateExpression(expressionString, validVariablesList)) {
+      expressionString: string, validVariablesList: string[]): boolean {
+    if (!this._validateExpression(expressionString)) {
       return false;
     }
 
-    let variablesList = nerdamer(this.insertMultiplicationSigns(
-      expressionString)).variables();
+    expressionString = this.insertMultiplicationSigns(expressionString);
+    let variablesList = nerdamer(expressionString).variables();
+    // Explicitly checking for presence of constants (pi and e).
+    if (expressionString.match(/(^|[^a-zA-Z])e($|[^a-zA-Z])/g)) {
+      variablesList.push('e');
+    }
+    if (expressionString.match(/(^|[^a-zA-Z])pi($|[^a-zA-Z])/g)) {
+      variablesList.push('pi');
+    }
+    const greekNameToSymbolMap: { [greekName: string]: string } = (
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
+    // Replacing greek names with symbols.
+    for (let i = 0; i < variablesList.length; i++) {
+      if (variablesList[i].length > 1) {
+        variablesList[i] = greekNameToSymbolMap[variablesList[i]];
+      }
+    }
     if (variablesList.length === 0) {
       this.warningText = 'It looks like you have entered only ' +
       'numbers. Make sure to include the necessary variables' +
@@ -134,8 +158,8 @@ export class MathInteractionsService {
       for (let variable of variablesList) {
         if (validVariablesList.indexOf(variable) === -1) {
           this.warningText = (
-            'You have entered an invalid character: ' + variable +
-            '. Please use only the characters ' + validVariablesList.join() +
+            'You have entered an invalid variable: ' + variable +
+            '. Please use only the variables ' + validVariablesList.join() +
             ' in your answer.');
           return false;
         }
@@ -144,8 +168,8 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateNumericExpression(expressionString: string) {
-    if (!this._validateExpression(expressionString, [])) {
+  validateNumericExpression(expressionString: string): boolean {
+    if (!this._validateExpression(expressionString)) {
       return false;
     }
     for (let functionName of this.mathFunctionNames) {
@@ -221,13 +245,10 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
-    // TODO(#7434): Use dot notation after we find a way to get
-    // rid of the TS2339 error on AppConstants.
-    /* eslint-disable dot-notation */
     let greekLetters = Object.keys(
-      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
-      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     /* eslint-enable dot-notation */
     let greekLettersAndSymbols = [];
     for (let i = 0; i < greekLetters.length; i++) {
@@ -238,8 +259,8 @@ export class MathInteractionsService {
     // ['alpha', 'beta'] and not ['alpha', 'b', 'eta'].
     greekLettersAndSymbols.sort((a, b) => b[0].length - a[0].length);
 
-    let greekLetterToSymbol = {};
-    let greekSymbolToLetter = {};
+    let greekLetterToSymbol: { [letter: string]: string } = {};
+    let greekSymbolToLetter: { [symbol: string]: string } = {};
     for (let letterAndSymbol of greekLettersAndSymbols) {
       greekLetterToSymbol[letterAndSymbol[0]] = letterAndSymbol[1];
       greekSymbolToLetter[letterAndSymbol[1]] = letterAndSymbol[0];
@@ -410,6 +431,60 @@ export class MathInteractionsService {
     }
 
     return partsList1.length === 0 && partsList2.length === 0;
+  }
+
+  expressionMatchWithPlaceholders(
+      expressionWithPlaceholders: string, inputExpression: string,
+      placeholders: string[]): boolean {
+    // Check if inputExpression contains any placeholders.
+    for (let variable of nerdamer(inputExpression).variables()) {
+      if (placeholders.includes(variable)) {
+        return false;
+      }
+    }
+
+    // The expressions are first split into terms by addition and subtraction.
+    let termsWithPlaceholders = this.getTerms(expressionWithPlaceholders);
+    let inputTerms = this.getTerms(inputExpression);
+
+    // Each term in the expression containing placeholders is compared with
+    // terms in the input expression. Two terms are said to be matched iff
+    // upon subtracting or dividing them, the resultant contains only
+    // placeholders. This would imply that the input term matches with the
+    // general form(the term with placeholders).
+    for (let i = termsWithPlaceholders.length - 1; i >= 0; i--) {
+      for (let j = 0; j < inputTerms.length; j++) {
+        let termWithPlaceholders = termsWithPlaceholders[i];
+        let termWithoutPlaceholders = inputTerms[j];
+
+        let divisionCondition;
+        // Try catch block is meant to catch division by zero errors.
+        try {
+          let variablesAfterDivision = nerdamer(termWithPlaceholders).divide(
+            termWithoutPlaceholders).variables();
+          divisionCondition = variablesAfterDivision.every(
+            variable => placeholders.includes(variable));
+        } catch (e) {
+          divisionCondition = true;
+        }
+
+        let variablesAfterSubtraction = nerdamer(termWithPlaceholders).subtract(
+          termWithoutPlaceholders).variables();
+        let subtractionCondition = variablesAfterSubtraction.every(
+          variable => placeholders.includes(variable));
+
+        // If only placeholders are left in the term after dividing/subtracting
+        // them, then the terms are said to match.
+        if (divisionCondition || subtractionCondition) {
+          termsWithPlaceholders.splice(i, 1);
+          inputTerms.splice(j, 1);
+          break;
+        }
+      }
+    }
+
+    // Checks if all terms have matched.
+    return termsWithPlaceholders.length + inputTerms.length === 0;
   }
 }
 

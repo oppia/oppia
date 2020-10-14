@@ -18,9 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -75,8 +72,6 @@ angular.module('oppia').factory('ExplorationEngineService', [
       FocusManagerService, ImagePreloaderService, LearnerParamsService,
       PlayerTranscriptService, ReadOnlyExplorationBackendApiService,
       StateCardObjectFactory, StatsReportingService, UrlService) {
-    StatsReportingService = (
-      OppiaAngularRootComponent.statsReportingService);
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
@@ -251,8 +246,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
       // This should only be used in editor preview mode. It sets the
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
-      initSettingsFromEditor: function(activeStateNameFromPreviewTab,
-          manualParamChangesToInit) {
+      initSettingsFromEditor: function(
+          activeStateNameFromPreviewTab, manualParamChangesToInit) {
         if (_editorPreviewMode) {
           manualParamChanges = manualParamChangesToInit;
           initStateName = activeStateNameFromPreviewTab;
@@ -374,6 +369,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
             LearnerParamsService.getAllParams(),
             answer,
             classificationResult.answerGroupIndex,
+            classificationResult.ruleIndex,
             classificationResult.classificationCategorization,
             feedbackIsUseful);
 

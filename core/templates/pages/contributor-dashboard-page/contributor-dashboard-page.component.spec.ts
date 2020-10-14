@@ -21,8 +21,6 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-const CONSTANTS = require('constants.ts');
-
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
 

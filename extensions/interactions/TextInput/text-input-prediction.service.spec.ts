@@ -19,8 +19,6 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // text-input-prediction.service.ts is upgraded to Angular 8.
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
-import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
@@ -28,9 +26,6 @@ import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 // ^^^ This block is to be removed.
 
 describe('Text Input Prediction Service', () => {
-  let $rootScope = null;
-  let $scope = null;
-
   beforeEach(angular.mock.module('oppia'));
 
   describe('Test text prediction service', () => {
@@ -38,13 +33,9 @@ describe('Text Input Prediction Service', () => {
     beforeEach(() => {
       predictionService = new TextInputPredictionService(
         new CountVectorizerService(),
-        new SVMPredictionService(new PredictionResultObjectFactory()),
+        new SVMPredictionService(),
         new TextInputTokenizer());
     });
-    beforeEach(angular.mock.inject(($injector) => {
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-    }));
     it('should predict the same as oppia-ml', () => {
       const classifierData =
           window.__fixtures__['core/tests/data/text_input_classifier_data'];

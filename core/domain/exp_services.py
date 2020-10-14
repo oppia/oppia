@@ -26,9 +26,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import copy
 import datetime
-import functools
 import logging
 import math
 import os
@@ -40,22 +38,23 @@ from constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
-from core.domain import config_domain
 from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feedback_services
 from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
-from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import param_domain
+from core.domain import recommendations_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -63,7 +62,6 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -540,7 +538,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             stored exploration model do not match.
     """
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -685,7 +683,7 @@ def _create_exploration(
     stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
-    create_exploration_summary(exploration.id, committer_id)
+    regenerate_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -765,20 +763,26 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     # Delete the explorations from search.
     search_services.delete_explorations_from_search_index(exploration_ids)
 
-    # Delete the exploration summaries, regardless of whether or not
-    # force_deletion is True.
+    # Delete the exploration summaries, recommendations and opportunities
+    # regardless of whether or not force_deletion is True.
     delete_exploration_summaries(exploration_ids)
+    recommendations_services.delete_explorations_from_recommendations(
+        exploration_ids)
+    opportunity_services.delete_exploration_opportunities(exploration_ids)
+    feedback_services.delete_exploration_feedback_analytics(exploration_ids)
 
     # Remove the explorations from the featured activity references, if
     # necessary.
     activity_services.remove_featured_activities(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
 
+    feedback_services.delete_threads_for_multiple_entities(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_ids)
+
     # Remove from subscribers.
     taskqueue_services.defer(
-        delete_explorations_from_subscribed_users,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        exploration_ids)
+        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):
@@ -790,6 +794,8 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     if not exploration_ids:
         return
 
+    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
+    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
         user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
     ).fetch()
@@ -934,7 +940,7 @@ def update_exploration(
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    update_exploration_summary(exploration_id, committer_id)
+    regenerate_exploration_summary(exploration_id, committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         user_services.add_edited_exploration_id(committer_id, exploration_id)
@@ -949,9 +955,9 @@ def update_exploration(
             exploration_id)
 
 
-def create_exploration_summary(exploration_id, contributor_id_to_add):
-    """Create the summary model for an exploration, and store it in the
-    datastore.
+def regenerate_exploration_summary(exploration_id, contributor_id_to_add):
+    """Regenerate a summary of the given exploration. If the summary does not
+    exist, this function generates a new one.
 
     Args:
         exploration_id: str. The id of the exploration.
@@ -959,24 +965,6 @@ def create_exploration_summary(exploration_id, contributor_id_to_add):
             created the exploration will be added to the list of contributours
             for the exploration if the argument is not None and it is not a
             system id.
-    """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(
-        exploration, contributor_id_to_add)
-    save_exploration_summary(exp_summary)
-
-
-def update_exploration_summary(exploration_id, contributor_id_to_add):
-    """Update the summary of an exploration.
-
-    Args:
-        exploration_id: str. The id of the exploration whose summary is
-            to be updated.
-        contributor_id_to_add: str or None. The user_id of user who have
-            contributed (humans who have made a positive (not just a revert)
-            update to the exploration's content) will be added to the list of
-            contributours for the exploration if the argument is not None and it
-            is not a system id.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
@@ -993,10 +981,10 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
-        contributor_id_to_add: str or None. The user_id of user who have
+        contributor_id_to_add: str|None. The user_id of user who have
             contributed (humans who have made a positive (not just a revert)
             change to the exploration's content) will be added to the list of
-            contributours for the exploration if the argument is not None and it
+            contributors for the exploration if the argument is not None and it
             is not a system id.
 
     Returns:
@@ -1026,6 +1014,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
             contributors_summary.get(contributor_id_to_add, 0) + 1)
+
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
@@ -1077,6 +1066,15 @@ def compute_exploration_contributors_summary(exploration_id):
                 'version_number']
         else:
             current_version -= 1
+
+    contributor_ids = list(contributors_summary)
+    # Remove IDs that are deleted or do not exist.
+    users_settings = user_services.get_users_settings(contributor_ids)
+    for contributor_id, user_settings in python_utils.ZIP(
+            contributor_ids, users_settings):
+        if user_settings is None:
+            del contributors_summary[contributor_id]
+
     return contributors_summary
 
 
@@ -1177,7 +1175,7 @@ def revert_exploration(
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -1192,7 +1190,7 @@ def revert_exploration(
 
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
-    update_exploration_summary(exploration_id, None)
+    regenerate_exploration_summary(exploration_id, None)
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
@@ -1760,280 +1758,3 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
-
-
-def save_multi_exploration_math_rich_text_info_model(
-        exploration_math_rich_text_info_list):
-    """Saves multiple instances of ExplorationMathRichTextInfoModel to the
-    datastore.
-
-    Args:
-        exploration_math_rich_text_info_list:
-            list(ExplorationMathRichTextInfoModel). A list of
-            ExplorationMathRichTextInfoModel domain objects.
-    """
-
-    exploration_math_rich_text_info_models = []
-    for exploration_math_rich_text_info in (
-            exploration_math_rich_text_info_list):
-        latex_strings_without_svg = (
-            exploration_math_rich_text_info.latex_strings_without_svg)
-        math_images_generation_required = (
-            exploration_math_rich_text_info.math_images_generation_required)
-        exp_id = (
-            exploration_math_rich_text_info.exp_id)
-        estimated_max_size_of_images_in_bytes = (
-            exploration_math_rich_text_info.get_svg_size_in_bytes())
-        exploration_math_rich_text_info_models.append(
-            exp_models.ExplorationMathRichTextInfoModel(
-                id=exp_id,
-                math_images_generation_required=math_images_generation_required,
-                latex_strings_without_svg=latex_strings_without_svg,
-                estimated_max_size_of_images_in_bytes=(
-                    estimated_max_size_of_images_in_bytes)))
-
-    exp_models.ExplorationMathRichTextInfoModel.put_multi(
-        exploration_math_rich_text_info_models)
-
-
-def generate_html_change_list_for_state(
-        state_name, new_state_dict, old_state_dict):
-    """Returns the change lists for all the html fields in a converted state
-    dict by comparing it with the corresponding old state dict.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-
-    Args:
-        state_name: str. The name of the state.
-        new_state_dict: dict. The dict representation of the new State object.
-        old_state_dict: dict. The dict representation of the old State object.
-
-    Returns:
-        list(ExplorationChange). The generated change list.
-    """
-
-    change_list = []
-    property_name_to_new_value_list = []
-    if old_state_dict['interaction']['customization_args'] != (
-            new_state_dict['interaction']['customization_args']):
-        property_name_to_new_value_list.append(
-            (
-                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                new_state_dict['interaction']['customization_args']))
-    if old_state_dict['content'] != new_state_dict['content']:
-        property_name_to_new_value_list.append(
-            (exp_domain.STATE_PROPERTY_CONTENT, new_state_dict['content']))
-
-    if old_state_dict['written_translations'] != (
-            new_state_dict['written_translations']):
-        property_name_to_new_value_list.append(
-            (
-                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
-                new_state_dict['written_translations']))
-    if old_state_dict['interaction']['default_outcome'] != (
-            new_state_dict['interaction']['default_outcome']):
-        property_name_to_new_value_list.append(
-            (
-                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                new_state_dict['interaction']['default_outcome']))
-    if old_state_dict['interaction']['hints'] != (
-            new_state_dict['interaction']['hints']):
-        property_name_to_new_value_list.append(
-            (
-                exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                new_state_dict['interaction']['hints']))
-    if old_state_dict['interaction']['solution'] != (
-            new_state_dict['interaction']['solution']):
-        property_name_to_new_value_list.append(
-            (
-                exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                new_state_dict['interaction']['solution']))
-    if old_state_dict['interaction']['answer_groups'] != (
-            new_state_dict['interaction']['answer_groups']):
-        property_name_to_new_value_list.append(
-            (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-                new_state_dict['interaction']['answer_groups']))
-
-    for property_name, new_value in property_name_to_new_value_list:
-        change_list.append(
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': property_name,
-                'new_value': new_value
-            }))
-    return change_list
-
-
-def get_batch_of_exps_for_latex_svg_generation():
-    """Returns a batch of LaTeX strings from explorations which have LaTeX
-    strings without SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-
-    Returns:
-        dict(str, list(str)). The dict having each key as an exp_id and value
-        as a list of LaTeX string. Each list has all the LaTeX strings in that
-        particular exploration ID.
-    """
-
-    latex_strings_mapping = {}
-    exploration_math_rich_text_info_models = (
-        exp_models.ExplorationMathRichTextInfoModel.get_all().filter(
-            exp_models.  # pylint: disable=singleton-comparison
-            ExplorationMathRichTextInfoModel.
-            math_images_generation_required == True))
-    number_of_svgs_in_current_batch = 0
-    max_number_of_svgs_in_math_svgs_batch = (
-        config_domain.MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH.value)
-    max_number_of_explorations_in_math_svgs_batch = (
-        config_domain.MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH.value)
-
-    for model_index, model in enumerate(exploration_math_rich_text_info_models):
-        if model_index + 1 > max_number_of_explorations_in_math_svgs_batch:
-            break
-        list_of_latex_strings_in_model = model.latex_strings_without_svg
-        if number_of_svgs_in_current_batch >= (
-                max_number_of_svgs_in_math_svgs_batch):
-            break
-
-        # This represents the projected number of SVGs in a batch if all the
-        # LaTeX strings in the model is added to the batch. But since we are
-        # limiting the batch also by the number of SVGs, we need to check how
-        # many LaTeX strings from the model we can add to the batch.
-        number_of_svgs_in_batch_along_with_latex_strings_in_model = (
-            number_of_svgs_in_current_batch + len(
-                list_of_latex_strings_in_model))
-        if number_of_svgs_in_batch_along_with_latex_strings_in_model > (
-                max_number_of_svgs_in_math_svgs_batch):
-            number_of_latex_strings_to_be_added = (
-                max_number_of_svgs_in_math_svgs_batch -
-                number_of_svgs_in_current_batch)
-            latex_strings_mapping[model.id] = (
-                list_of_latex_strings_in_model[
-                    :number_of_latex_strings_to_be_added])
-            break
-        else:
-            latex_strings_mapping[model.id] = list_of_latex_strings_in_model
-            number_of_svgs_in_current_batch += len(
-                list_of_latex_strings_in_model)
-
-    return latex_strings_mapping
-
-
-def get_number_explorations_having_latex_strings_without_svgs():
-    """Returns the number of explorations in the datastore which have LaTeX
-    strings without SVGs. These explorations need to be updated with math
-    SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-
-    Returns:
-        int. The number of explorations which need to be updated with math SVGs.
-    """
-
-    number_of_explorations_having_latex_strings_without_svgs = (
-        exp_models.ExplorationMathRichTextInfoModel.get_all().filter(
-            exp_models.  # pylint: disable=singleton-comparison
-            ExplorationMathRichTextInfoModel.
-            math_images_generation_required == True).count())
-
-    return number_of_explorations_having_latex_strings_without_svgs
-
-
-def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
-    """Saves an SVG for each LaTeX string without an SVG in an exploration
-    and updates the exploration. Also the corresponding valid draft changes are
-    updated.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-
-    Args:
-        raw_latex_to_image_data_dict: dict(str, LatexStringSvgImageData). The
-            dictionary having the key as a LaTeX string and the corresponding
-            value as the SVG image data for that LaTeX string.
-        exp_id: str. The ID of the exploration to update.
-
-    Raises:
-        Exception. If any of the SVG images provided fail validation.
-    """
-    exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    html_in_exploration_after_conversion = ''
-    change_lists = []
-    for state_name, state in exploration.states.items():
-        add_svg_filenames_for_latex_strings_in_html_string = (
-            functools.partial(
-                html_validation_service.
-                add_svg_filenames_for_latex_strings_in_html_string,
-                raw_latex_to_image_data_dict))
-        old_state_dict = copy.deepcopy(state.to_dict())
-        converted_state_dict = (
-            state_domain.State.convert_html_fields_in_state(
-                state.to_dict(),
-                add_svg_filenames_for_latex_strings_in_html_string))
-        converted_state = state_domain.State.from_dict(converted_state_dict)
-        html_in_exploration_after_conversion += (
-            ''.join(converted_state.get_all_html_content_strings()))
-        change_lists.extend(
-            generate_html_change_list_for_state(
-                state_name, converted_state_dict, old_state_dict))
-
-    filenames_mapping = (
-        html_validation_service.
-        extract_svg_filename_latex_mapping_in_math_rte_components(
-            html_in_exploration_after_conversion))
-
-    number_of_svg_files_saved = 0
-    for filename, raw_latex in filenames_mapping:
-        # Some new filenames may already have the images saved from the math
-        # rich-text editor, for these files we don't need to save the image
-        # again.
-        if raw_latex in raw_latex_to_image_data_dict.keys():
-            image_file = raw_latex_to_image_data_dict[raw_latex].raw_image
-            image_validation_error_message_suffix = (
-                'SVG image provided for latex %s failed validation' % raw_latex)
-            try:
-                file_format = (
-                    image_validation_services.validate_image_and_filename(
-                        image_file, filename))
-            except utils.ValidationError as e:
-                e = '%s %s' % (e, image_validation_error_message_suffix)
-                raise Exception(e)
-            image_is_compressible = (
-                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-            fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_EXPLORATION, exp_id, image_file,
-                'image', image_is_compressible)
-            number_of_svg_files_saved += 1
-    list_of_latex_string_converted = raw_latex_to_image_data_dict.keys()
-    exploration_math_rich_text_info_model = (
-        exp_models.ExplorationMathRichTextInfoModel.get_by_id(exp_id))
-    list_of_latex_strings_in_model = (
-        exploration_math_rich_text_info_model.latex_strings_without_svg)
-    list_of_latex_string_left_to_be_converted = list(
-        set(list_of_latex_strings_in_model) - set(
-            list_of_latex_string_converted))
-
-    commit_message = (
-        'Technical fix: Added %d SVG images to math tags in the '
-        'exploration.' % (number_of_svg_files_saved))
-    if list_of_latex_string_left_to_be_converted == []:
-        update_exploration(
-            feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
-            commit_message)
-        (
-            exploration_math_rich_text_info_model.
-            math_images_generation_required) = False
-    else:
-        update_exploration(
-            feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
-            commit_message)
-        exploration_math_rich_text_info_model.latex_strings_without_svg = (
-            list_of_latex_string_left_to_be_converted)
-
-    exploration_math_rich_text_info_model.put()

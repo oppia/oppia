@@ -61,7 +61,8 @@ class PlatformParameterChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_EDIT_RULES,
         'required_attribute_names': ['new_rules'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 

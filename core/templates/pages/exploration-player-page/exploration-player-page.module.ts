@@ -21,7 +21,10 @@ import 'zone.js';
 
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
+import 'third-party-imports/guppy.import';
+import 'third-party-imports/midi-js.import';
 import 'third-party-imports/ng-audio.import';
+import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
@@ -32,7 +35,7 @@ angular.module('oppia', [
   'ui.sortable', 'ui.tree', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -41,22 +44,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-
-import { AppConstants } from 'app.constants';
-import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants';
-import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -71,18 +60,15 @@ import { ExplorationPlayerConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    ClassifiersExtensionConstants,
-    CollectionSummaryTileConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    QuestionDomainConstants,
-    ServicesConstants,
-    SkillDomainConstants,
-    ExplorationPlayerConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]

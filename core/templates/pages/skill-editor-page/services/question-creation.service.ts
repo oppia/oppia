@@ -61,17 +61,17 @@ require('services/question-validation.service.ts');
 
 
 angular.module('oppia').factory('QuestionCreationService', [
-  '$location', '$uibModal', 'AlertsService',
+  '$location', '$rootScope', '$uibModal', 'AlertsService',
   'EditableQuestionBackendApiService', 'ImageLocalStorageService',
-  'MisconceptionObjectFactory', 'QuestionObjectFactory',
+  'QuestionObjectFactory',
   'QuestionUndoRedoService', 'SkillBackendApiService',
   'SkillDifficultyObjectFactory', 'SkillEditorStateService',
   'UrlInterpolationService', 'DEFAULT_SKILL_DIFFICULTY',
   'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
   function(
-      $location, $uibModal, AlertsService,
+      $location, $rootScope, $uibModal, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
-      MisconceptionObjectFactory, QuestionObjectFactory,
+      QuestionObjectFactory,
       QuestionUndoRedoService, SkillBackendApiService,
       SkillDifficultyObjectFactory, SkillEditorStateService,
       UrlInterpolationService, DEFAULT_SKILL_DIFFICULTY,
@@ -82,8 +82,6 @@ angular.module('oppia').factory('QuestionCreationService', [
     var skillId = null;
     var questionId = null;
     var questionStateData = null;
-    var questionIsBeingUpdated = null;
-    var newQuestionIsBeingCreated = null;
     var skillIdToRubricsObject = {};
     var misconceptionsBySkill = {};
     var groupedSkillSummaries = null;
@@ -92,15 +90,12 @@ angular.module('oppia').factory('QuestionCreationService', [
     var populateMisconceptions = function() {
       SkillBackendApiService.fetchMultiSkills(
         newQuestionSkillIds).then(
-        function(skillDicts) {
-          skillDicts.forEach(function(skillDict) {
-            misconceptionsBySkill[skillDict.id] =
-                  skillDict.misconceptions.map(
-                    function(misconceptionsBackendDict) {
-                      return MisconceptionObjectFactory
-                        .createFromBackendDict(misconceptionsBackendDict);
-                    });
+        function(skills) {
+          skills.forEach(function(skill) {
+            misconceptionsBySkill[skill.getId()] =
+              skill.getMisconceptions();
           });
+          $rootScope.$apply();
         }, function(error) {
           AlertsService.addWarning();
         });
@@ -172,8 +167,6 @@ angular.module('oppia').factory('QuestionCreationService', [
           QuestionObjectFactory.createDefaultQuestion(newQuestionSkillIds);
       questionId = question.getId();
       questionStateData = question.getStateData();
-      questionIsBeingUpdated = false;
-      newQuestionIsBeingCreated = true;
       openQuestionEditor(newQuestionSkillDifficulties[0]);
     };
 
@@ -213,7 +206,6 @@ angular.module('oppia').factory('QuestionCreationService', [
       var newQuestionIsBeingCreated = true;
 
       QuestionUndoRedoService.clearChanges();
-      var editorIsOpen = true;
       var selectedSkillId = SkillEditorStateService.getSkill().getId();
       $location.hash(questionId);
       var skillIdToNameMapping = (
@@ -248,7 +240,6 @@ angular.module('oppia').factory('QuestionCreationService', [
         controller: 'QuestionEditorModalController',
       }).result.then(function() {
         $location.hash(null);
-        editorIsOpen = false;
         saveAndPublishQuestion();
       });
     };

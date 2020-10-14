@@ -17,7 +17,8 @@
  * in Protractor tests.
  */
 
-var forms = require('./forms.js');
+var action = require('./action.js');
+var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var SkillEditorPage = function() {
@@ -97,6 +98,8 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-save-rubric-explanation-button'));
   var deleteRubricExplanationButton = element(
     by.css('.protractor-test-delete-rubric-explanation-button'));
+  var easyRubricDifficulty = element(
+    by.css('.protractor-test-skill-difficulty-easy'));
 
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
@@ -192,19 +195,18 @@ var SkillEditorPage = function() {
   };
 
   this.saveQuestion = async function() {
-    await saveQuestionButton.click();
+    await general.scrollToTop();
+    await action.click('Save Question Button', saveQuestionButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.moveToQuestionsTab = async function() {
-    await waitFor.elementToBeClickable(
-      questionsTab,
-      'Questions tab button takes too long to be clickable');
-    await questionsTab.click();
+    await action.click('Questions tab button', questionsTab);
   };
 
   this.clickCreateQuestionButton = async function() {
-    await createQuestionButton.click();
+    await action.click('Create Question Button', createQuestionButton);
+    await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
   this.confirmSkillDifficulty = async function() {

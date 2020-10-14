@@ -21,13 +21,12 @@ import datetime
 
 from constants import constants
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
-from google.appengine.ext import ndb
-
 transaction_services = models.Registry.import_transaction_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
@@ -38,17 +37,24 @@ VERSION_DELIMITER = '-'
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    # Models that should be kept.
     'KEEP',
+    # Models that should be deleted.
     'DELETE',
-    'ANONYMIZE',
+    # Models that should be deleted after all the other models are deleted and
+    # verified to be deleted.
+    'DELETE_AT_END',
+    # Models that should be pseudonymized in their local context.
     'LOCALLY_PSEUDONYMIZE',
+    # Models that should only be kept if published.
     'KEEP_IF_PUBLIC',
+    # Models that are not directly or indirectly related to users.
     'NOT_APPLICABLE'
 )
 
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'CONTAINS_USER_DATA',
-    'NOT_APPLICABLE',
+    'EXPORTED',
+    'NOT_APPLICABLE'
 )
 
 # Constant used when retrieving big number of models.
@@ -60,17 +66,19 @@ RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 
-class BaseModel(ndb.Model):
+class BaseModel(datastore_services.Model):
     """Base model for all persistent object storage classes."""
 
     # When this entity was first created. This value should only be modified
     # with the _update_timestamps method.
-    created_on = ndb.DateTimeProperty(indexed=True, required=True)
+    created_on = (
+        datastore_services.DateTimeProperty(indexed=True, required=True))
     # When this entity was last updated. This value should only be modified
     # with the _update_timestamps method.
-    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
+    last_updated = (
+        datastore_services.DateTimeProperty(indexed=True, required=True))
     # Whether the current version of the model instance is deleted.
-    deleted = ndb.BooleanProperty(indexed=True, default=False)
+    deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
     @property
     def id(self):
@@ -81,6 +89,13 @@ class BaseModel(ndb.Model):
         """Raised when no entity for a given id exists in the datastore."""
 
         pass
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role for all the classes will be Exploration
+        editor by default. The subclasses may override this value if needed.
+        """
+        return feconf.ROLE_ID_EXPLORATION_EDITOR
 
     @staticmethod
     def get_deletion_policy():
@@ -124,17 +139,14 @@ class BaseModel(ndb.Model):
             'The export_data() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
-    @staticmethod
-    def get_export_policy():
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError. The method is not overwritten in a derived
-                class.
-        """
-        raise NotImplementedError(
-            'The get_export_policy() method is missing from the '
-            'derived class. It should be implemented in the derived class.')
+    @classmethod
+    def get_export_policy(cls):
+        """Model creation time is not relevant to user data."""
+        return {
+            'created_on': EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': EXPORT_POLICY.NOT_APPLICABLE
+        }
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -151,7 +163,7 @@ class BaseModel(ndb.Model):
             that corresponds to the given id.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError. The value of strict is
+            BaseModel.EntityNotFoundError. The value of strict is
                 True and no undeleted entity with the given id exists in the
                 datastore.
         """
@@ -184,11 +196,11 @@ class BaseModel(ndb.Model):
         none_argument_indices = []
         for index, entity_id in enumerate(entity_ids):
             if entity_id:
-                entity_keys.append(ndb.Key(cls, entity_id))
+                entity_keys.append(datastore_services.Key(cls, entity_id))
             else:
                 none_argument_indices.append(index)
 
-        entities = ndb.get_multi(entity_keys)
+        entities = datastore_services.get_multi(entity_keys)
         for index in none_argument_indices:
             entities.insert(index, None)
 
@@ -212,7 +224,7 @@ class BaseModel(ndb.Model):
             self.last_updated = datetime.datetime.utcnow()
 
     def put(self, update_last_updated_time=True):
-        """Stores the given ndb.Model instance to the datastore.
+        """Stores the given datastore_services.Model instance to the datastore.
 
         Args:
             update_last_updated_time: bool. Whether to update the
@@ -225,7 +237,8 @@ class BaseModel(ndb.Model):
         return super(BaseModel, self).put()
 
     def put_async(self, update_last_updated_time=True):
-        """Stores the given ndb.Model instance to the datastore asynchronously.
+        """Stores the given datastore_services.Model instance to the datastore
+        asynchronously.
 
         Args:
             update_last_updated_time: bool. Whether to update the
@@ -239,24 +252,26 @@ class BaseModel(ndb.Model):
 
     @classmethod
     def put_multi(cls, entities, update_last_updated_time=True):
-        """Stores the given ndb.Model instances.
+        """Stores the given datastore_services.Model instances.
 
         Args:
-            entities: list(ndb.Model). List of model instances to be stored.
+            entities: list(datastore_services.Model). List of model instances to
+                be stored.
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
         """
         # Internally put_multi calls put so we don't need to call
         # _update_timestamps here.
-        ndb.put_multi(
+        datastore_services.put_multi(
             entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     def put_multi_async(cls, entities, update_last_updated_time=True):
-        """Stores the given ndb.Model instances asynchronously.
+        """Stores the given datastore_services.Model instances asynchronously.
 
         Args:
-            entities: list(ndb.Model). The list of model instances to be stored.
+            entities: list(datastore_services.Model). The list of model
+                instances to be stored.
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
 
@@ -265,19 +280,19 @@ class BaseModel(ndb.Model):
         """
         # Internally put_multi_async calls put_async so we don't need to call
         # _update_timestamps here.
-        return ndb.put_multi_async(
+        return datastore_services.put_multi_async(
             entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     def delete_multi(cls, entities):
-        """Deletes the given ndb.Model instances.
+        """Deletes the given datastore_services.Model instances.
 
         Args:
-            entities: list(ndb.Model). The list of model instances to be
-                deleted.
+            entities: list(datastore_services.Model). The list of model
+                instances to be deleted.
         """
         keys = [entity.key for entity in entities]
-        ndb.delete_multi(keys)
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def delete_by_id(cls, instance_id):
@@ -286,7 +301,7 @@ class BaseModel(ndb.Model):
         Args:
             instance_id: str. Id of the model to delete.
         """
-        ndb.Key(cls, instance_id).delete()
+        datastore_services.Key(cls, instance_id).delete()
 
     def delete(self):
         """Deletes this instance."""
@@ -342,7 +357,8 @@ class BaseModel(ndb.Model):
         descending order (newly updated first).
 
         Args:
-            query: ndb.Query. The query object to be used to fetch entities.
+            query: datastore_services.Query. The query object to be used to
+                fetch entities.
             page_size: int. The maximum number of entities to be returned.
             urlsafe_start_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise,
@@ -361,7 +377,8 @@ class BaseModel(ndb.Model):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
             start_cursor = None
 
@@ -379,24 +396,43 @@ class BaseCommitLogEntryModel(BaseModel):
     """
 
     # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
+    user_id = datastore_services.StringProperty(indexed=True, required=True)
     # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
+    commit_type = datastore_services.StringProperty(indexed=True, required=True)
     # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
+    commit_message = datastore_services.TextProperty(indexed=False)
     # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
+    commit_cmds = datastore_services.JsonProperty(indexed=False, required=True)
     # The status of the entity after the edit event ('private', 'public').
-    post_commit_status = ndb.StringProperty(indexed=True, required=True)
+    post_commit_status = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # Whether the entity is community-owned after the edit event.
-    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
+    post_commit_community_owned = (
+        datastore_services.BooleanProperty(indexed=True))
     # Whether the entity is private after the edit event. Having a
     # separate field for this makes queries faster, since an equality query
     # on this property is faster than an inequality query on
     # post_commit_status.
-    post_commit_is_private = ndb.BooleanProperty(indexed=True)
+    post_commit_is_private = datastore_services.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
-    version = ndb.IntegerProperty()
+    version = datastore_services.IntegerProperty()
+
+    @classmethod
+    def get_export_policy(cls):
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return dict(BaseModel.get_export_policy(), **{
+            'user_id': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status': EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned':
+                EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_is_private': EXPORT_POLICY.NOT_APPLICABLE,
+            'version': EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -555,13 +591,13 @@ class VersionedModel(BaseModel):
     ]
     # The reserved prefix for keys that are automatically inserted into a
     # commit_cmd dict by this model.
-    _AUTOGENERATED_PREFIX = 'AUTO'
+    _AUTOGENERATED_PREFIX = feconf.AUTOGENERATED_PREFIX
 
     # The command string for a revert commit.
-    CMD_REVERT_COMMIT = '%s_revert_version_number' % _AUTOGENERATED_PREFIX
+    CMD_REVERT_COMMIT = feconf.CMD_REVERT_COMMIT
 
     # The command string for a delete commit.
-    CMD_DELETE_COMMIT = '%s_mark_deleted' % _AUTOGENERATED_PREFIX
+    CMD_DELETE_COMMIT = feconf.CMD_DELETE_COMMIT
 
     # The current version number of this instance. In each PUT operation,
     # this number is incremented and a snapshot of the modified instance is
@@ -569,7 +605,7 @@ class VersionedModel(BaseModel):
     # version number starts at 1 when the model instance is first created.
     # All data in this instance represents the version at HEAD; data about the
     # previous versions is stored in the snapshot models.
-    version = ndb.IntegerProperty(default=0)
+    version = datastore_services.IntegerProperty(default=0)
 
     def _require_not_marked_deleted(self):
         """Checks whether the model instance is deleted."""
@@ -703,14 +739,15 @@ class VersionedModel(BaseModel):
                 for version_number in version_numbers]
 
             metadata_keys = [
-                ndb.Key(self.SNAPSHOT_METADATA_CLASS, snapshot_id)
+                datastore_services.Key(
+                    self.SNAPSHOT_METADATA_CLASS, snapshot_id)
                 for snapshot_id in snapshot_ids]
-            ndb.delete_multi(metadata_keys)
+            datastore_services.delete_multi(metadata_keys)
 
             content_keys = [
-                ndb.Key(self.SNAPSHOT_CONTENT_CLASS, snapshot_id)
+                datastore_services.Key(self.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                 for snapshot_id in snapshot_ids]
-            ndb.delete_multi(content_keys)
+            datastore_services.delete_multi(content_keys)
 
             super(VersionedModel, self).delete()
         else:
@@ -744,6 +781,10 @@ class VersionedModel(BaseModel):
         """
         versioned_models = cls.get_multi(
             entity_ids, include_deleted=force_deletion)
+        versioned_models = [
+            versioned_model for versioned_model in versioned_models
+            if versioned_model is not None
+        ]
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []
@@ -756,14 +797,16 @@ class VersionedModel(BaseModel):
                     for version_number in model_version_numbers]
 
                 all_models_metadata_keys.extend([
-                    ndb.Key(model.SNAPSHOT_METADATA_CLASS, snapshot_id)
+                    datastore_services.Key(
+                        model.SNAPSHOT_METADATA_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
                 all_models_content_keys.extend([
-                    ndb.Key(model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
+                    datastore_services.Key(
+                        model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
             versioned_models_keys = [model.key for model in versioned_models]
             transaction_services.run_in_transaction(
-                ndb.delete_multi,
+                datastore_services.delete_multi,
                 all_models_metadata_keys + all_models_content_keys +
                 versioned_models_keys)
         else:
@@ -1042,9 +1085,9 @@ class VersionedModel(BaseModel):
             cls.get_snapshot_id(model_instance_id, version_number)
             for version_number in version_numbers]
         metadata_keys = [
-            ndb.Key(cls.SNAPSHOT_METADATA_CLASS, snapshot_id)
+            datastore_services.Key(cls.SNAPSHOT_METADATA_CLASS, snapshot_id)
             for snapshot_id in snapshot_ids]
-        returned_models = ndb.get_multi(metadata_keys)
+        returned_models = datastore_services.get_multi(metadata_keys)
 
         for ind, model in enumerate(returned_models):
             if model is None:
@@ -1061,6 +1104,15 @@ class VersionedModel(BaseModel):
             'created_on_ms': utils.get_time_in_millisecs(model.created_on),
         } for (ind, model) in enumerate(returned_models)]
 
+    @classmethod
+    def get_export_policy(cls):
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return dict(BaseModel.get_export_policy(), **{
+            'version': EXPORT_POLICY.NOT_APPLICABLE
+        })
+
 
 class BaseSnapshotMetadataModel(BaseModel):
     """Base class for snapshot metadata classes.
@@ -1069,23 +1121,45 @@ class BaseSnapshotMetadataModel(BaseModel):
     """
 
     # The id of the user who committed this revision.
-    committer_id = ndb.StringProperty(required=True, indexed=True)
+    committer_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The type of the commit associated with this snapshot.
-    commit_type = ndb.StringProperty(
+    commit_type = datastore_services.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
     # The commit message associated with this snapshot.
-    commit_message = ndb.StringProperty(indexed=True)
+    commit_message = datastore_services.StringProperty(indexed=True)
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
-    commit_cmds = ndb.JsonProperty(indexed=False)
+    commit_cmds = datastore_services.JsonProperty(indexed=False)
+    # The user ids that are in some field in commit_cmds.
+    commit_cmds_user_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # The user ids that are enclosed inside the 'content' field in the relevant
+    # snapshot content model.
+    content_user_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
-    def get_export_policy():
-        """Snapshot Metadata is relevant to the user for Takeout."""
-        return EXPORT_POLICY.CONTAINS_USER_DATA
+    def get_deletion_policy():
+        """Metadata models should always be pseudonymized in the context of
+        their parent models.
+        """
+        return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def exists_for_user_id(cls, user_id):
+    def get_export_policy(cls):
+        """Snapshot Metadata is relevant to the user for Takeout."""
+        return dict(BaseModel.get_export_policy(), **{
+            'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': EXPORT_POLICY.EXPORTED,
+            'commit_message': EXPORT_POLICY.EXPORTED,
+            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds_user_ids': EXPORT_POLICY.NOT_APPLICABLE,
+            'content_user_ids': EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
         """Check whether BaseSnapshotMetadataModel references the given user.
 
         Args:
@@ -1094,8 +1168,11 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.committer_id == user_id).get(
-            keys_only=True) is not None
+        return cls.query(datastore_services.any_of(
+            cls.committer_id == user_id,
+            cls.commit_cmds_user_ids == user_id,
+            cls.content_user_ids == user_id,
+        )).get(keys_only=True) is not None
 
     @classmethod
     def create(
@@ -1166,14 +1243,35 @@ class BaseSnapshotContentModel(BaseModel):
     """
 
     # The snapshot content, as a JSON blob.
-    content = ndb.JsonProperty(indexed=False)
+    content = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
-    def get_export_policy():
+    def get_deletion_policy():
+        """The content models do not contain any user ID fields directly,
+        the user ID fields might be hidden inside the content field (because
+        content field contains all the fields from the parent model), e.g. the
+        owner_ids or viewer_ids in the ExplorationRightsModel that are then in
+        the content field of ExplorationRightsSnapshotContentModel.
+
+        The pseudonymization of these models is handled in the wipeout service
+        (in the relevant pseudonymization function, e.g. in
+        _pseudonymize_activity_models_with_associated_rights_models() for
+        CollectionRightsModel or ExplorationRightsModel), based on
+        the content_user_ids field of the relevant metadata model.
+        E.g. the content_user_ids in ExplorationRightsSnapshotMetadataModel are
+        used to pseudonymize the relevant fields in the corresponding
+        ExplorationRightsSnapshotContentModel.
+        """
+        return DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_export_policy(cls):
         """The contents of snapshots are not relevant to the user for
         Takeout.
         """
-        return EXPORT_POLICY.NOT_APPLICABLE
+        return dict(BaseModel.get_export_policy(), **{
+            'content': EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def create(cls, snapshot_id, content):

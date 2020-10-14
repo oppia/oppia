@@ -26,22 +26,21 @@ import re
 from constants import constants
 from core.domain import android_validation_constants
 from core.domain import change_domain
+from core.domain import subtopic_page_domain
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 import utils
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
+CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
+CMD_REMOVE_MANAGER_ROLE = feconf.CMD_REMOVE_MANAGER_ROLE
+CMD_PUBLISH_TOPIC = feconf.CMD_PUBLISH_TOPIC
+CMD_UNPUBLISH_TOPIC = feconf.CMD_UNPUBLISH_TOPIC
 
-CMD_CREATE_NEW = 'create_new'
-CMD_CHANGE_ROLE = 'change_role'
-CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
-CMD_PUBLISH_TOPIC = 'publish_topic'
-CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
+ROLE_MANAGER = feconf.ROLE_MANAGER
+ROLE_NONE = feconf.ROLE_NONE
 
-ROLE_MANAGER = 'manager'
-ROLE_NONE = 'none'
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
@@ -53,6 +52,8 @@ TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
+TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
+TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -114,7 +115,9 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_LANGUAGE_CODE,
         TOPIC_PROPERTY_THUMBNAIL_FILENAME,
         TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
-        TOPIC_PROPERTY_URL_FRAGMENT)
+        TOPIC_PROPERTY_URL_FRAGMENT,
+        TOPIC_PROPERTY_META_TAG_CONTENT,
+        TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -124,86 +127,117 @@ class TopicChange(change_domain.BaseChange):
         SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
         SUBTOPIC_PROPERTY_URL_FRAGMENT)
 
+    # The allowed list of subtopic page properties which can be used in
+    # update_subtopic_page_property command.
+    SUBTOPIC_PAGE_PROPERTIES = (
+        subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES)
+
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['name'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_SUBTOPIC,
         'required_attribute_names': ['title', 'subtopic_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_SUBTOPIC,
         'required_attribute_names': ['subtopic_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REARRANGE_CANONICAL_STORY,
         'required_attribute_names': ['from_index', 'to_index'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_ADDITIONAL_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_ADDITIONAL_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_PUBLISH_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UNPUBLISH_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
         'required_attribute_names': ['new_uncategorized_skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
         'required_attribute_names': ['uncategorized_skill_id'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
         'required_attribute_names': [
             'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
         'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REARRANGE_SUBTOPIC,
         'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
         'required_attribute_names': ['subtopic_id', 'skill_id'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
         'required_attribute_names': [
             'subtopic_id', 'property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SUBTOPIC_PROPERTIES}
+    }, {
+        'name': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+        'required_attribute_names': [
+            'property_name', 'new_value', 'old_value', 'subtopic_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES}
     }, {
         'name': CMD_UPDATE_TOPIC_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': TOPIC_PROPERTIES}
     }, {
         'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -217,31 +251,7 @@ class TopicRightsChange(change_domain.BaseChange):
         - 'unpublish_story'.
     """
 
-    # The allowed list of roles which can be used in change_role command.
-    ALLOWED_ROLES = [ROLE_NONE, ROLE_MANAGER]
-
-    ALLOWED_COMMANDS = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }, {
-        'name': CMD_CHANGE_ROLE,
-        'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
-        'optional_attribute_names': [],
-        'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
-    }, {
-        'name': CMD_REMOVE_MANAGER_ROLE,
-        'required_attribute_names': ['removed_user_id'],
-        'optional_attribute_names': []
-    }, {
-        'name': CMD_PUBLISH_TOPIC,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }, {
-        'name': CMD_UNPUBLISH_TOPIC,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }]
+    ALLOWED_COMMANDS = feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
 
 
 class StoryReference(python_utils.OBJECT):
@@ -469,7 +479,8 @@ class Topic(python_utils.OBJECT):
             canonical_story_references, additional_story_references,
             uncategorized_skill_ids, subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
-            story_reference_schema_version, created_on=None,
+            story_reference_schema_version, meta_tag_content,
+            practice_tab_is_displayed, created_on=None,
             last_updated=None):
         """Constructs a Topic domain object.
 
@@ -500,6 +511,9 @@ class Topic(python_utils.OBJECT):
             version: int. The version of the topic.
             story_reference_schema_version: int. The schema version of the
                 story reference object.
+            meta_tag_content: str. The meta tag content in the topic viewer
+                page.
+            practice_tab_is_displayed: bool. Whether the practice tab is shown.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -524,6 +538,8 @@ class Topic(python_utils.OBJECT):
         self.last_updated = last_updated
         self.version = version
         self.story_reference_schema_version = story_reference_schema_version
+        self.meta_tag_content = meta_tag_content
+        self.practice_tab_is_displayed = practice_tab_is_displayed
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -556,7 +572,9 @@ class Topic(python_utils.OBJECT):
             'language_code': self.language_code,
             'version': self.version,
             'story_reference_schema_version': (
-                self.story_reference_schema_version)
+                self.story_reference_schema_version),
+            'meta_tag_content': self.meta_tag_content,
+            'practice_tab_is_displayed': self.practice_tab_is_displayed
         }
 
     def serialize(self):
@@ -627,7 +645,10 @@ class Topic(python_utils.OBJECT):
             topic_dict['subtopic_schema_version'],
             topic_dict['next_subtopic_id'],
             topic_dict['language_code'], topic_version,
-            topic_dict['story_reference_schema_version'], topic_created_on,
+            topic_dict['story_reference_schema_version'],
+            topic_dict['meta_tag_content'],
+            topic_dict['practice_tab_is_displayed'],
+            topic_created_on,
             topic_last_updated)
 
         return topic
@@ -952,6 +973,11 @@ class Topic(python_utils.OBJECT):
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if not isinstance(self.practice_tab_is_displayed, bool):
+            raise utils.ValidationError(
+                'Practice tab is displayed property should be a boolean.'
+                'Received %s.' % self.practice_tab_is_displayed)
+        utils.require_valid_meta_tag_content(self.meta_tag_content)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
             raise utils.ValidationError(
@@ -1025,6 +1051,11 @@ class Topic(python_utils.OBJECT):
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
 
+        if strict:
+            if len(self.subtopics) == 0:
+                raise utils.ValidationError(
+                    'Topic should have at least 1 subtopic.')
+
         if not self.are_subtopic_url_fragments_unique():
             raise utils.ValidationError(
                 'Subtopic url fragments are not unique across '
@@ -1094,7 +1125,7 @@ class Topic(python_utils.OBJECT):
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False)
 
     @classmethod
     def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
@@ -1250,6 +1281,24 @@ class Topic(python_utils.OBJECT):
             new_language_code: str. The updated language code for the topic.
         """
         self.language_code = new_language_code
+
+    def update_meta_tag_content(self, new_meta_tag_content):
+        """Updates the meta tag content of a topic object.
+
+        Args:
+            new_meta_tag_content: str. The updated meta tag content for the
+                topic.
+        """
+        self.meta_tag_content = new_meta_tag_content
+
+    def update_practice_tab_is_displayed(self, new_practice_tab_is_displayed):
+        """Updates the language code of a topic object.
+
+        Args:
+            new_practice_tab_is_displayed: str. The updated practice tab is
+                displayed property for the topic.
+        """
+        self.practice_tab_is_displayed = new_practice_tab_is_displayed
 
     def add_uncategorized_skill_id(self, new_uncategorized_skill_id):
         """Updates the skill id list of a topic object.

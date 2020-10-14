@@ -49,13 +49,16 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
 
-require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
+require(
+  'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
 
 describe('Audio translation bar directive', function() {
@@ -72,7 +75,6 @@ describe('Audio translation bar directive', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var recordedVoiceoversObjectFactory = null;
-  var externalSaveService = null;
   var siteAnalyticsService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
@@ -117,16 +119,19 @@ describe('Audio translation bar directive', function() {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateEditorService', TestBed.get(StateEditorService));
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
-    $provide.value('StateRecordedVoiceoversService',
-      stateRecordedVoiceoversService);
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
   }));
 
@@ -141,7 +146,6 @@ describe('Audio translation bar directive', function() {
     contextService = $injector.get('ContextService');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     explorationStatesService = $injector.get('ExplorationStatesService');
-    externalSaveService = $injector.get('ExternalSaveService');
     stateEditorService = $injector.get('StateEditorService');
     translationLanguageService = $injector.get('TranslationLanguageService');
     translationTabActiveContentIdService = $injector.get(
@@ -161,20 +165,22 @@ describe('Audio translation bar directive', function() {
     spyOn(explorationStatesService, 'saveRecordedVoiceovers').and
       .callFake(function() {});
 
-    spyOnProperty(translationTabActiveContentIdService,
+    spyOnProperty(
+      translationTabActiveContentIdService,
       'onActiveContentIdChanged').and.returnValue(
       mockActiveContentIdChangedEventEmitter);
 
-    spyOnProperty(translationLanguageService,
-      'onActiveLanguageChanged').and.returnValue(
+    spyOnProperty(
+      translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
       mockActiveLanguageChangedEventEmitter);
 
-    spyOnProperty(stateEditorService,
+    spyOnProperty(
+      stateEditorService,
       'onShowTranslationTabBusyModal').and.returnValue(
       mockShowTranslationTabBusyModalEventEmitter);
 
-    stateRecordedVoiceoversService.init(stateName,
-      recordedVoiceoversObjectFactory.createFromBackendDict({
+    stateRecordedVoiceoversService.init(
+      stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
         voiceovers_mapping: {
           content: {
             en: {
@@ -350,8 +356,8 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should toggle audio needs update', function() {
-    spyOn(stateRecordedVoiceoversService.displayed,
-      'toggleNeedsUpdateAttribute');
+    spyOn(
+      stateRecordedVoiceoversService.displayed, 'toggleNeedsUpdateAttribute');
 
     $scope.toggleAudioNeedsUpdate();
     expect(
@@ -555,7 +561,7 @@ describe('Audio translation bar directive', function() {
         result: $q.resolve()
       });
 
-      $rootScope.$broadcast('showTranslationTabBusyModal');
+      mockShowTranslationTabBusyModalEventEmitter.emit();
       $scope.$apply();
 
       expect($q.resolve).toHaveBeenCalled();
@@ -568,7 +574,7 @@ describe('Audio translation bar directive', function() {
         result: $q.reject()
       });
 
-      $rootScope.$broadcast('showTranslationTabBusyModal');
+      mockShowTranslationTabBusyModalEventEmitter.emit();
       $scope.$apply();
 
       expect($q.reject).toHaveBeenCalled();
@@ -629,7 +635,7 @@ describe('Audio translation bar directive', function() {
       expect($scope.audioTimerIsShown).toBe(false);
     });
 
-  it('should delete audio when closing delete audio translation modal ',
+  it('should delete audio when closing delete audio translation modal',
     function() {
       spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
       spyOn($uibModal, 'open').and.returnValue({
@@ -646,7 +652,7 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should not delete audio when dismissing delete audio translation' +
-    ' modal ', function() {
+    ' modal', function() {
     spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
@@ -731,8 +737,8 @@ describe('Audio translation bar directive', function() {
         .returnValue($q.resolve({
           canVoiceover: true
         }));
-      stateRecordedVoiceoversService.init(stateName,
-        recordedVoiceoversObjectFactory.createFromBackendDict({
+      stateRecordedVoiceoversService.init(
+        stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
           voiceovers_mapping: {
             content: {
               en: {
@@ -777,7 +783,7 @@ describe('Audio translation bar directive', function() {
     });
 
     it('should trigger drop event in translation tab element and open add' +
-      ' audio translation modal with $uibModal', function() {
+      ' audio translation modal', function() {
       translationTabDivMock.triggerHandler('dragover');
 
       spyOn($uibModal, 'open').and.callThrough();

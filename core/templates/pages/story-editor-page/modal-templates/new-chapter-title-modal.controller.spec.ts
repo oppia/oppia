@@ -16,14 +16,10 @@
  * @fileoverview Unit tests for CreateNewChapterModalController.
  */
 
-
 import { AlertsService } from 'services/alerts.service';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
-import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Create New Chapter Modal Controller', function() {
@@ -40,11 +36,10 @@ describe('Create New Chapter Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('StoryObjectFactory',
-      new StoryObjectFactory(new StoryContentsObjectFactory(
-        new StoryNodeObjectFactory())));
+    $provide.value(
+      'StoryObjectFactory', new StoryObjectFactory(
+        new StoryContentsObjectFactory()));
     $provide.value('AlertsService', new AlertsService(new LoggerService()));
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $rootScope = $injector.get('$rootScope');

@@ -20,6 +20,11 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 import { EventEmitter } from '@angular/core';
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+
+import { TopicsAndSkillsDashboardFilter } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 
 // ^^^ This block is to be removed.
 
@@ -43,13 +48,8 @@ describe('Topics and Skills Dashboard Page', function() {
   var $rootScope = null;
   var $q = null;
   var $timeout = null;
-  var TopicsAndSkillsDashboardBackendApiService = null;
-  var WindowDimensionsService = null;
-  var TopicsAndSkillsDashboardFilterObjectFactory = null;
   var TopicSummaryObjectFactory = null;
-  var SkillSummaryObjectFactory = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
-  var AlertsService = null;
 
   var mocktasdReinitalizedEventEmitter = null;
 
@@ -87,17 +87,9 @@ describe('Topics and Skills Dashboard Page', function() {
       $scope = $rootScope.$new();
       $timeout = $injector.get('$timeout');
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
-      WindowDimensionsService = $injector.get('WindowDimensionsService');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
-        'TopicsAndSkillsDashboardFilterObjectFactory');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       TopicSummaryObjectFactory = $injector.get(
         'TopicSummaryObjectFactory');
-      SkillSummaryObjectFactory = $injector.get(
-        'SkillSummaryObjectFactory');
 
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
@@ -110,8 +102,8 @@ describe('Topics and Skills Dashboard Page', function() {
                 .createFromBackendDict(backendDict)),
             untriagedSkillSummaries: (
               sampleDataResults.untriaged_skill_summary_dicts.map(
-                backendDict => SkillSummaryObjectFactory
-                  .createFromBackendDict(backendDict))),
+                (backendDict: unknown) => SkillSummary.createFromBackendDict(
+                    backendDict as SkillSummaryBackendDict))),
             allClassroomNames: sampleDataResults.all_classroom_names,
             canCreateTopic: sampleDataResults.can_create_topic,
             canCreateSkill: sampleDataResults.can_create_skill,
@@ -153,7 +145,7 @@ describe('Topics and Skills Dashboard Page', function() {
 
     it('should init the dashboard and fetch data', function() {
       const filterObject =
-        TopicsAndSkillsDashboardFilterObjectFactory.createDefault();
+        TopicsAndSkillsDashboardFilter.createDefault();
       expect(ctrl.pageNumber).toEqual(0);
       expect(ctrl.topicPageNumber).toEqual(0);
       expect(ctrl.itemsPerPage).toEqual(10);
@@ -175,7 +167,8 @@ describe('Topics and Skills Dashboard Page', function() {
           dict => TopicSummaryObjectFactory.createFromBackendDict(dict)));
       expect(ctrl.untriagedSkillSummaries).toEqual(
         sampleDataResults.untriaged_skill_summary_dicts.map(
-          dict => SkillSummaryObjectFactory.createFromBackendDict(dict)));
+          (dict: unknown) => SkillSummary.createFromBackendDict(
+            dict as SkillSummaryBackendDict)));
       expect(ctrl.totalEntityCountToDisplay).toEqual(1);
       expect(ctrl.userCanCreateTopic).toEqual(true);
       expect(ctrl.userCanCreateSkill).toEqual(true);
@@ -272,7 +265,7 @@ describe('Topics and Skills Dashboard Page', function() {
 
     it('should reset the filters', function() {
       const filterObject = (
-        TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
+        TopicsAndSkillsDashboardFilter.createDefault());
       expect(ctrl.filterObject).toEqual(filterObject);
       ctrl.filterObject.sort = 'Newly Created';
       ctrl.filterObject.keywords = ['keyword1'];
@@ -328,7 +321,7 @@ describe('Topics and Skills Dashboard Page', function() {
         description: 'Gamma description',
       });
       ctrl.filterObject = (
-        TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
+        TopicsAndSkillsDashboardFilter.createDefault());
       ctrl.totalTopicSummaries = [topic1, topic2, topic3, topic4];
 
       ctrl.applyFilters();
@@ -370,16 +363,9 @@ describe('Topics and Skills Dashboard Page', function() {
     beforeEach(angular.mock.inject(function($injector) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
-        'TopicsAndSkillsDashboardFilterObjectFactory');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       TopicSummaryObjectFactory = $injector.get(
         'TopicSummaryObjectFactory');
-      SkillSummaryObjectFactory = $injector.get(
-        'SkillSummaryObjectFactory');
       var sampleDataResults2 = {
         topic_summary_dicts: [],
         skill_summary_dicts: [],
@@ -401,7 +387,8 @@ describe('Topics and Skills Dashboard Page', function() {
             topicSummaries: sampleDataResults2.topic_summary_dicts,
             untriagedSkillSummaries: (
               sampleDataResults2.untriaged_skill_summary_dicts.map(
-                dict => SkillSummaryObjectFactory.createFromBackendDict(dict))),
+                (dict: unknown) => SkillSummary.createFromBackendDict(
+                  dict as SkillSummaryBackendDict))),
             canCreateTopic: sampleDataResults2.can_create_topic,
             canCreateSkill: sampleDataResults2.can_create_skill
           });
@@ -501,7 +488,7 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should navigate skill page forward', function() {
-      var skillSpy = spyOn(ctrl, 'fetchSkills');
+      var skillSpy = spyOn(ctrl, 'fetchSkillsDebounced');
       ctrl.navigateSkillPage('next_page');
       expect(skillSpy).toHaveBeenCalled();
     });
@@ -519,10 +506,7 @@ describe('Topics and Skills Dashboard Page', function() {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
       mockAlertsService = {
         addWarning: function() {}
       };
@@ -575,10 +559,7 @@ describe('Topics and Skills Dashboard Page', function() {
         addWarning: function() {}
       };
       $uibModal = $injector.get('$uibModal');
-      AlertsService = $injector.get('AlertsService');
       $q = $injector.get('$q');
-      TopicsAndSkillsDashboardBackendApiService = $injector.get(
-        'TopicsAndSkillsDashboardBackendApiService');
 
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 

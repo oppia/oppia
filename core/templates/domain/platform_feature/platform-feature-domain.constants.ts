@@ -16,15 +16,15 @@
  * @fileoverview Constants for platform feature domain.
  */
 
-export class PlatformFeatureDomainConstants {
+export const PlatformFeatureDomainConstants = {
   // Url for the dummy backend handler gated by the dummy_feature.
-  public static DUMMY_HANDLER_URL = '/platform_feature_dummy_handler';
+  DUMMY_HANDLER_URL: '/platform_feature_dummy_handler',
 
   // Url for the backend handler for evaluation of platform features.
-  public static PLATFORM_FEATURES_EVALUATION_HANDLER_URL =
-    '/platform_features_evaluation_handler';
+  PLATFORM_FEATURES_EVALUATION_HANDLER_URL: (
+    '/platform_features_evaluation_handler'),
 
   // Action name for request to the admin handler that updates the rules
   // of feature flags.
-  public static UPDATE_FEATURE_FLAG_RULES_ACTION = 'update_feature_flag_rules';
-}
+  UPDATE_FEATURE_FLAG_RULES_ACTION: 'update_feature_flag_rules'
+} as const;

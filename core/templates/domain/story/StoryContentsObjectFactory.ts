@@ -22,8 +22,8 @@ import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
-import { StoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
+import { StoryNodeBackendDict, StoryNode } from
+  'domain/story/story-node.model';
 
 export interface StoryContentsBackendDict {
   'initial_node_id': string;
@@ -35,14 +35,11 @@ export class StoryContents {
   _initialNodeId: string;
   _nodes: StoryNode[];
   _nextNodeId: string;
-  _storyNodeObjectFactoryInstance: StoryNodeObjectFactory;
   constructor(
-      initialNodeId: string, nodes: StoryNode[], nextNodeId: string,
-      storyNodeObjectFactoryInstance: StoryNodeObjectFactory) {
+      initialNodeId: string, nodes: StoryNode[], nextNodeId: string) {
     this._initialNodeId = initialNodeId;
     this._nodes = nodes;
     this._nextNodeId = nextNodeId;
-    this._storyNodeObjectFactoryInstance = storyNodeObjectFactoryInstance;
   }
 
   getIncrementedNodeId(nodeId: string): string {
@@ -78,7 +75,7 @@ export class StoryContents {
     return null;
   }
 
-  rearrangeNodeInStory(fromIndex, toIndex) {
+  rearrangeNodeInStory(fromIndex: number, toIndex: number): void {
     const nodeToMove = this._nodes[fromIndex];
     this._nodes.splice(fromIndex, 1);
     this._nodes.splice(toIndex, 0, nodeToMove);
@@ -108,7 +105,7 @@ export class StoryContents {
     });
   }
 
-  getNodeIndex(nodeId: string) {
+  getNodeIndex(nodeId: string): number {
     for (var i = 0; i < this._nodes.length; i++) {
       if (this._nodes[i].getId() === nodeId) {
         return i;
@@ -133,9 +130,6 @@ export class StoryContents {
     // valid.
     var nodeIds = nodes.map((node: StoryNode) => {
       return node.getId();
-    });
-    var nodeTitles = nodes.map((node: StoryNode) => {
-      return node.getTitle();
     });
     for (var i = 0; i < nodeIds.length; i++) {
       var nodeId = nodeIds[i];
@@ -240,7 +234,7 @@ export class StoryContents {
 
   addNode(title: string): void {
     this._nodes.push(
-      this._storyNodeObjectFactoryInstance.createFromIdAndTitle(
+      StoryNode.createFromIdAndTitle(
         this._nextNodeId, title));
     if (this._initialNodeId === null) {
       this._initialNodeId = this._nextNodeId;
@@ -382,19 +376,18 @@ export class StoryContents {
   providedIn: 'root'
 })
 export class StoryContentsObjectFactory {
-  constructor(private storyNodeObjectFactory: StoryNodeObjectFactory) {}
+  constructor() {}
   createFromBackendDict(
       storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
     var nodes = [];
     for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
       nodes.push(
-        this.storyNodeObjectFactory.createFromBackendDict(
+        StoryNode.createFromBackendDict(
           storyContentsBackendObject.nodes[i]));
     }
     return new StoryContents(
       storyContentsBackendObject.initial_node_id, nodes,
-      storyContentsBackendObject.next_node_id,
-      this.storyNodeObjectFactory);
+      storyContentsBackendObject.next_node_id);
   }
 }
 

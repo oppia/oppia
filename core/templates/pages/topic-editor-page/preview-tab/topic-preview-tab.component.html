@@ -5,14 +5,6 @@
   <div class="topic-preview-container">
     <div class="topic-preview-nav">
       <div class="topic-preview-navbar-tabs">
-        <div class="topic-preview-navbar-tab" ng-class="{'topic-preview-nav-active': $ctrl.activeTab === 'info'}" ng-click="$ctrl.changePreviewTab('info')">
-          <div class="topic-preview-icon">
-            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
-          </div>
-          <div class="topic-preview-text">
-            Info
-          </div>
-        </div>
         <div class="topic-preview-navbar-tab" ng-class="{'topic-preview-nav-active': $ctrl.activeTab === 'story'}" ng-click="$ctrl.changePreviewTab('story')">
           <div class="topic-preview-icon">
             <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
@@ -39,16 +31,10 @@
         </div>
       </div>
     </div>
-    <div ng-if="$ctrl.activeTab === 'info'">
-      <topic-info-tab topic-name="$ctrl.topic.getName()"
-                      topic-description="$ctrl.topic.getDescription()"
-                      story-count="$ctrl.canonicalStorySummaries.length"
-                      subtopic-count="$ctrl.subtopics.length"
-                      chapter-count="$ctrl.chapterCount">
-      </topic-info-tab>
-    </div>
     <div ng-if="$ctrl.activeTab === 'story'">
-      <stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
+      <stories-list [topic-name]="$ctrl.topic.getName()"
+                    [topic-description]="$ctrl.topic.getDescription()"
+                    [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
                     [classroom-url-fragment]="''"
                     [topic-url-fragment]="''">
       </stories-list>
@@ -62,7 +48,8 @@
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
       <practice-tab [subtopics-list]="$ctrl.subtopics"
-                    [topic-name]="$ctrl.topicName">
+                    [topic-name]="$ctrl.topicName"
+                    [start-button-is-disabled]="true">
       </practice-tab>
     </div>
   </div>
@@ -72,7 +59,11 @@
     background-color: #FFF;
     margin: 0 auto;
     position: relative;
+    top: 50px;
     width: 50%;
+  }
+  topic-preview-tab .topic-preview-parent {
+    margin-top: -40px;
   }
   topic-preview-tab .topic-preview-nav {
     background-color: #00645c;
@@ -108,9 +99,6 @@
   topic-preview-tab .topic-preview-container md-card {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.24);
     margin-top: 0;
-  }
-  topic-preview-tab .topic-preview-parent .background-banner-position {
-    top: 121px;
   }
   topic-preview-tab .topic-preview-parent .topic-preview-container md-card {
     box-shadow: none;

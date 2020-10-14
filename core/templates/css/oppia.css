@@ -613,7 +613,7 @@ textarea {
   bottom: 100px;
   color: white;
   left: 0;
-  opacity: 0.7;
+  opacity: 0.85;
   padding: 4px 8px;
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;
@@ -752,7 +752,9 @@ textarea {
   color: #009688;
 }
 .modal-body .nav-link {
+  color: #00609C;
   font-size: 16px;
+  font-weight: bold;
 }
 .oppia-navbar-dropdown .nav-link:hover {
   color: #888;
@@ -761,7 +763,7 @@ textarea {
 
 
 .input-group-addon.oppia-search-bar-icon {
-  border-radius: 4px;
+  border-radius: 4px 0 0 4px;
   font-size: 14px;
   font-weight: normal;
   line-height: 1;
@@ -1988,6 +1990,15 @@ pre.oppia-pre-wrapped-text {
   z-index: 50;
 }
 
+.oppia-clear {
+  clear: both;
+}
+
+.oppia-form-error-text {
+  color: #ff0000;
+  font-size: smaller;
+}
+
 .oppia-editor-trash-icon {
   opacity: 0.2;
   -webkit-transition: all 200ms;
@@ -2128,12 +2139,12 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-response-button,
 .oppia-add-fallback-button,
 .oppia-add-hint-button {
-  background-color: rgba(5, 140, 166, 0.9);
+  background-color: #008098;
   border: 0;
-  border-radius: 4px;
-  color: white;
-  opacity: 0.9;
-  padding: 7px;
+  border-radius: 2px;
+  color: #FFF;
+  font-weight: bold;
+  padding: 7px 15px;
 }
 
 .oppia-add-interaction-button:active,
@@ -2158,17 +2169,24 @@ pre.oppia-pre-wrapped-text {
 .oppia-interaction-tile {
   cursor: pointer;
   display: inline-block;
-  margin: 5px;
-  outline: 1px solid #aaa;
+  margin: 10px;
   vertical-align: top;
-  width: 30%;
+  width: 20%;
+}
+@media screen and (max-width: 768px) {
+  .oppia-interaction-tile {
+    width: 42%;
+  }
 }
 .oppia-interaction-tile:hover {
   outline: 2px solid #009688;
 }
 .oppia-interaction-tile-name {
-  border-top: 1px solid #ccc;
-  padding: 3px 0;
+  background-color: #E0F2F1;
+  border: 1px solid #aaa;
+  border-radius: 0 0 5px 5px;
+  font-size: 15px;
+  padding: 6px;
   position: relative;
   text-align: center;
 }
@@ -2289,7 +2307,7 @@ pre.oppia-pre-wrapped-text {
   cursor: move;
   left: 10px;
   margin-left: 5px;
-  opacity: 0.3;
+  opacity: 1;
   position: absolute;
   top: 6px;
   width: 25px;
@@ -4357,25 +4375,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-save-exploration-wide-modal .legend-graph {
   right: -25px;
-}
-
-.oppia-mathexpression-input-mobile-overlay {
-  opacity: 0;
-  position: absolute;
-  z-index: 2;
-}
-
-.oppia-mathexpression-input-hidden-text {
-  /* In some versions of Chrome on Android, typing in a 0 input
-  field can cause the previous character to be selected.
-  Set to 1px and 0 opacity instead of 0 to prevent this issue. */
-  border: 0;
-  height: 1px;
-  margin: 0;
-  margin-left: -5px;
-  opacity: 0;
-  padding: 0;
-  width: 1px;
 }
 
 .oppia-rte-component-container {

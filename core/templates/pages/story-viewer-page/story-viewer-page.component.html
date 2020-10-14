@@ -52,7 +52,7 @@
                          xmlns="http://www.w3.org/1600/svg"
                          xmlns:xlink="http://www.w3.org/1999/xlink"
                          version="1.1"
-                         style="margin-right: 10px; margin-bottom: 10px;">
+                         class="oppia-story-viewer-card-content-img">
                       <defs>
                         <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
                           <rect width="240"
@@ -79,7 +79,7 @@
                     </svg>
 
                     <div class="oppia-story-viewer-card-description-box">
-                      <p style="font-size: 20px;"><[node.getDescription()]></p>
+                      <p class="oppia-story-description-text"><[node.getDescription()]></p>
                     </div>
                   </div>
 
@@ -129,12 +129,25 @@
   </div>
 </div>
 <style>
-  .oppia-story-viewer-container a {
+  story-viewer-page .oppia-story-viewer-container a {
     text-decoration: none;
   }
 
-  .disabled-link {
+  story-viewer-page .oppia-story-viewer-container a:hover, a:hover span {
+    color: #0844aa;
+  }
+
+  story-viewer-page .disabled-link {
     cursor: default;
     pointer-events: none;
+  }
+
+  story-viewer-page .oppia-story-viewer-card-content-img {
+    margin-bottom: 10px;
+    margin-right: 10px;
+  }
+
+  story-viewer-page .oppia-story-description-text {
+    font-size: 20px;
   }
 </style>

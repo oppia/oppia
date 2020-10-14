@@ -24,7 +24,7 @@ import { TopicSummary } from
 // eslint-disable-next-line max-len
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 import { TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
@@ -91,16 +91,16 @@ export class TopicsAndSkillsDashboardPageService {
           b.topicModelCreatedOn - a.topicModelCreatedOn));
         break;
       case ESortOptions.DecreasingUpdatedOn:
-        filteredTopics.sort((a, b) =>
-          -(b.topicModelCreatedOn - a.topicModelCreatedOn));
+        filteredTopics.sort(
+          (a, b) => -(b.topicModelCreatedOn - a.topicModelCreatedOn));
         break;
       case ESortOptions.IncreasingCreatedOn:
-        filteredTopics.sort((a, b) =>
-          (b.topicModelLastUpdated - a.topicModelLastUpdated));
+        filteredTopics.sort(
+          (a, b) => (b.topicModelLastUpdated - a.topicModelLastUpdated));
         break;
       case ESortOptions.DecreasingCreatedOn:
-        filteredTopics.sort((a, b) =>
-          -(b.topicModelLastUpdated - a.topicModelLastUpdated));
+        filteredTopics.sort(
+          (a, b) => -(b.topicModelLastUpdated - a.topicModelLastUpdated));
         break;
       default:
         throw new Error('Invalid filter by sort value provided.');

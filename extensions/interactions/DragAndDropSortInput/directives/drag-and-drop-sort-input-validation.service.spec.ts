@@ -20,10 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-/* eslint-disable max-len */
-import { DragAndDropSortInputValidationService } from
-  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
-/* eslint-enable max-len */
+import { DragAndDropSortInputValidationService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from
@@ -32,13 +29,12 @@ import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { DragAndDropSortInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('DragAndDropSortInputValidationService', () => {
   let validatorService: DragAndDropSortInputValidationService;
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
@@ -161,11 +157,18 @@ describe('DragAndDropSortInputValidationService', () => {
     });
 
     answerGroups = [
-      agof.createNew(goodDefaultOutcome, null, null),
-      agof.createNew(customOutcome, null, null)
+      agof.createNew(
+        [equalsListWithAllowedValuesRule],
+        goodDefaultOutcome,
+        null,
+        null
+      ), agof.createNew(
+        [goodRule1, goodRule2],
+        customOutcome,
+        null,
+        null
+      )
     ];
-    answerGroups[0].updateRuleTypesToInputs([equalsListWithAllowedValuesRule]);
-    answerGroups[1].updateRuleTypesToInputs([goodRule1, goodRule2]);
   });
 
   it('should be able to perform basic validation', () => {
@@ -183,11 +186,9 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     })];
     answerGroups = [
-      agof.createNew(customOutcome, null, null),
-      agof.createNew(customOutcome, null, null)
+      agof.createNew(rules, customOutcome, null, null),
+      agof.createNew(rules, customOutcome, null, null)
     ];
-    answerGroups[0].updateRuleTypesToInputs(rules);
-    answerGroups[1].updateRuleTypesToInputs(rules);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -202,7 +203,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all items to be nonempty', () => {
     // Add rule containing empty items.
-    answerGroups[0].updateRuleTypesToInputs([equalsListWithEmptyValuesRule]);
+    answerGroups[0].rules = [equalsListWithEmptyValuesRule];
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -218,7 +219,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all items to be unique', () => {
     // Add rule containing duplicate items.
-    answerGroups[0].updateRuleTypesToInputs([equalsListWithDuplicatesRule]);
+    answerGroups[0].rules = [equalsListWithDuplicatesRule];
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -270,11 +271,11 @@ describe('DragAndDropSortInputValidationService', () => {
   });
 
   it('should catch redundancy of rules', () => {
-    answerGroups[0].updateRuleTypesToInputs(
-      [equalsListWithValuesRule, equalsListWithAllowedValuesRule]);
+    answerGroups[0].rules = [equalsListWithValuesRule,
+      equalsListWithAllowedValuesRule];
 
-    var warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -282,23 +283,8 @@ describe('DragAndDropSortInputValidationService', () => {
     }]);
   });
 
-  it('should catch redundancy of rules accross answer groups', () => {
-    answerGroups[0].updateRuleTypesToInputs(
-      [equalsListWithValuesRule]);
-    answerGroups[1].updateRuleTypesToInputs(
-      [equalsListWithAllowedValuesRule]);
-
-    var warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
-    }]);
-  });
-
   it('should catch non-distinct selected choices', () => {
-    answerGroups[0].updateRuleTypesToInputs([hasXBeforeYRule]);
+    answerGroups[0].rules = [hasXBeforeYRule];
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -313,7 +299,7 @@ describe('DragAndDropSortInputValidationService', () => {
     'should catch selected choice not present in custom args for ' +
     'hasXBeforeY rule', () => {
       hasXBeforeYRule.inputs.x = 'x';
-      answerGroups[0].updateRuleTypesToInputs([hasXBeforeYRule]);
+      answerGroups[0].rules = [hasXBeforeYRule];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -326,7 +312,7 @@ describe('DragAndDropSortInputValidationService', () => {
   it(
     'should catch selected choices not present in custom args for ' +
     'hasElementXAtPositionY rule', () => {
-      answerGroups[0].updateRuleTypesToInputs([hasElementXAtPositionYRule]);
+      answerGroups[0].rules = [hasElementXAtPositionYRule];
 
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -346,7 +332,7 @@ describe('DragAndDropSortInputValidationService', () => {
     'IsEqualToOrderingWithOneItemAtIncorrectPosition rule is used but ' +
     'multiple choices in the same position are note allowed',
     () => {
-      answerGroups[0].updateRuleTypesToInputs([equalsListWithValuesRule]);
+      answerGroups[0].rules = [equalsListWithValuesRule];
       customizationArgs.allowMultipleItemsInSamePosition.value = false;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);

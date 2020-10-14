@@ -23,8 +23,7 @@ import { Injectable } from '@angular/core';
 import {
   ExplorationImprovementsConfig,
   ExplorationImprovementsConfigBackendDict,
-  ExplorationImprovementsConfigObjectFactory,
-} from 'domain/improvements/exploration-improvements-config-object.factory';
+} from 'domain/improvements/exploration-improvements-config.model';
 import {
   ExplorationTask,
   ExplorationTaskBackendDict,
@@ -65,8 +64,6 @@ export class ExplorationImprovementsHistoryResponse {
 export class ExplorationImprovementsBackendApiService {
   constructor(
       private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
-      private explorationImprovementsConfigObjectFactory:
-        ExplorationImprovementsConfigObjectFactory,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
@@ -87,6 +84,9 @@ export class ExplorationImprovementsBackendApiService {
   }
 
   async postTasksAsync(expId: string, tasks: ExplorationTask[]): Promise<void> {
+    if (tasks.length === 0) {
+      return;
+    }
     const explorationImprovementsUrl = (
       this.urlInterpolationService.interpolateUrl(
         ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL, {
@@ -128,9 +128,10 @@ export class ExplorationImprovementsBackendApiService {
         }));
     return this.http.get<ExplorationImprovementsConfigBackendDict>(
       explorationImprovementsConfigUrl
-    ).toPromise().then(backendDict =>
-      this.explorationImprovementsConfigObjectFactory.createFromBackendDict(
-        backendDict));
+    ).toPromise().then(
+      backendDict =>
+        ExplorationImprovementsConfig.createFromBackendDict(
+          backendDict));
   }
 }
 

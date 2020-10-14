@@ -21,12 +21,11 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ClientContext } from
-  'domain/platform_feature/client-context-object.factory';
+  'domain/platform_feature/client-context.model';
 import {
   FeatureStatusSummary,
   FeatureStatusSummaryBackendDict,
-  FeatureStatusSummaryObjectFactory,
-} from 'domain/platform_feature/feature-status-summary-object.factory';
+} from 'domain/platform_feature/feature-status-summary.model';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
 
@@ -35,9 +34,7 @@ import { PlatformFeatureDomainConstants } from
 })
 export class PlatformFeatureBackendApiService {
   constructor(
-    private http: HttpClient,
-    private featureStatusSummaryObjectFactory:
-      FeatureStatusSummaryObjectFactory,
+    private http: HttpClient
   ) {}
 
   /**
@@ -58,7 +55,7 @@ export class PlatformFeatureBackendApiService {
       }
     ).toPromise();
 
-    return this.featureStatusSummaryObjectFactory.createFromBackendDict(
+    return FeatureStatusSummary.createFromBackendDict(
       backendDict);
   }
 }

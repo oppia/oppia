@@ -20,6 +20,9 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
+import { AnswerClassificationResult } from
+  'domain/classifier/answer-classification-result.model';
+
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
@@ -28,7 +31,6 @@ require('domain/state/StateObjectFactory.ts');
 describe('Learner answer info service', function() {
   var sof = null;
   var oof = null;
-  var acrof = null;
   var stateDict = null;
   var firstState = null;
   var secondState = null;
@@ -79,14 +81,10 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Equals: [
-              {
-                x: 10
-              }
-            ]
-          }
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {x: 10}
+          }],
         }, {
           outcome: {
             dest: 'outcome 2',
@@ -99,22 +97,16 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Equals: [
-              {
-                x: 5
-              },
-              {
-                x: 6
-              }
-            ],
-            NotEquals: [
-              {
-                x: 7
-              }
-            ]
-          }
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: { x: 5 }
+          }, {
+            rule_type: 'Equals',
+            inputs: { x: 6 }
+          }, {
+            rule_type: 'NotEquals',
+            inputs: { x: 7 }
+          }],
         }],
         default_outcome: {
           dest: 'default',
@@ -143,7 +135,6 @@ describe('Learner answer info service', function() {
 
     sof = $injector.get('StateObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
-    acrof = $injector.get('AnswerClassificationResultObjectFactory');
     LearnerAnswerInfoService = $injector.get('LearnerAnswerInfoService');
     AnswerClassificationService = $injector.get('AnswerClassificationService');
     ladbas = $injector.get(
@@ -154,8 +145,8 @@ describe('Learner answer info service', function() {
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
     spyOn(AnswerClassificationService, 'getMatchingClassificationResult')
-      .and.returnValue(acrof.createNew(
-        oof.createNew('default', 'default_outcome', '', []), 2,
+      .and.returnValue(new AnswerClassificationResult(
+        oof.createNew('default', 'default_outcome', '', []), 2, 0,
         DEFAULT_OUTCOME_CLASSIFICATION));
     mockAnswer = 'This is my answer';
     mockInteractionRulesService = {

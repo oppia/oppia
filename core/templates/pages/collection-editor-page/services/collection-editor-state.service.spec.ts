@@ -24,8 +24,6 @@ import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
   'domain/collection/CollectionPlaythroughObjectFactory';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -50,7 +48,6 @@ describe('Collection editor state service', function() {
   var secondBackendCollectionObject = null;
   var unpublishablePublicCollectionRightsObject = null;
   var $rootScope = null;
-  var $scope = null;
   var $q = null;
   var testSubscriptions: Subscription;
 
@@ -113,7 +110,6 @@ describe('Collection editor state service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
     $provide.value(
@@ -154,7 +150,6 @@ describe('Collection editor state service', function() {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
     fakeEditableCollectionBackendApiService.newBackendCollectionObject = {
       id: '0',
@@ -288,7 +283,7 @@ describe('Collection editor state service', function() {
     }
   );
 
-  it('it should report that a collection has loaded through loadCollection()',
+  it('should report that a collection has loaded through loadCollection()',
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
@@ -300,7 +295,7 @@ describe('Collection editor state service', function() {
     }
   );
 
-  it('it should report that a collection has loaded through setCollection()',
+  it('should report that a collection has loaded through setCollection()',
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
@@ -441,10 +436,8 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(CollectionEditorStateService.saveCollection(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 

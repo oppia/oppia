@@ -19,7 +19,6 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/parameter-metadata.service');
-require('domain/exploration/ParamMetadataObjectFactory.ts');
 require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -83,8 +82,7 @@ describe('Parameter Metadata Service', function() {
             interaction: {
               id: null,
               answer_groups: [{
-                rule_input_translations: {},
-                rule_types_to_inputs: {},
+                rule_specs: [],
                 outcome: {
                   dest: '',
                   feedback: {
@@ -124,8 +122,7 @@ describe('Parameter Metadata Service', function() {
             interaction: {
               id: null,
               answer_groups: [{
-                rule_input_translations: {},
-                rule_types_to_inputs: {},
+                rule_specs: [],
                 outcome: {
                   dest: '',
                   feedback: {
@@ -165,8 +162,7 @@ describe('Parameter Metadata Service', function() {
             interaction: {
               id: null,
               answer_groups: [{
-                rule_input_translations: {},
-                rule_types_to_inputs: {},
+                rule_specs: [],
                 outcome: {
                   dest: '',
                   feedback: {
@@ -206,8 +202,7 @@ describe('Parameter Metadata Service', function() {
             interaction: {
               id: null,
               answer_groups: [{
-                rule_input_translations: {},
-                rule_types_to_inputs: {},
+                rule_specs: [],
                 outcome: {
                   dest: '',
                   feedback: {

@@ -30,18 +30,15 @@ import {
 import {
   ComputationData,
   ComputationDataBackendDict,
-  ComputationDataObjectFactory
-} from 'domain/admin/computation-data-object.factory';
+} from 'domain/admin/computation-data.model';
 import {
   Job,
   JobDataBackendDict,
-  JobDataObjectFactory
-} from 'domain/admin/job-data-object.factory';
+} from 'domain/admin/job.model';
 import {
   JobStatusSummary,
   JobStatusSummaryBackendDict,
-  JobStatusSummaryObjectFactory
-} from 'domain/admin/job-status-summary-object.factory';
+} from 'domain/admin/job-status-summary.model';
 import {
   PlatformParameterBackendDict,
   PlatformParameter,
@@ -109,9 +106,6 @@ export interface AdminPageData {
 export class AdminBackendApiService {
   constructor(
     private http: HttpClient,
-    private computationDataObjectFactory: ComputationDataObjectFactory,
-    private jobDataObjectFactory: JobDataObjectFactory,
-    private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory,
     private platformParameterObjectFactory: PlatformParameterObjectFactory) {}
 
@@ -124,20 +118,20 @@ export class AdminBackendApiService {
           demoCollections: response.demo_collections,
           demoExplorationIds: response.demo_exploration_ids,
           oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
-            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+            JobStatusSummary.createFromBackendDict),
           humanReadableCurrentTime: response.human_readable_current_time,
           auditJobStatusSummaries: response.audit_job_status_summaries.map(
-            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+            JobStatusSummary.createFromBackendDict),
           updatableRoles: response.updatable_roles,
           roleGraphData: response.role_graph_data,
           configProperties: response.config_properties,
           viewableRoles: response.viewable_roles,
           unfinishedJobData: response.unfinished_job_data.map(
-            this.jobDataObjectFactory.createFromBackendDict),
+            Job.createFromBackendDict),
           recentJobData: response.recent_job_data.map(
-            this.jobDataObjectFactory.createFromBackendDict),
+            Job.createFromBackendDict),
           continuousComputationsData: response.continuous_computations_data.map(
-            this.computationDataObjectFactory.createFromBackendDict),
+            ComputationData.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
             this.topicSummaryObjectFactory.createFromBackendDict),
           featureFlags: response.feature_flags.map(
@@ -149,57 +143,6 @@ export class AdminBackendApiService {
         reject(errorResponse.error.error);
       });
     });
-  }
-
-  // TODO(#10045): Remove this function once all the math-rich text
-  // components in explorations have a valid math SVG stored in the
-  // datastore.
-  sendMathSvgsToBackend(latexToSvgMapping): Promise<Object> {
-    let body = new FormData();
-    for (var expId in latexToSvgMapping) {
-      for (var latexString in latexToSvgMapping[expId]) {
-        // LaTeX strings cannot be appended in the request body as keys for
-        // files because of encoding issues (multiple backslash in the LaTeX
-        // string is processed improperly, e.g 3 backslashes in an
-        // expressions becomes 2 backslashes). As a workaround, we use a
-        // temporary latexId as keys for adding and retrieving raw images from
-        // the request body. Images can be extracted based on the latexId in the
-        // backend.
-        body.set(
-          latexToSvgMapping[expId][latexString].latexId,
-          latexToSvgMapping[expId][latexString].file);
-        delete latexToSvgMapping[expId][latexString].file;
-      }
-    }
-    body.append(
-      'payload', JSON.stringify({latexMapping: latexToSvgMapping}));
-    return this.http.post('/explorationslatexsvghandler', body).toPromise();
-  }
-
-  // TODO(#10045): Remove this function once all the math-rich text
-  // components in suggestions have a valid math SVG stored in the
-  // datastore.
-  sendSuggestionMathSvgsToBackend(
-      suggestionLatexToSvgMapping): Promise<Object> {
-    let body = new FormData();
-    for (var suggestionId in suggestionLatexToSvgMapping) {
-      for (var latexString in suggestionLatexToSvgMapping[suggestionId]) {
-        // LaTeX strings cannot be appended in the request body as keys for
-        // files because of encoding issues (multiple backslash in the LaTeX
-        // string is processed improperly, e.g 3 backslashes in an
-        // expressions becomes 2 backslashes). As a workaround, we use a
-        // temporary latexId as keys for adding and retrieving raw images from
-        // the request body. Images can be extracted based on the latexId in the
-        // backend.
-        body.set(
-          suggestionLatexToSvgMapping[suggestionId][latexString].latexId,
-          suggestionLatexToSvgMapping[suggestionId][latexString].file);
-        delete suggestionLatexToSvgMapping[suggestionId][latexString].file;
-      }
-    }
-    body.append(
-      'payload', JSON.stringify({latexMapping: suggestionLatexToSvgMapping}));
-    return this.http.post('/suggestionslatexsvghandler', body).toPromise();
   }
 }
 
