@@ -21,18 +21,15 @@ import { ComponentFixture, async, TestBed } from '@angular/core/testing';
 
 import { StateParamChangesEditorComponent } from
   // eslint-disable-next-line max-len
- 'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component'
+  'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-param-changes.service';
 
-let component: StateParamChangesEditorComponent; 
-let fixture: ComponentFixture<StateParamChangesEditorComponent>; 
-
+let component: StateParamChangesEditorComponent;
+let fixture: ComponentFixture<StateParamChangesEditorComponent>;
 describe('State Param Changes Editor directive', () => {
-
   let stateParamChangesService: StateParamChangesService = null;
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [StateParamChangesEditorComponent],

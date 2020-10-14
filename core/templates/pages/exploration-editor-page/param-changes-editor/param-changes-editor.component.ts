@@ -283,5 +283,5 @@ export class ParamChangesEditorDirective extends UpgradeComponent {
   @Input() currentlyInSettingsTab: boolean;
   constructor(elementRef: ElementRef, injector: Injector) {
     super('paramChangesEditor', elementRef, injector);
-}
+  }
 }
