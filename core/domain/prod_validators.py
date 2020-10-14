@@ -1150,6 +1150,9 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
+            # TODO (#10828): Remove validation for cloned_from
+            # exp ids after the field is entirely removed from
+            # all models.
             base_model_validators.ExternalModelFetcherDetails(
                 'cloned_from_exploration_ids',
                 exp_models.ExplorationModel,
