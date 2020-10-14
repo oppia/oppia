@@ -756,7 +756,14 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             str. The ID of the new playthrough.
         """
         issue_customization_args = {'state_names': {'value': state_names}}
-        actions = [
+        actions = [{
+            'action_type': 'ExplorationStart',
+            'action_customization_args': {
+                'state_name': {'value': state_names[0]},
+            },
+            'schema_version': 1,
+        }]
+        actions.extend(
             {
                 'action_type': 'AnswerSubmit',
                 'action_customization_args': {
@@ -770,8 +777,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 'schema_version': 1,
             }
             for state_name, dest_state_name in python_utils.ZIP(
-                state_names[:-1], state_names[1:])
-        ]
+                state_names[:-1], state_names[1:]))
+        actions.append({
+            'action_type': 'ExplorationQuit',
+            'action_customization_args': {
+                'state_name': {'value': state_names[-1]},
+                'time_spent_in_state_in_msecs': {'value': 1000},
+            },
+            'schema_version': 1,
+        })
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, 'CyclicStateTransitions',
             issue_customization_args, actions)
@@ -792,6 +806,13 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         actions = [{
             'action_type': 'ExplorationStart',
             'action_customization_args': {'state_name': {'value': state_name}},
+            'schema_version': 1,
+        }, {
+            'action_type': 'ExplorationQuit',
+            'action_customization_args': {
+                'state_name': {'value': state_name},
+                'time_spent_in_state_in_msecs': {'value': 1000},
+            },
             'schema_version': 1,
         }]
         return stats_models.PlaythroughModel.create(
@@ -818,17 +839,32 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             },
         }
         actions = [{
-            'action_type': 'AnswerSubmit',
+            'action_type': 'ExplorationStart',
+            'action_customization_args': {'state_name': {'value': state_name}},
+            'schema_version': 1,
+        }]
+        actions.extend(
+            {
+                'action_type': 'AnswerSubmit',
+                'action_customization_args': {
+                    'state_name': {'value': state_name},
+                    'dest_state_name': {'value': state_name},
+                    'interaction_id': {'value': 'TextInput'},
+                    'submitted_answer': {'value': 'Foo!'},
+                    'feedback': {'value': ''},
+                    'time_spent_in_exp_in_msecs': {'value': 1000},
+                },
+                'schema_version': 1,
+            }
+            for _ in python_utils.RANGE(num_times_answered_incorrectly))
+        actions.append({
+            'action_type': 'ExplorationQuit',
             'action_customization_args': {
                 'state_name': {'value': state_name},
-                'dest_state_name': {'value': state_name},
-                'interaction_id': {'value': 'TextInput'},
-                'submitted_answer': {'value': 'Foo!'},
-                'feedback': {'value': ''},
-                'time_spent_in_exp_in_msecs': {'value': 1000},
+                'time_spent_in_state_in_msecs': {'value': 1000},
             },
             'schema_version': 1,
-        }] * num_times_answered_incorrectly
+        })
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, 'MultipleIncorrectSubmissions',
             issue_customization_args, actions)
@@ -997,15 +1033,22 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertEqual(
             playthrough.issue_customization_args['state_names']['value'],
             ['Z', 'B', 'Z'])
-        self.assertEqual(len(playthrough.actions), 2)
+        self.assertEqual(len(playthrough.actions), 4)
 
         actions = playthrough.actions
         self.assertEqual(
             actions[0]['action_customization_args']['state_name']['value'],
             'Z')
         self.assertEqual(
-            actions[1]['action_customization_args']['dest_state_name']['value'],
+            actions[1]['action_customization_args']['state_name']['value'],
             'Z')
+        self.assertEqual(
+            actions[2]['action_customization_args']['dest_state_name']['value'],
+            'Z')
+        self.assertEqual(
+            actions[3]['action_customization_args']['state_name']['value'],
+            'Z')
+
 
     def test_eq_exp_issue_is_invalidated_when_state_is_deleted(self):
         stats_services.save_exp_issues_model_transactional(
@@ -1053,11 +1096,13 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             exp_issue.playthrough_ids[0])
         self.assertEqual(
             playthrough.issue_customization_args['state_name']['value'], 'Z')
-        self.assertEqual(len(playthrough.actions), 1)
+        self.assertEqual(len(playthrough.actions), 2)
 
         actions = playthrough.actions
         self.assertEqual(
             actions[0]['action_customization_args']['state_name']['value'], 'Z')
+        self.assertEqual(
+            actions[1]['action_customization_args']['state_name']['value'], 'Z')
 
     def test_mis_exp_issue_is_invalidated_when_state_is_deleted(self):
         stats_services.save_exp_issues_model_transactional(
@@ -1105,13 +1150,17 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             exp_issue.playthrough_ids[0])
         self.assertEqual(
             playthrough.issue_customization_args['state_name']['value'], 'Z')
-        self.assertEqual(len(playthrough.actions), 2)
+        self.assertEqual(len(playthrough.actions), 4)
 
         actions = playthrough.actions
         self.assertEqual(
             actions[0]['action_customization_args']['state_name']['value'], 'Z')
         self.assertEqual(
             actions[1]['action_customization_args']['state_name']['value'], 'Z')
+        self.assertEqual(
+            actions[2]['action_customization_args']['state_name']['value'], 'Z')
+        self.assertEqual(
+            actions[3]['action_customization_args']['state_name']['value'], 'Z')
 
     def test_revert_exploration_recovers_exp_issues(self):
         stats_services.save_exp_issues_model_transactional(
