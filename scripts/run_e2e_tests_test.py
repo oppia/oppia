@@ -112,12 +112,12 @@ class MockProcessClass(python_utils.OBJECT):
 class MockGoogleSheetResourceValuesGetter(python_utils.OBJECT):
 
     def __init__(self, sheet_values):
-        '''Create a mock values getter object.
+        """Create a mock values getter object.
 
         Args:
             sheet_values: list(list). The values of the sheet, with one
                 list per row.
-        '''
+        """
         self.sheet_values = sheet_values
         self.execute_called = False
 
@@ -145,9 +145,9 @@ class MockGoogleSheetResourceValuesUpdater(python_utils.OBJECT):
 
 class MockGoogleSheetResourceValues(python_utils.OBJECT):
 
-    def __init__(self, expected_sheet_id, expected_range,
-            sheet_values=None, expected_value_input_option=None,
-            expected_body=None):
+    def __init__(
+            self, expected_sheet_id, expected_range, sheet_values=None,
+            expected_value_input_option=None, expected_body=None):
         """Create a resource values object.
 
         Args:
@@ -171,7 +171,7 @@ class MockGoogleSheetResourceValues(python_utils.OBJECT):
         self.getter = None
         self.updater = None
 
-    def get(self, spreadsheetId, range):
+    def get(self, spreadsheetId, range):  # pylint: disable=redefined-builtin
         """Get data from the spreadsheet.
 
         Args:
@@ -189,7 +189,7 @@ class MockGoogleSheetResourceValues(python_utils.OBJECT):
         self.getter = MockGoogleSheetResourceValuesGetter(self.sheet_values)
         return self.getter
 
-    def update(self, spreadsheetId, range, valueInputOption, body):
+    def update(self, spreadsheetId, range, valueInputOption, body):  # pylint: disable=redefined-builtin
         """Update the spreadsheet data.
 
         Args:
@@ -219,7 +219,8 @@ class MockGoogleSheetResource(python_utils.OBJECT):
 
         Args:
             values_return_value:
-                MockGoogleSheetResourceValuesUpdater|MockGoogleSheetResourceValuesGetter.
+                MockGoogleSheetResourceValuesUpdater|
+                MockGoogleSheetResourceValuesGetter.
                 The updater or getter to return from values().
         """
         self.values_return_value = values_return_value
@@ -229,7 +230,8 @@ class MockGoogleSheetResource(python_utils.OBJECT):
         """Get the sheet's updater or getter.
 
         Returns:
-            MockGoogleSheetResourceValuesGetter|MockGoogleSheetResourceValuesUpdater.
+            MockGoogleSheetResourceValuesGetter|
+            MockGoogleSheetResourceValuesUpdater.
             The updater or getter.
         """
         self.values_called = True
