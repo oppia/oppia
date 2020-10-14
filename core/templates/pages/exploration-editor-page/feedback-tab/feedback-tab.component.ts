@@ -46,13 +46,13 @@ require(
 angular.module('oppia').component('feedbackTab', {
   template: require('./feedback-tab.component.html'),
   controller: [
-    '$q', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
     'LoaderService', 'SuggestionModalForExplorationEditorService',
     'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     function(
-        $q, $uibModal, AlertsService, ChangeListService,
+        $q, $rootScope, $uibModal, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
         LoaderService, SuggestionModalForExplorationEditorService,
         ThreadDataBackendApiService, ThreadStatusDisplayService,
@@ -83,6 +83,7 @@ angular.module('oppia').component('feedbackTab', {
             ctrl.activeThread = ThreadDataBackendApiService.getThread(
               activeThreadId);
           }
+          $rootScope.$apply();
         });
       };
 
@@ -106,6 +107,7 @@ angular.module('oppia').component('feedbackTab', {
         ).then(() => {
           ctrl.clearActiveThread();
           AlertsService.addSuccessMessage('Feedback thread created.');
+          $rootScope.$apply();
         },
         () => {
           // Note to developers:
@@ -178,9 +180,11 @@ angular.module('oppia').component('feedbackTab', {
           _resetTmpMessageFields();
           ctrl.activeThread.messages = messages;
           ctrl.messageSendingInProgress = false;
+          $rootScope.$apply();
         },
         () => {
           ctrl.messageSendingInProgress = false;
+          $rootScope.$apply();
         });
       };
 
@@ -193,6 +197,7 @@ angular.module('oppia').component('feedbackTab', {
           ctrl.activeThread = thread;
           ThreadDataBackendApiService.markThreadAsSeenAsync(ctrl.activeThread);
           ctrl.tmpMessage.status = ctrl.activeThread.status;
+          $rootScope.$apply();
         });
       };
 
