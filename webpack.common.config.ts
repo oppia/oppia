@@ -727,7 +727,12 @@ module.exports = {
       ],
       use: [
         'cache-loader',
-        'style-loader',
+        {
+          loader: 'style-loader',
+          options: {
+            esModule: false
+          }
+        },
         {
           loader: 'css-loader',
           options: {
