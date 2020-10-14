@@ -16,33 +16,42 @@
  * @fileoverview Unit tests for stateParamChangesEditor component.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture,async, TestBed } from '@angular/core/testing';
+
+import { StateParamChangesEditorComponent } from
+  // eslint-disable-next-line max-len
+ 'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component'
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-param-changes.service';
 
-describe('State Param Changes Editor directive', function() {
-  var $scope = null;
-  var stateParamChangesService = null;
+let component: StateParamChangesEditorComponent; 
+let fixture: ComponentFixture<StateParamChangesEditorComponent>; 
 
-  beforeEach(angular.mock.module('oppia'));
+describe('State Param Changes Editor directive', () => {
 
-  beforeEach(function() {
-    stateParamChangesService = TestBed.get(StateParamChangesService);
-  });
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
-
-    $scope = $rootScope.$new();
-    $componentController('stateParamChangesEditor', {
-      $scope: $scope,
-      StateParamChangesService: stateParamChangesService
-    });
+  let stateParamChangesService: StateParamChangesService = null;
+  
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [StateParamChangesEditorComponent],
+      providers: [
+        StateParamChangesService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    stateParamChangesService =
+      TestBed.get(StateParamChangesService);
   }));
 
-  it('should initialize controller properties after its initialization',
-    function() {
-      expect($scope.StateParamChangesService).toEqual(stateParamChangesService);
-    });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StateParamChangesEditorComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should evaluate controller properties', () => {
+    expect(component.spcs).toEqual(stateParamChangesService);
+  });
 });

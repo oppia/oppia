@@ -41,7 +41,7 @@ angular.module('oppia').component('paramChangesEditor', {
   bindings: {
     paramChangesService: '=',
     postSaveHook: '=',
-    isCurrentlyInSettingsTab: '&currentlyInSettingsTab'
+    isCurrentlyInSettingsTab: '<'
   },
   template: require('./param-changes-editor.component.html'),
   controller: [
@@ -280,7 +280,7 @@ selector: 'param-changes-editor'
 export class ParamChangesEditorDirective extends UpgradeComponent {
   @Input() paramChangesService: unknown;
   @Input() postSaveHook: () => void;
-  @Input() currentlyInSettingsTab: string;
+  @Input() currentlyInSettingsTab: boolean;
   constructor(elementRef: ElementRef, injector: Injector) {
     super('paramChangesEditor', elementRef, injector);
 }
