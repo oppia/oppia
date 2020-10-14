@@ -130,29 +130,6 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-_GOOGLE_PATHS_TO_INSERT = [
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-api-core-%s' % common.GOOGLE_API_CORE_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-auth-%s' % common.GOOGLE_AUTH_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-auth-httplib2-%s' % common.GOOGLE_AUTH_HTTPLIB2_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-auth-oauthlib-%s' % common.GOOGLE_AUTH_OAUTHLIB_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'google-api-python-client-%s' %
-        common.GOOGLE_API_PYTHON_CLIENT_VERSION)
-]
-for path in _GOOGLE_PATHS_TO_INSERT:
-    sys.path.insert(0, path)
-    pkg_resources.working_set.add_entry(path)
-    google.__path__.insert(0, os.path.join(path, 'google'))
-
 _TARGET_STDOUT = python_utils.string_io()
 _STDOUT_LIST = multiprocessing.Manager().list()
 _FILES = multiprocessing.Manager().dict()
