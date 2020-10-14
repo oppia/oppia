@@ -846,6 +846,32 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.author_id_1, suggestion_change, 'test description'
         )
 
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion with the language code given."""
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': language_code,
+            'content_html': '<p>State name: state_1, Content id: content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                translation_suggestion = suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, 1, self.author_id_1,
+                    add_translation_change_dict, 'test description')
+
+        return translation_suggestion
+
     def setUp(self):
         super(SuggestionGetServicesUnitTests, self).setUp()
 
@@ -1027,49 +1053,16 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
             self):
-        # Create a Hindi translation suggestion associated with exploration id
-        # target_id_1.
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.swap(
-                exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
-                suggestion_1 = suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id_1, 1, self.author_id_1,
-                    self.add_translation_change_dict, 'test description')
-        # Create a Hindi translation suggestion associated with exploration id
-        # target_id_2.
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.swap(
-                exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
-                suggestion_2 = suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id_2, 1, self.author_id_1,
-                    self.add_translation_change_dict, 'test description')
-        # Create a Hindi translation suggestion associated with exploration id
-        # target_id_3.
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.swap(
-                exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
-                suggestion_3 = suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id_3, 1, self.author_id_1,
-                    self.add_translation_change_dict, 'test description')
+        suggestion_1 = self._create_translation_suggestion_with_language_code(
+            'hi')
+        suggestion_2 = self._create_translation_suggestion_with_language_code(
+            'hi')
+        suggestion_3 = self._create_translation_suggestion_with_language_code(
+            'hi')
 
         suggestions = (
             suggestion_services
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+            .get_translation_suggestions_waiting_longest_for_review(
                 'hi'))
 
         # Assert that the suggestions are in the order that they were created.
@@ -1088,7 +1081,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self):
         suggestions = (
             suggestion_services
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+            .get_translation_suggestions_waiting_longest_for_review(
                 'wrong_language_code'))
 
         self.assertEqual(len(suggestions), 0)
