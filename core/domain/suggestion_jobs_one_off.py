@@ -357,12 +357,12 @@ class PopulateContributionStatsOneOffJob(
                     ) = count_value
 
             stats_model.put()
-            return (key, count_value)
+            return key, count_value
 
         key_from_transaction, count_value_from_transaction = (
             transaction_services.run_in_transaction(
                 _update_community_contribution_stats_transactional, key,
-                len(values))
+                len(values)))
 
         # Only yield the values from the transactions.
         yield (key_from_transaction, count_value_from_transaction)
