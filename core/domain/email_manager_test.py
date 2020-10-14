@@ -2890,7 +2890,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.value))
+                email_manager.EMAIL_FOOTER.value)
+        )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
             '<br><br>'
@@ -3499,7 +3500,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.value))
+                email_manager.EMAIL_FOOTER.value)
+        )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
             '<br><br>'
@@ -3615,7 +3617,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.value))
+                email_manager.EMAIL_FOOTER.value)
+        )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
             '<br><br>'
