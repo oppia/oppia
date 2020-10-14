@@ -787,7 +787,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         """
         issue_customization_args = {
             'state_name': {'value': state_name},
-            'time_spent_in_exp_in_msecs': {'value': 200}
+            'time_spent_in_exp_in_msecs': {'value': 200},
         }
         actions = [{
             'action_type': 'ExplorationStart',
