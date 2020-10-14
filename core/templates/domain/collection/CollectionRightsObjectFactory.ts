@@ -104,11 +104,7 @@ export class CollectionRights {
     return this._ownerNames;
   }
 
-  // Creates copy of the collection rights. This is performed as a deep copy
-  // such that none of the internal, bindable objects are changed within this
-  // collection rights. Note that the collection nodes within this collection
-  // will be completely redefined as copies from the specified collection
-  // rights.
+  // Create a copy of the collection rights. This is performed as a deep copy.
   static copyFromCollectionRights(
       otherCollectionRights: CollectionRights): CollectionRights {
     return new CollectionRights({
