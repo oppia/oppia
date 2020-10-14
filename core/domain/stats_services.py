@@ -1155,7 +1155,7 @@ def delete_learner_answer_info(
 def update_state_reference(
         entity_type, old_state_reference, new_state_reference):
     """Updates the state_reference field of the LearnerAnswerDetails model
-    instance with the new_state_reference recieved and then saves the instance
+    instance with the new_state_reference received and then saves the instance
     in the datastore.
 
     Args:
