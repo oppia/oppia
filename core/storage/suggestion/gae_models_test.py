@@ -410,21 +410,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.GeneralSuggestionModel
                 .get_all_stale_suggestion_ids()), 0)
 
-    def test_get_long_review_wait_suggestions_if_no_contributor_suggestion(
+    def test_get_long_review_wait_suggestions_raises_if_suggestion_types_empty(
+            self):
+        with self.swap(
+            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Expected the suggestion types offered on the Contributor '
+                'Dashboard to be nonempty.'):
+                (
+                    suggestion_models.GeneralSuggestionModel
+                    .get_suggestions_waiting_too_long_for_review()
+                )
+
+    def test_get_long_review_wait_suggestions_if_not_contributor_suggestion(
             self):
         suggestion_models.GeneralSuggestionModel.create(
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-        suggestion_models.TARGET_TYPE_EXPLORATION,
-        'exp1', self.target_version_at_submission,
-        suggestion_models.STATUS_IN_REVIEW, 'author_3',
-        'reviewer_2', self.change_cmd, self.score_category,
-        'exploration.exp1.thread1', self.translation_language_code)
-        mocked_contributor_dashboard_suggesetion_types = [
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', None)
+        # This mocked list cannot be empty because then the query will fail.
+        mocked_contributor_dashboard_suggestion_types = [
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION]
 
         with self.swap(
             suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
-            mocked_contributor_dashboard_suggesetion_types):
+            mocked_contributor_dashboard_suggestion_types):
             with self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
@@ -444,14 +458,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         suggestion_models.STATUS_IN_REVIEW, 'author_3',
         'reviewer_2', self.change_cmd, self.score_category,
         'exploration.exp1.thread1', self.translation_language_code)
-        mocked_threshold_review_wait_time_in_days = 2
 
-        mocked_datetime_review_wait_time_threshold = (
-            self.mocked_datetime_utcnow + datetime.timedelta(
-                days=mocked_threshold_review_wait_time_in_days))
-
-        with self.mock_datetime_utcnow(
-            mocked_datetime_review_wait_time_threshold):
+        # Make sure the threshold is nonzero.
+        with self.swap(
+            suggestion_models,
+            'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 1):
             suggestions_waiting_too_long_for_review = (
                 suggestion_models.GeneralSuggestionModel
                 .get_suggestions_waiting_too_long_for_review()

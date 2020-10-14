@@ -871,12 +871,16 @@ def get_suggestions_waiting_too_long_for_review_info():
         for review. The objects are sorted in descending order based on review
         wait time.
     """
+    suggestions_waiting_too_long_for_review = [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_suggestions_waiting_too_long_for_review())
+    ]
     return [
         create_reviewable_suggestion_email_info_from_suggestion(
             suggestion_waiting_too_long_for_review) for
-        suggestion_waiting_too_long_for_review in (
-            suggestion_models.GeneralSuggestionModel
-            .get_suggestions_waiting_too_long_for_review())
+        suggestion_waiting_too_long_for_review in
+        suggestions_waiting_too_long_for_review
     ]
 
 

@@ -340,7 +340,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             list(GeneralSuggestionModel). A list of suggestions, sorted in
             descending order by their review wait time.
+
+        Raises:
+            Exception. If there are no suggestion types offered on the
+            Contributor Dashboard.
         """
+        if not CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
+            raise Exception(
+                'Expected the suggestion types offered on the Contributor '
+                'Dashboard to be nonempty.')
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
                 days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS))
