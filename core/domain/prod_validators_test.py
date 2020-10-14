@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import datetime
 import math
 import random
@@ -50,7 +49,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
-from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -73,14 +71,14 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 (
     audit_models, classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, improvements_models, job_models,
+    feedback_models, job_models,
     opportunity_models, question_models, skill_models, stats_models,
     story_models, subtopic_models, suggestion_models,
     topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
     models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
+    models.NAMES.feedback, models.NAMES.job,
     models.NAMES.opportunity, models.NAMES.question,
     models.NAMES.skill, models.NAMES.statistics,
     models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
@@ -7886,8 +7884,11 @@ class CommunityContributionStatsModelValidatorTests(
     sample_language_code = 'hi'
     invalid_language_code = 'invalid'
 
-    def _create_translation_suggestion_with_language_code(self, language_code):
-        """Creates a translation suggestion in the given language_code."""
+    def _create_model_for_translation_suggestion_with_language_code(
+            self, language_code):
+        """Creates a GeneralSuggestionModel for a translation suggestion in the
+        given language_code.
+        """
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -7902,8 +7903,8 @@ class CommunityContributionStatsModelValidatorTests(
             self.reviewer_id, self.change_cmd, score_category,
             self.EXPLORATION_THREAD_ID, language_code)
 
-    def _create_question_suggestion(self):
-        """Creates a question suggestion."""
+    def _create_model_for_question_suggestion(self):
+        """Creates a GeneralSuggestionModel for a question suggestion."""
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_QUESTION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -7940,11 +7941,13 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, 'hi')
-        self._create_translation_suggestion_with_language_code('hi')
-        user_services.allow_user_to_review_question(self.reviewer_id)
-        self._create_question_suggestion()
+        user_models.UserContributionRightsModel(
+            id=self.reviewer_id,
+            can_review_translation_for_language_codes=['hi'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=True).put()
+        self._create_model_for_translation_suggestion_with_language_code('hi')
+        self._create_model_for_question_suggestion()
         translation_reviewer_counts_by_lang_code = {
             'hi': 1
         }
@@ -8243,7 +8246,7 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_if_translation_suggestion_lang_not_in_dict(
             self):
         missing_language_code = 'hi'
-        self._create_translation_suggestion_with_language_code(
+        self._create_model_for_translation_suggestion_with_language_code(
             missing_language_code)
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
@@ -8263,8 +8266,11 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_if_translation_reviewer_lang_not_in_dict(
             self):
         missing_language_code = 'hi'
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, missing_language_code)
+        user_models.UserContributionRightsModel(
+            id=self.reviewer_id,
+            can_review_translation_for_language_codes=[missing_language_code],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
         expected_output = [
@@ -14091,360 +14097,6 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
             ) % (self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
-
-
-class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(TaskEntryModelValidatorTests, self).setUp()
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.save_new_valid_exploration('exp_id', self.user_id)
-        self.job_class = (
-            prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob)
-
-    def run_job_and_get_output(self):
-        """Helper method to run job and fetch the output.
-
-        Returns:
-            list([str, *]). A list of output messages generated by the job.
-        """
-        job_id = self.job_class.create_new()
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-        self.job_class.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        return [ast.literal_eval(o) for o in self.job_class.get_output(job_id)]
-
-    def run_job_and_check_output(self, *expected_outputs):
-        """Helper method to run job and check for the expected output.
-
-        Args:
-            *expected_outputs: list(*). The items expected to be found in the
-                job's output.
-        """
-        self.assertItemsEqual(
-            self.run_job_and_get_output(), list(expected_outputs))
-
-    def test_no_models(self):
-        self.run_job_and_check_output()
-
-    def test_valid_model_check(self):
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        self.run_job_and_check_output(['fully-validated TaskEntryModel', 1])
-
-    def test_invalid_entity_id(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'invalid_exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        self.run_job_and_check_output(
-            ['failed validation check for entity_ids field check of '
-             'TaskEntryModel',
-             ['Entity id %s: based on field entity_ids having value '
-              'invalid_exp_id, expected model ExplorationModel with id '
-              'invalid_exp_id but it doesn\'t exist' % (task_id,)]],
-            ['failed validation check for target_id field check of '
-             'TaskEntryModel',
-             ['Entity id %s: exploration with id "invalid_exp_id" does not '
-              'exist at version 1' % (task_id,)]])
-
-    def test_invalid_entity_version(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            2,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        self.run_job_and_check_output(
-            ['failed validation check for target_id field check of '
-             'TaskEntryModel',
-             ['Entity id %s: exploration with id "exp_id" does not exist at '
-              'version 2' % (task_id,)]])
-
-    def test_invalid_resolver_ids(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_RESOLVED,
-            resolver_id='invalid_user_id',
-            resolved_on=CURRENT_DATETIME)
-        self.run_job_and_check_output(
-            ['failed validation check for resolver_ids field check of '
-             'TaskEntryModel',
-             ['Entity id %s: based on field resolver_ids having value '
-              'invalid_user_id, expected model UserSettingsModel with id '
-              'invalid_user_id but it doesn\'t exist' % (task_id,)]])
-
-    def test_invalid_id(self):
-        improvements_models.TaskEntryModel(
-            id='bad_id',
-            composite_entity_id='exploration.exp_id.1',
-            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            entity_id='exp_id',
-            entity_version=1,
-            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
-            status=improvements_models.TASK_STATUS_OPEN).put()
-        self.run_job_and_check_output(
-            ['failed validation check for model id check of TaskEntryModel',
-             ['Entity id bad_id: Entity id does not match regex pattern']])
-
-    def test_invalid_composite_entity_id(self):
-        task_id = improvements_models.TaskEntryModel.generate_task_id(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        improvements_models.TaskEntryModel(
-            id=task_id,
-            composite_entity_id='bad_composite_id',
-            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            entity_id='exp_id',
-            entity_version=1,
-            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
-            status=improvements_models.TASK_STATUS_OPEN).put()
-        self.run_job_and_check_output(
-            ['failed validation check for composite_entity_id field check of '
-             'TaskEntryModel',
-             ['Entity id %s: composite_entity_id "bad_composite_id" should be '
-              '"exploration.exp_id.1"' % (
-                  task_id,)]])
-
-    def test_status_open_but_resolver_id_is_set(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_OPEN,
-            resolver_id=self.user_id)
-        self.run_job_and_check_output(
-            ['failed validation check for status field check of TaskEntryModel',
-             ['Entity id %s: status is open but resolver_id is "%s", should be '
-              'empty.' % (task_id, self.user_id)]])
-
-    def test_status_open_but_resolved_on_is_set(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_OPEN,
-            resolved_on=CURRENT_DATETIME)
-        self.run_job_and_check_output(
-            ['failed validation check for status field check of TaskEntryModel',
-             ['Entity id %s: status is open but resolved_on is "%s", should be '
-              'empty.' % (task_id, CURRENT_DATETIME)]])
-
-    def test_status_resolved_but_resolver_id_is_not_set(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_RESOLVED,
-            resolver_id=None,
-            resolved_on=CURRENT_DATETIME)
-        self.run_job_and_check_output(
-            ['failed validation check for status field check of TaskEntryModel',
-             ['Entity id %s: status is resolved but resolver_id is not set' % (
-                 task_id,)]])
-
-    def test_status_resolved_but_resolved_on_is_not_set(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_RESOLVED,
-            resolver_id=self.user_id,
-            resolved_on=None)
-        self.run_job_and_check_output(
-            ['failed validation check for status field check of TaskEntryModel',
-             ['Entity id %s: status is resolved but resolved_on is not set' % (
-                 task_id,)]])
-
-    def test_missing_state_name_for_exploration_task_types(self):
-        hbr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'invalid_state_name')
-        ifl_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'invalid_state_name')
-        ngr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'invalid_state_name')
-        sia_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'invalid_state_name')
-        output = self.run_job_and_get_output()
-        self.assertEqual(len(output), 1)
-        error_key, error_messages = output[0]
-
-        self.assertEqual(
-            error_key,
-            'failed validation check for target_id field check of '
-            'TaskEntryModel')
-        self.assertItemsEqual(
-            error_messages, [
-                'Entity id %s: exploration with id "exp_id" does not have a '
-                'state named "invalid_state_name" at version 1' % (
-                    hbr_task_id,),
-                'Entity id %s: exploration with id "exp_id" does not have a '
-                'state named "invalid_state_name" at version 1' % (
-                    ifl_task_id,),
-                'Entity id %s: exploration with id "exp_id" does not have a '
-                'state named "invalid_state_name" at version 1' % (
-                    ngr_task_id,),
-                'Entity id %s: exploration with id "exp_id" does not have a '
-                'state named "invalid_state_name" at version 1' % (
-                    sia_task_id,)
-            ])
-
-    def test_deleted_state_name_for_exploration_task_types(self):
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            'linear_exp_id', 'owner_id',
-            ['State 1', 'State 2', 'State 3'],
-            ['TextInput', 'TextInput', 'EndExploration'])
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            1,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            1,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-
-        exp_services.update_exploration( # v2
-            'owner_id', 'linear_exp_id', [
-                exp_domain.ExplorationChange(
-                    {'cmd': 'delete_state', 'state_name': 'State 2'})
-            ], 'Delete State 2')
-        new_hbr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            2,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        new_ifl_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            2,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        new_ngr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            2,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        new_sia_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            2,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-
-        output = self.run_job_and_get_output()
-        self.assertEqual(len(output), 2)
-        self.assertEqual(output[0], ['fully-validated TaskEntryModel', 4])
-        error_key, error_messages = output[1]
-        self.assertEqual(
-            error_key,
-            'failed validation check for target_id field check of '
-            'TaskEntryModel')
-        self.assertItemsEqual(
-            error_messages, [
-                'Entity id %s: exploration with id "linear_exp_id" does not '
-                'have a state named "State 2" at version 2' % (
-                    new_ifl_task_id,),
-                'Entity id %s: exploration with id "linear_exp_id" does not '
-                'have a state named "State 2" at version 2' % (
-                    new_hbr_task_id,),
-                'Entity id %s: exploration with id "linear_exp_id" does not '
-                'have a state named "State 2" at version 2' % (
-                    new_ngr_task_id,),
-                'Entity id %s: exploration with id "linear_exp_id" does not '
-                'have a state named "State 2" at version 2' % (
-                    new_sia_task_id,)
-            ])
 
 
 class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
