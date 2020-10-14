@@ -1766,17 +1766,25 @@ class ReviewableSuggestionEmailInfoUnitTests(
             self):
         edit_state_content_suggestion = (
             self._create_edit_state_content_suggestion())
+        # Mocking the SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS dict in
+        # suggestion services so that this test still passes if the
+        # "edit state content" suggestion type is added to the Contributor
+        # Dashboard in the future.
+        suggestion_emphasized_text_getter_functions_mock = {}
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected suggestion type to be offered on the Contributor '
-            'Dashboard, received: %s.' % (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
-            (
-                suggestion_services
-                .create_reviewable_suggestion_email_info_from_suggestion(
-                    edit_state_content_suggestion)
-            )
+        with self.swap(
+            suggestion_services, 'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS',
+            suggestion_emphasized_text_getter_functions_mock):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Expected suggestion type to be offered on the Contributor '
+                'Dashboard, received: %s.' % (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
+                (
+                    suggestion_services
+                    .create_reviewable_suggestion_email_info_from_suggestion(
+                        edit_state_content_suggestion)
+                )
 
     def test_contributor_suggestion_types_are_in_suggestion_text_getter_dict(
             self):
