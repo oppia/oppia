@@ -2881,12 +2881,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
     stats.
 
-    TODO(#10957): can't resubmit rejected translation suggestions for review.
-    Note that it is currently not possible to resubmit a rejected translation
-    for review. As a result, there isn't a test for that case in this test
-    class. If the functionality is added, a new test should be added here to
-    cover that case. If the functionality is not going to be added then this
-    can be removed.
+    TODO(kaylahardie): It is currently not possible to resubmit a rejected
+    translation suggestion for review. As a result, there isn't a test for
+    that case in this test class. If the functionality is added, a new test
+    should be added here to cover that case. If the functionality is not going
+    to be added then this can be removed. See issue #10957 for more context.
     """
 
     target_id = 'exp1'
