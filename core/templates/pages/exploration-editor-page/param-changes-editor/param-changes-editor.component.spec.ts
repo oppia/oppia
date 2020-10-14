@@ -29,26 +29,24 @@ import { StateParamChangesService } from
   'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';  
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';  
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';  
+  'domain/exploration/ParamSpecsObjectFactory';
 import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';  
+  'interactions/TextInput/directives/text-input-rules.service';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';  
+  'pages/exploration-editor-page/services/angular-name.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
 import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
-import { ParamChangesEditorDirective } from './param-changes-editor.component';  
-
-
+import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
