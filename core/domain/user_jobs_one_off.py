@@ -19,9 +19,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import copy
+import imghdr
 
 from core import jobs
 from core.domain import exp_fetchers
+from core.domain import image_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -626,3 +628,63 @@ class CleanUpUserContributionsModelOneOffJob(
     def reduce(key, values):
         values.sort()
         yield (key, values)
+
+
+class VerifyProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that verifies various aspects of profile_picture_data_url in the
+    UserSettingsModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model):  # pylint: disable=too-many-return-statements
+        if model.deleted:
+            yield ('DELETED', model.id)
+            return
+
+        if model.username is None:
+            yield ('NOT REGISTERED', model.id)
+            return
+
+        if model.profile_picture_data_url is None:
+            yield ('MISSING PROFILE PICTURE', model.id)
+            return
+
+        try:
+            profile_picture_binary = utils.convert_png_data_url_to_binary(
+                model.profile_picture_data_url)
+        except Exception:
+            yield ('WRONG PROFILE PICTURE DATA URL', model.id)
+            return
+
+        if imghdr.what(None, h=profile_picture_binary) != 'png':
+            yield ('PROFILE PICTURE NOT PNG', model.id)
+            return
+
+        try:
+            height, width = image_services.get_image_dimensions(
+                profile_picture_binary)
+        except Exception:
+            yield ('CANNOT LOAD PROFILE PICTURE', model.id)
+            return
+
+        if (
+                height != user_services.GRAVATAR_SIZE_PX or
+                width != user_services.GRAVATAR_SIZE_PX
+        ):
+            yield (
+                'PROFILE PICTURE NON-STANDART DIMENSIONS - %s,%s' % (
+                    height, width
+                ),
+                model.id
+            )
+            return
+
+        yield ('CORRECT PROFILE PICTURE', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

@@ -41,6 +41,7 @@ sys.path.insert(0, _YAML_PATH)
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 
 
 class InvalidInputException(Exception):
@@ -265,21 +266,43 @@ def get_random_choice(alist):
     return alist[index]
 
 
+def convert_png_data_url_to_binary(content):
+    """Converts a PNG base64 data URL (represented by 'content') to a PNG
+    binary data.
+
+    Args:
+        content: str. PNG data URL.
+
+    Returns:
+        str. Binary content of the PNG created from the data URL.
+
+    Raises:
+        Exception. If the given string is not of a PNG data URL.
+    """
+    if content.startswith(PNG_DATA_URL_PREFIX):
+        return base64.b64decode(
+            python_utils.urllib_unquote(content[len(PNG_DATA_URL_PREFIX):]))
+    else:
+        raise Exception('The given string does not represent a PNG data URL.')
+
+
 def convert_png_binary_to_data_url(content):
-    """Converts a png image string (represented by 'content') to a data URL.
+    """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
         content: str. PNG binary file content.
 
     Returns:
-        str. Data url created from the binary content of the PNG.
+        str. Data URL created from the binary content of the PNG.
 
     Raises:
         Exception. If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % python_utils.url_quote(
-            base64.b64encode(content))
+        return '%s%s' % (
+            PNG_DATA_URL_PREFIX,
+            python_utils.url_quote(base64.b64encode(content))
+        )
     else:
         raise Exception('The given string does not represent a PNG image.')
 
