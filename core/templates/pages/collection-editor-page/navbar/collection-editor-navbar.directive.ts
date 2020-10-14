@@ -206,11 +206,6 @@ angular.module('oppia').directive('collectionEditorNavbar', [
           };
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              CollectionEditorStateService.onCollectionInitialized.subscribe(
-                () => _validateCollection()
-              )
-            );
-            ctrl.directiveSubscriptions.add(
               UndoRedoService.onUndoRedoChangeApplied$().subscribe(
                 () => _validateCollection()
               )
