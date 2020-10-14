@@ -733,13 +733,11 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
 
-class PlaythroughServicesTest(test_utils.GenericTestBase):
-    """Unit tests focused on services related to playthroughs and exploration
-    issues.
-    """
+class ExplorationIssuesTests(test_utils.GenericTestBase):
+    """Unit tests focused on services related to exploration issues."""
 
     def setUp(self):
-        super(PlaythroughServicesTest, self).setUp()
+        super(ExplorationIssuesTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp = self.save_new_valid_exploration(
