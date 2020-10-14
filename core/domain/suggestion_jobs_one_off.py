@@ -320,6 +320,10 @@ class PopulateContributionStatsOneOffJob(
                 key: str. A key containing the information regarding which count
                     to update.
                 count_value: int. The count value for the given key.
+
+            Returns:
+                tuple(str, str). A 2-tuple that consists of the key and
+                count_value to yield outside of the transaction.
             """
             item_type, item_category, language_code = key.split(
                 PopulateContributionStatsOneOffJob.KEY_DELIMITER)
@@ -355,13 +359,12 @@ class PopulateContributionStatsOneOffJob(
                     ) = count_value
 
             stats_model.put()
-            values_to_yield_after_transaction.append([key, count_value])
+            return (key, count_value)
 
-        transaction_services.run_in_transaction(
-            _update_community_contribution_stats_transactional, key,
-            len(values))
+        key_from_transaction, count_value_from_transaction = (
+            transaction_services.run_in_transaction(
+                _update_community_contribution_stats_transactional, key,
+                len(values))
 
-        # Only yield the values of the transactions that were successful.
-        if values_to_yield_after_transaction:
-            key, count_value = values_to_yield_after_transaction[0]
-            yield (key, count_value)
+        # Only yield the values from the transactions.
+        yield (key_from_transaction, count_value_from_transaction)
