@@ -81,7 +81,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var details = ctrl.contributions[key].details;
           var subheading = '';
           if (details === null) {
-            subheading = '[The corresponding opportunity is deleted.]';
+            subheading = '[The corresponding opportunity has been deleted.]';
           } else {
             subheading = details.skill_description;
           }
@@ -112,7 +112,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var details = ctrl.contributions[key].details;
           var subheading = '';
           if (details === null) {
-            subheading = '[The corresponding opportunity is deleted.]';
+            subheading = '[The corresponding opportunity has been deleted.]';
           } else {
             subheading = (
               details.topic_name + ' / ' + details.story_title +

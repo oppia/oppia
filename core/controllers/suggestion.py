@@ -48,10 +48,13 @@ def _get_target_id_to_exploration_opportunity_dict(suggestions):
         summary dict.
     """
     target_ids = set([s.target_id for s in suggestions])
-    opportunity_id_to_opportunity = (
-        opportunity_services.get_exploration_opportunity_summaries_by_ids(
-            list(target_ids)))
-    return opportunity_id_to_opportunity
+    opportunity_id_to_opportunity_dict = {
+        opp_id: (opp.to_dict() if opp is not None else None)
+        for opp_id, opp in (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                list(target_ids)).items())
+    }
+    return opportunity_id_to_opportunity_dict
 
 
 def _get_target_id_to_skill_opportunity_dict(suggestions):
@@ -73,7 +76,7 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     opportunity_id_to_skill = {
         skill.id: skill
         for skill in skill_fetchers.get_multi_skills([
-            opp.id
+            opp['id']
             for opp in opportunity_id_to_opportunity_dict.values()
             if opp is not None])
     }
