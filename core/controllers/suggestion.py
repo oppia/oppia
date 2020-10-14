@@ -81,12 +81,9 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
             if opp is not None])
     }
 
-    for opp_dict in opportunity_id_to_opportunity_dict.values():
-        if opp_dict is None:
-            continue
-        skill = opportunity_id_to_skill.get(opp_dict['id'])
+    for opp_id, skill in opportunity_id_to_skill.items():
         if skill is not None:
-            opp_dict['skill_rubrics'] = [
+            opportunity_id_to_opportunity_dict[opp_id]['skill_rubrics'] = [
                 rubric.to_dict() for rubric in skill.rubrics]
 
     return opportunity_id_to_opportunity_dict
