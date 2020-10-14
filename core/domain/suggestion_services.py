@@ -854,6 +854,32 @@ def get_submitted_suggestions(user_id, suggestion_type):
     ])
 
 
+def get_suggestions_waiting_too_long_for_review_info_for_admins():
+    """Gets the information about the suggestions that have been waiting longer
+    than SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for review on the
+    Contributor Dashboard. There can be information about at most
+    MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN suggestions. The information about
+    the suggestions are returned in descending order by the suggestion's review
+    wait time.
+
+    Returns:
+        list(ReviewableSuggestionEmailContentInfo). A list of suggestion email
+        content info objects that represent suggestions that have been waiting
+        too long for review. Each object contains the type of the suggestion,
+        the language if the suggestion is a translation, the suggestion content
+        (question/translation), and the date that the suggestion was submitted
+        for review. The objects are sorted in descending order based on review
+        wait time.
+    """
+    return [
+        create_reviewable_suggestion_email_info_from_suggestion(
+            suggestion_waiting_too_long_for_review) for
+        suggestion_waiting_too_long_for_review in (
+            suggestion_models.GeneralSuggestionModel
+            .get_suggestions_waiting_too_long_for_review())
+    ]
+
+
 def get_user_proficiency_from_model(user_proficiency_model):
     """Converts the given UserContributionProficiencyModel to a
     UserContributionProficiency domain object.

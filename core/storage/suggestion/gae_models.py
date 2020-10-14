@@ -110,14 +110,7 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
 # suggestion has waited too long for review. The admin will be notified of the
 # top MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN number of suggestions that have
 # waited for review longer than the threshold number of days.
-THRESHOLD_DAYS_BEFORE_NOTIFY_ADMIN = 7
-
-# Threshold time after which to notify the admin that the suggestion has waited
-# too long for review. The admin will be notified of the top
-# MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN number of suggestions that have
-# waited for review longer than the threshold time.
-THRESHOLD_TIME_BEFORE_NOTIFY_ADMIN_IN_MSECS = (
-    THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
+SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS = 7
 
 # The maximum number of suggestions, that have been waiting too long for review,
 # to email admins about.
@@ -336,11 +329,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 cls.last_updated < threshold_time).fetch()
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
+    @classmethod
     def get_suggestions_waiting_too_long_for_review(cls):
         """Returns a list of suggestions that have been waiting for review
-        longer than THRESHOLD_DAYS_BEFORE_NOTIFY_ADMIN on the Contributor
-        Dashboard. MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN suggestions are
-        returned, sorted in descending order by their review wait time.
+        longer than SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days on the
+        Contributor Dashboard. MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN
+        suggestions are returned, sorted in descending order by their review
+        wait time.
 
         Returns:
             list(GeneralSuggestionModel). A list of suggestions, sorted in
@@ -348,19 +343,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
-                0, 0, 0, THRESHOLD_TIME_BEFORE_NOTIFY_ADMIN_IN_MSECS))
+                days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS))
         return (
             cls.get_all()
             .filter(
                 cls.status == STATUS_IN_REVIEW)
             .filter(
                 cls.last_updated < threshold_time)
-            # "edit state content" suggestions are not available on the
-            # Contributor Dashboard
             .filter(
-                    cls.suggestion_type != SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+                    cls.suggestion_type.IN(
+                        CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
             .fetch(
-                MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
+                MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
 
     @classmethod
     def get_in_review_suggestions_in_score_categories(
