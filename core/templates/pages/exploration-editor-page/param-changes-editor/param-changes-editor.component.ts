@@ -36,6 +36,9 @@ require('services/editability.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
 
 angular.module('oppia').component('paramChangesEditor', {
   bindings: {
@@ -270,9 +273,6 @@ angular.module('oppia').component('paramChangesEditor', {
     }
   ]
 });
-
-import { Directive, ElementRef, Injector, Input } from '@angular/core';
-import { UpgradeComponent } from '@angular/upgrade/static';
 
 @Directive({
   selector: 'param-changes-editor'
