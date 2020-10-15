@@ -284,7 +284,7 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
     }
 }
 
-NOTIFY_ADMINS_SUGGESTIONS_WAITING_LONG_EMAIL_INFO = {
+NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_EMAIL_INFO = {
     'email_body_template': (
         'Hi %s,<br><br>'
         'There are suggestions on the <a href="%s%s">Contributor Dashboard</a> '
