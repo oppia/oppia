@@ -4126,8 +4126,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'en', '<p>Translation 1</p>',
                 self.mocked_review_submission_datetime))
-        # Translation suggestion 2 has waited slighlty less time than translation
-        # suggestion 1 so that the translation suggestions are not
+        # Translation suggestion 2 has waited slighlty less time than
+        # translation suggestion 1 so that the translation suggestions are not
         # indistinguishable in terms of review wait time.
         translation_suggestion_2 = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(

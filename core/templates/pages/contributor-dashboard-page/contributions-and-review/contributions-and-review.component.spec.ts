@@ -174,8 +174,8 @@ describe('Contributions and review component', function() {
 
     it('should initialize $scope properties after controller is' +
       ' initialized', function() {
-      expect(ctrl.activeReviewTab).toBe('add_question');
-      expect(ctrl.activeContributionTab).toBe('');
+      expect(ctrl.activeTabType).toBe('reviews');
+      expect(ctrl.activeSuggestionType).toBe('add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
@@ -193,7 +193,7 @@ describe('Contributions and review component', function() {
 
     it('should open show translation suggestion modal when clicking on' +
       ' suggestion', function() {
-      ctrl.switchToContributionsTab('translate_content');
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
       $scope.$apply();
 
       spyOn($uibModal, 'open').and.callThrough();
@@ -204,7 +204,7 @@ describe('Contributions and review component', function() {
 
     it('should resolve suggestion when closing show suggestion modal',
       function() {
-        ctrl.switchToContributionsTab('translate_content');
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
 
         spyOn(contributionAndReviewService, 'resolveSuggestionToExploration');
@@ -225,7 +225,7 @@ describe('Contributions and review component', function() {
 
     it('should not resolve suggestion when dismissing show suggestion modal',
       function() {
-        ctrl.switchToContributionsTab('translate_content');
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
 
         spyOn(contributionAndReviewService, 'resolveSuggestionToExploration');
@@ -410,7 +410,7 @@ describe('Contributions and review component', function() {
 
     it('should show correct heading for translation suggestions',
       function() {
-        ctrl.switchToContributionsTab('translate_content');
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
         expect(ctrl.contributionSummaries).toEqual([{
           id: 'suggestion_1',
@@ -424,7 +424,7 @@ describe('Contributions and review component', function() {
 
     it('should show correct heading for question suggestions',
       function() {
-        ctrl.switchToContributionsTab('add_question');
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
         $scope.$apply();
         expect(ctrl.contributionSummaries).toEqual([{
           id: 'suggestion_1',
@@ -576,37 +576,6 @@ describe('Contributions and review component', function() {
           })
         }));
 
-      $scope = $rootScope.$new();
-      ctrl = $componentController('contributionsAndReview', {
-        $scope: $scope,
-        ContextService: contextService,
-        MisconceptionObjectFactory: misconceptionObjectFactory
-      });
-      ctrl.$onInit();
-      $scope.$apply();
-    }));
-
-    it('should initialize $scope properties after controller is' +
-      ' initialized', function() {
-      expect(ctrl.activeReviewTab).toBe('');
-      expect(ctrl.activeContributionTab).toBe('add_question');
-      expect(ctrl.userIsLoggedIn).toBe(true);
-      expect(ctrl.userDetailsLoading).toBe(false);
-      expect(ctrl.reviewTabs.length).toEqual(0);
-      expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-      expect(ctrl.contributionSummaries).toEqual([{
-        id: 'suggestion_1',
-        heading: 'Question 1',
-        subheading: undefined,
-        labelText: 'Accepted',
-        labelColor: '#8ed274',
-        actionButtonTitle: 'View'
-      }]);
-      expect(ctrl.contributionsDataLoading).toBe(false);
-    });
-
-    it('should get translate contributions when switching to translation' +
-      ' in review tab', function() {
       spyOn(
         contributionAndReviewService, 'getReviewableTranslationSuggestions')
         .and.callFake(callback => callback({
@@ -628,7 +597,39 @@ describe('Contributions and review component', function() {
             }
           }
         }));
-      ctrl.switchToReviewTab('translate_content');
+
+      $scope = $rootScope.$new();
+      ctrl = $componentController('contributionsAndReview', {
+        $scope: $scope,
+        ContextService: contextService,
+        MisconceptionObjectFactory: misconceptionObjectFactory
+      });
+      ctrl.$onInit();
+      $scope.$apply();
+    }));
+
+    it('should initialize $scope properties after controller is' +
+      ' initialized', function() {
+      expect(ctrl.activeTabType).toBe('contributions');
+      expect(ctrl.activeSuggestionType).toBe('add_question');
+      expect(ctrl.userIsLoggedIn).toBe(true);
+      expect(ctrl.userDetailsLoading).toBe(false);
+      expect(ctrl.reviewTabs.length).toEqual(0);
+      expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
+      expect(ctrl.contributionSummaries).toEqual([{
+        id: 'suggestion_1',
+        heading: 'Question 1',
+        subheading: undefined,
+        labelText: 'Accepted',
+        labelColor: '#8ed274',
+        actionButtonTitle: 'View'
+      }]);
+      expect(ctrl.contributionsDataLoading).toBe(false);
+    });
+
+    it('should get translate contributions when switching to translation' +
+      ' in review tab', function() {
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
       $scope.$apply();
 
       expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
@@ -679,6 +680,14 @@ describe('Contributions and review component', function() {
       $scope.$apply();
 
       expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should return correctly check the active tab', function() {
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
+      ctrl.isActiveTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+      ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
     });
   });
 });
