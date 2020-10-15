@@ -384,20 +384,6 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.issue_customization_args, {})
         self.assertEqual(model.actions, [])
 
-    def test_delete_playthroughs_multi(self):
-        model_id1 = (
-            stats_models.PlaythroughModel.create(
-                'exp_id1', 1, 'EarlyQuit', {}, []))
-        model_id2 = (
-            stats_models.PlaythroughModel.create(
-                'exp_id1', 1, 'EarlyQuit', {}, []))
-
-        instance_ids = [model_id1, model_id2]
-        stats_models.PlaythroughModel.delete_playthroughs_multi(instance_ids)
-
-        instances = stats_models.PlaythroughModel.get_multi(instance_ids)
-        self.assertEqual(instances, [None, None])
-
     def test_create_raises_error_when_many_id_collisions_occur(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
