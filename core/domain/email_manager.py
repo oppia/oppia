@@ -1320,16 +1320,16 @@ def _create_html_for_reviewable_suggestion_email_info(
             values_to_populate_suggestion_template_dict))
 
 
-def send_mail_to_notify_admins_suggestions_waiting_too_long(
-    admin_ids, reviewable_suggestion_email_infos):
+def send_mail_to_notify_admins_suggestions_waiting_long(
+        admin_ids, reviewable_suggestion_email_infos):
     """Sends an email to admins to inform them about the suggestions that have
     been waiting longer than
-    suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for
+    suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for a
     review on the Contributor Dashboard. Admins can be informed about at most
     suggestion_models.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN suggestions.
     The information about the suggestions is organized in descending order
     by the suggestion's review wait time.
- 
+
     Args:
         admin_ids: list(str). The user ids of the admins to notify.
         reviewable_suggestion_email_infos: list(ReviewableSuggestionEmailInfo).
@@ -1352,11 +1352,11 @@ def send_mail_to_notify_admins_suggestions_waiting_too_long(
         return
 
     if not (
-        config_domain
-        .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED.value):
+            config_domain
+            .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED.value):
         log_new_error(
             'Notifying admins that there are Contributor Dashboard suggestions '
-            'that have been waiting too long for review must be enabled on '
+            'that have been waiting too long for a review must be enabled on '
             'the config page in order to send the admins the emails.'
         )
         return
@@ -1370,7 +1370,7 @@ def send_mail_to_notify_admins_suggestions_waiting_too_long(
     if not admin_ids:
         log_new_error(
             'No admins to notify that Contributor Dashboard suggestions have '
-            'waited too long for review.')
+            'waited too long for a review.')
         return
 
     suggestions_to_notify_admin_html_strings = []
@@ -1392,7 +1392,6 @@ def send_mail_to_notify_admins_suggestions_waiting_too_long(
         for admin_user_setting in admin_user_settings
     ]))
 
-    send_email_infos = []
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
             log_new_error(
@@ -1404,7 +1403,7 @@ def send_mail_to_notify_admins_suggestions_waiting_too_long(
                 feconf.CONTRIBUTOR_DASHBOARD_URL,
                 suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                suggestions_to_notify_admin_html) 
+                suggestions_to_notify_admin_html)
 
             _send_email(
                 admin_id, feconf.SYSTEM_COMMITTER_ID,
@@ -1499,7 +1498,6 @@ def send_mail_to_notify_admins_reviewers_needed(
         for admin_user_setting in admin_user_settings
     ]))
 
-    send_email_infos = []
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
             log_new_error(
@@ -1510,13 +1508,11 @@ def send_mail_to_notify_admins_reviewers_needed(
                 admin_usernames[index], feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
                 suggestion_types_need_reviewers_html)
 
-            send_email_infos.append(email_domain.SendEmailInfo(
+            _send_email(
                 admin_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                admin_emails[index]))
-
-    _send_emails(send_email_infos)
+                recipient_email=admin_emails[index])
 
 
 def send_mail_to_notify_contributor_dashboard_reviewers(

@@ -452,12 +452,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_suggestions_waiting_too_long_returns_empty_if_neg_timedelta(
             self):
         suggestion_models.GeneralSuggestionModel.create(
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-        suggestion_models.TARGET_TYPE_EXPLORATION,
-        'exp1', self.target_version_at_submission,
-        suggestion_models.STATUS_IN_REVIEW, 'author_3',
-        'reviewer_2', self.change_cmd, self.score_category,
-        'exploration.exp1.thread1', self.translation_language_code)
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
 
         # Make sure the threshold is nonzero.
         with self.swap(
@@ -474,12 +474,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self):
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp1', self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread1', self.translation_language_code)
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                'exp1', self.target_version_at_submission,
+                suggestion_models.STATUS_IN_REVIEW, 'author_3',
+                'reviewer_2', self.change_cmd, self.score_category,
+                'exploration.exp1.thread1', self.translation_language_code)
         mocked_threshold_review_wait_time_in_days = 2
         mocked_datetime_less_than_review_wait_time_threshold = (
             self.mocked_datetime_utcnow + datetime.timedelta(days=1))
@@ -501,12 +501,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self):
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp1', self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread1', self.translation_language_code)
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                'exp1', self.target_version_at_submission,
+                suggestion_models.STATUS_IN_REVIEW, 'author_3',
+                'reviewer_2', self.change_cmd, self.score_category,
+                'exploration.exp1.thread1', self.translation_language_code)
         mocked_threshold_review_wait_time_in_days = 2
         mocked_datetime_eq_review_wait_time_threshold = (
             self.mocked_datetime_utcnow + datetime.timedelta(
@@ -528,12 +528,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_suggestions_waiting_too_long_if_suggestion_waited_past_limit(
             self):
         suggestion_models.GeneralSuggestionModel.create(
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-        suggestion_models.TARGET_TYPE_EXPLORATION,
-        'exp1', self.target_version_at_submission,
-        suggestion_models.STATUS_IN_REVIEW, 'author_3',
-        'reviewer_2', self.change_cmd, self.score_category,
-        'exploration.exp1.thread1', self.translation_language_code)
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
 
         with self.swap(
             suggestion_models,
@@ -549,21 +549,21 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self):
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp1', self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread1', self.translation_language_code)
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                'exp1', self.target_version_at_submission,
+                suggestion_models.STATUS_IN_REVIEW, 'author_3',
+                'reviewer_2', self.change_cmd, self.score_category,
+                'exploration.exp1.thread1', self.translation_language_code)
         with self.mock_datetime_utcnow(
             self.mocked_datetime_utcnow + datetime.timedelta(days=2)):
             suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
-            'skill_1', self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category1',
-            'skill1.thread1', self.question_language_code)
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                'skill_1', self.target_version_at_submission,
+                suggestion_models.STATUS_IN_REVIEW, 'author_3',
+                'reviewer_2', self.change_cmd, 'category1',
+                'skill1.thread1', self.question_language_code)
         mocked_threshold_review_wait_time_in_days = 3
         mocked_datetime_past_review_wait_time_threshold = (
             self.mocked_datetime_utcnow + datetime.timedelta(days=4))
@@ -576,8 +576,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 mocked_threshold_review_wait_time_in_days):
                 suggestions_waiting_too_long_for_review = (
                 suggestion_models.GeneralSuggestionModel
-                .get_suggestions_waiting_too_long_for_review()
-            )
+                .get_suggestions_waiting_too_long_for_review())
 
         # The question suggestion was created 2 days after the translation
         # suggestion, so it has only waited 1 day for a review, which is less

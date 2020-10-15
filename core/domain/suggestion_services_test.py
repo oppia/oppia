@@ -3521,7 +3521,6 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             self.REVIEWER_2_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
-        
 
     def test_get_returns_empty_for_suggestion_type_not_on_contributor_dashboard(
             self):
@@ -3552,7 +3551,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         with self.swap(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 1):
-            suggestions_waiting_too_long_for_review_info= (
+            suggestions_waiting_too_long_for_review_info = (
                 suggestion_services
                 .get_suggestions_waiting_too_long_for_review_info()
             )
@@ -3574,7 +3573,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
-                suggestions_waiting_too_long_for_review_info= (
+                suggestions_waiting_too_long_for_review_info = (
                     suggestion_services
                     .get_suggestions_waiting_too_long_for_review_info()
                 )
@@ -3596,7 +3595,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
-                suggestions_waiting_too_long_for_review_info= (
+                suggestions_waiting_too_long_for_review_info = (
                     suggestion_services
                     .get_suggestions_waiting_too_long_for_review_info()
                 )

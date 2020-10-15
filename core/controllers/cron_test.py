@@ -563,7 +563,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
     def _mock_send_mail_to_notify_admins_suggestions_waiting(
             self, admin_ids, reviewable_suggestion_email_infos):
         """Mocks
-        email_manager.send_mail_to_notify_admins_suggestions_waiting_too_long as
+        email_manager.send_mail_to_notify_admins_suggestions_waiting_long as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
@@ -628,7 +628,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
                 with self.swap(
                     email_manager,
-                    'send_mail_to_notify_admins_suggestions_waiting_too_long',
+                    'send_mail_to_notify_admins_suggestions_waiting_long',
                     self._mock_send_mail_to_notify_admins_suggestions_waiting):
                     with self.swap(
                         suggestion_models,
@@ -673,7 +673,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.swap(
                     email_manager,
-                    'send_mail_to_notify_admins_suggestions_waiting_too_long',
+                    'send_mail_to_notify_admins_suggestions_waiting_long',
                     self._mock_send_mail_to_notify_admins_suggestions_waiting):
                     self.get_html_response(
                         '/cron/mail/admins/contributor_dashboard_review_issues')
@@ -716,7 +716,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.swap(
                     email_manager,
-                    'send_mail_to_notify_admins_suggestions_waiting_too_long',
+                    'send_mail_to_notify_admins_suggestions_waiting_long',
                     self._mock_send_mail_to_notify_admins_suggestions_waiting):
                     self.get_html_response(
                         '/cron/mail/admins/contributor_dashboard_review_issues')

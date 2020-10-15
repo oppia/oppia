@@ -3628,7 +3628,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
 class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         test_utils.EmailTestBase):
-    """Tests the send_mail_to_notify_admins_suggestions_waiting_too_long method,
+    """Tests the send_mail_to_notify_admins_suggestions_waiting_long method,
     which sends an email to admins with information regarding the suggestions
     that have waited longer than
     suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for
@@ -3693,7 +3693,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'skill_difficulty': 0.3
             }
 
-        with self.mock_datetime_utcnow(submission_datetime): 
+        with self.mock_datetime_utcnow(submission_datetime):
             question_suggestion = suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
@@ -3781,7 +3781,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
-        self.maxDiff = None
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
         config_services.set_property(
@@ -3794,7 +3793,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 (
                     email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                    .send_mail_to_notify_admins_suggestions_waiting_long(
                         [self.admin_1_id],
                         [self.reviewable_suggestion_email_info])
                 )
@@ -3805,7 +3804,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.assertEqual(
             self.logged_errors[0], 'This app cannot send emails to users.')
 
-    def test_email_not_sent_if_admin_notifications_is_disabled(self):
+    def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
+            self):
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', False)
@@ -3816,7 +3816,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 (
                     email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                    .send_mail_to_notify_admins_suggestions_waiting_long(
                         [self.admin_1_id],
                         [self.reviewable_suggestion_email_info])
                 )
@@ -3827,7 +3827,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.assertEqual(
             self.logged_errors[0],
             'Notifying admins that there are Contributor Dashboard suggestions '
-            'that have been waiting too long for review must be enabled on '
+            'that have been waiting too long for a review must be enabled on '
             'the config page in order to send the admins the emails.')
 
     def test_email_not_sent_if_admin_email_does_not_exist(self):
@@ -3841,7 +3841,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 (
                     email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                    .send_mail_to_notify_admins_suggestions_waiting_long(
                         ['admin_id_without_email'],
                         [self.reviewable_suggestion_email_info])
                 )
@@ -3865,7 +3865,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 (
                     email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                    .send_mail_to_notify_admins_suggestions_waiting_long(
                         [], [self.reviewable_suggestion_email_info])
                 )
 
@@ -3875,7 +3875,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.assertEqual(
             self.logged_errors[0],
             'No admins to notify that Contributor Dashboard suggestions have '
-            'waited too long for review.')
+            'waited too long for a review.')
 
     def test_email_not_sent_if_no_suggestions_to_notify_the_admin_about(
             self):
@@ -3889,7 +3889,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 (
                     email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                    .send_mail_to_notify_admins_suggestions_waiting_long(
                         [self.admin_1_id], [])
                 )
 
@@ -3953,8 +3953,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                    email_manager
+                    .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4022,7 +4022,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4090,7 +4090,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4158,7 +4158,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4226,7 +4226,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4294,7 +4294,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4362,7 +4362,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4438,7 +4438,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             reviewable_suggestion_email_infos)
                     )
@@ -4508,7 +4508,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4576,7 +4576,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4646,7 +4646,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4716,7 +4716,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4786,7 +4786,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4856,7 +4856,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -4926,7 +4926,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -5003,7 +5003,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             reviewable_suggestion_email_infos)
                     )
@@ -5096,7 +5096,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
                         email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id, self.admin_2_id],
                             [reviewable_suggestion_email_info])
                     )

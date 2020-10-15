@@ -888,10 +888,10 @@ def get_suggestions_waiting_too_long_for_review_info():
         list(ReviewableSuggestionEmailContentInfo). A list of reviewable
         suggestion email content info objects that represent suggestions that
         have been waiting too long for a review. Each object contains the type
-        of the suggestion, the language of the suggestion, the suggestion content
-        (question/translation), and the date that the suggestion was submitted
-        for review. The objects are sorted in descending order based on review
-        wait time.
+        of the suggestion, the language of the suggestion, the suggestion
+        content (question/translation), and the date that the suggestion was 
+        submitted for review. The objects are sorted in descending order based
+        on review wait time.
     """
     suggestions_waiting_too_long_for_review = [
         get_suggestion_from_model(suggestion_model) for suggestion_model in (

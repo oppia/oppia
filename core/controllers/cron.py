@@ -291,6 +291,6 @@ class CronMailAdminContributorDashboardReviewIssuesHandler(
                 )
                 (
                     email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                    .send_mail_to_notify_admins_suggestions_waiting_long(
                         admin_ids, suggestions_waiting_too_long_for_review_info)
                 )
