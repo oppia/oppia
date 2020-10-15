@@ -745,6 +745,8 @@ class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
             if commit_log_model is None:
                 commit_log_model = regenerate_exp_commit_log_model(
                     item, version)
+                commit_log_model.update_timestamps(
+                    update_last_updated_time=False)
                 commit_log_model.put(update_last_updated_time=False)
                 yield (
                     'Regenerated Exploration Commit Log Model: version %s' % (
