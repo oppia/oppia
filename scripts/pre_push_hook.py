@@ -245,8 +245,8 @@ def compare_to_remote(remote, local_branch, remote_branch=None):
     git_remote = '%s/%s' % (remote, remote_branch)
     # Ensure that references to the remote branches exist on the local machine.
     start_subprocess_for_result(['git', 'pull', remote])
-    # Only compare differences to the common base of remote (i.e., the same
-    # diffs shown on real pull requests).
+    # Only compare differences to the merge base of the local and remote
+    # branches (what GitHub shows in the files tab of pull requests).
     return git_diff_name_status(
         get_merge_base(git_remote, local_branch), local_branch)
 
