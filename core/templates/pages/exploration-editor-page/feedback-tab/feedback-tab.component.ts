@@ -106,9 +106,6 @@ angular.module('oppia').component('feedbackTab', {
         ).then(() => {
           ctrl.clearActiveThread();
           AlertsService.addSuccessMessage('Feedback thread created.');
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$apply();
         },
         () => {
           // Note to developers:
@@ -181,14 +178,10 @@ angular.module('oppia').component('feedbackTab', {
           _resetTmpMessageFields();
           ctrl.activeThread.messages = messages;
           ctrl.messageSendingInProgress = false;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
           $rootScope.$apply();
         },
         () => {
           ctrl.messageSendingInProgress = false;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
           $rootScope.$apply();
         });
       };
@@ -202,8 +195,7 @@ angular.module('oppia').component('feedbackTab', {
           ctrl.activeThread = thread;
           ThreadDataBackendApiService.markThreadAsSeenAsync(ctrl.activeThread);
           ctrl.tmpMessage.status = ctrl.activeThread.status;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
+
           $rootScope.$apply();
         });
       };
