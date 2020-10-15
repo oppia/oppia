@@ -174,7 +174,7 @@ class AnswerGroup(python_utils.OBJECT):
         # is used to figure out the assembly of the html in the rulespecs.
 
         outcome_html = self.outcome.feedback.html
-        html_list = html_list + [outcome_html]
+        html_list += [outcome_html]
 
         html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
@@ -206,18 +206,18 @@ class AnswerGroup(python_utils.OBJECT):
                                 rule_spec.inputs[input_variable])
                             if (html_type_format ==
                                     feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
-                                html_list = html_list + [rule_input_variable]
+                                html_list += [rule_input_variable]
                             elif (html_type_format ==
                                   feconf.HTML_RULE_VARIABLE_FORMAT_SET):
                                 for value in rule_input_variable:
                                     if isinstance(
                                             value, python_utils.BASESTRING):
-                                        html_list = html_list + [value]
+                                        html_list += [value]
                             elif (html_type_format ==
                                   feconf.
                                   HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
                                 for rule_spec_html in rule_input_variable:
-                                    html_list = html_list + rule_spec_html
+                                    html_list += rule_spec_html
                             else:
                                 raise Exception(
                                     'The rule spec does not belong to a valid'
@@ -781,16 +781,16 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            html_list = html_list + answer_group.get_all_html_content_strings(
+            html_list += + answer_group.get_all_html_content_strings(
                 self.id)
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
-            html_list = html_list + [default_outcome_html]
+            html_list += [default_outcome_html]
 
         for hint in self.hints:
             hint_html = hint.hint_content.html
-            html_list = html_list + [hint_html]
+            html_list += [hint_html]
 
         if self.id is None:
             return html_list
@@ -801,7 +801,7 @@ class InteractionInstance(python_utils.OBJECT):
 
         if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
-            html_list = html_list + [solution_html]
+            html_list += [solution_html]
             html_field_types_to_rule_specs_dict = json.loads(
                 utils.get_file_contents(
                     feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
@@ -813,10 +813,10 @@ class InteractionInstance(python_utils.OBJECT):
                                 html_type ==
                                 feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
                             for value in self.solution.correct_answer:
-                                html_list = html_list + value
+                                html_list += value
                         elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
                             for value in self.solution.correct_answer:
-                                html_list = html_list + [value]
+                                html_list += [value]
                         else:
                             raise Exception(
                                 'The solution does not have a valid '

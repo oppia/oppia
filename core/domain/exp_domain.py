@@ -4539,7 +4539,7 @@ class Exploration(python_utils.OBJECT):
             content_html = state.content.html
             interaction_html_list = (
                 state.interaction.get_all_html_content_strings())
-            html_list = html_list + [content_html] + interaction_html_list
+            html_list += [content_html] + interaction_html_list
 
         return html_list
 

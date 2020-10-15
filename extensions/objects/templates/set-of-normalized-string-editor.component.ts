@@ -16,10 +16,6 @@
  * @fileoverview Directive for list of normalized string editor.
  */
 
-// Every editor directive should implement an alwaysEditable option. There
-// may be additional customization options for the editor that should be passed
-// in via initArgs.
-
 angular.module('oppia').component('setOfNormalizedStringEditor', {
   bindings: {
     value: '='

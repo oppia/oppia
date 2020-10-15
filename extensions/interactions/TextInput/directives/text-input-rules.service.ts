@@ -30,9 +30,8 @@ export class TextInputRulesService {
   constructor(private nws: NormalizeWhitespacePipe) {}
   Equals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
-    const normalizedInput = inputs.x.map(
-      input => this.nws.transform(input).toLowerCase());
-    return normalizedInput.includes(normalizedAnswer);
+    return inputs.x.some(
+      input => this.nws.transform(input).toLowerCase() === normalizedAnswer);
   }
   FuzzyEquals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
@@ -77,8 +76,7 @@ export class TextInputRulesService {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
     const normalizedInput = inputs.x.map(
       input => this.nws.transform(input).toLowerCase());
-    return normalizedInput.some(
-      input => normalizedAnswer.includes(input));
+    return normalizedInput.some(input => normalizedAnswer.includes(input));
   }
 }
 

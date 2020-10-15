@@ -208,7 +208,7 @@ var SanitizedUrlEditor = function(elem) {
 var SetOfNormalizedStringEditor = function(elem) {
   const _getLength = async function() {
     var items = (
-      await elem.all(by.repeater('item in localValue track by $index')));
+      elem.all(by.repeater('item in localValue track by $index')));
     return items.length;
   };
 
@@ -217,13 +217,12 @@ var SetOfNormalizedStringEditor = function(elem) {
     await elem.element(by.css('.protractor-test-add-list-entry')).click();
     return await NormalizedStringEditor(
       elem.element(
-        await by.repeater(
-          'item in localValue track by $index').row(listLength))
+        by.repeater('item in localValue track by $index').row(listLength))
     ).setValue(value);
   };
 
   const deleteAllItems = async function() {
-    const entries = await elem.all(
+    const entries = elem.all(
       await by.repeater('item in localValue track by $index'));
     for (let entry of entries) {
       await entry.element(by.css('.protractor-test-delete-list-entry')).click();

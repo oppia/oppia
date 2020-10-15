@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the list of normalized string editor.
  */
 
-
 describe('SetOfNormalizedStringEditor', function() {
   var ctrl = null;
 

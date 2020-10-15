@@ -210,6 +210,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list_1_v40 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_1_v39, 1, 2, self.EXP_ID))
+        # Verify that changes which include customization arguments are
+        # not upgraded to v40.
         self.assertIsNone(migrated_draft_change_list_1_v40)
 
         migrated_draft_change_list_2_v40 = (
@@ -223,6 +225,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list_2_v40_dict_list = [
             change.to_dict() for change in migrated_draft_change_list_2_v40
         ]
+        # Verify that changes which do not include customization arguments can
+        # be upgraded to v40.
         self.assertEqual(
             draft_change_list_2_v39_dict_list,
             migrated_draft_change_list_2_v40_dict_list)
