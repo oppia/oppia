@@ -3684,7 +3684,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'test description'
         )
 
-    def _assert_created_sent_email_model_is_correct(
+    def _assert_email_data_stored_in_sent_email_model_is_correct(
             self, expected_email_html_body, admin_id, admin_email):
         """Asserts that the sent email model that was created from the email
         that was sent contains the right information.
@@ -3867,7 +3867,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body)
 
         # Make sure correct email model is stored.
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
 
     def test_email_sent_to_admins_if_question_suggestions_need_reviewers(
@@ -3934,10 +3934,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_1, self.admin_1_id,
             self.ADMIN_1_EMAIL)
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
             self.ADMIN_2_EMAIL)
 
@@ -3984,7 +3984,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body)
 
         # Make sure correct email model is stored.
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
 
     def test_admin_emails_sent_if_translations_need_reviewers_for_one_lang(
@@ -4056,10 +4056,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_1, self.admin_1_id,
             self.ADMIN_1_EMAIL)
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
             self.ADMIN_2_EMAIL)
 
@@ -4109,7 +4109,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body)
 
         # Make sure correct email model is stored.
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body, self.admin_1_id, self.ADMIN_1_EMAIL)
 
     def test_admin_emails_sent_if_translations_need_reviewers_for_multi_lang(
@@ -4185,10 +4185,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_1, self.admin_1_id,
             self.ADMIN_1_EMAIL)
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
             self.ADMIN_2_EMAIL)
 
@@ -4280,10 +4280,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             messages[0].html.decode(), expected_email_html_body_for_admin_2)
 
         # Make sure correct email models are stored.
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_1, self.admin_1_id,
             self.ADMIN_1_EMAIL)
-        self._assert_created_sent_email_model_is_correct(
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_for_admin_2, self.admin_2_id,
             self.ADMIN_2_EMAIL)
 
