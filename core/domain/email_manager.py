@@ -1331,9 +1331,9 @@ def send_mail_to_notify_admins_reviewers_needed(
                     'suggestion_types_need_reviewers_template'][
                         suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT][
                             'multi_language'] % (
-                            feconf.OPPIA_SITE_URL,
-                            feconf.CONTRIBUTOR_DASHBOARD_URL,
-                            html_for_languages_that_need_more_reviewers))
+                                feconf.OPPIA_SITE_URL,
+                                feconf.CONTRIBUTOR_DASHBOARD_URL,
+                                html_for_languages_that_need_more_reviewers))
 
     if suggestion_models.SUGGESTION_TYPE_ADD_QUESTION in (
             suggestion_types_need_more_reviewers):
