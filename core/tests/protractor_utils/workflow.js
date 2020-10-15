@@ -24,8 +24,7 @@ var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
-var imageUploadInput = element(
-  by.css('.protractor-test-photo-upload-input'));
+var imageUploadInput = element(by.css('.protractor-test-photo-upload-input'));
 var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
@@ -50,7 +49,8 @@ var triggerTitleOnBlurEvent = async function() {
     'Test Exploration Title Input', testExplorationTitleInput);
   var testExplorationObjectiveInput = element(
     by.css('.protractor-test-exploration-objective-input'));
-  await action.click('Test Exploration Objective Input', testExplorationObjectiveInput);
+  await action.click(
+    'Test Exploration Objective Input', testExplorationObjectiveInput);
 };
 
 // Open edit roles.
@@ -125,7 +125,8 @@ var publishExploration = async function() {
 
   var testPublishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
-  await action.click('testPublishExplorationButton', testPublishExplorationButton);
+  await action.click(
+    'testPublishExplorationButton', testPublishExplorationButton);
 
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
@@ -146,7 +147,7 @@ var publishExploration = async function() {
     by.css('.protractor-test-share-publish-close'));
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  await action.click("closePublishModalButton", closePublishModalButton);
+  await action.click('closePublishModalButton', closePublishModalButton);
 };
 
 // Creates and publishes a minimal exploration.
@@ -156,7 +157,7 @@ var createAndPublishExploration = async function(
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
-    await forms.toRichText('new exploration'));
+  await forms.toRichText('new exploration'));
   await explorationEditorMainTab.setInteraction('EndExploration');
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -177,7 +178,7 @@ var createAddExpDetailsAndPublishExp = async function(
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
-    await forms.toRichText('new exploration'));
+  await forms.toRichText('new exploration'));
   await explorationEditorMainTab.setInteraction('EndExploration');
   await explorationEditorPage.saveChanges('Save the changes');
   await explorationEditorPage.publishCardExploration(
@@ -309,18 +310,15 @@ var uploadImage = async function(
 var submitImage = async function(
   imageClickableElement, imageContainer, imgPath, resetExistingImage) {
   await waitFor.visibilityOf(
-    imageClickableElement,
-    'Image element is taking too long to appear.');
+    imageClickableElement, 'Image element is taking too long to appear.');
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
   await action.click('imageSubmitButton', imageSubmitButton);
   await waitFor.invisibilityOf(
-    imageUploadInput,
-    'Image uploader is taking too long to disappear');
+    imageUploadInput, 'Image uploader is taking too long to disappear');
   await waitFor.invisibilityOf(
-    imageContainer,
-    'Image container is taking too long to disappear');
+    imageContainer, 'Image container is taking too long to disappear');
   return await waitFor.pageToFullyLoad();
 };
 
