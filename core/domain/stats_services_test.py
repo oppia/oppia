@@ -965,11 +965,11 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             stats_models.PlaythroughModel.get_multi(playthrough_ids),
             [None, None, None])
 
-    def test_save_exp_issues_model_transactional(self):
+    def test_save_exp_issues_model(self):
         eq_playthrough_ids = [self._create_eq_playthrough('A')]
         cst_playthrough_ids = [self._create_cst_playthrough(['A', 'B', 'A'])]
         mis_playthrough_ids = [self._create_mis_playthrough('A', 3)]
-        stats_services.save_exp_issues_model_transactional(
+        stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_eq_exp_issue(eq_playthrough_ids, 'A'),
                 self._create_mis_exp_issue(mis_playthrough_ids, 'A', 3),
@@ -990,7 +990,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             cst_playthrough_ids)
 
     def test_cst_exp_issue_is_invalidated_when_state_is_deleted(self):
-        stats_services.save_exp_issues_model_transactional(
+        stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_cst_exp_issue(
                     [self._create_cst_playthrough(['A', 'B', 'A'])],
@@ -1008,7 +1008,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
 
     def test_cst_exp_issue_is_updated_when_state_is_renamed(self):
-        stats_services.save_exp_issues_model_transactional(
+        stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_cst_exp_issue(
                     [self._create_cst_playthrough(['A', 'B', 'A'])],
@@ -1056,7 +1056,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             'Z')
 
     def test_eq_exp_issue_is_invalidated_when_state_is_deleted(self):
-        stats_services.save_exp_issues_model_transactional(
+        stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_eq_exp_issue(
                     [self._create_eq_playthrough('B')], 'B')
@@ -1073,7 +1073,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
 
     def test_eq_exp_issue_is_updated_when_state_is_renamed(self):
-        stats_services.save_exp_issues_model_transactional(
+        stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_eq_exp_issue(
                     [self._create_eq_playthrough('A')], 'A')
@@ -1110,7 +1110,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             actions[1]['action_customization_args']['state_name']['value'], 'Z')
 
     def test_mis_exp_issue_is_invalidated_when_state_is_deleted(self):
-        stats_services.save_exp_issues_model_transactional(
+        stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_mis_exp_issue(
                     [self._create_mis_playthrough('B', 2)], 'B', 2)
@@ -1127,7 +1127,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
 
     def test_mis_exp_issue_is_updated_when_state_is_renamed(self):
-        stats_services.save_exp_issues_model_transactional(
+        stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_mis_exp_issue(
                     [self._create_mis_playthrough('A', 2)], 'A', 2)
@@ -1168,7 +1168,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             actions[3]['action_customization_args']['state_name']['value'], 'Z')
 
     def test_revert_exploration_recovers_exp_issues(self):
-        stats_services.save_exp_issues_model_transactional(
+        stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
                 self._create_eq_exp_issue(
                     [self._create_eq_playthrough('B')], 'B'),

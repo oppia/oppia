@@ -331,7 +331,8 @@ def update_exp_issues_for_new_exp_version(
 
         playthrough_model.issue_customization_args = (
             playthrough.issue_customization_args)
-        playthrough_model.actions = [a.to_dict() for a in playthrough.actions]
+        playthrough_model.actions = [
+            action.to_dict() for action in playthrough.actions]
 
     # Run in transaction to help prevent data-races between operations that may
     # update the playthroughs concurrently.
@@ -590,26 +591,7 @@ def create_exp_issues_model(exp_issues):
         exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
 
 
-def _save_exp_issues_model(exp_issues):
-    """Updates the ExplorationIssuesModel datastore instance with the passed
-    ExplorationIssues domain object.
-
-    Args:
-        exp_issues: ExplorationIssues. The exploration issues domain
-            object.
-    """
-    unresolved_issues_dicts = [
-        unresolved_issue.to_dict()
-        for unresolved_issue in exp_issues.unresolved_issues]
-    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-        exp_issues.exp_id, exp_issues.exp_version)
-    exp_issues_model.exp_version = exp_issues.exp_version
-    exp_issues_model.unresolved_issues = unresolved_issues_dicts
-
-    exp_issues_model.put()
-
-
-def save_exp_issues_model_transactional(exp_issues):
+def save_exp_issues_model(exp_issues):
     """Updates the ExplorationIssuesModel datastore instance with the passed
     ExplorationIssues domain object in a transaction.
 
@@ -617,9 +599,21 @@ def save_exp_issues_model_transactional(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
+
+    def _save_exp_issues_model_transactional():
+        """Implementation to be run in a transaction."""
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            exp_issues.exp_id, exp_issues.exp_version)
+        exp_issues_model.exp_version = exp_issues.exp_version
+        exp_issues_model.unresolved_issues = [
+            issue.to_dict() for issue in exp_issues.unresolved_issues]
+        exp_issues_model.put()
+
     # Run in transaction to help prevent data-races between concurrent learners
     # who may have a playthrough recorded at the same time.
-    transaction_services.run_in_transaction(_save_exp_issues_model, exp_issues)
+    transaction_services.run_in_transaction(
+        _save_exp_issues_model_transactional)
 
 
 def get_exploration_stats_multi(exp_version_references):
@@ -658,14 +652,15 @@ def delete_playthroughs_multi(playthrough_ids):
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
 
-    def _delete_playthroughs_multi():
+    def _delete_playthroughs_multi_transactional():
         """Implementation to be run in a transaction."""
         stats_models.PlaythroughModel.delete_multi(
             stats_models.PlaythroughModel.get_multi(playthrough_ids))
 
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
-    transaction_services.run_in_transaction(_delete_playthroughs_multi)
+    transaction_services.run_in_transaction(
+        _delete_playthroughs_multi_transactional)
 
 
 def get_visualizations_info(exp_id, state_name, interaction_id):
