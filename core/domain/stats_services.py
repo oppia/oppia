@@ -118,9 +118,9 @@ def get_exploration_stats(exp_id, exp_version):
 
 
 def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
-    """Updates ExplorationStatsModel according to the dict containing
-    aggregated stats. The model GET and PUT must be done in a transaction to
-    avoid loss of updates that come in rapid succession.
+    """Updates ExplorationStatsModel according to the dict containing aggregated
+    stats. The model GET and PUT must be done in a transaction to avoid loss of
+    updates that come in rapid succession.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -150,8 +150,8 @@ def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
 
 
 def update_stats(exp_id, exp_version, aggregated_stats):
-    """Updates ExplorationStatsModel according to the dict containing
-    aggregated stats.
+    """Updates ExplorationStatsModel according to the dict containing aggregated
+    stats.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -187,11 +187,11 @@ def get_stats_for_new_exploration(exp_id, exp_version, state_names):
 
 def get_stats_for_new_exp_version(
         exp_id, exp_version, state_names, exp_versions_diff, revert_to_version):
-    """Retrieves the ExplorationStatsModel for the old exp_version and makes
-    any required changes to the structure of the model. Then, a new
-    ExplorationStatsModel is created for the new exp_version.
-    Note: This function does not save the newly created model, it returns it.
-    Callers should explicitly save the model if required.
+    """Retrieves the ExplorationStatsModel for the old exp_version and makes any
+    required changes to the structure of the model. Then, a new
+    ExplorationStatsModel is created for the new exp_version. Note: This
+    function does not save the newly created model, it returns it. Callers
+    should explicitly save the model if required.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -217,8 +217,8 @@ def get_stats_for_new_exp_version(
     if revert_to_version:
         old_exp_stats = get_exploration_stats_by_id(exp_id, revert_to_version)
         # If the old exploration issues model doesn't exist, the current model
-        # is carried over (this is a fallback case for some tests, and can
-        # never happen in production.)
+        # is carried over (this is a fallback case for some tests, and can never
+        # happen in production.)
         if old_exp_stats:
             exploration_stats.num_starts_v2 = old_exp_stats.num_starts_v2
             exploration_stats.num_actual_starts_v2 = (
@@ -331,7 +331,8 @@ def update_exp_issues_for_new_exp_version(
 
         playthrough_model.issue_customization_args = (
             playthrough.issue_customization_args)
-        playthrough_model.actions = [a.to_dict() for a in playthrough.actions]
+        playthrough_model.actions = [
+            action.to_dict() for action in playthrough.actions]
 
     stats_models.PlaythroughModel.update_timestamps_multi(playthrough_models)
     transaction_services.run_in_transaction(
@@ -374,8 +375,8 @@ def get_exp_issues(exp_id, exp_version):
         exp_version: int. Version of the exploration.
 
     Returns:
-        ExplorationIssues|None. The domain object for exploration issues or
-        None if the exp_id is invalid.
+        ExplorationIssues|None. The domain object for exploration issues or None
+        if the exp_id is invalid.
     """
     exp_issues = None
     exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
@@ -590,37 +591,29 @@ def create_exp_issues_model(exp_issues):
         exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
 
 
-def _save_exp_issues_model(exp_issues):
+def save_exp_issues_model(exp_issues):
     """Updates the ExplorationIssuesModel datastore instance with the passed
     ExplorationIssues domain object.
 
     Args:
-        exp_issues: ExplorationIssues. The exploration issues domain
-            object.
+        exp_issues: ExplorationIssues. The exploration issues domain object.
     """
-    unresolved_issues_dicts = [
-        unresolved_issue.to_dict()
-        for unresolved_issue in exp_issues.unresolved_issues]
-    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-        exp_issues.exp_id, exp_issues.exp_version)
-    exp_issues_model.exp_version = exp_issues.exp_version
-    exp_issues_model.unresolved_issues = unresolved_issues_dicts
 
-    exp_issues_model.update_timestamps()
-    exp_issues_model.put()
+    def _save_exp_issues_model_transactional():
+        """Implementation to be run in a transaction."""
 
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            exp_issues.exp_id, exp_issues.exp_version)
+        exp_issues_model.exp_version = exp_issues.exp_version
+        exp_issues_model.unresolved_issues = [
+            issue.to_dict() for issue in exp_issues.unresolved_issues]
+        exp_issues_model.update_timestamps()
+        exp_issues_model.put()
 
-def save_exp_issues_model_transactional(exp_issues):
-    """Updates the ExplorationIssuesModel datastore instance with the passed
-    ExplorationIssues domain object in a transaction.
-
-    Args:
-        exp_issues: ExplorationIssues. The exploration issues domain
-            object.
-    """
     # Run in transaction to help prevent data-races between concurrent learners
     # who may have a playthrough recorded at the same time.
-    transaction_services.run_in_transaction(_save_exp_issues_model, exp_issues)
+    transaction_services.run_in_transaction(
+        _save_exp_issues_model_transactional)
 
 
 def get_exploration_stats_multi(exp_version_references):
@@ -659,14 +652,15 @@ def delete_playthroughs_multi(playthrough_ids):
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
 
-    def _delete_playthroughs_multi():
+    def _delete_playthroughs_multi_transactional():
         """Implementation to be run in a transaction."""
         stats_models.PlaythroughModel.delete_multi(
             stats_models.PlaythroughModel.get_multi(playthrough_ids))
 
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
-    transaction_services.run_in_transaction(_delete_playthroughs_multi)
+    transaction_services.run_in_transaction(
+        _delete_playthroughs_multi_transactional)
 
 
 def get_visualizations_info(exp_id, state_name, interaction_id):
@@ -755,7 +749,7 @@ def record_answer(
 def record_answers(
         exploration_id, exploration_version, state_name, interaction_id,
         submitted_answer_list):
-    """Optimally record a group of answers using an already loaded exploration..
+    """Optimally record a group of answers using an already loaded exploration.
     The submitted_answer_list is a list of SubmittedAnswer domain objects.
 
     Args:
@@ -829,8 +823,8 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
     if answers_model is None:
         return []
 
-    # Return at most 100 answers, and only answers from the initial shard (If
-    # we needed to use subsequent shards then the answers are probably too big
+    # Return at most 100 answers, and only answers from the initial shard (If we
+    # needed to use subsequent shards then the answers are probably too big
     # anyway).
     sample_answers = answers_model.submitted_answer_list[:100]
     return [
@@ -941,8 +935,8 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
 
 
 def get_state_reference_for_exploration(exp_id, state_name):
-    """Returns the generated state reference for the given exploration id
-    and state name.
+    """Returns the generated state reference for the given exploration id and
+    state name.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -1004,22 +998,21 @@ def get_learner_answer_details_from_model(learner_answer_details_model):
 
 
 def get_learner_answer_details(entity_type, state_reference):
-    """Returns a LearnerAnswerDetails domain object, with given
-    entity_type and state_name. This function checks
-    in the datastore if the corresponding LearnerAnswerDetailsModel exists,
-    if not then None is returned.
+    """Returns a LearnerAnswerDetails domain object, with given entity_type and
+    state_name. This function checks in the datastore if the corresponding
+    LearnerAnswerDetailsModel exists, if not then None is returned.
 
     Args:
-        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
-            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
-        state_reference: str. This is used to refer to a state
-            in an exploration or question. For an exploration the
-            value will be equal to 'exp_id:state_name' and for question
-            this will be equal to 'question_id'.
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION or
+            ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        state_reference: str. This is used to refer to a state in an exploration
+            or question. For an exploration the value will be equal to
+            'exp_id:state_name' and for question this will be equal to
+            'question_id'.
 
     Returns:
-        LearnerAnswerDetails. The learner answer domain object
-        or None if the model does not exist.
+        LearnerAnswerDetails. The learner answer domain object or None if the
+        model does not exist.
     """
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
@@ -1036,8 +1029,8 @@ def create_learner_answer_details_model_instance(learner_answer_details):
     object.
 
     Args:
-        learner_answer_details: LearnerAnswerDetails. The learner answer
-            details domain object.
+        learner_answer_details: LearnerAnswerDetails. The learner answer details
+            domain object.
     """
     stats_models.LearnerAnswerDetailsModel.create_model_instance(
         learner_answer_details.entity_type,
@@ -1051,21 +1044,20 @@ def create_learner_answer_details_model_instance(learner_answer_details):
 
 def save_learner_answer_details(
         entity_type, state_reference, learner_answer_details):
-    """Saves the LearnerAnswerDetails domain object in the datatstore,
-    if the model instance with the given entity_type and state_reference is
-    found and if the instance id of the model doesn't matches with the
-    generated instance id, then the earlier model is deleted and a new model
-    instance is created.
+    """Saves the LearnerAnswerDetails domain object in the datatstore, if the
+    model instance with the given entity_type and state_reference is found and
+    if the instance id of the model doesn't matches with the generated instance
+    id, then the earlier model is deleted and a new model instance is created.
 
     Args:
-        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
-            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
-        state_reference: str. This is used to refer to a state
-            in an exploration or question. For an exploration the
-            value will be equal to 'exp_id:state_name' and for question
-            this will be equal to 'question_id'.
-        learner_answer_details: LearnerAnswerDetails. The learner answer
-            details domain object which is to be saved.
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION or
+            ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        state_reference: str. This is used to refer to a state in an exploration
+            or question. For an exploration the value will be equal to
+            'exp_id:state_name' and for question this will be equal to
+            'question_id'.
+        learner_answer_details: LearnerAnswerDetails. The learner answer details
+            domain object which is to be saved.
     """
     learner_answer_details.validate()
     learner_answer_details_model = (
@@ -1098,19 +1090,18 @@ def record_learner_answer_info(
     model and then saves it.
 
     Args:
-        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
-            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
-        state_reference: str. This is used to refer to a state
-            in an exploration or question. For an exploration the
-            value will be equal to 'exp_id:state_name' and for question
-            this will be equal to 'question_id'.
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION or
+            ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        state_reference: str. This is used to refer to a state in an exploration
+            or question. For an exploration the value will be equal to
+            'exp_id:state_name' and for question this will be equal to
+            'question_id'.
         interaction_id: str. The ID of the interaction.
-        answer: *(json-like). The answer which is submitted by the
-            learner. The actual type of answer depends on the
-            interaction.
+        answer: *(json-like). The answer which is submitted by the learner. The
+            actual type of answer depends on the interaction.
         answer_details: str. The details the learner will submit when the
-            learner will be asked questions like 'Hey how did you land on
-            this answer', 'Why did you pick that answer' etc.
+            learner will be asked questions like 'Hey how did you land on this
+            answer', 'Why did you pick that answer' etc.
     """
     learner_answer_details = get_learner_answer_details(
         entity_type, state_reference)
@@ -1129,16 +1120,15 @@ def record_learner_answer_info(
 
 def delete_learner_answer_info(
         entity_type, state_reference, learner_answer_info_id):
-    """Deletes the learner answer info in the model, and then
-    saves it.
+    """Deletes the learner answer info in the model, and then saves it.
 
     Args:
-        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
-            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
-        state_reference: str. This is used to refer to a state
-            in an exploration or question. For an exploration the
-            value will be equal to 'exp_id:state_name' and for question
-            this will be equal to 'question_id'.
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION or
+            ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        state_reference: str. This is used to refer to a state in an exploration
+            or question. For an exploration the value will be equal to
+            'exp_id:state_name' and for question this will be equal to
+            'question_id'.
         learner_answer_info_id: str. The unique ID of the learner answer info
             which needs to be deleted.
     """
@@ -1161,8 +1151,8 @@ def update_state_reference(
     in the datastore.
 
     Args:
-        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
-            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION or
+            ENTITY_TYPE_QUESTION, which are declared in feconf.py.
         old_state_reference: str. The old state reference which needs to be
             changed.
         new_state_reference: str. The new state reference which needs to be
