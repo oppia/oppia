@@ -24,7 +24,6 @@ import logging
 
 from constants import constants
 from core.domain import config_domain
-from core.domain import email_domain
 from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_domain
@@ -212,30 +211,35 @@ NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
 
 NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
     'email_body_template': (
-        'Hi %s,<br><br>'
+        'Hi %s,'
+        '<br><br>'
         'There are new review opportunities that we think you might be '
-        'interested in on the '
-        '<a href="%s%s">Contributor '
-        'Dashboard</a>. Here are some examples of contributions that have been '
-        'waiting the longest for review:'
-        '<br>%s<br>'
+        'interested in on the <a href="%s%s">Contributor Dashboard</a>. '
+        'Here are some examples of contributions that have been waiting '
+        'the longest for review:'
+        '<br><br>'
+        '<ul>%s</ul><br>'
         'Please take some time to review any of the above contributions (if '
-        'they still need a review) or any other contributions on the dashboard.'
-        ' We appreciate your help!<br>'
-        'Thanks again, and happy reviewing!<br><br>'
+        'they still need a review) or any other contributions on the '
+        'dashboard. We appreciate your help!'
+        '<br><br>'
+        'Thanks again, and happy reviewing!<br>'
         '- The Oppia Contributor Dashboard Team'
         '<br><br>%s'
     ),
-    'email_subject': 'Contributor Dashboard Reviewer Opportunities',
+    'email_subject': 'Contributor Dashboard Reviewer Opportunities'
+}
+
+HTML_FOR_REVIEWABLE_SUGGESTION_EMAIL_INFO = {
     # The templates below are for listing the information for each suggestion
-    # type.
+    # type offered on the Contributor Dashboard.
     'suggestion_template': {
         suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
             '<li>The following %s translation suggestion was submitted for '
-            'review %s ago:<br>%s</li>'),
+            'review %s ago:<br>%s</li><br>'),
         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
             '<li>The following question suggestion was submitted for review '
-            '%s ago:<br>%s</li>')
+            '%s ago:<br>%s</li><br>')
     },
     # Each suggestion type has a lambda function to retrieve the values needed
     # to populate the above suggestion template.
@@ -284,50 +288,29 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
     }
 }
 
-NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_EMAIL_INFO = {
+NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_INFO = {
     'email_body_template': (
         'Hi %s,<br><br>'
         'There are suggestions on the <a href="%s%s">Contributor Dashboard</a> '
         'that have been waiting for more than %s days for review. Please take '
-        'a look at the suggestions mentioned below and help them by going to '
-        'the <a href="%s%s#/roles">admin roles page</a> and either:'
-        'interested in on the '
-        '<a href="%s%s">Contributor '
-        'Dashboard</a>. Here are some examples of contributions that have been '
-        'waiting the longest for review:'
-        '<br>%s<br>'
-        'Please take some time to review any of the above contributions (if '
-        'they still need a review) or any other contributions on the dashboard.'
-        ' We appreciate your help!<br>'
-        'Thanks again, and happy reviewing!<br><br>'
+        'a look at the suggestions mentioned below and help them get reviewed '
+        'by going to the <a href="%s%s#/roles">admin roles page</a> and either:'
+        '<br><br><ul>'
+        '<li>Add more reviewers to the suggestion types that have suggestions '
+        'waiting too long for a review</li><br>'
+        '<li>Find the existing reviewers and email reviewers directly about '
+        'the suggestions waiting for a review</li><br>'
+        '</ul><br>'
+        'The suggestions that have been waiting too long for a review:'
+        '<br><br>'
+        '<ul>%s</ul><br>'
+        'Thanks so much - we appreciate your help!<br>'
+        'Best Wishes!<br><br>'
         '- The Oppia Contributor Dashboard Team'
-        '<br><br>%s'
     ),
-    'email_subject': 'Contributor Dashboard Reviewer Opportunities',
-    # The templates below are for listing the information for each suggestion
-    # type.
-    'suggestion_template': {
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-            '<li>The following %s translation suggestion was submitted for '
-            'review %s ago:<br>%s</li>'),
-        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-            '<li>The following question suggestion was submitted for review '
-            '%s ago:<br>%s</li>')
-    },
-    # Each suggestion type has a lambda function to retrieve the values needed
-    # to populate the above suggestion template.
-    'suggestion_template_values_getter_functions': {
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-            lambda values_dict: (
-                values_dict['language'], values_dict['review_wait_time'],
-                values_dict['suggestion_content'])
-        ),
-        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-            lambda values_dict: (
-                values_dict['review_wait_time'],
-                values_dict['suggestion_content'])
-        )
-    }
+    'email_subject': (
+        'Contributor Dashboard Suggestions Have Been Waiting Too Long for a'
+        'Review')
 }
 
 SENDER_VALIDATORS = {
@@ -356,6 +339,8 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -474,66 +459,6 @@ def _send_email(
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     transaction_services.run_in_transaction(_send_email_in_transaction)
-
-
-def _send_emails(send_email_infos):
-    """Sends emails to the given recipients. Note that this method does not
-    consider whether the emails are duplicates.
-
-    Args:
-        send_email_infos: list(SendEmailInfo). Each SendEmailInfo object
-            contains the information necessary to send an email.
-
-    Raises:
-        Exception. A sender_id is not appropriate for an intent.
-    """
-    # Keep track the email information for emails that were successfully sent
-    # in transaction so that SentEmailModels can be created.
-    successfully_sent_in_transaction_email_infos = []
-    for send_email_info in send_email_infos:
-        if send_email_info.sender_name is None:
-            send_email_info.sender_name = EMAIL_SENDER_NAME.value
-
-        require_sender_id_is_valid(
-            send_email_info.intent, send_email_info.sender_id)
-
-        cleaned_html_body = html_cleaner.clean(send_email_info.email_html_body)
-        if cleaned_html_body != send_email_info.email_html_body:
-            log_new_error(
-                'Original email HTML body does not match cleaned HTML body:\n'
-                'Original:\n%s\n\nCleaned:\n%s\n' %
-                (send_email_info.email_html_body, cleaned_html_body))
-            return
-
-        raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
-            '<br>', '\n').replace('<li>', '<li>- ').replace(
-                '</p><p>', '</p>\n<p>')
-        cleaned_plaintext_body = html_cleaner.strip_html_tags(
-            raw_plaintext_body)
-
-        def _send_email_in_transaction(
-                send_email_info=send_email_info,
-                cleaned_plaintext_body=cleaned_plaintext_body):
-            """Sends the email to a single recipient."""
-            sender_name_email = '%s <%s>' % (
-                send_email_info.sender_name, send_email_info.sender_email)
-
-            email_services.send_mail(
-                sender_name_email, send_email_info.recipient_email,
-                send_email_info.email_subject, cleaned_plaintext_body,
-                send_email_info.email_html_body,
-                bcc_admin=send_email_info.bcc_admin,
-                reply_to_id=send_email_info.reply_to_id)
-
-            # This is done to maintain consistency with the _send_email and
-            # _send_bulk_email.
-            send_email_info.sender_email = sender_name_email
-            successfully_sent_in_transaction_email_infos.append(send_email_info)
-
-        transaction_services.run_in_transaction(_send_email_in_transaction)
-
-    email_models.SentEmailModel.create_multi(
-        successfully_sent_in_transaction_email_infos)
 
 
 def _send_bulk_mail(
@@ -1345,7 +1270,57 @@ def send_mail_to_notify_users_to_review(user_id, category):
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_mail_to_notify_admins_suggestions_waiting_too_long_for_review(
+def _create_html_for_reviewable_suggestion_email_info(
+        reviewable_suggestion_email_info):
+    """Creates the html for the given reviewable_suggestion_email_info. This
+    html content is used to provide information about a suggestion in an
+    email.
+
+    Args:
+        reviewable_suggestion_email_info: ReviewableSuggestionEmailInfo. The
+            information about the suggestion that will be used to form the
+            html for the email. This includes the suggestion type, language,
+            content and review submission date.
+
+    Returns:
+        str. A string containing the html that represents the suggestion
+        information.
+    """
+    # Get the language of the suggestion.
+    language = utils.get_supported_audio_language_description(
+        reviewable_suggestion_email_info.language_code)
+    # Calculate how long the suggestion has been waiting for review.
+    suggestion_review_wait_time = (
+        datetime.datetime.utcnow() - (
+            reviewable_suggestion_email_info.submission_datetime))
+    # Get a string composed of the largest time unit that has a
+    # value, followed by that time unit. For example, if the
+    # suggestion had been waiting for review for 5 days and 2 hours,
+    # '5 days' would be returned. This is more user friendly since a
+    # high level of precision is not needed.
+    human_readable_review_wait_time = (
+        utils.create_string_from_largest_unit_in_timedelta(
+            suggestion_review_wait_time))
+    values_to_populate_suggestion_template_dict = {
+        'language': language,
+        'review_wait_time': human_readable_review_wait_time,
+        'suggestion_content': (
+            reviewable_suggestion_email_info.suggestion_content)
+    }
+    get_values_to_populate_suggestion_template = (
+        HTML_FOR_REVIEWABLE_SUGGESTION_EMAIL_INFO[
+            'suggestion_template_values_getter_functions'][
+                reviewable_suggestion_email_info.suggestion_type])
+    suggestion_template = (
+        HTML_FOR_REVIEWABLE_SUGGESTION_EMAIL_INFO[
+            'suggestion_template'][
+                reviewable_suggestion_email_info.suggestion_type])
+    return suggestion_template % (
+        get_values_to_populate_suggestion_template(
+            values_to_populate_suggestion_template_dict))
+
+
+def send_mail_to_notify_admins_suggestions_waiting_too_long(
     admin_ids, reviewable_suggestion_email_infos):
     """Sends an email to admins to inform them about the suggestions that have
     been waiting longer than
@@ -1358,14 +1333,84 @@ def send_mail_to_notify_admins_suggestions_waiting_too_long_for_review(
     Args:
         admin_ids: list(str). The user ids of the admins to notify.
         reviewable_suggestion_email_infos: list(ReviewableSuggestionEmailInfo).
-            list(ReviewableSuggestionEmailContentInfo). A list of reviewable
-            suggestion email content info objects that represent suggestions
-            that have been waiting too long for review. Each object contains the
-            type of the suggestion, the language of the suggestion, the
-            suggestion content (question/translation), and the date that the
-            suggestion was submitted for review. The objects are sorted in
+            list(ReviewableSuggestionEmailContentInfo). A list of suggestion
+            email content info objects that represent suggestions
+            that have been waiting too long for review to notify the admins
+            about. Each object contains includes the suggestion type, language,
+            content and review submission date. The objects are sorted in
             descending order based on review wait time.
     """
+    email_subject = (
+        NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_INFO[
+            'email_subject'])
+    email_body_template = (
+        NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_INFO[
+            'email_body_template'])
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not (
+        config_domain
+        .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED.value):
+        log_new_error(
+            'Notifying admins that there are Contributor Dashboard suggestions '
+            'that have been waiting too long for review must be enabled on '
+            'the config page in order to send the admins the emails.'
+        )
+        return
+
+    if not reviewable_suggestion_email_infos:
+        log_new_error(
+            'There were no Contributor Dashboard suggestions that were waiting '
+            'too long for a review.')
+        return
+
+    if not admin_ids:
+        log_new_error(
+            'No admins to notify that Contributor Dashboard suggestions have '
+            'waited too long for review.')
+        return
+
+    suggestions_to_notify_admin_html_strings = []
+    # Get the html for the list of suggestions that have been waiting too long
+    # for a review.
+    for reviewable_suggestion_email_info in reviewable_suggestion_email_infos:
+        suggestions_to_notify_admin_html_strings.append(
+            _create_html_for_reviewable_suggestion_email_info(
+                reviewable_suggestion_email_info))
+
+    suggestions_to_notify_admin_html = ''.join(
+        suggestions_to_notify_admin_html_strings)
+
+    # Get the emails and usernames of the admins.
+    admin_user_settings = user_services.get_users_settings(admin_ids)
+    admin_usernames, admin_emails = list(python_utils.ZIP(*[
+        (admin_user_setting.username, admin_user_setting.email)
+        if admin_user_setting is not None else (None, None)
+        for admin_user_setting in admin_user_settings
+    ]))
+
+    send_email_infos = []
+    for index, admin_id in enumerate(admin_ids):
+        if not admin_emails[index]:
+            log_new_error(
+                'There was no email for the given admin id: %s.' % admin_id)
+            continue
+        else:
+            email_body = email_body_template % (
+                admin_usernames[index], feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL,
+                suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
+                suggestions_to_notify_admin_html) 
+
+            _send_email(
+                admin_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+                recipient_email=admin_emails[index])
 
 
 def send_mail_to_notify_admins_reviewers_needed(
@@ -1425,8 +1470,8 @@ def send_mail_to_notify_admins_reviewers_needed(
                 '<li><b>%s</b></li>' % (
                     utils.get_supported_audio_language_description(
                         language_code)) for language_code in
-                        suggestion_types_need_more_reviewers[
-                            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT]
+                suggestion_types_need_more_reviewers[
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT]
             ]
         )
         suggestion_types_need_reviewers_html_list.append(
@@ -1444,7 +1489,7 @@ def send_mail_to_notify_admins_reviewers_needed(
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION])
 
     suggestion_types_need_reviewers_html = ''.join(
-        suggestion_types_need_reviewers_html_list)   
+        suggestion_types_need_reviewers_html_list)
 
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
@@ -1519,7 +1564,6 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         for reviewer_user_setting in reviewer_user_settings
     ]))
 
-    send_email_infos = []
     for index, reviewer_id in enumerate(reviewer_ids):
         if not reviewers_suggestion_email_infos[index]:
             log_new_error(
@@ -1535,39 +1579,9 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             list_of_suggestions_to_notify_reviewer_strings = []
             for reviewer_suggestion_email_info in (
                     reviewers_suggestion_email_infos[index]):
-                # Get the language of the suggestion.
-                language = utils.get_supported_audio_language_description(
-                    reviewer_suggestion_email_info.language_code)
-                # Calculate how long the suggestion has been waiting for review.
-                suggestion_review_wait_time = (
-                    datetime.datetime.utcnow() - (
-                        reviewer_suggestion_email_info.submission_datetime))
-                # Get a string composed of the largest time unit that has a
-                # value, followed by that time unit. For example, if the
-                # suggestion had been waiting for review for 5 days and 2 hours,
-                # '5 days' would be returned. This is more user friendly since a
-                # high level of precision is not needed.
-                human_readable_review_wait_time = (
-                    utils.create_string_from_largest_unit_in_timedelta(
-                        suggestion_review_wait_time))
-                values_to_populate_suggestion_template_dict = {
-                    'language': language,
-                    'review_wait_time': human_readable_review_wait_time,
-                    'suggestion_content': (
-                        reviewer_suggestion_email_info.suggestion_content)
-                }
-                get_values_to_populate_suggestion_template = (
-                    NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-                        'suggestion_template_values_getter_functions'][
-                            reviewer_suggestion_email_info.suggestion_type])
-                suggestion_template = (
-                    NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
-                        'suggestion_template'][
-                            reviewer_suggestion_email_info.suggestion_type])
                 list_of_suggestions_to_notify_reviewer_strings.append(
-                    suggestion_template % (
-                        get_values_to_populate_suggestion_template(
-                            values_to_populate_suggestion_template_dict)))
+                    _create_html_for_reviewable_suggestion_email_info(
+                        reviewer_suggestion_email_info))
 
             email_body = email_body_template % (
                 reviewer_usernames[index], feconf.OPPIA_SITE_URL,
@@ -1575,13 +1589,11 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     list_of_suggestions_to_notify_reviewer_strings),
                 EMAIL_FOOTER.value)
 
-            send_email_infos.append(email_domain.SendEmailInfo(
+            _send_email(
                 reviewer_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                reviewer_emails[index]))
-
-    _send_emails(send_email_infos)
+                recipient_email=reviewer_emails[index])
 
 
 def send_accepted_voiceover_application_email(

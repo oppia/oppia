@@ -38,6 +38,7 @@ import python_utils
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
         [models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user]))
+transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -132,6 +133,11 @@ def create_suggestion(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
         None, change, score_category, thread_id, suggestion.language_code)
+
+    # Update the community contribution stats so that the number of suggestions
+    # of this type that are in review increases by one.
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], 1)
+
     return get_suggestion_by_id(thread_id)
 
 
@@ -359,6 +365,11 @@ def accept_suggestion(
 
     _update_suggestion(suggestion)
 
+    # Update the community contribution stats so that the number of suggestions
+    # of this type that are in review decreases by one, since this
+    # suggestion is no longer in review.
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], -1)
+
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
@@ -444,6 +455,11 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
 
     _update_suggestions(suggestions)
 
+    # Update the community contribution stats so that the number of suggestions
+    # that are in review decreases, since these suggestions are no longer in
+    # review.
+    _update_suggestion_counts_in_community_contribution_stats(suggestions, -1)
+
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message
@@ -523,6 +539,11 @@ def resubmit_rejected_suggestion(
     suggestion.change = change
     suggestion.set_suggestion_status_to_in_review()
     _update_suggestion(suggestion)
+
+    # Update the community contribution stats so that the number of suggestions
+    # of this type that are in review increases by one, since this suggestion is
+    # now back in review.
+    _update_suggestion_counts_in_community_contribution_stats([suggestion], 1)
 
     feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
@@ -626,8 +647,8 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def _get_plain_text_from_html_content_string(html_content_string):
     """Retrieves the plain text from the given html content string. RTE element
-    occurrences in the html are replaced by their corresponding rte tool name,
-    capitalized in square brackets.
+    occurrences in the html are replaced by their corresponding rte component
+    name, capitalized in square brackets.
     eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
         Sample2 </p> will give as output: Sample1 [Math] Sample2.
     Note: similar logic exists in the frontend in format-rte-preview.filter.ts.
@@ -642,7 +663,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
 
     def _replace_rte_tag(rte_tag):
         """Replaces all of the <oppia-noninteractive-**> tags with their
-        corresponding rte tool name in square brackets.
+        corresponding rte component name in square brackets.
 
         Args:
             rte_tag: MatchObject. A matched object that contins the
@@ -654,25 +675,26 @@ def _get_plain_text_from_html_content_string(html_content_string):
         # Retrieve the matched string from the MatchObject.
         rte_tag_string = rte_tag.group(0)
         # Get the name of the rte tag. The hyphen is there as an optional
-        # matching character to cover the case where the name of the rte tool
-        # is more than one word.
+        # matching character to cover the case where the name of the rte
+        # component is more than one word.
         rte_tag_name = re.search(
             r'oppia-noninteractive-(\w|-)+', rte_tag_string)
         # Retrieve the matched string from the MatchObject.
         rte_tag_name_string = rte_tag_name.group(0)
-        # Get the name of the rte tool.
-        rte_tool_name_string = rte_tag_name_string.split('-')[2:]
-        # If the tool name is more than word, connect the words with spaces
+        # Get the name of the rte component.
+        rte_component_name_string = rte_tag_name_string.split('-')[2:]
+        # If the component name is more than word, connect the words with spaces
         # to create a single string.
-        rte_tool_name_string = ' '.join(rte_tool_name_string)
+        rte_component_name_string = ' '.join(rte_component_name_string)
         # Captialize each word in the string.
-        capitalized_rte_tool_name_string = rte_tool_name_string.title()
-        formatted_rte_tool_name_string = ' [%s] ' % (
-            capitalized_rte_tool_name_string)
-        return formatted_rte_tool_name_string
+        capitalized_rte_component_name_string = (
+            rte_component_name_string.title())
+        formatted_rte_component_name_string = ' [%s] ' % (
+            capitalized_rte_component_name_string)
+        return formatted_rte_component_name_string
 
-    # Replace all the <oppia-noninteractive-**> tags with their rte tool names
-    # capitalized in square brackets.
+    # Replace all the <oppia-noninteractive-**> tags with their rte component
+    # names capitalized in square brackets.
     html_content_string_with_rte_tags_replaced = re.sub(
         r'<(oppia-noninteractive-.+?)[^>]+>(.*?)</oppia-noninteractive-.+?>',
         _replace_rte_tag, html_content_string)
@@ -857,7 +879,7 @@ def get_submitted_suggestions(user_id, suggestion_type):
 def get_suggestions_waiting_too_long_for_review_info():
     """Gets the information about the suggestions that have been waiting longer
     than suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days
-    for review on the Contributor Dashboard. There can be information about at
+    for a review on the Contributor Dashboard. There can be information about at
     most suggestion_models.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN suggestions.
     The information about the suggestions are returned in descending order by
     the suggestion's review wait time.
@@ -865,8 +887,8 @@ def get_suggestions_waiting_too_long_for_review_info():
     Returns:
         list(ReviewableSuggestionEmailContentInfo). A list of reviewable
         suggestion email content info objects that represent suggestions that
-        have been waiting too long for review. Each object contains the type of
-        the suggestion, the language of the suggestion, the suggestion content
+        have been waiting too long for a review. Each object contains the type
+        of the suggestion, the language of the suggestion, the suggestion content
         (question/translation), and the date that the suggestion was submitted
         for review. The objects are sorted in descending order based on review
         wait time.
@@ -1140,7 +1162,7 @@ def get_suggestion_types_that_need_reviewers():
                     suggestion_types_need_more_reviewers):
                 suggestion_types_need_more_reviewers[
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT].add(
-                                language_code)
+                        language_code)
             else:
                 suggestion_types_need_more_reviewers[
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = {
@@ -1152,3 +1174,62 @@ def get_suggestion_types_that_need_reviewers():
                 constants.DEFAULT_LANGUAGE_CODE}
 
     return suggestion_types_need_more_reviewers
+
+
+def _update_suggestion_counts_in_community_contribution_stats_transactional(
+        suggestions, amount):
+    """Updates the community contribution stats counts associated with the given
+    suggestions by the given amount. Note that this method should only ever be
+    called in a transaction.
+
+    Args:
+        suggestions: list(Suggestion). Suggestions that may update the counts
+            stored in the community contribution stats model. Only suggestion
+            types that are tracked in the community contribution stats model
+            trigger count updates.
+        amount: int. The amount to adjust the counts by.
+    """
+    stats_model = suggestion_models.CommunityContributionStatsModel.get()
+    for suggestion in suggestions:
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if suggestion.language_code not in (
+                    stats_model.translation_suggestion_counts_by_lang_code):
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code] = amount
+            else:
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    suggestion.language_code] += amount
+                # Remove the language code from the dict if the count reaches
+                # zero.
+                if stats_model.translation_suggestion_counts_by_lang_code[
+                        suggestion.language_code] == 0:
+                    del stats_model.translation_suggestion_counts_by_lang_code[
+                        suggestion.language_code]
+        elif suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            stats_model.question_suggestion_count += amount
+
+    # Create a community contribution stats object to validate the updates.
+    stats = create_community_contribution_stats_from_model(stats_model)
+    stats.validate()
+
+    stats_model.put()
+
+
+def _update_suggestion_counts_in_community_contribution_stats(
+        suggestions, amount):
+    """Updates the community contribution stats counts associated with the given
+    suggestions by the given amount. The GET and PUT is done in a single
+    transaction to avoid loss of updates that come in rapid succession.
+
+    Args:
+        suggestions: list(Suggestion). Suggestions that may update the counts
+            stored in the community contribution stats model. Only suggestion
+            types that are tracked in the community contribution stats model
+            trigger count updates.
+        amount: int. The amount to adjust the counts by.
+    """
+    transaction_services.run_in_transaction(
+        _update_suggestion_counts_in_community_contribution_stats_transactional,
+        suggestions, amount)

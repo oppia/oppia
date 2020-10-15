@@ -257,14 +257,14 @@ class CronMailContributorDashboardReviewerOpportunitiesHandler(
 
 class CronMailAdminContributorDashboardReviewIssuesHandler(
         base.BaseHandler):
-    """Handler for mailing admins if there are issues creating a longer
+    """Handler for mailing admins if there are issues that are causing a longer
     reviewer turnaround time on the Contributor Dashboard.
-    """ 
+    """
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Sends each admin up to two emails: an email to alert the admins that
-        there are suggestion types that need more reviewers and/or an email 
+        there are suggestion types that need more reviewers and/or an email
         to alert the admins that specific suggestions have been waiting too long
         to get reviewed.
         """
@@ -273,9 +273,24 @@ class CronMailAdminContributorDashboardReviewIssuesHandler(
             if config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
                 admin_ids = user_services.get_user_ids_by_role(
                     feconf.ROLE_ID_ADMIN)
-                suggestion_types_that_need_reviewers = (
+                suggestion_types_need_reviewers = (
                     suggestion_services
                     .get_suggestion_types_that_need_reviewers()
                 )
                 email_manager.send_mail_to_notify_admins_reviewers_needed(
-                    admin_ids, suggestion_types_need_more_reviewers)
+                    admin_ids, suggestion_types_need_reviewers)
+            if (
+                    config_domain
+                    .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED
+                    .value):
+                admin_ids = user_services.get_user_ids_by_role(
+                    feconf.ROLE_ID_ADMIN)
+                suggestions_waiting_too_long_for_review_info = (
+                    suggestion_services
+                    .get_suggestions_waiting_too_long_for_review_info()
+                )
+                (
+                    email_manager
+                    .send_mail_to_notify_admins_suggestions_waiting_too_long(
+                        admin_ids, suggestions_waiting_too_long_for_review_info)
+                )

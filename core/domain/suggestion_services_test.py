@@ -1768,17 +1768,25 @@ class ReviewableSuggestionEmailInfoUnitTests(
             self):
         edit_state_content_suggestion = (
             self._create_edit_state_content_suggestion())
+        # Mocking the SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS dict in
+        # suggestion services so that this test still passes if the
+        # "edit state content" suggestion type is added to the Contributor
+        # Dashboard in the future.
+        suggestion_emphasized_text_getter_functions_mock = {}
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected suggestion type to be offered on the Contributor '
-            'Dashboard, received: %s.' % (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
-            (
-                suggestion_services
-                .create_reviewable_suggestion_email_info_from_suggestion(
-                    edit_state_content_suggestion)
-            )
+        with self.swap(
+            suggestion_services, 'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS',
+            suggestion_emphasized_text_getter_functions_mock):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Expected suggestion type to be offered on the Contributor '
+                'Dashboard, received: %s.' % (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
+                (
+                    suggestion_services
+                    .create_reviewable_suggestion_email_info_from_suggestion(
+                        edit_state_content_suggestion)
+                )
 
     def test_contributor_suggestion_types_are_in_suggestion_text_getter_dict(
             self):
@@ -2879,6 +2887,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
     stats.
+
     TODO(#10957): It is currently not possible to resubmit a rejected
     translation suggestion for review. As a result, there isn't a test for
     that case in this test class. If the functionality is added, a new test
@@ -3386,17 +3395,17 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         test_utils.GenericTestBase):
     """Test the ability of the
-    get_suggestions_waiting_too_long_for_review_info_info_for_admins_info_for_admins method
-    in suggestion services, which is used to retrieve the information required
-    to notify admins if there are suggestions that have waited longer than
-    suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for
-    review.
+    get_suggestions_waiting_too_long_for_review_info method in suggestion
+    services, which is used to retrieve the information required to notify
+    admins if there are suggestions that have waited longer than
+    suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for a
+    review on the Contributor Dashboard.
     """
 
     target_id = 'exp1'
     skill_id = 'skill_123456'
     language_code = 'en'
-    AUTHOR_EMAIL = 'author1@example.com'
+    AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
     REVIEWER_2_EMAIL = 'reviewer2@community.org'
     COMMIT_MESSAGE = 'commit message'
@@ -3543,12 +3552,12 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         with self.swap(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 1):
-            suggestions_waiting_too_long_for_review = (
+            suggestions_waiting_too_long_for_review_info= (
                 suggestion_services
                 .get_suggestions_waiting_too_long_for_review_info()
             )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
+        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 0)
 
     def test_get_returns_empty_if_suggestions_have_waited_less_than_threshold(
             self):
@@ -3565,12 +3574,12 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
-                suggestions_waiting_too_long_for_review = (
+                suggestions_waiting_too_long_for_review_info= (
                     suggestion_services
                     .get_suggestions_waiting_too_long_for_review_info()
                 )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
+        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 0)
 
     def test_get_returns_empty_if_suggestions_have_waited_threshold_review_time(
             self):
@@ -3587,19 +3596,20 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
-                suggestions_waiting_too_long_for_review = (
+                suggestions_waiting_too_long_for_review_info= (
                     suggestion_services
                     .get_suggestions_waiting_too_long_for_review_info()
                 )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
+        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 0)
 
     def test_get_returns_suggestion_waited_long_if_their_wait_is_past_threshold(
             self):
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             translation_suggestion = self._create_translation_suggestion()
         # Give the question suggestion a slightly different review submission
-        # time so that the suggestions are not indistinguishable.
+        # time so that the suggestions are not indistinguishable, in terms of
+        # their review submission time.
         with self.mock_datetime_utcnow(
             self.mocked_datetime_utcnow + datetime.timedelta(minutes=5)):
             question_suggestion = self._create_question_suggestion()
@@ -3653,8 +3663,8 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 )
 
         # The question suggestion was created 2 days after the translation
-        # suggestion, so it has only waited 1 day for review, which is less than
-        # 3, the mocked review wait time threshold. Therefore, only the
+        # suggestion, so it has only waited 1 day for a review, which is less
+        # than 3, the mocked review wait time threshold. Therefore, only the
         # translation suggestion has waited too long for review.
         self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 1)
         self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
@@ -3662,35 +3672,93 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             expected_suggestion_email_infos
         )
 
-class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
+
+class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
     """Tests for the get_suggestion_types_that_need_reviewers method."""
 
     sample_language_code = 'en'
+    target_id = 'exp1'
+    skill_id = 'skill_123456'
+    language_code = 'en'
+    AUTHOR_EMAIL = 'author@example.com'
+    REVIEWER_EMAIL = 'reviewer@community.org'
 
-    def _assert_community_contribution_stats_model_is_in_default_state(
-            self, community_contribution_stats_model):
-        """Checks if the community contribution stats model is in its default
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>'
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description'
+        )
+
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
+        add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': self.skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_question_change_dict,
+            'test description'
+        )
+
+    def _assert_community_contribution_stats_is_in_default_state(self):
+        """Checks if the community contribution stats is in its default
         state.
         """
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats())
         self.assertEqual(
             (
-                community_contribution_stats_model
+                community_contribution_stats
                 .translation_reviewer_counts_by_lang_code
             ), {})
         self.assertEqual(
             (
-                community_contribution_stats_model
+                community_contribution_stats
                 .translation_suggestion_counts_by_lang_code
             ), {})
         self.assertEqual(
-            community_contribution_stats_model.question_reviewer_count, 0)
+            community_contribution_stats.question_reviewer_count, 0)
         self.assertEqual(
-            community_contribution_stats_model.question_suggestion_count, 0)
+            community_contribution_stats.question_suggestion_count, 0)
 
-    def test_get_returns_no_reviewers_needed_for_any_suggestion_types(self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
+    def setUp(self):
+        super(
+            GetSuggestionTypesThatNeedReviewersUnitTests,
+            self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
+
+    def test_get_returns_no_reviewers_needed_if_no_suggestions_exist(self):
+        self._assert_community_contribution_stats_is_in_default_state()
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -3698,11 +3766,14 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
         self.assertDictEqual(suggestion_types_need_reviewers, {})
 
     def test_get_returns_question_reviewers_needed(self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.question_suggestion_count = 1
-        stats_model.put()
+        self._create_question_suggestion()
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 1)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -3714,13 +3785,16 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
 
     def test_get_returns_translations_need_more_reviewers_for_one_lang_code(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            self.sample_language_code: 1
-        }
-        stats_model.put()
+        self._create_translation_suggestion_with_language_code(
+            self.sample_language_code)
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {
+                self.sample_language_code: 1})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -3732,12 +3806,16 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
 
     def test_get_returns_translations_need_more_reviewers_for_mutli_lang_code(
             self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            'en': 1, 'fr': 1}
-        stats_model.put()
+        self._create_translation_suggestion_with_language_code('en')
+        self._create_translation_suggestion_with_language_code('fr')
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {
+                'en': 1, 'fr': 1})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -3747,18 +3825,26 @@ class GetSuggestionTypesThatNeedMoreReviewers(test_utils.GenericTestBase):
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'}})
 
     def test_get_returns_translations_and_questions_need_more_reviewers(self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        self._assert_community_contribution_stats_model_is_in_default_state(
-            stats_model)
-        stats_model.translation_suggestion_counts_by_lang_code = {'en': 1, 'fr': 1}
-        stats_model.question_suggestion_count = 1
-        stats_model.put()
+        self._create_question_suggestion()
+        self._create_translation_suggestion_with_language_code('en')
+        self._create_translation_suggestion_with_language_code('fr')
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 1)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code,
+            {'en': 1, 'fr': 1})
 
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
             suggestion_types_need_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'},
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
-                constants.DEFAULT_LANGUAGE_CODE}})
+            {
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                    'en', 'fr'},
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
+                    constants.DEFAULT_LANGUAGE_CODE}
+            })

@@ -27,7 +27,8 @@ import feconf
 import python_utils
 import schema_utils
 
-(config_models,) = models.Registry.import_models([models.NAMES.config])
+(config_models, suggestion_models,) = models.Registry.import_models(
+    [models.NAMES.config, models.NAMES.suggestion])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
@@ -464,6 +465,15 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED = ConfigProperty(
         'about suggestions that need review. The default value is false.'
     ), False)
 
+NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED = ConfigProperty(
+    'notify_admins_suggestions_waiting_too_long_is_enabled', BOOL_SCHEMA,
+    (
+        'Enable sending admins email notifications if there are Contributor '
+        'Dashboard suggestions that have been waiting for a review for more '
+        'than %s days. The default value is false.' % (
+            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
+    ), False)
+
 NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED = ConfigProperty(
     'notify_admins_reviewers_needed_is_enabled', BOOL_SCHEMA,
     (
@@ -477,5 +487,5 @@ MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
     FLOAT_SCHEMA,
     'The maximum number of Contributor Dashboard suggestions per reviewer. If '
     'the number of suggestions per reviewer surpasses this maximum, for any '
-    'given suggestion type, the admins are notified by email.', 5.0)
-
+    'given suggestion type on the dashboard, the admins are notified by email.',
+    5.0)

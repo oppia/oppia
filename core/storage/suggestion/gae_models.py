@@ -107,9 +107,9 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
     THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
 
 # Threshold number of days after which to notify the admin that the
-# suggestion has waited too long for review. The admin will be notified of the
+# suggestion has waited too long for a review. The admin will be notified of the
 # top MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN number of suggestions that have
-# waited for review longer than the threshold number of days.
+# waited for a review longer than the threshold number of days.
 SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS = 7
 
 # The maximum number of suggestions, that have been waiting too long for review,
@@ -331,7 +331,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_suggestions_waiting_too_long_for_review(cls):
-        """Returns a list of suggestions that have been waiting for review
+        """Returns a list of suggestions that have been waiting for a review
         longer than SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days on the
         Contributor Dashboard. MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN
         suggestions are returned, sorted in descending order by their review

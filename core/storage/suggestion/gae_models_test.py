@@ -410,7 +410,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.GeneralSuggestionModel
                 .get_all_stale_suggestion_ids()), 0)
 
-    def test_get_long_review_wait_suggestions_raises_if_suggestion_types_empty(
+    def test_get__suggestions_waiting_too_long_raises_if_suggestion_types_empty(
             self):
         with self.swap(
             suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
@@ -423,7 +423,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                     .get_suggestions_waiting_too_long_for_review()
                 )
 
-    def test_get_long_review_wait_suggestions_if_not_contributor_suggestion(
+    def test_get_suggestions_waiting_too_long_if_not_contributor_suggestion(
             self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -449,7 +449,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
-    def test_get_long_review_wait_suggestions_returns_empty_if_neg_timedelta(
+    def test_get_suggestions_waiting_too_long_returns_empty_if_neg_timedelta(
             self):
         suggestion_models.GeneralSuggestionModel.create(
         suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -470,7 +470,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
-    def test_get_long_review_wait_suggestions_if_suggestions_waited_less_limit(
+    def test_get_suggestions_waiting_too_long_if_suggestions_waited_less_limit(
             self):
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             suggestion_models.GeneralSuggestionModel.create(
@@ -497,7 +497,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
-    def test_get_long_review_wait_suggestions_if_suggestion_waited_limit(
+    def test_get_suggestions_waiting_too_long_if_suggestion_waited_limit(
             self):
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
             suggestion_models.GeneralSuggestionModel.create(
@@ -525,7 +525,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
-    def test_get_long_review_wait_suggestions_if_suggestion_waited_past_limit(
+    def test_get_suggestions_waiting_too_long_if_suggestion_waited_past_limit(
             self):
         suggestion_models.GeneralSuggestionModel.create(
         suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -545,7 +545,50 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 1)
 
-    def test_get_long_review_wait_suggestions_returns_in_correct_wait_order(
+    def test_get_suggestions_waiting_too_long_with_diff_review_wait_times(
+            self):
+        with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
+            suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
+        with self.mock_datetime_utcnow(
+            self.mocked_datetime_utcnow + datetime.timedelta(days=2)):
+            suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            'skill1.thread1', self.question_language_code)
+        mocked_threshold_review_wait_time_in_days = 3
+        mocked_datetime_past_review_wait_time_threshold = (
+            self.mocked_datetime_utcnow + datetime.timedelta(days=4))
+
+        with self.mock_datetime_utcnow(
+            mocked_datetime_past_review_wait_time_threshold):
+            with self.swap(
+                suggestion_models,
+                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
+                mocked_threshold_review_wait_time_in_days):
+                suggestions_waiting_too_long_for_review = (
+                suggestion_models.GeneralSuggestionModel
+                .get_suggestions_waiting_too_long_for_review()
+            )
+
+        # The question suggestion was created 2 days after the translation
+        # suggestion, so it has only waited 1 day for a review, which is less
+        # than 3, the mocked review wait time threshold. Therefore, only the
+        # translation suggestion has waited too long for a review.
+        self.assertEqual(len(suggestions_waiting_too_long_for_review), 1)
+        self.assertEqual(
+            suggestions_waiting_too_long_for_review[0].id,
+            'exploration.exp1.thread1')
+
+    def test_get_suggestions_waiting_too_long_returns_in_correct_wait_order(
             self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,

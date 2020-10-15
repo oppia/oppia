@@ -28,6 +28,7 @@ from core.domain import config_services
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import exp_domain
+from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
@@ -481,6 +482,74 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
 class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
         test_utils.GenericTestBase):
 
+    target_id = 'exp1'
+    skill_id = 'skill_123456'
+    language_code = 'en'
+    AUTHOR_EMAIL = 'author@example.com'
+
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>'
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description'
+        )
+
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
+        add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': self.skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_question_change_dict,
+            'test description'
+        )
+
+    def _assert_reviewable_suggestion_email_infos_are_equal(
+            self, reviewable_suggestion_email_info,
+            expected_reviewable_suggestion_email_info):
+        """Asserts that the reviewable suggestion email info is equal to the
+        expected reviewable suggestion email info.
+        """
+        self.assertEqual(
+            reviewable_suggestion_email_info.suggestion_type,
+            expected_reviewable_suggestion_email_info.suggestion_type)
+        self.assertEqual(
+            reviewable_suggestion_email_info.language_code,
+            expected_reviewable_suggestion_email_info.language_code)
+        self.assertEqual(
+            reviewable_suggestion_email_info.suggestion_content,
+            expected_reviewable_suggestion_email_info.suggestion_content)
+        self.assertEqual(
+            reviewable_suggestion_email_info.submission_datetime,
+            expected_reviewable_suggestion_email_info.submission_datetime)
+
     def _mock_send_mail_to_notify_admins_reviewers_needed(
             self, admin_ids, suggestion_types_need_reviewers):
         """Mocks
@@ -488,24 +557,53 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
-        self.admin = admin_ids
+        self.admin_ids = admin_ids
         self.suggestion_types_need_reviewers = suggestion_types_need_reviewers
+
+    def _mock_send_mail_to_notify_admins_suggestions_waiting(
+            self, admin_ids, reviewable_suggestion_email_infos):
+        """Mocks
+        email_manager.send_mail_to_notify_admins_suggestions_waiting_too_long as
+        it's not possible to send mail with self.testapp_swap, i.e with the URLs
+        defined in main_cron.
+        """
+        self.admin_ids = admin_ids
+        self.reviewable_suggestion_email_infos = (
+            reviewable_suggestion_email_infos)
 
     def setUp(self):
         super(
             CronMailAdminContributorDashboardReviewIssuesHandlerTests,
-                self).setUp()
+            self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        # This sets the role of the user to admin.f
+        # This sets the role of the user to admin.
         self.set_admins([self.ADMIN_USERNAME])
+
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
+        suggestion_1 = (
+            self._create_translation_suggestion_with_language_code('en'))
+        suggestion_2 = (
+            self._create_translation_suggestion_with_language_code('fr'))
+        suggestion_3 = self._create_question_suggestion()
+        self.expected_reviewable_suggestion_email_infos = [
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion
+                )
+            ) for suggestion in [suggestion_1, suggestion_2, suggestion_3]
+        ]
         self.expected_suggestion_types_need_reviewers = {
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}
         }
-        
+
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
         self.testapp_swap = self.swap(
@@ -513,19 +611,47 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
 
         self.admin_ids = []
         self.suggestion_types_need_reviewers = {}
+        self.reviewable_suggestion_email_infos = []
 
-    def test_email_not_sent_if_notifying_admins_reviewers_needed_is_not_enabled(
+    def test_email_not_sent_if_sending_emails_is_disabled(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+        config_services.set_property(
+            'committer_id',
+            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+
+        with self.cannot_send_emails, self.testapp_swap:
+            with self.swap(
+                email_manager,
+                'send_mail_to_notify_admins_reviewers_needed',
+                self._mock_send_mail_to_notify_admins_reviewers_needed):
+                with self.swap(
+                    email_manager,
+                    'send_mail_to_notify_admins_suggestions_waiting_too_long',
+                    self._mock_send_mail_to_notify_admins_suggestions_waiting):
+                    with self.swap(
+                        suggestion_models,
+                        'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                        self.get_html_response(
+                            '/cron/mail/admins/'
+                            'contributor_dashboard_review_issues')
+
+        self.assertEqual(len(self.admin_ids), 0)
+        self.assertEqual(len(self.reviewable_suggestion_email_infos), 0)
+        self.assertDictEqual(self.suggestion_types_need_reviewers, {})
+
+    def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
-                config_services.set_property(
-                    'committer_id',
-                    'notify_admins_reviewers_needed_is_enabled', False)
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_review_issues')
 
@@ -534,19 +660,23 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
 
         self.logout()
 
-    def test_email_not_sent_if_sending_emails_is_not_enabled(self):
+    def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
+            self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id',
+            'notify_admins_suggestions_waiting_too_long_is_enabled', False)
 
-        with self.cannot_send_emails, self.testapp_swap:
+        with self.can_send_emails, self.testapp_swap:
             with self.swap(
-                email_manager,
-                'send_mail_to_notify_admins_reviewers_needed',
-                self._mock_send_mail_to_notify_admins_reviewers_needed):
-                config_services.set_property(
-                    'committer_id',
-                    'notify_admins_reviewers_needed_is_enabled', True)
-                self.get_html_response(
-                    '/cron/mail/admins/contributor_dashboard_review_issues')
+                suggestion_models,
+                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                with self.swap(
+                    email_manager,
+                    'send_mail_to_notify_admins_suggestions_waiting_too_long',
+                    self._mock_send_mail_to_notify_admins_suggestions_waiting):
+                    self.get_html_response(
+                        '/cron/mail/admins/contributor_dashboard_review_issues')
 
         self.assertEqual(len(self.admin_ids), 0)
         self.assertDictEqual(self.suggestion_types_need_reviewers, {})
@@ -556,27 +686,52 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
     def test_email_sent_to_admin_if_sending_admin_need_reviewers_emails_enabled(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
-                config_services.set_property(
-                    'committer_id',
-                    'notify_admins_reviewers_needed_is_enabled', True)
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_review_issues')
-
-        self.assertEqual(len(self.admin_ids), 0)
-        self.assertDictEqual(self.suggestion_types_need_reviewers, {})
-
 
         self.assertEqual(len(self.admin_ids), 1)
         self.assertEqual(self.admin_ids[0], self.admin_id)
         self.assertDictEqual(
             self.suggestion_types_need_reviewers,
             self.expected_suggestion_types_need_reviewers)
+
+    def test_email_sent_to_admin_if_notifying_admins_about_suggestions_enabled(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id',
+            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+
+        with self.can_send_emails, self.testapp_swap:
+            with self.swap(
+                suggestion_models,
+                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                with self.swap(
+                    email_manager,
+                    'send_mail_to_notify_admins_suggestions_waiting_too_long',
+                    self._mock_send_mail_to_notify_admins_suggestions_waiting):
+                    self.get_html_response(
+                        '/cron/mail/admins/contributor_dashboard_review_issues')
+
+        self.assertEqual(len(self.admin_ids), 1)
+        self.assertEqual(self.admin_ids[0], self.admin_id)
+        self.assertEqual(
+            len(self.reviewable_suggestion_email_infos),
+            len(self.expected_reviewable_suggestion_email_infos))
+        for index, reviewable_suggestion_email_info in enumerate(
+                self.reviewable_suggestion_email_infos):
+            self._assert_reviewable_suggestion_email_infos_are_equal(
+                reviewable_suggestion_email_info,
+                self.expected_reviewable_suggestion_email_infos[index]
+            )
 
 
 class JobModelsCleanupManagerTests(test_utils.GenericTestBase):
