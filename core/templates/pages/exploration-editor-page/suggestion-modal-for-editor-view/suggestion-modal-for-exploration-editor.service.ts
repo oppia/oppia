@@ -34,13 +34,13 @@ require('services/suggestion-modal.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
-  '$log', '$uibModal', 'ExplorationDataService',
+  '$log', '$rootScope', '$uibModal', 'ExplorationDataService',
   'ExplorationStatesService', 'RouterService',
   'StateEditorRefreshService', 'StateObjectFactory',
   'SuggestionModalService', 'ThreadDataBackendApiService',
   'UrlInterpolationService',
   function(
-      $log, $uibModal, ExplorationDataService,
+      $log, $rootScope, $uibModal, ExplorationDataService,
       ExplorationStatesService, RouterService,
       StateEditorRefreshService, StateObjectFactory,
       SuggestionModalService, ThreadDataBackendApiService,
@@ -95,6 +95,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               });
               StateEditorRefreshService.onRefreshStateEditor.emit();
             }
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$apply();
           },
           () => $log.error('Error resolving suggestion'));
       },
