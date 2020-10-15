@@ -630,10 +630,16 @@ class CleanUpUserContributionsModelOneOffJob(
         yield (key, values)
 
 
-class VerifyProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that verifies various aspects of profile_picture_data_url in the
     UserSettingsModel.
     """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(ProfilePictureAuditOneOffJob, cls).enqueue(job_id, shard_count=32)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -676,7 +682,7 @@ class VerifyProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 width != user_services.GRAVATAR_SIZE_PX
         ):
             yield (
-                'PROFILE PICTURE NON-STANDART DIMENSIONS - %s,%s' % (
+                'PROFILE PICTURE NON STANDARD DIMENSIONS - %s,%s' % (
                     height, width
                 ),
                 model.id
