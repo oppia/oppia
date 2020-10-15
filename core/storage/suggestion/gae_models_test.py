@@ -566,7 +566,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         translation_suggestion_models = (
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+            .get_translation_suggestions_waiting_longest_for_review(
                 self.translation_language_code
             )
         )
@@ -584,7 +584,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         translation_suggestion_models_with_different_lang_code = (
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+            .get_translation_suggestions_waiting_longest_for_review(
                 'fr'
             )
         )
@@ -599,7 +599,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self):
         translation_suggestion_models = (
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+            .get_translation_suggestions_waiting_longest_for_review(
                 'wrong_language_code'
             )
         )
@@ -628,7 +628,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS', 1):
             translation_suggestion_models = (
                 suggestion_models.GeneralSuggestionModel.
-                get_translation_suggestions_waiting_longest_for_review_per_lang(
+                get_translation_suggestions_waiting_longest_for_review(
                     self.translation_language_code)
             )
 
