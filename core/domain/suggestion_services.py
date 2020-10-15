@@ -288,9 +288,11 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
 
-    suggestion_models.GeneralSuggestionModel.put_multi(
+    suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update,
         update_last_updated_time=update_last_updated_time)
+    suggestion_models.GeneralSuggestionModel.put_multi(
+        suggestion_models_to_update)
 
 
 def get_commit_message_for_suggestion(author_username, commit_message):
@@ -911,6 +913,7 @@ def _update_user_proficiency(user_proficiency):
             user_proficiency.onboarding_email_sent
         )
 
+        user_proficiency_model.update_timestamps()
         user_proficiency_model.put()
 
     else:
@@ -1146,6 +1149,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
     stats = create_community_contribution_stats_from_model(stats_model)
     stats.validate()
 
+    stats_model.update_timestamps()
     stats_model.put()
 
 

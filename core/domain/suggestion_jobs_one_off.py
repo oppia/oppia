@@ -167,7 +167,8 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         item.id, e))
                 return
             item.change_cmd = suggestion.change.to_dict()
-            item.put(update_last_updated_time=False)
+            item.update_timestamps(update_last_updated_time=False)
+            item.put()
             yield ('suggestion_migrated', 1)
 
     @staticmethod
@@ -232,6 +233,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
                     item.id, e))
             return
         item.language_code = suggestion.language_code
+        item.update_timestamps()
         item.put()
         yield ('%s_suggestion_migrated' % item.suggestion_type, item.id)
 
@@ -333,6 +335,7 @@ class PopulateContributionStatsOneOffJob(
                     .translation_suggestion_counts_by_lang_code[language_code]
                 ) = len(values)
 
+        stats_model.update_timestamps()
         stats_model.put()
 
         yield (key, len(values))

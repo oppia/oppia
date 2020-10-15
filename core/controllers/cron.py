@@ -193,6 +193,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
                 if pipeline_id in pipeline_id_to_job_instance:
                     job_instance = pipeline_id_to_job_instance[pipeline_id]
                     job_instance.has_been_cleaned_up = True
+                    job_instance.update_timestamps()
                     job_instance.put()
 
                 # This enqueues a deferred cleanup item.
