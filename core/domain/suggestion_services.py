@@ -1148,8 +1148,8 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
     # Create a community contribution stats object to validate the updates.
     stats = create_community_contribution_stats_from_model(stats_model)
     stats.validate()
-    stats.update_timestamps()
 
+    stats_model.update_timestamps()
     stats_model.put()
 
 
