@@ -3901,75 +3901,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'There were no Contributor Dashboard suggestions that were waiting '
             'too long for a review.')
 
-    def test_email_sent_to_admin_if_question_has_waited_a_day_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_and_datetime(
-                '<p>What is the meaning of life?</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                question_suggestion))
-        review_wait_time = 1
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(days=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following question suggestion was submitted for review 1 '
-            'day ago:'
-            '<br>What is the meaning of life?</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_question_has_waited_days_for_review(
+    def test_email_sent_to_admin_if_question_has_waited_too_long_for_a_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4037,346 +3969,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_admin_if_question_has_waited_an_hour_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_and_datetime(
-                '<p>What is the meaning of life?</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                question_suggestion))
-        review_wait_time = 1
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(hours=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following question suggestion was submitted for review 1 '
-            'hour ago:'
-            '<br>What is the meaning of life?</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_question_has_waited_hours_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_and_datetime(
-                '<p>What is the meaning of life?</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                question_suggestion))
-        review_wait_time = 5
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(hours=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following question suggestion was submitted for review 5 '
-            'hours ago:'
-            '<br>What is the meaning of life?</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_question_has_waited_a_minute_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_and_datetime(
-                '<p>What is the meaning of life?</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                question_suggestion))
-        review_wait_time = 1
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(minutes=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following question suggestion was submitted for review 1 '
-            'minute ago:'
-            '<br>What is the meaning of life?</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_question_has_waited_minutes_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_and_datetime(
-                '<p>What is the meaning of life?</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                question_suggestion))
-        review_wait_time = 5
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(minutes=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following question suggestion was submitted for review 5 '
-            'minutes ago:'
-            '<br>What is the meaning of life?</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_question_has_waited_secs_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        question_suggestion = (
-            self._create_question_suggestion_with_question_html_and_datetime(
-                '<p>What is the meaning of life?</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                question_suggestion))
-        review_wait_time = 5
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(seconds=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following question suggestion was submitted for review 1 '
-            'minute ago:'
-            '<br>What is the meaning of life?</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
     def test_email_sent_to_admin_if_multiple_questions_have_waited_for_review(
             self):
         config_services.set_property(
@@ -4384,19 +3976,19 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
-                days=1, hours=1))
-        # Question suggestion 1 has waited 1 day for review.
+                days=2, hours=1))
         question_suggestion_1 = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 1</p>',
-                self.mocked_review_submission_datetime + datetime.timedelta(
-                    hours=1)))
-        # Question suggestion 2 has waited 1 hour for review.
+                self.mocked_review_submission_datetime))
+        # Question suggestion 2 has waited slighlty less time than question
+        # suggestion 1 so that the question suggestions are not
+        # indistinguishable in terms of review wait time.
         question_suggestion_2 = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>Question 2</p>',
                 self.mocked_review_submission_datetime + datetime.timedelta(
-                    days=1)))
+                    hours=1)))
         reviewable_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
                 [question_suggestion_1, question_suggestion_2]))
@@ -4417,11 +4009,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'The suggestions that have been waiting too long for a review:'
             '<br><br>'
             '<ul>'
-            '<li>The following question suggestion was submitted for review 1 '
-            'day ago:'
+            '<li>The following question suggestion was submitted for review 2 '
+            'days ago:'
             '<br>Question 1</li><br>'
-            '<li>The following question suggestion was submitted for review 1 '
-            'hour ago:'
+            '<li>The following question suggestion was submitted for review 2 '
+            'days ago:'
             '<br>Question 2</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
@@ -4454,77 +4046,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_admin_if_translation_has_waited_a_day_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        translation_suggestion = (
-            self._create_translation_suggestion_in_lang_with_html_and_datetime(
-                'hi', '<p>Sample translation</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion))
-        review_wait_time = 1
-        reviewable_suggestion_email_info.submission_datetime = (
-            self.mocked_review_submission_datetime)
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(days=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 day ago:'
-            '<br>Sample translation</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_translation_has_waited_days_for_review(
+    def test_email_sent_to_admin_if_translation_has_waited_too_long_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4592,375 +4114,26 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_admin_if_translation_has_waited_an_hour_for_review(
+    def test_email_sent_to_admin_if_multi_translations_have_waited_for_review(
             self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        translation_suggestion = (
-            self._create_translation_suggestion_in_lang_with_html_and_datetime(
-                'hi', '<p>Sample translation</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion))
-        review_wait_time = 1
-        reviewable_suggestion_email_info.submission_datetime = (
-            self.mocked_review_submission_datetime)
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(hours=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 hour ago:'
-            '<br>Sample translation</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_translation_has_waited_hours_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        translation_suggestion = (
-            self._create_translation_suggestion_in_lang_with_html_and_datetime(
-                'hi', '<p>Sample translation</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion))
-        review_wait_time = 5
-        reviewable_suggestion_email_info.submission_datetime = (
-            self.mocked_review_submission_datetime)
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(hours=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 hours ago:'
-            '<br>Sample translation</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_translation_has_waited_a_min_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        translation_suggestion = (
-            self._create_translation_suggestion_in_lang_with_html_and_datetime(
-                'hi', '<p>Sample translation</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion))
-        review_wait_time = 1
-        reviewable_suggestion_email_info.submission_datetime = (
-            self.mocked_review_submission_datetime)
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(minutes=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 minute ago:'
-            '<br>Sample translation</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_translation_has_waited_minutes_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        translation_suggestion = (
-            self._create_translation_suggestion_in_lang_with_html_and_datetime(
-                'hi', '<p>Sample translation</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion))
-        review_wait_time = 5
-        reviewable_suggestion_email_info.submission_datetime = (
-            self.mocked_review_submission_datetime)
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(minutes=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 5 minutes ago:'
-            '<br>Sample translation</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_translation_has_waited_secs_for_review(
-            self):
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
-        translation_suggestion = (
-            self._create_translation_suggestion_in_lang_with_html_and_datetime(
-                'hi', '<p>Sample translation</p>',
-                self.mocked_review_submission_datetime))
-        reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion))
-        review_wait_time = 1
-        reviewable_suggestion_email_info.submission_datetime = (
-            self.mocked_review_submission_datetime)
-        mocked_datetime_for_utcnow = (
-            reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(seconds=review_wait_time))
-        expected_email_html_body = (
-            'Hi user1,'
-            '<br><br>'
-            'There are suggestions on the '
-            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
-            'for more than 0 days for review. Please take a look at the '
-            'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
-            '<br><br><ul>'
-            '<li>Add more reviewers to the suggestion types that have '
-            'suggestions waiting too long for a review</li><br>'
-            '<li>Find the existing reviewers and email reviewers directly '
-            'about the suggestions waiting for a review</li><br>'
-            '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
-            '<br><br>'
-            '<ul>'
-            '<li>The following Hindi translation suggestion was submitted for '
-            'review 1 minute ago:'
-            '<br>Sample translation</li><br>'
-            '</ul><br>'
-            'Thanks so much - we appreciate your help!<br>'
-            'Best Wishes!<br><br>'
-            '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
-        )
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
-                    (
-                        email_manager
-                        .send_mail_to_notify_admins_suggestions_waiting_long(
-                            [self.admin_1_id],
-                            [reviewable_suggestion_email_info])
-                    )
-
-        # Make sure correct email is sent.
-        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].html.decode(), expected_email_html_body)
-
-        # Make sure correct email model is stored.
-        self._assert_email_data_stored_in_sent_email_model_is_correct(
-            expected_email_html_body, self.admin_1_id,
-            self.ADMIN_1_EMAIL)
-
-    def test_email_sent_to_admin_if_translations_have_waited_for_review(self):
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)
         mocked_datetime_for_utcnow = (
             self.mocked_review_submission_datetime + datetime.timedelta(
-                days=1, hours=1))
-        # Translation suggestion 1 has waited 1 day for review.
+                days=2, hours=1))
         translation_suggestion_1 = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'en', '<p>Translation 1</p>',
-                self.mocked_review_submission_datetime + datetime.timedelta(
-                    hours=1)))
-        # Translation suggestion 2 has waited 1 hour for review.
+                self.mocked_review_submission_datetime))
+        # Translation suggestion 2 has waited slighlty less time than translation
+        # suggestion 1 so that the translation suggestions are not
+        # indistinguishable in terms of review wait time.
         translation_suggestion_2 = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
                 'fr', '<p>Translation 2</p>',
                 self.mocked_review_submission_datetime + datetime.timedelta(
-                    days=1)))
+                    hours=1)))
         reviewable_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
                 [translation_suggestion_1, translation_suggestion_2]))
@@ -4982,11 +4155,99 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<br><br>'
             '<ul>'
             '<li>The following English translation suggestion was submitted '
-            'for review 1 day ago:'
+            'for review 2 days ago:'
             '<br>Translation 1</li><br>'
             '<li>The following French translation suggestion was submitted for '
-            'review 1 hour ago:'
+            'review 2 days ago:'
             '<br>Translation 2</li><br>'
+            '</ul><br>'
+            'Thanks so much - we appreciate your help!<br>'
+            'Best Wishes!<br><br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+        )
+
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.swap(
+                suggestion_models,
+                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                    (
+                        email_manager
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
+                            [self.admin_1_id],
+                            reviewable_suggestion_email_infos)
+                    )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+
+        # Make sure correct email model is stored.
+        self._assert_email_data_stored_in_sent_email_model_is_correct(
+            expected_email_html_body, self.admin_1_id,
+            self.ADMIN_1_EMAIL)
+
+    def test_email_sent_to_admin_if_multi_suggestion_types_waiting_for_review(
+            self):
+        config_services.set_property(
+            'committer_id',
+            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        mocked_datetime_for_utcnow = (
+            self.mocked_review_submission_datetime + datetime.timedelta(
+                days=2, hours=1, minutes=5))
+        suggestion_1 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'en', '<p>Translation 1</p>',
+                self.mocked_review_submission_datetime))
+        # Suggestion 2 has waited slighlty less time than suggestion 1 so that
+        # the suggestions are not indistinguishable in terms of review wait
+        # time.
+        suggestion_2 = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'fr', '<p>Translation 2</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    minutes=5)))
+        # Similarly, suggestion 3 has waited less than both suggestion 1 and
+        # suggestion 2 so that the suggestions are not indistinguishable in
+        # terms of review wait time.
+        suggestion_3 = (
+            self._create_question_suggestion_with_question_html_and_datetime(
+                '<p>Question 1</p>',
+                self.mocked_review_submission_datetime + datetime.timedelta(
+                    hours=1)))
+        reviewable_suggestion_email_infos = (
+            self._create_reviewable_suggestion_email_infos_from_suggestions(
+                [suggestion_1, suggestion_2, suggestion_3]))
+        expected_email_html_body = (
+            'Hi user1,'
+            '<br><br>'
+            'There are suggestions on the '
+            '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
+            'for more than 0 days for review. Please take a look at the '
+            'suggestions mentioned below and help them get reviewed by going '
+            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            '<br><br><ul>'
+            '<li>Add more reviewers to the suggestion types that have '
+            'suggestions waiting too long for a review</li><br>'
+            '<li>Find the existing reviewers and email reviewers directly '
+            'about the suggestions waiting for a review</li><br>'
+            '</ul><br>'
+            'The suggestions that have been waiting too long for a review:'
+            '<br><br>'
+            '<ul>'
+            '<li>The following English translation suggestion was submitted '
+            'for review 2 days ago:'
+            '<br>Translation 1</li><br>'
+            '<li>The following French translation suggestion was submitted for '
+            'review 2 days ago:'
+            '<br>Translation 2</li><br>'
+            '<li>The following question suggestion was submitted for review 2 '
+            'days ago:'
+            '<br>Question 1</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
@@ -5033,7 +4294,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         review_wait_time = 5
         mocked_datetime_for_utcnow = (
             reviewable_suggestion_email_info.submission_datetime +
-            datetime.timedelta(seconds=review_wait_time))
+            datetime.timedelta(days=review_wait_time))
         expected_email_html_body_admin_1 = (
             'Hi user1,'
             '<br><br>'
@@ -5051,8 +4312,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'The suggestions that have been waiting too long for a review:'
             '<br><br>'
             '<ul>'
-            '<li>The following question suggestion was submitted for review 1 '
-            'minute ago:'
+            '<li>The following question suggestion was submitted for review 5 '
+            'days ago:'
             '<br>What is the meaning of life?</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
@@ -5078,8 +4339,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'The suggestions that have been waiting too long for a review:'
             '<br><br>'
             '<ul>'
-            '<li>The following question suggestion was submitted for review 1 '
-            'minute ago:'
+            '<li>The following question suggestion was submitted for review 5 '
+            'days ago:'
             '<br>What is the meaning of life?</li><br>'
             '</ul><br>'
             'Thanks so much - we appreciate your help!<br>'
