@@ -2300,7 +2300,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'There were no suggestions to recommend to the reviewer with user '
             'id: %s.' % self.reviewer_1_id)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_a_day(
+    def test_email_sent_to_reviewer_with_question_waiting_a_day_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -2359,7 +2359,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_in_days(
+    def test_email_sent_to_reviewer_with_question_waiting_days_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -2418,7 +2418,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_a_hour(
+    def test_email_sent_to_reviewer_with_question_waiting_an_hour_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -2477,7 +2477,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_in_hours(
+    def test_email_sent_to_reviewer_with_question_waiting_hours_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -2536,7 +2536,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_a_minute(
+    def test_email_sent_to_reviewer_with_question_waiting_a_minute_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -2595,7 +2595,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_in_mins(
+    def test_email_sent_to_reviewer_with_question_waiting_minutes_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -2654,7 +2654,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_in_secs(
+    def test_email_sent_to_reviewer_with_question_waiting_seconds_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -2713,7 +2713,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_multi_question_suggestions(self):
+    def test_email_sent_to_reviewer_with_multi_questions_waiting_for_a_review(
+            self):
         config_services.set_property(
             'committer_id',
             'notify_contributor_dashboard_reviewers_is_enabled', True)
@@ -2780,7 +2781,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_multi_question_reviewers_multi_question_suggestions(
+    def test_email_sent_to_multi_reviewers_with_multi_question_suggestions(
             self):
         config_services.set_property(
             'committer_id',
@@ -2898,7 +2899,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body_reviewer_2, self.reviewer_2_id,
             self.REVIEWER_2_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_a_day(
+    def test_email_sent_to_reviewer_with_translation_waiting_a_day_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -2958,7 +2959,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_in_days(
+    def test_email_sent_to_reviewer_with_translation_waiting_days_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -3017,7 +3018,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_a_hour(
+    def test_email_sent_to_reviewer_with_translation_waiting_an_hour_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -3078,7 +3079,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_in_hours(
+    def test_email_sent_to_reviewer_with_translation_waiting_hours_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -3139,7 +3140,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_a_min(
+    def test_email_sent_to_reviewer_with_translation_waiting_a_min_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -3200,7 +3201,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_in_mins(
+    def test_email_sent_to_reviewer_with_translation_waiting_mins_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -3261,7 +3262,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_in_secs(
+    def test_email_sent_to_reviewer_with_translation_waiting_secs_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -3322,7 +3323,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_multi_translation_suggestions(
+    def test_email_sent_to_reviewer_with_multi_translation_waiting_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -3390,7 +3391,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body, self.reviewer_1_id,
             self.REVIEWER_1_EMAIL)
 
-    def test_email_sent_to_multi_translation_reviewers_multi_translations(
+    def test_email_sent_to_multi_reviewers_with_multi_translations_suggestions(
             self):
         config_services.set_property(
             'committer_id',
@@ -3508,7 +3509,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             expected_email_html_body_reviewer_2, self.reviewer_2_id,
             self.REVIEWER_2_EMAIL)
 
-    def test_email_sent_to_multi_reviewers_multi_suggestions(self):
+    def test_email_sent_to_multi_reviewers_with_multi_suggestions_waiting(self):
         config_services.set_property(
             'committer_id',
             'notify_contributor_dashboard_reviewers_is_enabled', True)

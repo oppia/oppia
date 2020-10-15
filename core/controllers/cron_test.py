@@ -399,7 +399,11 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
             self.reviewer_id, self.language_code)
         # Create a translation suggestion so that the reviewer has something
         # to be notified about.
-        self.translation_suggestion = self._create_translation_suggestion()
+        translation_suggestion = self._create_translation_suggestion()
+        self.expected_reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
 
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
@@ -451,10 +455,6 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
 
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        expected_reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                self.translation_suggestion))
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
@@ -474,7 +474,7 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         self.assertEqual(len(self.reviewers_suggestion_email_infos[0]), 1)
         self._assert_reviewable_suggestion_email_infos_are_equal(
             self.reviewers_suggestion_email_infos[0][0],
-            expected_reviewable_suggestion_email_info)
+            self.expected_reviewable_suggestion_email_info)
 
 
 class JobModelsCleanupManagerTests(test_utils.GenericTestBase):
