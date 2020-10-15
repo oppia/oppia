@@ -4741,3 +4741,19 @@ class ExplorationSummary(python_utils.OBJECT):
             bool. Whether the exploration is solely owned by the user.
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
+
+    def user_has_any_role(self, user_id):
+        """Checks if a given user has any role within the exploration.
+
+        Args:
+            user_id: str. User id of the user.
+
+        Returns:
+            bool. Whether the given user may edit the exploration.
+        """
+        return (
+            user_id in self.owner_ids or
+            user_id in self.editor_ids or
+            user_id in self.voice_artist_ids or
+            user_id in self.viewer_ids
+        )

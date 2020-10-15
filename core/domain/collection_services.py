@@ -996,8 +996,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
         collection_rights.owner_ids, collection_rights.editor_ids,
         collection_rights.viewer_ids, contributor_ids, contributors_summary,
         collection.version, collection_model_node_count,
-        collection_model_created_on,
-        collection_model_last_updated
+        collection_model_created_on, collection_model_last_updated
     )
 
     return collection_summary

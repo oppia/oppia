@@ -863,7 +863,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserSubscriptionsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy(self):
         user_models.UserSubscriptionsModel.apply_deletion_policy(self.USER_ID_1)

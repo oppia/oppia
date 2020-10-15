@@ -867,7 +867,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         """UserSubscriptionsModel can be deleted since it only contains
         information relevant to the one user.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):
@@ -2334,13 +2334,6 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # Whether the deletion is completed.
     deletion_complete = (
         datastore_services.BooleanProperty(default=False, indexed=True))
-
-    # IDs of all the private explorations created by this user.
-    exploration_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
-    # IDs of all the private collections created by this user.
-    collection_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
 
     # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
     # is grouped under different key (e.g. config, feedback, story, skill,
