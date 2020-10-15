@@ -500,7 +500,7 @@ var ExplorationEditorMainTab = function() {
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
-    await action.clear('Rich Text editor', richTextEditor);
+    await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     await action.click('Save State Content Button', saveStateContentButton);
     await waitFor.invisibilityOf(
@@ -532,8 +532,9 @@ var ExplorationEditorMainTab = function() {
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
     await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
-    await element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
-      .last().click();
+    var hintButton = await element(
+      by.css('.protractor-test-hint-text')).all(by.tagName('p')).last();
+    await action.click('Hint Button', hintButton);
     await browser.switchTo().activeElement().sendKeys(hint);
 
     await action.click('Save Hint button', saveHintButton);
