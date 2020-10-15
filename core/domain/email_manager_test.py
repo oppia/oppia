@@ -3637,22 +3637,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     ADMIN_2_USERNAME = 'user2'
     ADMIN_2_EMAIL = 'user2@community.org'
     AUTHOR_EMAIL = 'author@example.com'
-    sample_language_code = 'hi'
-    sample_language = 'Hindi'
     target_id = 'exp1'
     skill_id = 'skill_123456'
-
-    expected_email_body_template = (
-        'Hi %s,<br><br>'
-        'In the <a href="%s%s#/roles">admin '
-        'roles page,</a> please add reviewers to the Contributor Dashboard '
-        'Community by entering their username(s) and allow reviewing for the '
-        'suggestion types that need more reviewers bolded below.'
-        '<br>%s<br>'
-        'Thanks so much - we appreciate your help!<br>'
-        'Best Wishes!<br><br>'
-        '- The Oppia Contributor Dashboard Team'
-    )
 
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion in the given language_code."""
@@ -3697,33 +3683,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             self.author_id, add_question_change_dict,
             'test description'
         )
-
-    def _create_expected_html_if_question_reviewers_needed(self):
-        """Creates the expected email html for notifying admins that question
-        suggestions need more reviewers.
-        """
-        return (
-            'There have been <b>quesiton suggestions</b> created on the '
-            '<a href="%s%s">Contributor '
-            'Dashboard page</a> where there are not enough '
-            'reviewers' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
-
-    def _create_expected_html_if_translation_reviewers_needed(
-            self, languages):
-        """Creates the expected email html for notifying admins that translation
-        suggestions, in the given list of languages, need more reviewers.
-        """
-        languages_html_list = [
-            '<li><b>%s</b></li>' % language for language in languages]
-        return (
-            'There have been <b>translation suggestions</b> created on the '
-            '<a href="%s%s">Contributor '
-            'Dashboard page</a> in languages where there are not enough '
-            'reviewers. The languages that need more reviewers are:'
-            '<br>%s<br>' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                ''.join(languages_html_list)))
 
     def _assert_created_sent_email_model_is_correct(
             self, expected_email_html_body, admin_id, admin_email):
@@ -3784,44 +3743,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}
         }
-
-    def test_email_not_sent_if_email_html_is_malformatted(self):
-        # Change the email body template to have malformatted html.
-        mocked_email_info_dict = {
-            'email_body_template': '</p>Hi %s%s%s%s',
-            'email_subject': 'Reviewers Needed for Contributor Dashboard',
-            'suggestion_types_need_reviewers_template': {
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-                    'There have been <b>translation suggestions</b> created on '
-                    'the <a href=%s%s">Contributor '
-                    'Dashboard page</a> in languages where there are not '
-                    'enough reviewers. The languages that need more reviewers '
-                    'are:<br>%s<br>'),
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-                    'There have been <b>quesiton suggestions</b> created on '
-                    'the <a href="%s%s">Contributor '
-                    'Dashboard page</a> where there are not enough '
-                    'reviewers' % (
-                        feconf.OPPIA_SITE_URL,
-                        feconf.CONTRIBUTOR_DASHBOARD_URL))
-            }
-        }
-        config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
-
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap(
-                email_manager, 'NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO',
-                mocked_email_info_dict):
-                email_manager.send_mail_to_notify_admins_reviewers_needed(
-                    [self.admin_1_id],
-                    self.suggestion_types_need_reviewers)
-
-        messages = self._get_all_sent_email_messages()
-        self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertTrue(self.logged_errors[0].startswith(
-            'Original email HTML body does not match cleaned HTML body'))
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
         config_services.set_property(
@@ -3916,12 +3837,24 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_types_need_reviewers,
             {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}})
-        expected_html_for_suggestion_types_need_reviewers = (
-            self._create_expected_html_if_question_reviewers_needed())
         expected_email_html_body = (
-            self.expected_email_body_template % (
-                self.ADMIN_1_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user1,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>quesiton suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
+            'enough reviewers.'
+            '<br><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
@@ -3948,16 +3881,42 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_types_need_reviewers,
             {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}})
-        expected_html_for_suggestion_types_need_reviewers = (
-            self._create_expected_html_if_question_reviewers_needed())
         expected_email_html_body_for_admin_1 = (
-            self.expected_email_body_template % (
-                self.ADMIN_1_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user1,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>quesiton suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
+            'enough reviewers.'
+            '<br><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
         expected_email_html_body_for_admin_2 = (
-            self.expected_email_body_template % (
-                self.ADMIN_2_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user2,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>quesiton suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
+            'enough reviewers.'
+            '<br><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
@@ -3986,21 +3945,33 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             self):
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
-        self._create_translation_suggestion_with_language_code(
-            self.sample_language_code)
+        self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_need_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
-                self.sample_language_code}})
-        expected_html_for_suggestion_types_need_reviewers = (
-            self._create_expected_html_if_translation_reviewers_needed(
-                [self.sample_language]))
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
         expected_email_html_body = (
-            self.expected_email_body_template % (
-                self.ADMIN_1_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user1,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>'
+            '<li><b>Hindi</b></li>'
+            '<br></ul><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
@@ -4020,25 +3991,54 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             self):
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
-        self._create_translation_suggestion_with_language_code(
-            self.sample_language_code)
+        self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_need_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_need_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
-                self.sample_language_code}})
-        expected_html_for_suggestion_types_need_reviewers = (
-            self._create_expected_html_if_translation_reviewers_needed(
-                [self.sample_language]))
+            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
         expected_email_html_body_for_admin_1 = (
-            self.expected_email_body_template % (
-                self.ADMIN_1_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user1,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>'
+            '<li><b>Hindi</b></li>'
+            '<br></ul><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
         expected_email_html_body_for_admin_2 = (
-            self.expected_email_body_template % (
-                self.ADMIN_2_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user2,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>'
+            '<li><b>Hindi</b></li><br>'
+            '</ul><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
@@ -4075,13 +4075,28 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_types_need_reviewers,
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'fr', 'hi'}})
-        expected_html_for_suggestion_types_need_reviewers = (
-            self._create_expected_html_if_translation_reviewers_needed(
-                ['French', 'Hindi']))
         expected_email_html_body = (
-            self.expected_email_body_template % (
-                self.ADMIN_1_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user1,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>'
+            '<li><b>French</b></li><br>'
+            '<li><b>Hindi</b></li><br>'
+            '</ul><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
@@ -4109,17 +4124,50 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_types_need_reviewers,
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'fr', 'hi'}})
-        expected_html_for_suggestion_types_need_reviewers = (
-            self._create_expected_html_if_translation_reviewers_needed(
-                ['French', 'Hindi']))
         expected_email_html_body_for_admin_1 = (
-            self.expected_email_body_template % (
-                self.ADMIN_1_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user1,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>'
+            '<li><b>French</b></li><br>'
+            '<li><b>Hindi</b></li><br>'
+            '</ul><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
         expected_email_html_body_for_admin_2 = (
-            self.expected_email_body_template % (
-                self.ADMIN_2_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user2,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>'
+            '<li><b>French</b></li><br>'
+            '<li><b>Hindi</b></li><br>'
+            '</ul><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
@@ -4161,21 +4209,60 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                     constants.DEFAULT_LANGUAGE_CODE}
             })
-        expected_html_for_suggestion_types_need_reviewers = ''.join(
-            [
-                self._create_expected_html_if_translation_reviewers_needed(
-                    ['French', 'Hindi']),
-                self._create_expected_html_if_question_reviewers_needed()
-            ]
-        )
         expected_email_html_body_for_admin_1 = (
-            self.expected_email_body_template % (
-                self.ADMIN_1_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user1,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>'
+            '<li><b>French</b></li><br>'
+            '<li><b>Hindi</b></li><br>'
+            '</ul><br>'
+            'There have been <b>quesiton suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
+            'enough reviewers.'
+            '<br><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
         expected_email_html_body_for_admin_2 = (
-            self.expected_email_body_template % (
-                self.ADMIN_2_USERNAME, feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                expected_html_for_suggestion_types_need_reviewers))
+            'Hi user2,'
+            '<br><br>'
+            'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+            'reviewers to the Contributor Dashboard Community by entering '
+            'their username(s) and allow reviewing for the suggestion types '
+            'that need more reviewers bolded below.'
+            '<br><br>'
+            'There have been <b>translation suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>'
+            '<li><b>French</b></li><br>'
+            '<li><b>Hindi</b></li><br>'
+            '</ul><br>'
+            'There have been <b>quesiton suggestions</b> created on the '
+            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
+            'enough reviewers.'
+            '<br><br>'
+            'Thanks so much - we appreciate your help!<br><br>'
+            'Best Wishes!<br>'
+            '- The Oppia Contributor Dashboard Team' % (
+                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL)
+        )
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(

@@ -256,14 +256,15 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
 
 NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
     'email_body_template': (
-        'Hi %s,<br><br>'
-        'In the <a href="%s%s#/roles">admin '
-        'roles page,</a> please add reviewers to the Contributor Dashboard '
-        'Community by entering their username(s) and allow reviewing for the '
-        'suggestion types that need more reviewers bolded below.'
-        '<br>%s<br>'
-        'Thanks so much - we appreciate your help!<br>'
-        'Best Wishes!<br><br>'
+        'Hi %s,'
+        '<br><br>'
+        'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+        'reviewers to the Contributor Dashboard Community by entering their '
+        'username(s) and allow reviewing for the suggestion types that need '
+        'more reviewers bolded below.'
+        '<br><br>%s'
+        'Thanks so much - we appreciate your help!<br><br>'
+        'Best Wishes!<br>'
         '- The Oppia Contributor Dashboard Team'
     ),
     'email_subject': 'Reviewers Needed for Contributor Dashboard',
@@ -272,15 +273,14 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
     'suggestion_types_need_reviewers_template': {
         suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
             'There have been <b>translation suggestions</b> created on the '
-            '<a href="%s%s">Contributor '
-            'Dashboard page</a> in languages where there are not enough '
-            'reviewers. The languages that need more reviewers are:'
-            '<br>%s<br>'),
+            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
+            'there are not enough reviewers. The languages that need more '
+            'reviewers are:'
+            '<br><ul>%s</ul><br>'),
         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
             'There have been <b>quesiton suggestions</b> created on the '
-            '<a href="%s%s">Contributor '
-            'Dashboard page</a> where there are not enough '
-            'reviewers' % (
+            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
+            'enough reviewers.<br><br>' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
     }
 }
@@ -1294,7 +1294,7 @@ def send_mail_to_notify_admins_reviewers_needed(
             suggestion_types_need_more_reviewers):
         html_for_languages_that_need_more_reviewers = ''.join(
             [
-                '<li><b>%s</b></li>' % (
+                '<li><b>%s</b></li><br>' % (
                     utils.get_supported_audio_language_description(
                         language_code)) for language_code in
                 suggestion_types_need_more_reviewers[
@@ -1326,7 +1326,6 @@ def send_mail_to_notify_admins_reviewers_needed(
         for admin_user_setting in admin_user_settings
     ]))
 
-    send_email_infos = []
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
             log_new_error(
@@ -1337,13 +1336,11 @@ def send_mail_to_notify_admins_reviewers_needed(
                 admin_usernames[index], feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
                 suggestion_types_need_reviewers_html)
 
-            send_email_infos.append(email_domain.SendEmailInfo(
+            _send_email(
                 admin_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                admin_emails[index]))
-
-    _send_emails(send_email_infos)
+                recipient_email=admin_emails[index])
 
 
 def send_mail_to_notify_contributor_dashboard_reviewers(
