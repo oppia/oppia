@@ -969,6 +969,7 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
             stats_model.translation_reviewer_counts_by_lang_code[
                 language_code] += 1
 
+    stats_model.update_timestamps()
     stats_model.put()
 
 
