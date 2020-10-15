@@ -365,6 +365,12 @@ describe('Admin page feature tab', function() {
 
       expect(updateApiSpy).not.toHaveBeenCalled();
       expect(setStatusSpy).not.toHaveBeenCalled();
+
+      // We need to do this at the end, otherwise the AdminTaskManager will
+      // still think that the task is running (and this can mess up other
+      // frontend tests that rely on the starting state to be "nothing is
+      // happening").
+      adminTaskManagerService.finishTask();
     }));
 
     it('should not proceed if the user cancels the prompt', fakeAsync(
