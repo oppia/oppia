@@ -269,14 +269,23 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
     ),
     'email_subject': 'Reviewers Needed for Contributor Dashboard',
     # The templates below are for listing the information for each suggestion
-    # type that needs more reviewers.
+    # type that needs more reviewers. For translation languages there are two
+    # templates to account for: whether one or multiple languages needs more
+    # reviewers.
     'suggestion_types_need_reviewers_template': {
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-            'There have been <b>translation suggestions</b> created on the '
-            '<a href="%s%s">Contributor Dashboard page</a> in languages where '
-            'there are not enough reviewers. The languages that need more '
-            'reviewers are:'
-            '<br><ul>%s</ul><br>'),
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            'one_language': (
+                'There have been <b>%s translation suggestions</b> created on '
+                'the <a href="%s%s">Contributor Dashboard page</a> where there '
+                'are not enough reviewers.<br><br>'
+            ),
+            'multi_language': (
+                'There have been <b>translation suggestions</b> created on the '
+                '<a href="%s%s">Contributor Dashboard page</a> in languages '
+                'where there are not enough reviewers. The languages that need '
+                'more reviewers are:'
+                '<br><ul>%s</ul><br>')
+        },
         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
             'There have been <b>quesiton suggestions</b> created on the '
             '<a href="%s%s">Contributor Dashboard page</a> where there are not '
@@ -1292,21 +1301,39 @@ def send_mail_to_notify_admins_reviewers_needed(
     suggestion_types_need_reviewers_html_list = []
     if suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
             suggestion_types_need_more_reviewers):
-        html_for_languages_that_need_more_reviewers = ''.join(
-            [
-                '<li><b>%s</b></li><br>' % (
-                    utils.get_supported_audio_language_description(
-                        language_code)) for language_code in
-                suggestion_types_need_more_reviewers[
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT]
-            ]
-        )
-        suggestion_types_need_reviewers_html_list.append(
-            NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
-                'suggestion_types_need_reviewers_template'][
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] % (
-                        feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                        html_for_languages_that_need_more_reviewers))
+        language_codes_that_need_reviewers = (
+            suggestion_types_need_more_reviewers[
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT])
+        # There are different templates to handle whether multiple languages
+        # need more reviewers or just one language.
+        if len(language_codes_that_need_reviewers) == 1:
+            suggestion_types_need_reviewers_html_list.append(
+                NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+                    'suggestion_types_need_reviewers_template'][
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT][
+                            'one_language'] % (
+                                utils.get_supported_audio_language_description(
+                                    language_codes_that_need_reviewers.pop()),
+                                feconf.OPPIA_SITE_URL,
+                                feconf.CONTRIBUTOR_DASHBOARD_URL))
+
+        else:
+            html_for_languages_that_need_more_reviewers = ''.join(
+                [
+                    '<li><b>%s</b></li><br>' % (
+                        utils.get_supported_audio_language_description(
+                            language_code)) for language_code in
+                    language_codes_that_need_reviewers
+                ]
+            )
+            suggestion_types_need_reviewers_html_list.append(
+                NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+                    'suggestion_types_need_reviewers_template'][
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT][
+                            'multi_language'] % (
+                            feconf.OPPIA_SITE_URL,
+                            feconf.CONTRIBUTOR_DASHBOARD_URL,
+                            html_for_languages_that_need_more_reviewers))
 
     if suggestion_models.SUGGESTION_TYPE_ADD_QUESTION in (
             suggestion_types_need_more_reviewers):
