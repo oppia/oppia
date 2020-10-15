@@ -20,7 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
-from core.domain import subtopic_page_services
+from core.domain import recommendations_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -29,12 +29,57 @@ import python_utils
 
 (
     base_models, topic_models, user_models, subtopic_models, story_models,
-    skill_models
+    skill_models, recommendations_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.topic,
     models.NAMES.user, models.NAMES.subtopic, models.NAMES.story,
-    models.NAMES.skill
+    models.NAMES.skill, models.NAMES.recommendations
 ])
+
+
+class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
+    """Class for validating TopicSimilaritiesModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Valid id: topics.
+        return '^%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _validate_topic_similarities(cls, item):
+        """Validate the topic similarities to be symmetric and have real
+        values between 0.0 and 1.0.
+
+        Args:
+            item: datastore_services.Model. TopicSimilaritiesModel to validate.
+        """
+
+        topics = list(item.content.keys())
+        data = '%s\n' % (',').join(topics)
+
+        for topic1 in topics:
+            similarity_list = []
+            for topic2 in item.content[topic1]:
+                similarity_list.append(
+                    python_utils.UNICODE(item.content[topic1][topic2]))
+            if len(similarity_list):
+                data = data + '%s\n' % (',').join(similarity_list)
+
+        try:
+            recommendations_services.validate_topic_similarities(data)
+        except Exception as e:
+            cls._add_error(
+                'topic similarity check',
+                'Entity id %s: Topic similarity validation for content: %s '
+                'fails with error: %s' % (item.id, item.content, e))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_topic_similarities]
 
 
 class TopicModelValidator(base_model_validators.BaseModelValidator):
@@ -584,42 +629,3 @@ class TopicSummaryModelValidator(
             cls._validate_uncategorized_skill_count,
             cls._validate_total_skill_count,
             cls._validate_subtopic_count]
-
-
-class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating SubtopicPageModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '^%s-\\d*$' % (item.topic_id)
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        return subtopic_page_services.get_subtopic_page_from_model(item)
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
-                1, item.version + 1)]
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_commit_log_entry_ids',
-                subtopic_models.SubtopicPageCommitLogEntryModel,
-                ['subtopicpage-%s-%s'
-                 % (item.id, version) for version in python_utils.RANGE(
-                     1, item.version + 1)]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'snapshot_metadata_ids',
-                subtopic_models.SubtopicPageSnapshotMetadataModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'snapshot_content_ids',
-                subtopic_models.SubtopicPageSnapshotContentModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids', topic_models.TopicModel, [item.topic_id])]
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
