@@ -299,10 +299,7 @@ def convert_png_binary_to_data_url(content):
         Exception. If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return '%s%s' % (
-            PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content))
-        )
+        return '%s%s' % (PNG_DATA_URL_PREFIX, base64.b64encode(content))
     else:
         raise Exception('The given string does not represent a PNG image.')
 

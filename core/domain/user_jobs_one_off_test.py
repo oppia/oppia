@@ -2117,32 +2117,32 @@ class VerifyProfilePictureOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output, [['CORRECT PROFILE PICTURE', 1]])
 
     def test_profile_picture_non_standart_dimensions(self):
-        user_services.update_profile_picture_data_url(
+        user_services.update_profile_picture(
             self.owner_id, self.PNG_IMAGE_WRONG_DIMENSIONS_BASE64)
         output = self._run_one_off_job()
         self.assertEqual(
             output, [['PROFILE PICTURE NON-STANDART DIMENSIONS - 150,160', 1]])
 
     def test_cannot_load_profile_picture(self):
-        user_services.update_profile_picture_data_url(
+        user_services.update_profile_picture(
             self.owner_id, self.PNG_IMAGE_BROKEN_BASE64)
         output = self._run_one_off_job()
         self.assertEqual(output, [['CANNOT LOAD PROFILE PICTURE', 1]])
 
     def test_profile_picture_not_png(self):
-        user_services.update_profile_picture_data_url(
+        user_services.update_profile_picture(
             self.owner_id, self.JPG_IMAGE_BASE64)
         output = self._run_one_off_job()
         self.assertEqual(output, [['PROFILE PICTURE NOT PNG', 1]])
 
     def test_wrong_profile_picture_data_url(self):
-        user_services.update_profile_picture_data_url(
+        user_services.update_profile_picture(
             self.owner_id, self.BROKEN_BASE64)
         output = self._run_one_off_job()
         self.assertEqual(output, [['WRONG PROFILE PICTURE DATA URL', 1]])
 
     def test_messing_profile_picture(self):
-        user_services.update_profile_picture_data_url(self.owner_id, None)
+        user_services.update_profile_picture(self.owner_id, None)
         output = self._run_one_off_job()
         self.assertEqual(output, [['MISSING PROFILE PICTURE', 1]])
 

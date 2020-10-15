@@ -165,6 +165,7 @@ ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
+ENTITY_TYPE_USER = 'user'
 
 IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
 IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'

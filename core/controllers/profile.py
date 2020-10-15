@@ -191,7 +191,7 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_preferred_audio_language_code(
                 self.user_id, data)
         elif update_type == 'profile_picture_data_url':
-            user_services.update_profile_picture_data_url(self.user_id, data)
+            user_services.update_profile_picture(self.user_id, data)
         elif update_type == 'default_dashboard':
             user_services.update_user_default_dashboard(self.user_id, data)
         elif update_type == 'email_preferences':
@@ -205,44 +205,6 @@ class PreferencesHandler(base.BaseHandler):
                 'Invalid update type: %s' % update_type)
 
         self.render_json({})
-
-
-class ProfilePictureHandler(base.BaseHandler):
-    """Provides the dataURI of the user's profile picture, or none if no user
-    picture is uploaded.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        user_settings = user_services.get_user_settings(self.user_id)
-        self.values.update({
-            'profile_picture_data_url': user_settings.profile_picture_data_url
-        })
-        self.render_json(self.values)
-
-
-class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
-    """Provides the dataURI of the profile picture of the specified user,
-    or None if no user picture is uploaded for the user with that ID.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self, username):
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is None:
-            raise self.PageNotFoundException
-
-        user_settings = user_services.get_user_settings(user_id)
-        self.values.update({
-            'profile_picture_data_url_for_username': (
-                user_settings.profile_picture_data_url)
-        })
-        self.render_json(self.values)
 
 
 class SignupPage(base.BaseHandler):

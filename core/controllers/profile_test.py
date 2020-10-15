@@ -567,7 +567,7 @@ class ProfilePictureHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['profile_picture_data_url'],
             user_settings.profile_picture_data_url)
-        user_services.update_profile_picture_data_url(
+        user_services.update_profile_picture(
             owner_id, 'new_profile_picture')
         response = self.get_json('/preferenceshandler/profile_picture')
         self.assertEqual(

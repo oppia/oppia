@@ -29,6 +29,25 @@ import feconf
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
+def save_image(filename, entity_type, entity_id, content):
+    """Save image file."""
+    filetype = filename[filename.rfind('.') + 1:]
+    mimetype = (
+        'image/svg+xml' if filetype == 'svg' else 'image/%s' % filetype)
+    file_system_class = get_entity_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
+    if not fs.isfile(filename.encode('utf-8')):
+        fs.commit(filename.encode('utf-8'), content, mimetype=mimetype)
+
+
+def delete_image(filename, entity_type, entity_id):
+    """Delete image file."""
+    file_system_class = get_entity_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
+    fs.delete(filename)
+
+
+
 def save_original_and_compressed_versions_of_image(
         filename, entity_type, entity_id, original_image_content,
         filename_prefix, image_is_compressible):
@@ -57,10 +76,6 @@ def save_original_and_compressed_versions_of_image(
         filename_wo_filetype, filetype)
     micro_image_filepath = '%s/%s' % (filename_prefix, micro_image_filename)
 
-    file_system_class = get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        entity_type, entity_id))
-
     if image_is_compressible:
         compressed_image_content = image_services.compress_image(
             original_image_content, 0.8)
@@ -70,26 +85,15 @@ def save_original_and_compressed_versions_of_image(
         compressed_image_content = original_image_content
         micro_image_content = original_image_content
 
-    mimetype = (
-        'image/svg+xml' if filetype == 'svg' else 'image/%s' % filetype)
-    # Because in case of CreateVersionsOfImageJob, the original image is
-    # already there. Also, even if the compressed, micro versions for some
-    # image exists, then this would prevent from creating another copy of
-    # the same.
-    if not fs.isfile(filepath.encode('utf-8')):
-        fs.commit(
-            filepath.encode('utf-8'), original_image_content,
-            mimetype=mimetype)
-
-    if not fs.isfile(compressed_image_filepath.encode('utf-8')):
-        fs.commit(
-            compressed_image_filepath.encode('utf-8'),
-            compressed_image_content, mimetype=mimetype)
-
-    if not fs.isfile(micro_image_filepath.encode('utf-8')):
-        fs.commit(
-            micro_image_filepath.encode('utf-8'),
-            micro_image_content, mimetype=mimetype)
+    save_image(filepath, entity_type, entity_id,  original_image_content)
+    save_image(
+        compressed_image_filepath,
+        entity_type,
+        entity_id,
+        compressed_image_content
+    )
+    save_image(
+        micro_image_filepath, entity_type, entity_id, micro_image_content)
 
 
 def save_classifier_data(exp_id, job_id, classifier_data):
