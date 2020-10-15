@@ -410,7 +410,7 @@ describe('Contributions and review component', function() {
 
     it('should show correct heading for translation suggestions',
       function() {
-        ctrl.switchToContributionsTab('translate_content');
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
         expect(ctrl.contributionSummaries).toEqual([{
           id: 'suggestion_1',
@@ -424,7 +424,7 @@ describe('Contributions and review component', function() {
 
     it('should show correct heading for question suggestions',
       function() {
-        ctrl.switchToContributionsTab('add_question');
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
         $scope.$apply();
         expect(ctrl.contributionSummaries).toEqual([{
           id: 'suggestion_1',
