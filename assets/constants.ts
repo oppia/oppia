@@ -5440,7 +5440,7 @@ export = {
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
   // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": false,
+  "ENABLE_ACCOUNT_DELETION": true,
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": true,
