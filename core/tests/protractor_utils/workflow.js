@@ -152,12 +152,12 @@ var publishExploration = async function() {
 
 // Creates and publishes a minimal exploration.
 var createAndPublishExploration = async function(
-  title, category, objective, language) {
+    title, category, objective, language) {
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
-  await forms.toRichText('new exploration'));
+    await forms.toRichText('new exploration'));
   await explorationEditorMainTab.setInteraction('EndExploration');
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -173,12 +173,12 @@ var createAndPublishExploration = async function(
 };
 
 var createAddExpDetailsAndPublishExp = async function(
-  title, category, objective, language, tags) {
+    title, category, objective, language, tags) {
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
-  await forms.toRichText('new exploration'));
+    await forms.toRichText('new exploration'));
   await explorationEditorMainTab.setInteraction('EndExploration');
   await explorationEditorPage.saveChanges('Save the changes');
   await explorationEditorPage.publishCardExploration(
@@ -187,7 +187,7 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-  title, category, objective, language) {
+    title, category, objective, language) {
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -219,12 +219,11 @@ var _addExplorationRole = async function(roleName, username) {
   var testEditRoles = element(by.css('.protractor-test-edit-roles'));
   await action.click(testEditRoles);
   var testRoleUsername = element(by.css('.protractor-test-role-username'));
-  await action.sendKeys('testRoleUsername', testRoleUsername, username)
+  await action.sendKeys('testRoleUsername', testRoleUsername, username);
   await element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
   var testSaveRole = element(by.css('.protractor-test-save-role'));
   await action.click('testSaveRole', testSaveRole);
-
 };
 
 var addExplorationManager = async function(username) {
@@ -250,7 +249,7 @@ var _getExplorationRoles = async function(roleName) {
   return await element.all(by.repeater(
     itemName + ' in $ctrl.ExplorationRightsService.' + listName +
     ' track by $index'
-  )).map(async function (elem) {
+  )).map(async function(elem) {
     return await elem.getText();
   });
 };
@@ -273,7 +272,7 @@ var getExplorationPlaytesters = async function() {
 
 var createSkillAndAssignTopic = async function(
   skillDescription, material, topicName) {
-  var topicsAndSkillsDashboardPage = (
+    var topicsAndSkillsDashboardPage = (
     new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
   await topicsAndSkillsDashboardPage.get();
   await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
@@ -294,7 +293,7 @@ var getImageSource = async function(customImageElement) {
 
 var uploadImage = async function(
   imageClickableElement, imgPath, resetExistingImage) {
-  await imageClickableElement.click();
+    await imageClickableElement.click();
 
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
@@ -309,7 +308,7 @@ var uploadImage = async function(
 
 var submitImage = async function(
   imageClickableElement, imageContainer, imgPath, resetExistingImage) {
-  await waitFor.visibilityOf(
+    await waitFor.visibilityOf(
     imageClickableElement, 'Image element is taking too long to appear.');
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(

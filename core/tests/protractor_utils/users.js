@@ -23,7 +23,7 @@ var waitFor = require('./waitFor.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
-var login = async function (email, isSuperAdmin = false) {
+var login = async function(email, isSuperAdmin = false) {
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
   var driver = browser.driver;
@@ -50,7 +50,7 @@ var login = async function (email, isSuperAdmin = false) {
     }, waitFor.DEFAULT_WAIT_TIME_MSECS, 'Login takes too long.');
 };
 
-var logout = async function () {
+var logout = async function() {
   var driver = browser.driver;
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   await (await driver.findElement(protractor.By.id('submit-logout'))).click();
@@ -58,7 +58,7 @@ var logout = async function () {
 
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
-var _completeSignup = async function (username) {
+var _completeSignup = async function(username) {
   // This is required since there is a redirect which can be considered
   // as a client side navigation and the tests fail since Angular is
   // not found due to the navigation interfering with protractor's
@@ -79,17 +79,17 @@ var _completeSignup = async function (username) {
   await waitFor.pageToFullyLoad();
 };
 
-var createUser = async function (email, username) {
+var createUser = async function(email, username) {
   await createAndLoginUser(email, username);
   await logout();
 };
 
-var createAndLoginUser = async function (email, username) {
+var createAndLoginUser = async function(email, username) {
   await login(email);
   await _completeSignup(username);
 };
 
-var createModerator = async function (email, username) {
+var createModerator = async function(email, username) {
   await login(email, true);
   await _completeSignup(username);
   await adminPage.get();
@@ -97,7 +97,7 @@ var createModerator = async function (email, username) {
   await logout();
 };
 
-var createAdmin = async function (email, username) {
+var createAdmin = async function(email, username) {
   await createAndLoginAdminUser(email, username);
   await logout();
 };
@@ -109,17 +109,17 @@ var createAndLoginAdminUser = async function (email, username) {
   await adminPage.updateRole(username, 'admin');
 };
 
-var createAdminMobile = async function (email, username) {
+var createAdminMobile = async function(email, username) {
   await createAndLoginAdminUserMobile(email, username);
   await logout();
 };
 
-var createAndLoginAdminUserMobile = async function (email, username) {
+var createAndLoginAdminUserMobile = async function(email, username) {
   await login(email, true);
   await _completeSignup(username);
 };
 
-var isAdmin = async function () {
+var isAdmin = async function() {
   return await element(by.css('.protractor-test-admin-text')).isPresent();
 };
 
