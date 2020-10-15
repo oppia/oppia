@@ -1257,7 +1257,7 @@ def send_mail_to_notify_admins_reviewers_needed(
     Note: it is assumed that all admins are super admins because only super
     admins have access to the admin page where reviewers can be added to the
     Contributor Dashboard. Also note that these emails are sent out regardless
-    of the admins email preferenecs.
+    of the admins email preferences.
 
     Args:
         admin_ids: list(str). The user ids of the admins to notify.
