@@ -19,6 +19,7 @@
 
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
+var action  = require('./action.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
@@ -29,15 +30,15 @@ var login = async function(email, isSuperAdmin = false) {
   var driver = browser.driver;
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
-  await (await driver.findElement(protractor.By.name('email'))).clear();
-  await (await driver.findElement(protractor.By.name('email'))).sendKeys(email);
+  await action.clear('Email', (await driver.findElement(protractor.By.name('email'))));
+  await action.sendKeys('Email', (await driver.findElement(protractor.By.name('email'))), email);
   if (isSuperAdmin) {
-    await (await driver.findElement(protractor.By.name('admin'))).click();
+    await action.click('Admin', (await driver.findElement(protractor.By.name('admin'))));
     let adminCheckboxStatus = await driver.findElement(
       protractor.By.name('admin')).getAttribute('checked');
     expect(adminCheckboxStatus).toBeTruthy();
   }
-  await (await driver.findElement(protractor.By.id('submit-login'))).click();
+  await action.click('Submit login', (await driver.findElement(protractor.By.id('submit-login'))));
   // The statement below uses a browser.wait() to determine if the user has
   // logged in. Use of waitFor is not possible because the active page is
   // non-angular.
@@ -53,7 +54,7 @@ var login = async function(email, isSuperAdmin = false) {
 var logout = async function() {
   var driver = browser.driver;
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
-  await (await driver.findElement(protractor.By.id('submit-logout'))).click();
+  await action.click('Submit Logout', (await driver.findElement(protractor.By.id('submit-logout'))));
 };
 
 // The user needs to log in immediately before this method is called. Note
@@ -73,9 +74,9 @@ var _completeSignup = async function(username) {
   var registerUser = element(by.css('.protractor-test-register-user'));
   await waitFor.visibilityOf(
     usernameInput, 'No username input field was displayed');
-  await usernameInput.sendKeys(username);
-  await agreeToTermsCheckbox.click();
-  await registerUser.click();
+  await action.sendKeys('Username inpiut',usernameInput, username);
+  await action.click('Agree to Terms Checkbox', agreeToTermsCheckbox);
+  await action.click('Register User', registerUser);
   await waitFor.pageToFullyLoad();
 };
 
