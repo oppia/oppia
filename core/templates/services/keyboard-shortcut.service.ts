@@ -15,7 +15,7 @@
 /**
  * @fileoverview Keyboard shortcut service for Oppia webpages.
  */
-import 'mousetrap';
+import Mousetrap from 'mousetrap';
 
 import { Injectable, ApplicationRef } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
