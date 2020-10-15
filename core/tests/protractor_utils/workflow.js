@@ -102,7 +102,6 @@ var createCollectionAsAdmin = async function() {
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateCollectionButton();
 };
-
 /**
  * Creating exploration for Admin users.
  */
@@ -271,8 +270,8 @@ var getExplorationPlaytesters = async function() {
 };
 
 var createSkillAndAssignTopic = async function(
-  skillDescription, material, topicName) {
-    var topicsAndSkillsDashboardPage = (
+    skillDescription, material, topicName) {
+  var topicsAndSkillsDashboardPage = (
     new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
   await topicsAndSkillsDashboardPage.get();
   await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
@@ -292,9 +291,8 @@ var getImageSource = async function(customImageElement) {
 };
 
 var uploadImage = async function(
-  imageClickableElement, imgPath, resetExistingImage) {
-    await imageClickableElement.click();
-
+    imageClickableElement, imgPath, resetExistingImage) {
+  await imageClickableElement.click();
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
     await action.click('thumbnailResetButton', thumbnailResetButton);
@@ -307,8 +305,8 @@ var uploadImage = async function(
 };
 
 var submitImage = async function(
-  imageClickableElement, imageContainer, imgPath, resetExistingImage) {
-    await waitFor.visibilityOf(
+    imageClickableElement, imageContainer, imgPath, resetExistingImage) {
+  await waitFor.visibilityOf(
     imageClickableElement, 'Image element is taking too long to appear.');
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(

@@ -42,7 +42,7 @@ var login = async function(email, isSuperAdmin = false) {
   // logged in. Use of waitFor is not possible because the active page is
   // non-angular.
   await browser.wait(
-    async () => {
+    async() => {
       let loginStatusHeaderElement = (
         await driver.findElement(protractor.By.tagName('h3')));
       let text = await loginStatusHeaderElement.getText();
@@ -102,7 +102,7 @@ var createAdmin = async function(email, username) {
   await logout();
 };
 
-var createAndLoginAdminUser = async function (email, username) {
+var createAndLoginAdminUser = async function(email, username) {
   await login(email, true);
   await _completeSignup(username);
   await adminPage.get();
