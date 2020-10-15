@@ -593,7 +593,7 @@ def create_exp_issues_model(exp_issues):
 
 def save_exp_issues_model(exp_issues):
     """Updates the ExplorationIssuesModel datastore instance with the passed
-    ExplorationIssues domain object in a transaction.
+    ExplorationIssues domain object.
 
     Args:
         exp_issues: ExplorationIssues. The exploration issues domain
