@@ -343,7 +343,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Raises:
             Exception. If there are no suggestion types offered on the
-            Contributor Dashboard.
+                Contributor Dashboard.
         """
         if not CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
             raise Exception(

@@ -3893,7 +3893,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                         [self.admin_1_id], [])
                 )
 
-
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
@@ -3902,7 +3901,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'There were no Contributor Dashboard suggestions that were waiting '
             'too long for a review.')
 
-    def test_email_sent_to_question_admin_if_review_wait_time_a_day(
+    def test_email_sent_to_admin_if_question_has_waited_a_day_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -3953,8 +3952,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                     (
-                    email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_long(
+                        email_manager
+                        .send_mail_to_notify_admins_suggestions_waiting_long(
                             [self.admin_1_id],
                             [reviewable_suggestion_email_info])
                     )
@@ -3970,7 +3969,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_in_days(
+    def test_email_sent_to_admin_if_question_has_waited_days_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4038,7 +4037,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_a_hour(
+    def test_email_sent_to_admin_if_question_has_waited_an_hour_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4106,7 +4105,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_in_hours(
+    def test_email_sent_to_admin_if_question_has_waited_hours_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4174,7 +4173,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_a_minute(
+    def test_email_sent_to_admin_if_question_has_waited_a_minute_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4242,7 +4241,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_in_mins(
+    def test_email_sent_to_admin_if_question_has_waited_minutes_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4310,7 +4309,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_if_review_wait_time_in_secs(
+    def test_email_sent_to_admin_if_question_has_waited_secs_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4378,7 +4377,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_question_reviewer_multi_question_suggestions(self):
+    def test_email_sent_to_admin_if_multiple_questions_have_waited_for_review(
+            self):
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)
@@ -4454,7 +4454,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_a_day(
+    def test_email_sent_to_admin_if_translation_has_waited_a_day_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4524,7 +4524,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_in_days(
+    def test_email_sent_to_admin_if_translation_has_waited_days_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4592,7 +4592,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_a_hour(
+    def test_email_sent_to_admin_if_translation_has_waited_an_hour_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4662,7 +4662,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_in_hours(
+    def test_email_sent_to_admin_if_translation_has_waited_hours_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4732,7 +4732,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_a_min(
+    def test_email_sent_to_admin_if_translation_has_waited_a_min_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4802,7 +4802,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_in_mins(
+    def test_email_sent_to_admin_if_translation_has_waited_minutes_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4872,7 +4872,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_if_review_wait_time_in_secs(
+    def test_email_sent_to_admin_if_translation_has_waited_secs_for_review(
             self):
         config_services.set_property(
             'committer_id',
@@ -4942,8 +4942,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             expected_email_html_body, self.admin_1_id,
             self.ADMIN_1_EMAIL)
 
-    def test_email_sent_to_translation_reviewer_multi_translation_suggestions(
-            self):
+    def test_email_sent_to_admin_if_translations_have_waited_for_review(self):
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)

@@ -575,8 +575,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
                 suggestions_waiting_too_long_for_review = (
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_waiting_too_long_for_review())
+                    suggestion_models.GeneralSuggestionModel
+                    .get_suggestions_waiting_too_long_for_review())
 
         # The question suggestion was created 2 days after the translation
         # suggestion, so it has only waited 1 day for a review, which is less
