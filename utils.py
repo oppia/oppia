@@ -494,7 +494,7 @@ def create_string_from_largest_unit_in_timedelta(timedelta_obj):
         the string.
 
     Raises:
-        Exception. Timedelta must be positive.
+        Exception. If the provided timedelta is not positive.
     """
     total_seconds = timedelta_obj.total_seconds()
     if total_seconds <= 0:

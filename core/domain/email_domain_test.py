@@ -24,20 +24,6 @@ from core.tests import test_utils
 class EmailDomainTest(test_utils.GenericTestBase):
     """Tests for email_domain classes."""
 
-    recipient_id = 'sample_recipient_id'
-    sender_id = 'sample_sender_id'
-    intent = 'sample_intent'
-    email_subject = 'sample_email_subject'
-    email_html_body = '<p>sample_email_html_body</p>'
-    sender_email = 'sample_sender_email'
-    recipient_email = 'sample_recipient_email'
-    sender_name = 'sample_sender_name'
-    bcc_admin = True
-    reply_to_id = 'sample_reply_to_id'
-    default_sender_name = None
-    default_bcc_admin = False
-    default_reply_to_id = None
-
     def test_that_general_feedback_thread_reply_info_objects_are_created(self):
         obj = email_domain.FeedbackThreadReplyInfo(
             'user1.exploration.exp1.1', 'reply_to_id1')
@@ -47,35 +33,3 @@ class EmailDomainTest(test_utils.GenericTestBase):
         self.assertEqual(obj.entity_type, 'exploration')
         self.assertEqual(obj.entity_id, 'exp1')
         self.assertEqual(obj.thread_id, 'exploration.exp1.1')
-
-    def test_send_email_info_with_valid_default_arguments_has_correct_values(
-            self):
-        send_email_info = email_domain.SendEmailInfo(
-            self.recipient_id, self.sender_id, self.intent, self.email_subject,
-            self.email_html_body, self.sender_email, self.recipient_email
-        )
-
-        self.assertEqual(send_email_info.recipient_id, self.recipient_id)
-        self.assertEqual(send_email_info.sender_id, self.sender_id)
-        self.assertEqual(send_email_info.intent, self.intent)
-        self.assertEqual(send_email_info.email_subject, self.email_subject)
-        self.assertEqual(send_email_info.email_html_body, self.email_html_body)
-        self.assertEqual(send_email_info.sender_name, self.default_sender_name)
-        self.assertEqual(send_email_info.bcc_admin, self.default_bcc_admin)
-        self.assertEqual(send_email_info.reply_to_id, self.default_reply_to_id)
-
-    def test_send_email_info_with_valid_arguments_has_correct_properties(self):
-        send_email_info = email_domain.SendEmailInfo(
-            self.recipient_id, self.sender_id, self.intent, self.email_subject,
-            self.email_html_body, self.sender_email, self.recipient_email,
-            self.sender_name, self.bcc_admin, self.reply_to_id
-        )
-
-        self.assertEqual(send_email_info.recipient_id, self.recipient_id)
-        self.assertEqual(send_email_info.sender_id, self.sender_id)
-        self.assertEqual(send_email_info.intent, self.intent)
-        self.assertEqual(send_email_info.email_subject, self.email_subject)
-        self.assertEqual(send_email_info.email_html_body, self.email_html_body)
-        self.assertEqual(send_email_info.sender_name, self.sender_name)
-        self.assertEqual(send_email_info.bcc_admin, self.bcc_admin)
-        self.assertEqual(send_email_info.reply_to_id, self.reply_to_id)

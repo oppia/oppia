@@ -24,7 +24,6 @@ import logging
 
 from constants import constants
 from core.domain import config_domain
-from core.domain import email_domain
 from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_domain
@@ -212,17 +211,19 @@ NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
 
 NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
     'email_body_template': (
-        'Hi %s,<br><br>'
+        'Hi %s,'
+        '<br><br>'
         'There are new review opportunities that we think you might be '
-        'interested in on the '
-        '<a href="%s%s">Contributor '
-        'Dashboard</a>. Here are some examples of contributions that have been '
-        'waiting the longest for review:'
-        '<br>%s<br>'
+        'interested in on the <a href="%s%s">Contributor Dashboard</a>. '
+        'Here are some examples of contributions that have been waiting '
+        'the longest for review:'
+        '<br><br>'
+        '<ul>%s</ul><br>'
         'Please take some time to review any of the above contributions (if '
-        'they still need a review) or any other contributions on the dashboard.'
-        ' We appreciate your help!<br>'
-        'Thanks again, and happy reviewing!<br><br>'
+        'they still need a review) or any other contributions on the '
+        'dashboard. We appreciate your help!'
+        '<br><br>'
+        'Thanks again, and happy reviewing!<br>'
         '- The Oppia Contributor Dashboard Team'
         '<br><br>%s'
     ),
@@ -232,10 +233,10 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO = {
     'suggestion_template': {
         suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
             '<li>The following %s translation suggestion was submitted for '
-            'review %s ago:<br>%s</li>'),
+            'review %s ago:<br>%s</li><br>'),
         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
             '<li>The following question suggestion was submitted for review '
-            '%s ago:<br>%s</li>')
+            '%s ago:<br>%s</li><br>')
     },
     # Each suggestion type has a lambda function to retrieve the values needed
     # to populate the above suggestion template.
@@ -428,66 +429,6 @@ def _send_email(
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     transaction_services.run_in_transaction(_send_email_in_transaction)
-
-
-def _send_emails(send_email_infos):
-    """Sends emails to the given recipients. Note that this method does not
-    consider whether the emails are duplicates.
-
-    Args:
-        send_email_infos: list(SendEmailInfo). Each SendEmailInfo object
-            contains the information necessary to send an email.
-
-    Raises:
-        Exception. A sender_id is not appropriate for an intent.
-    """
-    # Keep track the email information for emails that were successfully sent
-    # in transaction so that SentEmailModels can be created.
-    successfully_sent_in_transaction_email_infos = []
-    for send_email_info in send_email_infos:
-        if send_email_info.sender_name is None:
-            send_email_info.sender_name = EMAIL_SENDER_NAME.value
-
-        require_sender_id_is_valid(
-            send_email_info.intent, send_email_info.sender_id)
-
-        cleaned_html_body = html_cleaner.clean(send_email_info.email_html_body)
-        if cleaned_html_body != send_email_info.email_html_body:
-            log_new_error(
-                'Original email HTML body does not match cleaned HTML body:\n'
-                'Original:\n%s\n\nCleaned:\n%s\n' %
-                (send_email_info.email_html_body, cleaned_html_body))
-            return
-
-        raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
-            '<br>', '\n').replace('<li>', '<li>- ').replace(
-                '</p><p>', '</p>\n<p>')
-        cleaned_plaintext_body = html_cleaner.strip_html_tags(
-            raw_plaintext_body)
-
-        def _send_email_in_transaction(
-                send_email_info=send_email_info,
-                cleaned_plaintext_body=cleaned_plaintext_body):
-            """Sends the email to a single recipient."""
-            sender_name_email = '%s <%s>' % (
-                send_email_info.sender_name, send_email_info.sender_email)
-
-            email_services.send_mail(
-                sender_name_email, send_email_info.recipient_email,
-                send_email_info.email_subject, cleaned_plaintext_body,
-                send_email_info.email_html_body,
-                bcc_admin=send_email_info.bcc_admin,
-                reply_to_id=send_email_info.reply_to_id)
-
-            # This is done to maintain consistency with the _send_email and
-            # _send_bulk_email.
-            send_email_info.sender_email = sender_name_email
-            successfully_sent_in_transaction_email_infos.append(send_email_info)
-
-        transaction_services.run_in_transaction(_send_email_in_transaction)
-
-    email_models.SentEmailModel.create_multi(
-        successfully_sent_in_transaction_email_infos)
 
 
 def _send_bulk_mail(
@@ -1450,7 +1391,6 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         for reviewer_user_setting in reviewer_user_settings
     ]))
 
-    send_email_infos = []
     for index, reviewer_id in enumerate(reviewer_ids):
         if not reviewers_suggestion_email_infos[index]:
             log_new_error(
@@ -1506,13 +1446,11 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     list_of_suggestions_to_notify_reviewer_strings),
                 EMAIL_FOOTER.value)
 
-            send_email_infos.append(email_domain.SendEmailInfo(
+            _send_email(
                 reviewer_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-                reviewer_emails[index]))
-
-    _send_emails(send_email_infos)
+                recipient_email=reviewer_emails[index])
 
 
 def send_accepted_voiceover_application_email(
