@@ -1,6 +1,6 @@
 <md-radio-group ng-model="skillWithDifficulty._difficulty">
   <md-radio-button ng-repeat="rubric in getSkillIdToRubricsObject()[skillWithDifficulty.getId()]"
-                   value="<[availableDifficultyValues[$index]]>"
+                   ng-value="availableDifficultyValues[$index]"
                    class="protractor-test-skill-difficulty-<[rubric.getDifficulty().toLowerCase()]>">
     <strong> <[rubric.getDifficulty()]> </strong>
     <md-list>

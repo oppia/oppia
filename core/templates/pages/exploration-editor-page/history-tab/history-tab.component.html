@@ -64,10 +64,10 @@
         </div>
         <div class="history-table-options protractor-test-history-list-options">
           <div class="dropdown">
-            <div type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="$ctrl.toggleHistoryOptions($index)">
+            <div type="button" id="<['dropdownMenuButton-' + $index]>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-ellipsis-v"></i>
             </div>
-            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuButton" ng-if="$ctrl.highlightedIndex === $index">
+            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="<['dropdownMenuButton-' + $index]>">
               <a class="dropdown-item protractor-test-revert-version" href="#" ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()" ng-click="$ctrl.showRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
