@@ -1226,7 +1226,11 @@ class CommunityContributionStats(python_utils.OBJECT):
 
     def are_translation_reviewers_needed_for_lang_code(self, lang_code):
         """Returns whether or not more reviewers are needed to review
-        translation suggestions in the given language code.
+        translation suggestions in the given language code. Translation
+        suggestions in a given language need more reviewers if the number of
+        translation suggestions in that language divided by the number of
+        translation reviewers in that language is greater than
+        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Args:
             lang_code: str. The language code of the translation
@@ -1253,7 +1257,11 @@ class CommunityContributionStats(python_utils.OBJECT):
 
     def get_translation_language_codes_that_need_reviewers(self):
         """Returns the language codes where more reviewers are needed to review
-        translations in those language codes.
+        translations in those language codes. Translation suggestions in a
+        given language need more reviewers if the number of translation
+        suggestions in that language divided by the number of translation
+        reviewers in that language is greater than
+        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Returns:
             set. A set of of the language codes where more translation reviewers
@@ -1268,7 +1276,9 @@ class CommunityContributionStats(python_utils.OBJECT):
 
     def are_question_reviewers_needed(self):
         """Returns whether or not more reviewers are needed to review question
-        suggestions.
+        suggestions. Question suggestions need more reviewers if the number of
+        question suggestions divided by the number of question reviewers is
+        greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Returns:
             bool. Whether or not more reviewers are needed to review

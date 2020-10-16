@@ -484,8 +484,8 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED = ConfigProperty(
 
 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
     'max_number_of_suggestions_per_reviewer',
-    FLOAT_SCHEMA,
+    INT_SCHEMA,
     'The maximum number of Contributor Dashboard suggestions per reviewer. If '
     'the number of suggestions per reviewer surpasses this maximum, for any '
     'given suggestion type on the dashboard, the admins are notified by email.',
-    5.0)
+    5)

@@ -718,15 +718,16 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
         self.assertEqual(len(self.admin_ids), 1)
         self.assertEqual(self.admin_ids[0], self.admin_id)
-        self.assertEqual(
-            len(self.reviewable_suggestion_email_infos),
-            len(self.expected_reviewable_suggestion_email_infos))
-        for index, reviewable_suggestion_email_info in enumerate(
-                self.reviewable_suggestion_email_infos):
-            self._assert_reviewable_suggestion_email_infos_are_equal(
-                reviewable_suggestion_email_info,
-                self.expected_reviewable_suggestion_email_infos[index]
-            )
+        self.assertEqual(len(self.reviewable_suggestion_email_infos), 3)
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_infos[0],
+            self.expected_reviewable_suggestion_email_infos[0])
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_infos[1],
+            self.expected_reviewable_suggestion_email_infos[1])
+        self._assert_reviewable_suggestion_email_infos_are_equal(
+            reviewable_suggestion_email_infos[2],
+            self.expected_reviewable_suggestion_email_infos[2])
 
 
 class JobModelsCleanupManagerTests(test_utils.GenericTestBase):
