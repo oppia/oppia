@@ -58,10 +58,7 @@ import subprocess
 import sys
 import threading
 
-import pkg_resources
 import python_utils
-
-import google
 
 # Install third party dependencies before proceeding.
 from . import codeowner_linter
