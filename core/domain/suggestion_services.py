@@ -694,7 +694,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
     # Replace all the <oppia-noninteractive-**> tags with their rte component
     # names capitalized in square brackets.
     html_content_string_with_rte_tags_replaced = re.sub(
-        r'<(oppia-noninteractive-.+?)[^>]+>(.*?)</oppia-noninteractive-.+?>',
+        r'<oppia-noninteractive-[^>]+>(.*?)</oppia-noninteractive-[^>]+>',
         _replace_rte_tag, html_content_string)
     # Get rid of all of the other html tags.
     plain_text = html_cleaner.strip_html_tags(
