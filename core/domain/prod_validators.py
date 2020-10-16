@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import itertools
+import json
 import re
 
 from constants import constants
@@ -2230,15 +2231,15 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
         Args:
             item: datastore_services.Model. TopicSimilaritiesModel to validate.
         """
-
-        topics = list(item.content.keys())
+        content = json.loads(item.content)
+        topics = list(content.keys())
         data = '%s\n' % (',').join(topics)
 
         for topic1 in topics:
             similarity_list = []
-            for topic2 in item.content[topic1]:
+            for topic2 in content[topic1]:
                 similarity_list.append(
-                    python_utils.UNICODE(item.content[topic1][topic2]))
+                    python_utils.UNICODE(content[topic1][topic2]))
             if len(similarity_list):
                 data = data + '%s\n' % (',').join(similarity_list)
 
@@ -2248,7 +2249,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
             cls._add_error(
                 'topic similarity check',
                 'Entity id %s: Topic similarity validation for content: %s '
-                'fails with error: %s' % (item.id, item.content, e))
+                'fails with error: %s' % (item.id, content, e))
 
     @classmethod
     def _get_custom_validation_functions(cls):
