@@ -319,7 +319,7 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
+    feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1245,7 +1245,7 @@ def send_mail_to_notify_users_to_review(user_id, category):
             recipient_user_settings.username, category, EMAIL_FOOTER.value)
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
@@ -1278,9 +1278,9 @@ def send_mail_to_notify_admins_reviewers_needed(
 
     if not config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
         log_new_error(
-            'Notifying admins that Contributor Dashboard reviewers are needed '
-            'must be enabled on the config page in order to send the admins '
-            'the emails.'
+            'The "notify_admins_reviewers_needed_is_enabled" property '
+            'must be enabled on the admin config page in order to send '
+            'admins the emails.'
         )
         return
 
@@ -1370,11 +1370,11 @@ def send_mail_to_notify_admins_reviewers_needed(
                 recipient_email=admin_emails[index])
 
 
-def send_mail_to_notify_contributor_dashboard_reviewers(
+def send_reviewers_contributor_dashboard_suggestions(
         reviewer_ids, reviewers_suggestion_email_infos):
-    """Sends an email to each Contributor Dashboard reviewer notifying them of
-    the suggestions that have been waiting the longest for reivew, and that the
-    reviewer has permission to review.
+    """Sends an email to each reviewer notifying them of the suggestions on the
+    Contributor Dashboard that have been waiting the longest for reivew, and
+    that the reviewer has permission to review.
 
     Args:
         reviewer_ids: list(str). A list of the Contributor Dashboard reviewer
@@ -1397,10 +1397,11 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     if not (
             config_domain
-            .NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED.value):
+            .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
         log_new_error(
-            'Notifying Contributor Dashboard reviewers must be enabled on the '
-            'config page in order to send reviewers the emails.'
+            'The "contributor_dashboard_reviewer_emails_is_enabled" property '
+            'must be enabled on the admin config page in order to send '
+            'reviewers the emails.'
         )
         return
 
@@ -1427,7 +1428,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     reviewer_id))
             continue
         else:
-            list_of_suggestions_to_notify_reviewer_strings = []
+            suggestion_descriptions = []
             for reviewer_suggestion_email_info in (
                     reviewers_suggestion_email_infos[index]):
                 # Get the language of the suggestion.
@@ -1459,7 +1460,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
                         'suggestion_template'][
                             reviewer_suggestion_email_info.suggestion_type])
-                list_of_suggestions_to_notify_reviewer_strings.append(
+                suggestion_descriptions.append(
                     suggestion_template % (
                         get_values_to_populate_suggestion_template(
                             values_to_populate_suggestion_template_dict)))
@@ -1467,7 +1468,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             email_body = email_body_template % (
                 reviewer_usernames[index], feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
-                    list_of_suggestions_to_notify_reviewer_strings),
+                    suggestion_descriptions),
                 EMAIL_FOOTER.value)
 
             _send_email(
