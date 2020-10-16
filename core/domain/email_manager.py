@@ -1364,9 +1364,9 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             config_domain
             .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED.value):
         log_new_error(
-            'Notifying admins that there are Contributor Dashboard suggestions '
-            'that have been waiting too long for a review must be enabled on '
-            'the config page in order to send the admins the emails.'
+            'The "notify_admins_suggestions_waiting_too_long" property '
+            'must be enabled on the admin config page in order to send '
+            'admins the emails.'
         )
         return
 

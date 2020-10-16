@@ -3828,9 +3828,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
-            'Notifying admins that there are Contributor Dashboard suggestions '
-            'that have been waiting too long for a review must be enabled on '
-            'the config page in order to send the admins the emails.')
+            'The "notify_admins_suggestions_waiting_too_long" property '
+            'must be enabled on the admin config page in order to send '
+            'admins the emails.')
 
     def test_email_not_sent_if_admin_email_does_not_exist(self):
         config_services.set_property(
