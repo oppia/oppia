@@ -6606,6 +6606,196 @@ class ExplorationRecommendationsModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
+class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(TopicSimilaritiesModelValidatorTests, self).setUp()
+
+        self.model_instance = recommendations_models.TopicSimilaritiesModel(
+            id=recommendations_models.TOPIC_SIMILARITIES_ID)
+
+        self.content = {
+            'Art': {'Art': '1.0', 'Biology': '0.8', 'Chemistry': '0.1'},
+            'Biology': {'Art': '0.8', 'Biology': '1.0', 'Chemistry': '0.5'},
+            'Chemistry': {'Art': '0.1', 'Biology': '0.5', 'Chemistry': '1.0'},
+        }
+
+        self.model_instance.content = self.content
+        self.model_instance.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob)
+
+    def test_standard_model(self):
+        expected_output = [(
+            u'[u\'fully-validated TopicSimilaritiesModel\', 1]')]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of TopicSimilaritiesModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id, self.model_instance.created_on,
+                    self.model_instance.last_updated)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'TopicSimilaritiesModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_invalid_id(self):
+        model_with_invalid_id = recommendations_models.TopicSimilaritiesModel(
+            id='invalid', content=self.content)
+        model_with_invalid_id.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for model id check of '
+                'TopicSimilaritiesModel\', '
+                '[u\'Entity id invalid: Entity id does not match regex '
+                'pattern\']]'
+            ),
+            u'[u\'fully-validated TopicSimilaritiesModel\', 1]']
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_with_invalid_topic_similarities_columns(self):
+        content = {
+            'Art': {'Art': '1.0', 'Biology': '0.5'},
+            'Biology': {}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic similarity check '
+            'of TopicSimilaritiesModel\', '
+            '[u"Entity id topics: Topic similarity validation for '
+            'content: {u\'Biology\': {}, u\'Art\': {u\'Biology\': u\'0.5\', '
+            'u\'Art\': u\'1.0\'}} fails with error: Length of topic '
+            'similarities columns: 1 does not match length of '
+            'topic list: 2."]]')]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_with_invalid_topic(self):
+        content = {
+            'Art': {'Art': '1.0', 'invalid': '0.5'},
+            'invalid': {'Art': '0.5', 'invalid': '1.0'}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic similarity check '
+            'of TopicSimilaritiesModel\', '
+            '[u"Entity id topics: Topic similarity validation for '
+            'content: {u\'Art\': {u\'Art\': u\'1.0\', u\'invalid\': u\'0.5\'}, '
+            'u\'invalid\': {u\'Art\': u\'0.5\', u\'invalid\': u\'1.0\'}} '
+            'fails with error: Topic invalid not in list of known topics."]]')]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_invalid_topic_similarities_rows(self):
+        content = {
+            'Art': {'Art': '1.0', 'Biology': '0.5'}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic similarity check '
+            'of TopicSimilaritiesModel\', [u"Entity id topics: '
+            'Topic similarity validation for content: {u\'Art\': '
+            '{u\'Biology\': u\'0.5\', u\'Art\': u\'1.0\'}} fails with '
+            'error: Length of topic similarities rows: 2 does not match '
+            'length of topic list: 1."]]')]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_invalid_similarity_type(self):
+        content = {
+            'Art': {'Art': 'one', 'Biology': 0.5},
+            'Biology': {'Art': 0.5, 'Biology': 1.0}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic similarity '
+            'check of TopicSimilaritiesModel\', '
+            '[u"Entity id topics: Topic similarity validation for '
+            'content: {u\'Biology\': {u\'Biology\': 1.0, u\'Art\': 0.5}, '
+            'u\'Art\': {u\'Biology\': 0.5, u\'Art\': u\'one\'}} '
+            'fails with error: Expected similarity to be a float, '
+            'received one"]]')]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_with_invalid_similarity_value(self):
+        content = {
+            'Art': {'Art': 10.0, 'Biology': 0.5},
+            'Biology': {'Art': 0.5, 'Biology': 1.0}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic similarity check '
+            'of TopicSimilaritiesModel\', '
+            '[u"Entity id topics: Topic similarity validation for '
+            'content: {u\'Biology\': {u\'Biology\': 1.0, u\'Art\': 0.5}, '
+            'u\'Art\': {u\'Biology\': 0.5, u\'Art\': 10.0}} '
+            'fails with error: Expected similarity to be between '
+            '0.0 and 1.0, received 10.0"]]')]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_assymetric_content(self):
+        content = {
+            'Art': {'Art': 1.0, 'Biology': 0.5},
+            'Biology': {'Art': 0.6, 'Biology': 1.0}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic similarity '
+            'check of TopicSimilaritiesModel\', '
+            '[u"Entity id topics: Topic similarity validation for '
+            'content: {u\'Biology\': {u\'Biology\': 1.0, u\'Art\': 0.6}, '
+            'u\'Art\': {u\'Biology\': 0.5, u\'Art\': 1.0}} fails with error: '
+            'Expected topic similarities to be symmetric."]]')]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+
 class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):

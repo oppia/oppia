@@ -38,6 +38,7 @@ from core.domain import platform_parameter_domain
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
+from core.domain import recommendations_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_fetchers
@@ -2203,6 +2204,51 @@ class ExplorationRecommendationsModelValidator(
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_item_id_not_in_recommended_exploration_ids]
+
+
+class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
+    """Class for validating TopicSimilaritiesModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Valid id: topics.
+        return '^%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _validate_topic_similarities(cls, item):
+        """Validate the topic similarities to be symmetric and have real
+        values between 0.0 and 1.0.
+
+        Args:
+            item: datastore_services.Model. TopicSimilaritiesModel to validate.
+        """
+
+        topics = list(item.content.keys())
+        data = '%s\n' % (',').join(topics)
+
+        for topic1 in topics:
+            similarity_list = []
+            for topic2 in item.content[topic1]:
+                similarity_list.append(
+                    python_utils.UNICODE(item.content[topic1][topic2]))
+            if len(similarity_list):
+                data = data + '%s\n' % (',').join(similarity_list)
+
+        try:
+            recommendations_services.validate_topic_similarities(data)
+        except Exception as e:
+            cls._add_error(
+                'topic similarity check',
+                'Entity id %s: Topic similarity validation for content: %s '
+                'fails with error: %s' % (item.id, item.content, e))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_topic_similarities]
 
 
 class StoryModelValidator(base_model_validators.BaseModelValidator):
