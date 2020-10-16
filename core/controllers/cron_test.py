@@ -372,7 +372,7 @@ class CronMailReviewerContributorDashboardSuggestionsHandlerTests(
     def _mock_send_contributor_dashboard_reviewers_emails(
             self, reviewer_ids, reviewers_suggestion_email_infos):
         """Mocks
-        email_manager.send_reviewer_contributor_dashboard_suggestions as
+        email_manager.send_reviewers_contributor_dashboard_suggestions as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
@@ -415,15 +415,15 @@ class CronMailReviewerContributorDashboardSuggestionsHandlerTests(
 
     def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id',
+            'contributor_dashboard_reviewer_emails_is_enabled', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewer_contributor_dashboard_suggestions',
+                'send_reviewers_contributor_dashboard_suggestions',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                config_services.set_property(
-                    'committer_id',
-                    'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED', False)
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
@@ -434,15 +434,15 @@ class CronMailReviewerContributorDashboardSuggestionsHandlerTests(
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id',
+            'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.cannot_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewer_contributor_dashboard_suggestions',
+                'send_reviewers_contributor_dashboard_suggestions',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                config_services.set_property(
-                    'committer_id',
-                    'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED', True)
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
@@ -453,15 +453,17 @@ class CronMailReviewerContributorDashboardSuggestionsHandlerTests(
 
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id',
+            'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewer_contributor_dashboard_suggestions',
+                'send_reviewers_contributor_dashboard_suggestions',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
-                
 
         self.assertEqual(len(self.reviewer_ids), 1)
         self.assertEqual(self.reviewer_ids[0], self.reviewer_id)

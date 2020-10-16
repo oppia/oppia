@@ -458,7 +458,7 @@ CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'Enable contributor dashboard page. The default value is true.', True)
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
-    'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED', BOOL_SCHEMA,
+    'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
     (
         'Enable sending Contributor Dashboard reviewers email notifications '
         'about suggestions that need review. The default value is false.'
