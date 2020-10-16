@@ -86,7 +86,7 @@ angular.module('oppia').requires.push(downgradedModule);
 
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
+  // bootstrap Angular 8.
   'oppiaAngularRoot',
   downgradeComponent({
     component: OppiaAngularRootComponent
