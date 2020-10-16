@@ -1124,7 +1124,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_from_service_account_file(cls, unused_file_name, scopes): # pylint: disable=unused-argument
             return
 
-
         class MockResource(python_utils.OBJECT):
             """Mock object with a spreadsheets() method, for testing."""
 
