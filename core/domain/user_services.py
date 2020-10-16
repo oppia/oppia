@@ -1949,17 +1949,6 @@ def get_email_preferences(user_id):
             email_preferences_model.subscription_notifications)
 
 
-def flush_migration_bot_contributions_model():
-    """Cleans migration bot contributions model."""
-    user_contributions = get_user_contributions(
-        feconf.MIGRATION_BOT_USER_ID, strict=False)
-
-    if user_contributions is not None:
-        user_contributions.edited_exploration_ids = []
-        user_contributions.created_exploration_ids = []
-        _save_user_contributions(user_contributions)
-
-
 def get_users_email_preferences(user_ids):
     """Get email preferences for the list of users.
 
@@ -2168,6 +2157,8 @@ def get_user_contributions(user_id, strict=False):
 def create_user_contributions(
         user_id, created_exploration_ids, edited_exploration_ids):
     """Creates a new UserContributionsModel and returns the domain object.
+    Note: This does not create a contributions model if the user is
+    OppiaMigrationBot.
 
     Args:
         user_id: str. The unique ID of the user.
@@ -2177,13 +2168,16 @@ def create_user_contributions(
             user has edited.
 
     Returns:
-        UserContributions. The domain object representing the newly-created
-        UserContributionsModel.
+        UserContributions|None. The domain object representing the newly-created
+        UserContributionsModel. If the user id is for oppia migration bot, None
+        is returned.
 
     Raises:
         Exception. The UserContributionsModel for the given user_id already
             exists.
     """
+    if user_id == feconf.MIGRATION_BOT_USER_ID:
+        return None
     user_contributions = get_user_contributions(user_id, strict=False)
     if user_contributions:
         raise Exception(
