@@ -22,8 +22,13 @@ import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 
 describe('Fraction Object Factory', () => {
+<<<<<<< HEAD
   let errors: typeof ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
   let fraction: FractionObjectFactory;
+=======
+  let errors = null;
+  let fraction: FractionObjectFactory = null;
+>>>>>>> parent of 0ab12b95d... Fixed errors to make strict typescript checks on FractionObjectFactory
 
   beforeEach(() => {
     errors = ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
