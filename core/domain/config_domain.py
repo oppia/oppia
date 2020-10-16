@@ -456,3 +456,10 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
+
+CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
+    'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
+    (
+        'Enable sending Contributor Dashboard reviewers email notifications '
+        'about suggestions that need review. The default value is false.'
+    ), False)
