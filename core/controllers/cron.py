@@ -229,7 +229,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
             logging.warning('Deletion jobs for JobModels entities kicked off.')
 
 
-class CronMailReviewerContributorDashboardSuggestionsHandler(
+class CronMailReviewersContributorDashboardSuggestionsHandler(
         base.BaseHandler):
     """Handler for mailing reviewers suggestions on the Contributor
     Dashboard that need review.

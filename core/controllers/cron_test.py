@@ -321,7 +321,7 @@ class CronJobTests(test_utils.GenericTestBase):
         )
 
 
-class CronMailReviewerContributorDashboardSuggestionsHandlerTests(
+class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         test_utils.GenericTestBase):
 
     target_id = 'exp1'
@@ -381,7 +381,7 @@ class CronMailReviewerContributorDashboardSuggestionsHandlerTests(
 
     def setUp(self):
         super(
-            CronMailReviewerContributorDashboardSuggestionsHandlerTests,
+            CronMailReviewersContributorDashboardSuggestionsHandlerTests,
             self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
