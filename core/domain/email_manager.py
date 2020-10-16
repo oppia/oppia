@@ -284,7 +284,7 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA = {
         'reviewers are:'
         '<br><ul>%s</ul><br>'
     ),
-    'question_template' : (
+    'question_template': (
         'There have been <b>question suggestions</b> created on the '
         '<a href="%s%s">Contributor Dashboard page</a> where there are not '
         'enough reviewers.<br><br>' % (
