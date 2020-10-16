@@ -321,7 +321,7 @@ class CronJobTests(test_utils.GenericTestBase):
         )
 
 
-class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
+class CronMailReviewerContributorDashboardSuggestionsHandlerTests(
         test_utils.GenericTestBase):
 
     target_id = 'exp1'
@@ -372,7 +372,7 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
     def _mock_send_contributor_dashboard_reviewers_emails(
             self, reviewer_ids, reviewers_suggestion_email_infos):
         """Mocks
-        email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
+        email_manager.send_reviewer_contributor_dashboard_suggestions as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
@@ -381,7 +381,7 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
 
     def setUp(self):
         super(
-            CronMailContributorDashboardReviewerOpportunitiesHandlerTests,
+            CronMailReviewerContributorDashboardSuggestionsHandlerTests,
             self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -419,14 +419,13 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_mail_to_notify_contributor_dashboard_reviewers',
+                'send_reviewer_contributor_dashboard_suggestions',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 config_services.set_property(
                     'committer_id',
-                    'notify_contributor_dashboard_reviewers_is_enabled', False)
+                    'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED', False)
                 self.get_html_response(
-                    '/cron/mail/contributor_dashboard_reviewers/'
-                    'review_opportunities')
+                    '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 0)
         self.assertEqual(len(self.reviewers_suggestion_email_infos), 0)
@@ -439,14 +438,13 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         with self.cannot_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_mail_to_notify_contributor_dashboard_reviewers',
+                'send_reviewer_contributor_dashboard_suggestions',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 config_services.set_property(
                     'committer_id',
-                    'notify_contributor_dashboard_reviewers_is_enabled', True)
+                    'CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED', True)
                 self.get_html_response(
-                    '/cron/mail/contributor_dashboard_reviewers/'
-                    'review_opportunities')
+                    '/cron/mail/reviewers/contributor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids), 0)
         self.assertEqual(len(self.reviewers_suggestion_email_infos), 0)
@@ -459,14 +457,11 @@ class CronMailContributorDashboardReviewerOpportunitiesHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_mail_to_notify_contributor_dashboard_reviewers',
+                'send_reviewer_contributor_dashboard_suggestions',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                config_services.set_property(
-                    'committer_id',
-                    'notify_contributor_dashboard_reviewers_is_enabled', True)
                 self.get_html_response(
-                    '/cron/mail/contributor_dashboard_reviewers/'
-                    'review_opportunities')
+                    '/cron/mail/reviewers/contributor_dashboard_suggestions')
+                
 
         self.assertEqual(len(self.reviewer_ids), 1)
         self.assertEqual(self.reviewer_ids[0], self.reviewer_id)

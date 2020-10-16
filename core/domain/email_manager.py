@@ -1207,11 +1207,11 @@ def send_mail_to_notify_users_to_review(user_id, category):
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_mail_to_notify_contributor_dashboard_reviewers(
+def send_reviewer_contributor_dashboard_suggestions(
         reviewer_ids, reviewers_suggestion_email_infos):
-    """Sends an email to each Contributor Dashboard reviewer notifying them of
-    the suggestions that have been waiting the longest for reivew, and that the
-    reviewer has permission to review.
+    """Sends an email to each reviewer notifying them of the suggestions on the
+    Contributor Dashboard that have been waiting the longest for reivew, and
+    that the reviewer has permission to review.
 
     Args:
         reviewer_ids: list(str). A list of the Contributor Dashboard reviewer
@@ -1234,7 +1234,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     if not (
             config_domain
-            .NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED.value):
+            .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
         log_new_error(
             'Notifying Contributor Dashboard reviewers must be enabled on the '
             'config page in order to send reviewers the emails.'
