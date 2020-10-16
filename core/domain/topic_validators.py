@@ -28,11 +28,11 @@ import python_utils
 
 (
     base_models, topic_models, user_models, subtopic_models, story_models,
-    skill_models, recommendations_models
+    skill_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.topic,
     models.NAMES.user, models.NAMES.subtopic, models.NAMES.story,
-    models.NAMES.skill, models.NAMES.recommendations
+    models.NAMES.skill
 ])
 
 
