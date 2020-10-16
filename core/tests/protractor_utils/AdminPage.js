@@ -94,9 +94,8 @@ var AdminPage = function() {
 
     this.reloadCollection = async function(collectionId) {
       await this.get();
-      var reloadCollectionButton = await (
-        reloadCollectionButtons.get(collectionId));
-      await action.click('reloadCollectionButtons', reloadCollectionButton);
+      var reloadCollectionButton = reloadCollectionButtons.get(collectionId);
+      await action.click('Reload Collection Buttons', reloadCollectionButton);
       await general.acceptAlert();
       // Time is needed for the reloading to complete.
       await waitFor.textToBePresentInElement(
@@ -111,7 +110,9 @@ var AdminPage = function() {
       await this.get();
       explorationElements.map(async function(explorationElement) {
         await waitFor.visibilityOf(
-          getExplorationTitleElement(explorationElement));
+          getExplorationTitleElement(
+            explorationElement,
+            'Exploration title taking too long to appear'));
         var title = await getExplorationTitleElement(
           explorationElement).getText();
 
@@ -120,7 +121,7 @@ var AdminPage = function() {
           var explorationElementReloadButton =
             getExplorationElementReloadButton(explorationElement);
           await action.click(
-            'GetExplorationElementReloadButton',
+            'Exploration Element Reload Button',
             explorationElementReloadButton);
           await general.acceptAlert();
           // Time is needed for the reloading to complete.
@@ -146,7 +147,8 @@ var AdminPage = function() {
       configProperty, propertyName, objectType, editingInstructions) {
     await waitFor.visibilityOf(
       configProperty.element(
-        by.css('.protractor-test-config-title')));
+        by.css('.protractor-test-config-title')),
+        'Config Title taking too long too appear');
     var title = await configProperty.element(
       by.css('.protractor-test-config-title')).getText();
     if (title.match(propertyName)) {
@@ -202,12 +204,13 @@ var AdminPage = function() {
     await waitFor.visibilityOf(
       await oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
-    await waitFor.visibilityOf(oneOffJobRows.get(i));
+    await waitFor.visibilityOf(
+      oneOffJobRows.get(i), 'Could not get One Off Jobs');
     var text = await oneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var oneOffJobRowsButton = oneOffJobRows.get(i).element(
         by.css('.protractor-test-one-off-jobs-start-btn'));
-      await action.click('OneOffJobRowsButton', oneOffJobRowsButton);
+      await action.click('One Off Job Rows Button', oneOffJobRowsButton);
     } else {
       await this._startOneOffJob(jobName, ++i);
     }
@@ -218,7 +221,9 @@ var AdminPage = function() {
   };
 
   this._stopOneOffJob = async function(jobName, i) {
-    await waitFor.visibilityOf(unfinishedOneOffJobRows.get(i));
+    await waitFor.visibilityOf(
+      unfinishedOneOffJobRows.get(i),
+      'Could not get Unfinished Off Job');
     var text = await unfinishedOneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var unfinishedOffJobRowsButton = (
@@ -273,7 +278,6 @@ var AdminPage = function() {
   this.getUsersAsssignedToRole = async function(role) {
     await action.sendKeys('Role Drop Down', roleDropdown, 'By Role');
 
-    await action.click('Role Value Option', roleValueOption);
     await action.sendKeys('Role Value Option', roleValueOption, role);
 
     await action.click('View Role Button', viewRoleButton);
@@ -282,7 +286,6 @@ var AdminPage = function() {
   this.viewRolesbyUsername = async function(username) {
     await action.sendKeys('Role Drop Down', roleDropdown, 'By Username');
 
-    await action.click('Role Username Option', roleUsernameOption);
     await action.sendKeys('Role Username Option', roleUsernameOption, username);
 
     await action.click('View Role Button', viewRoleButton);
@@ -413,7 +416,7 @@ var AdminPage = function() {
     var reviewRight = await _getUserReviewRightsElement(
       username, REVIEW_CATEGORY_QUESTION);
     await waitFor.visibilityOf(
-      reviewRight, 'Review right taking too long to appear');
+      reviewRight, 'Review Right Element taking too long to appear');
     expect(await reviewRight.getText()).toBe('Allowed');
   };
 };
