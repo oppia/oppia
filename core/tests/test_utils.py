@@ -45,6 +45,7 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -387,6 +388,8 @@ class TestBase(unittest.TestCase):
     NEW_USER_EMAIL = 'new.user@example.com'
     NEW_USER_USERNAME = 'newuser'
     DEFAULT_END_STATE_NAME = 'End'
+
+    PSEUDONYMOUS_ID = 'pid_%s' % (32 * 'a')
 
     VERSION_0_STATES_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: {
@@ -1521,6 +1524,10 @@ tags: []
             contributors_summary={},
         )
         exp_summary_model.put()
+
+        # Create an ExplorationIssues model to match the behavior of creating
+        # new explorations.
+        stats_services.create_exp_issues_for_new_exploration(exp_id, 1)
 
     def save_new_exp_with_custom_states_schema_version(
             self, exp_id, user_id, states_dict, version):

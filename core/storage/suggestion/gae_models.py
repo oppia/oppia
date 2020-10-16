@@ -62,6 +62,12 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# The types of suggestions that are offered on the Contributor Dashboard.
+CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]
+
 # Daily emails are sent to reviewers to notify them of suggestions on the
 # Contributor Dashboard to review. The constants below define the number of
 # question and translation suggestions to fetch to come up with these daily
@@ -377,7 +383,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_translation_suggestions_waiting_longest_for_review_per_lang(
+    def get_translation_suggestions_waiting_longest_for_review(
             cls, language_code):
         """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
         number of translation suggestions in the specified language code,
@@ -622,6 +628,9 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     total number of reviewers for each suggestion type and the total number of
     suggestions in review for each suggestion type. There is only ever one
     instance of this model, and its ID is COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
+
+    Note: since this is a singleton model, the model GET and PUT must be done in
+    a transaction to avoid the loss of updates that come in rapid succession.
     """
 
     # A dictionary where the keys represent the language codes that translation
