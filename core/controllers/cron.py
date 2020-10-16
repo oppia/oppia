@@ -273,9 +273,9 @@ class CronMailAdminContributorDashboardReviewIssuesHandler(
             if config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
                 admin_ids = user_services.get_user_ids_by_role(
                     feconf.ROLE_ID_ADMIN)
-                suggestion_types_need_reviewers = (
+                suggestion_types_needing_reviewers = (
                     suggestion_services
                     .get_suggestion_types_that_need_reviewers()
                 )
                 email_manager.send_mail_to_notify_admins_reviewers_needed(
-                    admin_ids, suggestion_types_need_reviewers)
+                    admin_ids, suggestion_types_needing_reviewers)

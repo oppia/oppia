@@ -1224,7 +1224,7 @@ class CommunityContributionStats(python_utils.OBJECT):
         """
         self.translation_suggestion_counts_by_lang_code[language_code] = count
 
-    def are_translation_reviewers_needed_in_lang_code(self, lang_code):
+    def are_translation_reviewers_needed_for_lang_code(self, lang_code):
         """Returns whether or not more reviewers are needed to review
         translation suggestions in the given language code.
 
@@ -1246,9 +1246,10 @@ class CommunityContributionStats(python_utils.OBJECT):
             self.translation_reviewer_counts_by_lang_code[lang_code])
         number_of_suggestions = (
             self.translation_suggestion_counts_by_lang_code[lang_code])
-        return python_utils.divide(
-            number_of_suggestions, number_of_reviewers) > (
-                config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value)
+        return (
+            number_of_suggestions > (
+                config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
+                    number_of_reviewers)))
 
     def get_translation_language_codes_that_need_reviewers(self):
         """Returns the language codes where more reviewers are needed to review
@@ -1260,7 +1261,7 @@ class CommunityContributionStats(python_utils.OBJECT):
         """
         language_codes_that_need_reviewers = set()
         for language_code in self.translation_suggestion_counts_by_lang_code:
-            if self.are_translation_reviewers_needed_in_lang_code(
+            if self.are_translation_reviewers_needed_for_lang_code(
                     language_code):
                 language_codes_that_need_reviewers.add(language_code)
         return language_codes_that_need_reviewers
@@ -1279,10 +1280,10 @@ class CommunityContributionStats(python_utils.OBJECT):
         if self.question_reviewer_count == 0:
             return True
 
-        return python_utils.divide(
-            self.question_suggestion_count,
-            self.question_reviewer_count) > (
-                config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value)
+        return (
+            self.question_suggestion_count > (
+                config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
+                    self.question_reviewer_count)))
 
 
 class ReviewableSuggestionEmailInfo(python_utils.OBJECT):

@@ -24,5 +24,5 @@ cron:
   url: /cron/mail/reviewers/contributor_dashboard_suggestions
   schedule: every day 16:00
 - description: daily email about issues creating a long review turnaround time
-  url: /cron/mail/admins/contributor_dashboard_review_issues
+  url: /cron/mail/admins/contributor_dashboard_review_turnaround_time_issues
   schedule: every day 16:00
