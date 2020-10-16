@@ -174,7 +174,7 @@ export const AboutPageConstants = {
     'Justin Du',
     'Jérôme',
     'K.N. Anantha Nandanan',
-    'Kajol',
+    'Kajol Kumari',
     'Karen Rustad',
     'Kartikey Pandey',
     'Kashif Jamal Soofi',
