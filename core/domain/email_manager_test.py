@@ -2178,6 +2178,12 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         """Appends the error message to the logged errors list."""
         self.logged_errors.append(error_message)
 
+    def _mock_logging_info(self, msg, *args):
+        """Mocks logging.info() by appending the log message to the logged info
+        list.
+        """
+        self.logged_info.append(msg % args)
+
     def setUp(self):
         super(NotifyContributionDashboardReviewersEmailTests, self).setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
@@ -2199,6 +2205,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self._log_error_for_tests)
         self.log_new_error_ctx = self.swap(
             email_manager, 'log_new_error', self.log_new_error_counter)
+        self.logged_info = []
+        self.log_new_info_ctx = self.swap(
+            logging, 'info', self._mock_logging_info)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
@@ -2288,16 +2297,15 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.can_send_emails_ctx, self.log_new_info_ctx:
             email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [self.reviewer_1_id], [[]]
             )
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
-            self.logged_errors[0],
+            self.logged_info[0],
             'There were no suggestions to recommend to the reviewer with user '
             'id: %s.' % self.reviewer_1_id)
 
@@ -3731,7 +3739,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.assertEqual(
             sent_email_model.subject, (
                 email_manager
-                .NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_INFO[
+                .NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA[
                     'email_subject']
             ))
         self.assertEqual(
@@ -3753,6 +3761,12 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         """Appends the error message to the logged errors list."""
         self.logged_errors.append(error_message)
 
+    def _mock_logging_info(self, msg, *args):
+        """Mocks logging.info() by appending the log message to the logged info
+        list.
+        """
+        self.logged_info.append(msg % args)
+
     def setUp(self):
         super(
             NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests,
@@ -3772,6 +3786,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             self._log_error_for_tests)
         self.log_new_error_ctx = self.swap(
             email_manager, 'log_new_error', self.log_new_error_counter)
+        self.logged_info = []
+        self.log_new_info_ctx = self.swap(
+            logging, 'info', self._mock_logging_info)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
@@ -3883,7 +3900,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.can_send_emails_ctx, self.log_new_info_ctx:
             with self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
@@ -3895,9 +3912,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
-            self.logged_errors[0],
+            self.logged_info[0],
             'There were no Contributor Dashboard suggestions that were waiting '
             'too long for a review.')
 
@@ -4470,6 +4486,12 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         """Appends the error message to the logged errors list."""
         self.logged_errors.append(error_message)
 
+    def _mock_logging_info(self, msg, *args):
+        """Mocks logging.info() by appending the log message to the logged info
+        list.
+        """
+        self.logged_info.append(msg % args)
+
     def setUp(self):
         super(
             NotifyAdminsContributorDashboardReviewersNeededTests,
@@ -4492,10 +4514,12 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             self._log_error_for_tests)
         self.log_new_error_ctx = self.swap(
             email_manager, 'log_new_error', self.log_new_error_counter)
+        self.logged_info = []
+        self.log_new_info_ctx = self.swap(
+            logging, 'info', self._mock_logging_info)
 
         self.suggestion_types_needing_reviewers = {
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
-                constants.DEFAULT_LANGUAGE_CODE}
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
         }
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
@@ -4549,15 +4573,14 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.can_send_emails_ctx, self.log_new_info_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], {})
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
-            self.logged_errors[0],
+            self.logged_info[0],
             'There were no suggestion types that needed more reviewers on the '
             'Contributor Dashboard.')
 
@@ -4587,8 +4610,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
-                constants.DEFAULT_LANGUAGE_CODE}})
+            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}})
         expected_email_html_body = (
             'Hi user1,'
             '<br><br>'
@@ -4631,8 +4653,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
-                constants.DEFAULT_LANGUAGE_CODE}})
+            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
             '<br><br>'
@@ -4946,8 +4967,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             {
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'fr', 'hi'},
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
-                    constants.DEFAULT_LANGUAGE_CODE}
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
             })
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'

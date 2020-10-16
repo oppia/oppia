@@ -294,7 +294,7 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA = {
             feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
 }
 
-NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_INFO = {
+NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA = {
     'email_body_template': (
         'Hi %s,<br><br>'
         'There are suggestions on the <a href="%s%s">Contributor Dashboard</a> '
@@ -1347,10 +1347,10 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             descending order based on review wait time.
     """
     email_subject = (
-        NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_INFO[
+        NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA[
             'email_subject'])
     email_body_template = (
-        NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_INFO[
+        NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA[
             'email_body_template'])
 
     if not feconf.CAN_SEND_EMAILS:
@@ -1368,7 +1368,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         return
 
     if not reviewable_suggestion_email_infos:
-        log_new_error(
+        logging.info(
             'There were no Contributor Dashboard suggestions that were waiting '
             'too long for a review.')
         return
@@ -1452,7 +1452,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         return
 
     if not suggestion_types_needing_reviewers:
-        log_new_error(
+        logging.info(
             'There were no suggestion types that needed more reviewers on the '
             'Contributor Dashboard.')
         return
@@ -1578,7 +1578,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     for index, reviewer_id in enumerate(reviewer_ids):
         if not reviewers_suggestion_email_infos[index]:
-            log_new_error(
+            logging.info(
                 'There were no suggestions to recommend to the reviewer with '
                 'user id: %s.' % reviewer_id)
             continue
