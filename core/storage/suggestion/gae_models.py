@@ -674,6 +674,9 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     total number of reviewers for each suggestion type and the total number of
     suggestions in review for each suggestion type. There is only ever one
     instance of this model, and its ID is COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
+
+    Note: since this is a singleton model, the model GET and PUT must be done in
+    a transaction to avoid the loss of updates that come in rapid succession.
     """
 
     # A dictionary where the keys represent the language codes that translation

@@ -251,7 +251,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                     reviewer_ids))
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 reviewer_ids, reviewers_suggestion_email_infos)
 
 
@@ -273,12 +273,12 @@ class CronMailAdminContributorDashboardReviewIssuesHandler(
         if config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
             admin_ids = user_services.get_user_ids_by_role(
                 feconf.ROLE_ID_ADMIN)
-            suggestion_types_need_reviewers = (
+            suggestion_types_needing_reviewers = (
                 suggestion_services
                 .get_suggestion_types_that_need_reviewers()
             )
             email_manager.send_mail_to_notify_admins_reviewers_needed(
-                admin_ids, suggestion_types_need_reviewers)
+                admin_ids, suggestion_types_needing_reviewers)
         if (
                 config_domain
                 .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED

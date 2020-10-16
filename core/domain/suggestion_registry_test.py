@@ -2677,7 +2677,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 1)
 
         self.assertTrue(
-            stats.are_translation_reviewers_needed_in_lang_code(
+            stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
     def test_translation_reviewers_are_needed_if_num_suggestions_past_max(self):
@@ -2690,7 +2690,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
         reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_in_lang_code(
+            stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
         self.assertTrue(reviewers_are_needed)
@@ -2705,7 +2705,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
         reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_in_lang_code(
+            stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
@@ -2720,7 +2720,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'committer_id', 'max_number_of_suggestions_per_reviewer', 1)
 
         reviewers_are_needed = (
-            stats.are_translation_reviewers_needed_in_lang_code(
+            stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
@@ -2732,7 +2732,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 1)
 
         self.assertFalse(
-            stats.are_translation_reviewers_needed_in_lang_code(
+            stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
     def test_translation_reviewers_not_needed_if_no_reviewers_no_sugestions(
@@ -2741,7 +2741,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self._assert_community_contribution_stats_is_in_default_state()
 
         self.assertFalse(
-            stats.are_translation_reviewers_needed_in_lang_code(
+            stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
     def test_question_reviewers_are_needed_if_suggestions_zero_reviewers(

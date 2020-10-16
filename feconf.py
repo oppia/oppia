@@ -509,7 +509,8 @@ EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
 EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'address_contributor_dashboard_suggestions'
 )
-EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS = 'review_suggestions'
+EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS = (
+    'review_creator_dashboard_suggestions')
 EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'review_contributor_dashboard_suggestions'
 )

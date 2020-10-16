@@ -3759,10 +3759,10 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
     def test_get_returns_no_reviewers_needed_if_no_suggestions_exist(self):
         self._assert_community_contribution_stats_is_in_default_state()
 
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
 
-        self.assertDictEqual(suggestion_types_need_reviewers, {})
+        self.assertDictEqual(suggestion_types_needing_reviewers, {})
 
     def test_get_returns_question_reviewers_needed(self):
         self._create_question_suggestion()
@@ -3774,11 +3774,11 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             stats.translation_suggestion_counts_by_lang_code, {})
 
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}})
 
@@ -3795,11 +3795,11 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             stats.translation_suggestion_counts_by_lang_code, {
                 self.sample_language_code: 1})
 
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 self.sample_language_code}})
 
@@ -3816,11 +3816,11 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             stats.translation_suggestion_counts_by_lang_code, {
                 'en': 1, 'fr': 1})
 
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'}})
 
     def test_get_returns_translations_and_questions_need_more_reviewers(self):
@@ -3836,11 +3836,11 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             stats.translation_suggestion_counts_by_lang_code,
             {'en': 1, 'fr': 1})
 
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
 
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'en', 'fr'},

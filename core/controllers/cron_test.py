@@ -374,7 +374,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     def _mock_send_contributor_dashboard_reviewers_emails(
             self, reviewer_ids, reviewers_suggestion_email_infos):
         """Mocks
-        email_manager.send_reviewers_contributor_dashboard_suggestions as
+        email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
@@ -424,7 +424,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewers_contributor_dashboard_suggestions',
+                'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
@@ -443,7 +443,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         with self.cannot_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewers_contributor_dashboard_suggestions',
+                'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
@@ -462,7 +462,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewers_contributor_dashboard_suggestions',
+                'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
@@ -548,14 +548,15 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
             expected_reviewable_suggestion_email_info.submission_datetime)
 
     def _mock_send_mail_to_notify_admins_reviewers_needed(
-            self, admin_ids, suggestion_types_need_reviewers):
+            self, admin_ids, suggestion_types_needing_reviewers):
         """Mocks
         email_manager.send_mail_to_notify_admins_reviewers_needed as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
         self.admin_ids = admin_ids
-        self.suggestion_types_need_reviewers = suggestion_types_need_reviewers
+        self.suggestion_types_needing_reviewers = (
+            suggestion_types_needing_reviewers)
 
     def _mock_send_mail_to_notify_admins_suggestions_waiting(
             self, admin_ids, reviewable_suggestion_email_infos):
@@ -594,7 +595,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 )
             ) for suggestion in [suggestion_1, suggestion_2, suggestion_3]
         ]
-        self.expected_suggestion_types_need_reviewers = {
+        self.expected_suggestion_types_needing_reviewers = {
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
@@ -607,7 +608,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
             self, 'testapp', webtest.TestApp(main_cron.app))
 
         self.admin_ids = []
-        self.suggestion_types_need_reviewers = {}
+        self.suggestion_types_needing_reviewers = {}
         self.reviewable_suggestion_email_infos = []
 
     def test_email_not_sent_if_sending_emails_is_disabled(self):
@@ -636,7 +637,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
 
         self.assertEqual(len(self.admin_ids), 0)
         self.assertEqual(len(self.reviewable_suggestion_email_infos), 0)
-        self.assertDictEqual(self.suggestion_types_need_reviewers, {})
+        self.assertDictEqual(self.suggestion_types_needing_reviewers, {})
 
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
             self):
@@ -650,10 +651,11 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
                 self.get_html_response(
-                    '/cron/mail/admins/contributor_dashboard_review_issues')
+                    '/cron/mail/admins/contributor_dashboard_review_turnaround'
+                    '_time_issues')
 
         self.assertEqual(len(self.admin_ids), 0)
-        self.assertDictEqual(self.suggestion_types_need_reviewers, {})
+        self.assertDictEqual(self.suggestion_types_needing_reviewers, {})
 
         self.logout()
 
@@ -676,7 +678,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                         '/cron/mail/admins/contributor_dashboard_review_issues')
 
         self.assertEqual(len(self.admin_ids), 0)
-        self.assertDictEqual(self.suggestion_types_need_reviewers, {})
+        self.assertDictEqual(self.suggestion_types_needing_reviewers, {})
 
         self.logout()
 
@@ -692,13 +694,14 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
                 self.get_html_response(
-                    '/cron/mail/admins/contributor_dashboard_review_issues')
+                    '/cron/mail/admins/contributor_dashboard_review_turnaround'
+                    '_time_issues')
 
         self.assertEqual(len(self.admin_ids), 1)
         self.assertEqual(self.admin_ids[0], self.admin_id)
         self.assertDictEqual(
-            self.suggestion_types_need_reviewers,
-            self.expected_suggestion_types_need_reviewers)
+            self.suggestion_types_needing_reviewers,
+            self.expected_suggestion_types_needing_reviewers)
 
     def test_email_sent_to_admin_if_notifying_admins_about_suggestions_enabled(
             self):

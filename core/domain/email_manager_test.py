@@ -2059,7 +2059,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
 
 
 class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
-    """Tests the send_reviewers_contributor_dashboard_suggestions method,
+    """Tests the send_mail_to_notify_contributor_dashboard_reviewers method,
     which sends an email to reviewers with information regarding the suggestions
     that have waited the longest for review.
     """
@@ -2157,7 +2157,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         sent_email_model = sent_email_models[0]
         self.assertEqual(
             sent_email_model.subject,
-            email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
+            email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_DATA[
                 'email_subject'])
         self.assertEqual(
             sent_email_model.recipient_id, reviewer_id)
@@ -2217,7 +2217,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [self.reviewer_1_id], [[self.reviewable_suggestion_email_info]]
             )
 
@@ -2233,7 +2233,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', False)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [self.reviewer_1_id], [[self.reviewable_suggestion_email_info]]
             )
 
@@ -2252,7 +2252,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 ['reviewer_id_with_no_email'],
                 [[self.reviewable_suggestion_email_info]]
             )
@@ -2271,7 +2271,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [], [[self.reviewable_suggestion_email_info]]
             )
 
@@ -2289,7 +2289,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [self.reviewer_1_id], [[]]
             )
 
@@ -2344,7 +2344,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2403,7 +2403,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2462,7 +2462,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2521,7 +2521,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2580,7 +2580,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2639,7 +2639,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2698,7 +2698,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2766,7 +2766,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [reviewable_suggestion_email_infos])
                 )
@@ -2874,7 +2874,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
                         [
                             reviewer_1_suggestion_email_infos,
@@ -2945,7 +2945,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3003,7 +3003,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3064,7 +3064,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3125,7 +3125,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3186,7 +3186,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3247,7 +3247,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3308,7 +3308,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3376,7 +3376,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [reviewable_suggestion_email_infos])
                 )
@@ -3484,7 +3484,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
                         [
                             reviewer_1_suggestion_email_infos,
@@ -3601,7 +3601,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
                         [
                             reviewer_1_suggestion_email_infos,
@@ -4451,7 +4451,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         sent_email_model = sent_email_models[0]
         self.assertEqual(
             sent_email_model.subject,
-            email_manager.NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+            email_manager.NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA[
                 'email_subject'])
         self.assertEqual(
             sent_email_model.recipient_id, admin_id)
@@ -4495,7 +4495,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.log_new_error_ctx = self.swap(
             email_manager, 'log_new_error', self.log_new_error_counter)
 
-        self.suggestion_types_need_reviewers = {
+        self.suggestion_types_needing_reviewers = {
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}
         }
@@ -4506,7 +4506,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.cannot_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
-                [self.admin_1_id], self.suggestion_types_need_reviewers)
+                [self.admin_1_id], self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4521,7 +4521,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
-                [self.admin_1_id], self.suggestion_types_need_reviewers)
+                [self.admin_1_id], self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4538,15 +4538,13 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
-                [], self.suggestion_types_need_reviewers)
+                [], self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
-            self.logged_errors[0],
-            'No admins to notify that Contributor Dashboard reviewers are '
-            'needed.')
+            self.logged_errors[0], 'There were no admins to notify.')
 
     def test_email_not_sent_if_no_suggestion_types_that_need_reviewers(
             self):
@@ -4572,7 +4570,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 ['admin_id_without_email'],
-                self.suggestion_types_need_reviewers)
+                self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
@@ -4587,10 +4585,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
         self._create_question_suggestion()
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}})
         expected_email_html_body = (
@@ -4601,7 +4599,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>quesiton suggestions</b> created on the '
+            'There have been <b>question suggestions</b> created on the '
             '<a href="%s%s">Contributor Dashboard page</a> where there are not '
             'enough reviewers.'
             '<br><br>'
@@ -4614,7 +4612,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
-                [self.admin_1_id], self.suggestion_types_need_reviewers)
+                [self.admin_1_id], self.suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
@@ -4631,10 +4629,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
         self._create_question_suggestion()
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
                 constants.DEFAULT_LANGUAGE_CODE}})
         expected_email_html_body_for_admin_1 = (
@@ -4645,7 +4643,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>quesiton suggestions</b> created on the '
+            'There have been <b>question suggestions</b> created on the '
             '<a href="%s%s">Contributor Dashboard page</a> where there are not '
             'enough reviewers.'
             '<br><br>'
@@ -4663,7 +4661,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
-            'There have been <b>quesiton suggestions</b> created on the '
+            'There have been <b>question suggestions</b> created on the '
             '<a href="%s%s">Contributor Dashboard page</a> where there are not '
             'enough reviewers.'
             '<br><br>'
@@ -4677,7 +4675,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id, self.admin_2_id],
-                suggestion_types_need_reviewers)
+                suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
@@ -4702,10 +4700,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
         self._create_translation_suggestion_with_language_code('hi')
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
         expected_email_html_body = (
             'Hi user1,'
@@ -4727,7 +4725,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
-                [self.admin_1_id], suggestion_types_need_reviewers)
+                [self.admin_1_id], suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
@@ -4744,10 +4742,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
         self._create_translation_suggestion_with_language_code('hi')
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
@@ -4787,7 +4785,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id, self.admin_2_id],
-                suggestion_types_need_reviewers)
+                suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
@@ -4813,10 +4811,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'fr', 'hi'}})
         expected_email_html_body = (
@@ -4844,7 +4842,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
-                [self.admin_1_id], suggestion_types_need_reviewers)
+                [self.admin_1_id], suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
@@ -4862,10 +4860,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'fr', 'hi'}})
         expected_email_html_body_for_admin_1 = (
@@ -4916,7 +4914,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id, self.admin_2_id],
-                suggestion_types_need_reviewers)
+                suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)
@@ -4936,17 +4934,17 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             expected_email_html_body_for_admin_2, self.admin_2_id,
             self.ADMIN_2_EMAIL)
 
-    def test_email_sent_to_admins_if_mutli_suggestion_types_need_reviewers(
+    def test_email_sent_to_admins_if_mutli_suggestion_types_needing_reviewers(
             self):
         config_services.set_property(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         self._create_question_suggestion()
-        suggestion_types_need_reviewers = (
+        suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
-            suggestion_types_need_reviewers,
+            suggestion_types_needing_reviewers,
             {
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'fr', 'hi'},
@@ -4969,7 +4967,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             '<li><b>French</b></li><br>'
             '<li><b>Hindi</b></li><br>'
             '</ul><br>'
-            'There have been <b>quesiton suggestions</b> created on the '
+            'There have been <b>question suggestions</b> created on the '
             '<a href="%s%s">Contributor Dashboard page</a> where there are not '
             'enough reviewers.'
             '<br><br>'
@@ -4996,7 +4994,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             '<li><b>French</b></li><br>'
             '<li><b>Hindi</b></li><br>'
             '</ul><br>'
-            'There have been <b>quesiton suggestions</b> created on the '
+            'There have been <b>question suggestions</b> created on the '
             '<a href="%s%s">Contributor Dashboard page</a> where there are not '
             'enough reviewers.'
             '<br><br>'
@@ -5011,7 +5009,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_reviewers_needed(
                 [self.admin_1_id, self.admin_2_id],
-                suggestion_types_need_reviewers)
+                suggestion_types_needing_reviewers)
 
         # Make sure correct emails are sent.
         messages = self._get_sent_email_messages(self.ADMIN_1_EMAIL)

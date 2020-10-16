@@ -488,8 +488,8 @@ def create_string_from_largest_unit_in_timedelta(timedelta_obj):
             objects.
 
     Returns:
-        str. A human readable string representing the value of largest non zero
-        time unit, along with the time units. If the largest time unit is
+        str. A human readable string representing the value of the largest non
+        zero time unit, along with the time units. If the largest time unit is
         seconds, 1 minute is returned. The value is represented as an integer in
         the string.
 
