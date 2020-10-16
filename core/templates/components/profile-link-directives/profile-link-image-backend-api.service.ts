@@ -42,10 +42,14 @@ export class ProfileLinkImageBackendApiService {
       // "data:image/png;base64,". But URL encoded data contains "%" (%2B for
       // "+" and "%3D" for ="). Hence the image is decoded here to conform to
       // the security restrictions imposed by angular.
+      // TODO(#10463): Remove the 'replace newlines' logic after moving
+      // profile pictures to GCS.
       map(response => {
         return (
           response.profile_picture_data_url_for_username &&
-          decodeURIComponent(response.profile_picture_data_url_for_username));
+          decodeURIComponent(
+            response.profile_picture_data_url_for_username
+          ).replace(/\n/g, ''));
       })).toPromise();
   }
 }
