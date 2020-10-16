@@ -875,7 +875,7 @@ def get_submitted_suggestions(user_id, suggestion_type):
     ])
 
 
-def get_suggestions_waiting_too_long_for_review_info():
+def get_info_about_suggestions_waiting_too_long_for_review():
     """Gets the information about the suggestions that have been waiting longer
     than suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days
     for a review on the Contributor Dashboard. There can be information about at

@@ -547,10 +547,10 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             reviewable_suggestion_email_info.submission_datetime,
             expected_reviewable_suggestion_email_info.submission_datetime)
 
-    def _mock_send_mail_to_notify_admins_reviewers_needed(
+    def mock_send_mail_to_notify_admins_that_reviewers_are_needed(
             self, admin_ids, suggestion_types_needing_reviewers):
         """Mocks
-        email_manager.send_mail_to_notify_admins_reviewers_needed as
+        email_manager.send_mail_to_notify_admins_that_reviewers_are_needed as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
@@ -622,8 +622,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         with self.cannot_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_mail_to_notify_admins_reviewers_needed',
-                self._mock_send_mail_to_notify_admins_reviewers_needed):
+                'send_mail_to_notify_admins_that_reviewers_are_needed',
+                self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
                 with self.swap(
                     email_manager,
                     'send_mail_to_notify_admins_suggestions_waiting_long',
@@ -648,8 +648,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_mail_to_notify_admins_reviewers_needed',
-                self._mock_send_mail_to_notify_admins_reviewers_needed):
+                'send_mail_to_notify_admins_that_reviewers_are_needed',
+                self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
@@ -668,8 +668,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_mail_to_notify_admins_reviewers_needed',
-                self._mock_send_mail_to_notify_admins_reviewers_needed):
+                'send_mail_to_notify_admins_that_reviewers_are_needed',
+                self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
@@ -687,8 +687,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_mail_to_notify_admins_reviewers_needed',
-                self._mock_send_mail_to_notify_admins_reviewers_needed):
+                'send_mail_to_notify_admins_that_reviewers_are_needed',
+                self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
                 self.get_html_response(
                     '/cron/mail/admins/contributor_dashboard_bottlenecks')
 

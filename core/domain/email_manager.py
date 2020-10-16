@@ -1374,21 +1374,19 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         return
 
     if not admin_ids:
-        log_new_error(
-            'No admins to notify that Contributor Dashboard suggestions have '
-            'waited too long for a review.')
+        log_new_error('There were no admins to notify.')
         return
 
-    suggestions_to_notify_admin_html_strings = []
+    suggestion_descriptions = []
     # Get the html for the list of suggestions that have been waiting too long
     # for a review.
     for reviewable_suggestion_email_info in reviewable_suggestion_email_infos:
-        suggestions_to_notify_admin_html_strings.append(
+        suggestion_descriptions.append(
             _create_html_for_reviewable_suggestion_email_info(
                 reviewable_suggestion_email_info))
 
-    suggestions_to_notify_admin_html = ''.join(
-        suggestions_to_notify_admin_html_strings)
+    list_of_suggestion_descriptions = ''.join(
+        suggestion_descriptions)
 
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
@@ -1409,7 +1407,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
                 feconf.CONTRIBUTOR_DASHBOARD_URL,
                 suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                suggestions_to_notify_admin_html)
+                list_of_suggestion_descriptions)
 
             _send_email(
                 admin_id, feconf.SYSTEM_COMMITTER_ID,
@@ -1418,7 +1416,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
                 recipient_email=admin_emails[index])
 
 
-def send_mail_to_notify_admins_reviewers_needed(
+def send_mail_to_notify_admins_that_reviewers_are_needed(
         admin_ids, suggestion_types_needing_reviewers):
     """Sends an email to admins to notify them that there are specific
     suggestion types on the Contributor Dashboard that need more reviewers.

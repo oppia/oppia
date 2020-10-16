@@ -3875,9 +3875,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.assertEqual(len(messages), 0)
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
-            self.logged_errors[0],
-            'No admins to notify that Contributor Dashboard suggestions have '
-            'waited too long for a review.')
+            self.logged_errors[0], 'There were no admins to notify.')
 
     def test_email_not_sent_if_no_suggestions_to_notify_the_admin_about(
             self):
@@ -4505,7 +4503,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
@@ -4520,7 +4518,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', False)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
@@ -4537,7 +4535,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [], self.suggestion_types_needing_reviewers)
 
         messages = self._get_all_sent_email_messages()
@@ -4552,7 +4550,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], {})
 
         messages = self._get_all_sent_email_messages()
@@ -4568,7 +4566,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 ['admin_id_without_email'],
                 self.suggestion_types_needing_reviewers)
 
@@ -4611,7 +4609,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         )
 
         with self.can_send_emails_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], self.suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
@@ -4673,7 +4671,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         )
 
         with self.can_send_emails_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_needing_reviewers)
 
@@ -4724,7 +4722,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         )
 
         with self.can_send_emails_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
@@ -4783,7 +4781,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         )
 
         with self.can_send_emails_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_needing_reviewers)
 
@@ -4841,7 +4839,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         )
 
         with self.can_send_emails_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], suggestion_types_needing_reviewers)
 
         # Make sure correct email is sent.
@@ -4912,7 +4910,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         )
 
         with self.can_send_emails_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_needing_reviewers)
 
@@ -5007,7 +5005,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         )
 
         with self.can_send_emails_ctx:
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id],
                 suggestion_types_needing_reviewers)
 

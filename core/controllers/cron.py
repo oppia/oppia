@@ -277,7 +277,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 suggestion_services
                 .get_suggestion_types_that_need_reviewers()
             )
-            email_manager.send_mail_to_notify_admins_reviewers_needed(
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 admin_ids, suggestion_types_needing_reviewers)
         if (
                 config_domain
@@ -285,12 +285,13 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 .value):
             admin_ids = user_services.get_user_ids_by_role(
                 feconf.ROLE_ID_ADMIN)
-            suggestions_waiting_too_long_for_review_info = (
+            info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services
-                .get_suggestions_waiting_too_long_for_review_info()
+                .get_info_about_suggestions_waiting_too_long_for_review()
             )
             (
                 email_manager
                 .send_mail_to_notify_admins_suggestions_waiting_long(
-                    admin_ids, suggestions_waiting_too_long_for_review_info)
+                    admin_ids,
+                    info_about_suggestions_waiting_too_long_for_review)
             )

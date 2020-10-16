@@ -3395,7 +3395,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         test_utils.GenericTestBase):
     """Test the ability of the
-    get_suggestions_waiting_too_long_for_review_info method in suggestion
+    get_info_about_suggestions_waiting_too_long_for_review method in suggestion
     services, which is used to retrieve the information required to notify
     admins if there are suggestions that have waited longer than
     suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days for a
@@ -3536,12 +3536,13 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             with self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                suggestions_waiting_too_long_for_review_info = (
+                info_about_suggestions_waiting_too_long_for_review = (
                     suggestion_services
-                    .get_suggestions_waiting_too_long_for_review_info()
+                    .get_info_about_suggestions_waiting_too_long_for_review()
                 )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 0)
+        self.assertEqual(
+            len(info_about_suggestions_waiting_too_long_for_review), 0)
 
     def test_get_returns_empty_if_suggestion_review_wait_time_diff_is_negative(
             self):
@@ -3551,12 +3552,13 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         with self.swap(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 1):
-            suggestions_waiting_too_long_for_review_info = (
+            info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services
-                .get_suggestions_waiting_too_long_for_review_info()
+                .get_info_about_suggestions_waiting_too_long_for_review()
             )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 0)
+        self.assertEqual(
+            len(info_about_suggestions_waiting_too_long_for_review), 0)
 
     def test_get_returns_empty_if_suggestions_have_waited_less_than_threshold(
             self):
@@ -3573,12 +3575,13 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
-                suggestions_waiting_too_long_for_review_info = (
+                info_about_suggestions_waiting_too_long_for_review = (
                     suggestion_services
-                    .get_suggestions_waiting_too_long_for_review_info()
+                    .get_info_about_suggestions_waiting_too_long_for_review()
                 )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 0)
+        self.assertEqual(
+            len(info_about_suggestions_waiting_too_long_for_review), 0)
 
     def test_get_returns_empty_if_suggestions_have_waited_threshold_review_time(
             self):
@@ -3595,12 +3598,13 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
-                suggestions_waiting_too_long_for_review_info = (
+                info_about_suggestions_waiting_too_long_for_review = (
                     suggestion_services
-                    .get_suggestions_waiting_too_long_for_review_info()
+                    .get_info_about_suggestions_waiting_too_long_for_review()
                 )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 0)
+        self.assertEqual(
+            len(info_about_suggestions_waiting_too_long_for_review), 0)
 
     def test_get_returns_suggestion_waited_long_if_their_wait_is_past_threshold(
             self):
@@ -3625,14 +3629,15 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
-                suggestions_waiting_too_long_for_review_info = (
+                info_about_suggestions_waiting_too_long_for_review = (
                     suggestion_services
-                    .get_suggestions_waiting_too_long_for_review_info()
+                    .get_info_about_suggestions_waiting_too_long_for_review()
                 )
 
-        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 2)
+        self.assertEqual(
+            len(info_about_suggestions_waiting_too_long_for_review), 2)
         self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
-            suggestions_waiting_too_long_for_review_info,
+            info_about_suggestions_waiting_too_long_for_review,
             expected_suggestion_email_infos
         )
 
@@ -3656,18 +3661,19 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
-                suggestions_waiting_too_long_for_review_info = (
+                info_about_suggestions_waiting_too_long_for_review = (
                     suggestion_services
-                    .get_suggestions_waiting_too_long_for_review_info()
+                    .get_info_about_suggestions_waiting_too_long_for_review()
                 )
 
         # The question suggestion was created 2 days after the translation
         # suggestion, so it has only waited 1 day for a review, which is less
         # than 3, the mocked review wait time threshold. Therefore, only the
         # translation suggestion has waited too long for review.
-        self.assertEqual(len(suggestions_waiting_too_long_for_review_info), 1)
+        self.assertEqual(
+            len(info_about_suggestions_waiting_too_long_for_review), 1)
         self._assert_reviewable_suggestion_email_infos_are_in_correct_order(
-            suggestions_waiting_too_long_for_review_info,
+            info_about_suggestions_waiting_too_long_for_review,
             expected_suggestion_email_infos
         )
 
