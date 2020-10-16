@@ -671,6 +671,7 @@ class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         try:
+            # Load the image to retrieve dimensions for later verification.
             height, width = image_services.get_image_dimensions(
                 profile_picture_binary)
         except Exception:
