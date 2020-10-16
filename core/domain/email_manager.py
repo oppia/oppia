@@ -259,31 +259,40 @@ HTML_FOR_REVIEWABLE_SUGGESTION_EMAIL_INFO = {
 
 NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO = {
     'email_body_template': (
-        'Hi %s,<br><br>'
-        'In the <a href="%s%s#/roles">admin '
-        'roles page,</a> please add reviewers to the Contributor Dashboard '
-        'Community by entering their username(s) and allow reviewing for the '
-        'suggestion types that need more reviewers bolded below.'
-        '<br>%s<br>'
-        'Thanks so much - we appreciate your help!<br>'
-        'Best Wishes!<br><br>'
+        'Hi %s,'
+        '<br><br>'
+        'In the <a href="%s%s#/roles">admin roles page,</a> please add '
+        'reviewers to the Contributor Dashboard Community by entering their '
+        'username(s) and allow reviewing for the suggestion types that need '
+        'more reviewers bolded below.'
+        '<br><br>%s'
+        'Thanks so much - we appreciate your help!<br><br>'
+        'Best Wishes!<br>'
         '- The Oppia Contributor Dashboard Team'
     ),
     'email_subject': 'Reviewers Needed for Contributor Dashboard',
     # The templates below are for listing the information for each suggestion
-    # type that needs more reviewers.
+    # type that needs more reviewers. For translation languages there are two
+    # templates to account for: whether one or multiple languages needs more
+    # reviewers.
     'suggestion_types_need_reviewers_template': {
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
-            'There have been <b>translation suggestions</b> created on the '
-            '<a href="%s%s">Contributor '
-            'Dashboard page</a> in languages where there are not enough '
-            'reviewers. The languages that need more reviewers are:'
-            '<br>%s<br>'),
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            'one_language': (
+                'There have been <b>%s translation suggestions</b> created on '
+                'the <a href="%s%s">Contributor Dashboard page</a> where there '
+                'are not enough reviewers.<br><br>'
+            ),
+            'multi_language': (
+                'There have been <b>translation suggestions</b> created on the '
+                '<a href="%s%s">Contributor Dashboard page</a> in languages '
+                'where there are not enough reviewers. The languages that need '
+                'more reviewers are:'
+                '<br><ul>%s</ul><br>')
+        },
         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
             'There have been <b>quesiton suggestions</b> created on the '
-            '<a href="%s%s">Contributor '
-            'Dashboard page</a> where there are not enough '
-            'reviewers' % (
+            '<a href="%s%s">Contributor Dashboard page</a> where there are not '
+            'enough reviewers.<br><br>' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
     }
 }
@@ -338,7 +347,7 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
+    feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1266,7 +1275,7 @@ def send_mail_to_notify_users_to_review(user_id, category):
             recipient_user_settings.username, category, EMAIL_FOOTER.value)
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
@@ -1420,7 +1429,7 @@ def send_mail_to_notify_admins_reviewers_needed(
     Note: it is assumed that all admins are super admins because only super
     admins have access to the admin page where reviewers can be added to the
     Contributor Dashboard. Also note that these emails are sent out regardless
-    of the admins email preferenecs.
+    of the admins email preferences.
 
     Args:
         admin_ids: list(str). The user ids of the admins to notify.
@@ -1441,9 +1450,9 @@ def send_mail_to_notify_admins_reviewers_needed(
 
     if not config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
         log_new_error(
-            'Notifying admins that Contributor Dashboard reviewers are needed '
-            'must be enabled on the config page in order to send the admins '
-            'the emails.'
+            'The "notify_admins_reviewers_needed_is_enabled" property '
+            'must be enabled on the admin config page in order to send '
+            'admins the emails.'
         )
         return
 
@@ -1464,21 +1473,39 @@ def send_mail_to_notify_admins_reviewers_needed(
     suggestion_types_need_reviewers_html_list = []
     if suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
             suggestion_types_need_more_reviewers):
-        html_for_languages_that_need_more_reviewers = ''.join(
-            [
-                '<li><b>%s</b></li>' % (
-                    utils.get_supported_audio_language_description(
-                        language_code)) for language_code in
-                suggestion_types_need_more_reviewers[
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT]
-            ]
-        )
-        suggestion_types_need_reviewers_html_list.append(
-            NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
-                'suggestion_types_need_reviewers_template'][
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] % (
-                        feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                        html_for_languages_that_need_more_reviewers))
+        language_codes_that_need_reviewers = (
+            suggestion_types_need_more_reviewers[
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT])
+        # There are different templates to handle whether multiple languages
+        # need more reviewers or just one language.
+        if len(language_codes_that_need_reviewers) == 1:
+            suggestion_types_need_reviewers_html_list.append(
+                NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+                    'suggestion_types_need_reviewers_template'][
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT][
+                            'one_language'] % (
+                                utils.get_supported_audio_language_description(
+                                    language_codes_that_need_reviewers.pop()),
+                                feconf.OPPIA_SITE_URL,
+                                feconf.CONTRIBUTOR_DASHBOARD_URL))
+
+        else:
+            html_for_languages_that_need_more_reviewers = ''.join(
+                [
+                    '<li><b>%s</b></li><br>' % (
+                        utils.get_supported_audio_language_description(
+                            language_code)) for language_code in
+                    language_codes_that_need_reviewers
+                ]
+            )
+            suggestion_types_need_reviewers_html_list.append(
+                NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_INFO[
+                    'suggestion_types_need_reviewers_template'][
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT][
+                            'multi_language'] % (
+                                feconf.OPPIA_SITE_URL,
+                                feconf.CONTRIBUTOR_DASHBOARD_URL,
+                                html_for_languages_that_need_more_reviewers))
 
     if suggestion_models.SUGGESTION_TYPE_ADD_QUESTION in (
             suggestion_types_need_more_reviewers):
@@ -1515,11 +1542,11 @@ def send_mail_to_notify_admins_reviewers_needed(
                 recipient_email=admin_emails[index])
 
 
-def send_mail_to_notify_contributor_dashboard_reviewers(
+def send_reviewers_contributor_dashboard_suggestions(
         reviewer_ids, reviewers_suggestion_email_infos):
-    """Sends an email to each Contributor Dashboard reviewer notifying them of
-    the suggestions that have been waiting the longest for reivew, and that the
-    reviewer has permission to review.
+    """Sends an email to each reviewer notifying them of the suggestions on the
+    Contributor Dashboard that have been waiting the longest for reivew, and
+    that the reviewer has permission to review.
 
     Args:
         reviewer_ids: list(str). A list of the Contributor Dashboard reviewer
@@ -1542,10 +1569,11 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     if not (
             config_domain
-            .NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED.value):
+            .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
         log_new_error(
-            'Notifying Contributor Dashboard reviewers must be enabled on the '
-            'config page in order to send reviewers the emails.'
+            'The "contributor_dashboard_reviewer_emails_is_enabled" property '
+            'must be enabled on the admin config page in order to send '
+            'reviewers the emails.'
         )
         return
 
@@ -1572,17 +1600,17 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                     reviewer_id))
             continue
         else:
-            list_of_suggestions_to_notify_reviewer_strings = []
+            suggestion_descriptions = []
             for reviewer_suggestion_email_info in (
                     reviewers_suggestion_email_infos[index]):
-                list_of_suggestions_to_notify_reviewer_strings.append(
+                suggestion_descriptions.append(
                     _create_html_for_reviewable_suggestion_email_info(
                         reviewer_suggestion_email_info))
 
             email_body = email_body_template % (
                 reviewer_usernames[index], feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
-                    list_of_suggestions_to_notify_reviewer_strings),
+                    suggestion_descriptions),
                 EMAIL_FOOTER.value)
 
             _send_email(

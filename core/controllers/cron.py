@@ -229,10 +229,10 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
             logging.warning('Deletion jobs for JobModels entities kicked off.')
 
 
-class CronMailContributorDashboardReviewerOpportunitiesHandler(
+class CronMailReviewersContributorDashboardSuggestionsHandler(
         base.BaseHandler):
-    """Handler for mailing reviewers review opportunities on the Contributor
-    Dashboard.
+    """Handler for mailing reviewers suggestions on the Contributor
+    Dashboard that need review.
     """
 
     @acl_decorators.can_perform_cron_tasks
@@ -245,13 +245,13 @@ class CronMailContributorDashboardReviewerOpportunitiesHandler(
         # Only execute this job if it's possible to send the emails.
         if feconf.CAN_SEND_EMAILS and (
                 config_domain
-                .NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_IS_ENABLED.value):
+                .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
             reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
             reviewers_suggestion_email_infos = (
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                     reviewer_ids))
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+            email_manager.send_reviewers_contributor_dashboard_suggestions(
                 reviewer_ids, reviewers_suggestion_email_infos)
 
 

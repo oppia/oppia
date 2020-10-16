@@ -506,10 +506,10 @@ EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
 EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
-EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
 EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'address_contributor_dashboard_suggestions'
 )
+EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS = 'review_suggestions'
 EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'review_contributor_dashboard_suggestions'
 )
