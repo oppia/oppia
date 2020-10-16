@@ -42,8 +42,9 @@ transaction_services = models.Registry.import_transaction_services()
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
-# The maximum number of suggestions to recommend to a reviewer to review.
-MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = 5
+# The maximum number of suggestions to recommend to a reviewer to review in an
+# email.
+MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER = 5
 
 # A dictionary that maps the suggestion type to a lambda function, which is
 # used to retrieve the html content that corresponds to the suggestion's
@@ -694,7 +695,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
     # Replace all the <oppia-noninteractive-**> tags with their rte component
     # names capitalized in square brackets.
     html_content_string_with_rte_tags_replaced = re.sub(
-        r'<(oppia-noninteractive-.+?)[^>]+>(.*?)</oppia-noninteractive-.+?>',
+        r'<oppia-noninteractive-[^>]+>(.*?)</oppia-noninteractive-[^>]+>',
         _replace_rte_tag, html_content_string)
     # Get rid of all of the other html tags.
     plain_text = html_cleaner.strip_html_tags(
@@ -784,9 +785,10 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         if user_contribution_rights.can_review_questions:
             for question_suggestion in question_suggestions:
                 # Break early because we only want the top
-                # MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER number of suggestions.
+                # MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER number of
+                # suggestions.
                 if len(suggestions_waiting_longest_heap) == (
-                        MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
+                        MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
                     break
                 # We can't include suggestions that were authored by the
                 # reviewer because reviewers aren't allowed to review their own
@@ -815,7 +817,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                 )
                 for translation_suggestion in translation_suggestions:
                     if len(suggestions_waiting_longest_heap) == (
-                            MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
+                            MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
                         # The shortest review wait time corresponds to the most
                         # recent review submission date, which is the max of
                         # the heap.
@@ -837,7 +839,8 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         # Get the key information from each suggestion that will be used to
         # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-        for _ in python_utils.RANGE(MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
+        for _ in python_utils.RANGE(
+                MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
             if len(suggestions_waiting_longest_heap) == 0:
                 break
             _, suggestion = heapq.heappop(suggestions_waiting_longest_heap)
