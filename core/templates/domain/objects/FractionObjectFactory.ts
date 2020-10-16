@@ -24,7 +24,7 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { FractionAnswer } from
   'interactions/answer-defs';
-import { number } from 'mathjs';
+
 
 export class Fraction {
   isNegative: boolean;
