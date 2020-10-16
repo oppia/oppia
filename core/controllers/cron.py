@@ -268,29 +268,29 @@ class CronMailAdminContributorDashboardReviewIssuesHandler(
         to alert the admins that specific suggestions have been waiting too long
         to get reviewed.
         """
-        # Only execute this job if it's possible to send the emails.
-        if feconf.CAN_SEND_EMAILS:
-            if config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
-                admin_ids = user_services.get_user_ids_by_role(
-                    feconf.ROLE_ID_ADMIN)
-                suggestion_types_need_reviewers = (
-                    suggestion_services
-                    .get_suggestion_types_that_need_reviewers()
-                )
-                email_manager.send_mail_to_notify_admins_reviewers_needed(
-                    admin_ids, suggestion_types_need_reviewers)
-            if (
-                    config_domain
-                    .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED
-                    .value):
-                admin_ids = user_services.get_user_ids_by_role(
-                    feconf.ROLE_ID_ADMIN)
-                suggestions_waiting_too_long_for_review_info = (
-                    suggestion_services
-                    .get_suggestions_waiting_too_long_for_review_info()
-                )
-                (
-                    email_manager
-                    .send_mail_to_notify_admins_suggestions_waiting_long(
-                        admin_ids, suggestions_waiting_too_long_for_review_info)
-                )
+        if not feconf.CAN_SEND_EMAILS:
+            return
+        if config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
+            admin_ids = user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_ADMIN)
+            suggestion_types_need_reviewers = (
+                suggestion_services
+                .get_suggestion_types_that_need_reviewers()
+            )
+            email_manager.send_mail_to_notify_admins_reviewers_needed(
+                admin_ids, suggestion_types_need_reviewers)
+        if (
+                config_domain
+                .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED
+                .value):
+            admin_ids = user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_ADMIN)
+            suggestions_waiting_too_long_for_review_info = (
+                suggestion_services
+                .get_suggestions_waiting_too_long_for_review_info()
+            )
+            (
+                email_manager
+                .send_mail_to_notify_admins_suggestions_waiting_long(
+                    admin_ids, suggestions_waiting_too_long_for_review_info)
+            )
