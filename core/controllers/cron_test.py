@@ -683,7 +683,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
-            'committer_id', 'enable_admin_notifications_for_reviewer_shortage', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
