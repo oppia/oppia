@@ -1250,6 +1250,21 @@ class CommunityContributionStats(python_utils.OBJECT):
             number_of_suggestions, number_of_reviewers) > (
                 config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value)
 
+    def get_translation_language_codes_that_need_reviewers(self):
+        """Returns the language codes where more reviewers are needed to review
+        translations in those language codes.
+
+        Returns:
+            set. A set of of the language codes where more translation reviewers
+            are needed.
+        """
+        language_codes_that_need_reviewers = set()
+        for language_code in self.translation_suggestion_counts_by_lang_code:
+            if self.are_translation_reviewers_needed_in_lang_code(
+                    language_code):
+                language_codes_that_need_reviewers.add(language_code)
+        return language_codes_that_need_reviewers
+
     def are_question_reviewers_needed(self):
         """Returns whether or not more reviewers are needed to review question
         suggestions.

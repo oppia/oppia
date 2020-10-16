@@ -2633,6 +2633,43 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             {'en': 1, 'hi': 2}
         )
 
+    def test_get_translation_language_codes_that_need_reviewers_for_one_lang(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+        stats.set_translation_suggestion_count_for_language_code(
+            self.sample_language_code, 1)
+
+        language_codes_that_need_reviewers = (
+            stats.get_translation_language_codes_that_need_reviewers()
+        )
+
+        self.assertEqual(
+            language_codes_that_need_reviewers, {self.sample_language_code})
+
+    def test_get_translation_language_codes_that_need_reviewers_for_multi_lang(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+        stats.set_translation_suggestion_count_for_language_code('hi', 1)
+        stats.set_translation_suggestion_count_for_language_code('fr', 1)
+
+        language_codes_that_need_reviewers = (
+            stats.get_translation_language_codes_that_need_reviewers()
+        )
+
+        self.assertEqual(
+            language_codes_that_need_reviewers, {'hi', 'fr'})
+
+    def test_get_translation_language_codes_that_need_reviewers_for_no_lang(
+            self):
+        stats = suggestion_services.get_community_contribution_stats()
+
+        language_codes_that_need_reviewers = (
+            stats.get_translation_language_codes_that_need_reviewers()
+        )
+
+        self.assertEqual(
+            language_codes_that_need_reviewers, set())
+
     def test_translation_reviewers_are_needed_if_suggestions_but_no_reviewers(
             self):
         stats = suggestion_services.get_community_contribution_stats()
