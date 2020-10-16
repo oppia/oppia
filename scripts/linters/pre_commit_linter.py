@@ -66,6 +66,7 @@ from . import css_linter
 from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
+from . import linter_utils
 from . import other_files_linter
 from . import python_linter
 from .. import common
@@ -408,10 +409,13 @@ def _print_summary_of_error_messages(lint_messages):
         lint_messages: list(str). List of linter error messages.
     """
     if lint_messages != '':
-        python_utils.PRINT('Please fix the errors below:')
-        python_utils.PRINT('----------------------------------------')
-        for message in lint_messages:
-            python_utils.PRINT(message)
+        error_message_lines = [
+            '----------------------------------------',
+            'Please fix the errors below:',
+            '----------------------------------------',
+            ] + lint_messages
+        linter_utils.print_failure_message(
+            '\033[91m' + '\n'.join(error_message_lines) + '\033[0m')
 
 
 def _get_task_output(lint_messages, failed, task):
@@ -547,14 +551,16 @@ def main(args=None):
 
     if failed:
         _print_summary_of_error_messages(lint_messages)
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('Checks Not Passed.')
-        python_utils.PRINT('---------------------------')
+        linter_utils.print_failure_message('\n'.join([
+            '---------------------------',
+            'Checks Not Passed.',
+            '---------------------------']))
         sys.exit(1)
     else:
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('All Checks Passed.')
-        python_utils.PRINT('---------------------------')
+        linter_utils.print_success_message('\n'.join([
+            '---------------------------',
+            'All Checks Passed.',
+            '---------------------------']))
 
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
