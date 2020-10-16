@@ -27,8 +27,6 @@ import subprocess
 import sys
 import time
 
-import googleapiclient.discovery
-
 import python_utils
 from scripts import build
 from scripts import common
@@ -42,8 +40,13 @@ _SIMPLE_CRYPT_PATH = os.path.join(
     'simple-crypt-' + common.SIMPLE_CRYPT_VERSION)
 sys.path.insert(0, _SIMPLE_CRYPT_PATH)
 
-
 import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+_PYTHON_LIBS_PATH = os.path.join(
+    os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _PYTHON_LIBS_PATH)
+
+import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 MAXIMUM_RUNS = 3
 WEB_DRIVER_PORT = 4444
