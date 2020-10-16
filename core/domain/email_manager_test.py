@@ -353,7 +353,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -414,7 +414,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -474,7 +474,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -534,7 +534,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -950,7 +950,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
         self.new_footer = (
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
         self.new_email_subject = 'THIS IS A PLACEHOLDER.'
         self.new_email_html_body = 'Hi %s,<br><br>%s<br><br>%s' % (
             self.NEW_USER_USERNAME,
@@ -1383,7 +1383,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi editor,\n'
@@ -1506,7 +1506,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi editor,\n'
@@ -1612,7 +1612,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -1722,7 +1722,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -1834,7 +1834,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hello Moderator,\n'
@@ -1955,7 +1955,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_onboard_new_reviewers(
@@ -2026,7 +2026,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         with self.can_send_emails_ctx:
             email_manager.send_mail_to_notify_users_to_review(
@@ -2157,7 +2157,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         sent_email_model = sent_email_models[0]
         self.assertEqual(
             sent_email_model.subject,
-            email_manager.NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_DATA[
+            email_manager
+            .CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
                 'email_subject'])
         self.assertEqual(
             sent_email_model.recipient_id, reviewer_id)
@@ -3739,7 +3740,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.assertEqual(
             sent_email_model.subject, (
                 email_manager
-                .NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA[
+                .ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
                     'email_subject']
             ))
         self.assertEqual(
@@ -3948,7 +3949,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>Find the existing reviewers and email reviewers directly '
             'about the suggestions waiting for a review</li><br>'
             '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
+            'Here are the suggestions:'
             '<br><br>'
             '<ul>'
             '<li>The following question suggestion was submitted for review 5 '
@@ -4022,7 +4023,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>Find the existing reviewers and email reviewers directly '
             'about the suggestions waiting for a review</li><br>'
             '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
+            'Here are the suggestions:'
             '<br><br>'
             '<ul>'
             '<li>The following question suggestion was submitted for review 2 '
@@ -4093,7 +4094,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>Find the existing reviewers and email reviewers directly '
             'about the suggestions waiting for a review</li><br>'
             '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
+            'Here are the suggestions:'
             '<br><br>'
             '<ul>'
             '<li>The following Hindi translation suggestion was submitted for '
@@ -4167,7 +4168,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>Find the existing reviewers and email reviewers directly '
             'about the suggestions waiting for a review</li><br>'
             '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
+            'Here are the suggestions:'
             '<br><br>'
             '<ul>'
             '<li>The following English translation suggestion was submitted '
@@ -4252,7 +4253,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>Find the existing reviewers and email reviewers directly '
             'about the suggestions waiting for a review</li><br>'
             '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
+            'Here are the suggestions:'
             '<br><br>'
             '<ul>'
             '<li>The following English translation suggestion was submitted '
@@ -4325,7 +4326,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>Find the existing reviewers and email reviewers directly '
             'about the suggestions waiting for a review</li><br>'
             '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
+            'Here are the suggestions:'
             '<br><br>'
             '<ul>'
             '<li>The following question suggestion was submitted for review 5 '
@@ -4352,7 +4353,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<li>Find the existing reviewers and email reviewers directly '
             'about the suggestions waiting for a review</li><br>'
             '</ul><br>'
-            'The suggestions that have been waiting too long for a review:'
+            'Here are the suggestions:'
             '<br><br>'
             '<ul>'
             '<li>The following question suggestion was submitted for review 5 '
@@ -4465,7 +4466,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         sent_email_model = sent_email_models[0]
         self.assertEqual(
             sent_email_model.subject,
-            email_manager.NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA[
+            email_manager.ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                 'email_subject'])
         self.assertEqual(
             sent_email_model.recipient_id, admin_id)
@@ -4524,7 +4525,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
 
         with self.cannot_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
@@ -4539,7 +4541,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', False)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', False)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
@@ -4550,13 +4553,14 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
-            'The "notify_admins_reviewers_needed_is_enabled" property '
-            'must be enabled on the admin config page in order to send '
-            'admins the emails.')
+            'The "enable_admin_notifications_for_reviewer_shortage" '
+            'property must be enabled on the admin config page in order to '
+            'send admins the emails.')
 
     def test_email_not_sent_if_no_admins_to_notify(self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
@@ -4571,7 +4575,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_not_sent_if_no_suggestion_types_that_need_reviewers(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
 
         with self.can_send_emails_ctx, self.log_new_info_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
@@ -4586,7 +4591,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def test_email_not_sent_if_admin_email_does_not_exist(self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
@@ -4604,7 +4610,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_sent_to_admin_if_question_suggestions_need_reviewers(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_question_suggestion()
         suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -4615,7 +4622,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user1,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4647,7 +4654,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_sent_to_admins_if_question_suggestions_need_reviewers(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_question_suggestion()
         suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -4658,7 +4666,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user1,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4676,7 +4684,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user2,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4717,7 +4725,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_admin_email_sent_if_translations_need_reviewers_for_one_lang(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -4728,7 +4737,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user1,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4759,7 +4768,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_admin_emails_sent_if_translations_need_reviewers_for_one_lang(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
             suggestion_services.get_suggestion_types_that_need_reviewers())
@@ -4770,7 +4780,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user1,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4787,7 +4797,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user2,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4827,7 +4837,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_admin_email_sent_if_translations_need_reviewers_for_multi_lang(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
@@ -4840,7 +4851,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user1,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4876,7 +4887,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_admin_emails_sent_if_translations_need_reviewers_for_multi_lang(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
@@ -4889,7 +4901,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user1,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4911,7 +4923,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user2,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -4956,7 +4968,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_sent_to_admins_if_mutli_suggestion_types_needing_reviewers(
             self):
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         self._create_question_suggestion()
@@ -4973,7 +4986,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user1,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -5000,7 +5013,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Hi user2,'
             '<br><br>'
             'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-            'reviewers to the Contributor Dashboard Community by entering '
+            'reviewers to the Contributor Dashboard community by entering '
             'their username(s) and allow reviewing for the suggestion types '
             'that need more reviewers bolded below.'
             '<br><br>'
@@ -5093,7 +5106,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi submit,\n'
@@ -5158,7 +5171,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi submit,\n'
@@ -5296,7 +5309,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         with self.can_send_emails_ctx:
             email_manager.send_accepted_voiceover_application_email(
@@ -5340,7 +5353,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         with self.can_send_emails_ctx:
             email_manager.send_rejected_voiceover_application_email(
@@ -5423,7 +5436,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         with self.can_send_emails_ctx:
             email_manager.send_account_deleted_email(

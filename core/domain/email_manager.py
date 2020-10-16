@@ -143,7 +143,8 @@ EMAIL_FOOTER = config_domain.ConfigProperty(
     'The footer to append to all outgoing emails. (This should be written in '
     'HTML and include an unsubscribe link.)',
     'You can change your email preferences via the '
-    '<a href="https://www.example.com">Preferences</a> page.')
+    '<a href="%s%s">Preferences</a> page.' % (
+        feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL))
 
 _PLACEHOLDER_SUBJECT = 'THIS IS A PLACEHOLDER.'
 _PLACEHOLDER_HTML_BODY = 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
@@ -209,7 +210,7 @@ NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
     []
 )
 
-NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_DATA = {
+CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA = {
     'email_body_template': (
         'Hi %s,'
         '<br><br>'
@@ -230,7 +231,7 @@ NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_DATA = {
     'email_subject': 'Contributor Dashboard Reviewer Opportunities'
 }
 
-HTML_FOR_REVIEWABLE_SUGGESTION_EMAIL_INFO = {
+HTML_FOR_SUGGESTION_DESCRIPTION = {
     # The templates below are for listing the information for each suggestion
     # type offered on the Contributor Dashboard.
     'suggestion_template': {
@@ -257,12 +258,12 @@ HTML_FOR_REVIEWABLE_SUGGESTION_EMAIL_INFO = {
     }
 }
 
-NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA = {
+ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA = {
     'email_body_template': (
         'Hi %s,'
         '<br><br>'
         'In the <a href="%s%s#/roles">admin roles page,</a> please add '
-        'reviewers to the Contributor Dashboard Community by entering their '
+        'reviewers to the Contributor Dashboard community by entering their '
         'username(s) and allow reviewing for the suggestion types that need '
         'more reviewers bolded below.'
         '<br><br>%s'
@@ -294,7 +295,7 @@ NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA = {
             feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
 }
 
-NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA = {
+ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA = {
     'email_body_template': (
         'Hi %s,<br><br>'
         'There are suggestions on the <a href="%s%s">Contributor Dashboard</a> '
@@ -307,7 +308,7 @@ NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA = {
         '<li>Find the existing reviewers and email reviewers directly about '
         'the suggestions waiting for a review</li><br>'
         '</ul><br>'
-        'The suggestions that have been waiting too long for a review:'
+        'Here are the suggestions:'
         '<br><br>'
         '<ul>%s</ul><br>'
         'Thanks so much - we appreciate your help!<br>'
@@ -1314,11 +1315,11 @@ def _create_html_for_reviewable_suggestion_email_info(
             reviewable_suggestion_email_info.suggestion_content)
     }
     get_values_to_populate_suggestion_template = (
-        HTML_FOR_REVIEWABLE_SUGGESTION_EMAIL_INFO[
+        HTML_FOR_SUGGESTION_DESCRIPTION[
             'suggestion_template_values_getter_functions'][
                 reviewable_suggestion_email_info.suggestion_type])
     suggestion_template = (
-        HTML_FOR_REVIEWABLE_SUGGESTION_EMAIL_INFO[
+        HTML_FOR_SUGGESTION_DESCRIPTION[
             'suggestion_template'][
                 reviewable_suggestion_email_info.suggestion_type])
     return suggestion_template % (
@@ -1347,10 +1348,10 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             descending order based on review wait time.
     """
     email_subject = (
-        NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA[
+        ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
             'email_subject'])
     email_body_template = (
-        NOTIFY_ADMINS_SUGGESTIONS_WAITING_FOR_REVIEW_EMAIL_DATA[
+        ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA[
             'email_body_template'])
 
     if not feconf.CAN_SEND_EMAILS:
@@ -1359,7 +1360,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
 
     if not (
             config_domain
-            .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED.value):
+            .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value):
         log_new_error(
             'The "notify_admins_suggestions_waiting_too_long" property '
             'must be enabled on the admin config page in order to send '
@@ -1435,19 +1436,22 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             would be a set of language codes that translations are offered in
             that need more reviewers.
     """
-    email_subject = NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA['email_subject']
-    email_body_template = NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA[
+    email_subject = ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
+        'email_subject']
+    email_body_template = ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
         'email_body_template']
 
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
 
-    if not config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
+    if not (
+            config_domain
+            .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
         log_new_error(
-            'The "notify_admins_reviewers_needed_is_enabled" property '
-            'must be enabled on the admin config page in order to send '
-            'admins the emails.'
+            'The "enable_admin_notifications_for_reviewer_shortage" '
+            'property must be enabled on the admin config page in order to '
+            'send admins the emails.'
         )
         return
 
@@ -1473,7 +1477,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         # need more reviewers or just one language.
         if len(language_codes_that_need_reviewers) == 1:
             suggestion_types_needing_reviewers_paragraphs.append(
-                NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA[
+                ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'one_language_template'] % (
                         utils.get_supported_audio_language_description(
                             language_codes_that_need_reviewers.pop()),
@@ -1490,7 +1494,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                 ]
             )
             suggestion_types_needing_reviewers_paragraphs.append(
-                NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA[
+                ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'multi_language_template'] % (
                         feconf.OPPIA_SITE_URL,
                         feconf.CONTRIBUTOR_DASHBOARD_URL,
@@ -1499,7 +1503,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
     if suggestion_models.SUGGESTION_TYPE_ADD_QUESTION in (
             suggestion_types_needing_reviewers):
         suggestion_types_needing_reviewers_paragraphs.append(
-            NOTIFY_ADMINS_REVIEWERS_NEEDED_EMAIL_DATA[
+            ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                 'question_template'])
 
     suggestion_types_needing_reviewers_html = ''.join(
@@ -1546,10 +1550,11 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             suggestions we're notifying reviewers about and will be used to
             compose the email body for each reviewer.
     """
-    email_subject = NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_DATA[
+    email_subject = CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
         'email_subject']
-    email_body_template = NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_DATA[
-        'email_body_template']
+    email_body_template = (
+        CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
+            'email_body_template'])
 
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')

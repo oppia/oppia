@@ -598,8 +598,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.expected_suggestion_types_needing_reviewers = {
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {
-                constants.DEFAULT_LANGUAGE_CODE}
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
         }
 
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -614,7 +613,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     def test_email_not_sent_if_sending_emails_is_disabled(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', True)
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)
@@ -643,7 +643,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', False)
+            'committer_id',
+            'enable_admin_notifications_for_reviewer_shortage', False)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
@@ -682,7 +683,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
-            'committer_id', 'notify_admins_reviewers_needed_is_enabled', True)
+            'committer_id', 'enable_admin_notifications_for_reviewer_shortage', True)
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(

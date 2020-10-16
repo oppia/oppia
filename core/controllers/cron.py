@@ -270,7 +270,10 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         """
         if not feconf.CAN_SEND_EMAILS:
             return
-        if config_domain.NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED.value:
+
+        if (
+                config_domain
+                .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
             admin_ids = user_services.get_user_ids_by_role(
                 feconf.ROLE_ID_ADMIN)
             suggestion_types_needing_reviewers = (
@@ -281,7 +284,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 admin_ids, suggestion_types_needing_reviewers)
         if (
                 config_domain
-                .NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED
+                .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
                 .value):
             admin_ids = user_services.get_user_ids_by_role(
                 feconf.ROLE_ID_ADMIN)

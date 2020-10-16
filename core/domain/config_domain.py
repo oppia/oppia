@@ -465,7 +465,7 @@ CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
         'about suggestions that need review. The default value is false.'
     ), False)
 
-NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED = ConfigProperty(
+ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = ConfigProperty(
     'notify_admins_suggestions_waiting_too_long_is_enabled', BOOL_SCHEMA,
     (
         'Enable sending admins email notifications if there are Contributor '
@@ -474,8 +474,8 @@ NOTIFY_ADMINS_SUGGESTIONS_WAITING_TOO_LONG_IS_ENABLED = ConfigProperty(
             suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
     ), False)
 
-NOTIFY_ADMINS_REVIEWERS_NEEDED_IS_ENABLED = ConfigProperty(
-    'notify_admins_reviewers_needed_is_enabled', BOOL_SCHEMA,
+ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = ConfigProperty(
+    'enable_admin_notifications_for_reviewer_shortage', BOOL_SCHEMA,
     (
         'Enable sending admins email notifications if Contributor Dashboard '
         'reviewers are needed in specific suggestion types. The default value '
