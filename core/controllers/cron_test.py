@@ -476,7 +476,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.expected_reviewable_suggestion_email_info)
 
 
-class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
+class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         test_utils.GenericTestBase):
 
     target_id = 'exp1'
@@ -571,7 +571,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
 
     def setUp(self):
         super(
-            CronMailAdminContributorDashboardReviewIssuesHandlerTests,
+            CronMailAdminContributorDashboardBottlenecksHandlerTests,
             self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -632,8 +632,8 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                         suggestion_models,
                         'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                         self.get_html_response(
-                            '/cron/mail/admins/'
-                            'contributor_dashboard_review_issues')
+                            '/cron/mail/admins/contributor_dashboard'
+                            '_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 0)
         self.assertEqual(len(self.reviewable_suggestion_email_infos), 0)
@@ -651,8 +651,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
                 self.get_html_response(
-                    '/cron/mail/admins/contributor_dashboard_review_turnaround'
-                    '_time_issues')
+                    '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 0)
         self.assertDictEqual(self.suggestion_types_needing_reviewers, {})
@@ -668,14 +667,11 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
 
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
-                suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
-                with self.swap(
-                    email_manager,
-                    'send_mail_to_notify_admins_suggestions_waiting_long',
-                    self._mock_send_mail_to_notify_admins_suggestions_waiting):
-                    self.get_html_response(
-                        '/cron/mail/admins/contributor_dashboard_review_issues')
+                email_manager,
+                'send_mail_to_notify_admins_reviewers_needed',
+                self._mock_send_mail_to_notify_admins_reviewers_needed):
+                self.get_html_response(
+                    '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 0)
         self.assertDictEqual(self.suggestion_types_needing_reviewers, {})
@@ -694,8 +690,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                 'send_mail_to_notify_admins_reviewers_needed',
                 self._mock_send_mail_to_notify_admins_reviewers_needed):
                 self.get_html_response(
-                    '/cron/mail/admins/contributor_dashboard_review_turnaround'
-                    '_time_issues')
+                    '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 1)
         self.assertEqual(self.admin_ids[0], self.admin_id)
@@ -719,7 +714,7 @@ class CronMailAdminContributorDashboardReviewIssuesHandlerTests(
                     'send_mail_to_notify_admins_suggestions_waiting_long',
                     self._mock_send_mail_to_notify_admins_suggestions_waiting):
                     self.get_html_response(
-                        '/cron/mail/admins/contributor_dashboard_review_issues')
+                        '/cron/mail/admins/contributor_dashboard_bottlenecks')
 
         self.assertEqual(len(self.admin_ids), 1)
         self.assertEqual(self.admin_ids[0], self.admin_id)

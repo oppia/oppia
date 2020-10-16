@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import heapq
 import re
 
-from constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -1167,8 +1166,7 @@ def get_suggestion_types_that_need_reviewers():
 
     if stats.are_question_reviewers_needed():
         suggestion_types_needing_reviewers[
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] = {
-                constants.DEFAULT_LANGUAGE_CODE}
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] = {}
 
     return suggestion_types_needing_reviewers
 

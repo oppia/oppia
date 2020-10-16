@@ -255,10 +255,10 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
                 reviewer_ids, reviewers_suggestion_email_infos)
 
 
-class CronMailAdminContributorDashboardReviewIssuesHandler(
+class CronMailAdminContributorDashboardBottlenecksHandler(
         base.BaseHandler):
-    """Handler for mailing admins if there are issues that are causing a longer
-    reviewer turnaround time on the Contributor Dashboard.
+    """Handler for mailing admins if there are bottlenecks that are causing a
+    longer reviewer turnaround time on the Contributor Dashboard.
     """
 
     @acl_decorators.can_perform_cron_tasks
