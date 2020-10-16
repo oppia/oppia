@@ -272,7 +272,7 @@ class MockSimpleCrypt(python_utils.OBJECT):
         """
         self.decrypt_called = True
         assert password == self.expected_password
-        return "sample output".encode()
+        return 'sample output'.encode()
 
 
 class RunE2ETestsTests(test_utils.GenericTestBase):
@@ -1124,13 +1124,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_from_service_account_file(cls, unused_file_name, scopes): # pylint: disable=unused-argument
             return
 
-        class mockResource(python_utils.OBJECT):
+
+        class MockResource(python_utils.OBJECT):
+            """Mock object with a spreadsheets() method, for testing."""
             def spreadsheets(self):
+                """Placeholder function for testing"""
                 return
 
         def mock_discovery_build(
                 unused_api_name, unused_version, credentials): # pylint: disable=unused-argument
-            return mockResource()
+            return MockResource()
 
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
