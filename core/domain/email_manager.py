@@ -1207,7 +1207,7 @@ def send_mail_to_notify_users_to_review(user_id, category):
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_reviewers_contributor_dashboard_suggestions(
+def send_mail_to_notify_contributor_dashboard_reviewers(
         reviewer_ids, reviewers_suggestion_email_infos):
     """Sends an email to each reviewer notifying them of the suggestions on the
     Contributor Dashboard that have been waiting the longest for reivew, and

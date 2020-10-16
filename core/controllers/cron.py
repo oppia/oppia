@@ -251,5 +251,5 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
                 suggestion_services
                 .get_suggestions_waiting_for_review_info_to_notify_reviewers(
                     reviewer_ids))
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 reviewer_ids, reviewers_suggestion_email_infos)
