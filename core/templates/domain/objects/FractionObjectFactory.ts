@@ -77,11 +77,7 @@ export class Fraction {
   }
 
   convertToSimplestForm(): Fraction {
-<<<<<<< HEAD
     var gcd = (x: number, y: number): number => {
-=======
-    var gcd = (x: number, y: number) => {
->>>>>>> parent of 0ab12b95d... Fixed errors to make strict typescript checks on FractionObjectFactory
       return y === 0 ? x : gcd(y, x % y);
     };
     var g = gcd(this.numerator, this.denominator);
