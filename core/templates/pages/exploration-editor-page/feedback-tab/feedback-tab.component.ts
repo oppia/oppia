@@ -83,7 +83,6 @@ angular.module('oppia').component('feedbackTab', {
             ctrl.activeThread = ThreadDataBackendApiService.getThread(
               activeThreadId);
           }
-          $rootScope.$apply();
         });
       };
 
