@@ -279,7 +279,7 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
+    feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1203,7 +1203,7 @@ def send_mail_to_notify_users_to_review(user_id, category):
             recipient_user_settings.username, category, EMAIL_FOOTER.value)
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
@@ -1236,8 +1236,9 @@ def send_reviewers_contributor_dashboard_suggestions(
             config_domain
             .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
         log_new_error(
-            'Notifying Contributor Dashboard reviewers must be enabled on the '
-            'config page in order to send reviewers the emails.'
+            'The "contributor_dashboard_reviewer_emails_is_enabled" property '
+            'must be enabled on the admin config page in order to send '
+            'reviewers the emails.'
         )
         return
 
@@ -1264,7 +1265,7 @@ def send_reviewers_contributor_dashboard_suggestions(
                     reviewer_id))
             continue
         else:
-            list_of_suggestions_to_notify_reviewer_strings = []
+            suggestion_descriptions = []
             for reviewer_suggestion_email_info in (
                     reviewers_suggestion_email_infos[index]):
                 # Get the language of the suggestion.
@@ -1296,7 +1297,7 @@ def send_reviewers_contributor_dashboard_suggestions(
                     NOTIFY_CONTRIBUTOR_DASHBOARD_REVIEWERS_EMAIL_INFO[
                         'suggestion_template'][
                             reviewer_suggestion_email_info.suggestion_type])
-                list_of_suggestions_to_notify_reviewer_strings.append(
+                suggestion_descriptions.append(
                     suggestion_template % (
                         get_values_to_populate_suggestion_template(
                             values_to_populate_suggestion_template_dict)))
@@ -1304,7 +1305,7 @@ def send_reviewers_contributor_dashboard_suggestions(
             email_body = email_body_template % (
                 reviewer_usernames[index], feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
-                    list_of_suggestions_to_notify_reviewer_strings),
+                    suggestion_descriptions),
                 EMAIL_FOOTER.value)
 
             _send_email(

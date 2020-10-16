@@ -2055,7 +2055,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent,
-                feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS)
+                feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS)
 
 
 class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
@@ -2242,8 +2242,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.assertEqual(self.log_new_error_counter.times_called, 1)
         self.assertEqual(
             self.logged_errors[0],
-            'Notifying Contributor Dashboard reviewers must be enabled on the '
-            'config page in order to send reviewers the emails.')
+            'The "contributor_dashboard_reviewer_emails_is_enabled" property '
+            'must be enabled on the admin config page in order to send '
+            'reviewers the emails.')
 
     def test_email_not_sent_if_reviewer_email_does_not_exist(self):
         config_services.set_property(
