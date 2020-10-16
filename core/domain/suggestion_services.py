@@ -1153,20 +1153,17 @@ def get_suggestion_types_that_need_reviewers():
         suggestions, the value would be a set of language codes that
         translations are offered in that need more reviewers.
     """
+    suggestion_types_need_more_reviewers = {}
     stats = get_community_contribution_stats()
 
-    suggestion_types_need_more_reviewers = {}
-    for language_code in stats.translation_suggestion_counts_by_lang_code:
-        if stats.are_translation_reviewers_needed_in_lang_code(language_code):
-            if suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
-                    suggestion_types_need_more_reviewers):
-                suggestion_types_need_more_reviewers[
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT].add(
-                        language_code)
-            else:
-                suggestion_types_need_more_reviewers[
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = {
-                        language_code}
+    language_codes_that_need_reviewers = (
+        stats.get_translation_language_codes_that_need_reviewers()
+    )
+    if len(language_codes_that_need_reviewers) != 0:
+        suggestion_types_need_more_reviewers[
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = (
+                language_codes_that_need_reviewers
+            )
 
     if stats.are_question_reviewers_needed():
         suggestion_types_need_more_reviewers[
