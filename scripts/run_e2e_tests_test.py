@@ -1127,8 +1127,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         class MockResource(python_utils.OBJECT):
             """Mock object with a spreadsheets() method, for testing."""
+
             def spreadsheets(self):
-                """Placeholder function for testing"""
+                """Placeholder function for testing."""
                 return
 
         def mock_discovery_build(
