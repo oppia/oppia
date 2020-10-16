@@ -27,12 +27,15 @@ import subprocess
 import sys
 import time
 
+import googleapiclient.discovery
+
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
+from google.oauth2 import service_account
 
 _SIMPLE_CRYPT_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools',
@@ -41,8 +44,6 @@ sys.path.insert(0, _SIMPLE_CRYPT_PATH)
 
 
 import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from google.oauth2 import service_account # isort:skip  pylint: disable=wrong-import-position, wrong-import-order, no-name-in-module, import-error, ungrouped-imports
 
 MAXIMUM_RUNS = 3
 WEB_DRIVER_PORT = 4444
@@ -667,24 +668,31 @@ def run_tests(args=None):
                 ansi_escape = re.compile(
                     r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
                 failure_log = ansi_escape.sub('', output_lines[i + 4])
-                failure_log = failure_log[2:].strip().lower()
+                failure_log = failure_log.strip().lower()
                 for index, row in enumerate(flaky_tests_list):
                     flaky_suite_name = row[0].strip().lower()
                     flaky_test_message = row[1].strip().lower()
                     flaky_error_message = row[2].strip().lower()
                     if (
                             suite_name == flaky_suite_name or
-                            suite_name == '[general]'):
+                            flaky_suite_name == '[general]'):
                         if (
                                 test_name == flaky_test_message or
-                                test_name == 'many'):
+                                flaky_test_message == 'many'):
                             if flaky_error_message in failure_log:
                                 update_flaky_tests_count(sheet, index, row[3])
                                 try:
                                     cleanup_portserver(portserver_process)
                                     cleanup()
-                                except Exception:
-                                    pass
+                                except Exception: # pragma: no cover
+                                    # This is marked as no cover because the
+                                    # exception happens due to some processes
+                                    # running on the local system, which might
+                                    # interfere with the cleanup stuff. This is
+                                    # added as a failsafe to make sure that
+                                    # even when it throws an exception, the
+                                    # test is retried.
+                                    pass # pragma: no cover
                                 return 'flake'
     sys.exit(p.returncode)
 

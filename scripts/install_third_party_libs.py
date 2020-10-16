@@ -95,20 +95,16 @@ def ensure_pip_library_is_installed(package, version, path):
     Args:
         package: str. The package name.
         version: str. The package version.
-        path: str or None. The installation path for the package.
+        path: str. The installation path for the package.
     """
-    if path is not None:
-        python_utils.PRINT(
-            'Checking if %s is installed in %s' % (package, path))
+    python_utils.PRINT(
+        'Checking if %s is installed in %s' % (package, path))
 
-        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
-        if not os.path.exists(exact_lib_path):
-            python_utils.PRINT('Installing %s' % package)
-            install_backend_python_libs.pip_install(
-                package, version, exact_lib_path)
-    else:
+    exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
+    if not os.path.exists(exact_lib_path):
+        python_utils.PRINT('Installing %s' % package)
         install_backend_python_libs.pip_install(
-            package, version, None)
+            package, version, exact_lib_path)
 
 
 def ensure_system_python_libraries_are_installed(package, version):
