@@ -190,9 +190,6 @@ class AdminHandler(base.BaseHandler):
                     self.payload.get('action') ==
                     'generate_dummy_new_skill_data'):
                 self._generate_dummy_skill_and_questions()
-            elif self.payload.get('action') == (
-                    'flush_migration_bot_contribution_data'):
-                user_services.flush_migration_bot_contributions_model()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
