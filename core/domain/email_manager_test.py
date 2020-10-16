@@ -2059,7 +2059,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
 
 
 class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
-    """Tests the send_reviewers_contributor_dashboard_suggestions method,
+    """Tests the send_mail_to_notify_contributor_dashboard_reviewers method,
     which sends an email to reviewers with information regarding the suggestions
     that have waited the longest for review.
     """
@@ -2217,7 +2217,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [self.reviewer_1_id], [[self.reviewable_suggestion_email_info]]
             )
 
@@ -2233,7 +2233,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', False)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [self.reviewer_1_id], [[self.reviewable_suggestion_email_info]]
             )
 
@@ -2252,7 +2252,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 ['reviewer_id_with_no_email'],
                 [[self.reviewable_suggestion_email_info]]
             )
@@ -2271,7 +2271,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [], [[self.reviewable_suggestion_email_info]]
             )
 
@@ -2289,7 +2289,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'contributor_dashboard_reviewer_emails_is_enabled', True)
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            email_manager.send_reviewers_contributor_dashboard_suggestions(
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 [self.reviewer_1_id], [[]]
             )
 
@@ -2344,7 +2344,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2403,7 +2403,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2462,7 +2462,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2521,7 +2521,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2580,7 +2580,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2639,7 +2639,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2698,7 +2698,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -2766,7 +2766,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [reviewable_suggestion_email_infos])
                 )
@@ -2874,7 +2874,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
                         [
                             reviewer_1_suggestion_email_infos,
@@ -2945,7 +2945,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3003,7 +3003,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3064,7 +3064,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3125,7 +3125,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3186,7 +3186,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3247,7 +3247,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3308,7 +3308,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [[reviewable_suggestion_email_info]])
                 )
@@ -3376,7 +3376,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id],
                         [reviewable_suggestion_email_infos])
                 )
@@ -3484,7 +3484,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
                         [
                             reviewer_1_suggestion_email_infos,
@@ -3601,7 +3601,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 (
                     email_manager
-                    .send_reviewers_contributor_dashboard_suggestions(
+                    .send_mail_to_notify_contributor_dashboard_reviewers(
                         [self.reviewer_1_id, self.reviewer_2_id],
                         [
                             reviewer_1_suggestion_email_infos,

@@ -374,7 +374,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     def _mock_send_contributor_dashboard_reviewers_emails(
             self, reviewer_ids, reviewers_suggestion_email_infos):
         """Mocks
-        email_manager.send_reviewers_contributor_dashboard_suggestions as
+        email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
         defined in main_cron.
         """
@@ -424,7 +424,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewers_contributor_dashboard_suggestions',
+                'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
@@ -443,7 +443,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         with self.cannot_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewers_contributor_dashboard_suggestions',
+                'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
@@ -462,7 +462,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         with self.can_send_emails, self.testapp_swap:
             with self.swap(
                 email_manager,
-                'send_reviewers_contributor_dashboard_suggestions',
+                'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_html_response(
                     '/cron/mail/reviewers/contributor_dashboard_suggestions')
