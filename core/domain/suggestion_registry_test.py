@@ -2643,18 +2643,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             stats.are_translation_reviewers_needed_in_lang_code(
                 self.sample_language_code))
 
-    def test_translation_reviewers_are_needed_if_suggestions_zero_reviewers(
-            self):
-        stats = suggestion_services.get_community_contribution_stats()
-        stats.set_translation_suggestion_count_for_language_code(
-            self.sample_language_code, 1)
-        stats.set_translation_reviewer_count_for_language_code(
-            self.sample_language_code, 0)
-
-        self.assertTrue(
-            stats.are_translation_reviewers_needed_in_lang_code(
-                self.sample_language_code))
-
     def test_translation_reviewers_are_needed_if_num_suggestions_past_max(self):
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
