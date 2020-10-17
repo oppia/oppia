@@ -355,9 +355,9 @@ def _remove_user_from_activities_with_associated_rights_models(user_id):
         exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
 
     explorations_to_be_deleted_ids = [
-        exp_summary.id for exp_summary in subscribed_exploration_summaries
-        if exp_summary.is_private() and
-           exp_summary.is_solely_owned_by_user(user_id)
+        exp_summary.id for exp_summary in subscribed_exploration_summaries if
+        exp_summary.is_private() and
+        exp_summary.is_solely_owned_by_user(user_id)
     ]
     exp_services.delete_explorations(
         user_id, explorations_to_be_deleted_ids, force_deletion=True)
@@ -365,19 +365,19 @@ def _remove_user_from_activities_with_associated_rights_models(user_id):
     # Release ownership of explorations that are public and are solely owned
     # by the to-be-deleted user.
     explorations_to_release_ownership_ids = [
-        exp_summary.id for exp_summary in subscribed_exploration_summaries
-        if not exp_summary.is_private() and
-           exp_summary.is_solely_owned_by_user(user_id) and
-           not exp_summary.community_owned
+        exp_summary.id for exp_summary in subscribed_exploration_summaries if
+        not exp_summary.is_private() and
+        exp_summary.is_solely_owned_by_user(user_id) and
+        not exp_summary.community_owned
     ]
     for exp_id in explorations_to_release_ownership_ids:
         rights_manager.release_ownership_of_exploration(
             user_services.get_system_user(), exp_id)
 
     explorations_to_remove_user_from_ids = [
-        exp_summary.id for exp_summary in subscribed_exploration_summaries
-        if not exp_summary.is_solely_owned_by_user(user_id) and
-           exp_summary.user_has_any_role(user_id)
+        exp_summary.id for exp_summary in subscribed_exploration_summaries if
+        not exp_summary.is_solely_owned_by_user(user_id) and
+        exp_summary.user_has_any_role(user_id)
     ]
     for exp_id in explorations_to_remove_user_from_ids:
         rights_manager.deassign_role_for_exploration(
@@ -386,9 +386,9 @@ def _remove_user_from_activities_with_associated_rights_models(user_id):
     subscribed_collection_summaries = (
         collection_services.get_collection_summaries_subscribed_to(user_id))
     collections_to_be_deleted_ids = [
-        col_summary.id for col_summary in subscribed_collection_summaries
-        if col_summary.is_private() and
-           col_summary.is_solely_owned_by_user(user_id)
+        col_summary.id for col_summary in subscribed_collection_summaries if
+        col_summary.is_private() and
+        col_summary.is_solely_owned_by_user(user_id)
     ]
     collection_services.delete_collections(
         user_id, collections_to_be_deleted_ids, force_deletion=True)
@@ -396,19 +396,19 @@ def _remove_user_from_activities_with_associated_rights_models(user_id):
     # Release ownership of collections that are public and are solely owned
     # by the to-be-deleted user.
     collections_to_release_ownership_ids = [
-        col_summary.id for col_summary in subscribed_collection_summaries
-        if not col_summary.is_private() and
-           col_summary.is_solely_owned_by_user(user_id) and
-           not col_summary.community_owned
+        col_summary.id for col_summary in subscribed_collection_summaries if
+        not col_summary.is_private() and
+        col_summary.is_solely_owned_by_user(user_id) and
+        not col_summary.community_owned
     ]
     for col_id in collections_to_release_ownership_ids:
         rights_manager.release_ownership_of_collection(
             user_services.get_system_user(), col_id)
 
     collections_to_remove_user_from_ids = [
-        col_summary.id for col_summary in subscribed_collection_summaries
-        if not col_summary.is_solely_owned_by_user(user_id) and
-           col_summary.user_has_any_role(user_id)
+        col_summary.id for col_summary in subscribed_collection_summaries if
+        not col_summary.is_solely_owned_by_user(user_id) and
+        col_summary.user_has_any_role(user_id)
     ]
     for col_id in collections_to_remove_user_from_ids:
         rights_manager.deassign_role_for_collection(

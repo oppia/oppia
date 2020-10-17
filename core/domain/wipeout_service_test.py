@@ -279,7 +279,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(user_auth_details.deleted)
         profile_user_settings = user_services.get_user_settings(
             self.profile_user_id)
-        self.assertFalse(user_settings.deleted)
+        self.assertFalse(profile_user_settings.deleted)
         profile_auth_details = user_services.get_user_settings(
             self.profile_user_id)
         self.assertFalse(profile_auth_details.deleted)
@@ -297,7 +297,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertTrue(profile_user_settings.deleted)
         profile_auth_details = user_models.UserAuthDetailsModel.get_by_id(
             self.profile_user_id)
-        self.assertTrue(profile_user_settings.deleted)
+        self.assertTrue(profile_auth_details.deleted)
 
     def test_pre_delete_user_without_activities_works_correctly(self):
         user_models.UserSubscriptionsModel(
@@ -318,19 +318,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
             self.user_1_id)
         self.assertTrue(user_auth_details.deleted)
-
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-
-    def test_pre_delete_user_with_activities(self):
-        self.save_new_valid_exploration('exp_id', self.user_1_id)
-        self.save_new_valid_collection(
-            'col_id', self.user_1_id, exploration_id='exp_id')
-
-        wipeout_service.pre_delete_user(self.user_1_id)
-
-        pending_deletion_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(pending_deletion_model)
 
     def test_pre_delete_user_with_activities_multiple_owners(self):
         user_services.update_user_role(
@@ -353,6 +343,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(pending_deletion_model)
 
     def test_pre_delete_user_collection_is_marked_deleted(self):
         self.save_new_valid_collection('col_id', self.user_1_id)
