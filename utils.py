@@ -478,7 +478,7 @@ def get_human_readable_time_string(time_msec):
 
 
 def create_string_from_largest_unit_in_timedelta(timedelta_obj):
-    """Given the timedelta object, find the largest non zero time unit and
+    """Given the timedelta object, find the largest nonzero time unit and
     return that value, along with the time unit, as a human readable string.
     The returned string is not localized.
 
@@ -488,10 +488,10 @@ def create_string_from_largest_unit_in_timedelta(timedelta_obj):
             objects.
 
     Returns:
-        str. A human readable string representing the value of largest non zero
-        time unit, along with the time units. If the largest time unit is
-        seconds, 1 minute is returned. The value is represented as an integer in
-        the string.
+        str. A human readable string representing the value of the largest
+        nonzero time unit, along with the time units. If the largest time unit
+        is seconds, 1 minute is returned. The value is represented as an integer
+        in the string.
 
     Raises:
         Exception. If the provided timedelta is not positive.

@@ -297,7 +297,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.'
         ) % (query_id, query_id)
 
         expected_email_text_body = (
@@ -342,7 +342,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.'
         ) % query_id
 
         expected_email_text_body = (
