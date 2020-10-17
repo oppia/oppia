@@ -2104,10 +2104,10 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.generate_initial_profile_picture(self.owner_id)
 
-    def test_correct_profile_picture_has_correct_profile_picture_value(self):
+    def test_correct_profile_picture_has_success_value(self):
         user_services.generate_initial_profile_picture(self.owner_id)
         output = self._run_one_off_job()
-        self.assertEqual(output, [['CORRECT PROFILE PICTURE', 1]])
+        self.assertEqual(output, [['SUCCESS', 1]])
 
     def test_resized_image_has_profile_picture_non_standard_dimensions_error(
             self):
@@ -2115,32 +2115,44 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
             self.owner_id, image_constants.PNG_IMAGE_WRONG_DIMENSIONS_BASE64)
         output = self._run_one_off_job()
         self.assertEqual(
-            output, [['PROFILE PICTURE NON STANDARD DIMENSIONS - 150,160', 1]])
+            output,
+            [[
+                'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - 150,160',
+                [self.owner_id]
+            ]]
+        )
 
     def test_invalid_image_has_cannot_load_picture_error(self):
         user_services.update_profile_picture_data_url(
             self.owner_id, image_constants.PNG_IMAGE_BROKEN_BASE64)
         output = self._run_one_off_job()
-        self.assertEqual(output, [['CANNOT LOAD PROFILE PICTURE', 1]])
+        self.assertEqual(
+            output, [['FAILURE - CANNOT LOAD PROFILE PICTURE', [self.owner_id]]]
+        )
 
     def test_non_png_image_has_profile_picture_not_png_error(self):
         user_services.update_profile_picture_data_url(
             self.owner_id, image_constants.JPG_IMAGE_BASE64)
         output = self._run_one_off_job()
-        self.assertEqual(output, [['PROFILE PICTURE NOT PNG', 1]])
+        self.assertEqual(
+            output, [['FAILURE - PROFILE PICTURE NOT PNG', [self.owner_id]]])
 
-    def test_broken_base64_data_url_has_wrong_profile_picture_data_url_error(
+    def test_broken_base64_data_url_has_invalid_profile_picture_data_url_error(
             self):
         user_services.update_profile_picture_data_url(
             self.owner_id, image_constants.BROKEN_BASE64)
         output = self._run_one_off_job()
-        self.assertEqual(output, [['WRONG PROFILE PICTURE DATA URL', 1]])
+        self.assertEqual(
+            output,
+            [['FAILURE - INVALID PROFILE PICTURE DATA URL', [self.owner_id]]]
+        )
 
     def test_user_without_profile_picture_has_missing_profile_picture_error(
             self):
         user_services.update_profile_picture_data_url(self.owner_id, None)
         output = self._run_one_off_job()
-        self.assertEqual(output, [['MISSING PROFILE PICTURE', 1]])
+        self.assertEqual(
+            output, [['FAILURE - MISSING PROFILE PICTURE', [self.owner_id]]])
 
     def test_not_registered_user_has_not_registered_value(self):
         user_settings_model = (
@@ -2148,7 +2160,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model.username = None
         user_settings_model.put()
         output = self._run_one_off_job()
-        self.assertEqual(output, [['NOT REGISTERED', 1]])
+        self.assertEqual(output, [['SUCCESS - NOT REGISTERED', 1]])
 
     def test_deleted_user_has_deleted_value(self):
         user_settings_model = (
@@ -2156,7 +2168,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model.deleted = True
         user_settings_model.put()
         output = self._run_one_off_job()
-        self.assertEqual(output, [['DELETED', 1]])
+        self.assertEqual(output, [['SUCCESS - DELETED', 1]])
 
     def test_zero_users_has_no_output(self):
         user_models.UserSettingsModel.delete_by_id(self.owner_id)
@@ -2174,14 +2186,19 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_services.update_profile_picture_data_url(
             new_user_id, image_constants.JPG_IMAGE_BASE64)
         user_services.update_profile_picture_data_url(editor_id, None)
-        user_services.update_profile_picture_data_url(moderator_id, None)
+
+        user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(moderator_id))
+        user_settings_model.deleted = True
+        user_settings_model.put()
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
             output,
             [
-                ['CORRECT PROFILE PICTURE', 1],
-                ['MISSING PROFILE PICTURE', 2],
-                ['PROFILE PICTURE NOT PNG', 1]
+                ['SUCCESS', 1],
+                ['FAILURE - MISSING PROFILE PICTURE', [editor_id]],
+                ['SUCCESS - DELETED', 1],
+                ['FAILURE - PROFILE PICTURE NOT PNG', [new_user_id]]
             ]
         )

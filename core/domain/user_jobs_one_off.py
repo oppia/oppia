@@ -648,26 +648,26 @@ class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model):  # pylint: disable=too-many-return-statements
         if model.deleted:
-            yield ('DELETED', model.id)
+            yield ('SUCCESS - DELETED', model.id)
             return
 
         if model.username is None:
-            yield ('NOT REGISTERED', model.id)
+            yield ('SUCCESS - NOT REGISTERED', model.id)
             return
 
         if model.profile_picture_data_url is None:
-            yield ('MISSING PROFILE PICTURE', model.id)
+            yield ('FAILURE - MISSING PROFILE PICTURE', model.id)
             return
 
         try:
             profile_picture_binary = utils.convert_png_data_url_to_binary(
                 model.profile_picture_data_url)
         except Exception:
-            yield ('WRONG PROFILE PICTURE DATA URL', model.id)
+            yield ('FAILURE - INVALID PROFILE PICTURE DATA URL', model.id)
             return
 
         if imghdr.what(None, h=profile_picture_binary) != 'png':
-            yield ('PROFILE PICTURE NOT PNG', model.id)
+            yield ('FAILURE - PROFILE PICTURE NOT PNG', model.id)
             return
 
         try:
@@ -675,7 +675,7 @@ class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             height, width = image_services.get_image_dimensions(
                 profile_picture_binary)
         except Exception:
-            yield ('CANNOT LOAD PROFILE PICTURE', model.id)
+            yield ('FAILURE - CANNOT LOAD PROFILE PICTURE', model.id)
             return
 
         if (
@@ -683,15 +683,18 @@ class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 width != user_services.GRAVATAR_SIZE_PX
         ):
             yield (
-                'PROFILE PICTURE NON STANDARD DIMENSIONS - %s,%s' % (
+                'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - %s,%s' % (
                     height, width
                 ),
                 model.id
             )
             return
 
-        yield ('CORRECT PROFILE PICTURE', model.id)
+        yield ('SUCCESS', model.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
