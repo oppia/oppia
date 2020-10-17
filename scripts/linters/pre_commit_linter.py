@@ -512,6 +512,9 @@ def main(args=None):
     custom_linters = []
     third_party_linters = []
     for file_extension_type in file_extension_types:
+        if (not file_extension_type == 'other' and not
+                len(_FILES['.%s' % file_extension_type])):
+            continue
         custom_linter, third_party_linter = _get_linters_for_file_extension(
             file_extension_type)
         custom_linters += custom_linter
