@@ -1424,24 +1424,14 @@ class PlaythroughModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def delete_playthroughs_multi(cls, playthrough_ids):
-        """Deltes multiple playthrough instances.
-
-        Args:
-            playthrough_ids: list(str). List of playthrough IDs to be deleted.
-        """
-        instances = cls.get_multi(playthrough_ids)
-        cls.delete_multi(instances)
-
-    @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super(PlaythroughModel, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'issue_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'issue_customization_args':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_customization_args': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'actions': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -1626,7 +1616,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     # ID of exploration.
     exploration_id = datastore_services.StringProperty(indexed=True)
     # Version of exploration.
-    version = datastore_services.StringProperty(indexed=False)
+    version = datastore_services.StringProperty(indexed=True)
     # Number of students who started the exploration.
     num_starts = datastore_services.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration.

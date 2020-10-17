@@ -22,8 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import prod_validation_jobs_one_off
 from core.domain import question_services
 from core.domain import story_domain
@@ -67,14 +65,16 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
             category='category',
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -250,7 +250,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 u'[u\'failed validation check for content count check '
                 'of ExplorationOpportunitySummaryModel\', '
                 '[u"Entity id 1: Content count: 10 does not match the '
-                'content count of external exploration model: 1"]]'
+                'content count of external exploration model: 2"]]'
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=True)
