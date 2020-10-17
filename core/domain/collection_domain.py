@@ -1296,7 +1296,7 @@ class CollectionSummary(python_utils.OBJECT):
             user_id: str. User id of the user.
 
         Returns:
-            bool. Whether the given user may edit the collection.
+            bool. Whether the given user has any role in the collection.
         """
         return (
             user_id in self.owner_ids or
