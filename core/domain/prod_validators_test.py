@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import json
 import math
 import random
 import time
@@ -6615,11 +6616,11 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance = recommendations_models.TopicSimilaritiesModel(
             id=recommendations_models.TOPIC_SIMILARITIES_ID)
 
-        self.content = {
+        self.content = json.dumps({
             'Art': {'Art': '1.0', 'Biology': '0.8', 'Chemistry': '0.1'},
             'Biology': {'Art': '0.8', 'Biology': '1.0', 'Chemistry': '0.5'},
             'Chemistry': {'Art': '0.1', 'Biology': '0.5', 'Chemistry': '1.0'},
-        }
+        })
 
         self.model_instance.content = self.content
         self.model_instance.put()
@@ -6681,10 +6682,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_topic_similarities_columns(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': '1.0', 'Biology': '0.5'},
             'Biology': {}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6701,10 +6702,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_topic(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': '1.0', 'invalid': '0.5'},
             'invalid': {'Art': '0.5', 'invalid': '1.0'}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6720,9 +6721,9 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_topic_similarities_rows(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': '1.0', 'Biology': '0.5'}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6738,10 +6739,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_similarity_type(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': 'one', 'Biology': 0.5},
             'Biology': {'Art': 0.5, 'Biology': 1.0}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6758,10 +6759,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_similarity_value(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': 10.0, 'Biology': 0.5},
             'Biology': {'Art': 0.5, 'Biology': 1.0}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6778,10 +6779,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_assymetric_content(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': 1.0, 'Biology': 0.5},
             'Biology': {'Art': 0.6, 'Biology': 1.0}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -12037,15 +12038,15 @@ class ExpUserLastPlaythroughModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_invalid_state_name(self):
-        self.model_instance.last_played_state_name = 'invalid'
+        self.model_instance.last_played_state_name = 'invalidθ'
         self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for state name check '
                 'of ExpUserLastPlaythroughModel\', '
-                '[u"Entity id %s.0: last played state name invalid is not '
-                'present in exploration states [u\'Introduction\', u\'End\'] '
-                'for exploration id 0"]]') % self.user_id]
+                '[u"Entity id %s.0: last played state name invalid\\u03b8 is '
+                'not present in exploration states [u\'Introduction\', '
+                'u\'End\'] for exploration id 0"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
