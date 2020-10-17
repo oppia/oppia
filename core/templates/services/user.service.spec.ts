@@ -186,7 +186,7 @@ describe('User Service', function() {
     $httpBackend.expect('GET', requestUrl).respond(
       200, {profile_picture_data_url: 'image data'});
 
-    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+    UserService.getProfilePictureUrl().then(function(dataUrl) {
       expect(dataUrl).toBe('image data');
     });
     $httpBackend.flush();
@@ -195,7 +195,7 @@ describe('User Service', function() {
       200, sampleUserInfoBackendObject);
     $httpBackend.when('GET', requestUrl).respond(404);
 
-    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+    UserService.getProfilePictureUrl().then(function(dataUrl) {
       expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.webp'));
     });
@@ -217,7 +217,7 @@ describe('User Service', function() {
       $httpBackend.expect('GET', '/userinfohandler').respond(
         200, sampleUserInfoBackendObject);
 
-      UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+      UserService.getProfilePictureUrl().then(function(dataUrl) {
         expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
           '/avatar/user_blue_72px.webp'));
       });

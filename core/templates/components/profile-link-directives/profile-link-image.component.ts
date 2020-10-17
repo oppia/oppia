@@ -18,6 +18,8 @@
 
 import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
+import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { ProfileLinkImageBackendApiService } from
@@ -30,35 +32,20 @@ import { ProfileLinkImageBackendApiService } from
 })
 export class ProfileLinkImageComponent implements OnInit {
   @Input() username: string;
-  profileImageUrl: string;
-  profilePicture: string;
+  profilePictureUrl: string;
   constructor(
     private profileLinkImageBackendApiService:
       ProfileLinkImageBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  isUsernameLinkable(username: string): boolean {
-    return ['admin', 'OppiaMigrationBot'].indexOf(username) === -1;
+  isUsernameLinkable(): boolean {
+    return !(['admin', 'OppiaMigrationBot'].includes(this.username));
   }
 
   ngOnInit(): void {
-    this.profileImageUrl = (
-      '/preferenceshandler/profile_picture_by_username/' +
-      this.username);
-    var DEFAULT_PROFILE_IMAGE_PATH = (
-      this.urlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.webp'));
-    this.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
-
-    // Returns a promise for the user profile picture, or the default
-    // image if user is not logged in or has not uploaded a profile
-    // picture, or the player is in preview mode.
-    this.profileLinkImageBackendApiService.fetchProfilePictureDataAsync(
-      this.profileImageUrl).then((base64ProfilePicture: string) => {
-      this.profilePicture = (
-        base64ProfilePicture || DEFAULT_PROFILE_IMAGE_PATH);
-    });
+    this.profilePictureUrl = (
+      this.urlInterpolationService.getProfilePictureUrlFor(this.username))
   }
 }
 

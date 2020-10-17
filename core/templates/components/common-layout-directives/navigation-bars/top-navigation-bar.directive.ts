@@ -272,6 +272,8 @@ angular.module('oppia').directive('topNavigationBar', [
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               ctrl.username = userInfo.getUsername();
               if (ctrl.username) {
+                ctrl.profilePictureUrl = (
+                  UserService.getProfilePictureUrl(ctrl.username))
                 ctrl.profilePageUrl = UrlInterpolationService.interpolateUrl(
                   '/profile/<username>', {
                     username: ctrl.username
@@ -293,9 +295,6 @@ angular.module('oppia').directive('topNavigationBar', [
                   }
                 });
               }
-            });
-            UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-              ctrl.profilePictureDataUrl = dataUrl;
             });
 
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {

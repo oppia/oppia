@@ -51,24 +51,8 @@ angular.module('oppia').factory('UserService', [
     };
 
     return {
-      getProfileImageDataUrlAsync: function() {
-        var profilePictureDataUrl = (
-          UrlInterpolationService.getStaticImageUrl(
-            DEFAULT_PROFILE_IMAGE_PATH));
-        return getUserInfoAsync().then(function(userInfo) {
-          if (userInfo.isLoggedIn()) {
-            return $http.get(
-              '/preferenceshandler/profile_picture'
-            ).then(function(response) {
-              if (response.data.profile_picture_data_url) {
-                profilePictureDataUrl = response.data.profile_picture_data_url;
-              }
-              return profilePictureDataUrl;
-            });
-          } else {
-            return $q.resolve(profilePictureDataUrl);
-          }
-        });
+      getProfilePictureUrl: function(username) {
+        return UrlInterpolationService.getProfilePictureUrlFor(username);
       },
       setProfileImageDataUrlAsync: function(newProfileImageDataUrl) {
         return $http.put(PREFERENCES_DATA_URL, {

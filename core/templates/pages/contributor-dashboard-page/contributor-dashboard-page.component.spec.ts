@@ -65,7 +65,7 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
+      spyOn(UserService, 'getProfilePictureUrl').and.returnValue(
         $q.resolve(userProfileImage));
       spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
         $q.resolve(userContributionRights));
@@ -94,7 +94,7 @@ describe('Contributor dashboard page', function() {
         'English', 'Portuguese', 'Hindi']);
       expect(ctrl.userCanReviewQuestions).toBe(true);
       expect(ctrl.userIsReviewer).toBe(true);
-      expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
+      expect(ctrl.profilePictureUrl).toBe(userProfileImage);
     });
 
     it('should change active tab name when clicking on translate text tab',
@@ -136,7 +136,7 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
+      spyOn(UserService, 'getProfilePictureUrl').and.returnValue(
         $q.resolve(userProfileImage));
       spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
         $q.resolve(userContributionRights));

@@ -40,12 +40,18 @@ def save_image(filename, entity_type, entity_id, content):
         fs.commit(filename.encode('utf-8'), content, mimetype=mimetype)
 
 
+def image_exists(filename, entity_type, entity_id):
+    """Check if image exists."""
+    file_system_class = get_entity_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
+    return fs.isfile(filename)
+
+
 def delete_image(filename, entity_type, entity_id):
     """Delete image file."""
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
-    fs.delete(filename)
-
+    fs.delete(filename.encode('utf-8'))
 
 
 def save_original_and_compressed_versions_of_image(

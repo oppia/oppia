@@ -227,10 +227,12 @@ angular.module('oppia').directive('tutorCard', [
               '/avatar/user_blue_72px.png');
 
             if (!_editorPreviewMode) {
-              UserService.getProfileImageDataUrlAsync()
-                .then(function(dataUrl) {
-                  $scope.profilePicture = dataUrl;
-                });
+              UserService.getUserInfoAsync().then(function(userInfo) {
+                if (userInfo.isLoggedIn()) {
+                  ctrl.profilePictureUrl = (
+                    UserService.getProfilePictureUrl(userInfo.getUsername()))
+                }
+              });
             } else {
               $scope.profilePicture = (
                 UrlInterpolationService.getStaticImageUrl(

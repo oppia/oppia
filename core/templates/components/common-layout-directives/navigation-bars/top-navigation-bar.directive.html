@@ -156,10 +156,12 @@
          ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
          ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
         <div class="oppia-navbar-profile-picture-container dropdown-toggle">
-          <span ng-if="$ctrl.profilePictureDataUrl">
-            <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture rounded-circle" alt="User Avatar">
+          <span ng-if="$ctrl.profilePictureUrl">
+            <img ng-src="<[$ctrl.profilePictureUrl]>"
+                 class="oppia-navbar-profile-picture rounded-circle"
+                 alt="User Avatar">
           </span>
-          <span ng-if="!$ctrl.profilePictureDataUrl">
+          <span ng-if="!$ctrl.profilePictureUrl">
             <i class="material-icons md-40 oppia-user-avatar-icon">&#xE853;</i>
             <span class="oppia-icon-accessibility-label">User Avatar</span>
           </span>

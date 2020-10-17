@@ -20,12 +20,11 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 
-
-const Constants = require('constants.ts');
 const hashes = require('hashes.json');
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
@@ -61,7 +60,7 @@ export class UrlInterpolationService {
    * returns resource path with cache slug.
    */
   _getUrlWithSlug(resourcePath: string): string {
-    if (!Constants.DEV_MODE) {
+    if (!AppConstants.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
         return (
@@ -78,7 +77,7 @@ export class UrlInterpolationService {
    * depending on dev/prod mode.
    */
   _getCompleteUrl(prefix: string, path: string): string {
-    if (Constants.DEV_MODE) {
+    if (AppConstants.DEV_MODE) {
       return prefix + this._getUrlWithSlug(path);
     } else {
       return '/build' + prefix + this._getUrlWithSlug(path);
@@ -207,7 +206,7 @@ export class UrlInterpolationService {
 
   getFullStaticAssetUrl(path: string): string {
     this.validateResourcePath(path);
-    if (Constants.DEV_MODE) {
+    if (AppConstants.DEV_MODE) {
       return this.urlService.getOrigin() + path;
     } else {
       return this.urlService.getOrigin() + '/build' + path;
@@ -233,11 +232,31 @@ export class UrlInterpolationService {
    */
   getDirectiveTemplateUrl(path: string): string {
     this.validateResourcePath(path);
-    if (Constants.DEV_MODE) {
+    if (AppConstants.DEV_MODE) {
       return '/templates' + this._getUrlWithSlug(path);
     } else {
       return '/build/templates' + this._getUrlWithSlug(path);
     }
+  }
+
+  getGcsUrl(): string {
+    const prodGcsUrl = (
+      'https://storage.googleapis.com/' +
+      AppConstants.GCS_RESOURCE_BUCKET_NAME
+    );
+    return AppConstants.DEV_MODE ? '/assetsdevhandler' : prodGcsUrl;
+  }
+
+  getProfilePictureUrlFor(username: string): string {
+    let urlPrefix = this.getGcsUrl();
+    return this.interpolateUrl(
+      urlPrefix + '/<entity_type>/<username>/<filename>',
+      {
+        entity_type: AppConstants.ENTITY_TYPE.USER,
+        username: username,
+        filename: AppConstants.PROFILE_PICTURE_FILENAME
+      }
+    )
   }
 }
 

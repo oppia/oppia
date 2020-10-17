@@ -48,7 +48,7 @@ export class UserProfile {
     public userBio: string,
     public subjectInterests: string[],
     public firstContributionMsec: number,
-    public profilePictureDataUrl: string,
+    public profilePictureUrl: string,
     public userImpactScore: number,
     public isAlreadySubscribed: boolean,
     public isUserVisitingOwnProfile: boolean,

@@ -221,8 +221,8 @@ angular.module('oppia').component('profilePage', {
             data.editedExpSummaries.length);
           ctrl.subjectInterests = data.subjectInterests;
           ctrl.firstContributionMsec = data.firstContributionMsec;
-          ctrl.profilePictureDataUrl = (
-            data.profilePictureDataUrl || DEFAULT_PROFILE_PICTURE_URL);
+          ctrl.profilePictureUrl = (
+            data.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL);
           LoaderService.hideLoadingScreen();
           $rootScope.$apply();
         });

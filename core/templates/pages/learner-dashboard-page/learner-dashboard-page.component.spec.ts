@@ -47,7 +47,7 @@ describe('Learner dashboard page', function() {
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
 
-  var profilePictureDataUrl = 'profile-picture-url';
+  var profilePictureUrl = 'profile-picture-url';
   var userInfo = {
     getUsername: () => 'username1'
   };
@@ -227,8 +227,8 @@ describe('Learner dashboard page', function() {
           ));
       }
 
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(profilePictureDataUrl));
+      spyOn(UserService, 'getProfilePictureUrl').and.returnValue(
+        $q.resolve(profilePictureUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
@@ -283,7 +283,7 @@ describe('Learner dashboard page', function() {
 
     it('should initialize correctly controller properties after its' +
     ' initialization and get data from backend', function() {
-      expect(ctrl.profilePictureDataUrl).toBe(profilePictureDataUrl);
+      expect(ctrl.profilePictureUrl).toBe(profilePictureUrl);
       expect(ctrl.username).toBe(userInfo.getUsername());
 
       expect(ctrl.noExplorationActivity).toBe(false);
@@ -861,8 +861,8 @@ describe('Learner dashboard page', function() {
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(profilePictureDataUrl));
+      spyOn(UserService, 'getProfilePictureUrl').and.returnValue(
+        $q.resolve(profilePictureUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')

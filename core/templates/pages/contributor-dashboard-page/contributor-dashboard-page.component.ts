@@ -93,7 +93,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.activeTabName = activeTabName;
       };
       ctrl.$onInit = function() {
-        ctrl.profilePictureDataUrl = null;
+        ctrl.profilePictureUrl = null;
         ctrl.username = null;
         ctrl.userInfoIsLoading = true;
         ctrl.userIsLoggedIn = false;
@@ -101,10 +101,6 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
-
-        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          ctrl.profilePictureDataUrl = dataUrl;
-        });
 
         UserService.getUserContributionRightsData().then(
           function(userContributionRights) {
@@ -134,6 +130,8 @@ angular.module('oppia').component('contributorDashboardPage', {
           if (userInfo.isLoggedIn()) {
             ctrl.userIsLoggedIn = true;
             ctrl.username = userInfo.getUsername();
+            ctrl.profilePictureUrl = (
+              UserService.getProfilePictureUrl(ctrl.username))
           } else {
             ctrl.userIsLoggedIn = false;
             ctrl.username = '';

@@ -41,7 +41,6 @@ current_user_services = models.Registry.import_current_user_services()
     [models.NAMES.user, models.NAMES.audit, models.NAMES.suggestion])
 transaction_services = models.Registry.import_transaction_services()
 
-PROFILE_PICTURE_FILENAME = 'profile_image.png'
 # Size (in px) of the gravatar being retrieved.
 GRAVATAR_SIZE_PX = 150
 # Data url for images/avatar/user_blue_72px.png.
@@ -684,14 +683,15 @@ def fetch_gravatar(email):
     gravatar_url = get_gravatar_url(email)
     try:
         response = requests.get(
-            gravatar_url, headers={b'Content-Type': b'image/png'},
+            gravatar_url,
+            headers={b'Content-Type': b'image/png'},
             allow_redirects=False)
     except Exception:
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if response.ok:
             if imghdr.what(None, h=response.content) == 'png':
-                return utils.convert_png_binary_to_data_url(response.content)
+                return response.content
         else:
             logging.error(
                 '[Status %s] Failed to fetch Gravatar from %s' %
@@ -1580,21 +1580,27 @@ def record_agreement_to_terms(user_id):
     _save_user_settings(user_settings)
 
 
-def update_profile_picture(user_id, profile_picture_data_url):
+def update_profile_picture(user_id, profile_picture_binary):
     """Updates profile_picture_data_url of user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
-        profile_picture_data_url: str. New profile picture url to be set.
+        profile_picture_binary: str. New profile picture binary to be set.
     """
     username = get_username(user_id)
-    fs_services.delete_image(
-        PROFILE_PICTURE_FILENAME, feconf.ENTITY_TYPE_USER, username)
+    if fs_services.image_exists(
+            constants.PROFILE_PICTURE_FILENAME,
+            feconf.ENTITY_TYPE_USER,
+            username):
+        fs_services.delete_image(
+            constants.PROFILE_PICTURE_FILENAME,
+            feconf.ENTITY_TYPE_USER,
+            username)
     fs_services.save_image(
-        PROFILE_PICTURE_FILENAME,
+        constants.PROFILE_PICTURE_FILENAME,
         feconf.ENTITY_TYPE_USER,
         username,
-        utils.convert_png_data_url_to_binary(profile_picture_data_url)
+        profile_picture_binary
     )
 
 

@@ -330,7 +330,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           var newMessageSummary = (
             FeedbackMessageSummaryObjectFactory.createNewMessage(
               ctrl.threadSummary.totalMessageCount, newMessage,
-              ctrl.username, ctrl.profilePictureDataUrl));
+              ctrl.username, ctrl.profilePictureUrl));
           ctrl.messageSummaries.push(newMessageSummary);
         });
       };
@@ -431,15 +431,16 @@ angular.module('oppia').component('learnerDashboardPage', {
         };
         ctrl.PAGE_SIZE = 8;
         ctrl.Math = window.Math;
-        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          ctrl.profilePictureDataUrl = dataUrl;
-        });
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.username = '';
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
+          if (ctrl.username) {
+            ctrl.profilePictureUrl = (
+              UserService.getProfilePictureUrl(ctrl.username))
+          }
         });
 
         var dashboardDataPromise = (

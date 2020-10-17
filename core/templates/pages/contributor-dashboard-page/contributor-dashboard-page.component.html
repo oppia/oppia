@@ -14,10 +14,10 @@
   <div class="oppia-opportunities-tab-custmization-container">
     <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
       <div class="oppia-profile-details-container">
-        <span ng-if="$ctrl.profilePictureDataUrl">
-          <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="rounded-circle" alt="User Avatar">
+        <span ng-if="$ctrl.profilePictureUrl">
+          <img ng-src="<[$ctrl.profilePictureUrl]>" class="rounded-circle" alt="User Avatar">
         </span>
-        <span ng-if="!$ctrl.profilePictureDataUrl">
+        <span ng-if="!$ctrl.profilePictureUrl">
           <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
         </span>
       </div>

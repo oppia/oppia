@@ -81,8 +81,8 @@ angular.module('oppia').directive('adminNavbar', [
 
         ctrl.$onInit = function() {
           ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            ctrl.profilePictureDataUrl = dataUrl;
+          UserService.getProfilePictureUrl().then(function(url) {
+            ctrl.profilePictureUrl = url;
           });
 
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -97,12 +97,15 @@ angular.module('oppia').directive('adminNavbar', [
             ctrl.username = userInfo.getUsername();
             ctrl.isModerator = userInfo.isModerator();
             ctrl.isSuperAdmin = userInfo.isSuperAdmin();
-
-            ctrl.profileUrl = (
-              UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
-                username: ctrl.username
-              })
-            );
+            if (ctrl.username) {
+              ctrl.profilePictureUrl = (
+                UserService.getProfilePictureUrl(ctrl.username))
+              ctrl.profileUrl = (
+                UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
+                  username: ctrl.username
+                })
+              );
+            }
           });
 
           ctrl.logoutUrl = LOGOUT_URL;

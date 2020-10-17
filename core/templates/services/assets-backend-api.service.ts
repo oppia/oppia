@@ -28,8 +28,6 @@ import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-const Constants = require('constants.ts');
-
 interface SaveAudioResponse {
   'filename': string;
   'duration_secs': number;
@@ -56,12 +54,10 @@ export class AssetsBackendApiService {
       private csrfTokenService: CsrfTokenService,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {
-    if (!Constants.DEV_MODE && !Constants.GCS_RESOURCE_BUCKET_NAME) {
+    if (!AppConstants.DEV_MODE && !AppConstants.GCS_RESOURCE_BUCKET_NAME) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
-    const urlPrefix = Constants.DEV_MODE ?
-      '/assetsdevhandler' :
-      'https://storage.googleapis.com/' + Constants.GCS_RESOURCE_BUCKET_NAME;
+    const urlPrefix = urlInterpolationService.getGcsUrl();
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
   }

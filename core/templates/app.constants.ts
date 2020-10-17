@@ -156,6 +156,7 @@ export const AppConstants = {
     SKILL: 'skill',
     STORY: 'story',
     QUESTION: 'question',
+    USER: 'user',
   },
 
   ASSET_TYPE_AUDIO: 'audio',

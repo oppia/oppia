@@ -5464,5 +5464,7 @@ export = {
   "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
     "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
+  "PROFILE_PICTURE_FILENAME": "profile_image.png",
+
   "DEV_MODE": true
 } as const;

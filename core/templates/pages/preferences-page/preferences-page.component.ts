@@ -155,9 +155,9 @@ angular.module('oppia').component('preferencesPage', {
             'edit-profile-picture-modal.directive.html'),
           backdrop: 'static',
           controller: 'EditProfilePictureModalController'
-        }).result.then(function(newProfilePictureDataUrl) {
+        }).result.then(function(newprofilePictureUrl) {
           UserService.setProfileImageDataUrlAsync(
-            newProfilePictureDataUrl)
+            newprofilePictureUrl)
             .then(function() {
               // The reload is needed in order to update the profile picture
               // in the top-right corner.
@@ -170,7 +170,7 @@ angular.module('oppia').component('preferencesPage', {
         });
       };
       ctrl.$onInit = function() {
-        ctrl.profilePictureDataUrl = '';
+        ctrl.profilePictureUrl = '';
         ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
         ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
@@ -180,6 +180,10 @@ angular.module('oppia').component('preferencesPage', {
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           ctrl.email = userInfo.getEmail();
+          if (ctrl.username) {
+            ctrl.profilePictureUrl = (
+              UserService.getProfilePictureUrl(ctrl.username))
+          }
         });
 
         ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
@@ -198,7 +202,6 @@ angular.module('oppia').component('preferencesPage', {
           ctrl.userBio = data.user_bio;
           ctrl.subjectInterests = data.subject_interests;
           ctrl.preferredLanguageCodes = data.preferred_language_codes;
-          ctrl.profilePictureDataUrl = data.profile_picture_data_url;
           ctrl.defaultDashboard = data.default_dashboard;
           ctrl.canReceiveEmailUpdates = data.can_receive_email_updates;
           ctrl.canReceiveEditorRoleEmail =

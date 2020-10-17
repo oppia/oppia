@@ -463,11 +463,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
-    get_redirect_route(
-        r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
-    get_redirect_route(
-        r'/preferenceshandler/profile_picture_by_username/<username>',
-        profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
