@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 import { StorySummary } from 'domain/story/story-summary.model';
 
 describe('Topic preview tab', function() {
@@ -23,6 +25,9 @@ describe('Topic preview tab', function() {
   var $rootScope = null;
   var $scope = null;
   var TopicEditorStateService = null;
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

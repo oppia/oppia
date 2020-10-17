@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { Subscription } from 'rxjs';
 import { EventEmitter } from '@angular/core';
@@ -41,6 +41,8 @@ describe('Topics List Directive', function() {
       return mockTasdReinitializedEventEmitter;
     }
   };
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
 

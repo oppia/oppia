@@ -19,6 +19,7 @@
 import { EventEmitter } from '@angular/core';
 
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var $scope = null;
@@ -32,6 +33,9 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var TopicObjectFactory;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
