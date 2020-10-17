@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import itertools
-import json
 import re
 
 from constants import constants
@@ -64,14 +63,14 @@ import utils
 (
     base_models, collection_models, config_models,
     email_models, exp_models, feedback_models,
-    job_models, question_models,
+    improvements_models, job_models, question_models,
     recommendations_models, skill_models, stats_models,
     story_models, subtopic_models, suggestion_models,
     topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
     models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.job, models.NAMES.question,
+    models.NAMES.improvements, models.NAMES.job, models.NAMES.question,
     models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
     models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
     models.NAMES.topic, models.NAMES.user
@@ -110,41 +109,6 @@ TARGET_TYPE_TO_TARGET_MODEL = {
 VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
-
-
-class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating RoleQueryAuditModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        # Valid id: [user_id].[timestamp_in_sec].[intent].[random_number]
-        regex_string = '^%s\\.\\d+\\.%s\\.\\d+$' % (item.user_id, item.intent)
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_ids', user_models.UserSettingsModel, [item.user_id])]
-
-
-class UsernameChangeAuditModelValidator(
-        base_model_validators.BaseModelValidator):
-    """Class for validating UsernameChangeAuditModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        # Valid id: [committer_id].[timestamp_in_sec]
-        # committer_id refers to the user that is making the change.
-        regex_string = '^%s\\.\\d+$' % item.committer_id
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
 
 
 class ClassifierTrainingJobModelValidator(
@@ -1151,9 +1115,6 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
-            # TODO (#10828): Remove validation for cloned_from
-            # exp ids after the field is entirely removed from
-            # all models.
             base_model_validators.ExternalModelFetcherDetails(
                 'cloned_from_exploration_ids',
                 exp_models.ExplorationModel,
@@ -2233,15 +2194,15 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
         Args:
             item: datastore_services.Model. TopicSimilaritiesModel to validate.
         """
-        content = json.loads(item.content)
-        topics = list(content.keys())
+
+        topics = list(item.content.keys())
         data = '%s\n' % (',').join(topics)
 
         for topic1 in topics:
             similarity_list = []
-            for topic2 in content[topic1]:
+            for topic2 in item.content[topic1]:
                 similarity_list.append(
-                    python_utils.UNICODE(content[topic1][topic2]))
+                    python_utils.UNICODE(item.content[topic1][topic2]))
             if len(similarity_list):
                 data = data + '%s\n' % (',').join(similarity_list)
 
@@ -2251,7 +2212,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
             cls._add_error(
                 'topic similarity check',
                 'Entity id %s: Topic similarity validation for content: %s '
-                'fails with error: %s' % (item.id, content, e))
+                'fails with error: %s' % (item.id, item.content, e))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -5077,6 +5038,119 @@ class DeletedUserModelValidator(base_model_validators.BaseUserModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_user_is_properly_deleted]
+
+
+class TaskEntryModelValidator(base_model_validators.BaseModelValidator):
+    """One off job for auditing task entries."""
+
+    # The name of the model which is to be used in the error messages.
+    MODEL_NAME = 'task entry'
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return re.escape(improvements_models.TaskEntryModel.generate_task_id(
+            item.entity_type, item.entity_id, item.entity_version,
+            item.task_type, item.target_type, item.target_id))
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'resolver_ids', user_models.UserSettingsModel,
+                [item.resolver_id] if item.resolver_id is not None else []),
+            base_model_validators.ExternalModelFetcherDetails(
+                'entity_ids', exp_models.ExplorationModel, [item.entity_id])]
+
+    @classmethod
+    def _validate_composite_entity_id(cls, item):
+        """Validates the composite_entity_id field of the given item.
+
+        Args:
+            item: improvements_models.TaskEntryModel. The TaskEntry model
+                object to get the composite entity id.
+        """
+        expected_composite_entity_id = (
+            improvements_models.TaskEntryModel.generate_composite_entity_id(
+                item.entity_type, item.entity_id, item.entity_version))
+        if item.composite_entity_id != expected_composite_entity_id:
+            cls._add_error(
+                'composite_entity_id %s' % (
+                    base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                'Entity id %s: composite_entity_id "%s" should be "%s"' % (
+                    item.id,
+                    item.composite_entity_id,
+                    expected_composite_entity_id))
+
+    @classmethod
+    def _validate_status(cls, item):
+        """Validates the fields of the item relating to the status field.
+
+        Args:
+            item: improvements_models.TaskEntryModel. The item to check the
+                status for.
+        """
+        if item.status == improvements_models.TASK_STATUS_OPEN:
+            if item.resolver_id:
+                cls._add_error(
+                    'status %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: status is open but resolver_id is "%s", '
+                    'should be empty.' % (item.id, item.resolver_id))
+            if item.resolved_on:
+                cls._add_error(
+                    'status %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: status is open but resolved_on is "%s", '
+                    'should be empty.' % (item.id, item.resolved_on))
+        elif item.status == improvements_models.TASK_STATUS_RESOLVED:
+            if item.resolver_id is None:
+                cls._add_error(
+                    'status %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: status is resolved but resolver_id is not '
+                    'set' % (item.id,))
+            if item.resolved_on is None:
+                cls._add_error(
+                    'status %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: status is resolved but resolved_on is not '
+                    'set' % (item.id,))
+
+    @classmethod
+    def _validate_target_id(cls, item):
+        """Validate that the given item contains an existing exploration state
+        name.
+
+        Args:
+            item: improvements_models.TaskEntryModel. The item to fetch and
+                check the target id.
+        """
+        try:
+            exp_model = exp_models.ExplorationModel.get(
+                item.entity_id, strict=True, version=item.entity_version)
+        except Exception:
+            cls._add_error(
+                'target_id %s' % (
+                    base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                'Entity id %s: exploration with id "%s" does not exist at '
+                'version %d' % (item.id, item.entity_id, item.entity_version))
+            return
+        if item.target_id not in exp_model.states.keys():
+            cls._add_error(
+                'target_id %s' % (
+                    base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                'Entity id %s: exploration with id "%s" does not have a state '
+                'named "%s" at version %d' % (
+                    item.id, item.entity_id, item.target_id,
+                    item.entity_version))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_composite_entity_id,
+            cls._validate_status,
+            cls._validate_target_id,
+        ]
 
 
 class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
