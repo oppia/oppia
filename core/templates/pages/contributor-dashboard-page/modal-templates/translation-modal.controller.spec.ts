@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TranslationModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Translation Modal Controller', function() {
   let $httpBackend = null;
   let $q = null;
@@ -32,6 +34,8 @@ describe('Translation Modal Controller', function() {
     heading: 'Heading'
   };
   let getTextToTranslateSpy = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {

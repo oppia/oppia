@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for QuestionSuggestionEditorModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Question Suggestion Editor Modal Controller', function() {
   let $httpBackend = null;
   let $uibModal = null;
@@ -36,6 +38,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
   const skillDifficulty = 0.3;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   describe('when question is valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {

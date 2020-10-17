@@ -18,6 +18,7 @@
 
 import { NewlyCreatedStoryObjectFactory } from
   'domain/topic/NewlyCreatedStoryObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 const CONSTANTS = require('constants.ts');
 
@@ -26,6 +27,8 @@ describe('Create New Story Modal Controller', function() {
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
   var StoryEditorStateService = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {

@@ -16,17 +16,13 @@
  * @fileoverview Unit tests for the topics and skills dashboard controller.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
 import { EventEmitter } from '@angular/core';
 import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
-
-// ^^^ This block is to be removed.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
@@ -35,12 +31,7 @@ require(
 describe('Topics and Skills Dashboard Page', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   var $scope = null, ctrl = null;
   var $uibModal = null;

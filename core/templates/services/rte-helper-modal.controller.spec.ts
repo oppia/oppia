@@ -18,6 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Rte Helper Modal Controller', function() {
   var $scope = null;
@@ -25,6 +26,7 @@ describe('Rte Helper Modal Controller', function() {
   var $timeout = null;
 
   var mockExternalRteSaveEventEmitter = null;
+  importAllAngularServices();
 
   describe('when customization args has a valid youtube video', function() {
     var customizationArgSpecs = [{
