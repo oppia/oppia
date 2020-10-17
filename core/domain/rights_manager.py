@@ -295,19 +295,6 @@ def is_exploration_cloned(exploration_id):
     return bool(exploration_rights.cloned_from)
 
 
-def is_exploration_community_owned(exploration_id):
-    """Returns whether the exploration is community owned.
-
-    Args:
-        exploration_id: str. ID of the exploration.
-
-    Returns:
-        bool. Whether the exploration is a community owned.
-    """
-    exploration_rights = get_exploration_rights(exploration_id)
-    return exploration_rights.community_owned
-
-
 def create_new_collection_rights(collection_id, committer_id):
     """Creates a new collection rights object and saves it to the datastore.
     Subscribes the committer to the new collection.
