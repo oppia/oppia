@@ -98,4 +98,3 @@ describe('expression interpolation service', ()=> {
       'abc{{a+b}}')).toEqual(['a', 'b']);
   });
 });
-
