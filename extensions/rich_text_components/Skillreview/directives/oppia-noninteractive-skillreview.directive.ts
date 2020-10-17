@@ -41,8 +41,9 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
         // check.
         if (
           elem.find(
-            '.skillreview-rte-element').parent().parent()[0].localName ===
-          'p') {
+            '.skillreview-rte-element'
+          ).parent().parent()[0].localName === 'p'
+        ) {
           elem.find('.skillreview-rte-element').css('margin-right', '-4px');
         }
       },
