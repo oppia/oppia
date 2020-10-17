@@ -30,11 +30,12 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
+
 (
-    base_models, collection_models, config_models,
+    base_models, collection_models, 
      exp_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.base_model, models.NAMES.collection,models.NAMES.exp,
        models.NAMES.user
 ])
 
