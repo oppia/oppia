@@ -308,7 +308,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA = {
         '<li>Find the existing reviewers and email reviewers directly about '
         'the suggestions waiting for a review</li><br>'
         '</ul><br>'
-        'Here are the suggestions:'
+        'Here are the suggestions that have been waiting too long for a review:'
         '<br><br>'
         '<ul>%s</ul><br>'
         'Thanks so much - we appreciate your help!<br>'

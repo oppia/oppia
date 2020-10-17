@@ -892,14 +892,15 @@ def get_info_about_suggestions_waiting_too_long_for_review():
         submitted for review. The objects are sorted in descending order based
         on review wait time.
     """
-    suggestions = [
+    suggestions_waiting_too_long_for_review = [
         get_suggestion_from_model(suggestion_model) for suggestion_model in (
             suggestion_models.GeneralSuggestionModel
             .get_suggestions_waiting_too_long_for_review())
     ]
     return [
         create_reviewable_suggestion_email_info_from_suggestion(
-            suggestion) for suggestion in suggestions
+            suggestion) for suggestion in
+        suggestions_waiting_too_long_for_review
     ]
 
 
@@ -1147,12 +1148,14 @@ def get_suggestion_types_that_need_reviewers():
 
     Returns:
         dict. A dictionary that uses the presence of its keys to indicate which
-        suggestion types need more reviewers. The keys are the suggestion types
-        that need more reviewers. The dictionary values correspond to a set that
-        contains the language codes within the suggestion type that need more
-        reviewers. For example, for translation suggestions, the value would be
-        a set of language codes that translations are offered in that need more
-        reviewers.
+        suggestion types need more reviewers. The possible key values are the
+        suggestion types listed in
+        suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
+        values for each suggestion type are the following:
+        - for question suggestions the value is an empty set
+        - for translation suggestions the value is a nonempty set containing the
+            language codes of the translation suggestions that need more
+            reviewers.
     """
     suggestion_types_needing_reviewers = {}
     stats = get_community_contribution_stats()
