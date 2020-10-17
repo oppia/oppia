@@ -36,7 +36,7 @@ import {
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
 
-interface TopicBackendDict {
+export interface TopicBackendDict {
   'id': string;
   'name': string;
   'abbreviated_name': string;

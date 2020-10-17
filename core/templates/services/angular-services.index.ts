@@ -155,6 +155,7 @@ import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageCont
 import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
+import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -391,6 +392,7 @@ export const angularServices: [string, unknown][] = [
     DragAndDropSortInputValidationService],
   ['EditabilityService', EditabilityService],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
+  ['EditableTopicBackendApiService', EditableTopicBackendApiService],
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
