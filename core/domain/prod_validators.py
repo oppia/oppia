@@ -4979,48 +4979,6 @@ class PendingDeletionRequestModelValidator(
                 % (item.id))
 
     @classmethod
-    def _validate_explorations_are_marked_deleted(cls, item):
-        """Validates that explorations for model are marked as deleted.
-
-        Args:
-            item: PendingDeletionRequestModel. Pending deletion request model
-                to validate.
-        """
-        exp_ids = item.exploration_ids
-        not_marked_exp_ids = []
-        for exp_id in exp_ids:
-            exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
-            if exp_model is None or not exp_model.deleted:
-                not_marked_exp_ids.append(exp_id)
-
-        if not_marked_exp_ids:
-            cls._add_error(
-                'deleted exploration check',
-                'Entity id %s: Explorations with ids %s are not marked as '
-                'deleted' % (item.id, not_marked_exp_ids))
-
-    @classmethod
-    def _validate_collections_are_marked_deleted(cls, item):
-        """Validates that collections for model are marked as deleted.
-
-        Args:
-            item: PendingDeletionRequestModel. Pending deletion request model
-                to validate.
-        """
-        col_ids = item.collection_ids
-        not_marked_col_ids = []
-        for col_id in col_ids:
-            col_model = collection_models.CollectionModel.get_by_id(col_id)
-            if col_model is None or not col_model.deleted:
-                not_marked_col_ids.append(col_id)
-
-        if not_marked_col_ids:
-            cls._add_error(
-                'deleted collection check',
-                'Entity id %s: Collections with ids %s are not marked as '
-                'deleted' % (item.id, not_marked_col_ids))
-
-    @classmethod
     def _validate_activity_mapping_contains_only_allowed_keys(cls, item):
         """Validates that pseudonymizable_entity_mappings keys are only from
         the core.platform.models.NAMES enum.
@@ -5048,8 +5006,6 @@ class PendingDeletionRequestModelValidator(
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_user_settings_are_marked_deleted,
-            cls._validate_explorations_are_marked_deleted,
-            cls._validate_collections_are_marked_deleted,
             cls._validate_activity_mapping_contains_only_allowed_keys]
 
 

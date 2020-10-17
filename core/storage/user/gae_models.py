@@ -2371,8 +2371,6 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pseudonymizable_entity_mappings': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
