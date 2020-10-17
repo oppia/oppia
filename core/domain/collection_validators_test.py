@@ -32,28 +32,18 @@ from core.domain import prod_validation_jobs_one_off
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
-
-
 import feconf
 import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-gae_search_services = models.Registry.import_search_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
-CURRENT_DATETIME = datetime.datetime.utcnow()
 
-(
-    collection_models,
-    config_models, exp_models, user_models
-) = models.Registry.import_models([
-    models.NAMES.collection,
-    models.NAMES.config, models.NAMES.user
+(collection_models,exp_models, user_models) = models.Registry.import_models([ 
+    models.NAMES.collection,models.NAMES.exp, models.NAMES.user
 ])
-
-
 
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
      
