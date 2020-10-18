@@ -139,9 +139,6 @@ class TaskEntry(python_utils.OBJECT):
                 status: str. Tracks the state/progress of the task entry.
                 resolver_username: str. Username of the user who resolved the
                     task when status is resolved. Otherwise None.
-                resolver_profile_picture_data_url: str. Profile picture URL of
-                    the user who resolved the task when status is resolved.
-                    Otherwise None.
                 resolved_on_msecs: float. Time in milliseconds since epoch at
                     which the task was resolved when status is resolved.
                     Otherwise None.
@@ -160,9 +157,6 @@ class TaskEntry(python_utils.OBJECT):
             'status': self.status,
             'resolver_username': (
                 resolver_settings and resolver_settings.username),
-            'resolver_profile_picture_data_url': (
-                resolver_settings and
-                resolver_settings.profile_picture_data_url),
             'resolved_on_msecs': (
                 self.resolved_on and
                 utils.get_time_in_millisecs(self.resolved_on)),

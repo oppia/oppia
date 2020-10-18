@@ -658,8 +658,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
-    upgradedServices['FeedbackMessageSummaryObjectFactory'] =
-      new FeedbackMessageSummaryObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
@@ -1223,6 +1221,9 @@ export class UpgradedServices {
       new ExplorationStatsBackendApiService(
         upgradedServices['ExplorationStatsObjectFactory'],
         upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
+    upgradedServices['FeedbackMessageSummaryObjectFactory'] =
+      new FeedbackMessageSummaryObjectFactory(
         upgradedServices['UrlInterpolationService']);
     upgradedServices['GenerateContentIdService'] =
      new GenerateContentIdService(

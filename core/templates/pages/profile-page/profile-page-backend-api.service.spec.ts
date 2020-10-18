@@ -201,7 +201,6 @@ describe('Profile test backend API service', () => {
       subject_interests: [],
       username_of_viewed_profile: 'user2',
       user_bio: 'hi',
-      profile_picture_data_url: 'image',
     });
 
     flushMicrotasks();

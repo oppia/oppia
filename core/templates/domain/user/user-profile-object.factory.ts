@@ -32,7 +32,6 @@ export interface UserProfileBackendDict {
   'user_bio': string;
   'subject_interests': string[];
   'first_contribution_msec': number;
-  'profile_picture_data_url': string;
   'user_impact_score': number;
   'is_already_subscribed': boolean;
   'is_user_visiting_own_profile': boolean;
@@ -48,7 +47,6 @@ export class UserProfile {
     public userBio: string,
     public subjectInterests: string[],
     public firstContributionMsec: number,
-    public profilePictureUrl: string,
     public userImpactScore: number,
     public isAlreadySubscribed: boolean,
     public isUserVisitingOwnProfile: boolean,
@@ -73,7 +71,6 @@ export class UserProfileObjectFactory {
       backendDict.user_bio,
       backendDict.subject_interests,
       backendDict.first_contribution_msec,
-      backendDict.profile_picture_data_url,
       backendDict.user_impact_score,
       backendDict.is_already_subscribed,
       backendDict.is_user_visiting_own_profile,

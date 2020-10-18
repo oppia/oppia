@@ -81,9 +81,6 @@ angular.module('oppia').directive('adminNavbar', [
 
         ctrl.$onInit = function() {
           ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-          UserService.getProfilePictureUrl().then(function(url) {
-            ctrl.profilePictureUrl = url;
-          });
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -99,7 +96,7 @@ angular.module('oppia').directive('adminNavbar', [
             ctrl.isSuperAdmin = userInfo.isSuperAdmin();
             if (ctrl.username) {
               ctrl.profilePictureUrl = (
-                UserService.getProfilePictureUrl(ctrl.username))
+                UrlInterpolationService.getProfilePictureUrl(ctrl.username))
               ctrl.profileUrl = (
                 UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
                   username: ctrl.username

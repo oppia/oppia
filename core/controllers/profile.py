@@ -95,7 +95,6 @@ class ProfileHandler(base.BaseHandler):
             'first_contribution_msec': (
                 user_settings.first_contribution_msec
                 if user_settings.first_contribution_msec else None),
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_impact_score': user_services.get_user_impact_score(
                 user_settings.user_id),
             'created_exp_summary_dicts': created_exp_summary_dicts,
@@ -135,8 +134,6 @@ class PreferencesHandler(base.BaseHandler):
 
         for index, creator_settings in enumerate(creators_settings):
             subscription_summary = {
-                'creator_picture_data_url': (
-                    creator_settings.profile_picture_data_url),
                 'creator_username': creator_settings.username,
                 'creator_impact': (
                     user_services.get_user_impact_score(
@@ -151,7 +148,6 @@ class PreferencesHandler(base.BaseHandler):
                 user_settings.preferred_site_language_code),
             'preferred_audio_language_code': (
                 user_settings.preferred_audio_language_code),
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,

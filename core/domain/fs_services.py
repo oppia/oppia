@@ -29,29 +29,29 @@ import feconf
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-def save_image(filename, entity_type, entity_id, content):
+def save_image(filepath, entity_type, entity_id, content):
     """Save image file."""
-    filetype = filename[filename.rfind('.') + 1:]
+    filetype = filepath[filepath.rfind('.') + 1:]
     mimetype = (
         'image/svg+xml' if filetype == 'svg' else 'image/%s' % filetype)
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
-    if not fs.isfile(filename.encode('utf-8')):
-        fs.commit(filename.encode('utf-8'), content, mimetype=mimetype)
+    if not fs.isfile(filepath.encode('utf-8')):
+        fs.commit(filepath.encode('utf-8'), content, mimetype=mimetype)
 
 
-def image_exists(filename, entity_type, entity_id):
+def image_exists(filepath, entity_type, entity_id):
     """Check if image exists."""
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
-    return fs.isfile(filename)
+    return fs.isfile(filepath)
 
 
-def delete_image(filename, entity_type, entity_id):
+def delete_image(filepath, entity_type, entity_id):
     """Delete image file."""
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
-    fs.delete(filename.encode('utf-8'))
+    fs.delete(filepath.encode('utf-8'))
 
 
 def save_original_and_compressed_versions_of_image(

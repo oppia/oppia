@@ -93,7 +93,6 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.activeTabName = activeTabName;
       };
       ctrl.$onInit = function() {
-        ctrl.profilePictureUrl = null;
         ctrl.username = null;
         ctrl.userInfoIsLoading = true;
         ctrl.userIsLoggedIn = false;
@@ -131,7 +130,7 @@ angular.module('oppia').component('contributorDashboardPage', {
             ctrl.userIsLoggedIn = true;
             ctrl.username = userInfo.getUsername();
             ctrl.profilePictureUrl = (
-              UserService.getProfilePictureUrl(ctrl.username))
+              UrlInterpolationService.getProfilePictureUrl(ctrl.username))
           } else {
             ctrl.userIsLoggedIn = false;
             ctrl.username = '';

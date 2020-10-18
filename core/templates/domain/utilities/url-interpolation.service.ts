@@ -247,10 +247,10 @@ export class UrlInterpolationService {
     return AppConstants.DEV_MODE ? '/assetsdevhandler' : prodGcsUrl;
   }
 
-  getProfilePictureUrlFor(username: string): string {
+  getProfilePictureUrl(username: string): string {
     let urlPrefix = this.getGcsUrl();
     return this.interpolateUrl(
-      urlPrefix + '/<entity_type>/<username>/<filename>',
+      urlPrefix + '/<entity_type>/<username>/assets/image/<filename>',
       {
         entity_type: AppConstants.ENTITY_TYPE.USER,
         username: username,

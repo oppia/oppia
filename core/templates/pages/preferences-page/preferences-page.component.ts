@@ -155,9 +155,9 @@ angular.module('oppia').component('preferencesPage', {
             'edit-profile-picture-modal.directive.html'),
           backdrop: 'static',
           controller: 'EditProfilePictureModalController'
-        }).result.then(function(newprofilePictureUrl) {
+        }).result.then(function(newProfilePictureUrl) {
           UserService.setProfileImageDataUrlAsync(
-            newprofilePictureUrl)
+            newProfilePictureUrl)
             .then(function() {
               // The reload is needed in order to update the profile picture
               // in the top-right corner.
@@ -170,7 +170,6 @@ angular.module('oppia').component('preferencesPage', {
         });
       };
       ctrl.$onInit = function() {
-        ctrl.profilePictureUrl = '';
         ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
         ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
@@ -182,7 +181,7 @@ angular.module('oppia').component('preferencesPage', {
           ctrl.email = userInfo.getEmail();
           if (ctrl.username) {
             ctrl.profilePictureUrl = (
-              UserService.getProfilePictureUrl(ctrl.username))
+              UrlInterpolationService.getProfilePictureUrl(ctrl.username))
           }
         });
 

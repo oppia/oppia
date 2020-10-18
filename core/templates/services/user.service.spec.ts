@@ -168,62 +168,6 @@ describe('User Service', function() {
     $httpBackend.flush();
   });
 
-  it('should return image data', function() {
-    var requestUrl = '/preferenceshandler/profile_picture';
-    // Create a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      user_is_logged_in: true
-    };
-    $httpBackend.expect('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
-    $httpBackend.expect('GET', requestUrl).respond(
-      200, {profile_picture_data_url: 'image data'});
-
-    UserService.getProfilePictureUrl().then(function(dataUrl) {
-      expect(dataUrl).toBe('image data');
-    });
-    $httpBackend.flush();
-
-    $httpBackend.when('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
-    $httpBackend.when('GET', requestUrl).respond(404);
-
-    UserService.getProfilePictureUrl().then(function(dataUrl) {
-      expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.webp'));
-    });
-    $httpBackend.flush();
-  });
-
-  it('should return the default profile image path when user is not logged',
-    function() {
-      var sampleUserInfoBackendObject = {
-        is_moderator: false,
-        is_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: true,
-        preferred_site_language_code: null,
-        username: 'tester',
-        user_is_logged_in: false
-      };
-      $httpBackend.expect('GET', '/userinfohandler').respond(
-        200, sampleUserInfoBackendObject);
-
-      UserService.getProfilePictureUrl().then(function(dataUrl) {
-        expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.webp'));
-      });
-      $httpBackend.flush();
-    });
-
   it('should return the login url', function() {
     var loginUrl = '/login';
     var currentUrl = 'home';

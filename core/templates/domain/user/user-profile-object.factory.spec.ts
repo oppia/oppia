@@ -86,7 +86,6 @@ describe('User profile object factory', () => {
         subject_interests: [],
         username_of_viewed_profile: 'user2',
         user_bio: 'hi',
-        profile_picture_data_url: 'image',
         user_email: 'test@email.com'
       };
 
@@ -102,7 +101,6 @@ describe('User profile object factory', () => {
       expect(userProfile.isAlreadySubscribed).toEqual(false);
       expect(userProfile.isUserVisitingOwnProfile).toEqual(false);
       expect(userProfile.profileIsOfCurrentUser).toEqual(false);
-      expect(userProfile.profilePictureUrl).toEqual('image');
       expect(userProfile.usernameOfViewedProfile).toEqual('user2');
       expect(userProfile.subjectInterests).toEqual([]);
       expect(userProfile.userBio).toEqual('hi');

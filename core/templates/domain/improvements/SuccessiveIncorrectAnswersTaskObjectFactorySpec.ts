@@ -88,7 +88,6 @@ describe('Successive incorrect answers task', function() {
           'answers at this card.'),
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       }));
 
@@ -118,7 +117,6 @@ describe('Successive incorrect answers task', function() {
           'answers at this card.'),
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
@@ -144,7 +142,6 @@ describe('Successive incorrect answers task', function() {
           'answers at this card.'),
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
@@ -167,7 +164,6 @@ describe('Successive incorrect answers task', function() {
           'answers at this card.'),
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError('backend dict has target_type "???" but expected "state"');

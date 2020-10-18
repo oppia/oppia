@@ -399,7 +399,6 @@ describe('ExplorationImprovementsService', function() {
         issue_description: null,
         resolved_on_msecs: null,
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
       });
       this.eibasGetTasksAsyncSpy.and.returnValue(Promise.resolve(
         new ExplorationImprovementsResponse([hbrTask], new Map())));

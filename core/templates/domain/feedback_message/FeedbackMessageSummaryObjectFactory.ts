@@ -19,6 +19,8 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 interface FeedbackMessageSummaryBackendDict {
   'message_id': number;
@@ -28,7 +30,6 @@ interface FeedbackMessageSummaryBackendDict {
   'current_content_html': string;
   'description': string;
   'author_username': string;
-  'author_picture_data_url': string;
   'created_on_msecs': number;
 }
 
@@ -40,13 +41,13 @@ export class FeedbackMessageSummary {
   currentContentHtml: string;
   description: string;
   authorUsername: string;
-  authorPictureDataUrl: string;
+  authorPictureUrl: string;
   createdOnMsecs: number;
 
   constructor(
       messageId: number, text: string, updatedStatus: string,
       suggestionHtml: string, currentContentHtml: string, description: string,
-      authorUsername: string, authorPictureDataUrl: string,
+      authorUsername: string, authorPictureUrl: string,
       createdOnMsecs: number) {
     this.messageId = messageId;
     this.text = text;
@@ -55,28 +56,35 @@ export class FeedbackMessageSummary {
     this.currentContentHtml = currentContentHtml;
     this.description = description;
     this.authorUsername = authorUsername;
-    this.authorPictureDataUrl = authorPictureDataUrl;
+    this.authorPictureUrl = authorPictureUrl;
     this.createdOnMsecs = createdOnMsecs;
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class FeedbackMessageSummaryObjectFactory {
+  constructor(
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
   createNewMessage(
-      newMessageId: number, newMessageText: string, authorUsername: string,
-      authorPictureDataUrl: string): FeedbackMessageSummary {
+      newMessageId: number, newMessageText: string, authorUsername: string
+  ): FeedbackMessageSummary {
     // Date.now() returns number of milliseconds since 1970-01-01 UTC.
     let createdOnMsecs: number = new Date().getTime();
+    let authorPictureUrl = (
+      this.urlInterpolationService.getProfilePictureUrl(authorUsername))
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
-      authorPictureDataUrl, createdOnMsecs);
+      authorPictureUrl, createdOnMsecs);
   }
 
   createFromBackendDict(
       feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict):
       FeedbackMessageSummary {
+    let authorPictureUrl = (
+      this.urlInterpolationService.getProfilePictureUrl(
+        feedbackMessageSummaryBackendDict.author_username))
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,
@@ -85,7 +93,7 @@ export class FeedbackMessageSummaryObjectFactory {
       feedbackMessageSummaryBackendDict.current_content_html,
       feedbackMessageSummaryBackendDict.description,
       feedbackMessageSummaryBackendDict.author_username,
-      feedbackMessageSummaryBackendDict.author_picture_data_url,
+      authorPictureUrl,
       feedbackMessageSummaryBackendDict.created_on_msecs);
   }
 }

@@ -22,10 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { map } from 'rxjs/operators';
 
-interface ProfileDict {
-  'profile_picture_data_url_for_username': string | null;
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -35,7 +31,7 @@ export class ProfileLinkImageBackendApiService {
   ) {}
 
   async fetchProfilePictureDataAsync(profileImageUrl: string): Promise<string> {
-    return this.http.get<ProfileDict>(profileImageUrl).pipe(
+    return this.http.get(profileImageUrl).pipe(
       // A URL encoded base64 image is treated as unsafe by Angular. This is
       // because angular's security doesn't allow anything outside the following
       // regex: [a-z0-9+\/]+=*$/i in the image data, i.e., the string after

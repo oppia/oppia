@@ -41,7 +41,6 @@ export interface TaskEntryBackendDict<TaskType = string> {
   'issue_description': string;
   'status': string;
   'resolver_username': string;
-  'resolver_profile_picture_data_url': string;
   'resolved_on_msecs': number;
 }
 
@@ -79,7 +78,6 @@ export class TaskEntry<TaskType = string> {
   public readonly targetType: string;
   public readonly targetId: string;
   public readonly resolverUsername: string;
-  public readonly resolverprofilePictureUrl: string;
   public readonly resolvedOnMsecs: number;
   protected issueDescription: string;
   private taskStatus: string;
@@ -92,8 +90,6 @@ export class TaskEntry<TaskType = string> {
     this.targetType = backendDict.target_type;
     this.targetId = backendDict.target_id;
     this.resolverUsername = backendDict.resolver_username;
-    this.resolverprofilePictureUrl = (
-      backendDict.resolver_profile_picture_data_url);
     this.resolvedOnMsecs = backendDict.resolved_on_msecs;
     this.issueDescription = backendDict.issue_description;
     this.taskStatus = backendDict.status;
@@ -110,7 +106,6 @@ export class TaskEntry<TaskType = string> {
       issue_description: this.issueDescription,
       status: this.taskStatus,
       resolver_username: this.resolverUsername,
-      resolver_profile_picture_data_url: this.resolverprofilePictureUrl,
       resolved_on_msecs: this.resolvedOnMsecs,
     };
   }

@@ -439,7 +439,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           ctrl.username = userInfo.getUsername();
           if (ctrl.username) {
             ctrl.profilePictureUrl = (
-              UserService.getProfilePictureUrl(ctrl.username))
+              UrlInterpolationService.getProfilePictureUrl(ctrl.username))
           }
         });
 

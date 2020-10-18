@@ -51,9 +51,6 @@ angular.module('oppia').factory('UserService', [
     };
 
     return {
-      getProfilePictureUrl: function(username) {
-        return UrlInterpolationService.getProfilePictureUrlFor(username);
-      },
       setProfileImageDataUrlAsync: function(newProfileImageDataUrl) {
         return $http.put(PREFERENCES_DATA_URL, {
           update_type: 'profile_picture_data_url',

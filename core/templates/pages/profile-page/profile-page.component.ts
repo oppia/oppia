@@ -222,7 +222,8 @@ angular.module('oppia').component('profilePage', {
           ctrl.subjectInterests = data.subjectInterests;
           ctrl.firstContributionMsec = data.firstContributionMsec;
           ctrl.profilePictureUrl = (
-            data.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL);
+            UrlInterpolationService.getProfilePictureUrl(
+              data.usernameOfViewedProfile))
           LoaderService.hideLoadingScreen();
           $rootScope.$apply();
         });

@@ -72,8 +72,6 @@ class UserSettings(python_utils.OBJECT):
             last created an exploration.
         last_edited_an_exploration: datetime.datetime or None. When the user
             last edited an exploration.
-        profile_picture_data_url: str or None. User uploaded profile picture as
-            a dataURI string.
         default_dashboard: str or None. The default dashboard of the user.
         user_bio: str. User-specified biography.
         subject_interests: list(str) or None. Subject interests specified by
@@ -95,7 +93,7 @@ class UserSettings(python_utils.OBJECT):
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
             last_started_state_translation_tutorial=None, last_logged_in=None,
             last_created_an_exploration=None, last_edited_an_exploration=None,
-            profile_picture_data_url=None, default_dashboard=None,
+            default_dashboard=None,
             creator_dashboard_display_pref=(
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
@@ -123,8 +121,6 @@ class UserSettings(python_utils.OBJECT):
                 user last created an exploration.
             last_edited_an_exploration: datetime.datetime or None. When the
                 user last edited an exploration.
-            profile_picture_data_url: str or None. User uploaded profile
-                picture as a dataURI string.
             default_dashboard: str|None. The default dashboard of the user.
             creator_dashboard_display_pref: str. The creator dashboard of the
                 user.
@@ -159,7 +155,6 @@ class UserSettings(python_utils.OBJECT):
         self.last_logged_in = last_logged_in
         self.last_edited_an_exploration = last_edited_an_exploration
         self.last_created_an_exploration = last_created_an_exploration
-        self.profile_picture_data_url = profile_picture_data_url
         self.default_dashboard = default_dashboard
         self.creator_dashboard_display_pref = creator_dashboard_display_pref
         self.user_bio = user_bio
@@ -315,7 +310,6 @@ class UserSettings(python_utils.OBJECT):
                 self.last_edited_an_exploration),
             'last_created_an_exploration': (
                 self.last_created_an_exploration),
-            'profile_picture_data_url': self.profile_picture_data_url,
             'default_dashboard': self.default_dashboard,
             'creator_dashboard_display_pref': (
                 self.creator_dashboard_display_pref),
@@ -1114,8 +1108,6 @@ def _get_user_settings_from_model(user_settings_model):
             user_settings_model.last_edited_an_exploration),
         last_created_an_exploration=(
             user_settings_model.last_created_an_exploration),
-        profile_picture_data_url=(
-            user_settings_model.profile_picture_data_url),
         default_dashboard=user_settings_model.default_dashboard,
         creator_dashboard_display_pref=(
             user_settings_model.creator_dashboard_display_pref),
@@ -1587,17 +1579,14 @@ def update_profile_picture(user_id, profile_picture_binary):
         user_id: str. The unique ID of the user.
         profile_picture_binary: str. New profile picture binary to be set.
     """
+    profile_picture_path = 'image/%s' % constants.PROFILE_PICTURE_FILENAME
     username = get_username(user_id)
     if fs_services.image_exists(
-            constants.PROFILE_PICTURE_FILENAME,
-            feconf.ENTITY_TYPE_USER,
-            username):
+            profile_picture_path, feconf.ENTITY_TYPE_USER, username):
         fs_services.delete_image(
-            constants.PROFILE_PICTURE_FILENAME,
-            feconf.ENTITY_TYPE_USER,
-            username)
+            profile_picture_path, feconf.ENTITY_TYPE_USER, username)
     fs_services.save_image(
-        constants.PROFILE_PICTURE_FILENAME,
+        profile_picture_path,
         feconf.ENTITY_TYPE_USER,
         username,
         profile_picture_binary

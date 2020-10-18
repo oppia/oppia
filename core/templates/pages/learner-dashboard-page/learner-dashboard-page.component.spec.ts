@@ -227,10 +227,12 @@ describe('Learner dashboard page', function() {
           ));
       }
 
-      spyOn(UserService, 'getProfilePictureUrl').and.returnValue(
-        $q.resolve(profilePictureUrl));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
-        userInfo));
+      spyOn(
+        UrlInterpolationService, 'getProfilePictureUrl'
+      ).and.returnValue($q.resolve(profilePictureUrl));
+      spyOn(
+        UserService, 'getUserInfoAsync'
+      ).and.returnValue($q.resolve(userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.resolve({
           completedExplorationsList: (
@@ -363,7 +365,6 @@ describe('Learner dashboard page', function() {
         current_content_html: 'A orange',
         description: 'Suggestion for english grammar',
         author_username: 'username2',
-        author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
 
@@ -597,7 +598,6 @@ describe('Learner dashboard page', function() {
         current_content_html: 'A orange',
         description: 'Suggestion for english grammar',
         author_username: 'username2',
-        author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
 
@@ -631,7 +631,6 @@ describe('Learner dashboard page', function() {
         current_content_html: 'A orange',
         description: 'Suggestion for english grammar',
         author_username: 'username2',
-        author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
 
@@ -666,7 +665,6 @@ describe('Learner dashboard page', function() {
           current_content_html: 'A orange',
           description: 'Suggestion for english grammar',
           author_username: 'username2',
-          author_picture_data_url: 'foo',
           created_on_msecs: 1200
         }];
 
@@ -861,7 +859,7 @@ describe('Learner dashboard page', function() {
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(UserService, 'getProfilePictureUrl').and.returnValue(
+      spyOn(UrlInterpolationService, 'getProfilePictureUrl').and.returnValue(
         $q.resolve(profilePictureUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));

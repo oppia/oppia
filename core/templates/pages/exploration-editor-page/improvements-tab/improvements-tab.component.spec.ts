@@ -119,7 +119,6 @@ describe('Improvements tab', function() {
         status: (isOpen ? 'open' : 'obsolete'),
         issue_description: null,
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       }));
 

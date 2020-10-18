@@ -165,7 +165,6 @@ describe('Profile page', function() {
         title: 'Test Title'
       }],
       subject_interests: [],
-      profile_picture_data_url: 'image',
     };
 
     beforeEach(function() {

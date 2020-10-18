@@ -65,7 +65,6 @@ describe('Exploration stats back-end API service', () => {
       issue_description: '20% of learners dropped at this state',
       status: 'resolved',
       resolver_username: 'test_user',
-      resolver_profile_picture_data_url: './image.png',
       resolved_on_msecs: 123456789,
     };
 
@@ -99,7 +98,6 @@ describe('Exploration stats back-end API service', () => {
         issue_description: '20% of learners dropped at this state',
         status: 'resolved',
         resolver_username: 'test_user',
-        resolver_profile_picture_data_url: './image.png',
         resolved_on_msecs: 123456789,
       };
 
@@ -135,7 +133,6 @@ describe('Exploration stats back-end API service', () => {
       issue_description: '20% of learners dropped at this state',
       status: 'resolved',
       resolver_username: 'test_user',
-      resolver_profile_picture_data_url: './image.png',
       resolved_on_msecs: 123456789,
     };
 
@@ -171,7 +168,6 @@ describe('Exploration stats back-end API service', () => {
       issue_description: '20% of learners dropped at this state',
       status: 'resolved',
       resolver_username: 'test_user',
-      resolver_profile_picture_data_url: './image.png',
       resolved_on_msecs: 123456789,
     });
 

@@ -136,8 +136,9 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfilePictureUrl').and.returnValue(
-        $q.resolve(userProfileImage));
+      spyOn(
+        UrlInterpolationService, 'getProfilePictureUrl'
+      ).and.returnValue($q.resolve(userProfileImage));
       spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
         $q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(

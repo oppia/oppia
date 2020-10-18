@@ -230,7 +230,8 @@ angular.module('oppia').directive('tutorCard', [
               UserService.getUserInfoAsync().then(function(userInfo) {
                 if (userInfo.isLoggedIn()) {
                   ctrl.profilePictureUrl = (
-                    UserService.getProfilePictureUrl(userInfo.getUsername()))
+                    UrlInterpolationService.getProfilePictureUrl(
+                      userInfo.getUsername()))
                 }
               });
             } else {

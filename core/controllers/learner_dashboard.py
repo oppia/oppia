@@ -101,8 +101,6 @@ class LearnerDashboardHandler(base.BaseHandler):
 
         for index, creator_settings in enumerate(creators_settings):
             subscription_summary = {
-                'creator_picture_data_url': (
-                    creator_settings.profile_picture_data_url),
                 'creator_username': creator_settings.username,
                 'creator_impact': (
                     user_services.get_user_impact_score(
@@ -184,8 +182,6 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
                 'author_username': authors_settings[0].username,
-                'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url),
                 'created_on_msecs': utils.get_time_in_millisecs(
                     messages[0].created_on)
             }
@@ -197,18 +193,14 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
 
             if author_settings is None:
                 author_username = None
-                author_picture_data_url = None
             else:
                 author_username = author_settings.username
-                author_picture_data_url = (
-                    author_settings.profile_picture_data_url)
 
             message_summary = {
                 'message_id': m.message_id,
                 'text': m.text,
                 'updated_status': m.updated_status,
                 'author_username': author_username,
-                'author_picture_data_url': author_picture_data_url,
                 'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)

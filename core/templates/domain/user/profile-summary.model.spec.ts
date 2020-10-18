@@ -22,7 +22,6 @@ import { ProfileSummary } from
 describe('Subscriber Summary model', () => {
   it('should correctly convert subscriber backend dict to object', () => {
     let backendDict = {
-      subscriber_picture_data_url: 'path/to/img',
       subscriber_username: 'username',
       subscriber_impact: 0,
     };

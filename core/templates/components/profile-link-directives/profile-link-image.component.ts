@@ -45,7 +45,7 @@ export class ProfileLinkImageComponent implements OnInit {
 
   ngOnInit(): void {
     this.profilePictureUrl = (
-      this.urlInterpolationService.getProfilePictureUrlFor(this.username))
+      this.urlInterpolationService.getProfilePictureUrl(this.username))
   }
 }
 
