@@ -174,7 +174,7 @@ export class EditableTopicBackendApiService {
       topicId: string,
       topicVersion: string,
       commitMessage: string,
-      changeList,
+      changeList: BackendChangeObject[],
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: string) => void): void {
     let editableTopicDataUrl = this.urlInterpolationService.interpolateUrl(
