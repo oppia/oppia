@@ -31,8 +31,8 @@
     }
   },
   "files": [
-    "core/templates/domain/email-dashboard/email-dashboard-query-object.factory.ts",
-    "core/templates/domain/email-dashboard/email-dashboard-query-object.factory.spec.ts",
+    "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
+    "core/templates/domain/email-dashboard/email-dashboard-query.model.spec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.spec.ts",
     "core/templates/domain/skill/assigned-skill.model.ts",
