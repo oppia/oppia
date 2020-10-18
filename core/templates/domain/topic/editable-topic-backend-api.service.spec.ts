@@ -319,8 +319,7 @@ describe('Editable topic backend API service', () => {
       });
 
       flushMicrotasks();
-    }
-  ));
+    }));
 
   it('should sucessfully fetch stories from a topic', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
