@@ -24,8 +24,6 @@ import { TestBed } from '@angular/core/testing';
 import { ExpressionInterpolationService } from
   'expressions/expression-interpolation.service';
 
-import 'App';
-
 describe('expression interpolation service', ()=> {
   let expressionInterpolationService:
     ExpressionInterpolationService = null;

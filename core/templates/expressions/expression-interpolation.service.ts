@@ -48,7 +48,7 @@ export class ExpressionInterpolationService {
           this.expressionEvaluatorService.evaluateExpression(
             convertHtmlToUnicode(p1), envs) as string);
       } catch (e) {
-        var EXPRESSION_ERROR_TAG = (
+        const EXPRESSION_ERROR_TAG = (
           '<oppia-expression-error-tag></oppia-expression-error-tag>');
         if ((e instanceof this.expressionParserService.SyntaxError) ||
             (e instanceof this.expressionSyntaxTreeService.ExpressionError)) {
@@ -78,17 +78,17 @@ export class ExpressionInterpolationService {
   }
 
   getParamsFromString(sourceString: string): string[] {
-    var matches = sourceString.match(/{{([^}]*)}}/g) || [];
+    let matches = sourceString.match(/{{([^}]*)}}/g) || [];
 
-    var allParams = [];
-    for (var i = 0; i < matches.length; i++) {
+    let allParams = [];
+    for (let i = 0; i < matches.length; i++) {
       // Trim the '{{' and '}}'.
       matches[i] = matches[i].substring(2, matches[i].length - 2);
 
-      var params = this.expressionSyntaxTreeService.getParamsUsedInExpression(
+      let params = this.expressionSyntaxTreeService.getParamsUsedInExpression(
         convertHtmlToUnicode(matches[i]));
 
-      for (var j = 0; j < params.length; j++) {
+      for (let j = 0; j < params.length; j++) {
         if (allParams.indexOf(params[j]) === -1) {
           allParams.push(params[j]);
         }
