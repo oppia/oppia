@@ -47,6 +47,9 @@ URLS = [
     main.get_redirect_route(
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
     main.get_redirect_route(
+        r'/cron/mail/admins/contributor_dashboard_bottlenecks',
+        cron.CronMailAdminContributorDashboardBottlenecksHandler),
+    main.get_redirect_route(
         r'/cron/mail/reviewers/contributor_dashboard_suggestions',
         cron.CronMailReviewersContributorDashboardSuggestionsHandler),
 ]
