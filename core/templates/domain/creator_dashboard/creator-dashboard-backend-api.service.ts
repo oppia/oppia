@@ -53,9 +53,8 @@ import {
 } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import {
   TopicSummary,
-  TopicSummaryBackendDict,
-  TopicSummaryObjectFactory
-} from 'domain/topic/TopicSummaryObjectFactory';
+  TopicSummaryBackendDict
+} from 'domain/topic/topic-summary.model';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionsService } from
   'services/suggestions.service';
@@ -100,7 +99,6 @@ export class CreatorDashboardBackendApiService {
     private suggestionObjectFactory: SuggestionObjectFactory,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
     private loggerService: LoggerService) {}
 
   _getSuggestionThreads(
@@ -176,8 +174,8 @@ export class CreatorDashboardBackendApiService {
         topicSummaries: (
           dashboardData.topic_summary_dicts ? (
             dashboardData.topic_summary_dicts.map(
-              topicSummaryDict => this.topicSummaryObjectFactory
-                .createFromBackendDict(topicSummaryDict))) : null)
+              topicSummaryDict => TopicSummary.createFromBackendDict(
+                topicSummaryDict))) : null)
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);
