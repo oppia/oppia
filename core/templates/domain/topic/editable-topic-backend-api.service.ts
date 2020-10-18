@@ -158,7 +158,7 @@ export class EditableTopicBackendApiService {
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
       });
-    this.http.delete<DeleteTopicBackendResponse>(
+    this.http['delete']<DeleteTopicBackendResponse>(
       topicDataUrl).toPromise().then((response) => {
       if (successCallback) {
         successCallback(response.status);
