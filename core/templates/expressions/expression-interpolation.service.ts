@@ -38,7 +38,7 @@ export class ExpressionInterpolationService {
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  processHtml(sourceHtml: string, envs: [{}]): string {
+  processHtml(sourceHtml: string, envs: Record<string, string>[]): string {
     return sourceHtml.replace(/{{([^}]*)}}/g, (match, p1)=> {
       try {
         // TODO(sll): Remove the call to $filter once we have a
@@ -59,7 +59,8 @@ export class ExpressionInterpolationService {
     });
   }
 
-  processUnicode(sourceUnicode: string, envs: [{}]): string {
+  processUnicode(
+      sourceUnicode: string, envs: Record<string, string>[]): string {
     try {
       return sourceUnicode.replace(/{{([^}]*)}}/g, (match, p1)=> {
         // TODO(sll): Remove the call to $filter once we have a
