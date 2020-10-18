@@ -23,11 +23,10 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
 import {
-  ClassroomData,
-  ClassroomDataObjectFactory
-} from 'domain/classroom/ClassroomDataObjectFactory';
+  ClassroomData
+} from 'domain/classroom/classroom-data.model';
 import { TopicSummaryBackendDict } from
-  'domain/topic/TopicSummaryObjectFactory';
+  'domain/topic/topic-summary.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -49,8 +48,7 @@ export class ClassroomBackendApiService {
   classroomData: ClassroomData = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient,
-    private classroomDataObjectFactory: ClassroomDataObjectFactory
+    private http: HttpClient
   ) {}
 
   private _initializeTranslationEventEmitter = new EventEmitter<void>();
@@ -67,7 +65,7 @@ export class ClassroomBackendApiService {
     this.http.get<ClassroomDataBackendDict>(
       classroomDataUrl).toPromise().then(response => {
       this.classroomData = (
-        this.classroomDataObjectFactory.createFromBackendData(
+        ClassroomData.createFromBackendData(
           response.name, response.topic_summary_dicts, response.course_details,
           response.topic_list_intro));
       if (successCallback) {
