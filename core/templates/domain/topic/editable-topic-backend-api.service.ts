@@ -245,19 +245,21 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  fetchTopic(topicId: string) {
+  fetchTopic(topicId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchTopic(topicId, resolve, reject);
     });
   }
 
-  fetchStories(topicId: string) {
+  fetchStories(topicId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchStories(topicId, resolve, reject);
     });
   }
 
-  fetchSubtopicPage(topicId: string, subtopicId: number) {
+  fetchSubtopicPage(
+      topicId: string,
+      subtopicId: number): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicPage(topicId, subtopicId, resolve, reject);
     });
@@ -274,7 +276,10 @@ export class EditableTopicBackendApiService {
    * object. Errors are passed to the error callback, if one is provided.
    */
   updateTopic(
-    topicId: string, topicVersion: string, commitMessage: string, changeList: BackendChangeObject[]) {
+      topicId: string,
+      topicVersion: string,
+      commitMessage: string,
+      changeList: BackendChangeObject[]): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._updateTopic(
         topicId, topicVersion, commitMessage, changeList,
@@ -282,19 +287,21 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  deleteTopic(topicId: string) {
+  deleteTopic(topicId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._deleteTopic(topicId, resolve, reject);
     });
   }
 
-  async doesTopicWithNameExistAsync(topicName: string) {
+  async doesTopicWithNameExistAsync(topicName: string):
+      Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesTopicWithNameExist(topicName, resolve, reject);
     });
   }
 
-  async doesTopicWithUrlFragmentExistAsync(topicUrlFragment: string) {
+  async doesTopicWithUrlFragmentExistAsync(topicUrlFragment: string):
+       Promise<boolean> {
     return new Promise((resolve, reject) => {
      this._doesTopicWithUrlFragmentExist(topicUrlFragment, resolve, reject);
     });
