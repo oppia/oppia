@@ -25,6 +25,8 @@ import { SuggestionThreadObjectFactory } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
@@ -42,7 +44,11 @@ describe('Feedback Tab Component', function() {
   var userService = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
@@ -56,6 +62,9 @@ describe('Feedback Tab Component', function() {
     $provide.value(
       'SuggestionModalService', TestBed.get(SuggestionModalService));
     $provide.value('RouterService', {});
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

@@ -58,7 +58,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/graph-data.service');
@@ -118,12 +118,7 @@ describe('Exploration Warnings Service', function() {
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   describe('when exploration param changes has jinja values', function() {
     beforeEach(angular.mock.module('oppia', function($provide) {

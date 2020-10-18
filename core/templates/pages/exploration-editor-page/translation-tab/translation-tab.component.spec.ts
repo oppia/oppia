@@ -53,6 +53,7 @@ import { UserExplorationPermissionsService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
 import { ExternalSaveService } from 'services/external-save.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 import $ from 'jquery';
 
@@ -115,6 +116,9 @@ describe('Translation tab component', function() {
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

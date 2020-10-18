@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -33,6 +33,8 @@ import { WrittenTranslationObjectFactory } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('State Translation Editor Component', function() {
   var ctrl = null;
@@ -125,6 +127,12 @@ describe('State Translation Editor Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
   beforeEach(function() {
     stateEditorService = TestBed.get(StateEditorService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
@@ -145,6 +153,9 @@ describe('State Translation Editor Component', function() {
       StateRecordedVoiceoversService));
     $provide.value(
       'StateWrittenTranslationsService', stateWrittenTranslationsService);
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   describe('when has written translation', function() {

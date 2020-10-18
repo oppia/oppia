@@ -75,7 +75,8 @@ import { RatioObjectFactory } from
   'domain/objects/RatioObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('State translation component', function() {
   var ctrl = null;
@@ -368,6 +369,13 @@ describe('State translation component', function() {
   var refreshStateTranslationEmitter = new EventEmitter();
   var showTranslationTabBusyModalEmitter = new EventEmitter();
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [WrapTextWithEllipsisPipe, ConvertToPlainTextPipe]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
@@ -405,14 +413,12 @@ describe('State translation component', function() {
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     $provide.value('RatioObjectFactory', TestBed.get(RatioObjectFactory));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(function() {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [WrapTextWithEllipsisPipe, ConvertToPlainTextPipe]
-    });
-
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.get(CkEditorCopyContentService);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);

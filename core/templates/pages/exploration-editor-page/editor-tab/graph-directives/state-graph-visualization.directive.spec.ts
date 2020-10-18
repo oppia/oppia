@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateGraphLayoutService } from
   'components/graph-services/graph-layout.service';
 import { AnswerGroupsCacheService } from
@@ -45,7 +45,8 @@ import { StateRecordedVoiceoversService } from
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
-
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import * as d3 from 'd3';
 import { of } from 'rxjs';
 import { StateEditorRefreshService } from
@@ -100,6 +101,11 @@ describe('State Graph Visualization directive', function() {
   };
 
   beforeEach(angular.mock.module('directiveTemplates'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
   beforeEach(function() {
     stateGraphLayoutService = TestBed.get(StateGraphLayoutService);
   });
@@ -136,6 +142,9 @@ describe('State Graph Visualization directive', function() {
       'RouterService', {
         onCenterGraph: mockCenterGraphEventEmitter
       });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');

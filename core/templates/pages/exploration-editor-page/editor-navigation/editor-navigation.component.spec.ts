@@ -23,7 +23,7 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -60,12 +60,7 @@ describe('Editor Navigation Component', function() {
   };
   var isImprovementsTabEnabledAsyncSpy = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);

@@ -18,6 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -39,6 +40,8 @@ import { StateSolutionService } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Teach Oppia Modal Controller', function() {
   var $httpBackend = null;
@@ -119,6 +122,12 @@ describe('Teach Oppia Modal Controller', function() {
     }
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
   beforeEach(function() {
     angularNameService = TestBed.get(AngularNameService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
@@ -145,6 +154,9 @@ describe('Teach Oppia Modal Controller', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   describe('when successfully fetching top unresolved answers', function() {
