@@ -47,7 +47,6 @@ require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -521,7 +520,7 @@ angular.module('oppia').directive('conversationSkin', [
                 var collectionIdToAdd = $scope.collectionId;
                 var storyUrlFragmentToAdd = null;
                 var topicUrlFragment = null;
-                var classroomName = null;
+                var classroomUrlFragment = null;
                 // Replace the collection ID with the one in the URL if it
                 // exists in urlParams.
                 if (parentExplorationIds &&
@@ -534,15 +533,15 @@ angular.module('oppia').directive('conversationSkin', [
                     UrlService.getStoryUrlFragmentFromLearnerUrl());
                   topicUrlFragment = (
                     UrlService.getTopicUrlFragmentFromLearnerUrl());
-                  classroomName = (
+                  classroomUrlFragment = (
                     UrlService.getClassroomUrlFragmentFromLearnerUrl());
                 } else if (
                   urlParams.hasOwnProperty('story_url_fragment') &&
                     urlParams.hasOwnProperty('node_id') &&
                     urlParams.hasOwnProperty('topic_url_fragment') &&
-                    urlParams.hasOwnProperty('classroom_name')) {
+                    urlParams.hasOwnProperty('classroom_url_fragment')) {
                   topicUrlFragment = urlParams.topic_url_fragment;
-                  classroomName = urlParams.classroom_name;
+                  classroomUrlFragment = urlParams.classroom_url_fragment;
                   storyUrlFragmentToAdd = urlParams.story_url_fragment;
                 }
 
@@ -560,7 +559,7 @@ angular.module('oppia').directive('conversationSkin', [
                   result = UrlService.addField(
                     result, 'topic_url_fragment', topicUrlFragment);
                   result = UrlService.addField(
-                    result, 'classroom_name', classroomName);
+                    result, 'classroom_url_fragment', classroomUrlFragment);
                   result = UrlService.addField(
                     result, 'story_url_fragment', storyUrlFragmentToAdd);
                   result = UrlService.addField(

@@ -23,10 +23,9 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
-  TopicSummaryBackendDict,
   TopicSummary,
-  TopicSummaryObjectFactory
-} from 'domain/topic/TopicSummaryObjectFactory';
+  TopicSummaryBackendDict
+} from 'domain/topic/topic-summary.model';
 import {
   ComputationData,
   ComputationDataBackendDict,
@@ -39,6 +38,10 @@ import {
   JobStatusSummary,
   JobStatusSummaryBackendDict,
 } from 'domain/admin/job-status-summary.model';
+import {
+  PlatformParameter,
+  PlatformParameterBackendDict
+} from 'domain/platform_feature/platform-parameter.model';
 
 
 interface UserRoles {
@@ -74,6 +77,7 @@ export interface AdminPageDataBackendDict {
   'recent_job_data': JobDataBackendDict[];
   'continuous_computations_data': ComputationDataBackendDict[];
   'topic_summaries': TopicSummaryBackendDict[];
+  'feature_flags': PlatformParameterBackendDict[];
 }
 
 export interface AdminPageData {
@@ -91,6 +95,7 @@ export interface AdminPageData {
   recentJobData: Job[];
   continuousComputationsData: ComputationData[];
   topicSummaries: TopicSummary[];
+  featureFlags: PlatformParameter[];
 }
 
 @Injectable({
@@ -98,8 +103,7 @@ export interface AdminPageData {
 })
 export class AdminBackendApiService {
   constructor(
-    private http: HttpClient,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
+    private http: HttpClient) {}
 
   getData(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
@@ -125,7 +129,11 @@ export class AdminBackendApiService {
           continuousComputationsData: response.continuous_computations_data.map(
             ComputationData.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
-            this.topicSummaryObjectFactory.createFromBackendDict)
+            TopicSummary.createFromBackendDict),
+          featureFlags: response.feature_flags.map(
+            dict => PlatformParameter.createFromBackendDict(
+              dict)
+          )
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
