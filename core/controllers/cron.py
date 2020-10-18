@@ -23,12 +23,16 @@ from core import jobs
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import activity_jobs_one_off
+from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
+from core.domain import suggestion_services
 from core.domain import user_jobs_one_off
+from core.domain import user_services
 from core.domain import wipeout_jobs_one_off
 from core.platform import models
+import feconf
 import utils
 
 from pipeline import pipeline
@@ -223,3 +227,74 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
             cron_services.JobModelsCleanupManager.enqueue(
                 cron_services.JobModelsCleanupManager.create_new())
             logging.warning('Deletion jobs for JobModels entities kicked off.')
+
+
+class CronMailReviewersContributorDashboardSuggestionsHandler(
+        base.BaseHandler):
+    """Handler for mailing reviewers suggestions on the Contributor
+    Dashboard that need review.
+    """
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Sends each reviewer an email with up to
+        suggestion_services.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER
+        suggestions that have been waiting the longest for review, based on
+        their reviewing permissions.
+        """
+        # Only execute this job if it's possible to send the emails.
+        if feconf.CAN_SEND_EMAILS and (
+                config_domain
+                .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
+            reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
+            reviewers_suggestion_email_infos = (
+                suggestion_services
+                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                    reviewer_ids))
+            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+                reviewer_ids, reviewers_suggestion_email_infos)
+
+
+class CronMailAdminContributorDashboardBottlenecksHandler(
+        base.BaseHandler):
+    """Handler for mailing admins if there are bottlenecks that are causing a
+    longer reviewer turnaround time on the Contributor Dashboard.
+    """
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Sends each admin up to two emails: an email to alert the admins that
+        there are suggestion types that need more reviewers and/or an email
+        to alert the admins that specific suggestions have been waiting too long
+        to get reviewed.
+        """
+        if not feconf.CAN_SEND_EMAILS:
+            return
+
+        if (
+                config_domain
+                .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
+            admin_ids = user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_ADMIN)
+            suggestion_types_needing_reviewers = (
+                suggestion_services
+                .get_suggestion_types_that_need_reviewers()
+            )
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
+                admin_ids, suggestion_types_needing_reviewers)
+        if (
+                config_domain
+                .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
+                .value):
+            admin_ids = user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_ADMIN)
+            info_about_suggestions_waiting_too_long_for_review = (
+                suggestion_services
+                .get_info_about_suggestions_waiting_too_long_for_review()
+            )
+            (
+                email_manager
+                .send_mail_to_notify_admins_suggestions_waiting_long(
+                    admin_ids,
+                    info_about_suggestions_waiting_too_long_for_review)
+            )
