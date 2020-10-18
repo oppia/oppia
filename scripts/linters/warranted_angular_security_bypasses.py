@@ -26,5 +26,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 #  have a longer review time. This is because the reviewers will have to ensure
 #  that the introduction of bypassSecurityTrust was the only option.
 
-EXCLUDED_BYPASS_SECURITY_TRUST_FILES = ()
+EXCLUDED_BYPASS_SECURITY_TRUST_FILES = (
+    '/templates/services/image-upload-helper.service.ts')
 EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES = ()
