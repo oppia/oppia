@@ -28,7 +28,7 @@ describe('Topics List Directive', function() {
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
-  var $q = null
+  var $q = null;
   var $rootScope = null;
   var directive = null;
   var AlertsService = null;

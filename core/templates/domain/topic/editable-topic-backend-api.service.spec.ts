@@ -125,8 +125,7 @@ describe('Editable topic backend API service', () => {
         classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  ));
+    }));
 
   it('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
@@ -146,8 +145,7 @@ describe('Editable topic backend API service', () => {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading topic 1.');
-    }
-  ));
+    }));
 
   it('should successfully fetch an existing subtopic page from the backend',
     fakeAsync(() => {
@@ -166,8 +164,7 @@ describe('Editable topic backend API service', () => {
       expect(successHandler).toHaveBeenCalledWith(
         sampleDataResults.subtopic_page);
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  ));
+    }));
 
   it('should use the rejection handler when fetching an existing subtopic' +
     ' page fails', fakeAsync(() => {
@@ -233,8 +230,7 @@ describe('Editable topic backend API service', () => {
         skillIdToRubricsDict: topicWrapper.skill_id_to_rubrics_dict
       });
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  ));
+    }));
 
   it('should use the rejection handler if the topic to update doesn\'t exist',
     fakeAsync(() => {
@@ -257,8 +253,7 @@ describe('Editable topic backend API service', () => {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Topic with given id doesn\'t exist.');
-    }
-  ));
+    }));
 
   it('should check if a topic name already exists',
     fakeAsync(() => {
@@ -274,8 +269,7 @@ describe('Editable topic backend API service', () => {
       });
 
       flushMicrotasks();
-    }
-  ));
+    }));
 
   it('should use the rejection handler if the topic name already exists',
     fakeAsync(() => {
@@ -292,8 +286,7 @@ describe('Editable topic backend API service', () => {
       });
 
       flushMicrotasks();
-    }
-  ));
+    }));
 
   it('should check if a topic url fragment already exists',
     fakeAsync(() => {
@@ -309,8 +302,7 @@ describe('Editable topic backend API service', () => {
       });
 
       flushMicrotasks();
-    }
-  ));
+    }));
 
   it('should use the rejection handler if the url fragment already exists',
     fakeAsync(() => {
@@ -408,6 +400,5 @@ describe('Editable topic backend API service', () => {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error deleting topic 1.');
-    }
-  ));
+    }));
 });

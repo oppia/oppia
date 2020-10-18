@@ -75,8 +75,8 @@ export class EditableTopicBackendApiService {
       errorCallback: (reason?: string) => void): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
-      topic_id: topicId
-    });
+        topic_id: topicId
+      });
 
     this.http.get<FetchTopicBackendResponse>(
       topicDataUrl).toPromise().then((response) => {
@@ -303,11 +303,11 @@ export class EditableTopicBackendApiService {
   async doesTopicWithUrlFragmentExistAsync(topicUrlFragment: string):
        Promise<boolean> {
     return new Promise((resolve, reject) => {
-     this._doesTopicWithUrlFragmentExist(topicUrlFragment, resolve, reject);
+      this._doesTopicWithUrlFragmentExist(topicUrlFragment, resolve, reject);
     });
   }
 }
 
 angular.module('oppia').factory(
   'EditableTopicBackendApiService',
-   downgradeInjectable(EditableTopicBackendApiService));
+  downgradeInjectable(EditableTopicBackendApiService));
