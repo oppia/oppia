@@ -27,8 +27,8 @@ import {
 import {
   ExplorationTask,
   ExplorationTaskBackendDict,
-  ExplorationTaskObjectFactory
-} from 'domain/improvements/ExplorationTaskObjectFactory';
+  ExplorationTaskModel
+} from 'domain/improvements/exploration-task.model';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { UrlInterpolationService } from
@@ -63,7 +63,6 @@ export class ExplorationImprovementsHistoryResponse {
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsBackendApiService {
   constructor(
-      private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
@@ -78,7 +77,7 @@ export class ExplorationImprovementsBackendApiService {
     ).toPromise().then(
       backendDict => new ExplorationImprovementsResponse(
         backendDict.open_tasks.map(
-          d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
+          d => ExplorationTaskModel.createFromBackendDict(d)),
         new Map(Object.entries(backendDict.resolved_task_types_by_state_name)))
     );
   }
@@ -114,7 +113,7 @@ export class ExplorationImprovementsBackendApiService {
     ).toPromise().then(
       backendDict => new ExplorationImprovementsHistoryResponse(
         backendDict.results.map(
-          d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
+          d => ExplorationTaskModel.createFromBackendDict(d)),
         backendDict.cursor,
         backendDict.more));
   }

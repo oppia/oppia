@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -27,7 +28,6 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
   var $uibModalInstance = null;
   var AlertsService = null;
   var CollectionEditorStateService = null;
-  var CollectionObjectFactory = null;
   var CollectionUpdateService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -60,7 +60,6 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       var $rootScope = $injector.get('$rootScope');
       CollectionEditorStateService = $injector.get(
         'CollectionEditorStateService');
-      CollectionObjectFactory = $injector.get('CollectionObjectFactory');
       CollectionUpdateService = $injector.get('CollectionUpdateService');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -69,7 +68,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       spyOnAllFunctions(CollectionUpdateService);
 
       spyOn(CollectionEditorStateService, 'getCollection').and.returnValue(
-        CollectionObjectFactory.create(collectionDict));
+        Collection.create(collectionDict as CollectionBackendDict));
 
       $scope = $rootScope.$new();
       ctrl = $controller('CollectionEditorPrePublishModalController', {
@@ -138,7 +137,6 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       AlertsService = $injector.get('AlertsService');
       CollectionEditorStateService = $injector.get(
         'CollectionEditorStateService');
-      CollectionObjectFactory = $injector.get('CollectionObjectFactory');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -146,7 +144,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       spyOn(AlertsService, 'addWarning').and.callThrough();
 
       spyOn(CollectionEditorStateService, 'getCollection').and.returnValue(
-        CollectionObjectFactory.create(collectionDict));
+        Collection.create(collectionDict as CollectionBackendDict));
 
       $scope = $rootScope.$new();
       ctrl = $controller('CollectionEditorPrePublishModalController', {

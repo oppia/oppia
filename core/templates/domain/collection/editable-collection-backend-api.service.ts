@@ -20,8 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Collection, CollectionBackendDict, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
+import { Collection, CollectionBackendDict } from
+  'domain/collection/collection.model';
 import { CollectionEditorPageConstants } from
   'pages/collection-editor-page/collection-editor-page.constants';
 import { ReadOnlyCollectionBackendApiService } from
@@ -82,7 +82,6 @@ export class EditableCollectionBackendApiService {
   constructor(
     private http: HttpClient,
     private readOnlyCollectionService: ReadOnlyCollectionBackendApiService,
-    private collectionObjectFactory: CollectionObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
   private _fetchCollection(
       collectionId: string,
@@ -95,7 +94,7 @@ export class EditableCollectionBackendApiService {
 
     this.http.get<EditableCollectionBackendResponse>(
       collectionDataUrl).toPromise().then(response => {
-      var collectionObject = this.collectionObjectFactory.create(
+      var collectionObject = Collection.create(
         response.collection);
       if (successCallback) {
         successCallback(collectionObject);
@@ -125,7 +124,7 @@ export class EditableCollectionBackendApiService {
     this.http.put<EditableCollectionBackendResponse>(
       editableCollectionDataUrl, putData).toPromise().then(response => {
       // The returned data is an updated collection dict.
-      var collectionObject = this.collectionObjectFactory.create(
+      var collectionObject = Collection.create(
         response.collection);
 
       // Update the ReadOnlyCollectionBackendApiService's cache with the new

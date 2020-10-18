@@ -24,13 +24,12 @@ import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformParameterRuleObjectFactory } from
-  'domain/platform_feature/platform-parameter-rule-object.factory';
+import { PlatformParameterRule } from
+  'domain/platform_feature/platform-parameter-rule.model';
 
 describe('PlatformFeatureAdminBackendApiService', () => {
   let featureAdminService: PlatformFeatureAdminBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let ruleFactory: PlatformParameterRuleObjectFactory = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -39,7 +38,6 @@ describe('PlatformFeatureAdminBackendApiService', () => {
 
     featureAdminService = TestBed.get(PlatformFeatureAdminBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    ruleFactory = TestBed.get(PlatformParameterRuleObjectFactory);
   });
 
   afterEach(() => {
@@ -52,7 +50,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       const failHandler = jasmine.createSpy('fail');
 
       const newRules = [
-        ruleFactory.createFromBackendDict({
+        PlatformParameterRule.createFromBackendDict({
           filters: [],
           value_when_matched: false
         })
@@ -79,7 +77,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     const failHandler = jasmine.createSpy('fail');
 
     const newRules = [
-      ruleFactory.createFromBackendDict({
+      PlatformParameterRule.createFromBackendDict({
         filters: [],
         value_when_matched: false
       })

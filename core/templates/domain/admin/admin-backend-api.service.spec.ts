@@ -24,16 +24,12 @@ import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backen
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { Job } from 'domain/admin/job.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
-import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter-object.factory';
-import { FeatureStage, PlatformParameterObjectFactory } from
-  'domain/platform_feature/platform-parameter-object.factory';
-import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
+import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
-  let ppof: PlatformParameterObjectFactory;
-  let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   let adminBackendResponse = {
     unfinished_job_data: [],
@@ -130,8 +126,6 @@ describe('Admin backend api service', () => {
     });
 
     abas = TestBed.get(AdminBackendApiService);
-    ppof = TestBed.get(PlatformParameterObjectFactory);
-    tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataObject = {
       demoExplorations: adminBackendResponse.demo_explorations,
@@ -157,9 +151,9 @@ describe('Admin backend api service', () => {
         adminBackendResponse.continuous_computations_data.map(
           ComputationData.createFromBackendDict),
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        tsof.createFromBackendDict),
+        TopicSummary.createFromBackendDict),
       featureFlags: adminBackendResponse.feature_flags.map(
-        dict => ppof.createFromBackendDict(dict)
+        dict => PlatformParameter.createFromBackendDict(dict)
       )
     };
   });

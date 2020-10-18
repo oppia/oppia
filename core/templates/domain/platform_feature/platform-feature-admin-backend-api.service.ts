@@ -25,7 +25,7 @@ import { AdminPageConstants } from
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
 import { PlatformParameterRule } from
-  'domain/platform_feature/platform-parameter-rule-object.factory';
+  'domain/platform_feature/platform-parameter-rule.model';
 
 @Injectable({
   providedIn: 'root'

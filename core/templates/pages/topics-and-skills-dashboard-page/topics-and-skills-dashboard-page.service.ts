@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { TopicSummary } from
-  'domain/topic/TopicSummaryObjectFactory';
+  'domain/topic/topic-summary.model';
 // eslint-disable-next-line max-len
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len

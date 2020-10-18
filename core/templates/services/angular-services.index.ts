@@ -45,13 +45,9 @@ import { StateSolicitAnswerDetailsService } from 'components/state-editor/state-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObjectFactory';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { CollectionObjectFactory } from 'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from 'domain/collection/CollectionPlaythroughObjectFactory';
 import { CollectionRightsObjectFactory } from 'domain/collection/CollectionRightsObjectFactory';
 import { GuestCollectionProgressObjectFactory } from 'domain/collection/GuestCollectionProgressObjectFactory';
-import { CollectionNodeObjectFactory } from 'domain/collection/collection-node-object.factory';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
@@ -60,8 +56,6 @@ import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
-import { EmailDashboardQueryObjectFactory } from 'domain/email-dashboard/email-dashboard-query-object.factory';
-import { EmailDashboardQueryResultsObjectFactory } from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
@@ -90,11 +84,6 @@ import { FeedbackMessageSummaryObjectFactory } from 'domain/feedback_message/Fee
 import { ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummaryObjectFactory } from 'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { ExplorationTaskObjectFactory } from 'domain/improvements/ExplorationTaskObjectFactory';
-import { HighBounceRateTaskObjectFactory } from 'domain/improvements/HighBounceRateTaskObjectFactory';
-import { IneffectiveFeedbackLoopTaskObjectFactory } from 'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
-import { NeedsGuidingResponsesTaskObjectFactory } from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { SuccessiveIncorrectAnswersTaskObjectFactory } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { TaskEntryObjectFactory } from 'domain/improvements/TaskEntryObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
@@ -105,9 +94,6 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { SkillOpportunityObjectFactory } from 'domain/opportunity/SkillOpportunityObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
-import { PlatformParameterFilterObjectFactory } from 'domain/platform_feature/platform-parameter-filter-object.factory';
-import { PlatformParameterObjectFactory } from 'domain/platform_feature/platform-parameter-object.factory';
-import { PlatformParameterRuleObjectFactory } from 'domain/platform_feature/platform-parameter-rule-object.factory';
 import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from 'domain/question/QuestionSummaryObjectFactory';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
@@ -131,7 +117,6 @@ import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backen
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service.ts';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
-import { ExplorationStatsObjectFactory } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughIssueObjectFactory } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
@@ -140,27 +125,22 @@ import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-back
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
 import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { ReadOnlyStoryNodeObjectFactory } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
-import { StoryPlaythroughObjectFactory } from 'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionObjectFactory } from 'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
-import { LearnerExplorationSummaryObjectFactory } from 'domain/summary/learner-exploration-summary-object.factory';
 import { NewlyCreatedStoryObjectFactory } from 'domain/topic/NewlyCreatedStoryObjectFactory';
 import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageContentsObjectFactory';
 import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
-import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { UserProfileObjectFactory } from 'domain/user/user-profile-object.factory';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -354,16 +334,12 @@ export const angularServices: [string, unknown][] = [
   ['CapitalizePipe', CapitalizePipe],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
-  ['ClassroomDataObjectFactory', ClassroomDataObjectFactory],
   ['CodeNormalizerService', CodeNormalizerService],
   ['CodeReplPredictionService', CodeReplPredictionService],
   ['CodeReplRulesService', CodeReplRulesService],
   ['CodeReplValidationService', CodeReplValidationService],
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
-  ['CollectionNodeObjectFactory', CollectionNodeObjectFactory],
-  ['CollectionObjectFactory', CollectionObjectFactory],
-  ['CollectionPlaythroughObjectFactory', CollectionPlaythroughObjectFactory],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionRightsObjectFactory', CollectionRightsObjectFactory],
   ['CollectionValidationService', CollectionValidationService],
@@ -394,9 +370,6 @@ export const angularServices: [string, unknown][] = [
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
-  ['EmailDashboardQueryObjectFactory', EmailDashboardQueryObjectFactory],
-  ['EmailDashboardQueryResultsObjectFactory',
-    EmailDashboardQueryResultsObjectFactory],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['ExplorationDiffService', ExplorationDiffService],
@@ -415,9 +388,7 @@ export const angularServices: [string, unknown][] = [
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
-  ['ExplorationStatsObjectFactory', ExplorationStatsObjectFactory],
   ['ExplorationStatsService', ExplorationStatsService],
-  ['ExplorationTaskObjectFactory', ExplorationTaskObjectFactory],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionParserService', ExpressionParserService],
   ['ExpressionSyntaxTreeService', ExpressionSyntaxTreeService],
@@ -444,7 +415,6 @@ export const angularServices: [string, unknown][] = [
   ['GuestCollectionProgressService', GuestCollectionProgressService],
   ['GuppyConfigurationService', GuppyConfigurationService],
   ['GuppyInitializationService', GuppyInitializationService],
-  ['HighBounceRateTaskObjectFactory', HighBounceRateTaskObjectFactory],
   ['HintObjectFactory', HintObjectFactory],
   ['HtmlEscaperService', HtmlEscaperService],
   ['I18nLanguageCodeService', I18nLanguageCodeService],
@@ -453,8 +423,6 @@ export const angularServices: [string, unknown][] = [
   ['ImageClickInputValidationService', ImageClickInputValidationService],
   ['ImagePreloaderService', ImagePreloaderService],
   ['ImprovementsService', ImprovementsService],
-  ['IneffectiveFeedbackLoopTaskObjectFactory',
-    IneffectiveFeedbackLoopTaskObjectFactory],
   ['InteractionAttributesExtractorService',
     InteractionAttributesExtractorService],
   ['InteractionDetailsCacheService', InteractionDetailsCacheService],
@@ -473,8 +441,6 @@ export const angularServices: [string, unknown][] = [
   ['LearnerDashboardBackendApiService', LearnerDashboardBackendApiService],
   ['LearnerDashboardIdsBackendApiService',
     LearnerDashboardIdsBackendApiService],
-  ['LearnerExplorationSummaryObjectFactory',
-    LearnerExplorationSummaryObjectFactory],
   ['LearnerParamsService', LearnerParamsService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
@@ -495,8 +461,6 @@ export const angularServices: [string, unknown][] = [
   ['MusicNotesInputRulesService', MusicNotesInputRulesService],
   ['MusicNotesInputValidationService', MusicNotesInputValidationService],
   ['MusicPhrasePlayerService', MusicPhrasePlayerService],
-  ['NeedsGuidingResponsesTaskObjectFactory',
-    NeedsGuidingResponsesTaskObjectFactory],
   ['NewlyCreatedStoryObjectFactory', NewlyCreatedStoryObjectFactory],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
@@ -523,10 +487,6 @@ export const angularServices: [string, unknown][] = [
     PlatformFeatureAdminBackendApiService],
   ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
-  ['PlatformParameterFilterObjectFactory',
-    PlatformParameterFilterObjectFactory],
-  ['PlatformParameterObjectFactory', PlatformParameterObjectFactory],
-  ['PlatformParameterRuleObjectFactory', PlatformParameterRuleObjectFactory],
   ['PlayerCorrectnessFeedbackEnabledService',
     PlayerCorrectnessFeedbackEnabledService],
   ['PlayerPositionService', PlayerPositionService],
@@ -552,7 +512,6 @@ export const angularServices: [string, unknown][] = [
     RatioExpressionInputValidationService],
   ['RatioObjectFactory', RatioObjectFactory],
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
-  ['ReadOnlyStoryNodeObjectFactory', ReadOnlyStoryNodeObjectFactory],
   ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RecordedVoiceoversObjectFactory', RecordedVoiceoversObjectFactory],
@@ -614,7 +573,6 @@ export const angularServices: [string, unknown][] = [
   ['StoryContentsObjectFactory', StoryContentsObjectFactory],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryObjectFactory', StoryObjectFactory],
-  ['StoryPlaythroughObjectFactory', StoryPlaythroughObjectFactory],
   ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledHtmlObjectFactory', SubtitledHtmlObjectFactory],
@@ -623,8 +581,6 @@ export const angularServices: [string, unknown][] = [
   ['SubtopicPageContentsObjectFactory', SubtopicPageContentsObjectFactory],
   ['SubtopicPageObjectFactory', SubtopicPageObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
-  ['SuccessiveIncorrectAnswersTaskObjectFactory',
-    SuccessiveIncorrectAnswersTaskObjectFactory],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionObjectFactory', SuggestionObjectFactory],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
@@ -639,7 +595,6 @@ export const angularServices: [string, unknown][] = [
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicObjectFactory', TopicObjectFactory],
-  ['TopicSummaryObjectFactory', TopicSummaryObjectFactory],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
   ['TopicsAndSkillsDashboardBackendApiService',
     TopicsAndSkillsDashboardBackendApiService],
@@ -652,7 +607,6 @@ export const angularServices: [string, unknown][] = [
   ['UrlService', UrlService],
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UserInfoObjectFactory', UserInfoObjectFactory],
-  ['UserProfileObjectFactory', UserProfileObjectFactory],
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
   ['VersionTreeService', VersionTreeService],

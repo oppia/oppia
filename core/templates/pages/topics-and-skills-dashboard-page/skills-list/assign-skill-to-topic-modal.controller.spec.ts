@@ -1,3 +1,4 @@
+import { TopicSummary, TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +27,6 @@ describe('Assign Skill To Topic Modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var topicSummaryDict = null;
-  var TopicSummaryObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -39,11 +39,10 @@ describe('Assign Skill To Topic Modal', function() {
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
-    TopicSummaryObjectFactory = $injector.get('TopicSummaryObjectFactory');
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    topicSummaryDict = TopicSummaryObjectFactory.createFromBackendDict({
+    topicSummaryDict = TopicSummary.createFromBackendDict({
       id: '1',
       name: 'topic1',
       canonical_story_count: 2,
@@ -52,7 +51,7 @@ describe('Assign Skill To Topic Modal', function() {
       uncategorized_skill_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
-    });
+    } as TopicSummaryBackendDict);
     $scope = $rootScope.$new();
     $controller('AssignSkillToTopicModalController', {
       $scope: $scope,

@@ -43,8 +43,8 @@ import {
   TopicsAndSkillsDashboardFilter
 // eslint-disable-next-line max-len
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
-import { TopicSummary, TopicSummaryBackendDict, TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+import { TopicSummary, TopicSummaryBackendDict } from
+  'domain/topic/topic-summary.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -112,7 +112,6 @@ export class TopicsAndSkillsDashboardBackendApiService {
   constructor(
     private http: HttpClient,
     private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _topicsAndSkillsDashboardReinitializedEventEmitter =
@@ -151,8 +150,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
         totalSkillCount: response.total_skill_count,
         topicSummaries: (
           response.topic_summary_dicts.map(
-            backendDict => this.topicSummaryObjectFactory
-              .createFromBackendDict(backendDict))),
+            backendDict => TopicSummary.createFromBackendDict(backendDict))),
         categorizedSkillsDict: categorizedSkills
       };
     }, errorResponse => {

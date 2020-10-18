@@ -24,21 +24,16 @@ import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminPageData } from
   'domain/admin/admin-backend-api.service';
-import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter-object.factory';
-import { FeatureStage, PlatformParameterObjectFactory } from
-  'domain/platform_feature/platform-parameter-object.factory';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
+import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
+import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
 
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService = null;
-  let ppof: PlatformParameterObjectFactory;
-  let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   var sampleAdminData = {
     unfinished_job_data: [],
@@ -135,8 +130,6 @@ describe('Admin Data Service', () => {
       providers: [AdminDataService]
     });
     adminDataService = TestBed.get(AdminDataService);
-    ppof = TestBed.get(PlatformParameterObjectFactory);
-    tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataResponse = {
       demoExplorations: sampleAdminData.demo_explorations,
@@ -162,9 +155,9 @@ describe('Admin Data Service', () => {
         sampleAdminData.continuous_computations_data.map(
           ComputationData.createFromBackendDict),
       topicSummaries: sampleAdminData.topic_summaries.map(
-        tsof.createFromBackendDict),
+        TopicSummary.createFromBackendDict),
       featureFlags: sampleAdminData.feature_flags.map(
-        dict => ppof.createFromBackendDict(dict))
+        dict => PlatformParameter.createFromBackendDict(dict))
     };
   });
 

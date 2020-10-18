@@ -23,10 +23,9 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
-  TopicSummaryBackendDict,
   TopicSummary,
-  TopicSummaryObjectFactory
-} from 'domain/topic/TopicSummaryObjectFactory';
+  TopicSummaryBackendDict
+} from 'domain/topic/topic-summary.model';
 import {
   ComputationData,
   ComputationDataBackendDict,
@@ -40,10 +39,9 @@ import {
   JobStatusSummaryBackendDict,
 } from 'domain/admin/job-status-summary.model';
 import {
-  PlatformParameterBackendDict,
   PlatformParameter,
-  PlatformParameterObjectFactory
-} from 'domain/platform_feature/platform-parameter-object.factory';
+  PlatformParameterBackendDict
+} from 'domain/platform_feature/platform-parameter.model';
 
 
 interface UserRoles {
@@ -105,9 +103,7 @@ export interface AdminPageData {
 })
 export class AdminBackendApiService {
   constructor(
-    private http: HttpClient,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
-    private platformParameterObjectFactory: PlatformParameterObjectFactory) {}
+    private http: HttpClient) {}
 
   getData(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
@@ -133,9 +129,9 @@ export class AdminBackendApiService {
           continuousComputationsData: response.continuous_computations_data.map(
             ComputationData.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
-            this.topicSummaryObjectFactory.createFromBackendDict),
+            TopicSummary.createFromBackendDict),
           featureFlags: response.feature_flags.map(
-            dict => this.platformParameterObjectFactory.createFromBackendDict(
+            dict => PlatformParameter.createFromBackendDict(
               dict)
           )
         });
