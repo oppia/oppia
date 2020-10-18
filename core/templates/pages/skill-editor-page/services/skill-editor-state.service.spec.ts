@@ -28,7 +28,7 @@ import { SkillRights } from
   'domain/skill/skill-rights.model';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('domain/skill/skill-update.service.ts');
@@ -116,12 +116,8 @@ describe('Skill editor state service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeSkillBackendApiService = (
       FakeSkillBackendApiService());

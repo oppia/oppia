@@ -250,27 +250,63 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_compare_to_remote(self):
         check_function_calls = {
             'start_subprocess_for_result_is_called': False,
-            'git_diff_name_status_is_called': False
+            'git_diff_name_status_is_called': False,
+            'get_merge_base_is_called': False,
         }
         expected_check_function_calls = {
             'start_subprocess_for_result_is_called': True,
-            'git_diff_name_status_is_called': True
+            'git_diff_name_status_is_called': True,
+            'get_merge_base_is_called': True,
         }
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             check_function_calls['start_subprocess_for_result_is_called'] = True
         def mock_git_diff_name_status(unused_left, unused_right):
             check_function_calls['git_diff_name_status_is_called'] = True
             return 'Test'
+        def mock_get_merge_base(unused_left, unused_right):
+            check_function_calls['get_merge_base_is_called'] = True
+            return 'Merge Base'
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         git_diff_swap = self.swap(
             pre_push_hook, 'git_diff_name_status', mock_git_diff_name_status)
+        get_merge_base_swap = self.swap(
+            pre_push_hook, 'get_merge_base', mock_get_merge_base)
 
-        with subprocess_swap, git_diff_swap:
+        with subprocess_swap, git_diff_swap, get_merge_base_swap:
             self.assertEqual(
                 pre_push_hook.compare_to_remote('remote', 'local branch'),
                 'Test')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_get_merge_base_reports_error(self):
+        def mock_start_subprocess_for_result(unused_cmd_tokens):
+            return None, 'Test'
+        subprocess_swap = self.swap(
+            pre_push_hook, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result)
+
+        with subprocess_swap, self.assertRaisesRegexp(ValueError, 'Test'):
+            pre_push_hook.get_merge_base('A', 'B')
+
+    def test_get_merge_base_returns_merge_base(self):
+        check_function_calls = {
+            'start_subprocess_for_result_is_called': False,
+        }
+        expected_check_function_calls = {
+            'start_subprocess_for_result_is_called': True,
+        }
+        def mock_start_subprocess_for_result(unused_cmd_tokens):
+            check_function_calls['start_subprocess_for_result_is_called'] = True
+            return 'Test', None
+        subprocess_swap = self.swap(
+            pre_push_hook, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result)
+
+        with subprocess_swap:
+            self.assertEqual(pre_push_hook.get_merge_base('A', 'B'), 'Test')
+
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_extract_files_to_lint_with_empty_file_diffs(self):

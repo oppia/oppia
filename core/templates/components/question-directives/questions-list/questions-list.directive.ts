@@ -75,8 +75,6 @@ angular.module('oppia').directive('questionsList', [
         skillDescriptionsAreShown: '&skillDescriptionsAreShown',
         selectSkillModalIsShown: '&selectSkillModalIsShown',
         getSkillIds: '&skillIds',
-        getQuestionSummariesAsync: '=',
-        isLastPage: '=isLastQuestionBatch',
         getAllSkillSummaries: '&allSkillSummaries',
         canEditQuestion: '&',
         getSkillIdToRubricsObject: '&skillIdToRubricsObject',
@@ -111,11 +109,6 @@ angular.module('oppia').directive('questionsList', [
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
-            if (ctrl.selectedSkillId !== null) {
-              ctrl.selectedSkillIds = [ctrl.selectedSkillId];
-            } else {
-              ctrl.selectedSkillIds = [];
-            }
           };
 
           var _initTab = function(resetHistoryAndFetch) {
@@ -123,8 +116,8 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionEditorIsShown = false;
             ctrl.question = null;
             _reInitializeSelectedSkillIds();
-            ctrl.getQuestionSummariesAsync(
-              ctrl.selectedSkillIds, resetHistoryAndFetch,
+            QuestionsListService.getQuestionSummariesAsync(
+              ctrl.selectedSkillId, resetHistoryAndFetch,
               resetHistoryAndFetch
             );
             ctrl.questionIsBeingUpdated = false;
@@ -151,16 +144,16 @@ angular.module('oppia').directive('questionsList', [
           ctrl.goToNextPage = function() {
             _reInitializeSelectedSkillIds();
             QuestionsListService.incrementPageNumber();
-            ctrl.getQuestionSummariesAsync(
-              ctrl.selectedSkillIds, true, false
+            QuestionsListService.getQuestionSummariesAsync(
+              ctrl.selectedSkillId, true, false
             );
           };
 
           ctrl.goToPreviousPage = function() {
             _reInitializeSelectedSkillIds();
             QuestionsListService.decrementPageNumber();
-            ctrl.getQuestionSummariesAsync(
-              ctrl.selectedSkillIds, false, false
+            QuestionsListService.getQuestionSummariesAsync(
+              ctrl.selectedSkillId, false, false
             );
           };
 
@@ -205,8 +198,8 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.question.toBackendDict(true), imagesData
               ).then(function() {
                 QuestionsListService.resetPageNumber();
-                ctrl.getQuestionSummariesAsync(
-                  ctrl.selectedSkillIds, true, true
+                QuestionsListService.getQuestionSummariesAsync(
+                  ctrl.selectedSkillId, true, true
                 );
                 ctrl.questionIsBeingSaved = false;
                 ctrl.editorIsOpen = false;
@@ -225,8 +218,8 @@ angular.module('oppia').directive('questionsList', [
                       QuestionUndoRedoService.clearChanges();
                       ctrl.editorIsOpen = false;
                       ctrl.questionIsBeingSaved = false;
-                      ctrl.getQuestionSummariesAsync(
-                        ctrl.selectedSkillIds, true, true
+                      QuestionsListService.getQuestionSummariesAsync(
+                        ctrl.selectedSkillId, true, true
                       );
                     }, function(error) {
                       AlertsService.addWarning(
@@ -246,6 +239,10 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.getSkillEditorUrl = function(skillId) {
             return `/skill_editor/${skillId}`;
+          };
+
+          ctrl.isLastPage = function() {
+            return QuestionsListService.isLastQuestionBatch();
           };
 
           ctrl.cancel = function() {
@@ -429,8 +426,8 @@ angular.module('oppia').directive('questionsList', [
                 questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
               ).then(function() {
                 QuestionsListService.resetPageNumber();
-                ctrl.getQuestionSummariesAsync(
-                  ctrl.selectedSkillIds, true, true
+                QuestionsListService.getQuestionSummariesAsync(
+                  ctrl.selectedSkillId, true, true
                 );
                 AlertsService.addSuccessMessage('Deleted Question');
               });
@@ -441,8 +438,8 @@ angular.module('oppia').directive('questionsList', [
                     questionId, [{id: summary.getId(), task: 'remove'}]
                   ).then(function() {
                     QuestionsListService.resetPageNumber();
-                    ctrl.getQuestionSummariesAsync(
-                      ctrl.selectedSkillIds, true, true
+                    QuestionsListService.getQuestionSummariesAsync(
+                      ctrl.selectedSkillId, true, true
                     );
                     AlertsService.addSuccessMessage('Deleted Question');
                   });
@@ -514,8 +511,8 @@ angular.module('oppia').directive('questionsList', [
                       if (count === changedDifficultyCount) {
                         $timeout(function() {
                           QuestionsListService.resetPageNumber();
-                          ctrl.getQuestionSummariesAsync(
-                            ctrl.selectedSkillIds, true, true
+                          QuestionsListService.getQuestionSummariesAsync(
+                            ctrl.selectedSkillId, true, true
                           );
                           AlertsService.addSuccessMessage('Updated Difficulty');
                         }, 100 * count);
@@ -616,8 +613,8 @@ angular.module('oppia').directive('questionsList', [
                 $timeout(function() {
                   QuestionsListService.resetPageNumber();
                   _reInitializeSelectedSkillIds();
-                  ctrl.getQuestionSummariesAsync(
-                    ctrl.selectedSkillIds, true, true
+                  QuestionsListService.getQuestionSummariesAsync(
+                    ctrl.selectedSkillId, true, true
                   );
                   ctrl.editorIsOpen = false;
                   ctrl.saveAndPublishQuestion(commitMsg);
@@ -673,12 +670,14 @@ angular.module('oppia').directive('questionsList', [
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               QuestionsListService.onQuestionSummariesInitialized.subscribe(
-                () => _initTab(false)));
+                () => {
+                  _initTab(false);
+                  $rootScope.$apply();
+                }));
             ctrl.showDifficultyChoices = false;
             ctrl.difficultyCardIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             ctrl.skillIds = [];
-            ctrl.selectedSkillIds = [];
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             ctrl.editorIsOpen = false;

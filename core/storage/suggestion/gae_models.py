@@ -62,6 +62,12 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# The types of suggestions that are offered on the Contributor Dashboard.
+CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]
+
 # Daily emails are sent to reviewers to notify them of suggestions on the
 # Contributor Dashboard to review. The constants below define the number of
 # question and translation suggestions to fetch to come up with these daily
@@ -99,6 +105,16 @@ THRESHOLD_DAYS_BEFORE_ACCEPT = 7
 # Threshold time after which suggestion is considered stale and auto-accepted.
 THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
     THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
+
+# Threshold number of days after which to notify the admin that the
+# suggestion has waited too long for a review. The admin will be notified of the
+# top MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN number of suggestions that have
+# waited for a review longer than the threshold number of days.
+SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS = 7
+
+# The maximum number of suggestions, that have been waiting too long for review,
+# to email admins about.
+MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN = 10
 
 # The default message to be shown when accepting stale suggestions.
 DEFAULT_SUGGESTION_ACCEPT_MESSAGE = (
@@ -314,6 +330,38 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
+    def get_suggestions_waiting_too_long_for_review(cls):
+        """Returns a list of suggestions that have been waiting for a review
+        longer than SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days on the
+        Contributor Dashboard. MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN
+        suggestions are returned, sorted in descending order by their review
+        wait time.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of suggestions, sorted in
+            descending order by their review wait time.
+
+        Raises:
+            Exception. If there are no suggestion types offered on the
+                Contributor Dashboard.
+        """
+        if not CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
+            raise Exception(
+                'Expected the suggestion types offered on the Contributor '
+                'Dashboard to be nonempty.')
+        threshold_time = (
+            datetime.datetime.utcnow() - datetime.timedelta(
+                days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS))
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.last_updated < threshold_time)
+            .filter(cls.suggestion_type.IN(
+                CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
+            .order(cls.last_updated)
+            .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
+
+    @classmethod
     def get_in_review_suggestions_in_score_categories(
             cls, score_categories, user_id):
         """Gets all suggestions which are in review in the given
@@ -377,7 +425,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_translation_suggestions_waiting_longest_for_review_per_lang(
+    def get_translation_suggestions_waiting_longest_for_review(
             cls, language_code):
         """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
         number of translation suggestions in the specified language code,
@@ -622,6 +670,9 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     total number of reviewers for each suggestion type and the total number of
     suggestions in review for each suggestion type. There is only ever one
     instance of this model, and its ID is COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
+
+    Note: since this is a singleton model, the model GET and PUT must be done in
+    a transaction to avoid the loss of updates that come in rapid succession.
     """
 
     # A dictionary where the keys represent the language codes that translation

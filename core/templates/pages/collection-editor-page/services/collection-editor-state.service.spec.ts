@@ -18,12 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-editor-state.service.ts is upgraded to Angular 8.
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from
-  'domain/collection/CollectionPlaythroughObjectFactory';
+import { Collection } from
+  'domain/collection/collection.model';
 import { CollectionRights } from
   'domain/collection/collection-rights.model';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -39,7 +35,6 @@ import { Subscription } from 'rxjs';
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
-  var collectionObjectFactory = null;
   var CollectionUpdateService = null;
   var fakeEditableCollectionBackendApiService = null;
   var fakeCollectionRightsBackendApiService = null;
@@ -63,7 +58,7 @@ describe('Collection editor state service', function() {
     var _fetchOrUpdateCollection = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(collectionObjectFactory.create(
+          resolve(Collection.create(
             self.newBackendCollectionObject));
         } else {
           reject();
@@ -108,14 +103,6 @@ describe('Collection editor state service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
-    $provide.value(
-      'CollectionObjectFactory', new CollectionObjectFactory(
-        new CollectionNodeObjectFactory(),
-        new CollectionPlaythroughObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -140,7 +127,6 @@ describe('Collection editor state service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     CollectionEditorStateService = $injector.get(
       'CollectionEditorStateService');
-    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -293,7 +279,7 @@ describe('Collection editor state service', function() {
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-      var newCollection = collectionObjectFactory.create(
+      var newCollection = Collection.create(
         secondBackendCollectionObject);
       CollectionEditorStateService.setCollection(newCollection);
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
@@ -320,7 +306,7 @@ describe('Collection editor state service', function() {
 
   it('should return the last collection loaded as the same object', function() {
     var previousCollection = CollectionEditorStateService.getCollection();
-    var expectedCollection = collectionObjectFactory.create(
+    var expectedCollection = Collection.create(
       fakeEditableCollectionBackendApiService.newBackendCollectionObject);
     expect(previousCollection).not.toEqual(expectedCollection);
 
@@ -363,7 +349,7 @@ describe('Collection editor state service', function() {
   it('should be able to set a new collection with an in-place copy',
     function() {
       var previousCollection = CollectionEditorStateService.getCollection();
-      var expectedCollection = collectionObjectFactory.create(
+      var expectedCollection = Collection.create(
         secondBackendCollectionObject);
       expect(previousCollection).not.toEqual(expectedCollection);
 
@@ -409,7 +395,7 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      var newCollection = collectionObjectFactory.create(
+      var newCollection = Collection.create(
         secondBackendCollectionObject);
       CollectionEditorStateService.setCollection(newCollection);
 
