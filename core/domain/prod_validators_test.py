@@ -531,9 +531,6 @@ class TrainingJobExplorationMappingModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-
-
-
 class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
