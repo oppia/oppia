@@ -1858,6 +1858,23 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                         line=line_num)
 
 
+    class BlankSpaceBelowFunctionDefChecker(checkers.BaseChecker):
+        """Custom pylint checker which checks that there isn't a blank space
+        below the function definition.
+        """
+
+        __implements__ = interfaces.ITokenChecker
+        name = "no-blank-line-after-function-definition"
+        priority = -1
+        msgs = {
+            'C0030' : (
+                "Blank line not permitted below function definition",
+                "no-blank-line-after-function-definition",
+                "Blank line below the funciton definition should be removed",
+            ),
+        }
+
+
 def register(linter):
     """Registers the checker with pylint.
 
