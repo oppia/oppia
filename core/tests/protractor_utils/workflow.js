@@ -24,6 +24,7 @@ var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var action = require('./action.js');
 
 var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
@@ -31,6 +32,16 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
   '.protractor-thumbnail-reset-button'));
+var publishExplorationButton = element(
+  by.css('.protractor-test-publish-exploration'));
+var prePublicationButtonElem = element(by.css(
+  '.protractor-test-confirm-pre-publication'));
+var confirmPublicationButton = element(
+  by.css('.protractor-test-confirm-publish'));
+var sharePublishModal = element(
+  by.css('.protractor-test-share-publish-modal'));
+var closePublishModalButton = element(
+  by.css('.protractor-test-share-publish-close'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -80,10 +91,7 @@ var createExplorationAndStartTutorial = async function() {
       'ActivityCreationModal takes too long to be visible.');
     var createExplorationButton = element(
       by.css('.protractor-test-create-exploration'));
-    await waitFor.elementToBeClickable(
-      createExplorationButton,
-      'createExplorationButton takes too long to be clickable.');
-    await createExplorationButton.click();
+    await action.click('Create exploration button', createExplorationButton);
   }
 };
 
@@ -118,27 +126,18 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
-  await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
-  await element(by.css('.protractor-test-publish-exploration')).click();
-  var prePublicationButtonElem = element(by.css(
-    '.protractor-test-confirm-pre-publication'));
-  await prePublicationButtonElem.isPresent();
-  await prePublicationButtonElem.click();
+  await action.click('Publish Exploration button', publishExplorationButton);
+
+  await action.click('Pre-publication button', prePublicationButtonElem);
 
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  await element(by.css('.protractor-test-confirm-publish')).click();
+  await action.click('Confirm publication button', confirmPublicationButton);
 
-  var sharePublishModal = element(
-    by.css('.protractor-test-share-publish-modal'));
-  var closePublishModalButton = element(
-    by.css('.protractor-test-share-publish-close'));
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  await waitFor.elementToBeClickable(
-    closePublishModalButton, 'Close Publish Modal button is not clickable');
-  await closePublishModalButton.click();
+  await action.click('Close publication modal button', closePublishModalButton);
 };
 
 // Creates and publishes a minimal exploration.

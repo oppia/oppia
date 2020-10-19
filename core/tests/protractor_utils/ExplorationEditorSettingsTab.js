@@ -91,11 +91,12 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.openAndClosePreviewSummaryTile = async function() {
-    await openPreviewSummaryButton.click();
+    await action.click('Open preview summary button', openPreviewSummaryButton);
     await waitFor.visibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to appear');
     expect(await explorationSummaryTile.isPresent()).toBeTruthy();
-    await closePreviewSummaryButton.click();
+    await action.click(
+      'Close preview summary button', closePreviewSummaryButton);
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
     expect(await explorationSummaryTile.isPresent()).toBeFalsy();
@@ -108,7 +109,8 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setFirstState = async function(stateName) {
-    await initialStateSelectOption(stateName).click();
+    await action.click(
+      'Initial State Select Option', initialStateSelectOption(stateName));
   };
 
   this.setLanguage = async function(language) {
@@ -118,12 +120,15 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setObjective = async function(objective) {
     await explorationObjectiveInput.clear();
-    await explorationObjectiveInput.sendKeys(objective);
+    await action.sendKeys(
+      'Exploration Objective input field',
+      explorationObjectiveInput, objective);
   };
 
   this.setTitle = async function(title) {
     await explorationTitleInput.clear();
-    await explorationTitleInput.sendKeys(title);
+    await action.sendKeys(
+      'Exploration Title input field', explorationTitleInput, title);
   };
 
   this.expectCategoryToBe = async function(category) {

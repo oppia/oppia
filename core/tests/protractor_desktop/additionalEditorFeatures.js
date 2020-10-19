@@ -24,6 +24,7 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
+var action = require('../protractor_utils/action.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -48,9 +49,8 @@ describe('Full exploration editor', function() {
 
   it('should walk through the tutorial when user repeatedly clicks Next',
     async function() {
-      await users.createUser(
+      await users.createAndLoginUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
-      await users.login('userTutorial@stateEditor.com');
       await workflow.createExplorationAndStartTutorial();
       await explorationEditorMainTab.startTutorial();
       await explorationEditorMainTab.playTutorial();
@@ -61,8 +61,8 @@ describe('Full exploration editor', function() {
 
   it('should generate warning message if card height limit is exceeded',
     async function() {
-      await users.createUser('user@heightWarning.com', 'userHeightWarning');
-      await users.login('user@heightWarning.com');
+      await users.createAndLoginUser(
+        'user@heightWarning.com', 'userHeightWarning');
 
       await workflow.createExploration();
 
@@ -70,10 +70,7 @@ describe('Full exploration editor', function() {
       var stateEditContent = element(by.css('.protractor-test-edit-content'));
       await waitFor.invisibilityOf(
         postTutorialPopover, 'Post-tutorial popover does not disappear.');
-      await waitFor.elementToBeClickable(
-        stateEditContent,
-        'stateEditContent taking too long to appear to set content');
-      await stateEditContent.click();
+      await action.click('State Edit Content' ,stateEditContent);
       var stateEditorTag = element(by.tagName('state-content-editor'));
       var stateContentEditor = stateEditorTag.element(
         by.css('.protractor-test-state-content-editor'));
@@ -99,7 +96,9 @@ describe('Full exploration editor', function() {
       await waitFor.visibilityOf(
         heightMessage, 'Card height limit message not displayed');
 
-      await element(by.css('.oppia-hide-card-height-warning-icon')).click();
+      await action.click(
+        'Hide Card Height Warning Icon',
+        element(by.css('.oppia-hide-card-height-warning-icon')));
       expect(await heightMessage.isPresent()).toBe(false);
 
       await users.logout();
@@ -108,8 +107,8 @@ describe('Full exploration editor', function() {
   it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', async function() {
-    await users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
-    await users.login('user5@editorAndPlayer.com');
+    await users.createAndLoginUser(
+      'user5@editorAndPlayer.com', 'user5EditorAndPlayer');
 
     await workflow.createExploration();
     await explorationEditorMainTab.setStateName('card1');
@@ -356,8 +355,8 @@ describe('Full exploration editor', function() {
   });
 
   it('should delete interactions cleanly', async function() {
-    await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
-    await users.login('user8@editorAndPlayer.com');
+    await users.createAndLoginUser(
+      'user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await workflow.createExploration();
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'How are you feeling?'));

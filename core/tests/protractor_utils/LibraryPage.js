@@ -78,7 +78,7 @@ var LibraryPage = function() {
       browser.isMobile ? await searchInputs.get(1) :
       await searchInputs.first());
     await searchInput.clear();
-    await searchInput.sendKeys(searchQuery);
+    await action.sendKeys('Search input field', searchInput, searchQuery);
     let searchButtonExists = await searchButton.isPresent();
     if (searchButtonExists) {
       await action.click('Search button', searchButton);
@@ -164,7 +164,7 @@ var LibraryPage = function() {
     var explorationCard = await allExplorationsTitled(explorationName).first();
     await waitFor.visibilityOf(
       explorationCard, 'Unable to find exploration ' + explorationName);
-    await explorationCard.click();
+    await action.click('Exploration card button', explorationCard);
     await waitFor.pageToFullyLoad();
   };
 
