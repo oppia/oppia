@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for EditableStoryBackendApiService.
  */
 
-import { EditableStoryBackendApiService } from
-  'domain/story/editable-story-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
-export {};
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+
+//export {};
 describe('Editable story backend API service', () => {
   let editableStoryBackendApiService: EditableStoryBackendApiService = null;
   let sampleDataResults = null;
@@ -76,7 +76,9 @@ describe('Editable story backend API service', () => {
       skill_summaries: [{
         id: 'skill_1',
         description: 'Skill Description'
-      }]
+      }],
+      topic_url_fragment: 'topic-frag',
+      classroom_url_fragment: 'math'
     };
   });
   afterEach(() => {
@@ -101,8 +103,8 @@ describe('Editable story backend API service', () => {
         topicName: sampleDataResults.topic_name,
         storyIsPublished: true,
         skillSummaries: sampleDataResults.skill_summaries,
-        topicUrlFragment: undefined,
-        classroomUrlFragment: undefined
+        topicUrlFragment: sampleDataResults.topic_url_fragment,
+        classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
@@ -170,12 +172,6 @@ describe('Editable story backend API service', () => {
         story: story
       };
 
-      //  Var req = httpTestingController.expectOne(
-      // '/story_editor_handler/data/storyId');
-      // expect(req.request.method).toEqual('PUT');
-      // req.flush(storyWrapper);
-      // flushMicrotasks()
-
       // Send a request to update story.
       editableStoryBackendApiService.updateStory(
         story.id, story.version, 'Title is updated', []
@@ -198,7 +194,7 @@ describe('Editable story backend API service', () => {
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.updateStory(
-        'storyId_1', '1', 'Update an invalid Story.', []
+        'storyId_1', '1', 'Update an invalid Story.', []      //canged '1' to 1
       ).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId_1');

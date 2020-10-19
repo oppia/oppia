@@ -48,14 +48,14 @@ interface UpdateStoryBackendResponse {
   story: StoryBackendDict;
 }
 
-interface StoryUrlFragmentExists {
+interface StoryUrlFragmentExistsBackendResponse {
   // eslint-disable-next-line
-  story_url_fragment_exists: StoryUrlFragmentExists;
+  story_url_fragment_exists: string;
 }
 
 interface ValidationErrorMessages {
   // eslint-disable-next-line
-  validation_error_messages: ValidationErrorMessages;
+  validation_error_messages: boolean;
 }
 
 @Injectable({
@@ -121,7 +121,7 @@ export class EditableStoryBackendApiService {
   private _changeStoryPublicationStatus(
       storyId: string,
       newStoryStatusIsPublic: boolean,
-      successCallback: (value: number) =>void,
+      successCallback: (value: void) =>void,
       errorCallback: (reason: string) => void): void {
     const storyPublishUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
@@ -132,7 +132,7 @@ export class EditableStoryBackendApiService {
     };
     // eslint-disable-next-line max-len
     this.http.put(storyPublishUrl, putData, { observe: 'response'}).toPromise().then(
-      response => successCallback(response.status),
+      response => successCallback(),
       errorResponse => errorCallback(errorResponse.error.error));
   }
 
@@ -160,7 +160,7 @@ export class EditableStoryBackendApiService {
 
   private _deleteStory(
       storyId: string,
-      successCallback: (value: void) =>void,
+      successCallback: (value: number) =>void,
       errorCallback: (reason: string) => void): void {
     const storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
@@ -168,11 +168,11 @@ export class EditableStoryBackendApiService {
       });
 
     // eslint-disable-next-line
-    this.http.delete<void>(
+    this.http.delete(
       storyDataUrl, {observe: 'response'}).toPromise().then(
       (response) => {
         if (successCallback) {
-          successCallback();
+          successCallback(response.status);
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -183,14 +183,14 @@ export class EditableStoryBackendApiService {
 
   private _doesStoryWithUrlFragmentExist(
       storyUrlFragment: string,
-      successCallback: (value: StoryUrlFragmentExists) => void,
+      successCallback: (value: string/*StoryUrlFragmentExistsBackendResponse*/) => string,
       errorCallback: (reason: string) => void): void {
     const storyUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
         story_url_fragment: storyUrlFragment
       });
-    this.http.get<StoryUrlFragmentExists>(
-      storyUrlFragmentUrl).toPromise().then(
+    this.http.get<StoryUrlFragmentExistsBackendResponse>(
+      storyUrlFragmentUrl/*, {observe: 'response'}*/).toPromise().then(
       (response) => {
         if (successCallback) {
           successCallback(response.story_url_fragment_exists);
@@ -233,7 +233,7 @@ export class EditableStoryBackendApiService {
   changeStoryPublicationStatus(
       storyId: string,
       newStoryStatusIsPublic: boolean):
-  Promise<number> {
+  Promise<void> {
     return new Promise((resolve, reject) => {
       this._changeStoryPublicationStatus(
         storyId, newStoryStatusIsPublic, resolve, reject);
@@ -248,14 +248,14 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  deleteStory(storyId: string): Promise<void> {
+  deleteStory(storyId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this._deleteStory(storyId, resolve, reject);
     });
   }
 
   async doesStoryWithUrlFragmentExistAsync(storyUrlFragment: string):
-  Promise<StoryUrlFragmentExists> {
+  Promise<string/*StoryUrlFragmentExistsBackendResponse*/> {
     return new Promise((resolve, reject) => {
       this._doesStoryWithUrlFragmentExist(
         storyUrlFragment, resolve, reject);
