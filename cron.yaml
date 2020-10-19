@@ -23,3 +23,6 @@ cron:
 - description: daily email about suggestions on the Contributor Dashboard
   url: /cron/mail/reviewers/contributor_dashboard_suggestions
   schedule: every day 16:00
+- description: daily email about bottlenecks on the Contributor Dashboard
+  url: /cron/mail/admins/contributor_dashboard_bottlenecks
+  schedule: every day 17:00

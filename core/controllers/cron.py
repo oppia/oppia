@@ -253,3 +253,48 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
                     reviewer_ids))
             email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
                 reviewer_ids, reviewers_suggestion_email_infos)
+
+
+class CronMailAdminContributorDashboardBottlenecksHandler(
+        base.BaseHandler):
+    """Handler for mailing admins if there are bottlenecks that are causing a
+    longer reviewer turnaround time on the Contributor Dashboard.
+    """
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Sends each admin up to two emails: an email to alert the admins that
+        there are suggestion types that need more reviewers and/or an email
+        to alert the admins that specific suggestions have been waiting too long
+        to get reviewed.
+        """
+        if not feconf.CAN_SEND_EMAILS:
+            return
+
+        if (
+                config_domain
+                .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
+            admin_ids = user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_ADMIN)
+            suggestion_types_needing_reviewers = (
+                suggestion_services
+                .get_suggestion_types_that_need_reviewers()
+            )
+            email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
+                admin_ids, suggestion_types_needing_reviewers)
+        if (
+                config_domain
+                .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
+                .value):
+            admin_ids = user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_ADMIN)
+            info_about_suggestions_waiting_too_long_for_review = (
+                suggestion_services
+                .get_info_about_suggestions_waiting_too_long_for_review()
+            )
+            (
+                email_manager
+                .send_mail_to_notify_admins_suggestions_waiting_long(
+                    admin_ids,
+                    info_about_suggestions_waiting_too_long_for_review)
+            )
