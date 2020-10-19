@@ -31,7 +31,7 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
           sudo apt-get update
-          sudo apt-get install lsb-release
+          sudo apt-get install libappindicator3-1
           curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
           sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
           sudo dpkg -i google-chrome.deb
