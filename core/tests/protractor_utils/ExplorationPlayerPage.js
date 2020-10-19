@@ -251,7 +251,7 @@ var ExplorationPlayerPage = function() {
     await waitFor.visibilityOf(
       conversationContent.last(), 'Ending message not visible');
     expect(
-      await(conversationContent.last()).getText()
+      await (conversationContent.last()).getText()
     ).toEqual('Congratulations, you have finished!');
   };
 
