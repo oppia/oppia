@@ -42,7 +42,7 @@ USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
 (collection_models, exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exp, models.NAMES.user])
+    models.NAMES.collection,  models.NAMES.exploration, models.NAMES.user])
 
 
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
