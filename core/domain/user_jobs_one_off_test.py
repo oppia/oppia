@@ -1440,8 +1440,8 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
 
     def test_one_setting_model_with_gae_user_id(self):
         with self.swap(
-                user_models, 'UserSettingsModel',
-                MockUserSettingsModelWithGaeUserId):
+            user_models, 'UserSettingsModel',
+            MockUserSettingsModelWithGaeUserId):
             original_setting_model = (
                 user_models.UserSettingsModel(
                     id='id',
@@ -1521,8 +1521,8 @@ class RemoveGaeIdOneOffJobTests(test_utils.GenericTestBase):
 
     def test_one_setting_model_with_gae_id(self):
         with self.swap(
-                user_models, 'UserSettingsModel',
-                MockUserSettingsModelWithGaeId):
+            user_models, 'UserSettingsModel',
+            MockUserSettingsModelWithGaeId):
             original_setting_model = (
                 user_models.UserSettingsModel(
                     id='id',
