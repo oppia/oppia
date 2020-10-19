@@ -27,7 +27,9 @@ from core.platform import models
 import python_utils
 import utils
 
-(base_models, collection_models, exp_models, user_models) = models.Registry.import_models([ models.NAMES.base_model, models.NAMES.collection, models.NAMES.exp, models.NAMES.user])
+(base_models, collection_models, exp_models, user_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exp, models.NAMES.user])
+
 
 class CollectionModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating CollectionModel."""
@@ -399,4 +401,3 @@ class CollectionSummaryModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_node_count]
-
