@@ -33,7 +33,6 @@ require(
   'pages/story-viewer-page/navbar-pre-logo-action/' +
   'story-viewer-navbar-pre-logo-action.component.ts');
 
-require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');

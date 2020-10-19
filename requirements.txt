@@ -19,7 +19,7 @@ enum34==1.1.10            # via google-cloud-tasks, grpcio
 funcsigs==1.0.2           # via mock
 future==0.18.2            # via -r requirements.in
 futures==3.3.0            # via google-api-core, grpcio
-google-api-core[grpc]==1.22.2  # via google-api-python-client, google-cloud-tasks
+google-api-core[grpc]==1.22.4  # via google-api-python-client, google-cloud-tasks
 google-api-python-client==1.11.0  # via -r requirements.in
 google-auth-httplib2==0.0.4  # via -r requirements.in, google-api-python-client
 google-auth-oauthlib==0.4.1  # via -r requirements.in
