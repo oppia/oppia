@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core.domain.prod_validators."""
+"""Unit tests for core.domain.collection_validators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-module
@@ -24,14 +24,14 @@ import datetime
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.platform import models
-from core.tests import test_utils
-from core.domain import exp_services
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import prod_validation_jobs_one_off
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
+from core.platform import models
+from core.tests import test_utils
 import feconf
 import python_utils
 import utils
@@ -41,25 +41,19 @@ datastore_services = models.Registry.import_datastore_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(collection_models,exp_models, user_models) = models.Registry.import_models([ 
-    models.NAMES.collection,models.NAMES.exp, models.NAMES.user
-])
+(collection_models, exp_models, user_models) = models.Registry.import_models([models.NAMES.collection, models.NAMES.exp, models.NAMES.user])
 
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
-     
-     def setUp(self):
+    def setUp(self):
         super(CollectionModelValidatorTests, self).setUp()
-
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i,
         ) for i in python_utils.RANGE(6)]
-
+     
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
@@ -85,7 +79,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.job_class = (
             prod_validation_jobs_one_off.CollectionModelAuditOneOffJob)
 
-     def test_standard_operation(self):
+    def test_standard_operation(self):
         collection_services.update_collection(
             self.owner_id, '0', [{
                 'cmd': 'edit_collection_property',
@@ -98,7 +92,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-     def test_model_with_created_on_greater_than_last_updated(self):
+    def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
         self.model_instance_0.commit(
@@ -134,7 +128,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
-     def test_model_with_invalid_collection_schema(self):
+    def test_model_with_invalid_collection_schema(self):
         expected_output = [
             (
                 u'[u\'failed validation check for domain object check of '
@@ -149,7 +143,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
-     def test_private_collection_with_missing_title(self):
+    def test_private_collection_with_missing_title(self):
         collection_services.update_collection(
             self.owner_id, '0', [{
                 'cmd': 'edit_collection_property',
@@ -161,7 +155,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-     def test_public_collection_with_missing_title(self):
+    def test_public_collection_with_missing_title(self):
         collection_services.update_collection(
             self.owner_id, '0', [{
                 'cmd': 'edit_collection_property',
@@ -181,7 +175,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-     def test_missing_exploration_model_failure(self):
+    def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
             self.owner_id, '', [])
         expected_output = [
@@ -196,7 +190,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-     def test_missing_collection_commit_log_entry_model_failure(self):
+    def test_missing_collection_commit_log_entry_model_failure(self):
         collection_services.update_collection(
             self.owner_id, '0', [{
                 'cmd': 'edit_collection_property',
@@ -219,7 +213,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-     def test_missing_summary_model_failure(self):
+    def test_missing_summary_model_failure(self):
         collection_models.CollectionSummaryModel.get_by_id('0').delete()
 
         expected_output = [
@@ -233,7 +227,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-     def test_missing_collection_rights_model_failure(self):
+    def test_missing_collection_rights_model_failure(self):
         collection_models.CollectionRightsModel.get_by_id(
             '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
 
@@ -248,7 +242,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-     def test_missing_snapshot_metadata_model_failure(self):
+    def test_missing_snapshot_metadata_model_failure(self):
         collection_models.CollectionSnapshotMetadataModel.get_by_id(
             '0-1').delete()
         expected_output = [
@@ -262,7 +256,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-     def test_missing_snapshot_content_model_failure(self):
+    def test_missing_snapshot_content_model_failure(self):
         collection_models.CollectionSnapshotContentModel.get_by_id(
             '0-1').delete()
         expected_output = [
@@ -275,7 +269,6 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-
 
 class CollectionSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
@@ -341,7 +334,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_model_with_created_on_greater_than_last_updated(self):
+   def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
         self.model_instance_0.put()
