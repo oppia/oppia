@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import datetime
 import random
 import types
@@ -48,7 +47,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
-from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -70,16 +68,16 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 (
     classifier_models, collection_models, config_models,
     email_models, exp_models, feedback_models,
-    job_models, opportunity_models, question_models, 
-    recommendations_models, skill_models, story_models, 
-    subtopic_models, suggestion_models, topic_models, 
+    job_models, opportunity_models, question_models,
+    recommendations_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
     models.NAMES.classifier, models.NAMES.collection, models.NAMES.config,
     models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.job, models.NAMES.opportunity, models.NAMES.question, 
-    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.story, 
-    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic, 
+    models.NAMES.job, models.NAMES.opportunity, models.NAMES.question,
+    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
     models.NAMES.user
 ])
 
