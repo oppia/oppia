@@ -148,7 +148,7 @@ var AdminPage = function() {
     await waitFor.visibilityOf(
       configProperty.element(
         by.css('.protractor-test-config-title')),
-        'Config Title taking too long too appear');
+      'Config Title taking too long too appear');
     var title = await configProperty.element(
       by.css('.protractor-test-config-title')).getText();
     if (title.match(propertyName)) {
