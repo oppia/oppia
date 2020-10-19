@@ -1858,21 +1858,36 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                         line=line_num)
 
 
-    class BlankSpaceBelowFunctionDefChecker(checkers.BaseChecker):
-        """Custom pylint checker which checks that there isn't a blank space
-        below the function definition.
-        """
+class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
+    """Custom pylint checker which ensures that there isn't a blank space
+    below a function definition.
+    """
 
-        __implements__ = interfaces.ITokenChecker
-        name = "no-blank-line-after-function-definition"
-        priority = -1
-        msgs = {
-            'C0030' : (
-                "Blank line not permitted below function definition",
-                "no-blank-line-after-function-definition",
-                "Blank line below the funciton definition should be removed",
-            ),
-        }
+    __implements__ = interfaces.IAstroidChecker
+    name = "blank-line-below-function-definition"
+    priority = -1
+    msgs = {
+        'C0030' : (
+            "Blank line not permitted below function definition",
+            "blank-line-below-function-definition",
+            "The Blank line below the function definition should be removed",
+        ),
+    }
+
+    def visit_functiondef(self, node):
+        """Visit every function definition in a module and check if there is a
+        blank line below the function definition.
+
+        Args:
+            node: astroid.nodes.FunctionDef. Node for a function definition
+                in the AST.
+        """
+        line_number = node.fromlineno
+        line_number += 1
+        if linecache.getline(node.root().file, line_number).strip() == b'':
+            self.add_message(
+                'blank-line-below-function-definition', line=line_number
+            )
 
 
 def register(linter):
@@ -1894,3 +1909,4 @@ def register(linter):
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
+    linter.register_checker(BlankLineBelowFunctionDefChecker(linter))
