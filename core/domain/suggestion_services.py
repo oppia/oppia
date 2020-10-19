@@ -875,6 +875,35 @@ def get_submitted_suggestions(user_id, suggestion_type):
     ])
 
 
+def get_info_about_suggestions_waiting_too_long_for_review():
+    """Gets the information about the suggestions that have been waiting longer
+    than suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days
+    for a review on the Contributor Dashboard. There can be information about at
+    most suggestion_models.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN suggestions.
+    The information about the suggestions are returned in descending order by
+    the suggestion's review wait time.
+
+    Returns:
+        list(ReviewableSuggestionEmailContentInfo). A list of reviewable
+        suggestion email content info objects that represent suggestions that
+        have been waiting too long for a review. Each object contains the type
+        of the suggestion, the language of the suggestion, the suggestion
+        content (question/translation), and the date that the suggestion was
+        submitted for review. The objects are sorted in descending order based
+        on review wait time.
+    """
+    suggestions_waiting_too_long_for_review = [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_suggestions_waiting_too_long_for_review())
+    ]
+    return [
+        create_reviewable_suggestion_email_info_from_suggestion(
+            suggestion) for suggestion in
+        suggestions_waiting_too_long_for_review
+    ]
+
+
 def get_user_proficiency_from_model(user_proficiency_model):
     """Converts the given UserContributionProficiencyModel to a
     UserContributionProficiency domain object.
@@ -1109,6 +1138,42 @@ def get_community_contribution_stats():
 
     return create_community_contribution_stats_from_model(
         community_contribution_stats_model)
+
+
+def get_suggestion_types_that_need_reviewers():
+    """Uses the community contribution stats to determine which suggestion
+    types need more reviewers. Suggestion types need more reviewers if the
+    number of suggestions in that type divided by the number of reviewers is
+    greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+
+    Returns:
+        dict. A dictionary that uses the presence of its keys to indicate which
+        suggestion types need more reviewers. The possible key values are the
+        suggestion types listed in
+        suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
+        values for each suggestion type are the following:
+        - for question suggestions the value is an empty set
+        - for translation suggestions the value is a nonempty set containing the
+            language codes of the translation suggestions that need more
+            reviewers.
+    """
+    suggestion_types_needing_reviewers = {}
+    stats = get_community_contribution_stats()
+
+    language_codes_that_need_reviewers = (
+        stats.get_translation_language_codes_that_need_reviewers()
+    )
+    if len(language_codes_that_need_reviewers) != 0:
+        suggestion_types_needing_reviewers[
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = (
+                language_codes_that_need_reviewers
+            )
+
+    if stats.are_question_reviewers_needed():
+        suggestion_types_needing_reviewers[
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] = {}
+
+    return suggestion_types_needing_reviewers
 
 
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
