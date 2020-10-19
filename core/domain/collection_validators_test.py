@@ -17,7 +17,7 @@
 """Unit tests for core.domain.collection_validators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-module
+
 
 import datetime
 
@@ -34,14 +34,16 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
+
 
 datastore_services = models.Registry.import_datastore_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(collection_models, exp_models, user_models) = models.Registry.import_models([models.NAMES.collection, models.NAMES.exp, models.NAMES.user])
+(collection_models, exp_models, user_models) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exp, models.NAMES.user])
+
 
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
@@ -51,8 +53,8 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(6)]
+            category='category%d' % i,)
+        for i in python_utils.RANGE(6)]
      
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
@@ -270,6 +272,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+        
 class CollectionSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
