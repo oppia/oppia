@@ -45,7 +45,7 @@ FECONF_REGEX = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
 TERMS_PAGE_URL = (
     'https://github.com/oppia/oppia/commits/develop/core/'
-    'templates/pages/terms-page/terms-page.mainpage.html')
+    'templates/pages/terms-page/terms-page.component.html')
 
 
 def apply_changes_based_on_config(
