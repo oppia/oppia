@@ -1289,7 +1289,7 @@ class CollectionSummary(python_utils.OBJECT):
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
-    def user_has_any_role(self, user_id):
+    def does_user_have_any_role(self, user_id):
         """Checks if a given user has any role within the collection.
 
         Args:

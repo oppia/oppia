@@ -377,7 +377,7 @@ def _remove_user_from_activities_with_associated_rights_models(user_id):
     explorations_to_remove_user_from_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries if
         not exp_summary.is_solely_owned_by_user(user_id) and
-        exp_summary.user_has_any_role(user_id)
+        exp_summary.does_user_have_any_role(user_id)
     ]
     for exp_id in explorations_to_remove_user_from_ids:
         rights_manager.deassign_role_for_exploration(
@@ -408,7 +408,7 @@ def _remove_user_from_activities_with_associated_rights_models(user_id):
     collections_to_remove_user_from_ids = [
         col_summary.id for col_summary in subscribed_collection_summaries if
         not col_summary.is_solely_owned_by_user(user_id) and
-        col_summary.user_has_any_role(user_id)
+        col_summary.does_user_have_any_role(user_id)
     ]
     for col_id in collections_to_remove_user_from_ids:
         rights_manager.deassign_role_for_collection(
