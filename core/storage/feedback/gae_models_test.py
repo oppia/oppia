@@ -60,12 +60,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
-            gae_id='gae_1_id',
             email='some@email.com'
         ).put()
         user_models.UserSettingsModel(
             id=self.NEW_USER_2_ID,
-            gae_id='gae_2_id',
             email='some_other@email.com'
         ).put()
 

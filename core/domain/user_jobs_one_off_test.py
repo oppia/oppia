@@ -1413,7 +1413,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted(actual_output), sorted(expected_output))
 
 
-class MockUserSettingsModel(user_models.UserSettingsModel):
+class MockUserSettingsModelWithGaeUserId(user_models.UserSettingsModel):
     """Mock UserSettingsModel so that it allows to set `gae_user_id`."""
 
     gae_user_id = (
@@ -1439,7 +1439,9 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
         return eval_output
 
     def test_one_setting_model_with_gae_user_id(self):
-        with self.swap(user_models, 'UserSettingsModel', MockUserSettingsModel):
+        with self.swap(
+                user_models, 'UserSettingsModel',
+                MockUserSettingsModelWithGaeUserId):
             original_setting_model = (
                 user_models.UserSettingsModel(
                     id='id',
@@ -1487,6 +1489,87 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
         migrated_setting_model = user_models.UserSettingsModel.get_by_id('id')
         self.assertNotIn('gae_user_id', migrated_setting_model._values)  # pylint: disable=protected-access
         self.assertNotIn('gae_user_id', migrated_setting_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_setting_model.last_updated,
+            migrated_setting_model.last_updated)
+
+
+class MockUserSettingsModelWithGaeId(user_models.UserSettingsModel):
+    """Mock UserSettingsModel so that it allows to set `gae_id`."""
+
+    gae_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+
+
+class RemoveGaeIdOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.RemoveGaeIdOneOffJob.create_new())
+        user_jobs_one_off.RemoveGaeIdOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.RemoveGaeIdOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_setting_model_with_gae_id(self):
+        with self.swap(
+                user_models, 'UserSettingsModel',
+                MockUserSettingsModelWithGaeId):
+            original_setting_model = (
+                user_models.UserSettingsModel(
+                    id='id',
+                    email='test@email.com',
+                    gae_id='gae_id'
+                )
+            )
+            original_setting_model.put()
+
+            self.assertIsNotNone(original_setting_model.gae_id)
+            self.assertIn('gae_id', original_setting_model._values)  # pylint: disable=protected-access
+            self.assertIn('gae_id', original_setting_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - UserSettingsModel', 1]], output)
+
+            migrated_setting_model = (
+                user_models.UserSettingsModel.get_by_id('id'))
+
+            self.assertNotIn('gae_id', migrated_setting_model._values)  # pylint: disable=protected-access
+            self.assertNotIn('gae_id', migrated_setting_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_setting_model.last_updated,
+                migrated_setting_model.last_updated)
+
+    def test_one_setting_model_without_gae_id(self):
+        original_setting_model = (
+            user_models.UserSettingsModel(
+                id='id',
+                email='test@email.com',
+            )
+        )
+        original_setting_model.put()
+
+        self.assertNotIn('gae_id', original_setting_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('gae_id', original_setting_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        # There already exists a UserSettings because it is being created
+        # test_utils. So 2 is used here.
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSettingsModel', 2]], output)
+
+        migrated_setting_model = user_models.UserSettingsModel.get_by_id('id')
+        self.assertNotIn('gae_id', migrated_setting_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('gae_id', migrated_setting_model._properties)  # pylint: disable=protected-access
         self.assertEqual(
             original_setting_model.last_updated,
             migrated_setting_model.last_updated)
