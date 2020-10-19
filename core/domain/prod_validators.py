@@ -27,8 +27,6 @@ from constants import constants
 from core.domain import base_model_validators
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import collection_domain
-from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -392,7 +390,6 @@ class TrainingJobExplorationMappingModelValidator(
 
 class ConfigPropertyModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating ConfigPropertyModel."""
-
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return r'^[A-Za-z0-9_]{1,100}$'
