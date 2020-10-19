@@ -25,6 +25,8 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install wheel==0.35.0
       - name: Install Third Party Dependencies
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
       - name: Run lighthouse checks
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode accessibility
