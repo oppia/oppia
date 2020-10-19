@@ -20,6 +20,7 @@
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
+var general = require('../protractor_utils/general.js');
 
 var ExplorationEditorSettingsTab = function() {
   /*
@@ -126,6 +127,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setTitle = async function(title) {
+    await general.scrollToTop();
     await explorationTitleInput.clear();
     await action.sendKeys(
       'Exploration Title input field', explorationTitleInput, title);
