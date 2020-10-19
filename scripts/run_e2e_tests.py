@@ -27,13 +27,12 @@ import subprocess
 import sys
 import time
 
+from google.oauth2 import service_account
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-
-from google.oauth2 import service_account
 
 _SIMPLE_CRYPT_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools',

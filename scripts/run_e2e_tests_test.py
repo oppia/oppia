@@ -30,6 +30,7 @@ import types
 
 from core.tests import test_utils
 import feconf
+from google.oauth2 import service_account
 import googleapiclient.discovery
 import python_utils
 from scripts import build
@@ -37,8 +38,6 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
-
-from google.oauth2 import service_account
 
 _SIMPLE_CRYPT_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools',
