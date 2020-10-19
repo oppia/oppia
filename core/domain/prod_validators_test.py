@@ -528,6 +528,8 @@ class TrainingJobExplorationMappingModelValidatorTests(
                 'states of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_state_name.id,
             u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
+        
+        
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
