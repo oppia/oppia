@@ -334,7 +334,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-   def test_model_with_created_on_greater_than_last_updated(self):
+    def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
         self.model_instance_0.put()
