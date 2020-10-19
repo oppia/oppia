@@ -18,27 +18,16 @@
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
-
-
+from core.domain import base_model_validators
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import base_model_validators
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
-
-import feconf
 import python_utils
 import utils
 
-(
-    base_models, collection_models, 
-     exp_models, user_models
-) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection,models.NAMES.exp,
-       models.NAMES.user
-])
-
+(base_models, collection_models, exp_models, user_models) = models.Registry.import_models([ models.NAMES.base_model, models.NAMES.collection, models.NAMES.exp, models.NAMES.user])
 
 class CollectionModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating CollectionModel."""
