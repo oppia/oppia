@@ -27,7 +27,7 @@ angular.module('oppia', [
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
-
+import { AdminProdModeActivitiesTabComponent } from './activities-tab/admin-prod-mode-activities-tab.component';
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -52,11 +52,13 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   ],
   declarations: [
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent
+    AdminFeaturesTabComponent,
+    AdminProdModeActivitiesTabComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent
+    AdminFeaturesTabComponent,
+    AdminProdModeActivitiesTabComponent
   ],
   providers: [
     {
