@@ -91,7 +91,7 @@ def create_http_task(
         task['name'] = task_name
 
     # Use the CLIENT to build and send the task.
-    response = CLIENT.create_task(parent, task)
+    response = CLIENT.create_task(parent, task, retry=None)
 
     logging.info('Created task %s' % response.name)
     return response
