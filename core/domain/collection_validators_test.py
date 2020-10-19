@@ -112,7 +112,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-     def test_model_with_last_updated_greater_than_current_time(self):
+    def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         expected_output = [(
