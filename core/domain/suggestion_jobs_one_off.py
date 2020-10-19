@@ -358,6 +358,7 @@ class PopulateContributionStatsOneOffJob(
                             language_code]
                     ) = count_value
 
+            stats_model.update_timestamps()
             stats_model.put()
             return key, count_value
 
