@@ -84,10 +84,11 @@ describe('PlaythroughService', () => {
 
   const spyOnStorePlaythrough = (callback: (p: Playthrough) => void = null) => {
     if (callback) {
-      return spyOn(playthroughBackendApiService, 'storePlaythrough')
+      return spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));
     } else {
-      return spyOn(playthroughBackendApiService, 'storePlaythrough').and.stub();
+      // eslint-disable-next-line max-len
+      return spyOn(playthroughBackendApiService, 'storePlaythroughAsync').and.stub();
     }
   };
 
