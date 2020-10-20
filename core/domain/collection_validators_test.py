@@ -41,8 +41,12 @@ datastore_services = models.Registry.import_datastore_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(collection_models, exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.collection,  models.NAMES.exploration, models.NAMES.user])
+(
+    collection_models, exp_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration, 
+    models.NAMES.user
+])
 
 
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -53,9 +57,9 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
-            category='category%d' % i,)
-        for i in python_utils.RANGE(6)]
-     
+            category='category%d' % i
+        ) for i in python_utils.RANGE(6)]
+        
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
@@ -271,8 +275,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-
-        
+     
 class CollectionSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
