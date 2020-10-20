@@ -208,6 +208,12 @@ indexes:
   - name: time_queued_msec
     direction: desc
 
+- kind: PlatformParameterSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: QuestionSkillLinkModel
   properties:
   - name: skill_id
