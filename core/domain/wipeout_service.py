@@ -153,7 +153,8 @@ def pre_delete_user(user_id):
             )
         )
     if user_settings.role != feconf.ROLE_ID_LEARNER:
-        _remove_user_from_activities_with_associated_rights_models(user_id)
+        _remove_user_from_activities_with_associated_rights_models(
+            user_id, True)
 
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
@@ -247,7 +248,7 @@ def delete_user(pending_deletion_request):
     _delete_models(user_id, user_role, models.NAMES.improvements)
     if user_role != feconf.ROLE_ID_LEARNER:
         _remove_user_from_activities_with_associated_rights_models(
-            pending_deletion_request.user_id)
+            pending_deletion_request.user_id, False)
         _pseudonymize_feedback_models(pending_deletion_request)
         _pseudonymize_suggestion_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
@@ -344,15 +345,23 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
     return user_is_verified
 
 
-def _remove_user_from_activities_with_associated_rights_models(user_id):
+def _remove_user_from_activities_with_associated_rights_models(
+        user_id, use_user_subscriptions_ids):
     """Remove the user from exploration, collection, and topic models.
 
     Args:
         user_id: str. The ID of the user for which to remove the user from
             explorations, collections, and topics.
+        use_user_subscriptions_ids: bool. Whether to use the IDs from user's
+            UserSubscriptionsModel. When False the IDs are gathered via
+            datastore queries.
     """
-    subscribed_exploration_summaries = (
-        exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
+    if use_user_subscriptions_ids:
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
+    else:
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_where_user_has_role(user_id))
 
     explorations_to_be_deleted_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries if
@@ -383,8 +392,14 @@ def _remove_user_from_activities_with_associated_rights_models(user_id):
         rights_manager.deassign_role_for_exploration(
             user_services.get_system_user(), exp_id, user_id)
 
-    subscribed_collection_summaries = (
-        collection_services.get_collection_summaries_subscribed_to(user_id))
+    if use_user_subscriptions_ids:
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_subscribed_to(user_id))
+    else:
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_where_user_has_role(
+                user_id))
+
     collections_to_be_deleted_ids = [
         col_summary.id for col_summary in subscribed_collection_summaries if
         col_summary.is_private() and

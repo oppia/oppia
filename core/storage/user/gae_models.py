@@ -867,7 +867,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         """UserSubscriptionsModel can be deleted since it only contains
         information relevant to the one user.
         """
-        return base_models.DELETION_POLICY.DELETE_AT_END
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def get_export_policy(cls):
