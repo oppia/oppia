@@ -20,7 +20,7 @@ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { CollectionNode } from
-  'domain/collection/collection-node-object.factory';
+  'domain/collection/collection-node.model';
 
 @Component({
   selector: 'collection-node-list',
