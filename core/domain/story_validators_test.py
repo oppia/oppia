@@ -38,15 +38,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
-CURRENT_DATETIME = datetime.datetime.utcnow()
 
-(
-    base_models, exp_models,
-    story_models, user_models
-) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration,
-    models.NAMES.story, models.NAMES.user
-])
+(exp_models, story_models, user_models = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
 
 
 class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
