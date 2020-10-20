@@ -106,16 +106,16 @@ angular.module('oppia').directive('feedbackPopup', [
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),
                 state_name: PlayerPositionService.getCurrentStateName()
-              });
+              }).then(() => {
+                $scope.feedbackSubmitted = true;
+                $timeout(function() {
+                  var triggerElt = getTriggerElt();
+                  if (triggerElt) {
+                    triggerElt.trigger('click');
+                  }
+                }, 2000);
+              }, () => {});
             }
-
-            $scope.feedbackSubmitted = true;
-            $timeout(function() {
-              var triggerElt = getTriggerElt();
-              if (triggerElt) {
-                triggerElt.trigger('click');
-              }
-            }, 2000);
           };
 
           $scope.closePopover = function() {
