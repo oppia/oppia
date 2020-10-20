@@ -13,23 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the activities tab in the admin panel when Oppia
+ * @fileoverview Component for the activities tab in the admin panel when Oppia
  * is in production mode.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').directive('adminProdModeActivitiesTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin-page/activities-tab/' +
-        'admin-prod-mode-activities-tab.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }
-]);
+
+@Component({
+  selector: 'admin-prod-mode-activities-tab',
+  templateUrl: './admin-prod-mode-activities-tab.component.html',
+  styleUrls: []
+})
+
+export class AdminProdModeActivitiesTabComponent {
+  constructor() {}
+}
+
+angular.module('oppia').directive(
+  'adminProdModeActivitiesTab', downgradeComponent(
+    {
+      component: AdminProdModeActivitiesTabComponent
+    }
+  )
+);

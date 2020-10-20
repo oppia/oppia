@@ -39,7 +39,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'admin-misc-tab.directive.ts',
     'admin-navbar.directive.ts',
     'admin-page.directive.ts',
-    'admin-prod-mode-activities-tab.directive.ts',
+
     'admin-roles-tab.directive.ts',
     'alert-message.directive.ts',
     'angular-html-bind.directive.ts',
