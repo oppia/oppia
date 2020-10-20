@@ -781,7 +781,7 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            html_list += + answer_group.get_all_html_content_strings(
+            html_list += answer_group.get_all_html_content_strings(
                 self.id)
 
         if self.default_outcome:
