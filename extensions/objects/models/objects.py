@@ -630,15 +630,15 @@ class LogicQuestion(BaseObject):
             assert isinstance(
                 expression['top_kind_name'], python_utils.BASESTRING)
             top_operator_name_type = (
-                python_utils.BASESTRING
+                int
                 if (
                     expression['top_kind_name'] == 'constant' and
                     'type' in expression and
                     expression['type'] == 'integer'
-                ) else int
+                ) else python_utils.BASESTRING
             )
             assert isinstance(
-                expression['top_operator_name'], python_utils.BASESTRING)
+                expression['top_operator_name'], top_operator_name_type)
             _validate_expression_array(expression['arguments'])
             _validate_expression_array(expression['dummies'])
 
