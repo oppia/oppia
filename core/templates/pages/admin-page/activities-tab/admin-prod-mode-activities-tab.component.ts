@@ -20,7 +20,6 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-<<<<<<< HEAD:core/templates/pages/admin-page/activities-tab/admin-prod-mode-activities-tab.component.ts
 
 
 @Component({
@@ -33,20 +32,6 @@ export class AdminProdModeActivitiesTabComponent {
   constructor() {}
 }
 
-=======
-
-
-@Component({
-  selector: 'admin-prod-mode-activities-tab',
-  templateUrl: './admin-prod-mode-activities-tab.component.html',
-  styleUrls: []
-})
-
-export class AdminProdModeActivitiesTabComponent {
-  constructor() {}
-}
-
->>>>>>> aa4679dd4de1273392339869fadf94f9ef3ea961:core/templates/pages/admin-page/activities-tab/admin-prod-mode-activities-tab.directive.ts
 angular.module('oppia').directive(
   'adminProdModeActivitiesTab', downgradeComponent(
     {

@@ -44,8 +44,7 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule,
-    FormsModule
+    SharedComponentsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -77,7 +76,6 @@ class TopicsAndSkillsDashboardPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from './navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
-import { FormsModule } from '@angular/forms';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
