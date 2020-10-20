@@ -33,8 +33,6 @@
   "files": [
     "core/templates/domain/objects/FractionObjectFactorySpec.ts",
     "core/templates/domain/objects/FractionObjectFactory.ts",
-    "core/templates/domain/skill/assigned-skill-object.factory.ts",
-    "core/templates/domain/skill/assigned-skill-object.factory.spec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.spec.ts",
     "core/templates/domain/skill/assigned-skill.model.ts",
