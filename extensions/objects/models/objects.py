@@ -629,6 +629,14 @@ class LogicQuestion(BaseObject):
             assert isinstance(expression, dict)
             assert isinstance(
                 expression['top_kind_name'], python_utils.BASESTRING)
+            top_operator_name_type = (
+                python_utils.BASESTRING
+                if (
+                    expression['top_kind_name'] == 'constant' and
+                    'type' in expression and
+                    expression['type'] == 'integer'
+                ) else int
+            )
             assert isinstance(
                 expression['top_operator_name'], python_utils.BASESTRING)
             _validate_expression_array(expression['arguments'])
@@ -1228,7 +1236,7 @@ class CustomOskLetters(BaseObject):
 
     SCHEMA = {
         'type': 'list',
-        'items': AlgebraicIdentifier.SCHEMA,
+        'items': constants.VALID_CUSTOM_OSK_LETTERS,
         'validators': [{
             'id': 'is_uniquified'
         }]
