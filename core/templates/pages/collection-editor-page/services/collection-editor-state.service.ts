@@ -18,7 +18,6 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
-require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/collection-rights-backend-api.service.ts');
 require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/editable-collection-backend-api.service.ts');
@@ -28,16 +27,17 @@ require('services/alerts.service.ts');
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
+import { Collection } from 'domain/collection/collection.model';
 
 angular.module('oppia').factory('CollectionEditorStateService', [
-  '$rootScope', 'AlertsService', 'CollectionObjectFactory',
+  '$rootScope', 'AlertsService',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
   'EditableCollectionBackendApiService', 'UndoRedoService',
   function(
-      $rootScope, AlertsService, CollectionObjectFactory,
+      $rootScope, AlertsService,
       CollectionRightsBackendApiService, CollectionRightsObjectFactory,
       EditableCollectionBackendApiService, UndoRedoService) {
-    var _collection = CollectionObjectFactory.createEmptyCollection();
+    var _collection = Collection.createEmptyCollection();
     var _collectionRights = (
       CollectionRightsObjectFactory.createEmptyCollectionRights());
     var _collectionIsInitialized = false;
