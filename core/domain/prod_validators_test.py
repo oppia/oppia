@@ -70,8 +70,8 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     audit_models, classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, job_models,
-    opportunity_models, question_models, skill_models, 
-    story_models, subtopic_models, suggestion_models, 
+    opportunity_models, question_models, skill_models,
+    story_models, subtopic_models, suggestion_models,
     topic_models, user_models
 
 ) = models.Registry.import_models([
