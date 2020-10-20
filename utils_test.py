@@ -264,6 +264,118 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.convert_string_to_naive_datetime_object(time_string),
             initial_time)
 
+    def test_create_string_from_largest_unit_in_timedelta_raises_for_zero_diff(
+            self):
+        timedelta_object = datetime.timedelta(days=0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected a positive timedelta, received: %s.' % (
+                timedelta_object.total_seconds())):
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+
+    def test_create_string_from_largest_unit_in_timedelta_raises_for_neg_diff(
+            self):
+        timedelta_object = datetime.timedelta(days=-40)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected a positive timedelta, received: %s.' % (
+                timedelta_object.total_seconds())):
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_days(self):
+        timedelta_object = datetime.timedelta(
+            days=4, hours=1, minutes=1, seconds=1)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '4 days')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_a_day(self):
+        timedelta_object = datetime.timedelta(
+            days=1, hours=1, minutes=1, seconds=1)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '1 day')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_hours(self):
+        timedelta_object = datetime.timedelta(
+            days=0, hours=2, minutes=1, seconds=1)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '2 hours')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_an_hour(self):
+        timedelta_object = datetime.timedelta(
+            days=0, hours=1, minutes=1, seconds=1)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '1 hour')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_minutes(self):
+        timedelta_object = datetime.timedelta(
+            days=0, hours=0, minutes=4, seconds=1)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '4 minutes')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_a_minute(
+            self):
+        timedelta_object = datetime.timedelta(
+            days=0, hours=0, minutes=1, seconds=12)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '1 minute')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_a_min_for_min(
+            self):
+        timedelta_object = datetime.timedelta(
+            days=0, hours=0, minutes=1, seconds=0)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '1 minute')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_minute_if_sec(
+            self):
+        timedelta_object = datetime.timedelta(
+            days=0, hours=0, minutes=0, seconds=1)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '1 minute')
+
+    def test_create_string_from_largest_unit_in_timedelta_returns_a_min_if_msec(
+            self):
+        timedelta_object = datetime.timedelta(
+            days=0, hours=0, minutes=0, seconds=0, milliseconds=1)
+
+        time_string = (
+            utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
+        )
+
+        self.assertEqual(time_string, '1 minute')
+
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]
         json2 = ['fee', {'fie': ['foe', 'fum']}]
@@ -479,3 +591,26 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_get_current_appengine_environment(self):
+        saved_appengine_runtime = (
+            os.environ['APPENGINE_RUNTIME'] if 'APPENGINE_RUNTIME' in os.environ
+            else None)
+        saved_server_software = (
+            os.environ['SERVER_SOFTWARE'] if 'SERVER_SOFTWARE' in os.environ
+            else None)
+
+        os.environ['APPENGINE_RUNTIME'] = 'True'
+        self.assertTrue(utils.is_local_server_environment())
+        os.environ['SERVER_SOFTWARE'] = 'Google App Engine/'
+        self.assertTrue(utils.is_appengine_cloud_environment())
+
+        if saved_appengine_runtime is not None:
+            os.environ['SERVER_SOFTWARE'] = saved_appengine_runtime
+        else:
+            del os.environ['SERVER_SOFTWARE']
+
+        if saved_server_software is not None:
+            os.environ['SERVER_SOFTWARE'] = saved_server_software
+        else:
+            del os.environ['SERVER_SOFTWARE']

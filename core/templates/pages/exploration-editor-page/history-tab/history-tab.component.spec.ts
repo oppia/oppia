@@ -21,8 +21,6 @@ import { EventEmitter } from '@angular/core';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -95,9 +93,6 @@ describe('History tab component', function() {
       'AnswerGroupObjectFactory', TestBed.get(AnswerGroupObjectFactory));
     $provide.value('CsrfTokenService', TestBed.get(CsrfTokenService));
     $provide.value('EditabilityService', TestBed.get(EditabilityService));
-    $provide.value(
-      'ExplorationDraftObjectFactory',
-      TestBed.get(ExplorationDraftObjectFactory));
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
     $provide.value(
@@ -345,15 +340,6 @@ describe('History tab component', function() {
     ctrl.hideHistoryGraph = false;
     ctrl.resetGraph();
     expect(ctrl.hideHistoryGraph).toBe(true);
-  });
-
-  it('should toggle history options', function() {
-    ctrl.toggleHistoryOptions(10);
-    expect(ctrl.highlightedIndex).toBe(10);
-    ctrl.toggleHistoryOptions(10);
-    expect(ctrl.highlightedIndex).toBe(null);
-    ctrl.toggleHistoryOptions(5);
-    expect(ctrl.highlightedIndex).toBe(5);
   });
 
   it('should reverse the array when the date filter is applied', function() {

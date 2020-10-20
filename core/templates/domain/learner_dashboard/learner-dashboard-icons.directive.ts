@@ -55,7 +55,8 @@ angular.module('oppia').directive('learnerDashboardIcons', [
             $scope.activityIsCurrentlyHoveredOver = $scope.activityActive;
           });
 
-          LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
+          /* eslint-disable-next-line max-len */
+          LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIdsAsync().then(
             function(learnerDashboardActivityIds) {
               $scope.learnerDashboardActivityIds = learnerDashboardActivityIds;
             }

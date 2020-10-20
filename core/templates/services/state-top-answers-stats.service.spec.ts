@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AnswerStatsBackendDict } from
-  'domain/exploration/visualization-info-object.factory';
+  'domain/exploration/visualization-info.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { StateTopAnswersStats } from

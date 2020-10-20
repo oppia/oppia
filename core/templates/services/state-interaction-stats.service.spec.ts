@@ -27,8 +27,6 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { StateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
-import { VisualizationInfoObjectFactory } from
-  'domain/exploration/visualization-info-object.factory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
@@ -47,8 +45,7 @@ describe('State Interaction Stats Service', () => {
       ],
       providers: [
         NormalizeWhitespacePipe,
-        NormalizeWhitespacePunctuationAndCasePipe,
-        VisualizationInfoObjectFactory
+        NormalizeWhitespacePunctuationAndCasePipe
       ],
     });
 

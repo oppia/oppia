@@ -60,7 +60,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def mock_generate_new_exploration_thread_id(
             self, unused_entity_type, unused_entity_id):
@@ -288,7 +288,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -386,7 +386,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -535,7 +535,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -589,7 +589,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)
         self.signup(self.REVIEWER_EMAIL_1, 'reviewer1')
         self.reviewer_id_1 = self.get_user_id_from_email(self.REVIEWER_EMAIL_1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_when_suggestions_have_invalid_filenames(self):
         invalid_html_content1 = (
@@ -655,7 +655,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -716,7 +716,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -765,7 +765,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -827,7 +827,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -851,7 +851,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def mock_generate_new_exploration_thread_id(
             self, unused_entity_type, unused_entity_id):
@@ -1072,7 +1072,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         observed_translation_suggestion = (
             suggestion_services.get_suggestion_by_id(
                 'exploration.exp1.thread_1'))
@@ -1202,7 +1202,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         observed_translation_suggestion = (
             suggestion_services.get_suggestion_by_id(
                 'exploration.exp1.thread_1'))
@@ -1301,7 +1301,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -1453,7 +1453,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             (
                 suggestion_jobs_one_off.
                 SuggestionMathMigrationOneOffJob.enqueue(job_id))
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
             get_output(job_id))
@@ -1609,7 +1609,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             (
                 suggestion_jobs_one_off.
                 SuggestionMathMigrationOneOffJob.enqueue(job_id))
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
             get_output(job_id))
@@ -1715,7 +1715,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             .PopulateSuggestionLanguageCodeMigrationOneOffJob
             .enqueue(job_id)
         )
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
@@ -1774,7 +1774,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         self.add_question_change_dict['question_dict'][
             'question_state_data'] = self._create_valid_question_data(
                 'default_state').to_dict()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_migrate_language_code_for_edit_state_content_suggestions(
             self):
@@ -2176,29 +2176,6 @@ class PopulateContributionStatsOneOffJobTests(
 
         return question_suggestion
 
-    def _assert_community_contribution_stats_is_in_default_state(self):
-        """Checks if the community contribution stats is in its default
-        state.
-        """
-        community_contribution_stats = (
-            suggestion_services.get_community_contribution_stats()
-        )
-
-        self.assertEqual(
-            (
-                community_contribution_stats
-                .translation_reviewer_counts_by_lang_code
-            ), {})
-        self.assertEqual(
-            (
-                community_contribution_stats
-                .translation_suggestion_counts_by_lang_code
-            ), {})
-        self.assertEqual(
-            community_contribution_stats.question_reviewer_count, 0)
-        self.assertEqual(
-            community_contribution_stats.question_suggestion_count, 0)
-
     def _run_job_and_verify_output(self, expected_output):
         """Runs the PopulateContributionStatsOneOffJob and verifies
         that the output matches the expected output.
@@ -2216,6 +2193,7 @@ class PopulateContributionStatsOneOffJobTests(
             .enqueue(job_id)
         )
         self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
@@ -2246,7 +2224,6 @@ class PopulateContributionStatsOneOffJobTests(
             self):
         question_suggestion = self._create_question_suggestion_with_skill_id(
             'skill_1')
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
 
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
@@ -2256,12 +2233,10 @@ class PopulateContributionStatsOneOffJobTests(
         suggestion_model.put()
 
         self._run_job_and_verify_output(expected_output)
-        self._assert_community_contribution_stats_is_in_default_state()
 
     def test_no_action_is_performed_for_suggestion_that_has_been_deleted(self):
         question_suggestion = self._create_question_suggestion_with_skill_id(
             'skill_1')
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
 
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
@@ -2271,14 +2246,11 @@ class PopulateContributionStatsOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-        self._assert_community_contribution_stats_is_in_default_state()
-
     def test_no_action_is_performed_for_user_contribution_rights_marked_deleted(
             self):
         # Allowing the reviewer to review questions will create an associated
         # user contribution rights model, if it doesn't already exist.
         user_services.allow_user_to_review_question(self.reviewer_1_id)
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
 
         user_contribution_rights_model = (
@@ -2290,13 +2262,10 @@ class PopulateContributionStatsOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-        self._assert_community_contribution_stats_is_in_default_state()
-
     def test_no_action_is_performed_for_deleted_user_contribution_rights(self):
         # Allowing the reviewer to review questions will create an associated
         # user contribution rights model, if it doesn't already exist.
         user_services.allow_user_to_review_question(self.reviewer_1_id)
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
 
         # Removing the contribution reviewer deletes their user contribution
@@ -2305,25 +2274,18 @@ class PopulateContributionStatsOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-        self._assert_community_contribution_stats_is_in_default_state()
-
     def test_no_action_taken_for_suggestions_not_on_the_contributor_dashboard(
             self):
         self._create_edit_state_content_suggestion()
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
 
         self._run_job_and_verify_output(expected_output)
-
-        self._assert_community_contribution_stats_is_in_default_state()
 
     def test_no_action_is_performed_for_rejected_suggestions(self):
         question_suggestion = self._create_question_suggestion_with_skill_id(
             'skill_1'
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
-
         suggestion_services.reject_suggestion(
             question_suggestion.suggestion_id, self.reviewer_1_id,
             'reject message'
@@ -2331,14 +2293,11 @@ class PopulateContributionStatsOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-        self._assert_community_contribution_stats_is_in_default_state()
-
     def test_no_action_is_performed_for_accepted_suggestions(self):
         translation_suggestion = (
             self._create_translation_suggestion_with_language_code(
                 self.sample_language_code)
         )
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
 
         self.mock_accept_suggestion(
@@ -2348,15 +2307,12 @@ class PopulateContributionStatsOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-        self._assert_community_contribution_stats_is_in_default_state()
-
     def test_job_updates_counts_for_translation_suggestions_in_same_lang_code(
             self):
         self._create_translation_suggestion_with_language_code(
             self.sample_language_code)
         self._create_translation_suggestion_with_language_code(
             self.sample_language_code)
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
             '[u\'suggestion.translate_content.%s\', 2]' % (
                 self.sample_language_code)
@@ -2405,7 +2361,6 @@ class PopulateContributionStatsOneOffJobTests(
             self.reviewer_1_id, self.sample_language_code)
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_2_id, self.sample_language_code)
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
             '[u\'reviewer.translation.%s\', 2]' % self.sample_language_code
         ]
@@ -2428,7 +2383,6 @@ class PopulateContributionStatsOneOffJobTests(
             self.reviewer_1_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_2_id, 'en')
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
             '[u\'reviewer.translation.hi\', 1]',
             '[u\'reviewer.translation.en\', 1]'
@@ -2453,7 +2407,6 @@ class PopulateContributionStatsOneOffJobTests(
     def test_job_updates_question_suggestion_count(self):
         self._create_question_suggestion_with_skill_id('skill_1')
         self._create_question_suggestion_with_skill_id('skill_2')
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = ['[u\'suggestion.add_question.en\', 2]']
 
         self._run_job_and_verify_output(expected_output)
@@ -2469,7 +2422,6 @@ class PopulateContributionStatsOneOffJobTests(
             self):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         user_services.allow_user_to_review_question(self.reviewer_2_id)
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = ['[u\'reviewer.question.en\', 2]']
 
         self._run_job_and_verify_output(expected_output)
@@ -2498,7 +2450,6 @@ class PopulateContributionStatsOneOffJobTests(
             self.reviewer_2_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_2_id, 'en')
-        self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
             '[u\'reviewer.translation.en\', 1]',
             '[u\'reviewer.translation.hi\', 2]',
