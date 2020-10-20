@@ -385,11 +385,9 @@ class TrainingJobExplorationMappingModelValidator(
             cls._validate_state_name]
 
 
-
-
-
 class ConfigPropertyModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating ConfigPropertyModel."""
+    
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return r'^[A-Za-z0-9_]{1,100}$'
