@@ -159,7 +159,7 @@ var CollectionEditorPage = function() {
     await action.click(
       'Editor Category Drop Down', editorCategoryDropdown.first());
     await action.sendKeys(
-      'Active Element', browser.driver.switchTo().activeElement(),
+      'Category Item', browser.driver.switchTo().activeElement(),
       category + '\n');
   };
 
