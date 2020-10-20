@@ -27,8 +27,12 @@ from core.platform import models
 import python_utils
 import utils
 
-(base_models, collection_models, exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration, models.NAMES.user])
+(
+    base_models, collection_models, exp_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration, 
+    models.NAMES.user
+])
 
 
 class CollectionModelValidator(base_model_validators.BaseModelValidator):
