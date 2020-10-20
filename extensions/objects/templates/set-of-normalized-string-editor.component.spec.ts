@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the list of normalized string editor.
  */
 
+// TODO(#11014): Add more extensive front end tests for object editors that rely
+// * on schema editors.
 describe('SetOfNormalizedStringEditor', function() {
   var ctrl = null;
 
