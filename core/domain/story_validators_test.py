@@ -39,8 +39,8 @@ datastore_services = models.Registry.import_datastore_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(exp_models, story_models, user_models = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
+(exp_models, story_models, user_models = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
 
 
 class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
