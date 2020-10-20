@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0030.
+presubmit checks. Next message id would be C0031.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1864,13 +1864,13 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
     """
 
     __implements__ = interfaces.IAstroidChecker
-    name = "blank-line-below-function-definition"
+    name = 'blank-line-below-function-definition'
     priority = -1
     msgs = {
-        'C0030' : (
-            "Blank line not permitted below function definition",
-            "blank-line-below-function-definition",
-            "The Blank line below the function definition should be removed",
+        'C0030': (
+            'Blank line not permitted below function definition',
+            'blank-line-below-function-definition',
+            'The Blank line below the function definition should be removed',
         ),
     }
 
@@ -1886,8 +1886,7 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
         line_number += 1
         if linecache.getline(node.root().file, line_number).strip() == b'':
             self.add_message(
-                'blank-line-below-function-definition', line=line_number
-            )
+                'blank-line-below-function-definition', node=node)
 
 
 def register(linter):

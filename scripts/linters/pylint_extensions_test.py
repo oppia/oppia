@@ -2862,3 +2862,60 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
+
+
+class BlankLineBelowFunctionDefCheckerTest(unittest.TestCase):
+
+    def setUp(self):
+        super(BlankLineBelowFunctionDefCheckerTest, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.BlankLineBelowFunctionDefChecker)
+        self.checker_test_object.setup_method()
+
+    def test_blank_line_below_function_definition(self):
+        node_blank_line_below_function_definition = (
+            astroid.scoped_nodes.Module(name='test', doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def function_name():
+
+                    pass
+                """)
+        node_blank_line_below_function_definition.file = filename
+        node_blank_line_below_function_definition.path = filename
+
+        self.checker_test_object.checker.visit_functiondef(
+            node_blank_line_below_function_definition)
+
+        message = testutils.Message(
+            msg_id='blank-line-below-function-definition',
+            node=node_blank_line_below_function_definition)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_blank_line_below_function_definition(self):
+        node_no_blank_line_below_function_definition = (
+            astroid.scoped_nodes.Module(name='test', doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def function_name():
+                    pass
+                """)
+        node_no_blank_line_below_function_definition.file = filename
+        node_no_blank_line_below_function_definition.path = filename
+
+        self.checker_test_object.checker.visit_functiondef(
+            node_no_blank_line_below_function_definition)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
