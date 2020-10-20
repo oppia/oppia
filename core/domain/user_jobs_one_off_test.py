@@ -2118,7 +2118,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
             output,
             [[
                 'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - 150,160',
-                [self.owner_id]
+                [self.OWNER_USERNAME]
             ]]
         )
 
@@ -2127,7 +2127,8 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
             self.owner_id, image_constants.PNG_IMAGE_BROKEN_BASE64)
         output = self._run_one_off_job()
         self.assertEqual(
-            output, [['FAILURE - CANNOT LOAD PROFILE PICTURE', [self.owner_id]]]
+            output,
+            [['FAILURE - CANNOT LOAD PROFILE PICTURE', [self.OWNER_USERNAME]]]
         )
 
     def test_non_png_image_has_profile_picture_not_png_error(self):
@@ -2135,7 +2136,9 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
             self.owner_id, image_constants.JPG_IMAGE_BASE64)
         output = self._run_one_off_job()
         self.assertEqual(
-            output, [['FAILURE - PROFILE PICTURE NOT PNG', [self.owner_id]]])
+            output,
+            [['FAILURE - PROFILE PICTURE NOT PNG', [self.OWNER_USERNAME]]]
+        )
 
     def test_broken_base64_data_url_has_invalid_profile_picture_data_url_error(
             self):
@@ -2144,7 +2147,10 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         output = self._run_one_off_job()
         self.assertEqual(
             output,
-            [['FAILURE - INVALID PROFILE PICTURE DATA URL', [self.owner_id]]]
+            [[
+                'FAILURE - INVALID PROFILE PICTURE DATA URL',
+                [self.OWNER_USERNAME]
+            ]]
         )
 
     def test_user_without_profile_picture_has_missing_profile_picture_error(
@@ -2152,7 +2158,9 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_services.update_profile_picture_data_url(self.owner_id, None)
         output = self._run_one_off_job()
         self.assertEqual(
-            output, [['FAILURE - MISSING PROFILE PICTURE', [self.owner_id]]])
+            output,
+            [['FAILURE - MISSING PROFILE PICTURE', [self.OWNER_USERNAME]]]
+        )
 
     def test_not_registered_user_has_not_registered_value(self):
         user_settings_model = (
@@ -2197,8 +2205,8 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
             output,
             [
                 ['SUCCESS', 1],
-                ['FAILURE - MISSING PROFILE PICTURE', [editor_id]],
+                ['FAILURE - MISSING PROFILE PICTURE', [self.EDITOR_USERNAME]],
                 ['SUCCESS - DELETED', 1],
-                ['FAILURE - PROFILE PICTURE NOT PNG', [new_user_id]]
+                ['FAILURE - PROFILE PICTURE NOT PNG', [self.NEW_USER_USERNAME]]
             ]
         )
