@@ -37,9 +37,10 @@ angular.module('oppia').factory('LearnerViewRatingService', [
       submitUserRating: function(ratingValue) {
         $http.put(ratingsUrl, {
           user_rating: ratingValue
-        });
-        userRating = ratingValue;
-        _ratingUpdatedEventEmitter.emit();
+        }).then(() => {
+          userRating = ratingValue;
+          _ratingUpdatedEventEmitter.emit();
+        }, () => {});
       },
       getUserRating: function() {
         return userRating;
