@@ -2196,7 +2196,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
             item: datastore_services.Model. TopicSimilaritiesModel to validate.
         """
         content = json.loads(item.content)
-        topics = list(item.content.keys())
+        topics = list(content.keys())
         data = '%s\n' % (',').join(topics)
 
         for topic1 in topics:
