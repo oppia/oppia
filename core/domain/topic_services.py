@@ -939,10 +939,13 @@ def save_topic_summary(topic_summary):
         topic_models.TopicSummaryModel.get_by_id(topic_summary.id))
     if topic_summary_model is not None:
         topic_summary_model.populate(**topic_summary_dict)
+        topic_summary_model.update_timestamps()
         topic_summary_model.put()
     else:
         topic_summary_dict['id'] = topic_summary.id
-        topic_models.TopicSummaryModel(**topic_summary_dict).put()
+        model = topic_models.TopicSummaryModel(**topic_summary_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def publish_topic(topic_id, committer_id):

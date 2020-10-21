@@ -344,6 +344,7 @@ title: Old Title
             contributor_ids=[],
             contributors_summary={},
         )
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
     def test_converts_exp_model_with_default_states_schema_version(self):

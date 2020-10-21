@@ -703,6 +703,7 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.question_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             question_models.QuestionCommitLogEntryModel
@@ -728,6 +729,7 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
             question_model_created_on=datetime.datetime.utcnow(),
             question_model_last_updated=datetime.datetime.utcnow()
         )
+        question_summary_model.update_timestamps()
         question_summary_model.put()
 
         self.assertFalse(

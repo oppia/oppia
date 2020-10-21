@@ -152,6 +152,7 @@ class TopicModel(base_models.VersionedModel):
             commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
+        topic_commit_log_entry.update_timestamps()
         topic_commit_log_entry.put()
 
     @classmethod
@@ -482,6 +483,7 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
+        snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()
 
     @classmethod

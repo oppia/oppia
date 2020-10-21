@@ -94,6 +94,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 self.job_id, strict=False))
         classifier_training_job_model.status = (
             feconf.TRAINING_JOB_STATUS_PENDING)
+        classifier_training_job_model.update_timestamps()
         classifier_training_job_model.put()
 
         self.job_result_dict = {
@@ -225,6 +226,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 self.job_id, strict=False))
         classifier_training_job_model.status = (
             feconf.TRAINING_JOB_STATUS_FAILED)
+        classifier_training_job_model.update_timestamps()
         classifier_training_job_model.put()
 
         self.post_json(
@@ -236,6 +238,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             classifier_models.ClassifierTrainingJobModel.get(
                 self.job_id, strict=False))
         classifier_training_job_model.state_name = 'invalid_state'
+        classifier_training_job_model.update_timestamps()
         classifier_training_job_model.put()
 
         self.post_json(

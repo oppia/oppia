@@ -104,6 +104,7 @@ class SubtopicPageModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
+        subtopic_page_commit_log_entry.update_timestamps()
         subtopic_page_commit_log_entry.put()
 
     @classmethod

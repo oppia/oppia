@@ -1925,6 +1925,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             self.SKILL_THREAD_ID
         )
         suggestion_model.deleted = True
+        suggestion_model.update_timestamps()
         suggestion_model.put()
 
         self._run_job_and_verify_output(expected_output)
@@ -2230,6 +2231,7 @@ class PopulateContributionStatsOneOffJobTests(
             question_suggestion.suggestion_id
         )
         suggestion_model.deleted = True
+        suggestion_model.update_timestamps()
         suggestion_model.put()
 
         self._run_job_and_verify_output(expected_output)
@@ -2258,6 +2260,7 @@ class PopulateContributionStatsOneOffJobTests(
                 self.reviewer_1_id)
         )
         user_contribution_rights_model.deleted = True
+        user_contribution_rights_model.update_timestamps()
         user_contribution_rights_model.put()
 
         self._run_job_and_verify_output(expected_output)

@@ -162,6 +162,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             self):
         model1 = exp_models.ExplorationSnapshotMetadataModel(
             id='exp_id-1', committer_id=self.user_a_id, commit_type='create')
+        model1.update_timestamps()
         model1.put()
         user_models.UserContributionsModel(
             id=self.user_a_id,
@@ -185,6 +186,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     def test_user_contributions_get_created_after_running_the_job(self):
         model1 = exp_models.ExplorationSnapshotMetadataModel(
             id='exp_id-1', committer_id='new_user', commit_type='create')
+        model1.update_timestamps()
         model1.put()
 
         user_contributions_model = user_models.UserContributionsModel.get(
@@ -247,7 +249,9 @@ class PopulateUserAuthDetailsModelOneOffJobTests(test_utils.GenericTestBase):
             gae_id=self.USER_B_GAE_ID,
             email=self.USER_B_EMAIL
         )
+        self.user_a_model.update_timestamps()
         self.user_a_model.put()
+        self.user_b_model.update_timestamps()
         self.user_b_model.put()
 
     def test_before_migration_old_users_do_not_exist_in_user_auth_model(self):
@@ -564,6 +568,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
             id=user_id_a,
             gae_id='gae_' + user_id_a,
             email=self.USER_A_EMAIL)
+        model1.update_timestamps()
         model1.put()
 
         result = self._run_one_off_job()
@@ -1350,6 +1355,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self):
         model1 = exp_models.ExplorationRightsSnapshotMetadataModel(
             id='exp_id-1', committer_id=self.owner_id, commit_type='create')
+        model1.update_timestamps()
         model1.put()
 
         self.assertIsNone(user_services.get_user_settings(
@@ -1614,6 +1620,7 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
                     gae_user_id='gae_user_id'
                 )
             )
+            original_setting_model.update_timestamps()
             original_setting_model.put()
 
             self.assertIsNotNone(original_setting_model.gae_user_id)
@@ -1641,6 +1648,7 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
                 email='test@email.com',
             )
         )
+        original_setting_model.update_timestamps()
         original_setting_model.put()
 
         self.assertNotIn('gae_user_id', original_setting_model._values)  # pylint: disable=protected-access
@@ -1690,6 +1698,7 @@ class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
     def test_migration_job_skips_deleted_model(self):
         self.model_instance.subscriber_ids.append(self.owner_id)
         self.model_instance.deleted = True
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         job_id = (
@@ -1704,6 +1713,7 @@ class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
 
     def test_job_removes_user_id_from_subscriber_ids(self):
         self.model_instance.subscriber_ids.append(self.owner_id)
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         job_id = (
             user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob.create_new())
@@ -1784,6 +1794,7 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
     def test_migration_job_skips_deleted_model(self):
         self.model_instance.completed_explorations.append('3')
         self.model_instance.deleted = True
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         job_id = (
@@ -1807,6 +1818,7 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
         self.model_instance.completed_explorations.append('3')
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1', '3'])
@@ -1885,6 +1897,7 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             completed_activities_model.exploration_ids, ['0', '1', '2'])
         completed_activities_model.exploration_ids = ['0', '2']
+        completed_activities_model.update_timestamps()
         completed_activities_model.put()
 
         completed_activities_model = (
@@ -1976,6 +1989,7 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
         model_instance = user_models.UserContributionsModel.get_by_id(
             self.user_id)
         model_instance.deleted = True
+        model_instance.update_timestamps()
         model_instance.put()
         exp_services.delete_exploration(self.user_id, 'exp0')
         job_id = (

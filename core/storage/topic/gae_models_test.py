@@ -128,6 +128,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.topic_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             topic_models.TopicCommitLogEntryModel

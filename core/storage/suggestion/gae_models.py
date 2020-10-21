@@ -715,6 +715,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
                 question_reviewer_count=0,
                 question_suggestion_count=0
             )
+            community_contribution_stats_model.update_timestamps()
             community_contribution_stats_model.put()
             return community_contribution_stats_model
 

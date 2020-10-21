@@ -168,6 +168,7 @@ class CleanUpExplorationRecommendationsOneOffJob(
                 exp_ids_removed.append(exp_id)
                 item.recommended_exploration_ids.remove(exp_id)
         if exp_ids_removed:
+            item.update_timestamps()
             item.put()
             yield ('Removed deleted exp ids from recommendations', item.id)
 

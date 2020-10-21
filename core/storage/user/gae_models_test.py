@@ -1592,10 +1592,12 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
     def test_get_multi(self):
         model = user_models.StoryProgressModel.create(
             'user_id', 'story_id_1')
+        model.update_timestamps()
         model.put()
 
         model = user_models.StoryProgressModel.create(
             'user_id', 'story_id_2')
+        model.update_timestamps()
         model.put()
 
         story_progress_models = user_models.StoryProgressModel.get_multi(
