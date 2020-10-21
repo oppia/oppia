@@ -71,7 +71,7 @@ describe('Playthrough backend api service', () => {
 
     let onSuccess = jasmine.createSpy('onSuccess');
     let onFailure = jasmine.createSpy('onFailure');
-    pbas.storePlaythrough(playthorughObject, 1).then(onSuccess, onFailure);
+    pbas.storePlaythroughAsync(playthorughObject, 1).then(onSuccess, onFailure);
 
     let req = httpTestingController.expectOne(
       '/explorehandler/store_playthrough/expId1');
