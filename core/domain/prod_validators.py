@@ -3923,7 +3923,6 @@ class LearnerPlaylistModelValidator(
         ]
 
 
-
 class UserStatsModelValidator(base_model_validators.BaseUserModelValidator):
     """Class for validating UserStatsModels."""
 

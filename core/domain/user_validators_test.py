@@ -49,7 +49,8 @@ USER_NAME = 'username'
 (
     audit_models, email_models, exp_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.email, models.NAMES.exploration, models.NAMES.user
+    models.NAMES.audit, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.user
 ])
 
 
@@ -434,7 +435,6 @@ class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
-
 
 
 class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
