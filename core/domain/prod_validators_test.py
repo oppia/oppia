@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import json
 import random
 import types
 
@@ -63,7 +64,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
-CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
     classifier_models, collection_models, config_models,
@@ -6426,11 +6426,11 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance = recommendations_models.TopicSimilaritiesModel(
             id=recommendations_models.TOPIC_SIMILARITIES_ID)
 
-        self.content = {
+        self.content = json.dumps({
             'Art': {'Art': '1.0', 'Biology': '0.8', 'Chemistry': '0.1'},
             'Biology': {'Art': '0.8', 'Biology': '1.0', 'Chemistry': '0.5'},
             'Chemistry': {'Art': '0.1', 'Biology': '0.5', 'Chemistry': '1.0'},
-        }
+        })
 
         self.model_instance.content = self.content
         self.model_instance.put()
@@ -6492,10 +6492,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_topic_similarities_columns(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': '1.0', 'Biology': '0.5'},
             'Biology': {}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6512,10 +6512,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_topic(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': '1.0', 'invalid': '0.5'},
             'invalid': {'Art': '0.5', 'invalid': '1.0'}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6531,9 +6531,9 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_topic_similarities_rows(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': '1.0', 'Biology': '0.5'}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6549,10 +6549,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_similarity_type(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': 'one', 'Biology': 0.5},
             'Biology': {'Art': 0.5, 'Biology': 1.0}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -6589,10 +6589,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_assymetric_content(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': 1.0, 'Biology': 0.5},
             'Biology': {'Art': 0.6, 'Biology': 1.0}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -7990,8 +7990,11 @@ class CommunityContributionStatsModelValidatorTests(
     sample_language_code = 'hi'
     invalid_language_code = 'invalid'
 
-    def _create_translation_suggestion_with_language_code(self, language_code):
-        """Creates a translation suggestion in the given language_code."""
+    def _create_model_for_translation_suggestion_with_language_code(
+            self, language_code):
+        """Creates a GeneralSuggestionModel for a translation suggestion in the
+        given language_code.
+        """
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -8006,8 +8009,8 @@ class CommunityContributionStatsModelValidatorTests(
             self.reviewer_id, self.change_cmd, score_category,
             self.EXPLORATION_THREAD_ID, language_code)
 
-    def _create_question_suggestion(self):
-        """Creates a question suggestion."""
+    def _create_model_for_question_suggestion(self):
+        """Creates a GeneralSuggestionModel for a question suggestion."""
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_QUESTION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -8044,11 +8047,13 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, 'hi')
-        self._create_translation_suggestion_with_language_code('hi')
-        user_services.allow_user_to_review_question(self.reviewer_id)
-        self._create_question_suggestion()
+        user_models.UserContributionRightsModel(
+            id=self.reviewer_id,
+            can_review_translation_for_language_codes=['hi'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=True).put()
+        self._create_model_for_translation_suggestion_with_language_code('hi')
+        self._create_model_for_question_suggestion()
         translation_reviewer_counts_by_lang_code = {
             'hi': 1
         }
@@ -8347,7 +8352,7 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_if_translation_suggestion_lang_not_in_dict(
             self):
         missing_language_code = 'hi'
-        self._create_translation_suggestion_with_language_code(
+        self._create_model_for_translation_suggestion_with_language_code(
             missing_language_code)
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
@@ -8367,8 +8372,11 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_if_translation_reviewer_lang_not_in_dict(
             self):
         missing_language_code = 'hi'
-        user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_id, missing_language_code)
+        user_models.UserContributionRightsModel(
+            id=self.reviewer_id,
+            can_review_translation_for_language_codes=[missing_language_code],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
         expected_output = [
@@ -11840,15 +11848,15 @@ class ExpUserLastPlaythroughModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_invalid_state_name(self):
-        self.model_instance.last_played_state_name = 'invalid'
+        self.model_instance.last_played_state_name = 'invalid0'
         self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for state name check '
                 'of ExpUserLastPlaythroughModel\', '
-                '[u"Entity id %s.0: last played state name invalid is not '
-                'present in exploration states [u\'Introduction\', u\'End\'] '
-                'for exploration id 0"]]') % self.user_id]
+                '[u"Entity id %s.0: last played state name invalid\\u03b8 is '
+                'not present in exploration states [u\'Introduction\', '
+                'u\'End\'] for exploration id 0"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
