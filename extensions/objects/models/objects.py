@@ -1124,6 +1124,21 @@ class AlgebraicExpression(BaseObject):
     }
 
 
+class OskCharacters(BaseObject):
+    """Class for OSK characters.
+    An OSK character could be an english alphabet (uppercase/lowercase)
+    or a greek letter.
+    """
+
+    description = 'An allowed OSK character.'
+    default_value = 'a'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': constants.VALID_CUSTOM_OSK_LETTERS
+    }
+
+
 class AlgebraicIdentifier(BaseObject):
     """Class for an algebraic identifier.
     An algebraic identifier could be an english alphabet (uppercase/lowercase)
@@ -1236,7 +1251,7 @@ class CustomOskLetters(BaseObject):
 
     SCHEMA = {
         'type': 'list',
-        'items': constants.VALID_CUSTOM_OSK_LETTERS,
+        'items': OskCharacters.SCHEMA,
         'validators': [{
             'id': 'is_uniquified'
         }]
