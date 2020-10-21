@@ -34,7 +34,8 @@ import { ExplorationPlayerConstants } from '../exploration-player-page.constants
 
 interface MockInteractionRulesService {
   [ruleName: string]: (
-    answer: InteractionAnswer, ruleInputs: MockInteractionRuleInputs) => boolean;
+    answer: InteractionAnswer,
+    ruleInputs: MockInteractionRuleInputs) => boolean;
 }
 
 interface MockInteractionRuleInputs {
