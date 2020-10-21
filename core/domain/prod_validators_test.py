@@ -6569,10 +6569,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_similarity_value(self):
-        content = {
+        content = json.dumps({
             'Art': {'Art': 10.0, 'Biology': 0.5},
             'Biology': {'Art': 0.5, 'Biology': 1.0}
-        }
+        })
         self.model_instance.content = content
         self.model_instance.put()
 
@@ -11848,7 +11848,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_invalid_state_name(self):
-        self.model_instance.last_played_state_name = 'invalid0'
+        self.model_instance.last_played_state_name = 'invalidθ'
         self.model_instance.put()
         expected_output = [
             (
