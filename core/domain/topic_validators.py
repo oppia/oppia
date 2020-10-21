@@ -27,12 +27,12 @@ from core.platform import models
 import python_utils
 
 (
-    base_models, topic_models, user_models, subtopic_models, story_models,
-    skill_models
+    base_models, skill_models, story_models, subtopic_models, topic_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.topic,
-    models.NAMES.user, models.NAMES.subtopic, models.NAMES.story,
-    models.NAMES.skill
+    models.NAMES.base_model, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.topic,
+    models.NAMES.user
 ])
 
 
