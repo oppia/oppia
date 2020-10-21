@@ -30,6 +30,7 @@ import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { AnswerClassificationService } from './answer-classification.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
+import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 
 interface MockInteractionRulesService {
   [ruleName: string]: (
@@ -40,7 +41,7 @@ interface MockInteractionRuleInputs {
   x: number
 }
 
-fdescribe('Learner answer info service', () =>{
+describe('Learner answer info service', () =>{
   let sof: StateObjectFactory;
   let oof: OutcomeObjectFactory;
   let stateDict: StateBackendDict;
@@ -151,8 +152,8 @@ fdescribe('Learner answer info service', () =>{
     answerClassificationService = TestBed.get(AnswerClassificationService);
     ladbas = TestBed.get(
       LearnerAnswerDetailsBackendApiService);
-    DEFAULT_OUTCOME_CLASSIFICATION = TestBed.get(
-      DEFAULT_OUTCOME_CLASSIFICATION);
+    DEFAULT_OUTCOME_CLASSIFICATION =
+      ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION;
     firstState = sof.createFromBackendDict('new state', stateDict);
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
