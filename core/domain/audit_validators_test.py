@@ -35,7 +35,6 @@ gae_search_services = models.Registry.import_search_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
-CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
     audit_models, user_models
