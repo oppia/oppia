@@ -23,7 +23,7 @@ import { ExternalSaveService } from
   'services/external-save.service';
 
 describe('External Save Service', () => {
-  let externalSaveService = null;
+  let externalSaveService: ExternalSaveService;
 
   beforeEach(() => {
     externalSaveService = TestBed.get(ExternalSaveService);
