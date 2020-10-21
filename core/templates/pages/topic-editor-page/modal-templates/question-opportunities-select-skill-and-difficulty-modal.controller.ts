@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Controller for questions opportunities select skill and
  * difficulty modal.
  */
+
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
 require('domain/skill/skill-backend-api.service.ts');
-require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').controller(
   'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', [
     '$controller', '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
-    'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-    'skillId', 'DEFAULT_SKILL_DIFFICULTY',
-    'MODE_SELECT_DIFFICULTY',
+    'SkillBackendApiService', 'skillId',
+    'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
     function(
         $controller, $rootScope, $scope, $uibModalInstance, AlertsService,
-        SkillBackendApiService, SkillDifficultyObjectFactory,
-        skillId, DEFAULT_SKILL_DIFFICULTY,
-        MODE_SELECT_DIFFICULTY) {
+        SkillBackendApiService, skillId,
+        DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance
@@ -48,7 +48,7 @@ angular.module('oppia').controller(
         .then(function(backendSkillObject) {
           $scope.skill = backendSkillObject.skill;
           $scope.linkedSkillsWithDifficulty = [
-            SkillDifficultyObjectFactory.create(
+            SkillDifficulty.create(
               skillId, $scope.skill.getDescription(),
               DEFAULT_SKILL_DIFFICULTY)
           ];

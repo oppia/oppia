@@ -118,8 +118,6 @@ import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
 import { CollectionRightsBackendApiService } from
   'domain/collection/collection-rights-backend-api.service';
-import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
@@ -189,8 +187,6 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExternalSaveService } from 'services/external-save.service.ts';
 import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
-import { FeedbackMessageSummaryObjectFactory } from
-  'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -206,10 +202,6 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
-import { GraphUtilsService } from
-  'interactions/GraphInput/directives/graph-utils.service';
-import { GuestCollectionProgressObjectFactory } from
-  'domain/collection/GuestCollectionProgressObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
@@ -254,6 +246,7 @@ import { LearnerParamsService } from
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { GraphUtilsService } from 'interactions/GraphInput/directives/graph-utils.service';
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
 import { LogicProofValidationService } from
@@ -274,8 +267,6 @@ import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import { MusicPhrasePlayerService } from 'interactions/MusicNotesInput/directives/music-phrase-player.service';
-import { NewlyCreatedStoryObjectFactory } from
-  'domain/topic/NewlyCreatedStoryObjectFactory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
@@ -344,7 +335,6 @@ import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlySubtopicPageObjectFactory } from
@@ -379,19 +369,11 @@ import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
-import { SkillDifficultyObjectFactory } from
-  'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
-import { SkillMasteryObjectFactory } from
-  'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
-import { SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -486,7 +468,6 @@ import { UrlInterpolationService } from
 import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
@@ -548,7 +529,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static collectionCreationBackendService: CollectionCreationBackendService;
   static collectionCreationService: CollectionCreationService;
   static collectionRightsBackendApiService: CollectionRightsBackendApiService;
-  static collectionRightsObjectFactory: CollectionRightsObjectFactory;
   static collectionValidationService: CollectionValidationService;
   static computeGraphService: ComputeGraphService;
   static conceptCardObjectFactory: ConceptCardObjectFactory;
@@ -601,8 +581,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static externalSaveService: ExternalSaveService;
   static extractImageFilenamesFromStateService:
     ExtractImageFilenamesFromStateService;
-  static feedbackMessageSummaryObjectFactory:
-    FeedbackMessageSummaryObjectFactory;
   static feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
   static formatTimePipe: FormatTimePipe;
   static fractionInputRulesService: FractionInputRulesService;
@@ -613,8 +591,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static graphInputRulesService: GraphInputRulesService;
   static graphInputValidationService: GraphInputValidationService;
   static graphUtilsService: GraphUtilsService;
-  static guestCollectionProgressObjectFactory:
-    GuestCollectionProgressObjectFactory;
   static guestCollectionProgressService: GuestCollectionProgressService;
   static guppyConfigurationService: GuppyConfigurationService;
   static guppyInitializationService: GuppyInitializationService;
@@ -662,7 +638,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static musicNotesInputRulesService: MusicNotesInputRulesService;
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
-  static newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
   static normalizeWhitespacePunctuationAndCasePipe:
     NormalizeWhitespacePunctuationAndCasePipe;
@@ -711,7 +686,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ratioExpressionInputRulesService: RatioExpressionInputRulesService;
   static ratioExpressionInputValidationService:
     RatioExpressionInputValidationService;
-  static ratioObjectFactory: RatioObjectFactory;
   static ratingComputationService: RatingComputationService;
   static readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory;
   static readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
@@ -732,13 +706,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static sidebarStatusService: SidebarStatusService;
   static siteAnalyticsService: SiteAnalyticsService;
   static skillCreationBackendApiService: SkillCreationBackendApiService;
-  static skillDifficultyObjectFactory: SkillDifficultyObjectFactory;
   static skillMasteryBackendApiService: SkillMasteryBackendApiService;
-  static skillMasteryObjectFactory: SkillMasteryObjectFactory;
   static skillObjectFactory: SkillObjectFactory;
-  static skillOpportunityObjectFactory: SkillOpportunityObjectFactory;
   static skillRightsBackendApiService: SkillRightsBackendApiService;
-  static skillRightsObjectFactory: SkillRightsObjectFactory;
   static solutionObjectFactory: SolutionObjectFactory;
   static solutionValidityService: SolutionValidityService;
   static speechSynthesisChunkerService: SpeechSynthesisChunkerService;
@@ -804,7 +774,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static urlInterpolationService: UrlInterpolationService;
   static urlService: UrlService;
   static userExplorationPermissionsService: UserExplorationPermissionsService;
-  static userInfoObjectFactory: UserInfoObjectFactory;
   static utilsService: UtilsService;
   static validatorsService: ValidatorsService;
   static versionTreeService: VersionTreeService;
@@ -851,7 +820,6 @@ private codeReplValidationService: CodeReplValidationService,
 private collectionCreationBackendService: CollectionCreationBackendService,
 private collectionCreationService: CollectionCreationService,
 private collectionRightsBackendApiService: CollectionRightsBackendApiService,
-private collectionRightsObjectFactory: CollectionRightsObjectFactory,
 private collectionValidationService: CollectionValidationService,
 private computeGraphService: ComputeGraphService,
 private conceptCardObjectFactory: ConceptCardObjectFactory,
@@ -904,8 +872,6 @@ private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private externalSaveService: ExternalSaveService,
 private extractImageFilenamesFromStateService:
   ExtractImageFilenamesFromStateService,
-private feedbackMessageSummaryObjectFactory:
-  FeedbackMessageSummaryObjectFactory,
 private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
 private formatTimePipe: FormatTimePipe,
 private fractionInputRulesService: FractionInputRulesService,
@@ -916,8 +882,6 @@ private graphDetailService: GraphDetailService,
 private graphInputRulesService: GraphInputRulesService,
 private graphInputValidationService: GraphInputValidationService,
 private graphUtilsService: GraphUtilsService,
-private guestCollectionProgressObjectFactory:
-  GuestCollectionProgressObjectFactory,
 private guppyConfigurationService: GuppyConfigurationService,
 private guppyInitializationService: GuppyInitializationService,
 private guestCollectionProgressService: GuestCollectionProgressService,
@@ -965,7 +929,6 @@ private multipleChoiceInputValidationService:
 private musicNotesInputRulesService: MusicNotesInputRulesService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
-private newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
 private normalizeWhitespacePunctuationAndCasePipe:
   NormalizeWhitespacePunctuationAndCasePipe,
@@ -1016,7 +979,6 @@ private readOnlyCollectionBackendApiService:
 private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
 private ratioExpressionInputValidationService:
   RatioExpressionInputValidationService,
-private ratioObjectFactory: RatioObjectFactory,
 private ratingComputationService: RatingComputationService,
 private readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory,
 private readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory,
@@ -1037,13 +999,9 @@ private sVMPredictionService: SVMPredictionService,
 private sidebarStatusService: SidebarStatusService,
 private siteAnalyticsService: SiteAnalyticsService,
 private skillCreationBackendApiService: SkillCreationBackendApiService,
-private skillDifficultyObjectFactory: SkillDifficultyObjectFactory,
 private skillMasteryBackendApiService: SkillMasteryBackendApiService,
-private skillMasteryObjectFactory: SkillMasteryObjectFactory,
 private skillObjectFactory: SkillObjectFactory,
-private skillOpportunityObjectFactory: SkillOpportunityObjectFactory,
 private skillRightsBackendApiService: SkillRightsBackendApiService,
-private skillRightsObjectFactory: SkillRightsObjectFactory,
 private solutionObjectFactory: SolutionObjectFactory,
 private solutionValidityService: SolutionValidityService,
 private speechSynthesisChunkerService: SpeechSynthesisChunkerService,
@@ -1109,7 +1067,6 @@ private unitsObjectFactory: UnitsObjectFactory,
 private urlInterpolationService: UrlInterpolationService,
 private urlService: UrlService,
 private userExplorationPermissionsService: UserExplorationPermissionsService,
-private userInfoObjectFactory: UserInfoObjectFactory,
 private utilsService: UtilsService,
 private validatorsService: ValidatorsService,
 private versionTreeService: VersionTreeService,
@@ -1182,8 +1139,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.collectionCreationService);
     OppiaAngularRootComponent.collectionRightsBackendApiService = (
       this.collectionRightsBackendApiService);
-    OppiaAngularRootComponent.collectionRightsObjectFactory = (
-      this.collectionRightsObjectFactory);
     OppiaAngularRootComponent.collectionValidationService = (
       this.collectionValidationService);
     OppiaAngularRootComponent.computeGraphService = (
@@ -1262,8 +1217,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.externalSaveService = this.externalSaveService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = (
       this.extractImageFilenamesFromStateService);
-    OppiaAngularRootComponent.feedbackMessageSummaryObjectFactory = (
-      this.feedbackMessageSummaryObjectFactory);
     OppiaAngularRootComponent.feedbackThreadObjectFactory = (
       this.feedbackThreadObjectFactory);
     OppiaAngularRootComponent.formatTimePipe = this.formatTimePipe;
@@ -1281,8 +1234,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.graphInputValidationService = (
       this.graphInputValidationService);
     OppiaAngularRootComponent.graphUtilsService = this.graphUtilsService;
-    OppiaAngularRootComponent.guestCollectionProgressObjectFactory = (
-      this.guestCollectionProgressObjectFactory);
     OppiaAngularRootComponent.guppyConfigurationService = (
       this.guppyConfigurationService);
     OppiaAngularRootComponent.guppyInitializationService = (
@@ -1357,8 +1308,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.musicNotesInputValidationService);
     OppiaAngularRootComponent.musicPhrasePlayerService = (
       this.musicPhrasePlayerService);
-    OppiaAngularRootComponent.newlyCreatedStoryObjectFactory = (
-      this.newlyCreatedStoryObjectFactory);
     OppiaAngularRootComponent.normalizeWhitespacePipe = (
       this.normalizeWhitespacePipe);
     OppiaAngularRootComponent.normalizeWhitespacePunctuationAndCasePipe = (
@@ -1439,7 +1388,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.ratioExpressionInputRulesService);
     OppiaAngularRootComponent.ratioExpressionInputValidationService = (
       this.ratioExpressionInputValidationService);
-    OppiaAngularRootComponent.ratioObjectFactory = this.ratioObjectFactory;
     OppiaAngularRootComponent.ratingComputationService = (
       this.ratingComputationService);
     OppiaAngularRootComponent.readOnlySubtopicPageObjectFactory = (
@@ -1473,19 +1421,11 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.siteAnalyticsService = this.siteAnalyticsService;
     OppiaAngularRootComponent.skillCreationBackendApiService = (
       this.skillCreationBackendApiService);
-    OppiaAngularRootComponent.skillDifficultyObjectFactory = (
-      this.skillDifficultyObjectFactory);
     OppiaAngularRootComponent.skillMasteryBackendApiService = (
       this.skillMasteryBackendApiService);
-    OppiaAngularRootComponent.skillMasteryObjectFactory = (
-      this.skillMasteryObjectFactory);
     OppiaAngularRootComponent.skillObjectFactory = this.skillObjectFactory;
-    OppiaAngularRootComponent.skillOpportunityObjectFactory = (
-      this.skillOpportunityObjectFactory);
     OppiaAngularRootComponent.skillRightsBackendApiService = (
       this.skillRightsBackendApiService);
-    OppiaAngularRootComponent.skillRightsObjectFactory = (
-      this.skillRightsObjectFactory);
     OppiaAngularRootComponent.solutionObjectFactory = (
       this.solutionObjectFactory);
     OppiaAngularRootComponent.solutionValidityService = (
@@ -1596,8 +1536,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.urlService = this.urlService;
     OppiaAngularRootComponent.userExplorationPermissionsService = (
       this.userExplorationPermissionsService);
-    OppiaAngularRootComponent.userInfoObjectFactory = (
-      this.userInfoObjectFactory);
     OppiaAngularRootComponent.utilsService = this.utilsService;
     OppiaAngularRootComponent.validatorsService = this.validatorsService;
     OppiaAngularRootComponent.versionTreeService = this.versionTreeService;

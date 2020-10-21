@@ -13,12 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
- * skill mastery domain objects.
+ * @fileoverview Frontend Model for skill mastery.
  */
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface SkillMasteryBackendDict {
   [skillId: string]: number;
@@ -29,6 +25,11 @@ export class SkillMastery {
 
   constructor(backendDict: SkillMasteryBackendDict) {
     this._skillMasteryDict = { ...backendDict };
+  }
+
+  static createFromBackendDict(
+      backendDict: SkillMasteryBackendDict): SkillMastery {
+    return new SkillMastery(backendDict);
   }
 
   getMasteryDegree(skillId: string): number {
@@ -43,16 +44,3 @@ export class SkillMastery {
     return { ...this._skillMasteryDict };
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SkillMasteryObjectFactory {
-  createFromBackendDict(backendDict: SkillMasteryBackendDict): SkillMastery {
-    return new SkillMastery(backendDict);
-  }
-}
-
-angular.module('oppia').factory(
-  'SkillMasteryObjectFactory',
-  downgradeInjectable(SkillMasteryObjectFactory));

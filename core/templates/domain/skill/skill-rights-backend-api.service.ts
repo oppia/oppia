@@ -22,8 +22,8 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { SkillRightsBackendDict, SkillRightsObjectFactory, SkillRights } from
-  'domain/skill/SkillRightsObjectFactory.ts';
+import { SkillRightsBackendDict, SkillRights } from
+  'domain/skill/skill-rights.model';
 import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
 import { UrlInterpolationService } from
@@ -41,7 +41,6 @@ export class SkillRightsBackendApiService {
 
   constructor(
     private http: HttpClient,
-    private skillRightsObjectFactory: SkillRightsObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
   _fetchSkillRights(
@@ -55,8 +54,7 @@ export class SkillRightsBackendApiService {
 
     this.http.get<SkillRightsBackendDict>(skillRightsUrl).toPromise()
       .then(response => {
-        let skillRightsObject = this.skillRightsObjectFactory
-          .createFromBackendDict(response);
+        let skillRightsObject = SkillRights.createFromBackendDict(response);
 
         if (successCallback) {
           successCallback(skillRightsObject);

@@ -20,18 +20,19 @@
  * followed by the name of the arg.
  */
 
-require('domain/objects/RatioObjectFactory.ts');
+import { Ratio } from 'domain/objects/ratio.model';
+
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').component('oppiaResponseRatioExpressionInput', {
   template: require('./ratio-expression-input-response.component.html'),
   controller: [
-    '$attrs', 'HtmlEscaperService', 'RatioObjectFactory',
-    function($attrs, HtmlEscaperService, RatioObjectFactory) {
+    '$attrs', 'HtmlEscaperService',
+    function($attrs, HtmlEscaperService) {
       var ctrl = this;
       ctrl.$onInit = function() {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.answer = RatioObjectFactory.fromList(answer).toAnswerString();
+        ctrl.answer = Ratio.fromList(answer).toAnswerString();
       };
     }
   ]

@@ -17,7 +17,7 @@
  * component.
  */
 
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory.ts';
+import { Ratio } from 'domain/objects/ratio.model';
 
 require(
   'interactions/RatioExpressionInput/directives/' +
@@ -32,13 +32,9 @@ describe('RatioExpressionInputShortResponse', function() {
     }
   };
 
-  let ratioObjectFactory = null;
-
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    ratioObjectFactory = new RatioObjectFactory();
-
-    $provide.value('RatioObjectFactory', ratioObjectFactory);
+    $provide.value('Ratio', Ratio);
     $provide.value('HtmlEscaperService', mockHtmlEscaperService);
 
     $provide.value('$attrs', {

@@ -15,12 +15,12 @@
 /**
  * @fileoverview Controller for create new story modal.
  */
+import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-require('domain/topic/NewlyCreatedStoryObjectFactory.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/context.service.ts');
@@ -30,13 +30,13 @@ const newStoryConstants = require('constants.ts');
 
 angular.module('oppia').controller('CreateNewStoryModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',
-  'ImageLocalStorageService', 'NewlyCreatedStoryObjectFactory',
-  'StoryEditorStateService', 'TopicEditorStateService', 'WindowRef',
+  'ImageLocalStorageService', 'StoryEditorStateService',
+  'TopicEditorStateService', 'WindowRef',
   'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
   function(
       $controller, $rootScope, $scope, $uibModalInstance,
-      ImageLocalStorageService, NewlyCreatedStoryObjectFactory,
-      StoryEditorStateService, TopicEditorStateService, WindowRef,
+      ImageLocalStorageService, StoryEditorStateService,
+      TopicEditorStateService, WindowRef,
       MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -44,7 +44,7 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
     });
     $scope.validUrlFragmentRegex = new RegExp(
       newStoryConstants.VALID_URL_FRAGMENT_REGEX);
-    $scope.story = NewlyCreatedStoryObjectFactory.createDefault();
+    $scope.story = NewlyCreatedStory.createDefault();
     $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
     $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = MAX_CHARS_IN_STORY_URL_FRAGMENT;
     $scope.allowedBgColors = (

@@ -16,37 +16,36 @@
  * @fileoverview Component for ratio editor.
  */
 
-require('domain/objects/RatioObjectFactory.ts');
+import { Ratio } from 'domain/objects/ratio.model';
 
 angular.module('oppia').component('ratioExpressionEditor', {
   bindings: {
     value: '='
   },
   template: require('./ratio-expression-editor.component.html'),
-  controller: ['RatioObjectFactory',
-    function(RatioObjectFactory) {
-      const ctrl = this;
-      ctrl.warningText = '';
+  controller: [function() {
+    const ctrl = this;
+    ctrl.warningText = '';
 
-      ctrl.isValidRatio = function(value) {
-        try {
-          ctrl.value = RatioObjectFactory.fromRawInputString(value).components;
-          ctrl.warningText = '';
-          return true;
-        } catch (parsingError) {
-          ctrl.warningText = parsingError.message;
-          return false;
-        }
-      };
+    ctrl.isValidRatio = function(value) {
+      try {
+        ctrl.value = Ratio.fromRawInputString(value).components;
+        ctrl.warningText = '';
+        return true;
+      } catch (parsingError) {
+        ctrl.warningText = parsingError.message;
+        return false;
+      }
+    };
 
-      ctrl.$onInit = function() {
-        if (ctrl.value === null) {
-          ctrl.value = [1, 1];
-        }
-        ctrl.localValue = {
-          label: RatioObjectFactory.fromList(ctrl.value).toAnswerString()
-        };
+    ctrl.$onInit = function() {
+      if (ctrl.value === null) {
+        ctrl.value = [1, 1];
+      }
+      ctrl.localValue = {
+        label: Ratio.fromList(ctrl.value).toAnswerString()
       };
-    }
+    };
+  }
   ]
 });

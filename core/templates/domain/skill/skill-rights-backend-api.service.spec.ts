@@ -21,14 +21,13 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 
-import { SkillRightsBackendDict, SkillRights, SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory.ts';
+import { SkillRightsBackendDict, SkillRights } from
+  'domain/skill/skill-rights.model';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 
 describe('Skill rights backend API service', () => {
   let skillRightsBackendApiService:SkillRightsBackendApiService = null;
-  let skillRightsObjectFactory: SkillRightsObjectFactory = null;
   let httpTestingController: HttpTestingController = null;
   let sampleSkillRights: SkillRightsBackendDict = {
     skill_id: '0',
@@ -42,9 +41,8 @@ describe('Skill rights backend API service', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     skillRightsBackendApiService = TestBed.get(SkillRightsBackendApiService);
-    skillRightsObjectFactory = TestBed.get(SkillRightsObjectFactory);
 
-    skillRightsObject = skillRightsObjectFactory.createFromBackendDict(
+    skillRightsObject = SkillRights.createFromBackendDict(
       sampleSkillRights);
   });
   afterEach(() => {
