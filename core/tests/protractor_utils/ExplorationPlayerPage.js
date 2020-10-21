@@ -307,6 +307,8 @@ var ExplorationPlayerPage = function() {
       await elements.get(ratingValue - 1),
       'Rating Star takes too long to be clickable');
     await (await elements.get(ratingValue - 1)).click();
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for rating takes too long to appear.');
     await waitFor.elementToBeClickable(
       feedbackCloseButton, 'Close Feedback button is not clickable');
     await feedbackCloseButton.click();

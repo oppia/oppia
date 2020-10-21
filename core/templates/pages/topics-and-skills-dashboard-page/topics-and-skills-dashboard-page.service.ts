@@ -20,11 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { TopicSummary } from
-  'domain/topic/TopicSummaryObjectFactory';
+  'domain/topic/topic-summary.model';
 // eslint-disable-next-line max-len
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 import { TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';

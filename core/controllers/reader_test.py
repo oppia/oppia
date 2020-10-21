@@ -36,10 +36,10 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -1139,7 +1139,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hello Moderator,\n'

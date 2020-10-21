@@ -120,7 +120,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_users_deletes_them(self):
         # Case for a full user.
@@ -253,6 +253,18 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel(
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
+
+    def test_get_new_id_with_deleted_user_model(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.DeletedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.DeletedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.UserSettingsModel.get_new_id('exploration')
 
     def test_get_new_id_for_too_many_collisions_raises_error(self):
         # Swap dependent method get_by_id to simulate collision every time.
@@ -2317,7 +2329,20 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AT_END)
+
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.USER_1_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.NONEXISTENT_USER_ID))
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -2330,13 +2355,22 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         )
 
 
+class DeletedUserModelTests(test_utils.GenericTestBase):
+    """Tests for DeletedUserModelTests."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.DeletedUserModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+
 class PseudonymizedUserModelTests(test_utils.GenericTestBase):
     """Tests for PseudonymizedUserModel."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_create_raises_error_when_many_id_collisions_occur(self):
         # Swap dependent method get_by_id to simulate collision every time.
@@ -2387,10 +2421,10 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_LEARNER
         )
 
-    def test_get_deletion_policy_is_delete(self):
+    def test_get_deletion_policy_is_delete_after_verification(self):
         self.assertEqual(
             user_models.UserAuthDetailsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.

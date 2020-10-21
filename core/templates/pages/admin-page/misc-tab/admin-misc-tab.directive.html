@@ -15,11 +15,6 @@
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Flush migration bot contributions</h3>
-  <button ng-click="$ctrl.flushMigrationBotContributions()">Flush contributions</button>
-</md-card>
-
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Extract Data</h3>
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.submitQuery()">
@@ -124,6 +119,20 @@
     </form>
   </div>
 </md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Number of pending deletion requests</h3>
+  <div class="oppia-query-form">
+    <form class="form"
+          ng-submit="$ctrl.getNumberOfPendingDeletionRequestModels()">
+      <div class="form-group row">
+        <input type="submit"
+               value="Get number of users whose deletion is currently in-progress">
+      </div>
+    </form>
+  </div>
+</md-card>
+
 <style>
   admin-misc-tab .oppia-admin-page-card {
     max-width: 700px

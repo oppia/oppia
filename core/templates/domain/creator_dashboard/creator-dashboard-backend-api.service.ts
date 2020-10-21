@@ -24,18 +24,15 @@ import { Injectable } from '@angular/core';
 import {
   CollectionSummary,
   CollectionSummaryBackendDict,
-  CollectionSummaryObjectFactory
-} from 'domain/collection/collection-summary-object.factory';
+} from 'domain/collection/collection-summary.model';
 import {
   CreatorDashboardStatsBackendDict,
   CreatorDashboardStats,
-  CreatorDashboardStatsObjectFactory
-} from 'domain/creator_dashboard/creator-dashboard-stats-object.factory';
+} from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import {
   CreatorExplorationSummary,
-  CreatorExplorationSummaryBackendDict,
-  CreatorExplorationSummaryObjectFactory
-} from 'domain/summary/creator-exploration-summary-object.factory';
+  CreatorExplorationSummaryBackendDict
+} from 'domain/summary/creator-exploration-summary.model';
 import {
   FeedbackThread,
   FeedbackThreadObjectFactory,
@@ -49,17 +46,15 @@ import {
 import {
   ProfileSummary,
   SubscriberSummaryBackendDict,
-  ProfileSummaryObjectFactory
-} from 'domain/user/profile-summary-object.factory';
+} from 'domain/user/profile-summary.model';
 import {
   SuggestionThread,
   SuggestionThreadObjectFactory
 } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import {
   TopicSummary,
-  TopicSummaryBackendDict,
-  TopicSummaryObjectFactory
-} from 'domain/topic/TopicSummaryObjectFactory';
+  TopicSummaryBackendDict
+} from 'domain/topic/topic-summary.model';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionsService } from
   'services/suggestions.service';
@@ -100,18 +95,10 @@ interface CreatorDashboardData {
 export class CreatorDashboardBackendApiService {
   constructor(
     private http: HttpClient,
-    private collectionSummaryObjectFactory:
-    CollectionSummaryObjectFactory,
-    private creatorDashboardStatsObjectFactory:
-    CreatorDashboardStatsObjectFactory,
-    private creatorExplorationSummaryObjectFactory:
-    CreatorExplorationSummaryObjectFactory,
-    private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private suggestionObjectFactory: SuggestionObjectFactory,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
     private loggerService: LoggerService) {}
 
   _getSuggestionThreads(
@@ -146,15 +133,15 @@ export class CreatorDashboardBackendApiService {
     return this.http.get<CreatorDashboardDataBackendDict>(
       '/creatordashboardhandler/data').toPromise().then(dashboardData => {
       return {
-        dashboardStats: this.creatorDashboardStatsObjectFactory
+        dashboardStats: CreatorDashboardStats
           .createFromBackendDict(dashboardData.dashboard_stats),
         // Because lastWeekStats may be null.
         lastWeekStats: dashboardData.last_week_stats ? (
-          this.creatorDashboardStatsObjectFactory
+          CreatorDashboardStats
             .createFromBackendDict(dashboardData.last_week_stats)) : null,
         displayPreference: dashboardData.display_preference,
         subscribersList: dashboardData.subscribers_list.map(
-          subscriber => this.profileSummaryObjectFactory
+          subscriber => ProfileSummary
             .createFromSubscriberBackendDict(subscriber)),
         threadsForCreatedSuggestionsList: (
           dashboardData.threads_for_created_suggestions_list.map(
@@ -179,16 +166,16 @@ export class CreatorDashboardBackendApiService {
           dashboardData.threads_for_suggestions_to_review_list,
           dashboardData.suggestions_to_review_list),
         explorationsList: dashboardData.explorations_list.map(
-          expSummary => this.creatorExplorationSummaryObjectFactory
+          expSummary => CreatorExplorationSummary
             .createFromBackendDict(expSummary)),
         collectionsList: dashboardData.collections_list.map(
-          collectionSummary => this.collectionSummaryObjectFactory
+          collectionSummary => CollectionSummary
             .createFromBackendDict(collectionSummary)),
         topicSummaries: (
           dashboardData.topic_summary_dicts ? (
             dashboardData.topic_summary_dicts.map(
-              topicSummaryDict => this.topicSummaryObjectFactory
-                .createFromBackendDict(topicSummaryDict))) : null)
+              topicSummaryDict => TopicSummary.createFromBackendDict(
+                topicSummaryDict))) : null)
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);

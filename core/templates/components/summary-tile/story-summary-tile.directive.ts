@@ -19,10 +19,12 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('services/assets-backend-api.service.ts');
+require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('storySummaryTile', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'UrlService',
+  function(UrlInterpolationService, UrlService) {
     return {
       restrict: 'E',
       scope: {},
@@ -42,6 +44,7 @@ angular.module('oppia').directive('storySummaryTile', [
           var ctrl = this;
           var circumference = (20 * 2 * Math.PI);
           var gapLength = 5;
+          var EXPLORE_PAGE_PREFIX = '/explore/';
 
           ctrl.getStoryLink = function() {
             // This component is being used in the topic editor as well and
@@ -86,6 +89,26 @@ angular.module('oppia').directive('storySummaryTile', [
             var segmentLength = (
               (circumference - (ctrl.nodeCount * gapLength)) / ctrl.nodeCount);
             return segmentLength.toString() + ' ' + gapLength.toString();
+          };
+
+          // Returns the exploration page URL for the provided chapter title.
+          ctrl.getChapterUrl = function(nodeTitle) {
+            let node = this.storySummary.getPendingNodes().find(node => {
+              return node.getTitle() === nodeTitle;
+            });
+            if (!node) {
+              return '';
+            }
+            let urlParams = UrlService.addField(
+              '', 'story_url_fragment', this.storySummary.getUrlFragment());
+            urlParams = UrlService.addField(
+              urlParams, 'topic_url_fragment', ctrl.topicUrlFragment);
+            urlParams = UrlService.addField(
+              urlParams, 'classroom_url_fragment', ctrl.classroomUrlFragment);
+            urlParams = UrlService.addField(
+              urlParams, 'node_id', node.getId());
+            return (
+              `${EXPLORE_PAGE_PREFIX}${node.getExplorationId()}${urlParams}`);
           };
 
           ctrl.getCompletedStrokeDashArrayValues = function() {

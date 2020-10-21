@@ -271,10 +271,6 @@ angular.module('oppia').component('historyTab', {
         ctrl.selectedVersionsArray = [];
       };
 
-      ctrl.toggleHistoryOptions = function(index) {
-        ctrl.highlightedIndex = !ctrl.highlightedIndex ? index : null;
-      };
-
       ctrl.reverseDateOrder = function() {
         ctrl.explorationVersionMetadata.reverse();
       };
@@ -290,7 +286,6 @@ angular.module('oppia').component('historyTab', {
         );
 
         ctrl.EditabilityService = EditabilityService;
-        ctrl.highlightedIndex = null;
         ctrl.explorationId = ExplorationDataService.explorationId;
         ctrl.explorationAllSnapshotsUrl =
             '/createhandler/snapshots/' + ctrl.explorationId;

@@ -16,10 +16,12 @@
  * @fileoverview End-to-end tests for rich-text components and interactions.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 var action = require('../protractor_utils/action.js');
 
@@ -180,9 +182,13 @@ describe('Interactions', function() {
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
           '.protractor-test-close-help-card-button'));
+        var helpCard = element(
+          by.css('.protractor-test-conversation-skin-help-card'));
         var isPresent = await clearHelpcardButton.isPresent();
         if (isPresent) {
-          await action.click('Clear Help Card button', clearHelpcardButton);
+          await action.click('Clear Helper Button', clearHelpcardButton);
+          await waitFor.invisibilityOf(
+            helpCard, 'Help Card takes too long to disappear.');
         }
 
         for (var j = 0; j < test.correctAnswers.length; j++) {

@@ -66,6 +66,7 @@ from . import css_linter
 from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
+from . import linter_utils
 from . import other_files_linter
 from . import python_linter
 from .. import common
@@ -110,6 +111,9 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION),
     os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'setuptools-%s' % common.SETUPTOOLS_VERSION),
+    os.path.join(
         _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
@@ -117,6 +121,7 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
+
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
@@ -404,10 +409,12 @@ def _print_summary_of_error_messages(lint_messages):
         lint_messages: list(str). List of linter error messages.
     """
     if lint_messages != '':
-        python_utils.PRINT('Please fix the errors below:')
-        python_utils.PRINT('----------------------------------------')
-        for message in lint_messages:
-            python_utils.PRINT(message)
+        error_message_lines = [
+            '----------------------------------------',
+            'Please fix the errors below:',
+            '----------------------------------------',
+            ] + lint_messages
+        linter_utils.print_failure_message('\n'.join(error_message_lines))
 
 
 def _get_task_output(lint_messages, failed, task):
@@ -465,6 +472,7 @@ def main(args=None):
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
     install_third_party_libs.main()
+    common.fix_third_party_imports()
 
     python_utils.PRINT('Starting Linter....')
 
@@ -542,14 +550,16 @@ def main(args=None):
 
     if failed:
         _print_summary_of_error_messages(lint_messages)
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('Checks Not Passed.')
-        python_utils.PRINT('---------------------------')
+        linter_utils.print_failure_message('\n'.join([
+            '---------------------------',
+            'Checks Not Passed.',
+            '---------------------------']))
         sys.exit(1)
     else:
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('All Checks Passed.')
-        python_utils.PRINT('---------------------------')
+        linter_utils.print_success_message('\n'.join([
+            '---------------------------',
+            'All Checks Passed.',
+            '---------------------------']))
 
 
 NAME_SPACE = multiprocessing.Manager().Namespace()

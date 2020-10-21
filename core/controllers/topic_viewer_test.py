@@ -142,7 +142,8 @@ class TopicPageDataHandlerTests(
                 'thumbnail_bg_color': None,
                 'story_is_published': True,
                 'completed_node_titles': [],
-                'url_fragment': 'story-frag-one'
+                'url_fragment': 'story-frag-one',
+                'pending_node_dicts': []
             }],
             'additional_story_dicts': [{
                 'id': self.story_2.id,
@@ -153,7 +154,8 @@ class TopicPageDataHandlerTests(
                 'thumbnail_bg_color': None,
                 'story_is_published': True,
                 'completed_node_titles': [],
-                'url_fragment': 'story-frag-two'
+                'url_fragment': 'story-frag-two',
+                'pending_node_dicts': []
             }],
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [{
@@ -206,7 +208,8 @@ class TopicPageDataHandlerTests(
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
                     'completed_node_titles': [],
-                    'url_fragment': 'story-frag-one'
+                    'url_fragment': 'story-frag-one',
+                    'pending_node_dicts': []
                 }],
                 'additional_story_dicts': [{
                     'id': self.story_2.id,
@@ -217,7 +220,8 @@ class TopicPageDataHandlerTests(
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
                     'completed_node_titles': [],
-                    'url_fragment': 'story-frag-two'
+                    'url_fragment': 'story-frag-two',
+                    'pending_node_dicts': []
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{

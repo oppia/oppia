@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import datetime
 import math
 import random
@@ -29,7 +28,6 @@ import types
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -41,7 +39,6 @@ from core.domain import prod_validators
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rating_services
-from core.domain import recommendations_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
@@ -51,7 +48,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -59,36 +55,34 @@ from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
 import utils
 
-gae_search_services = models.Registry.import_search_services()
+datastore_services = models.Registry.import_datastore_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    audit_models,
-    classifier_models, collection_models,
+    audit_models, classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, improvements_models, job_models,
-    opportunity_models, question_models,
-    recommendations_models, skill_models, stats_models,
-    story_models, suggestion_models, topic_models,
-    user_models,) = (
-        models.Registry.import_models([
-            models.NAMES.audit,
-            models.NAMES.classifier, models.NAMES.collection,
-            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.question,
-            models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.statistics, models.NAMES.story,
-            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
+    feedback_models, job_models,
+    opportunity_models, question_models, skill_models,
+    story_models, subtopic_models, suggestion_models,
+    topic_models, user_models
+
+) = models.Registry.import_models([
+    models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
+    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.job,
+    models.NAMES.opportunity, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user
+])
 
 
 class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -147,7 +141,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -157,7 +151,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for user_ids field check of '
             'RoleQueryAuditModel\', '
             '[u"Entity id %s: based on field user_ids having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.admin_id, self.admin_id)]
 
@@ -239,7 +233,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -249,7 +243,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for committer_ids field check of '
             'UsernameChangeAuditModel\', '
             '[u"Entity id %s: based on field committer_ids having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.admin_id, self.admin_id)]
 
@@ -352,7 +346,7 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -364,7 +358,7 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of ClassifierTrainingJobModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
             u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
         self.run_job_and_check_output(
@@ -480,7 +474,7 @@ class TrainingJobExplorationMappingModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -492,7 +486,7 @@ class TrainingJobExplorationMappingModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids field '
                 'check of TrainingJobExplorationMappingModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
             u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
         self.run_job_and_check_output(
@@ -618,7 +612,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -677,7 +671,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for '
                 'exploration_ids field check of CollectionModel\', '
                 '[u"Entity id 0: based on field exploration_ids having value '
-                '1, expect model ExplorationModel '
+                '1, expected model ExplorationModel '
                 'with id 1 but it doesn\'t exist"]]'
             ),
             u'[u\'fully-validated CollectionModel\', 2]']
@@ -701,7 +695,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'CollectionModel\', '
                 '[u"Entity id 0: based on field '
                 'collection_commit_log_entry_ids having value '
-                'collection-0-1, expect model CollectionCommitLogEntryModel '
+                'collection-0-1, expected model CollectionCommitLogEntryModel '
                 'with id collection-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -715,7 +709,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_summary_ids '
                 'field check of CollectionModel\', '
                 '[u"Entity id 0: based on field collection_summary_ids '
-                'having value 0, expect model CollectionSummaryModel with '
+                'having value 0, expected model CollectionSummaryModel with '
                 'id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -730,7 +724,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionModel\', '
                 '[u"Entity id 0: based on field collection_rights_ids having '
-                'value 0, expect model CollectionRightsModel with id 0 but '
+                'value 0, expected model CollectionRightsModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -744,7 +738,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of CollectionModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model CollectionSnapshotMetadataModel '
+                'value 0-1, expected model CollectionSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -758,7 +752,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of CollectionModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model CollectionSnapshotContentModel '
+                'value 0-1, expected model CollectionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         self.run_job_and_check_output(
@@ -860,7 +854,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -872,9 +866,9 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field collection_ids '
-                'having value 0, expect model CollectionModel with '
+                'having value 0, expected model CollectionModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'collection_ids having value 0, expect model '
+                'collection_ids having value 0, expected model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -889,7 +883,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of CollectionSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -1035,7 +1029,7 @@ class CollectionSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1047,9 +1041,9 @@ class CollectionSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field collection_ids '
-                'having value 0, expect model CollectionModel with '
+                'having value 0, expected model CollectionModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'collection_ids having value 0, expect model '
+                'collection_ids having value 0, expected model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -1172,7 +1166,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1203,7 +1197,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field collection_ids having '
-                'value 0, expect model CollectionModel with id 0 but '
+                'value 0, expected model CollectionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -1218,7 +1212,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for owner_user_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field owner_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -1231,7 +1225,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for editor_user_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field editor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
@@ -1245,7 +1239,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for viewer_user_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 2: based on field viewer_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
@@ -1260,7 +1254,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model '
+                'value 0-1, expected model '
                 'CollectionRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
@@ -1276,8 +1270,9 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of CollectionRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model CollectionRightsSnapshotContentModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
+                'value 0-1, expected model '
+                'CollectionRightsSnapshotContentModel with id 0-1 but it '
+                'doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -1373,7 +1368,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1385,9 +1380,9 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field collection_rights_ids '
-                'having value 0, expect model CollectionRightsModel with '
+                'having value 0, expected model CollectionRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'collection_rights_ids having value 0, expect model '
+                'collection_rights_ids having value 0, expected model '
                 'CollectionRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -1402,7 +1397,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of CollectionRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -1547,7 +1542,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1559,9 +1554,9 @@ class CollectionRightsSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionRightsSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field collection_rights_ids '
-                'having value 0, expect model CollectionRightsModel with '
+                'having value 0, expected model CollectionRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'collection_rights_ids having value 0, expect model '
+                'collection_rights_ids having value 0, expected model '
                 'CollectionRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -1688,7 +1683,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1700,9 +1695,9 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionCommitLogEntryModel\', '
                 '[u"Entity id collection-0-1: based on field collection_ids '
-                'having value 0, expect model CollectionModel with id 0 '
+                'having value 0, expected model CollectionModel with id 0 '
                 'but it doesn\'t exist", u"Entity id collection-0-2: based '
-                'on field collection_ids having value 0, expect model '
+                'on field collection_ids having value 0, expected model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
@@ -1716,7 +1711,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionCommitLogEntryModel\', '
                 '[u"Entity id rights-1-1: based on field '
-                'collection_rights_ids having value 1, expect model '
+                'collection_rights_ids having value 1, expected model '
                 'CollectionRightsModel with id 1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
@@ -1972,7 +1967,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -1987,7 +1982,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 0: based on field collection_ids having '
-                'value 0, expect model CollectionModel with id 0 but '
+                'value 0, expected model CollectionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -2002,7 +1997,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for owner_user_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 0: based on field owner_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -2015,7 +2010,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for editor_user_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 0: based on field editor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -2029,7 +2024,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for viewer_user_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 2: based on field viewer_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -2043,7 +2038,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for contributor_user_ids '
                 'field check of CollectionSummaryModel\', '
                 '[u"Entity id 0: based on field contributor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.contributor_id, self.contributor_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -2125,400 +2120,6 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationOpportunitySummaryModelValidatorTests(
-        test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(ExplorationOpportunitySummaryModelValidatorTests, self).setUp()
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .ExplorationOpportunitySummaryModelAuditOneOffJob)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.set_admins([self.ADMIN_USERNAME])
-
-        self.TOPIC_ID = 'topic'
-        self.STORY_ID = 'story'
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s' % i,
-            title='title %d' % i,
-            category='category',
-        ) for i in python_utils.RANGE(5)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-            self.publish_exploration(self.owner_id, exp.id)
-
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
-        topic.thumbnail_filename = 'thumbnail.svg'
-        topic.thumbnail_bg_color = '#C6DCDA'
-        topic.subtopics = [
-            topic_domain.Subtopic(
-                1, 'Title', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-                'dummy-subtopic-three')]
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                1, self.TOPIC_ID))
-        subtopic_page_services.save_subtopic_page(
-            self.owner_id, subtopic_page, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 1,
-                'title': 'Sample'
-            })]
-        )
-        topic.next_subtopic_id = 2
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
-
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
-            'story-one')
-        story_services.save_new_story(self.owner_id, story)
-        topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID, self.STORY_ID)
-        topic_services.publish_story(
-            self.TOPIC_ID, self.STORY_ID, self.admin_id)
-
-        story_change_list = [story_domain.StoryChange({
-            'cmd': 'add_story_node',
-            'node_id': 'node_%s' % i,
-            'title': 'Node %s' % i,
-            }) for i in python_utils.RANGE(1, 4)]
-
-        story_change_list += [story_domain.StoryChange({
-            'cmd': 'update_story_node_property',
-            'property_name': 'destination_node_ids',
-            'node_id': 'node_%s' % i,
-            'old_value': [],
-            'new_value': ['node_%s' % (i + 1)]
-            }) for i in python_utils.RANGE(1, 3)]
-
-        story_change_list += [story_domain.StoryChange({
-            'cmd': 'update_story_node_property',
-            'property_name': 'exploration_id',
-            'node_id': 'node_%s' % i,
-            'old_value': None,
-            'new_value': '%s' % i
-            }) for i in python_utils.RANGE(1, 4)]
-
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, story_change_list, 'Changes.')
-
-        self.model_instance_1 = (
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .get_by_id('1'))
-        self.model_instance_2 = (
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .get_by_id('2'))
-        self.model_instance_3 = (
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .get_by_id('3'))
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_1.created_on = (
-            self.model_instance_1.last_updated + datetime.timedelta(days=1))
-        self.model_instance_1.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of ExplorationOpportunitySummaryModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_1.id,
-                self.model_instance_1.created_on,
-                self.model_instance_1.last_updated
-            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationOpportunitySummaryModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\', '
-            'u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\', '
-            'u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (
-            self.model_instance_1.id, self.model_instance_1.last_updated,
-            self.model_instance_2.id, self.model_instance_2.last_updated,
-            self.model_instance_3.id, self.model_instance_3.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=True)
-
-    def test_missing_story_model_failure(self):
-        story_model = story_models.StoryModel.get_by_id(self.STORY_ID)
-        story_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for story_ids field check of '
-                'ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 1: based on field story_ids having value story, '
-                'expect model StoryModel with id story but it doesn\'t exist", '
-                'u"Entity id 2: based on field story_ids having value story, '
-                'expect model StoryModel with id story but it doesn\'t exist", '
-                'u"Entity id 3: based on field story_ids having value story, '
-                'expect model StoryModel with id story but it doesn\'t exist"]]'
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=True)
-
-    def test_missing_topic_model_failure(self):
-        topic_model = topic_models.TopicModel.get_by_id(self.TOPIC_ID)
-        topic_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for topic_ids field check of '
-                'ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 1: based on field topic_ids having value topic, '
-                'expect model TopicModel with id topic but it doesn\'t exist", '
-                'u"Entity id 2: based on field topic_ids having value topic, '
-                'expect model TopicModel with id topic but it doesn\'t exist", '
-                'u"Entity id 3: based on field topic_ids having value topic, '
-                'expect model TopicModel with id topic but it doesn\'t exist"]]'
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=True)
-
-    def test_missing_exp_model_failure(self):
-        exp_model = exp_models.ExplorationModel.get_by_id('1')
-        exp_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [(
-            u'[u\'failed validation check for exploration_ids field check '
-            'of ExplorationOpportunitySummaryModel\', '
-            '[u"Entity id 1: based on field exploration_ids having '
-            'value 1, expect model ExplorationModel with id 1 but it '
-            'doesn\'t exist"]]'), (
-                u'[u\'fully-validated ExplorationOpportunitySummaryModel\','
-                ' 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_content_count(self):
-        self.model_instance_1.content_count = 10
-        self.model_instance_1.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for content count check '
-                'of ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 1: Content count: 10 does not match the '
-                'content count of external exploration model: 1"]]'
-            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=True)
-
-    def test_model_with_invalid_translation_counts(self):
-        self.model_instance_1.translation_counts = {'hi': 0}
-        self.model_instance_1.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for translation count check '
-                'of ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 1: Translation counts: {u\'hi\': 0} does not '
-                'match the translation counts of external exploration model: '
-                '{}"]]'
-            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=True)
-
-    def test_model_with_invalid_chapter_title(self):
-        self.model_instance_1.chapter_title = 'Invalid title'
-        self.model_instance_1.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for chapter title check '
-                'of ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 1: Chapter title: Invalid title does not match '
-                'the chapter title of external story model: Node 1"]]'
-            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=True)
-
-    def test_model_with_invalid_topic_related_property(self):
-        self.model_instance_1.topic_name = 'invalid'
-        self.model_instance_1.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for topic_name field check of '
-                'ExplorationOpportunitySummaryModel\', '
-                '[u\'Entity id %s: topic_name field in entity: invalid does '
-                'not match corresponding topic name field: topic\']]'
-            ) % self.model_instance_1.id,
-            u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_story_related_property(self):
-        self.model_instance_1.story_title = 'invalid'
-        self.model_instance_1.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for story_title field check of '
-                'ExplorationOpportunitySummaryModel\', '
-                '[u\'Entity id %s: story_title field in entity: invalid does '
-                'not match corresponding story title field: A story\']]'
-            ) % self.model_instance_1.id,
-            u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(SkillOpportunityModelValidatorTests, self).setUp()
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .SkillOpportunityModelAuditOneOffJob)
-
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-
-        for i in python_utils.RANGE(3):
-            skill_id = '%s' % i
-            self.save_new_skill(
-                skill_id, self.admin_id, description='description %d' % i)
-
-        self.QUESTION_ID = question_services.get_new_question_id()
-        self.save_new_question(
-            self.QUESTION_ID, self.owner_id,
-            self._create_valid_question_data('ABC'), ['0'])
-        question_services.create_new_question_skill_link(
-            self.owner_id, self.QUESTION_ID, '0', 0.3)
-
-        self.model_instance_0 = (
-            opportunity_models.SkillOpportunityModel.get('0'))
-        self.model_instance_1 = (
-            opportunity_models.SkillOpportunityModel.get('1'))
-        self.model_instance_2 = (
-            opportunity_models.SkillOpportunityModel.get('2'))
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated SkillOpportunityModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillOpportunityModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\', '
-            'u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\', '
-            'u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (
-            self.model_instance_0.id, self.model_instance_0.last_updated,
-            self.model_instance_1.id, self.model_instance_1.last_updated,
-            self.model_instance_2.id, self.model_instance_2.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=True)
-
-    def test_missing_skill_model_failure(self):
-        skill_model = skill_models.SkillModel.get_by_id('0')
-        skill_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_ids field '
-                'check of SkillOpportunityModel\', '
-                '[u"Entity id 0: based on field skill_ids having '
-                'value 0, expect model SkillModel with id 0 but it '
-                'doesn\'t exist"]]'
-            ),
-            u'[u\'fully-validated SkillOpportunityModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_skill_description(self):
-        self.model_instance_0.skill_description = 'invalid'
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_description field '
-                'check of SkillOpportunityModel\', '
-                '[u\'Entity id %s: skill_description field in entity: invalid '
-                'does not match corresponding skill description field: '
-                'description 0\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillOpportunityModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_question_count(self):
-        self.model_instance_0.question_count = 10
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for question_count check of '
-                'SkillOpportunityModel\', '
-                '[u\'Entity id %s: question_count: 10 does not match the '
-                'question_count of external skill model: 1\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillOpportunityModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_question_count_schema(self):
-        self.model_instance_0.question_count = -1
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for domain object check of '
-                'SkillOpportunityModel\', '
-                '[u\'Entity id 0: Entity fails domain validation with the '
-                'error Expected question_count to be a non-negative integer, '
-                'received -1\']]'
-            ),
-            (
-                u'[u\'failed validation check for question_count check of '
-                'SkillOpportunityModel\', '
-                '[u\'Entity id 0: question_count: -1 does not match the '
-                'question_count of external skill model: 1\']]'
-            ), u'[u\'fully-validated SkillOpportunityModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
 class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -2572,7 +2173,7 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -2585,7 +2186,7 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of ConfigPropertyModel\', '
                 '[u"Entity id config_model: based on field '
                 'snapshot_metadata_ids having '
-                'value config_model-1, expect model '
+                'value config_model-1, expected model '
                 'ConfigPropertySnapshotMetadataModel '
                 'with id config_model-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ConfigPropertyModel\', 1]']
@@ -2601,7 +2202,7 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of ConfigPropertyModel\', '
                 '[u"Entity id config_model: based on field '
                 'snapshot_content_ids having '
-                'value config_model-1, expect model '
+                'value config_model-1, expected model '
                 'ConfigPropertySnapshotContentModel '
                 'with id config_model-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ConfigPropertyModel\', 1]']
@@ -2673,7 +2274,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -2685,10 +2286,10 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 'field check of ConfigPropertySnapshotMetadataModel\', '
                 '[u"Entity id config_model-1: based on field '
                 'config_property_ids having value config_model, '
-                'expect model ConfigPropertyModel with '
+                'expected model ConfigPropertyModel with '
                 'id config_model but it doesn\'t exist", '
                 'u"Entity id config_model-2: based on field '
-                'config_property_ids having value config_model, expect model '
+                'config_property_ids having value config_model, expected model '
                 'ConfigPropertyModel with id config_model but it doesn\'t '
                 'exist"]]'
             ),
@@ -2703,7 +2304,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of ConfigPropertySnapshotMetadataModel\', '
                 '[u"Entity id config_model-1: based on field committer_ids '
-                'having value %s, expect model UserSettingsModel with id %s '
+                'having value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.admin_id, self.admin_id),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
@@ -2818,7 +2419,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -2830,10 +2431,10 @@ class ConfigPropertySnapshotContentModelValidatorTests(
                 'field check of ConfigPropertySnapshotContentModel\', '
                 '[u"Entity id config_model-1: based on field '
                 'config_property_ids having value config_model, '
-                'expect model ConfigPropertyModel with '
+                'expected model ConfigPropertyModel with '
                 'id config_model but it doesn\'t exist", '
                 'u"Entity id config_model-2: based on field '
-                'config_property_ids having value config_model, expect model '
+                'config_property_ids having value config_model, expected model '
                 'ConfigPropertyModel with id config_model but it '
                 'doesn\'t exist"]]'
             ),
@@ -2935,7 +2536,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -2945,7 +2546,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for sender_id field check of '
             'SentEmailModel\', '
             '[u"Entity id %s: based on field sender_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.sender_id, self.sender_id)]
 
@@ -2958,7 +2559,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for recipient_id field check of '
             'SentEmailModel\', '
             '[u"Entity id %s: based on field recipient_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.recipient_id, self.recipient_id)]
 
@@ -3080,7 +2681,7 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -3090,7 +2691,7 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for sender_id field check of '
             'BulkEmailModel\', '
             '[u"Entity id %s: based on field sender_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.sender_id, self.sender_id)]
 
@@ -3103,7 +2704,7 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'failed validation check for recipient_id field check of '
             'BulkEmailModel\', '
             '[u"Entity id %s: based on field recipient_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.recipient_ids[0],
                 self.recipient_ids[0])]
@@ -3209,7 +2810,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -3219,7 +2820,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             u'[u\'failed validation check for item.id.user_id field check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
             '[u"Entity id %s: based on field item.id.user_id having value '
-            '%s, expect model UserSettingsModel with '
+            '%s, expected model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.user_id, self.user_id)]
 
@@ -3233,7 +2834,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             u'[u\'failed validation check for item.id.thread_id field check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
             '[u"Entity id %s: based on field item.id.thread_id having value '
-            '%s, expect model GeneralFeedbackThreadModel with '
+            '%s, expected model GeneralFeedbackThreadModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.thread_id, self.thread_id)]
 
@@ -3330,7 +2931,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3386,8 +2987,9 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 'ExplorationModel\', '
                 '[u"Entity id 0: based on field '
                 'exploration_commit_log_entry_ids having value '
-                'exploration-0-1, expect model ExplorationCommitLogEntryModel '
-                'with id exploration-0-1 but it doesn\'t exist"]]'),
+                'exploration-0-1, expected model '
+                'ExplorationCommitLogEntryModel with id exploration-0-1 but it '
+                'doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -3400,7 +3002,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exp_summary_ids '
                 'field check of ExplorationModel\', '
                 '[u"Entity id 0: based on field exp_summary_ids having '
-                'value 0, expect model ExpSummaryModel with id 0 '
+                'value 0, expected model ExpSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
@@ -3415,7 +3017,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationModel\', '
                 '[u"Entity id 0: based on field exploration_rights_ids '
-                'having value 0, expect model ExplorationRightsModel '
+                'having value 0, expected model ExplorationRightsModel '
                 'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
@@ -3429,7 +3031,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of ExplorationModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model ExplorationSnapshotMetadataModel '
+                'value 0-1, expected model ExplorationSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
@@ -3443,7 +3045,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of ExplorationModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model ExplorationSnapshotContentModel '
+                'value 0-1, expected model ExplorationSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         self.run_job_and_check_output(
@@ -3530,7 +3132,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3542,9 +3144,9 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field exploration_ids '
-                'having value 0, expect model ExplorationModel with '
+                'having value 0, expected model ExplorationModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_ids having value 0, expect model '
+                'exploration_ids having value 0, expected model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -3559,7 +3161,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of ExplorationSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -3693,7 +3295,7 @@ class ExplorationSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3704,9 +3306,9 @@ class ExplorationSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field exploration_ids '
-                'having value 0, expect model ExplorationModel with '
+                'having value 0, expected model ExplorationModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_ids having value 0, expect model '
+                'exploration_ids having value 0, expected model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -3814,7 +3416,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -3845,7 +3447,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field exploration_ids having '
-                'value 0, expect model ExplorationModel with id 0 but '
+                'value 0, expected model ExplorationModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -3860,7 +3462,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'cloned_from_exploration_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field cloned_from_exploration_ids '
-                'having value invalid, expect model ExplorationModel with id '
+                'having value invalid, expected model ExplorationModel with id '
                 'invalid but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -3875,7 +3477,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for owner_user_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field owner_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -3888,7 +3490,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for editor_user_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field editor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
@@ -3902,7 +3504,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for viewer_user_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 2: based on field viewer_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
@@ -3917,7 +3519,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model '
+                'value 0-1, expected model '
                 'ExplorationRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
@@ -3933,8 +3535,9 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model ExplorationRightsSnapshotContentModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
+                'value 0-1, expected model '
+                'ExplorationRightsSnapshotContentModel with id 0-1 but it '
+                'doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -4015,7 +3618,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4027,9 +3630,9 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field exploration_rights_ids '
-                'having value 0, expect model ExplorationRightsModel with '
+                'having value 0, expected model ExplorationRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_rights_ids having value 0, expect model '
+                'exploration_rights_ids having value 0, expected model '
                 'ExplorationRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -4044,7 +3647,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of ExplorationRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -4176,7 +3779,7 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4188,9 +3791,9 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationRightsSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field exploration_rights_ids '
-                'having value 0, expect model ExplorationRightsModel with '
+                'having value 0, expected model ExplorationRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_rights_ids having value 0, expect model '
+                'exploration_rights_ids having value 0, expected model '
                 'ExplorationRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -4306,7 +3909,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4318,10 +3921,10 @@ class ExplorationCommitLogEntryModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationCommitLogEntryModel\', '
                 '[u"Entity id exploration-0-1: based on field '
-                'exploration_ids having value 0, expect model '
+                'exploration_ids having value 0, expected model '
                 'ExplorationModel with id 0 '
                 'but it doesn\'t exist", u"Entity id exploration-0-2: based '
-                'on field exploration_ids having value 0, expect model '
+                'on field exploration_ids having value 0, expected model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
@@ -4335,7 +3938,7 @@ class ExplorationCommitLogEntryModelValidatorTests(
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationCommitLogEntryModel\', '
                 '[u"Entity id rights-1-1: based on field '
-                'exploration_rights_ids having value 1, expect model '
+                'exploration_rights_ids having value 1, expected model '
                 'ExplorationRightsModel with id 1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         self.run_job_and_check_output(
@@ -4581,7 +4184,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4617,7 +4220,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 0: based on field exploration_ids having '
-                'value 0, expect model ExplorationModel with id 0 but '
+                'value 0, expected model ExplorationModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -4632,7 +4235,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for owner_user_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 0: based on field owner_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -4645,7 +4248,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for editor_user_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 0: based on field editor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -4659,7 +4262,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for viewer_user_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 2: based on field viewer_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -4673,7 +4276,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for contributor_user_ids '
                 'field check of ExpSummaryModel\', '
                 '[u"Entity id 0: based on field contributor_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s but '
+                'value %s, expected model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.contributor_id, self.contributor_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -4843,7 +4446,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
         ) % (self.model_instance.id, self.model_instance.last_updated)]
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4855,7 +4458,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -4868,7 +4471,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for suggestion_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field suggestion_ids having '
-                'value %s, expect model GeneralSuggestionModel with id %s '
+                'value %s, expected model GeneralSuggestionModel with id %s '
                 'but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -4878,12 +4481,58 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for author_ids field '
+                '[u\'failed validation check for '
+                'last_nonempty_message_author_ids field '
+                'check of GeneralFeedbackThreadModel\', '
+                '[u"Entity id %s: based on field '
+                'last_nonempty_message_author_ids having value '
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]'
+            ) % (
+                self.model_instance.id, self.owner_id, self.owner_id
+            ),
+            (
+                '[u\'failed validation check for author_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
-                    self.model_instance.id, self.owner_id, self.owner_id)]
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]'
+            ) % (
+                self.model_instance.id, self.owner_id, self.owner_id
+            ),
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_original_author_id_format_failure(self):
+        self.model_instance.original_author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final author '
+                'check of GeneralFeedbackThreadModel\', [u\'Entity id %s: '
+                'Original author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (
+                self.model_instance.id, self.model_instance.original_author_id)
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_last_nonempty_message_author_id_format_failure(self):
+        self.model_instance.last_nonempty_message_author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final author '
+                'check of GeneralFeedbackThreadModel\', [u\'Entity id %s: '
+                'Last non-empty message author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (
+                self.model_instance.id,
+                self.model_instance.last_nonempty_message_author_id
+            )
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -4895,7 +4544,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for message_ids field '
                 'check of GeneralFeedbackThreadModel\', '
                 '[u"Entity id %s: based on field message_ids having value '
-                '%s.0, expect model GeneralFeedbackMessageModel with '
+                '%s.0, expected model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -4987,7 +4636,7 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -4998,9 +4647,24 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for author_ids field '
                 'check of GeneralFeedbackMessageModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_author_id_format_failure(self):
+        self.model_instance.author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final author '
+                'check of GeneralFeedbackMessageModel\', [u\'Entity id %s: '
+                'Author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (
+                self.model_instance.id, self.model_instance.author_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -5012,7 +4676,7 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for feedback_thread_ids field '
                 'check of GeneralFeedbackMessageModel\', '
                 '[u"Entity id %s: based on field feedback_thread_ids having '
-                'value %s, expect model GeneralFeedbackThreadModel with '
+                'value %s, expected model GeneralFeedbackThreadModel with '
                 'id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -5098,7 +4762,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5109,8 +4773,8 @@ class GeneralFeedbackThreadUserModelValidatorTests(
                 u'[u\'failed validation check for user_ids field '
                 'check of GeneralFeedbackThreadUserModel\', '
                 '[u"Entity id %s: based on field user_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -5123,7 +4787,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(
                 u'[u\'failed validation check for message_ids field '
                 'check of GeneralFeedbackThreadUserModel\', '
                 '[u"Entity id %s: based on field message_ids having '
-                'value %s.0, expect model GeneralFeedbackMessageModel with '
+                'value %s.0, expected model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -5184,7 +4848,7 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5196,7 +4860,7 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of FeedbackAnalyticsModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -5269,7 +4933,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5280,8 +4944,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for user_ids field '
                 'check of UnsentFeedbackEmailModel\', '
                 '[u"Entity id %s: based on field user_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -5294,7 +4958,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for message_ids field '
                 'check of UnsentFeedbackEmailModel\', '
                 '[u"Entity id %s: based on field message_ids having value '
-                '%s.0, expect model GeneralFeedbackMessageModel with '
+                '%s.0, expected model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
@@ -5441,7 +5105,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5588,7 +5252,7 @@ class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -5748,7 +5412,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5775,7 +5439,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for linked_skill_ids field '
                 'check of QuestionModel\', '
                 '[u"Entity id 0: based on field linked_skill_ids '
-                'having value 111111111111, expect model SkillModel with id '
+                'having value 111111111111, expected model SkillModel with id '
                 '111111111111 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5799,7 +5463,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'QuestionModel\', '
                 '[u"Entity id 0: based on field '
                 'question_commit_log_entry_ids having value '
-                'question-0-1, expect model QuestionCommitLogEntryModel '
+                'question-0-1, expected model QuestionCommitLogEntryModel '
                 'with id question-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5813,7 +5477,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for question_summary_ids '
                 'field check of QuestionModel\', '
                 '[u"Entity id 0: based on field question_summary_ids having '
-                'value 0, expect model QuestionSummaryModel with id 0 '
+                'value 0, expected model QuestionSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5827,7 +5491,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of QuestionModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model QuestionSnapshotMetadataModel '
+                'value 0-1, expected model QuestionSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5841,7 +5505,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of QuestionModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model QuestionSnapshotContentModel '
+                'value 0-1, expected model QuestionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
@@ -5984,7 +5648,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -5996,7 +5660,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_ids field '
                 'check of QuestionSkillLinkModel\', '
                 '[u"Entity id 0:2: based on field skill_ids '
-                'having value 2, expect model SkillModel with id 2 but it '
+                'having value 2, expected model SkillModel with id 2 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
         self.run_job_and_check_output(
@@ -6010,7 +5674,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for '
                 'question_ids field check of QuestionSkillLinkModel\', '
                 '[u"Entity id 0:2: based on field '
-                'question_ids having value 0, expect model QuestionModel '
+                'question_ids having value 0, expected model QuestionModel '
                 'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
         self.run_job_and_check_output(
@@ -6107,7 +5771,7 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6119,7 +5783,7 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids field '
                 'check of ExplorationContextModel\', '
                 '[u"Entity id 2: based on field story_ids '
-                'having value 1, expect model StoryModel with id 1 but it '
+                'having value 1, expected model StoryModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationContextModel\', 2]']
         self.run_job_and_check_output(
@@ -6133,7 +5797,7 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for '
                 'exp_ids field check of ExplorationContextModel\', '
                 '[u"Entity id 2: based on field '
-                'exp_ids having value 2, expect model ExplorationModel '
+                'exp_ids having value 2, expected model ExplorationModel '
                 'with id 2 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationContextModel\', 2]']
         self.run_job_and_check_output(
@@ -6241,7 +5905,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6253,9 +5917,9 @@ class QuestionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for question_ids '
                 'field check of QuestionSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field question_ids '
-                'having value 0, expect model QuestionModel with '
+                'having value 0, expected model QuestionModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'question_ids having value 0, expect model '
+                'question_ids having value 0, expected model '
                 'QuestionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -6270,7 +5934,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of QuestionSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -6423,7 +6087,7 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6435,9 +6099,9 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for question_ids '
                 'field check of QuestionSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field question_ids '
-                'having value 0, expect model QuestionModel with '
+                'having value 0, expected model QuestionModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'question_ids having value 0, expect model '
+                'question_ids having value 0, expected model '
                 'QuestionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -6556,7 +6220,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6568,9 +6232,9 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for question_ids field '
                 'check of QuestionCommitLogEntryModel\', '
                 '[u"Entity id question-0-1: based on field question_ids '
-                'having value 0, expect model QuestionModel with id '
+                'having value 0, expected model QuestionModel with id '
                 '0 but it doesn\'t exist", u"Entity id question-0-2: '
-                'based on field question_ids having value 0, expect '
+                'based on field question_ids having value 0, expected '
                 'model QuestionModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -6784,7 +6448,7 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -6799,7 +6463,7 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for question_ids '
                 'field check of QuestionSummaryModel\', '
                 '[u"Entity id 0: based on field question_ids having '
-                'value 0, expect model QuestionModel with id 0 but '
+                'value 0, expected model QuestionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -6833,1337 +6497,6 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'created_on field: %s\']]'
             ) % (self.model_instance_0.id, mock_time, actual_time),
             u'[u\'fully-validated QuestionSummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class ExplorationRecommendationsModelValidatorTests(
-        test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(ExplorationRecommendationsModelValidatorTests, self).setUp()
-
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(6)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.user_id, exp)
-
-        recommendations_services.set_exploration_recommendations(
-            '0', ['3', '4'])
-        recommendations_services.set_exploration_recommendations('1', ['5'])
-
-        self.model_instance_0 = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '0'))
-        self.model_instance_1 = (
-            recommendations_models.ExplorationRecommendationsModel.get_by_id(
-                '1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .ExplorationRecommendationsModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [(
-            u'[u\'fully-validated ExplorationRecommendationsModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of ExplorationRecommendationsModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id, self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated),
-            u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationRecommendationsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_missing_recommended_exploration(self):
-        exp_models.ExplorationModel.get_by_id('3').delete(
-            self.user_id, '', [{}])
-        expected_output = [
-            (
-                u'[u\'failed validation check for exploration_ids field '
-                'check of ExplorationRecommendationsModel\', '
-                '[u"Entity id 0: based on field exploration_ids having value '
-                '3, expect model ExplorationModel with '
-                'id 3 but it doesn\'t exist"]]'
-            ),
-            u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_id_in_recommended_ids(self):
-        self.model_instance_0.recommended_exploration_ids = ['0', '4']
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for item exploration id check '
-                'of ExplorationRecommendationsModel\', '
-                '[u\'Entity id 0: The exploration id: 0 for which the '
-                'entity is created is also present in the recommended '
-                'exploration ids for entity\']]'
-            ),
-            u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(TopicSimilaritiesModelValidatorTests, self).setUp()
-
-        self.model_instance = recommendations_models.TopicSimilaritiesModel(
-            id=recommendations_models.TOPIC_SIMILARITIES_ID)
-
-        self.content = {
-            'Art': {'Art': '1.0', 'Biology': '0.8', 'Chemistry': '0.1'},
-            'Biology': {'Art': '0.8', 'Biology': '1.0', 'Chemistry': '0.5'},
-            'Chemistry': {'Art': '0.1', 'Biology': '0.5', 'Chemistry': '1.0'},
-        }
-
-        self.model_instance.content = self.content
-        self.model_instance.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [(
-            u'[u\'fully-validated TopicSimilaritiesModel\', 1]')]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of TopicSimilaritiesModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance.id, self.model_instance.created_on,
-                    self.model_instance.last_updated)]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicSimilaritiesModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_with_invalid_id = recommendations_models.TopicSimilaritiesModel(
-            id='invalid', content=self.content)
-        model_with_invalid_id.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for model id check of '
-                'TopicSimilaritiesModel\', '
-                '[u\'Entity id invalid: Entity id does not match regex '
-                'pattern\']]'
-            ),
-            u'[u\'fully-validated TopicSimilaritiesModel\', 1]']
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_topic_similarities_columns(self):
-        content = {
-            'Art': {'Art': '1.0', 'Biology': '0.5'},
-            'Biology': {}
-        }
-        self.model_instance.content = content
-        self.model_instance.put()
-
-        expected_output = [(
-            u'[u\'failed validation check for topic similarity check '
-            'of TopicSimilaritiesModel\', '
-            '[u"Entity id topics: Topic similarity validation for '
-            'content: {u\'Biology\': {}, u\'Art\': {u\'Biology\': u\'0.5\', '
-            'u\'Art\': u\'1.0\'}} fails with error: Length of topic '
-            'similarities columns: 1 does not match length of '
-            'topic list: 2."]]')]
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_topic(self):
-        content = {
-            'Art': {'Art': '1.0', 'invalid': '0.5'},
-            'invalid': {'Art': '0.5', 'invalid': '1.0'}
-        }
-        self.model_instance.content = content
-        self.model_instance.put()
-
-        expected_output = [(
-            u'[u\'failed validation check for topic similarity check '
-            'of TopicSimilaritiesModel\', '
-            '[u"Entity id topics: Topic similarity validation for '
-            'content: {u\'Art\': {u\'Art\': u\'1.0\', u\'invalid\': u\'0.5\'}, '
-            'u\'invalid\': {u\'Art\': u\'0.5\', u\'invalid\': u\'1.0\'}} '
-            'fails with error: Topic invalid not in list of known topics."]]')]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_topic_similarities_rows(self):
-        content = {
-            'Art': {'Art': '1.0', 'Biology': '0.5'}
-        }
-        self.model_instance.content = content
-        self.model_instance.put()
-
-        expected_output = [(
-            u'[u\'failed validation check for topic similarity check '
-            'of TopicSimilaritiesModel\', [u"Entity id topics: '
-            'Topic similarity validation for content: {u\'Art\': '
-            '{u\'Biology\': u\'0.5\', u\'Art\': u\'1.0\'}} fails with '
-            'error: Length of topic similarities rows: 2 does not match '
-            'length of topic list: 1."]]')]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_similarity_type(self):
-        content = {
-            'Art': {'Art': 'one', 'Biology': 0.5},
-            'Biology': {'Art': 0.5, 'Biology': 1.0}
-        }
-        self.model_instance.content = content
-        self.model_instance.put()
-
-        expected_output = [(
-            u'[u\'failed validation check for topic similarity '
-            'check of TopicSimilaritiesModel\', '
-            '[u"Entity id topics: Topic similarity validation for '
-            'content: {u\'Biology\': {u\'Biology\': 1.0, u\'Art\': 0.5}, '
-            'u\'Art\': {u\'Biology\': 0.5, u\'Art\': u\'one\'}} '
-            'fails with error: Expected similarity to be a float, '
-            'received one"]]')]
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_similarity_value(self):
-        content = {
-            'Art': {'Art': 10.0, 'Biology': 0.5},
-            'Biology': {'Art': 0.5, 'Biology': 1.0}
-        }
-        self.model_instance.content = content
-        self.model_instance.put()
-
-        expected_output = [(
-            u'[u\'failed validation check for topic similarity check '
-            'of TopicSimilaritiesModel\', '
-            '[u"Entity id topics: Topic similarity validation for '
-            'content: {u\'Biology\': {u\'Biology\': 1.0, u\'Art\': 0.5}, '
-            'u\'Art\': {u\'Biology\': 0.5, u\'Art\': 10.0}} '
-            'fails with error: Expected similarity to be between '
-            '0.0 and 1.0, received 10.0"]]')]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_assymetric_content(self):
-        content = {
-            'Art': {'Art': 1.0, 'Biology': 0.5},
-            'Biology': {'Art': 0.6, 'Biology': 1.0}
-        }
-        self.model_instance.content = content
-        self.model_instance.put()
-
-        expected_output = [(
-            u'[u\'failed validation check for topic similarity '
-            'check of TopicSimilaritiesModel\', '
-            '[u"Entity id topics: Topic similarity validation for '
-            'content: {u\'Biology\': {u\'Biology\': 1.0, u\'Art\': 0.6}, '
-            'u\'Art\': {u\'Biology\': 0.5, u\'Art\': 1.0}} fails with error: '
-            'Expected topic similarities to be symmetric."]]')]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-
-class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(SkillModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        self.set_admins([self.ADMIN_USERNAME])
-
-        language_codes = ['ar', 'en', 'en']
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            'description %d' % i,
-            rubrics
-        ) for i in python_utils.RANGE(3)]
-
-        for i in python_utils.RANGE(2):
-            skill = skill_domain.Skill.create_default_skill(
-                '%s' % (i + 3),
-                'description %d' % (i + 3),
-                rubrics)
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
-        skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict({
-                'voiceovers_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            }),
-            state_domain.WrittenTranslations.from_dict({
-                'translations_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            })
-        )
-        misconception_dict = {
-            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-
-        misconception = skill_domain.Misconception.from_dict(
-            misconception_dict)
-
-        for index, skill in enumerate(skills):
-            skill.language_code = language_codes[index]
-            skill.skill_contents = skill_contents
-            skill.add_misconception(misconception)
-            if index < 2:
-                skill.superseding_skill_id = '%s' % (index + 3)
-                skill.all_questions_merged = True
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        self.model_instance_0 = skill_models.SkillModel.get_by_id('0')
-        self.model_instance_1 = skill_models.SkillModel.get_by_id('1')
-        self.model_instance_2 = skill_models.SkillModel.get_by_id('2')
-        self.superseding_skill_0 = skill_models.SkillModel.get_by_id('3')
-        self.superseding_skill_1 = skill_models.SkillModel.get_by_id('4')
-
-        self.job_class = (
-            prod_validation_jobs_one_off.SkillModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        skill_services.update_skill(
-            self.admin_id, '0', [skill_domain.SkillChange({
-                'cmd': 'update_skill_property',
-                'property_name': 'description',
-                'new_value': 'New description',
-                'old_value': 'description 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated SkillModel\', 5]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.commit(
-            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of SkillModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated SkillModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_0.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        self.superseding_skill_0.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        self.superseding_skill_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_2.id, self.model_instance_2.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_skill_schema(self):
-        expected_output = [
-            (
-                u'[u\'failed validation check for domain object check of '
-                'SkillModel\', '
-                '[u\'Entity id %s: Entity fails domain validation with the '
-                'error Invalid language code: %s\']]'
-            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
-            u'[u\'fully-validated SkillModel\', 4]']
-        with self.swap(
-            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
-                'code': 'en', 'description': 'English'}]):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_all_questions_merged(self):
-        question_models.QuestionSkillLinkModel(
-            id='question1-0', question_id='question1', skill_id='0',
-            skill_difficulty=0.5).put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for all questions merged '
-                'check of SkillModel\', '
-                '[u"Entity id 0: all_questions_merged is True but the '
-                'following question ids are still linked to the skill: '
-                '[u\'question1\']"]]'
-            ), u'[u\'fully-validated SkillModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_superseding_skill_model_failure(self):
-        self.superseding_skill_0.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for superseding_skill_ids field '
-                'check of SkillModel\', '
-                '[u"Entity id 0: based on field superseding_skill_ids '
-                'having value 3, expect model SkillModel with id 3 but it '
-                'doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_skill_commit_log_entry_model_failure(self):
-        skill_services.update_skill(
-            self.admin_id, '0', [skill_domain.SkillChange({
-                'cmd': 'update_skill_property',
-                'property_name': 'description',
-                'new_value': 'New description',
-                'old_value': 'description 0'
-            })], 'Changes.')
-        self.process_and_flush_pending_tasks()
-        skill_models.SkillCommitLogEntryModel.get_by_id(
-            'skill-0-1').delete()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for '
-                'skill_commit_log_entry_ids field check of '
-                'SkillModel\', '
-                '[u"Entity id 0: based on field '
-                'skill_commit_log_entry_ids having value '
-                'skill-0-1, expect model SkillCommitLogEntryModel '
-                'with id skill-0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_summary_model_failure(self):
-        skill_models.SkillSummaryModel.get_by_id('0').delete()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_summary_ids '
-                'field check of SkillModel\', '
-                '[u"Entity id 0: based on field skill_summary_ids having '
-                'value 0, expect model SkillSummaryModel with id 0 '
-                'but it doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_snapshot_metadata_model_failure(self):
-        skill_models.SkillSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_metadata_ids '
-                'field check of SkillModel\', '
-                '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model SkillSnapshotMetadataModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_snapshot_content_model_failure(self):
-        skill_models.SkillSnapshotContentModel.get_by_id(
-            '0-1').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_content_ids '
-                'field check of SkillModel\', '
-                '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model SkillSnapshotContentModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class SkillSnapshotMetadataModelValidatorTests(
-        test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(SkillSnapshotMetadataModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        language_codes = ['ar', 'en', 'en']
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            'description %d' % i,
-            rubrics
-        ) for i in python_utils.RANGE(3)]
-
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
-        skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict({
-                'voiceovers_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            }),
-            state_domain.WrittenTranslations.from_dict({
-                'translations_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            })
-        )
-
-        misconception_dict = {
-            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-
-        misconception = skill_domain.Misconception.from_dict(
-            misconception_dict)
-
-        for index, skill in enumerate(skills):
-            skill.language_code = language_codes[index]
-            skill.skill_contents = skill_contents
-            skill.add_misconception(misconception)
-            if index == 0:
-                skill_services.save_new_skill(self.user_id, skill)
-            else:
-                skill_services.save_new_skill(self.owner_id, skill)
-
-        self.model_instance_0 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                '0-1'))
-        self.model_instance_1 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                '1-1'))
-        self.model_instance_2 = (
-            skill_models.SkillSnapshotMetadataModel.get_by_id(
-                '2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .SkillSnapshotMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        skill_services.update_skill(
-            self.admin_id, '0', [skill_domain.SkillChange({
-                'cmd': 'update_skill_property',
-                'property_name': 'description',
-                'new_value': 'New description',
-                'old_value': 'description 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated SkillSnapshotMetadataModel\', 4]']
-        self.process_and_flush_pending_tasks()
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SkillSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'SkillSnapshotMetadataModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('0').delete(
-            self.user_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_ids '
-                'field check of SkillSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field skill_ids '
-                'having value 0, expect model SkillModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'skill_ids having value 0, expect model '
-                'SkillModel with id 0 but it doesn\'t exist"]]'
-            ), (
-                u'[u\'fully-validated '
-                'SkillSnapshotMetadataModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, literal_eval=True)
-
-    def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for committer_ids field '
-                'check of SkillSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]'
-            ) % (self.user_id, self.user_id), (
-                u'[u\'fully-validated '
-                'SkillSnapshotMetadataModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_skill_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            skill_models.SkillSnapshotMetadataModel(
-                id='0-3', committer_id=self.owner_id, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill model '
-                'version check of SkillSnapshotMetadataModel\', '
-                '[u\'Entity id 0-3: Skill model corresponding to '
-                'id 0 has a version 1 which is less than the version 3 in '
-                'snapshot metadata model id\']]'
-            ), (
-                u'[u\'fully-validated SkillSnapshotMetadataModel\', '
-                '3]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_commit_cmd_schmea(self):
-        self.model_instance_0.commit_cmds = [{
-            'cmd': 'add_skill_misconception'
-        }, {
-            'cmd': 'delete_skill_misconception',
-            'invalid_attribute': 'invalid'
-        }]
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for commit cmd '
-                'delete_skill_misconception check of '
-                'SkillSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'delete_skill_misconception\', '
-                'u\'invalid_attribute\': u\'invalid\'} failed with error: '
-                'The following required attributes are missing: '
-                'misconception_id, The following extra attributes are present: '
-                'invalid_attribute"]]'
-            ), (
-                u'[u\'failed validation check for commit cmd '
-                'add_skill_misconception check of '
-                'SkillSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'add_skill_misconception\'} '
-                'failed with error: The following required attributes '
-                'are missing: new_misconception_dict"]]'
-            ), u'[u\'fully-validated SkillSnapshotMetadataModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(SkillSnapshotContentModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        language_codes = ['ar', 'en', 'en']
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            'description %d' % i,
-            rubrics
-        ) for i in python_utils.RANGE(3)]
-
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
-        skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict({
-                'voiceovers_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            }),
-            state_domain.WrittenTranslations.from_dict({
-                'translations_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            })
-        )
-        misconception_dict = {
-            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-
-        misconception = skill_domain.Misconception.from_dict(
-            misconception_dict)
-
-        for index, skill in enumerate(skills):
-            skill.language_code = language_codes[index]
-            skill.skill_contents = skill_contents
-            skill.add_misconception(misconception)
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        self.model_instance_0 = (
-            skill_models.SkillSnapshotContentModel.get_by_id(
-                '0-1'))
-        self.model_instance_1 = (
-            skill_models.SkillSnapshotContentModel.get_by_id(
-                '1-1'))
-        self.model_instance_2 = (
-            skill_models.SkillSnapshotContentModel.get_by_id(
-                '2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .SkillSnapshotContentModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        skill_services.update_skill(
-            self.admin_id, '0', [skill_domain.SkillChange({
-                'cmd': 'update_skill_property',
-                'property_name': 'description',
-                'new_value': 'New description',
-                'old_value': 'description 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated SkillSnapshotContentModel\', 4]']
-        self.process_and_flush_pending_tasks()
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SkillSnapshotContentModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'SkillSnapshotContentModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillSnapshotContentModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('0').delete(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_ids '
-                'field check of SkillSnapshotContentModel\', '
-                '[u"Entity id 0-1: based on field skill_ids '
-                'having value 0, expect model SkillModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'skill_ids having value 0, expect model '
-                'SkillModel with id 0 but it doesn\'t exist"]]'
-            ), (
-                u'[u\'fully-validated '
-                'SkillSnapshotContentModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_skill_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            skill_models.SkillSnapshotContentModel(
-                id='0-3'))
-        model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill model '
-                'version check of SkillSnapshotContentModel\', '
-                '[u\'Entity id 0-3: Skill model corresponding to '
-                'id 0 has a version 1 which is less than '
-                'the version 3 in snapshot content model id\']]'
-            ), (
-                u'[u\'fully-validated SkillSnapshotContentModel\', '
-                '3]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(SkillCommitLogEntryModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        language_codes = ['ar', 'en', 'en']
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            'description %d' % i,
-            rubrics
-        ) for i in python_utils.RANGE(3)]
-
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
-        skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict({
-                'voiceovers_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            }),
-            state_domain.WrittenTranslations.from_dict({
-                'translations_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            })
-        )
-        misconception_dict = {
-            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-
-        misconception = skill_domain.Misconception.from_dict(
-            misconception_dict)
-
-        for index, skill in enumerate(skills):
-            skill.language_code = language_codes[index]
-            skill.skill_contents = skill_contents
-            skill.add_misconception(misconception)
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        self.model_instance_0 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-0-1'))
-        self.model_instance_1 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-1-1'))
-        self.model_instance_2 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'skill-2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .SkillCommitLogEntryModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        skill_services.update_skill(
-            self.admin_id, '0', [skill_domain.SkillChange({
-                'cmd': 'update_skill_property',
-                'property_name': 'description',
-                'new_value': 'New description',
-                'old_value': 'description 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
-        self.process_and_flush_pending_tasks()
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SkillCommitLogEntryModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillCommitLogEntryModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('0').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_ids field '
-                'check of SkillCommitLogEntryModel\', '
-                '[u"Entity id skill-0-1: based on field skill_ids '
-                'having value 0, expect model SkillModel with id '
-                '0 but it doesn\'t exist", u"Entity id skill-0-2: '
-                'based on field skill_ids having value 0, expect '
-                'model SkillModel with id 0 but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=True)
-
-    def test_invalid_skill_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            skill_models.SkillCommitLogEntryModel.create(
-                '0', 3, self.owner_id, 'edit', 'msg', [{}],
-                constants.ACTIVITY_STATUS_PUBLIC, False))
-        model_with_invalid_version_in_id.skill_id = '0'
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill model '
-                'version check of SkillCommitLogEntryModel\', '
-                '[u\'Entity id %s: Skill model corresponding '
-                'to id 0 has a version 1 which is less than '
-                'the version 3 in commit log entry model id\']]'
-            ) % (model_with_invalid_version_in_id.id),
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_with_invalid_id = (
-            skill_models.SkillCommitLogEntryModel(
-                id='invalid-0-1',
-                user_id=self.owner_id,
-                commit_type='edit',
-                commit_message='msg',
-                commit_cmds=[{}],
-                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
-                post_commit_is_private=False))
-        model_with_invalid_id.skill_id = '0'
-        model_with_invalid_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for model id check of '
-                'SkillCommitLogEntryModel\', '
-                '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id), (
-                u'[u\'failed validation check for commit cmd check of '
-                'SkillCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
-                'No commit command domain object defined for entity with '
-                'commands: [{}]\']]'),
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_commit_type(self):
-        self.model_instance_0.commit_type = 'invalid'
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for commit type check of '
-                'SkillCommitLogEntryModel\', '
-                '[u\'Entity id skill-0-1: Commit type invalid is '
-                'not allowed\']]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_post_commit_status(self):
-        self.model_instance_0.post_commit_status = 'invalid'
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit status check '
-                'of SkillCommitLogEntryModel\', '
-                '[u\'Entity id skill-0-1: Post commit status invalid '
-                'is invalid\']]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_private_post_commit_status(self):
-        self.model_instance_0.post_commit_status = 'private'
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit status check '
-                'of SkillCommitLogEntryModel\', '
-                '[u\'Entity id skill-0-1: Post commit status private '
-                'is invalid\']]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_commit_cmd_schmea(self):
-        self.model_instance_0.commit_cmds = [{
-            'cmd': 'add_skill_misconception'
-        }, {
-            'cmd': 'delete_skill_misconception',
-            'invalid_attribute': 'invalid'
-        }]
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for commit cmd '
-                'add_skill_misconception check of SkillCommitLogEntryModel\', '
-                '[u"Entity id skill-0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'add_skill_misconception\'} '
-                'failed with error: The following required attributes are '
-                'missing: new_misconception_dict"]]'
-            ), (
-                u'[u\'failed validation check for commit cmd '
-                'delete_skill_misconception check of '
-                'SkillCommitLogEntryModel\', '
-                '[u"Entity id skill-0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'delete_skill_misconception\', '
-                'u\'invalid_attribute\': u\'invalid\'} failed with error: '
-                'The following required attributes are missing: '
-                'misconception_id, The following extra attributes are present: '
-                'invalid_attribute"]]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(SkillSummaryModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        language_codes = ['ar', 'en', 'en']
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            'description %d' % i,
-            rubrics
-        ) for i in python_utils.RANGE(3)]
-
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
-        skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict({
-                'voiceovers_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            }),
-            state_domain.WrittenTranslations.from_dict({
-                'translations_mapping': {
-                    '1': {}, '2': {}, '3': {}
-                }
-            })
-        )
-
-        misconception_dict = {
-            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-
-        misconception = skill_domain.Misconception.from_dict(
-            misconception_dict)
-
-        for index, skill in enumerate(skills):
-            skill.language_code = language_codes[index]
-            skill.skill_contents = skill_contents
-            skill.add_misconception(misconception)
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        self.model_instance_0 = skill_models.SkillSummaryModel.get_by_id('0')
-        self.model_instance_1 = skill_models.SkillSummaryModel.get_by_id('1')
-        self.model_instance_2 = skill_models.SkillSummaryModel.get_by_id('2')
-
-        self.job_class = (
-            prod_validation_jobs_one_off.SkillSummaryModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        skill_services.update_skill(
-            self.admin_id, '0', [skill_domain.SkillChange({
-                'cmd': 'update_skill_property',
-                'property_name': 'description',
-                'new_value': 'New description',
-                'old_value': 'description 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated SkillSummaryModel\', 3]']
-        self.process_and_flush_pending_tasks()
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SkillSummaryModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), u'[u\'fully-validated SkillSummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        skill_services.delete_skill(self.owner_id, '1')
-        skill_services.delete_skill(self.owner_id, '2')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillSummaryModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_skill_model_failure(self):
-        skill_model = skill_models.SkillModel.get_by_id('0')
-        skill_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-        self.model_instance_0.skill_model_last_updated = (
-            skill_model.last_updated)
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_ids '
-                'field check of SkillSummaryModel\', '
-                '[u"Entity id 0: based on field skill_ids having '
-                'value 0, expect model SkillModel with id 0 but '
-                'it doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillSummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_misconception_count(self):
-        self.model_instance_0.misconception_count = 10
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for misconception count '
-                'check of SkillSummaryModel\', '
-                '[u"Entity id 0: Misconception count: 10 does not match '
-                'the number of misconceptions in skill model: '
-                '[{u\'id\': 0, u\'must_be_addressed\': True, '
-                'u\'notes\': u\'<p>notes</p>\', u\'name\': u\'name\', '
-                'u\'feedback\': u\'<p>default_feedback</p>\'}]"]]'
-            ), u'[u\'fully-validated SkillSummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_worked_examples_count(self):
-        self.model_instance_0.worked_examples_count = 10
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for worked examples '
-                'count check of SkillSummaryModel\', '
-                '[u"Entity id 0: Worked examples count: 10 does not '
-                'match the number of worked examples in skill_contents '
-                'in skill model: [{u\'explanation\': {u\'content_id\': u\'3\', '
-                'u\'html\': u\'<p>Example Explanation 1</p>\'}, u\'question\': '
-                '{u\'content_id\': u\'2\', u\'html\': u\'<p>Example Question '
-                '1</p>\'}}]"]]'
-            ), u'[u\'fully-validated SkillSummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_skill_related_property(self):
-        self.model_instance_0.description = 'invalid'
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for description field check of '
-                'SkillSummaryModel\', '
-                '[u\'Entity id %s: description field in entity: invalid does '
-                'not match corresponding skill description field: '
-                'description 0\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillSummaryModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -8287,7 +6620,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8315,7 +6648,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of StoryModel\', '
                 '[u"Entity id 0: based on field exploration_ids having value '
-                '1, expect model ExplorationModel with id 1 but it '
+                '1, expected model ExplorationModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -8339,7 +6672,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'StoryModel\', '
                 '[u"Entity id 0: based on field '
                 'story_commit_log_entry_ids having value '
-                'story-0-1, expect model StoryCommitLogEntryModel '
+                'story-0-1, expected model StoryCommitLogEntryModel '
                 'with id story-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -8353,7 +6686,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_summary_ids '
                 'field check of StoryModel\', '
                 '[u"Entity id 0: based on field story_summary_ids having '
-                'value 0, expect model StorySummaryModel with id 0 '
+                'value 0, expected model StorySummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -8367,7 +6700,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of StoryModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model StorySnapshotMetadataModel '
+                'value 0-1, expected model StorySnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -8381,7 +6714,7 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of StoryModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model StorySnapshotContentModel '
+                'value 0-1, expected model StorySnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
         self.run_job_and_check_output(
@@ -8478,7 +6811,7 @@ class StorySnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8490,9 +6823,9 @@ class StorySnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for story_ids '
                 'field check of StorySnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field story_ids '
-                'having value 0, expect model StoryModel with '
+                'having value 0, expected model StoryModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'story_ids having value 0, expect model '
+                'story_ids having value 0, expected model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -8507,7 +6840,7 @@ class StorySnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of StorySnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -8649,7 +6982,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8660,9 +6993,9 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids '
                 'field check of StorySnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field story_ids '
-                'having value 0, expect model StoryModel with '
+                'having value 0, expected model StoryModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'story_ids having value 0, expect model '
+                'story_ids having value 0, expected model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -8772,7 +7105,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -8784,9 +7117,9 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids '
                 'field check of StoryCommitLogEntryModel\', '
                 '[u"Entity id story-0-1: based on field story_ids '
-                'having value 0, expect model StoryModel with id 0 '
+                'having value 0, expected model StoryModel with id 0 '
                 'but it doesn\'t exist", u"Entity id story-0-2: based '
-                'on field story_ids having value 0, expect model '
+                'on field story_ids having value 0, expected model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -9005,7 +7338,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -9020,7 +7353,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids '
                 'field check of StorySummaryModel\', '
                 '[u"Entity id 0: based on field story_ids having '
-                'value 0, expect model StoryModel with id 0 but '
+                'value 0, expected model StoryModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated StorySummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -9130,7 +7463,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         ) % (self.model_instance.id, self.model_instance.last_updated)]
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -9142,7 +7475,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids field '
                 'check of GeneralSuggestionModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9155,8 +7488,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for feedback_thread_ids field '
                 'check of GeneralSuggestionModel\', '
                 '[u"Entity id %s: based on field feedback_thread_ids having '
-                'value %s, expect model GeneralFeedbackThreadModel with id %s '
-                'but it doesn\'t exist"]]') % (
+                'value %s, expected model GeneralFeedbackThreadModel with id '
+                '%s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9168,8 +7501,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for author_ids field '
                 'check of GeneralSuggestionModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9181,8 +7514,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for reviewer_ids field '
                 'check of GeneralSuggestionModel\', '
                 '[u"Entity id %s: based on field reviewer_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.admin_id, self.admin_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9212,6 +7545,20 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_wrong_final_reviewer_id_format(self):
+        self.model_instance.final_reviewer_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                '[u\'failed validation check for domain object check of '
+                'GeneralSuggestionModel\', [u\'Entity id %s: '
+                'Entity fails domain validation with the error Expected '
+                'final_reviewer_id to be in a valid user ID format, '
+                'received %s\']]'
+            ) % (self.model_instance.id, self.model_instance.final_reviewer_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
     def test_invalid_non_empty_final_reviewer_id(self):
         self.model_instance.status = suggestion_models.STATUS_IN_REVIEW
         self.model_instance.put()
@@ -9222,6 +7569,19 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'Final reviewer id %s is not empty but '
                 'suggestion is in review\']]'
             ) % (self.model_instance.id, self.admin_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_author_id_format(self):
+        self.model_instance.author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                '[u\'failed validation check for domain object check of '
+                'GeneralSuggestionModel\', [u\'Entity id %s: '
+                'Entity fails domain validation with the error Expected '
+                'author_id to be in a valid user ID format, received %s\']]'
+            ) % (self.model_instance.id, self.model_instance.author_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -9416,7 +7776,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         ) % (self.model_instance.id, self.model_instance.last_updated)]
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -9428,7 +7788,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids field '
                 'check of GeneralVoiceoverApplicationModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                '0, expected model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -9440,9 +7800,35 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 u'[u\'failed validation check for author_ids field '
                 'check of GeneralVoiceoverApplicationModel\', '
                 '[u"Entity id %s: based on field author_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
+                '%s, expected model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_final_reviewer_id_format(self):
+        self.model_instance.final_reviewer_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                '[u\'failed validation check for final reviewer check of '
+                'GeneralVoiceoverApplicationModel\', [u\'Entity id %s: '
+                'Final reviewer ID %s is in a wrong format. It should be '
+                'either pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (self.model_instance.id, self.model_instance.final_reviewer_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_wrong_author_id_format(self):
+        self.model_instance.author_id = 'wrong_id'
+        self.model_instance.put()
+        expected_output = [
+            (
+                '[u\'failed validation check for final author check of '
+                'GeneralVoiceoverApplicationModel\', [u\'Entity id %s: '
+                'Author ID %s is in a wrong format. It should be either '
+                'pid_<32 chars> or uid_<32 chars>.\']]'
+            ) % (self.model_instance.id, self.model_instance.author_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -9453,7 +7839,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 u'[u\'failed validation check for final_reviewer_ids field '
                 'check of GeneralVoiceoverApplicationModel\', '
                 '[u"Entity id %s: based on field final_reviewer_ids having '
-                'value %s, expect model UserSettingsModel with id %s but it '
+                'value %s, expected model UserSettingsModel with id %s but it '
                 'doesn\'t exist"]]') % (
                     self.model_instance.id, self.admin_id, self.admin_id)]
         self.run_job_and_check_output(
@@ -9480,25 +7866,67 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 class CommunityContributionStatsModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    translation_reviewer_counts_by_lang_code = {
-        'hi': 0,
-        'en': 1
-    }
-
-    translation_suggestion_counts_by_lang_code = {
-        'fr': 6,
-        'en': 5
-    }
-
-    question_reviewer_count = 1
-    question_suggestion_count = 4
+    target_id = 'exp1'
+    skill_id = 'skill1'
+    target_version_at_submission = 1
+    exploration_category = 'Algebra'
+    AUTHOR_EMAIL = 'author@example.com'
+    AUTHOR_USERNAME = 'author'
+    REVIEWER_EMAIL = 'reviewer@community.org'
+    REVIEWER_USERNAME = 'reviewer'
+    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
+    SKILL_THREAD_ID = 'skill1.thread1'
+    change_cmd = {}
 
     negative_count = -1
-    sample_language_code = 'en'
+    non_integer_count = 'non_integer_count'
+    sample_language_code = 'hi'
     invalid_language_code = 'invalid'
+
+    def _create_model_for_translation_suggestion_with_language_code(
+            self, language_code):
+        """Creates a GeneralSuggestionModel for a translation suggestion in the
+        given language_code.
+        """
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.exploration_category
+        )
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            self.reviewer_id, self.change_cmd, score_category,
+            self.EXPLORATION_THREAD_ID, language_code)
+
+    def _create_model_for_question_suggestion(self):
+        """Creates a GeneralSuggestionModel for a question suggestion."""
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.target_id
+        )
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            self.reviewer_id, self.change_cmd, score_category,
+            self.SKILL_THREAD_ID, 'en')
 
     def setUp(self):
         super(CommunityContributionStatsModelValidatorTests, self).setUp()
+
+        self.signup(
+            self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(
+            self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -9512,14 +7940,30 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
+        user_models.UserContributionRightsModel(
+            id=self.reviewer_id,
+            can_review_translation_for_language_codes=['hi'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=True).put()
+        self._create_model_for_translation_suggestion_with_language_code('hi')
+        self._create_model_for_question_suggestion()
+        translation_reviewer_counts_by_lang_code = {
+            'hi': 1
+        }
+        translation_suggestion_counts_by_lang_code = {
+            'hi': 1
+        }
+        question_reviewer_count = 1
+        question_suggestion_count = 1
+
         suggestion_models.CommunityContributionStatsModel(
             id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
             translation_reviewer_counts_by_lang_code=(
-                self.translation_reviewer_counts_by_lang_code),
+                translation_reviewer_counts_by_lang_code),
             translation_suggestion_counts_by_lang_code=(
-                self.translation_suggestion_counts_by_lang_code),
-            question_reviewer_count=self.question_reviewer_count,
-            question_suggestion_count=self.question_suggestion_count
+                translation_suggestion_counts_by_lang_code),
+            question_reviewer_count=question_reviewer_count,
+            question_suggestion_count=question_suggestion_count
         ).put()
         expected_output = [(
             u'[u\'fully-validated CommunityContributionStatsModel\', 1]')]
@@ -9545,12 +7989,10 @@ class CommunityContributionStatsModelValidatorTests(
     def test_model_validation_fails_with_invalid_model_id(self):
         suggestion_models.CommunityContributionStatsModel(
             id='invalid_id',
-            translation_reviewer_counts_by_lang_code=(
-                self.translation_reviewer_counts_by_lang_code),
-            translation_suggestion_counts_by_lang_code=(
-                self.translation_suggestion_counts_by_lang_code),
-            question_reviewer_count=self.question_reviewer_count,
-            question_suggestion_count=self.question_suggestion_count
+            translation_reviewer_counts_by_lang_code={},
+            translation_suggestion_counts_by_lang_code={},
+            question_reviewer_count=0,
+            question_suggestion_count=0
         ).put()
 
         expected_output = [
@@ -9570,11 +8012,20 @@ class CommunityContributionStatsModelValidatorTests(
             self.sample_language_code: self.negative_count}
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for translation reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'reviewer count to be non-negative for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_reviewer_counts_by_lang_code[
@@ -9591,11 +8042,20 @@ class CommunityContributionStatsModelValidatorTests(
             self.sample_language_code: self.negative_count}
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'suggestion count to be non-negative for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_suggestion_counts_by_lang_code[
@@ -9611,10 +8071,16 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model.question_reviewer_count = self.negative_count
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
-            'question reviewer count to be non-negative, recieved: %s.\']]' % (
+            'question reviewer count to be non-negative, received: %s.\']]' % (
                 stats_model.id, stats_model.question_reviewer_count)
         ]
 
@@ -9627,12 +8093,193 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model.question_suggestion_count = self.negative_count
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
-            'question suggestion count to be non-negative, recieved: '
+            'question suggestion count to be non-negative, received: '
             '%s.\']]' % (
                 stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_non_integer_translation_reviewer_counts(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: self.non_integer_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'reviewer count to be an integer for %s language code, '
+            'received: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_non_integer_translation_suggestion_count(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: self.non_integer_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'suggestion count to be an integer for %s language code, '
+            'received: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_suggestion_counts_dont_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_reviewer_counts_dont_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_question_reviewer_count_does_not_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_reviewer_count = 1
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_question_suggestion_count_does_not_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_suggestion_count = 1
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_suggestion_lang_not_in_dict(
+            self):
+        missing_language_code = 'hi'
+        self._create_model_for_translation_suggestion_with_language_code(
+            missing_language_code)
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'field check of CommunityContributionStatsModel\', [u"Entity id '
+            '%s: The translation suggestion count for language code %s is 1, '
+            'expected model CommunityContributionStatsModel to have the '
+            'language code %s in its translation suggestion counts but it '
+            'doesn\'t exist."]]' % (
+                stats_model.id, missing_language_code, missing_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_reviewer_lang_not_in_dict(
+            self):
+        missing_language_code = 'hi'
+        user_models.UserContributionRightsModel(
+            id=self.reviewer_id,
+            can_review_translation_for_language_codes=[missing_language_code],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count '
+            'field check of CommunityContributionStatsModel\', [u"Entity id '
+            '%s: The translation reviewer count for language code %s is 1, '
+            'expected model CommunityContributionStatsModel to have the '
+            'language code %s in its translation reviewer counts but it '
+            'doesn\'t exist."]]' % (
+                stats_model.id, missing_language_code, missing_language_code)
         ]
 
         self.run_job_and_check_output(
@@ -9796,7 +8443,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -9850,7 +8497,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids field '
                 'check of TopicModel\', '
                 '[u"Entity id 0: based on field story_ids having value '
-                '1, expect model StoryModel with id 1 but it '
+                '1, expected model StoryModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9865,14 +8512,14 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for skill_ids field '
                 'check of TopicModel\', '
                 '[u"Entity id 0: based on field skill_ids having value '
-                '1, expect model SkillModel with id 1 but it '
+                '1, expected model SkillModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
         expected_output = [
@@ -9880,7 +8527,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for subtopic_page_ids field '
                 'check of TopicModel\', '
                 '[u"Entity id 0: based on field subtopic_page_ids having value '
-                '0-1, expect model SubtopicPageModel with id 0-1 but it '
+                '0-1, expected model SubtopicPageModel with id 0-1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9904,7 +8551,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 'TopicModel\', '
                 '[u"Entity id 0: based on field '
                 'topic_commit_log_entry_ids having value '
-                'topic-0-1, expect model TopicCommitLogEntryModel '
+                'topic-0-1, expected model TopicCommitLogEntryModel '
                 'with id topic-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9918,7 +8565,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_summary_ids '
                 'field check of TopicModel\', '
                 '[u"Entity id 0: based on field topic_summary_ids having '
-                'value 0, expect model TopicSummaryModel with id 0 '
+                'value 0, expected model TopicSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9933,7 +8580,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_rights_ids '
                 'field check of TopicModel\', '
                 '[u"Entity id 0: based on field topic_rights_ids having '
-                'value 0, expect model TopicRightsModel with id 0 but '
+                'value 0, expected model TopicRightsModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9947,7 +8594,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of TopicModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model TopicSnapshotMetadataModel '
+                'value 0-1, expected model TopicSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -9961,7 +8608,7 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of TopicModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model TopicSnapshotContentModel '
+                'value 0-1, expected model TopicSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         self.run_job_and_check_output(
@@ -10127,7 +8774,7 @@ class TopicSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10139,9 +8786,9 @@ class TopicSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for topic_ids '
                 'field check of TopicSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field topic_ids '
-                'having value 0, expect model TopicModel with '
+                'having value 0, expected model TopicModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'topic_ids having value 0, expect model '
+                'topic_ids having value 0, expected model '
                 'TopicModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -10156,7 +8803,7 @@ class TopicSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of TopicSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -10325,7 +8972,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10336,9 +8983,9 @@ class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids '
                 'field check of TopicSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field topic_ids '
-                'having value 0, expect model TopicModel with '
+                'having value 0, expected model TopicModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'topic_ids having value 0, expect model '
+                'topic_ids having value 0, expected model '
                 'TopicModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -10499,7 +9146,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10511,7 +9158,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids '
                 'field check of TopicRightsModel\', '
                 '[u"Entity id 0: based on field topic_ids having '
-                'value 0, expect model TopicModel with id 0 but '
+                'value 0, expected model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -10524,7 +9171,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for manager_user_ids '
                 'field check of TopicRightsModel\', '
                 '[u"Entity id 0: based on field manager_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (
                     self.manager1_id, self.manager1_id),
             u'[u\'fully-validated TopicRightsModel\', 2]']
@@ -10539,7 +9186,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of TopicRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model '
+                'value 0-1, expected model '
                 'TopicRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
@@ -10555,7 +9202,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of TopicRightsModel\', '
                 '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model TopicRightsSnapshotContentModel '
+                'value 0-1, expected model TopicRightsSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicRightsModel\', 2]']
         self.run_job_and_check_output(
@@ -10690,7 +9337,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10702,9 +9349,9 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for topic_rights_ids '
                 'field check of TopicRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field topic_rights_ids '
-                'having value 0, expect model TopicRightsModel with '
+                'having value 0, expected model TopicRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'topic_rights_ids having value 0, expect model '
+                'topic_rights_ids having value 0, expected model '
                 'TopicRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -10719,7 +9366,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of TopicRightsSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -10901,7 +9548,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -10913,9 +9560,9 @@ class TopicRightsSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for topic_rights_ids '
                 'field check of TopicRightsSnapshotContentModel\', '
                 '[u"Entity id 0-1: based on field topic_rights_ids '
-                'having value 0, expect model TopicRightsModel with '
+                'having value 0, expected model TopicRightsModel with '
                 'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'topic_rights_ids having value 0, expect model '
+                'topic_rights_ids having value 0, expected model '
                 'TopicRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -11071,7 +9718,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -11083,12 +9730,12 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids field check '
                 'of TopicCommitLogEntryModel\', '
                 '[u"Entity id rights-0-1: based on field topic_ids '
-                'having value 0, expect model TopicModel with id 0 '
+                'having value 0, expected model TopicModel with id 0 '
                 'but it doesn\'t exist", u"Entity id topic-0-1: '
-                'based on field topic_ids having value 0, expect model '
+                'based on field topic_ids having value 0, expected model '
                 'TopicModel with id 0 but it doesn\'t exist", '
                 'u"Entity id topic-0-2: based on field topic_ids having '
-                'value 0, expect model TopicModel with id 0 but '
+                'value 0, expected model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 4]']
         self.run_job_and_check_output(
@@ -11102,9 +9749,9 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_rights_ids field '
                 'check of TopicCommitLogEntryModel\', '
                 '[u"Entity id rights-0-1: based on field topic_rights_ids '
-                'having value 0, expect model TopicRightsModel with id 0 '
+                'having value 0, expected model TopicRightsModel with id 0 '
                 'but it doesn\'t exist", u"Entity id rights-0-2: based '
-                'on field topic_rights_ids having value 0, expect '
+                'on field topic_rights_ids having value 0, expected '
                 'model TopicRightsModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
         self.run_job_and_check_output(
@@ -11367,7 +10014,7 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -11382,7 +10029,7 @@ class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids '
                 'field check of TopicSummaryModel\', '
                 '[u"Entity id 0: based on field topic_ids having '
-                'value 0, expect model TopicModel with id 0 but '
+                'value 0, expected model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicSummaryModel\', 2]']
         self.run_job_and_check_output(
@@ -11550,9 +10197,12 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
 
-        self.model_instance_0 = topic_models.SubtopicPageModel.get_by_id('0-1')
-        self.model_instance_1 = topic_models.SubtopicPageModel.get_by_id('1-1')
-        self.model_instance_2 = topic_models.SubtopicPageModel.get_by_id('2-1')
+        self.model_instance_0 = (
+            subtopic_models.SubtopicPageModel.get_by_id('0-1'))
+        self.model_instance_1 = (
+            subtopic_models.SubtopicPageModel.get_by_id('1-1'))
+        self.model_instance_2 = (
+            subtopic_models.SubtopicPageModel.get_by_id('2-1'))
 
         self.job_class = (
             prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob)
@@ -11606,7 +10256,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -11636,7 +10286,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for topic_ids field '
                 'check of SubtopicPageModel\', '
                 '[u"Entity id 0-1: based on field topic_ids having value '
-                '0, expect model TopicModel with id 0 but it '
+                '0, expected model TopicModel with id 0 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
         self.run_job_and_check_output(
@@ -11654,7 +10304,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 },
                 'old_value': {}
             })], 'Changes.')
-        topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+        subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
             'subtopicpage-0-1-1').delete()
 
         expected_output = [
@@ -11664,7 +10314,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 'SubtopicPageModel\', '
                 '[u"Entity id 0-1: based on field '
                 'subtopic_page_commit_log_entry_ids having value '
-                'subtopicpage-0-1-1, expect model '
+                'subtopicpage-0-1-1, expected model '
                 'SubtopicPageCommitLogEntryModel '
                 'with id subtopicpage-0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
@@ -11672,28 +10322,28 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
-        topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+        subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
             '0-1-1').delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of SubtopicPageModel\', '
                 '[u"Entity id 0-1: based on field snapshot_metadata_ids having '
-                'value 0-1-1, expect model SubtopicPageSnapshotMetadataModel '
+                'value 0-1-1, expected model SubtopicPageSnapshotMetadataModel '
                 'with id 0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
-        topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+        subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
             '0-1-1').delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
                 'field check of SubtopicPageModel\', '
                 '[u"Entity id 0-1: based on field snapshot_content_ids having '
-                'value 0-1-1, expect model SubtopicPageSnapshotContentModel '
+                'value 0-1-1, expected model SubtopicPageSnapshotContentModel '
                 'with id 0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
         self.run_job_and_check_output(
@@ -11777,13 +10427,13 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '2-1-1'))
 
         self.job_class = (
@@ -11838,21 +10488,21 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             self.user_id, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for subtopic_page_ids '
                 'field check of SubtopicPageSnapshotMetadataModel\', '
                 '[u"Entity id 0-1-1: based on field subtopic_page_ids '
-                'having value 0-1, expect model SubtopicPageModel with '
+                'having value 0-1, expected model SubtopicPageModel with '
                 'id 0-1 but it doesn\'t exist", u"Entity id 0-1-2: based '
-                'on field subtopic_page_ids having value 0-1, expect model '
+                'on field subtopic_page_ids having value 0-1, expected model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -11867,7 +10517,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of SubtopicPageSnapshotMetadataModel\', '
                 '[u"Entity id 0-1-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
+                'value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
@@ -11877,7 +10527,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageSnapshotMetadataModel(
+            subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='0-1-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
         model_with_invalid_version_in_id.put()
@@ -11988,13 +10638,13 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageSnapshotContentModel.get_by_id(
+            subtopic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '2-1-1'))
 
         self.job_class = (
@@ -12049,21 +10699,21 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             self.user_id, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for subtopic_page_ids '
                 'field check of SubtopicPageSnapshotContentModel\', '
                 '[u"Entity id 0-1-1: based on field subtopic_page_ids '
-                'having value 0-1, expect model SubtopicPageModel with '
+                'having value 0-1, expected model SubtopicPageModel with '
                 'id 0-1 but it doesn\'t exist", u"Entity id 0-1-2: based '
-                'on field subtopic_page_ids having value 0-1, expect model '
+                'on field subtopic_page_ids having value 0-1, expected model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -12073,7 +10723,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageSnapshotContentModel(id='0-1-3'))
+            subtopic_models.SubtopicPageSnapshotContentModel(id='0-1-3'))
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -12167,13 +10817,13 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
                 })], 'Changes.')
 
         self.model_instance_0 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-0-1-1'))
         self.model_instance_1 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-1-1-1'))
         self.model_instance_2 = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-2-1-1'))
 
         self.job_class = (
@@ -12226,22 +10876,22 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
-        topic_models.SubtopicPageModel.get_by_id('0-1').delete(
+        subtopic_models.SubtopicPageModel.get_by_id('0-1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for subtopic_page_ids '
                 'field check of SubtopicPageCommitLogEntryModel\', '
                 '[u"Entity id subtopicpage-0-1-1: based on field '
-                'subtopic_page_ids having value 0-1, expect model '
+                'subtopic_page_ids having value 0-1, expected model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist", '
                 'u"Entity id subtopicpage-0-1-2: based on field '
-                'subtopic_page_ids having value 0-1, expect model '
+                'subtopic_page_ids having value 0-1, expected model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -12249,7 +10899,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
-            topic_models.SubtopicPageCommitLogEntryModel.create(
+            subtopic_models.SubtopicPageCommitLogEntryModel.create(
                 '0-1', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.subtopic_page_id = '0-1'
@@ -12268,7 +10918,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
-            topic_models.SubtopicPageCommitLogEntryModel(
+            subtopic_models.SubtopicPageCommitLogEntryModel(
                 id='invalid-0-1-1',
                 user_id=self.owner_id,
                 commit_type='edit',
@@ -12432,24 +11082,9 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
-
-    def test_missing_user_contributions_model_failure(self):
-        user_models.UserContributionsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_contributions_ids '
-                'field check of UserSettingsModel\', '
-                '[u"Entity id %s: based on '
-                'field user_contributions_ids having value '
-                '%s, expect model UserContributionsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserSettingsModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_schema(self):
         self.model_instance_1.email = 'invalid'
@@ -12646,7 +11281,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -12658,7 +11293,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of CompletedActivitiesModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -12674,7 +11309,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of CompletedActivitiesModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '2, expect model ExplorationModel with id 2 but it '
+                '2, expected model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12689,7 +11324,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CompletedActivitiesModel\', '
                 '[u"Entity id %s: based on field collection_ids having value '
-                '4, expect model CollectionModel with id 4 but it '
+                '4, expected model CollectionModel with id 4 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12846,7 +11481,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -12858,7 +11493,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of IncompleteActivitiesModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -12874,7 +11509,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of IncompleteActivitiesModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '2, expect model ExplorationModel with id 2 but it '
+                '2, expected model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -12889,7 +11524,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of IncompleteActivitiesModel\', '
                 '[u"Entity id %s: based on field collection_ids having value '
-                '4, expect model CollectionModel with id 4 but it '
+                '4, expected model CollectionModel with id 4 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -13033,7 +11668,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13045,7 +11680,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 'field check of ExpUserLastPlaythroughModel\', '
                 '[u"Entity id %s.0: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13061,7 +11696,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExpUserLastPlaythroughModel\', '
                 '[u"Entity id %s.0: based on field exploration_ids having '
-                'value 0, expect model ExplorationModel with id 0 but it '
+                'value 0, expected model ExplorationModel with id 0 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -13106,15 +11741,15 @@ class ExpUserLastPlaythroughModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_invalid_state_name(self):
-        self.model_instance.last_played_state_name = 'invalid'
+        self.model_instance.last_played_state_name = 'invalidθ'
         self.model_instance.put()
         expected_output = [
             (
                 u'[u\'failed validation check for state name check '
                 'of ExpUserLastPlaythroughModel\', '
-                '[u"Entity id %s.0: last played state name invalid is not '
-                'present in exploration states [u\'Introduction\', u\'End\'] '
-                'for exploration id 0"]]') % self.user_id]
+                '[u"Entity id %s.0: last played state name invalid\\u03b8 is '
+                'not present in exploration states [u\'Introduction\', '
+                'u\'End\'] for exploration id 0"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -13219,7 +11854,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13231,7 +11866,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of LearnerPlaylistModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13247,7 +11882,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of LearnerPlaylistModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '2, expect model ExplorationModel with id 2 but it '
+                '2, expected model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -13262,7 +11897,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of LearnerPlaylistModel\', '
                 '[u"Entity id %s: based on field collection_ids having value '
-                '6, expect model CollectionModel with id 6 but it '
+                '6, expected model CollectionModel with id 6 but it '
                 'doesn\'t exist"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -13423,7 +12058,7 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13435,7 +12070,7 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserContributionsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id),
             u'[u\'fully-validated UserContributionsModel\', 2]']
@@ -13450,13 +12085,13 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for created_exploration_ids '
                 'field check of UserContributionsModel\', '
                 '[u"Entity id %s: based on field created_exploration_ids '
-                'having value exp1, expect model ExplorationModel with id '
+                'having value exp1, expected model ExplorationModel with id '
                 'exp1 but it doesn\'t exist"]]' % self.owner_id
             ), (
                 u'[u\'failed validation check for edited_exploration_ids '
                 'field check of UserContributionsModel\', '
                 '[u"Entity id %s: based on field edited_exploration_ids '
-                'having value exp1, expect model ExplorationModel with '
+                'having value exp1, expected model ExplorationModel with '
                 'id exp1 but it doesn\'t exist"]]' % self.owner_id
             ), u'[u\'fully-validated UserContributionsModel\', 2]']
 
@@ -13472,7 +12107,7 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for edited_exploration_ids '
                 'field check of UserContributionsModel\', '
                 '[u"Entity id %s: based on field edited_exploration_ids '
-                'having value exp0, expect model ExplorationModel with '
+                'having value exp0, expected model ExplorationModel with '
                 'id exp0 but it doesn\'t exist"]]' % self.user_id
             ), u'[u\'fully-validated UserContributionsModel\', 1]']
         self.run_job_and_check_output(
@@ -13531,7 +12166,7 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13543,7 +12178,7 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserAuthDetailsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id),
             u'[u\'fully-validated UserAuthDetailsModel\', 1]']
@@ -13599,7 +12234,7 @@ class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13611,7 +12246,7 @@ class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserEmailPreferencesModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13662,7 +12297,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
         for collection in collections:
             subscription_services.subscribe_to_collection(
                 self.user_id, collection.id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.model_instance = user_models.UserSubscriptionsModel.get_by_id(
             self.user_id)
@@ -13702,7 +12337,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13745,7 +12380,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSubscriptionsModel\', '
                 '[u"Entity id %s: based on '
                 'field subscriber_ids having value '
-                '%s, expect model UserSubscribersModel '
+                '%s, expected model UserSubscribersModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.owner_id, self.owner_id),
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
@@ -13763,7 +12398,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSubscriptionsModel\', '
                 '[u"Entity id %s: based on '
                 'field general_feedback_thread_ids having value '
-                'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
+                'nonexist_thread_id, expected model GeneralFeedbackThreadModel '
                 'with id nonexist_thread_id but it doesn\'t '
                 'exist"]]') % self.user_id,
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
@@ -13825,7 +12460,7 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13840,8 +12475,9 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
             ), (
                 u'[u\'failed validation check for subscription_ids field '
                 'check of UserSubscribersModel\', [u"Entity id %s: '
-                'based on field subscription_ids having value %s, expect model '
-                'UserSubscriptionsModel with id %s but it doesn\'t exist"]]'
+                'based on field subscription_ids having value %s, expected '
+                'model UserSubscriptionsModel with id %s but it doesn\'t '
+                'exist"]]'
             ) % (self.owner_id, self.owner_id, self.owner_id)]
 
         self.run_job_and_check_output(
@@ -13868,7 +12504,7 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSubscribersModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.owner_id, self.owner_id, self.owner_id)]
         self.run_job_and_check_output(
@@ -13882,7 +12518,7 @@ class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSubscribersModel\', '
                 '[u"Entity id %s: based on '
                 'field subscription_ids having value '
-                '%s, expect model UserSubscriptionsModel '
+                '%s, expected model UserSubscriptionsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.owner_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -13936,7 +12572,7 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -13961,7 +12597,7 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserRecentChangesBatchModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14035,7 +12671,7 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14145,7 +12781,7 @@ class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserStatsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14216,7 +12852,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14228,7 +12864,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of ExplorationUserDataModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14242,7 +12878,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationUserDataModel\', '
                 '[u"Entity id %s: based on field exploration_ids '
-                'having value exp0, expect model ExplorationModel with id '
+                'having value exp0, expected model ExplorationModel with id '
                 'exp0 but it doesn\'t exist"]]' % self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -14420,7 +13056,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14432,7 +13068,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of CollectionProgressModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14448,7 +13084,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for exploration_ids '
                 'field check of CollectionProgressModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
-                '1, expect model ExplorationModel with id 1 but it '
+                '1, expected model ExplorationModel with id 1 but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -14463,7 +13099,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for collection_ids '
                 'field check of CollectionProgressModel\', '
                 '[u"Entity id %s: based on field collection_ids having value '
-                'col, expect model CollectionModel with id col but it '
+                'col, expected model CollectionModel with id col but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -14475,7 +13111,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for completed_activities_ids '
                 'field check of CollectionProgressModel\', '
                 '[u"Entity id %s: based on field completed_activities_ids '
-                'having value %s, expect model CompletedActivitiesModel '
+                'having value %s, expected model CompletedActivitiesModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14538,14 +13174,15 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         self.set_admins([self.OWNER_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
-            category='category%d' % i
-        ) for i in python_utils.RANGE(0, 4)]
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in python_utils.RANGE(4)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
             rights_manager.publish_exploration(self.owner, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -14623,7 +13260,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14635,7 +13272,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of StoryProgressModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14649,7 +13286,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for story_ids '
                 'field check of StoryProgressModel\', '
                 '[u"Entity id %s: based on field story_ids having value '
-                'story, expect model StoryModel with id story but it '
+                'story, expected model StoryModel with id story but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -14778,7 +13415,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14790,7 +13427,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserQueryModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.query_id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -14804,7 +13441,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserQueryModel\', '
                 '[u"Entity id %s: based on '
                 'field sent_email_model_ids having value '
-                '%s, expect model BulkEmailModel '
+                '%s, expected model BulkEmailModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.query_id, self.sent_mail_id, self.sent_mail_id)]
         self.run_job_and_check_output(
@@ -14915,7 +13552,7 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -14927,7 +13564,7 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserBulkEmailsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]' % (
                     self.user_id, self.user_id, self.user_id)
             ), u'[u\'fully-validated UserBulkEmailsModel\', 1]']
@@ -14939,10 +13576,10 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             u'[u\'failed validation check for sent_email_model_ids field '
             'check of UserBulkEmailsModel\', [u"Entity id %s: based on '
-            'field sent_email_model_ids having value %s, expect model '
+            'field sent_email_model_ids having value %s, expected model '
             'BulkEmailModel with id %s but it doesn\'t exist", '
             'u"Entity id %s: based on field sent_email_model_ids having '
-            'value %s, expect model BulkEmailModel with id %s but it '
+            'value %s, expected model BulkEmailModel with id %s but it '
             'doesn\'t exist"]]') % (
                 self.user_id, self.sent_mail_id, self.sent_mail_id,
                 self.owner_id, self.sent_mail_id, self.sent_mail_id)]
@@ -15025,7 +13662,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -15037,7 +13674,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSkillMasteryModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -15052,7 +13689,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
                 'field check of UserSkillMasteryModel\', '
                 '[u"Entity id %s: based on '
                 'field skill_ids having value '
-                'skill, expect model SkillModel '
+                'skill, expected model SkillModel '
                 'with id skill but it doesn\'t exist"]]') % (
                     self.model_instance.id)]
         self.run_job_and_check_output(
@@ -15121,7 +13758,7 @@ class UserContributionProficiencyModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -15133,7 +13770,7 @@ class UserContributionProficiencyModelValidatorTests(
                 'field check of UserContributionProficiencyModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
+                '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
         self.run_job_and_check_output(
@@ -15197,7 +13834,7 @@ class UserContributionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for user_settings_ids field '
                 'check of UserContributionRightsModel\', [u"Entity id %s: '
-                'based on field user_settings_ids having value %s, expect '
+                'based on field user_settings_ids having value %s, expected '
                 'model UserSettingsModel with id %s but it doesn\'t exist"]]'
             ) % (self.translator_id, self.translator_id, self.translator_id),
             u'[u\'fully-validated UserContributionRightsModel\', 1]']
@@ -15240,7 +13877,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_actions = user_services.UserActionsInfo(self.user_id)
 
         wipeout_service.pre_delete_user(self.user_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.model_instance = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_id))
@@ -15281,7 +13918,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -15375,550 +14012,88 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
+class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
-        super(TaskEntryModelValidatorTests, self).setUp()
+        super(DeletedUserModelValidatorTests, self).setUp()
+
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.save_new_valid_exploration('exp_id', self.user_id)
+
+        # Run the full user deletion process as it works when the user
+        # pre-deletes itself via frontend and then is fully deleted via
+        # subsequent cron jobs.
+        wipeout_service.pre_delete_user(self.user_id)
+        wipeout_service.run_user_deletion(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+        wipeout_service.run_user_deletion_completion(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+
+        user_models.DeletedUserModel(id=self.user_id).put()
+
+        self.model_instance = (
+            user_models.DeletedUserModel.get_by_id(self.user_id))
+
         self.job_class = (
-            prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob)
+            prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob)
 
-    def run_job_and_get_output(self):
-        """Helper method to run job and fetch the output.
-
-        Returns:
-            list([str, *]). A list of output messages generated by the job.
-        """
-        job_id = self.job_class.create_new()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-        self.job_class.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        return [ast.literal_eval(o) for o in self.job_class.get_output(job_id)]
-
-    def run_job_and_check_output(self, *expected_outputs):
-        """Helper method to run job and check for the expected output.
-
-        Args:
-            *expected_outputs: list(*). The items expected to be found in the
-                job's output.
-        """
-        self.assertItemsEqual(
-            self.run_job_and_get_output(), list(expected_outputs))
-
-    def test_no_models(self):
-        self.run_job_and_check_output()
-
-    def test_valid_model_check(self):
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        self.run_job_and_check_output(['fully-validated TaskEntryModel', 1])
-
-    def test_invalid_entity_id(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'invalid_exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        self.run_job_and_check_output(
-            ['failed validation check for entity_ids field check of '
-             'TaskEntryModel',
-             ['Entity id %s: based on field entity_ids having value '
-              'invalid_exp_id, expect model ExplorationModel with id '
-              'invalid_exp_id but it doesn\'t exist' % (task_id,)]],
-            ['failed validation check for target_id field check of '
-             'TaskEntryModel',
-             ['Entity id %s: exploration with id "invalid_exp_id" does not '
-              'exist at version 1' % (task_id,)]])
-
-    def test_invalid_entity_version(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            2,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        self.run_job_and_check_output(
-            ['failed validation check for target_id field check of '
-             'TaskEntryModel',
-             ['Entity id %s: exploration with id "exp_id" does not exist at '
-              'version 2' % (task_id,)]])
-
-    def test_invalid_resolver_ids(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_RESOLVED,
-            resolver_id='invalid_user_id',
-            resolved_on=CURRENT_DATETIME)
-        self.run_job_and_check_output(
-            ['failed validation check for resolver_ids field check of '
-             'TaskEntryModel',
-             ['Entity id %s: based on field resolver_ids having value '
-              'invalid_user_id, expect model UserSettingsModel with id '
-              'invalid_user_id but it doesn\'t exist' % (task_id,)]])
-
-    def test_invalid_id(self):
-        improvements_models.TaskEntryModel(
-            id='bad_id',
-            composite_entity_id='exploration.exp_id.1',
-            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            entity_id='exp_id',
-            entity_version=1,
-            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
-            status=improvements_models.TASK_STATUS_OPEN).put()
-        self.run_job_and_check_output(
-            ['failed validation check for model id check of TaskEntryModel',
-             ['Entity id bad_id: Entity id does not match regex pattern']])
-
-    def test_invalid_composite_entity_id(self):
-        task_id = improvements_models.TaskEntryModel.generate_task_id(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        improvements_models.TaskEntryModel(
-            id=task_id,
-            composite_entity_id='bad_composite_id',
-            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            entity_id='exp_id',
-            entity_version=1,
-            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
-            status=improvements_models.TASK_STATUS_OPEN).put()
-        self.run_job_and_check_output(
-            ['failed validation check for composite_entity_id field check of '
-             'TaskEntryModel',
-             ['Entity id %s: composite_entity_id "bad_composite_id" should be '
-              '"exploration.exp_id.1"' % (
-                  task_id,)]])
-
-    def test_status_open_but_resolver_id_is_set(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_OPEN,
-            resolver_id=self.user_id)
-        self.run_job_and_check_output(
-            ['failed validation check for status field check of TaskEntryModel',
-             ['Entity id %s: status is open but resolver_id is "%s", should be '
-              'empty.' % (task_id, self.user_id)]])
-
-    def test_status_open_but_resolved_on_is_set(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_OPEN,
-            resolved_on=CURRENT_DATETIME)
-        self.run_job_and_check_output(
-            ['failed validation check for status field check of TaskEntryModel',
-             ['Entity id %s: status is open but resolved_on is "%s", should be '
-              'empty.' % (task_id, CURRENT_DATETIME)]])
-
-    def test_status_resolved_but_resolver_id_is_not_set(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_RESOLVED,
-            resolver_id=None,
-            resolved_on=CURRENT_DATETIME)
-        self.run_job_and_check_output(
-            ['failed validation check for status field check of TaskEntryModel',
-             ['Entity id %s: status is resolved but resolver_id is not set' % (
-                 task_id,)]])
-
-    def test_status_resolved_but_resolved_on_is_not_set(self):
-        task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            issue_description='issue description',
-            status=improvements_models.TASK_STATUS_RESOLVED,
-            resolver_id=self.user_id,
-            resolved_on=None)
-        self.run_job_and_check_output(
-            ['failed validation check for status field check of TaskEntryModel',
-             ['Entity id %s: status is resolved but resolved_on is not set' % (
-                 task_id,)]])
-
-    def test_missing_state_name_for_exploration_task_types(self):
-        hbr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'invalid_state_name')
-        ifl_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'invalid_state_name')
-        ngr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'invalid_state_name')
-        sia_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'invalid_state_name')
-        output = self.run_job_and_get_output()
-        self.assertEqual(len(output), 1)
-        error_key, error_messages = output[0]
-
-        self.assertEqual(
-            error_key,
-            'failed validation check for target_id field check of '
-            'TaskEntryModel')
-        self.assertItemsEqual(
-            error_messages, [
-                'Entity id %s: exploration with id "exp_id" does not have a '
-                'state named "invalid_state_name" at version 1' % (
-                    hbr_task_id,),
-                'Entity id %s: exploration with id "exp_id" does not have a '
-                'state named "invalid_state_name" at version 1' % (
-                    ifl_task_id,),
-                'Entity id %s: exploration with id "exp_id" does not have a '
-                'state named "invalid_state_name" at version 1' % (
-                    ngr_task_id,),
-                'Entity id %s: exploration with id "exp_id" does not have a '
-                'state named "invalid_state_name" at version 1' % (
-                    sia_task_id,)
-            ])
-
-    def test_deleted_state_name_for_exploration_task_types(self):
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            'linear_exp_id', 'owner_id',
-            ['State 1', 'State 2', 'State 3'],
-            ['TextInput', 'TextInput', 'EndExploration'])
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            1,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            1,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-
-        exp_services.update_exploration( # v2
-            'owner_id', 'linear_exp_id', [
-                exp_domain.ExplorationChange(
-                    {'cmd': 'delete_state', 'state_name': 'State 2'})
-            ], 'Delete State 2')
-        new_hbr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            2,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        new_ifl_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            2,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        new_ngr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            2,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-        new_sia_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'linear_exp_id',
-            2,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            'State 2')
-
-        output = self.run_job_and_get_output()
-        self.assertEqual(len(output), 2)
-        self.assertEqual(output[0], ['fully-validated TaskEntryModel', 4])
-        error_key, error_messages = output[1]
-        self.assertEqual(
-            error_key,
-            'failed validation check for target_id field check of '
-            'TaskEntryModel')
-        self.assertItemsEqual(
-            error_messages, [
-                'Entity id %s: exploration with id "linear_exp_id" does not '
-                'have a state named "State 2" at version 2' % (
-                    new_ifl_task_id,),
-                'Entity id %s: exploration with id "linear_exp_id" does not '
-                'have a state named "State 2" at version 2' % (
-                    new_hbr_task_id,),
-                'Entity id %s: exploration with id "linear_exp_id" does not '
-                'have a state named "State 2" at version 2' % (
-                    new_ngr_task_id,),
-                'Entity id %s: exploration with id "linear_exp_id" does not '
-                'have a state named "State 2" at version 2' % (
-                    new_sia_task_id,)
-            ])
-
-
-class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
-    def setUp(self):
-        super(PlaythroughModelValidatorTests, self).setUp()
-        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .PlaythroughModelAuditOneOffJob)
-
-    def create_playthrough(self):
-        """Helper method to create and return a simple playthrough model."""
-        playthrough_id = stats_models.PlaythroughModel.create(
-            self.exp.id, self.exp.version, issue_type='EarlyQuit',
-            issue_customization_args={
-                'state_name': {'value': 'state_name'},
-                'time_spent_in_exp_in_msecs': {'value': 200},
-            },
-            actions=[])
-        return stats_models.PlaythroughModel.get(playthrough_id)
-
-    def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
-        """Helper method to create and return an ExplorationIssuesModel instance
-        with the given sets of playthrough ids as reference issues.
-        """
-        return stats_models.ExplorationIssuesModel.create(
-            self.exp.id, self.exp.version, unresolved_issues=[
-                {
-                    'issue_type': 'EarlyQuit',
-                    'issue_customization_args': {
-                        'state_name': {'value': 'state_name'},
-                        'time_spent_in_exp_in_msecs': {'value': 200},
-                    },
-                    'playthrough_ids': list(playthrough_ids),
-                    'schema_version': 1,
-                    'is_valid': True,
-                }
-                for playthrough_ids in playthrough_ids_list
-            ])
-
-    def test_output_for_valid_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        expected_output = [u'[u\'fully-validated PlaythroughModel\', 1]']
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated DeletedUserModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_output_for_pre_released_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        # Set created_on to a date which is definitely before GSoC 2018.
-        playthrough.created_on = datetime.datetime(2017, 12, 31)
-        playthrough.put()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for create datetime check of '
-                'PlaythroughModel\', [u\'Entity id %s: released on '
-                '2017-12-31, which is before the GSoC 2018 submission '
-                'deadline (2018-09-01) and should therefore not exist.\']]' % (
-                    playthrough.id,)
-            )
-        ]
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of DeletedUserModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_output_for_non_whitelisted_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id + 'differentiated'])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'DeletedUserModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
 
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_existing_user_settings_model_failure(self):
+        user_models.UserSettingsModel(
+            id=self.user_id, email='email@email.com', gae_id='gae_id').put()
         expected_output = [
             (
-                u'[u\'failed validation check for exploration id check of '
-                'PlaythroughModel\', [u\'Entity id %s: recorded in '
-                'exploration_id:EXP_ID which has not been curated for '
-                'recording.\']]' % (playthrough.id,)
-            )
-        ]
+                '[u\'failed validation check for '
+                'user properly deleted of DeletedUserModel\', '
+                '[u\'Entity id %s: The deletion verification fails\']]'
+            ) % (self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_output_for_bad_schema_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        playthrough.actions.append({'bad schema key': 'bad schema value'})
-        playthrough.put()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
+    def test_existing_feedback_email_reply_to_id_model_failure(self):
+        email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='id', user_id=self.user_id, reply_to_id='id').put()
         expected_output = [
             (
-                u'[u\'failed validation check for domain object check of '
-                'PlaythroughModel\', [u"Entity id %s: '
-                'Entity fails domain validation with the error u\''
-                'schema_version\'"]]' % (playthrough.id,)
-            )
-        ]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_output_for_missing_reference(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([
-            [playthrough.id + '-different'],
-        ])
-        expected_output = [
-            (
-                u'[u\'failed validation check for reference check of '
-                'PlaythroughModel\', [u\'Entity id %s: not referenced'
-                ' by any issue of the corresponding exploration '
-                '(id=%s, version=%s).\']]' % (
-                    playthrough.id, playthrough.exp_id, playthrough.exp_version
-                )
-            )
-        ]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_output_for_multiple_references(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs(
-            [[playthrough.id], [playthrough.id]])
-        expected_output = [
-            (
-                u'[u\'failed validation check for reference check of '
-                'PlaythroughModel\', [u\'Entity id %s: referenced by '
-                'more than one issues of the corresponding exploration '
-                '(id=%s, version=%s), issue indices: [0, 1].\']]' % (
-                    playthrough.id, self.exp.id, self.exp.version)
-            )
-        ]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_output_for_duplicate_references_in_one_issue(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs(
-            [[playthrough.id, playthrough.id]])
-        expected_output = [
-            (
-                u'[u\'failed validation check for reference check of '
-                'PlaythroughModel\', [u\'Entity id %s: referenced multiple '
-                'times in an issue (index=0) of the corresponding exploration '
-                '(id=%s, version=%s), duplicated id indices: [0, 1].\']]' % (
-                    playthrough.id, self.exp.id, self.exp.version)
-            )
-        ]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_missing_exp_issues_model_failure(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        exp_issues_id = (
-            stats_models.ExplorationIssuesModel.get_entity_id(
-                self.exp.id, self.exp.version)
-        )
-        exp_issues = stats_models.ExplorationIssuesModel.get_by_id(
-            exp_issues_id)
-
-        exp_issues.delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for exp_issues_ids '
-                'field check of PlaythroughModel\', '
-                '[u"Entity id %s: based on '
-                'field exp_issues_ids having value '
-                '%s, expect model ExplorationIssuesModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    playthrough.id, exp_issues_id, exp_issues_id)]
+                '[u\'failed validation check for '
+                'user properly deleted of DeletedUserModel\', '
+                '[u\'Entity id %s: The deletion verification fails\']]'
+            ) % (self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -15971,7 +14146,7 @@ class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
 
@@ -16046,7 +14221,7 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -16057,7 +14232,7 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for snapshot_metadata_ids field'
                 ' check of PlatformParameterModel\', [u"Entity id %s: based on '
-                'field snapshot_metadata_ids having value %s-1, expect model '
+                'field snapshot_metadata_ids having value %s-1, expected model '
                 'PlatformParameterSnapshotMetadataModel '
                 'with id %s-1 but it doesn\'t exist"]]' % (
                     (self.parameter_model.id,) * 3))
@@ -16072,7 +14247,7 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for snapshot_content_ids field'
                 ' check of PlatformParameterModel\', [u"Entity id %s: based on '
-                'field snapshot_content_ids having value %s-1, expect model '
+                'field snapshot_content_ids having value %s-1, expected model '
                 'PlatformParameterSnapshotContentModel '
                 'with id %s-1 but it doesn\'t exist"]]' % (
                     (self.parameter_model.id,) * 3))
@@ -16147,7 +14322,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -16159,10 +14334,10 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                 'field check of PlatformParameterSnapshotMetadataModel\', '
                 '[u"Entity id %s-1: based on field '
                 'platform_parameter_ids having value %s, '
-                'expect model PlatformParameterModel with '
+                'expected model PlatformParameterModel with '
                 'id %s but it doesn\'t exist", '
                 'u"Entity id %s-2: based on field '
-                'platform_parameter_ids having value %s, expect model '
+                'platform_parameter_ids having value %s, expected model '
                 'PlatformParameterModel with id %s but it doesn\'t '
                 'exist"]]' % ((self.parameter_model.id,) * 6)
             )]
@@ -16176,7 +14351,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for committer_ids field '
                 'check of PlatformParameterSnapshotMetadataModel\', '
                 '[u"Entity id %s-1: based on field committer_ids '
-                'having value %s, expect model UserSettingsModel with id %s '
+                'having value %s, expected model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.parameter_model.id, self.admin_id, self.admin_id)
         ]
@@ -16292,7 +14467,7 @@ class PlatformParameterSnapshotContentModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -16303,9 +14478,9 @@ class PlatformParameterSnapshotContentModelValidatorTests(
                 u'[u\'failed validation check for platform_parameter_ids '
                 'field check of PlatformParameterSnapshotContentModel\', '
                 '[u"Entity id %s-1: based on field platform_parameter_ids '
-                'having value %s, expect model PlatformParameterModel with '
+                'having value %s, expected model PlatformParameterModel with '
                 'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field platform_parameter_ids having value %s, expect model '
+                'field platform_parameter_ids having value %s, expected model '
                 'PlatformParameterModel with id %s but it doesn\'t exist"]]' % (
                     (self.parameter_model.id,) * 6)
             ),

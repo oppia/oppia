@@ -27,15 +27,13 @@ import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
+import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 describe('PlaythroughService', () => {
   let explorationFeaturesService: ExplorationFeaturesService = null;
   let learnerActionObjectFactory: LearnerActionObjectFactory = null;
   let playthroughBackendApiService: PlaythroughBackendApiService = null;
   let playthroughService: PlaythroughService = null;
-  let stopwatchObjectFactory: StopwatchObjectFactory = null;
 
   // NOTE TO DEVELOPERS: For the following 3 "record" functions, it is the test
   // writer's responsibility to create a "sensible" set of transitions.
@@ -81,15 +79,16 @@ describe('PlaythroughService', () => {
       getTimeInSecs: durationInSecs,
       reset: null,
     });
-    spyOn(stopwatchObjectFactory, 'create').and.returnValue(mockStopwatch);
+    spyOn(Stopwatch, 'create').and.returnValue(mockStopwatch);
   };
 
   const spyOnStorePlaythrough = (callback: (p: Playthrough) => void = null) => {
     if (callback) {
-      return spyOn(playthroughBackendApiService, 'storePlaythrough')
+      return spyOn(playthroughBackendApiService, 'storePlaythroughAsync')
         .and.callFake(async(p: Playthrough, _: number) => callback(p));
     } else {
-      return spyOn(playthroughBackendApiService, 'storePlaythrough').and.stub();
+      return spyOn(
+        playthroughBackendApiService, 'storePlaythroughAsync').and.stub();
     }
   };
 
@@ -100,7 +99,6 @@ describe('PlaythroughService', () => {
     learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
     playthroughBackendApiService = TestBed.get(PlaythroughBackendApiService);
     playthroughService = TestBed.get(PlaythroughService);
-    stopwatchObjectFactory = TestBed.get(StopwatchObjectFactory);
   });
 
   describe('Recording playthroughs', () => {
