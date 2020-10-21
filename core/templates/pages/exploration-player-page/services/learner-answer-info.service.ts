@@ -121,7 +121,7 @@ export class LearnerAnswerInfoService {
   }
 
   recordLearnerAnswerInfo(answerDetails: string): void {
-    this.learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
+    this.learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
       this.currentEntityId, this.stateName, this.interactionId,
       this.currentAnswer, answerDetails);
     this.submittedAnswerInfoCount++;
