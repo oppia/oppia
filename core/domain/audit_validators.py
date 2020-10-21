@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import base_model_validators
 from core.platform import models
 
-user_models = models.NAMES.user
+user_models = models.Registry.import_models([models.NAMES.user])
 
 
 class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
