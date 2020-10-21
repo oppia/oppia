@@ -22,15 +22,15 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class WindowRef {
-/**
-* @returns {object} the global native browser window object
-*/
+  /**
+  * @returns the global native browser window object
+  */
   _window(): Window {
     return window;
   }
-/**
-* @returns {object} the global native browser window object
-*/
+  /**
+  * @returns the global native browser window object
+  */
   get nativeWindow(): Window {
     return this._window();
   }
