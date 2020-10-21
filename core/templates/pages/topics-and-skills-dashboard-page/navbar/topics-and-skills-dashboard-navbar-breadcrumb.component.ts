@@ -30,9 +30,5 @@ export class TopicsAndSkillsDashboardNavbarBreadcrumbComponent {
 }
 
 angular.module('oppia').directive(
-  'topicsAndSkillsDashboardNavbarBreadcrumb', downgradeComponent(
-    {
-      component: TopicsAndSkillsDashboardNavbarBreadcrumbComponent
-    }
-  )
-);
+  'topicsAndSkillsDashboardNavbarBreadcrumb', downgradeComponent({
+    component: TopicsAndSkillsDashboardNavbarBreadcrumbComponent}));
