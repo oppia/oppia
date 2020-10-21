@@ -15,8 +15,8 @@
 /**
  * @fileoverview Unit tests for the learner answer info service.
  */
-
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TestBed } from '@angular/core/testing';
 
 import { AnswerClassificationResult } from
   'domain/classifier/answer-classification-result.model';
@@ -40,19 +40,21 @@ interface MockInteractionRuleInputs {
   x: number
 }
 
-describe('Learner answer info service', () =>{
-  var sof: StateObjectFactory = null;
-  var oof: OutcomeObjectFactory = null;
-  var stateDict: StateBackendDict = null;
-  var firstState: State = null;
-  var secondState: State = null;
-  var thirdState: State = null;
-  var mockAnswer: string = null;
-  var mockInteractionRulesService: MockInteractionRulesService = null;
-  var ladbas: LearnerAnswerDetailsBackendApiService = null;
-  var learnerAnswerInfoService: LearnerAnswerInfoService = null;
-  var answerClassificationService: AnswerClassificationService = null;
-  var DEFAULT_OUTCOME_CLASSIFICATION: string;
+fdescribe('Learner answer info service', () =>{
+  let sof: StateObjectFactory;
+  let oof: OutcomeObjectFactory;
+  let stateDict: StateBackendDict;
+  let firstState: State;
+  let secondState: State;
+  let thirdState: State;
+  let mockAnswer: string;
+  let mockInteractionRulesService: MockInteractionRulesService;
+  let ladbas: LearnerAnswerDetailsBackendApiService;
+  let learnerAnswerInfoService: LearnerAnswerInfoService;
+  let answerClassificationService: AnswerClassificationService;
+  let DEFAULT_OUTCOME_CLASSIFICATION: string;
+
+  importAllAngularServices();
 
   beforeEach(() => {
     stateDict = {
@@ -183,21 +185,21 @@ describe('Learner answer info service', () =>{
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
 
-    it('should return can ask learner for answer info true', fakeAsync(() => {
+    it('should return can ask learner for answer info true', () => {
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         true);
-    }));
+    });
 
-    it('should return current answer', fakeAsync(() => {
+    it('should return current answer', () => {
       expect(learnerAnswerInfoService.getCurrentAnswer()).toEqual(
         'This is my answer');
-    }));
+    });
 
-    it('should return current interaction rules service', fakeAsync(() => {
+    it('should return current interaction rules service', () => {
       expect(
         learnerAnswerInfoService.getCurrentInteractionRulesService()).toEqual(
         mockInteractionRulesService);
-    }));
+    });
   });
 
   describe('learner answer info service', () => {
@@ -206,7 +208,7 @@ describe('Learner answer info service', () =>{
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
 
-    it('should not ask for answer details for same state', fakeAsync(() => {
+    it('should not ask for answer details for same state', () => {
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         true);
       learnerAnswerInfoService.recordLearnerAnswerInfo('My answer details');
@@ -216,7 +218,7 @@ describe('Learner answer info service', () =>{
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false);
-    }));
+    });
   });
 
   describe(
@@ -228,11 +230,11 @@ describe('Learner answer info service', () =>{
           '10', firstState, mockAnswer, mockInteractionRulesService, false);
       });
 
-      it('should return can ask learner for answer info false', fakeAsync(() => {
+      it('should return can ask learner for answer info false', () => {
         expect(
           learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
           false);
-      }));
+      });
     });
 
   describe('init learner answer info service with solicit answer details false',
@@ -242,11 +244,11 @@ describe('Learner answer info service', () =>{
         learnerAnswerInfoService.initLearnerAnswerInfoService(
           '10', firstState, mockAnswer, mockInteractionRulesService, false);
       });
-      it('should return can ask learner for answer info false', fakeAsync(() => {
+      it('should return can ask learner for answer info false', () => {
         expect(
           learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
           false);
-      }));
+      });
     });
 
 
@@ -275,25 +277,25 @@ describe('Learner answer info service', () =>{
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
     });
 
-    it('should not record answer details more than two times', fakeAsync(() => {
+    it('should not record answer details more than two times', () => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', thirdState, mockAnswer, mockInteractionRulesService, false);
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false);
-    }));
+    });
   });
 
   describe('return html from the service', () => {
-    it('should return solicit answer details question', fakeAsync(() => {
+    it('should return solicit answer details question', () => {
       expect(
         learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()).toEqual(
         '<p translate="I18N_SOLICIT_ANSWER_DETAILS_QUESTION"></p>');
-    }));
+    });
 
-    it('should return solicit answer details feedabck', fakeAsync(() => {
+    it('should return solicit answer details feedabck', () => {
       expect(
         learnerAnswerInfoService.getSolicitAnswerDetailsFeedback()).toEqual(
         '<p translate="I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK"></p>');
-    }));
+    });
   });
 });
