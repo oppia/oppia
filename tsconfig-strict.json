@@ -30,7 +30,8 @@
       "tests/*": ["core/templates/tests/*"]
     }
   },
-  "files": ["core/templates/services/external-save.service.ts",
+  "files": [
+    "core/templates/services/external-save.service.ts",
     "core/templates/services/external-save.service.spec.ts",
     "core/templates/domain/objects/FractionObjectFactory.ts",
     "core/templates/domain/objects/FractionObjectFactorySpec.ts",
