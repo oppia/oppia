@@ -2865,6 +2865,9 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 
 
 class BlankLineBelowFunctionDefCheckerTest(unittest.TestCase):
+    """Test to check custom pylint checker which ensures that there isn't a
+    blank space below a function definition.
+    """
 
     def setUp(self):
         super(BlankLineBelowFunctionDefCheckerTest, self).setUp()
