@@ -532,4 +532,3 @@ class UserAuthDetailsModelValidator(
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id])]
-
