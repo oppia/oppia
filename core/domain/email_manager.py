@@ -1720,7 +1720,7 @@ def send_account_deleted_email(user_id, user_email):
 
     email_body_template = (
         'Hi %s,<br><br>'
-        'Your account was successfully deleted.'
+        'Your account was successfully deleted.<br><br>'
         '- The Oppia Team<br>'
         '<br>%s')
 

@@ -50,8 +50,6 @@ current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
-MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
-
 
 def get_pending_deletion_request(user_id):
     """Return the pending deletion request.
@@ -622,10 +620,11 @@ def _pseudonymize_config_models(pending_deletion_request):
         for i in python_utils.RANGE(
                 0,
                 len(config_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                config_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                config_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
             )
 
@@ -713,10 +712,11 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         for i in python_utils.RANGE(
                 0,
                 len(activity_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                activity_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                activity_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
 
 
@@ -899,10 +899,11 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         for i in python_utils.RANGE(
                 0,
                 len(activity_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                activity_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                activity_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
             )
 
@@ -944,10 +945,13 @@ def _remove_user_id_from_contributors_in_summary_models(
         datastore_services.put_multi(summary_models)
 
     for i in python_utils.RANGE(
-            0, len(related_summary_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            0,
+            len(related_summary_models),
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         transaction_services.run_in_transaction(
             _remove_user_id_from_models,
-            related_summary_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION])
+            related_summary_models[
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
 
 
 def _pseudonymize_feedback_models(pending_deletion_request):
@@ -1053,10 +1057,11 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         for i in python_utils.RANGE(
                 0,
                 len(feedback_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                feedback_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                feedback_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
 
 
@@ -1111,8 +1116,9 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),
-            MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         transaction_services.run_in_transaction(
             _pseudonymize_models,
-            voiceover_application_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION]
+            voiceover_application_models[
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
