@@ -24,7 +24,6 @@ import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-//export {};
 describe('Editable story backend API service', () => {
   let editableStoryBackendApiService: EditableStoryBackendApiService = null;
   let sampleDataResults = null;
@@ -194,7 +193,7 @@ describe('Editable story backend API service', () => {
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.updateStory(
-        'storyId_1', '1', 'Update an invalid Story.', []      //canged '1' to 1
+        'storyId_1', '1', 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId_1');

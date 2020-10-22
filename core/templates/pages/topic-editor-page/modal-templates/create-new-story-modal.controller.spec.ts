@@ -38,7 +38,6 @@ describe('Create New Story Modal Controller', function() {
       providers: [EditableStoryBackendApiService]
     });
   });
-  
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
