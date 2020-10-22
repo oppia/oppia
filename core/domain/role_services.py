@@ -335,6 +335,8 @@ def log_role_query(user_id, intent, role=None, username=None):
         user_id, int(math.floor(time.time())), intent, random.randint(0, 1000)
     )
 
-    audit_models.RoleQueryAuditModel(
+    model = audit_models.RoleQueryAuditModel(
         id=model_id, user_id=user_id, intent=intent,
-        role=role, username=username).put()
+        role=role, username=username)
+    model.update_timestamps()
+    model.put()

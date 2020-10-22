@@ -332,6 +332,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.COLLECTION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
         with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
@@ -357,6 +358,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.COLLECTION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
         with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
@@ -385,6 +387,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.collection_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             collection_models.CollectionCommitLogEntryModel
@@ -402,7 +405,9 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False)
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
+        private_commit.update_timestamps()
         private_commit.put()
+        public_commit.update_timestamps()
         public_commit.put()
         commits = (
             collection_models.CollectionCommitLogEntryModel
@@ -432,7 +437,9 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         # CollectionModel._trusted_commit().
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
+        private_commit.update_timestamps()
         private_commit.put()
+        public_commit.update_timestamps()
         public_commit.put()
 
         max_age = datetime.timedelta(hours=1)
@@ -525,6 +532,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        public_collection_summary_model.update_timestamps()
         public_collection_summary_model.put()
 
         private_collection_summary_model = (
@@ -547,6 +555,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        private_collection_summary_model.update_timestamps()
         private_collection_summary_model.put()
         collection_summary_models = (
             collection_models.CollectionSummaryModel.get_non_private())
@@ -573,6 +582,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        viewable_collection_summary_model.update_timestamps()
         viewable_collection_summary_model.put()
 
         unviewable_collection_summary_model = (
@@ -595,6 +605,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        unviewable_collection_summary_model.update_timestamps()
         unviewable_collection_summary_model.put()
         collection_summary_models = (
             collection_models.CollectionSummaryModel
@@ -623,6 +634,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        editable_collection_summary_model.update_timestamps()
         editable_collection_summary_model.put()
 
         uneditable_collection_summary_model = (
@@ -645,6 +657,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        uneditable_collection_summary_model.update_timestamps()
         uneditable_collection_summary_model.put()
         collection_summary_models = (
             collection_models.CollectionSummaryModel
