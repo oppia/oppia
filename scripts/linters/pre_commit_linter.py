@@ -569,6 +569,7 @@ def main(args=None):
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
+        failed = True
         _print_errors_stacktrace(errors_stacktrace)
 
     if failed:
