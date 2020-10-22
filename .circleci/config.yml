@@ -103,11 +103,15 @@ commands:
 
   webpack_build:
     description: "Build Javascript files"
+    parameters:
+      to:
+        type: string
+        default: "--prod_env"
     steps:
       - run:
           name: Builds Javascript files
           command: |
-            python -m scripts.run_e2e_tests --deparallelize_terser --prod_env --build-only
+            python -m scripts.run_e2e_tests --deparallelize_terser << parameters.to >> --build-only
 
 jobs:
   setup_and_typescript_tests:
@@ -256,7 +260,8 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
-      - webpack_build
+      - webpack_build:
+          to: ""
       - run:
           name: Run e2e file upload features test
           command: |
@@ -286,7 +291,8 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
-      - webpack_build
+      - webpack_build:
+          to: ""
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
