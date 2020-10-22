@@ -21,8 +21,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
-import { NewlyCreatedStoryObjectFactory } from
-  'domain/topic/NewlyCreatedStoryObjectFactory';
 
 const CONSTANTS = require('constants.ts');
 
@@ -40,12 +38,11 @@ describe('Create New Story Modal Controller', function() {
       providers: [EditableStoryBackendApiService]
     });
   });
+  
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
       TestBed.get(EditableStoryBackendApiService));
-    $provide.value(
-      'NewlyCreatedStoryObjectFactory', new NewlyCreatedStoryObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {

@@ -50,12 +50,12 @@ interface UpdateStoryBackendResponse {
 
 interface StoryUrlFragmentExistsBackendResponse {
   // eslint-disable-next-line
-  story_url_fragment_exists: string;
+  story_url_fragment_exists: StoryUrlFragmentExistsBackendResponse;
 }
 
 interface ValidationErrorMessages {
   // eslint-disable-next-line
-  validation_error_messages: boolean;
+  validation_error_messages: ValidationErrorMessages;
 }
 
 @Injectable({
@@ -183,14 +183,14 @@ export class EditableStoryBackendApiService {
 
   private _doesStoryWithUrlFragmentExist(
       storyUrlFragment: string,
-      successCallback: (value: string/*StoryUrlFragmentExistsBackendResponse*/) => string,
+      successCallback: (value: StoryUrlFragmentExistsBackendResponse) => void,
       errorCallback: (reason: string) => void): void {
     const storyUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
         story_url_fragment: storyUrlFragment
       });
     this.http.get<StoryUrlFragmentExistsBackendResponse>(
-      storyUrlFragmentUrl/*, {observe: 'response'}*/).toPromise().then(
+      storyUrlFragmentUrl).toPromise().then(
       (response) => {
         if (successCallback) {
           successCallback(response.story_url_fragment_exists);
@@ -255,7 +255,7 @@ export class EditableStoryBackendApiService {
   }
 
   async doesStoryWithUrlFragmentExistAsync(storyUrlFragment: string):
-  Promise<string/*StoryUrlFragmentExistsBackendResponse*/> {
+  Promise<StoryUrlFragmentExistsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._doesStoryWithUrlFragmentExist(
         storyUrlFragment, resolve, reject);
