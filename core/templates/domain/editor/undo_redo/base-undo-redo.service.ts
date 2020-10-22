@@ -145,6 +145,7 @@ export class BaseUndoRedo {
    * applied from applyChange() or redoChange(). This fires mutation event.
    */
   clearChanges(): void {
+    console.log("clear changes called");
     this._appliedChanges = [];
     this._undoneChanges = [];
     this._dispatchMutation();

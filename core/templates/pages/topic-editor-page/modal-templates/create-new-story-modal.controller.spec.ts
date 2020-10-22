@@ -16,12 +16,17 @@
  * @fileoverview Unit tests for CreateNewStoryModalController.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { NewlyCreatedStoryObjectFactory } from
   'domain/topic/NewlyCreatedStoryObjectFactory';
 
 const CONSTANTS = require('constants.ts');
 
 describe('Create New Story Modal Controller', function() {
+  importAllAngularServices();
+  
   var $scope = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;

@@ -128,7 +128,8 @@ describe('Topic editor state service', function() {
     var _fetchTopicRights = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(self.backendTopicRightsObject);
+          resolve(TopicRights.createFromBackendDict(
+            self.backendTopicRightsObject));
         } else {
           reject();
         }

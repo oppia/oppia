@@ -17,8 +17,13 @@
  */
 
 import { StorySummary } from 'domain/story/story-summary.model';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Topic preview tab', function() {
+  importAllAngularServices();
+  
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;

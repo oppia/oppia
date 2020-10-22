@@ -27,7 +27,13 @@ import { SkillOpportunityObjectFactory } from
 import { AlertsService } from 'services/alerts.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Question opportunities component', function() {
+  importAllAngularServices();
+  
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
