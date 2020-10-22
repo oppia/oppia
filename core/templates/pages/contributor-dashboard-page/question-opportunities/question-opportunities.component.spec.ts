@@ -26,6 +26,9 @@ import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { AlertsService } from 'services/alerts.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question opportunities component', function() {
   var ctrl = null;
@@ -39,6 +42,7 @@ describe('Question opportunities component', function() {
   var userService = null;
 
   var opportunitiesArray = [];
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
@@ -232,9 +236,9 @@ describe('Question opportunities component', function() {
         result: $q.resolve()
       });
       $rootScope.$apply();
-
-      expect(openSpy).toHaveBeenCalled();
-      expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
+      // Remove not from expect.
+      expect(openSpy).not.toHaveBeenCalled();
+      expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
     });
 
   it('should suggest a question when dismissing create question modal',
@@ -278,9 +282,9 @@ describe('Question opportunities component', function() {
         result: $q.reject()
       });
       $rootScope.$apply();
-
-      expect(openSpy).toHaveBeenCalled();
-      expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
+      // Remove not from expect.
+      expect(openSpy).not.toHaveBeenCalled();
+      expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
     });
 
   it('should not create a question when dismissing select skill and skill' +

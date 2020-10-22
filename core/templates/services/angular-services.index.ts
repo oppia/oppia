@@ -90,7 +90,7 @@ import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/p
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
-import { QuestionObjectFactory } from 'core/templates/domain/question/QuestionObjectFactory';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionSummaryObjectFactory } from 'domain/question/QuestionSummaryObjectFactory';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service.ts';
