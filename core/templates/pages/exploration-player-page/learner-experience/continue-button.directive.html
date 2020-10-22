@@ -1,14 +1,14 @@
 <md-button class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
-           focus-on="<[::focusLabel]>"
-           ng-click="onClickContinueButton()"
+           focus-on="{{::focusLabel}}"
+           (click)="onClickContinueButton()"
            aria-label="Continue">
-  <div ng-if="!isLearnAgainButton()">
-    <span class="protractor-test-next-card-button" translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
+  <div *ngif="!isLearnAgainButton()">
+    <span class="protractor-test-next-card-button" [innerHTML]="'I18N_PLAYER_CONTINUE_BUTTON' | translate"></span>
     <i class="fas fa-arrow-right icon">
     </i>
   </div>
-  <div ng-if="isLearnAgainButton()">
-    <span class="protractor-test-next-card-button" translate="I18N_PLAYER_LEARN_AGAIN_BUTTON"></span>
+  <div *ngif="isLearnAgainButton()">
+    <span class="protractor-test-next-card-button" [innerHTML]="'I18N_PLAYER_LEARN_AGAIN_BUTTON' | translate"></span>
     <i class="fas fa-redo icon">
     </i>
   </div>
