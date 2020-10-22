@@ -24,10 +24,10 @@ import { CollectionEditorPageConstants } from
   'pages/collection-editor-page/collection-editor-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { CollectionRights, CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
+import { CollectionRights } from
+  'domain/collection/collection-rights.model';
 import { CollectionRightsBackendDict } from
-  'domain/collection/CollectionRightsObjectFactory';
+  'domain/collection/collection-rights.model';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +35,6 @@ import { CollectionRightsBackendDict } from
 export class CollectionRightsBackendApiService {
   // Maps previously loaded collection rights to their IDs.
   collectionRightsCache: Object = {};
-  collectionRightsObjectFactory = new CollectionRightsObjectFactory();
 
   constructor(
     private http: HttpClient,
@@ -55,8 +54,7 @@ export class CollectionRightsBackendApiService {
       .then(response => {
         if (successCallback) {
           successCallback(
-            this.collectionRightsObjectFactory
-              .create(response)
+            CollectionRights.create(response)
           );
         }
       },
@@ -92,8 +90,7 @@ export class CollectionRightsBackendApiService {
 
     this.http.put<CollectionRightsBackendDict>(requestUrl, putParams)
       .toPromise().then(response => {
-        let collectionRights =
-          this.collectionRightsObjectFactory.create(response);
+        let collectionRights = CollectionRights.create(response);
         this.collectionRightsCache[collectionId] = collectionRights;
 
         if (successCallback) {

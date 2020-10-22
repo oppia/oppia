@@ -20,10 +20,11 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 import { EventEmitter } from '@angular/core';
-
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
+import { TopicSummary, TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
 
 // ^^^ This block is to be removed.
 
@@ -47,8 +48,6 @@ describe('Topics and Skills Dashboard Page', function() {
   var $rootScope = null;
   var $q = null;
   var $timeout = null;
-  var TopicSummaryObjectFactory = null;
-  var SkillSummaryObjectFactory = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
 
   var mocktasdReinitalizedEventEmitter = null;
@@ -88,10 +87,6 @@ describe('Topics and Skills Dashboard Page', function() {
       $timeout = $injector.get('$timeout');
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
-      TopicSummaryObjectFactory = $injector.get(
-        'TopicSummaryObjectFactory');
-      SkillSummaryObjectFactory = $injector.get(
-        'SkillSummaryObjectFactory');
 
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
@@ -100,12 +95,12 @@ describe('Topics and Skills Dashboard Page', function() {
           var deferred = $q.defer();
           deferred.resolve({
             topicSummaries: sampleDataResults.topic_summary_dicts.map(
-              backendDict => TopicSummaryObjectFactory
-                .createFromBackendDict(backendDict)),
+              backendDict => TopicSummary.createFromBackendDict(
+                backendDict as TopicSummaryBackendDict)),
             untriagedSkillSummaries: (
               sampleDataResults.untriaged_skill_summary_dicts.map(
-                backendDict => SkillSummaryObjectFactory
-                  .createFromBackendDict(backendDict))),
+                (backendDict: unknown) => SkillSummary.createFromBackendDict(
+                    backendDict as SkillSummaryBackendDict))),
             allClassroomNames: sampleDataResults.all_classroom_names,
             canCreateTopic: sampleDataResults.can_create_topic,
             canCreateSkill: sampleDataResults.can_create_skill,
@@ -166,10 +161,12 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.activeTab).toEqual('topics');
       expect(ctrl.totalTopicSummaries).toEqual(
         sampleDataResults.topic_summary_dicts.map(
-          dict => TopicSummaryObjectFactory.createFromBackendDict(dict)));
+          dict => TopicSummary.createFromBackendDict(
+            dict as TopicSummaryBackendDict)));
       expect(ctrl.untriagedSkillSummaries).toEqual(
         sampleDataResults.untriaged_skill_summary_dicts.map(
-          dict => SkillSummaryObjectFactory.createFromBackendDict(dict)));
+          (dict: unknown) => SkillSummary.createFromBackendDict(
+            dict as SkillSummaryBackendDict)));
       expect(ctrl.totalEntityCountToDisplay).toEqual(1);
       expect(ctrl.userCanCreateTopic).toEqual(true);
       expect(ctrl.userCanCreateSkill).toEqual(true);
@@ -305,22 +302,22 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should apply the filters', function() {
-      const topic1 = TopicSummaryObjectFactory.createFromBackendDict({
+      const topic1 = TopicSummary.createFromBackendDict({
         is_published: true, name: 'Alpha', classroom: 'Math',
         description: 'Alpha description',
-      });
-      const topic2 = TopicSummaryObjectFactory.createFromBackendDict({
+      } as TopicSummaryBackendDict);
+      const topic2 = TopicSummary.createFromBackendDict({
         is_published: false, name: 'Alpha2', classroom: 'Math',
         description: 'Alp2 desc',
-      });
-      const topic3 = TopicSummaryObjectFactory.createFromBackendDict({
+      } as TopicSummaryBackendDict);
+      const topic3 = TopicSummary.createFromBackendDict({
         is_published: false, name: 'Beta', classroom: 'Math',
         description: 'Beta description',
-      });
-      const topic4 = TopicSummaryObjectFactory.createFromBackendDict({
+      } as TopicSummaryBackendDict);
+      const topic4 = TopicSummary.createFromBackendDict({
         is_published: true, name: 'Gamma', classroom: 'Math',
         description: 'Gamma description',
-      });
+      } as TopicSummaryBackendDict);
       ctrl.filterObject = (
         TopicsAndSkillsDashboardFilter.createDefault());
       ctrl.totalTopicSummaries = [topic1, topic2, topic3, topic4];
@@ -365,10 +362,6 @@ describe('Topics and Skills Dashboard Page', function() {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $q = $injector.get('$q');
-      TopicSummaryObjectFactory = $injector.get(
-        'TopicSummaryObjectFactory');
-      SkillSummaryObjectFactory = $injector.get(
-        'SkillSummaryObjectFactory');
       var sampleDataResults2 = {
         topic_summary_dicts: [],
         skill_summary_dicts: [],
@@ -390,7 +383,8 @@ describe('Topics and Skills Dashboard Page', function() {
             topicSummaries: sampleDataResults2.topic_summary_dicts,
             untriagedSkillSummaries: (
               sampleDataResults2.untriaged_skill_summary_dicts.map(
-                dict => SkillSummaryObjectFactory.createFromBackendDict(dict))),
+                (dict: unknown) => SkillSummary.createFromBackendDict(
+                  dict as SkillSummaryBackendDict))),
             canCreateTopic: sampleDataResults2.can_create_topic,
             canCreateSkill: sampleDataResults2.can_create_skill
           });

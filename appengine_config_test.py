@@ -41,18 +41,6 @@ class AppengineConfigTests(test_utils.GenericTestBase):
         """
         raise pkg_resources.DistributionNotFound(distribution_name, 'tests')
 
-    def test_monkeypatched_get_distribution_for_google_api_core(self):
-        """Test that the monkey-patched get_distribution() method returns an
-        object with a suitable version string for google-api-core.
-        """
-        with self.swap(
-            appengine_config, 'old_get_distribution',
-            self._mock_get_distribution_which_raises_error
-            ):
-            mock_distribution = appengine_config.monkeypatched_get_distribution(
-                'google-api-core')
-        self.assertEqual(mock_distribution.version, '1.22.2')
-
     def test_monkeypatched_get_distribution_for_google_cloud_tasks(self):
         """Test that the monkey-patched get_distribution() method returns an
         object with a suitable version string for google-cloud-tasks.

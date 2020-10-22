@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { QueryData, EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQuery } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
+  'domain/email-dashboard/email-dashboard-query.model';
 
 @Injectable({
   providedIn: 'root'
