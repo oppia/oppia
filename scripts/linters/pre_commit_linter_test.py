@@ -77,7 +77,7 @@ def all_checks_passed(linter_stdout):
     Returns:
         bool. Whether all checks have passed or not.
     """
-    return 'All Checks Passed.' in linter_stdout
+    return 'All Checks Passed.' in linter_stdout[-1]
 
 
 class PreCommitLinterTests(test_utils.LinterTestBase):

@@ -24,26 +24,23 @@ import { CsrfTokenService } from
   'services/csrf-token.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
-import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
+import { EmailDashboardQuery } from
+  'domain/email-dashboard/email-dashboard-query.model';
 
 describe('Email Dashboard Services', () => {
   describe('Email Dashboard Services', () => {
     let csrfService: CsrfTokenService = null;
     let emailDashboardDataService: EmailDashboardDataService = null;
     let httpTestingController: HttpTestingController;
-    let emailDashboardQueryObjectFactory: EmailDashboardQueryObjectFactory;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [EmailDashboardDataService, EmailDashboardQueryObjectFactory]
+        providers: [EmailDashboardDataService]
       });
       csrfService = TestBed.get(CsrfTokenService);
       emailDashboardDataService = TestBed.get(EmailDashboardDataService);
       httpTestingController = TestBed.get(HttpTestingController);
-      emailDashboardQueryObjectFactory = TestBed.get(
-        EmailDashboardQueryObjectFactory);
 
       spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
         return new Promise((resolve) => {
@@ -66,7 +63,7 @@ describe('Email Dashboard Services', () => {
               id: 'q456',
               status: 'processing'
             }
-          }].map(emailDashboardQueryObjectFactory.createFromBackendDict);
+          }].map(EmailDashboardQuery.createFromBackendDict);
 
         emailDashboardDataService.getNextQueriesAsync();
 
@@ -97,7 +94,7 @@ describe('Email Dashboard Services', () => {
           editedAtLeastNExps: null,
           editedFewerThanNExps: null
         };
-        var queryData = emailDashboardQueryObjectFactory.createFromQueryDict({
+        var queryData = EmailDashboardQuery.createFromQueryDict({
           id: 'qnew',
           status: 'processing'
         });
@@ -127,7 +124,7 @@ describe('Email Dashboard Services', () => {
         {
           id: 'q456',
           status: 'processing'
-        }].map(emailDashboardQueryObjectFactory.createFromQueryDict);
+        }].map(EmailDashboardQuery.createFromQueryDict);
         var expectedQueries = [{
           id: 'q123',
           status: 'completed'
@@ -135,7 +132,7 @@ describe('Email Dashboard Services', () => {
         {
           id: 'q456',
           status: 'processing'
-        }].map(emailDashboardQueryObjectFactory.createFromQueryDict);
+        }].map(EmailDashboardQuery.createFromQueryDict);
 
         emailDashboardDataService.getNextQueriesAsync();
 
@@ -232,7 +229,7 @@ describe('Email Dashboard Services', () => {
         }
 
         let totalQueriesResponse = totalQueries.map(
-          emailDashboardQueryObjectFactory.createFromQueryDict);
+          EmailDashboardQuery.createFromQueryDict);
         expect(emailDashboardDataService.getQueries().length).toEqual(25);
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(0);
         expect(emailDashboardDataService.getQueries()).toEqual(
@@ -278,7 +275,7 @@ describe('Email Dashboard Services', () => {
 
         totalQueries.unshift(queryData);
         let queryDataResponse = (
-          emailDashboardQueryObjectFactory.createFromQueryDict(queryData));
+          EmailDashboardQuery.createFromQueryDict(queryData));
         totalQueriesResponse.unshift(queryDataResponse);
 
         expect(emailDashboardDataService.getQueries().length).toEqual(26);
