@@ -809,6 +809,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance = user_models.UserQueryModel.get_by_id(
             self.query_id)
         self.model_instance.user_ids = [self.owner_id, self.user_id]
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -828,6 +829,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -869,17 +871,15 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_missing_sent_email_model_failure(self):
-        email_models.BulkEmailModel.get_by_id(self.sent_mail_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for sent_email_model_ids '
-                'field check of UserQueryModel\', '
-                '[u"Entity id %s: based on '
-                'field sent_email_model_ids having value '
-                '%s, expected model BulkEmailModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.query_id, self.sent_mail_id, self.sent_mail_id)]
+    def test_completed_node_missing_in_story_node_ids(self):
+        self.model_instance.completed_node_ids.append('invalid')
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for completed node check of '
+            'StoryProgressModel\', [u"Entity id %s: Following completed '
+            'node ids [u\'invalid\'] do not belong to the story with '
+            'id story corresponding to the entity"]]') % (
+                self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -887,13 +887,13 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model = email_models.BulkEmailModel.get_by_id(
             self.sent_mail_id)
         bulk_email_model.recipient_ids.append('invalid')
+        bulk_email_model.update_timestamps()
         bulk_email_model.put()
         expected_output = [(
-            u'[u\'failed validation check for recipient check of '
-            'UserQueryModel\', [u"Entity id %s: Email model %s '
-            'for query has following extra recipients [u\'invalid\'] '
-            'which are not qualified as per the query"]]') % (
-                self.query_id, self.sent_mail_id)]
+            u'[u\'failed validation check for explorations in completed '
+            'node check of StoryProgressModel\', [u"Entity id %s: '
+            'Following exploration ids are private [u\'1\']. "]]') % (
+                self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -901,23 +901,27 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model = email_models.BulkEmailModel.get_by_id(
             self.sent_mail_id)
         bulk_email_model.sender_id = 'invalid'
+        bulk_email_model.update_timestamps()
         bulk_email_model.put()
         expected_output = [(
-            u'[u\'failed validation check for sender check of '
-            'UserQueryModel\', [u\'Entity id %s: Sender id invalid in '
-            'email model with id %s does not match submitter id '
-            '%s of query\']]') % (
-                self.query_id, self.sent_mail_id, self.admin_id)]
+            u'[u\'failed validation check for explorations in completed '
+            'node check of StoryProgressModel\', [u"Entity id %s: '
+            'Following exploration ids are missing [u\'1\']. "]]') % (
+                self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_missing_user_bulk_email_model(self):
-        user_models.UserBulkEmailsModel.get_by_id(self.owner_id).delete()
+    def test_exploration_not_marked_as_completed(self):
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(self.user_id))
+        completed_activities_model.exploration_ids.remove('1')
+        completed_activities_model.put()
         expected_output = [(
-            u'[u\'failed validation check for user bulk email check of '
-            'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
-            'is missing for recipient with id %s\']]') % (
-                self.query_id, self.owner_id)]
+            u'[u\'failed validation check for explorations in completed '
+            'node check of StoryProgressModel\', [u"Entity id %s: '
+            'Following exploration ids are not marked in '
+            'CompletedActivitiesModel [u\'1\']."]]') % (
+                self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
