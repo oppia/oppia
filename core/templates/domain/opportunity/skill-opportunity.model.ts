@@ -13,12 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating frontend instances of
- * skill opportunity domain object.
+ * @fileoverview Frontend Model for skill opportunity.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export interface SkillOpportunityBackendDict {
   'id': string;
@@ -42,6 +38,13 @@ export class SkillOpportunity {
     this.questionCount = questionCount;
   }
 
+  static createFromBackendDict(
+      backendDict: SkillOpportunityBackendDict): SkillOpportunity {
+    return new SkillOpportunity(
+      backendDict.id, backendDict.skill_description, backendDict.topic_name,
+      backendDict.question_count);
+  }
+
   getSkillId(): string {
     return this.id;
   }
@@ -58,19 +61,3 @@ export class SkillOpportunity {
     return this.questionCount;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SkillOpportunityObjectFactory {
-  createFromBackendDict(
-      backendDict: SkillOpportunityBackendDict): SkillOpportunity {
-    return new SkillOpportunity(
-      backendDict.id, backendDict.skill_description, backendDict.topic_name,
-      backendDict.question_count);
-  }
-}
-
-angular.module('oppia').factory(
-  'SkillOpportunityObjectFactory',
-  downgradeInjectable(SkillOpportunityObjectFactory));
