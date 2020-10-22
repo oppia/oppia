@@ -107,7 +107,7 @@ commands:
       - run:
           name: Builds Javascript files
           command: |
-            python -m scripts.run_e2e_tests --prod_env --build-only
+            python -m scripts.run_e2e_tests --deparallelize_terser --prod_env --build-only
 
 jobs:
   setup_and_typescript_tests:
