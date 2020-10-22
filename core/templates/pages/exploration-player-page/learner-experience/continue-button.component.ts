@@ -16,7 +16,7 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 /**
- * @fileoverview Directive for the Continue button in exploration player and
+ * @fileoverview Component for the Continue button in exploration player and
  * editor.
  */
 
@@ -35,7 +35,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'continue-button',
-  templateUrl: './continue-button.directive.html',
+  templateUrl: './continue-button.component.html',
   styleUrls: []
 })
 export class ContinueButtonComponent {}
