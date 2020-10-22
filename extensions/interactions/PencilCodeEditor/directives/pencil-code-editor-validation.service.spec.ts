@@ -113,4 +113,3 @@ describe('Pencil Code Editor Validation Service', () => {
     ).toEqual([]);
   });
 });
-
