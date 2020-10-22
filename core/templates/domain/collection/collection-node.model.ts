@@ -21,6 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
+import { nullDependencies } from 'mathjs';
 
 export interface CollectionNodeBackendDict {
   'exploration_id': string;
@@ -46,34 +47,8 @@ export class CollectionNode {
   static createFromExplorationId(explorationId: string): CollectionNode {
     return CollectionNode.create({
       exploration_id: explorationId,
-      exploration_summary: {
-        'community_owned': false,
-        'activity_type': '',
-        'last_updated_msec': 123,
-        'ratings': {
-          '1': 1,
-          '2': 1,
-          '3': 1,
-          '4': 1,
-          '5': 1
-        },
-        'id': '',
-        'created_on_msec': 123,
-        'human_readable_contributors_summary': {
-          'abc': {
-            'num_commits': 123
-          }
-        },
-        'language_code': '',
-        'num_views': 123,
-        'objective': '',
-        'status': '',
-        'tags': [],
-        'thumbnail_bg_color': '',
-        'thumbnail_icon_url': '',
-        'title': ''
-      }
-    });
+      exploration_summary: null,
+    })
   }
 
   // Returns the ID of the exploration represented by this collection node.
