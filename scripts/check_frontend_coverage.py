@@ -237,7 +237,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'outcome-feedback-editor.directive.ts',
     'parameter-name-editor.directive.ts',
     'parameterize-rule-description.filter.ts',
-    'pencil-code-editor-validation.service.ts',
     'player-correctness-feedback-enabled.service.ts',
     'player-transcript.service.ts',
     'Polyfills.ts',
