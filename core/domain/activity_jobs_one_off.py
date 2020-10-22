@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 from core import jobs
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -30,17 +28,16 @@ from core.domain import search_services
 from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
-import feconf
 import python_utils
 
 (
     collection_models, exp_models, question_models,
     skill_models, story_models, topic_models,
-    user_models
+    subtopic_models
 ) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.subtopic
 ])
 transaction_services = models.Registry.import_transaction_services()
 
@@ -146,114 +143,6 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
         pass
 
 
-class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that sets the username in *CommitLogEntryModels to None in order to
-    remove it from the datastore.
-    """
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        super(RemoveCommitUsernamesOneOffJob, cls).enqueue(
-            job_id, shard_count=64)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [
-            collection_models.CollectionCommitLogEntryModel,
-            exp_models.ExplorationCommitLogEntryModel,
-            question_models.QuestionCommitLogEntryModel,
-            skill_models.SkillCommitLogEntryModel,
-            story_models.StoryCommitLogEntryModel,
-            topic_models.TopicCommitLogEntryModel,
-            topic_models.SubtopicPageCommitLogEntryModel
-        ]
-
-    @staticmethod
-    def map(commit_model):
-        class_name = commit_model.__class__.__name__
-        # This is an only way to remove the field from the model,
-        # see https://stackoverflow.com/a/15116016/3688189 and
-        # https://stackoverflow.com/a/12701172/3688189.
-        if 'username' in commit_model._properties:  # pylint: disable=protected-access
-            del commit_model._properties['username']  # pylint: disable=protected-access
-            if 'username' in commit_model._values:  # pylint: disable=protected-access
-                del commit_model._values['username']  # pylint: disable=protected-access
-            commit_model.put(update_last_updated_time=False)
-            yield ('SUCCESS_REMOVED - %s' % class_name, commit_model.id)
-        else:
-            yield ('SUCCESS_ALREADY_REMOVED - %s' % class_name, commit_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        """Implements the reduce function for this job."""
-        yield (key, len(values))
-
-
-class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that sets the last_updated in *CommitLogEntryModels to created_on if
-    the last_updated is in the timespan when user ID migration was done.
-    """
-
-    MIGRATION_START = datetime.datetime.strptime(
-        '2020-06-28T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-    MIGRATION_END = datetime.datetime.strptime(
-        '2020-06-30T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-    TEST_SERVER_MIGRATION_START = datetime.datetime.strptime(
-        '2020-06-12T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-    TEST_SERVER_MIGRATION_END = datetime.datetime.strptime(
-        '2020-06-14T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        super(FixCommitLastUpdatedOneOffJob, cls).enqueue(
-            job_id, shard_count=64)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [
-            collection_models.CollectionCommitLogEntryModel,
-            exp_models.ExplorationCommitLogEntryModel,
-            question_models.QuestionCommitLogEntryModel,
-            skill_models.SkillCommitLogEntryModel,
-            story_models.StoryCommitLogEntryModel,
-            topic_models.TopicCommitLogEntryModel,
-            topic_models.SubtopicPageCommitLogEntryModel
-        ]
-
-    @staticmethod
-    def map(commit_model):
-        class_name = commit_model.__class__.__name__
-        last_updated = commit_model.last_updated
-        created_on = commit_model.created_on
-        if (FixCommitLastUpdatedOneOffJob.MIGRATION_START < last_updated <
-                FixCommitLastUpdatedOneOffJob.MIGRATION_END):
-            commit_model.last_updated = commit_model.created_on
-            commit_model.put(update_last_updated_time=False)
-            yield ('SUCCESS_FIXED - %s' % class_name, commit_model.id)
-        elif (FixCommitLastUpdatedOneOffJob.TEST_SERVER_MIGRATION_START <
-              last_updated <
-              FixCommitLastUpdatedOneOffJob.TEST_SERVER_MIGRATION_END):
-            commit_model.last_updated = commit_model.created_on
-            commit_model.put(update_last_updated_time=False)
-            yield (
-                'SUCCESS_TEST_SERVER_FIXED - %s' % class_name, commit_model.id)
-        elif (datetime.timedelta(0) < last_updated - created_on <
-              datetime.timedelta(hours=1)):
-            yield ('SUCCESS_NEWLY_CREATED - %s' % class_name, commit_model.id)
-        elif commit_model.user_id in feconf.SYSTEM_USERS.keys():
-            yield ('SUCCESS_ADMIN - %s' % class_name, commit_model.id)
-        else:
-            yield ('FAILURE_INCORRECT - %s' % class_name, commit_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        """Implements the reduce function for this job."""
-        if key.startswith('FAILURE_INCORRECT'):
-            yield (key, values)
-        else:
-            yield (key, len(values))
-
-
 class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
     """For every snapshot content of a rights model, merge the data from all
     the user id fields in content together and put them in the
@@ -278,7 +167,9 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids)))
-        snapshot_metadata_model.put(update_last_updated_time=False)
+        snapshot_metadata_model.update_timestamps(
+            update_last_updated_time=False)
+        snapshot_metadata_model.put()
 
     @staticmethod
     def _add_exploration_user_ids(snapshot_content_model):
@@ -298,7 +189,9 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids)))
-        snapshot_metadata_model.put(update_last_updated_time=False)
+        snapshot_metadata_model.update_timestamps(
+            update_last_updated_time=False)
+        snapshot_metadata_model.put()
 
     @staticmethod
     def _add_topic_user_ids(snapshot_content_model):
@@ -312,7 +205,9 @@ class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
                 snapshot_content_model.id))
         snapshot_metadata_model.content_user_ids = list(sorted(set(
             reconstituted_rights_model.manager_ids)))
-        snapshot_metadata_model.put(update_last_updated_time=False)
+        snapshot_metadata_model.update_timestamps(
+            update_last_updated_time=False)
+        snapshot_metadata_model.put()
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
@@ -408,7 +303,8 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
             )
         )
         if commit_log_model is None:
-            snapshot_model.put(update_last_updated_time=False)
+            snapshot_model.update_timestamps(update_last_updated_time=False)
+            snapshot_model.put()
             return (
                 'MIGRATION_SUCCESS_MISSING_COMMIT_LOG',
                 snapshot_model.id
@@ -418,8 +314,10 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
 
         def _put_both_models():
             """Put both models into the datastore together."""
-            snapshot_model.put(update_last_updated_time=False)
-            commit_log_model.put(update_last_updated_time=False)
+            snapshot_model.update_timestamps(update_last_updated_time=False)
+            snapshot_model.put()
+            commit_log_model.update_timestamps(update_last_updated_time=False)
+            commit_log_model.put()
 
         transaction_services.run_in_transaction(_put_both_models)
         return ('MIGRATION_SUCCESS', snapshot_model.id)
@@ -439,7 +337,8 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
                 commit_cmds_user_ids.add(commit_cmd['assignee_id'])
         snapshot_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
-        snapshot_model.put(update_last_updated_time=False)
+        snapshot_model.update_timestamps(update_last_updated_time=False)
+        snapshot_model.put()
 
     @staticmethod
     def _add_topic_user_ids(snapshot_model):
@@ -458,7 +357,8 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
                 commit_cmds_user_ids.add(commit_cmd['removed_user_id'])
         snapshot_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
-        snapshot_model.put(update_last_updated_time=False)
+        snapshot_model.update_timestamps(update_last_updated_time=False)
+        snapshot_model.put()
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
@@ -589,3 +489,142 @@ class AuditSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
+
+class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that validates whether each SnapshotMetadata model has a
+    corresponding CommitLog model pair and the corresponding parent model.
+    """
+
+    FAILURE_PREFIX = 'VALIDATION FAILURE'
+    SNAPSHOT_METADATA_MODELS = [
+        collection_models.CollectionSnapshotMetadataModel,
+        collection_models.CollectionRightsSnapshotMetadataModel,
+        exp_models.ExplorationSnapshotMetadataModel,
+        exp_models.ExplorationRightsSnapshotMetadataModel,
+        question_models.QuestionSnapshotMetadataModel,
+        skill_models.SkillSnapshotMetadataModel,
+        story_models.StorySnapshotMetadataModel,
+        topic_models.TopicSnapshotMetadataModel,
+        subtopic_models.SubtopicPageSnapshotMetadataModel,
+        topic_models.TopicRightsSnapshotMetadataModel
+    ]
+    MODEL_NAMES_TO_PROPERTIES = {
+        'CollectionSnapshotMetadataModel': {
+            'parent_model_class': collection_models.CollectionModel,
+            'commit_log_model_class': (
+                collection_models.CollectionCommitLogEntryModel),
+            'id_string_format': 'collection-%s-%s'
+        },
+        'ExplorationSnapshotMetadataModel': {
+            'parent_model_class': exp_models.ExplorationModel,
+            'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
+            'id_string_format': 'exploration-%s-%s'
+        },
+        'QuestionSnapshotMetadataModel': {
+            'parent_model_class': question_models.QuestionModel,
+            'commit_log_model_class': (
+                question_models.QuestionCommitLogEntryModel),
+            'id_string_format': 'question-%s-%s'
+        },
+        'SkillSnapshotMetadataModel': {
+            'parent_model_class': skill_models.SkillModel,
+            'commit_log_model_class': skill_models.SkillCommitLogEntryModel,
+            'id_string_format': 'skill-%s-%s'
+        },
+        'StorySnapshotMetadataModel': {
+            'parent_model_class': story_models.StoryModel,
+            'commit_log_model_class': story_models.StoryCommitLogEntryModel,
+            'id_string_format': 'story-%s-%s'
+        },
+        'TopicSnapshotMetadataModel': {
+            'parent_model_class': topic_models.TopicModel,
+            'commit_log_model_class': topic_models.TopicCommitLogEntryModel,
+            'id_string_format': 'topic-%s-%s'
+        },
+        'SubtopicPageSnapshotMetadataModel': {
+            'parent_model_class': subtopic_models.SubtopicPageModel,
+            'commit_log_model_class': (
+                subtopic_models.SubtopicPageCommitLogEntryModel),
+            'id_string_format': 'subtopicpage-%s-%s'
+        },
+        'TopicRightsSnapshotMetadataModel': {
+            'parent_model_class': topic_models.TopicRightsModel,
+            'commit_log_model_class': topic_models.TopicCommitLogEntryModel,
+            'id_string_format': 'rights-%s-%s'
+        },
+        'CollectionRightsSnapshotMetadataModel': {
+            'parent_model_class': collection_models.CollectionRightsModel,
+            'commit_log_model_class': (
+                collection_models.CollectionCommitLogEntryModel),
+            'id_string_format': 'rights-%s-%s'
+        },
+        'ExplorationRightsSnapshotMetadataModel': {
+            'parent_model_class': exp_models.ExplorationRightsModel,
+            'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
+            'id_string_format': 'rights-%s-%s'
+        },
+    }
+    # This list consists of the rights snapshot metadata models for which
+    # the commit log model is not created when the commit cmd is "create"
+    # or "delete".
+    MODEL_NAMES_WITH_PARTIAL_COMMIT_LOGS = [
+        'CollectionRightsSnapshotMetadataModel',
+        'ExplorationRightsSnapshotMetadataModel'
+    ]
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of SnapshotMetadata models that is associated
+        with a CommitLogEntry model.
+        """
+        return ValidateSnapshotMetadataModelsJob.SNAPSHOT_METADATA_MODELS
+
+    @staticmethod
+    def map(snapshot_model):
+        """Implements the map function for this job."""
+        job_class = ValidateSnapshotMetadataModelsJob
+        class_name = snapshot_model.__class__.__name__
+        missing_commit_log_msg = (
+            '%s - MISSING COMMIT LOGS' % job_class.FAILURE_PREFIX)
+        found_commit_log_msg = 'FOUND COMMIT LOGS'
+
+        # Note: The subtopic snapshot ID is in the format
+        # '<topicId>-<subtopicNum>-<version>'.
+        model_id, version = snapshot_model.id.rsplit('-', 1)
+        model_properties = job_class.MODEL_NAMES_TO_PROPERTIES[class_name]
+        commit_log_id = (
+            model_properties['id_string_format'] % (model_id, version))
+        parent_model_class = (
+            model_properties['parent_model_class'].get_by_id(model_id))
+        commit_log_model_class = (
+            model_properties['commit_log_model_class'].get_by_id(
+                commit_log_id))
+        if class_name in job_class.MODEL_NAMES_WITH_PARTIAL_COMMIT_LOGS:
+            if snapshot_model.commit_type in ['create', 'delete']:
+                missing_commit_log_msg = (
+                    'COMMIT LOGS SHOULD NOT EXIST AND DOES NOT EXIST')
+                found_commit_log_msg = (
+                    '%s - COMMIT LOGS SHOULD NOT EXIST BUT EXISTS' % (
+                        job_class.FAILURE_PREFIX))
+
+        message_prefix = (
+            missing_commit_log_msg if commit_log_model_class is None
+            else found_commit_log_msg)
+        yield ('%s - %s' % (message_prefix, class_name), snapshot_model.id)
+
+        if parent_model_class is None:
+            yield (
+                '%s - MISSING PARENT MODEL - %s' % (
+                    job_class.FAILURE_PREFIX, class_name),
+                snapshot_model.id)
+        else:
+            yield ('FOUND PARENT MODEL - %s' % class_name, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key.startswith(ValidateSnapshotMetadataModelsJob.FAILURE_PREFIX):
+            yield (key, values)
+        else:
+            yield (key, len(values))

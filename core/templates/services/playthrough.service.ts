@@ -34,8 +34,7 @@ import { Playthrough, PlaythroughObjectFactory } from
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
-import { Stopwatch, StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
+import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
@@ -187,8 +186,7 @@ export class PlaythroughService {
       private explorationFeaturesService: ExplorationFeaturesService,
       private learnerActionObjectFactory: LearnerActionObjectFactory,
       private playthroughBackendApiService: PlaythroughBackendApiService,
-      private playthroughObjectFactory: PlaythroughObjectFactory,
-      private stopwatchObjectFactory: StopwatchObjectFactory) {}
+      private playthroughObjectFactory: PlaythroughObjectFactory) {}
 
   initSession(
       explorationId: string, explorationVersion: number,
@@ -215,7 +213,7 @@ export class PlaythroughService {
     this.cstTracker = new CyclicStateTransitionsTracker(initStateName);
 
     this.playthroughDurationInSecs = 0;
-    this.playthroughStopwatch = this.stopwatchObjectFactory.create();
+    this.playthroughStopwatch = Stopwatch.create();
     this.playthroughStopwatch.reset();
   }
 
@@ -261,7 +259,7 @@ export class PlaythroughService {
     if (this.isRecordedPlaythroughHelpful()) {
       const playthrough = this.createNewPlaythrough();
       if (playthrough !== null) {
-        this.playthroughBackendApiService.storePlaythrough(playthrough, 1);
+        this.playthroughBackendApiService.storePlaythroughAsync(playthrough, 1);
       }
     }
   }

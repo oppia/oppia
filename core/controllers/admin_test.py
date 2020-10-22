@@ -308,36 +308,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 15)
         self.logout()
 
-    def test_flush_migration_bot_contributions_action(self):
-        created_exploration_ids = ['exp_1', 'exp_2']
-        edited_exploration_ids = ['exp_3', 'exp_4']
-        user_services.create_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, created_exploration_ids,
-            edited_exploration_ids)
-
-        migration_bot_contributions_model = (
-            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
-        self.assertEqual(
-            migration_bot_contributions_model.created_exploration_ids,
-            created_exploration_ids)
-        self.assertEqual(
-            migration_bot_contributions_model.edited_exploration_ids,
-            edited_exploration_ids)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        self.post_json(
-            '/adminhandler', {
-                'action': 'flush_migration_bot_contribution_data'
-            }, csrf_token=csrf_token)
-
-        migration_bot_contributions_model = (
-            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
-        self.assertEqual(
-            migration_bot_contributions_model.created_exploration_ids, [])
-        self.assertEqual(
-            migration_bot_contributions_model.edited_exploration_ids, [])
-
     def test_regenerate_topic_related_opportunities_action(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -347,8 +317,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         topic_id = 'topic'
         story_id = 'story'
         self.save_new_valid_exploration(
-            '0', owner_id, title='title',
-            end_state_name='End State')
+            '0', owner_id, title='title', end_state_name='End State',
+            correctness_feedback_enabled=True)
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(

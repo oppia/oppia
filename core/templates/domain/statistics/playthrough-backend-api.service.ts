@@ -36,7 +36,7 @@ export class PlaythroughBackendApiService {
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  storePlaythrough(
+  async storePlaythroughAsync(
       playthrough: Playthrough, issueSchemaVersion: number): Promise<void> {
     let playthroughUrl = this.urlInterpolationService.interpolateUrl(
       this.STORE_PLAYTHROUGH_URL, {

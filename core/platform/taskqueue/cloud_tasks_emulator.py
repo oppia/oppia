@@ -159,7 +159,13 @@ class Emulator(python_utils.OBJECT):
         return sum(len(q) for q in self._queues.values())
 
     def create_task(
-            self, queue_name, url, payload, scheduled_for=None, task_name=None):
+            self,
+            queue_name,
+            url,
+            payload,
+            scheduled_for=None,
+            task_name=None,
+            retry=None):  # pylint: disable=unused-argument
         """Creates a Task in the corresponding queue that will be executed when
         the 'scheduled_for' time is reached. If the queue doesn't exist yet,
         it will be created.
@@ -172,6 +178,8 @@ class Emulator(python_utils.OBJECT):
             scheduled_for: datetime|None. The naive datetime object for the
                 time to execute the task. Pass in None for immediate execution.
             task_name: str|None. Optional. The name of the task.
+            retry: None. The retry mechanism that should be used. Here we ignore
+                the value and it is not used for anything.
         """
         scheduled_for_time = (
             time.mktime(scheduled_for.timetuple())

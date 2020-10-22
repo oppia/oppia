@@ -30,6 +30,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import image_validation_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import taskqueue_services
@@ -40,12 +41,14 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
+(
+    job_models, exp_models, base_models, classifier_models, improvements_models,
+) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
+    models.NAMES.classifier, models.NAMES.improvements
+])
 
-(job_models, exp_models, base_models, classifier_models) = (
-    models.Registry.import_models([
-        models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
-        models.NAMES.classifier]))
+datastore_services = models.Registry.import_datastore_services()
 search_services = models.Registry.import_search_services()
 
 
@@ -2221,10 +2224,344 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
 
+class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
+        test_utils.GenericTestBase):
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests,
+            self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        self.process_and_flush_pending_tasks()
+
+    def test_the_job_adds_xmlns_attribute_in_svg_images_successful(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The svg tag does not contains the \'xmlns\' attribute.'):
+            image_validation_services.validate_image_and_filename(
+                invalid_svg_string.encode(encoding='utf-8'), svg_filename)
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [
+            u'[u\'SUCCESS - CHANGED\', [u\'mathImg_12ab_height_1d2_width_2d3_'
+            u'vertical_3d2.svg\', u\'Exp Id: exp_id0\']]'])
+
+    def test_the_job_reports_validation_failure(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" role="" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Unsupported tags/attributes found in the SVG:'):
+            image_validation_services.validate_image_and_filename(
+                invalid_svg_string.encode(encoding='utf-8'), svg_filename)
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [
+            u'[u\'FAILED validation\', [u"Exploration with id exp_id0 failed '
+            'image validation for the filename '
+            'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg with following'
+            ' error: Unsupported tags/attributes found in the SVG:'
+            '\\n\\nattributes: [u\'svg:role\']"]]'])
+
+    def test_the_job_does_not_changes_a_valid_svg_image(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        old_svg_string = (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
+            'width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        image_validation_services.validate_image_and_filename(
+            old_svg_string.encode(encoding='utf-8'), svg_filename)
+
+        filepath = 'image/%s' % svg_filename
+        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [u'[u\'UNCHANGED\', 1]'])
+
+        new_svg_string = fs.get(filepath)
+
+        self.assertEqual(
+            old_svg_string.encode(encoding='utf-8'), new_svg_string)
+
+    def test_no_action_is_performed_on_non_math_svgs(self):
+        """Test that no action is performed on non-math SVGs."""
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        old_svg_string = (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
+            'width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'random_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        filepath = 'image/%s' % svg_filename
+        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" role="" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob)
+
+
+class XmlnsAttributeInExplorationMathSvgImagesAuditJobTests(
+        test_utils.GenericTestBase):
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            XmlnsAttributeInExplorationMathSvgImagesAuditJobTests,
+            self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        self.process_and_flush_pending_tasks()
+
+    def test_reports_math_svgs_without_xmlns_attributes(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob.create_new())
+        (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [
+            u'[u\'exp_id0\', '
+            u'[u\'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg\']]'
+        ])
+
+    def test_no_action_is_performed_on_non_math_svgs(self):
+        """Test that no action is performed on non-math SVGs."""
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        old_svg_string = (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
+            'width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'random_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        filepath = 'image/%s' % svg_filename
+        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob.create_new())
+        (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        invalid_svg_string = (
+            '<svg version="1.0" role="" width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        fs.commit(
+            'image/%s' % svg_filename, invalid_svg_string,
+            mimetype='image/svg+xml')
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off
+            .XmlnsAttributeInExplorationMathSvgImagesAuditJob)
+
+
 class MockExpSummaryModel(exp_models.ExpSummaryModel):
     """Mock ExpSummaryModel so that it allows to set `translator_ids`."""
 
-    translator_ids = ndb.StringProperty(
+    translator_ids = datastore_services.StringProperty(
         indexed=True, repeated=True, required=False)
 
 
@@ -2310,3 +2647,407 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_summary_model.last_updated,
             migrated_summary_model.last_updated)
+
+
+class RegenerateStringPropertyIndexOneOffJobTests(test_utils.GenericTestBase):
+
+    JOB = exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
+
+    def run_job(self):
+        """Runs the job and returns its output."""
+        job_id = self.JOB.create_new()
+        self.JOB.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        return [ast.literal_eval(s) for s in self.JOB.get_output(job_id)]
+
+    def test_outputs_successful_writes(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+        self.save_new_valid_exploration('exp2', 'owner2')
+        improvements_models.TaskEntryModel.create(
+            'exploration', 'eid', 1, 'high_bounce_rate', 'state',
+            'Introduction')
+
+        self.assertItemsEqual(
+            self.run_job(), [['ExplorationModel', 2], ['TaskEntryModel', 1]])
+
+    def test_versioned_models_are_not_changed_to_a_newer_version(self):
+        self.save_new_valid_exploration('exp1', 'owner1')
+
+        self.assertItemsEqual(self.run_job(), [['ExplorationModel', 1]])
+
+        exp_model = exp_models.ExplorationModel.get_by_id('exp1')
+        self.assertEqual(exp_model.version, 1)
+
+
+class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(RegenerateMissingExpCommitLogModelsTests, self).setUp()
+
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+        self.user = user_services.UserActionsInfo(self.user_id)
+        self.set_admins(['user'])
+
+        self.save_new_valid_exploration(
+            '0', self.user_id, end_state_name='End')
+
+    def test_standard_operation(self):
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-1'))
+        commit_log_model.delete()
+        exp_services.delete_exploration(self.user_id, '0')
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.RegenerateMissingExpCommitLogModels,
+            exp_id='0')
+
+    def test_migration_job_regenerates_missing_model_with_only_one_rights_model(
+            self):
+        # Commit log v2 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Updated title.')
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-2'))
+        actual_commit_log_details = [
+            commit_log_model.user_id, commit_log_model.commit_type,
+            commit_log_model.commit_message, commit_log_model.commit_cmds,
+            commit_log_model.version, commit_log_model.post_commit_status,
+            commit_log_model.post_commit_community_owned,
+            commit_log_model.post_commit_is_private,
+            commit_log_model.exploration_id
+        ]
+
+        commit_log_model.delete()
+
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        regenerated_commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-2'))
+        regenerated_commit_log_details = [
+            regenerated_commit_log_model.user_id,
+            regenerated_commit_log_model.commit_type,
+            regenerated_commit_log_model.commit_message,
+            regenerated_commit_log_model.commit_cmds,
+            regenerated_commit_log_model.version,
+            regenerated_commit_log_model.post_commit_status,
+            regenerated_commit_log_model.post_commit_community_owned,
+            regenerated_commit_log_model.post_commit_is_private,
+            regenerated_commit_log_model.exploration_id
+        ]
+        self.assertFalse(regenerated_commit_log_model.deleted)
+        self.assertEqual(
+            actual_commit_log_details, regenerated_commit_log_details)
+        self.assertEqual(
+            output, [
+                '[u\'Regenerated Exploration Commit Log Model: version 2\', '
+                '[u\'0\']]'])
+
+    def test_migration_job_regenerates_missing_model_when_rights_not_updated(
+            self):
+        # Commit log v2 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Updated title.')
+        # Rights updated.
+        rights_manager.publish_exploration(self.user, '0')
+        # Commit log v3 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Updated title.')
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-2'))
+        actual_commit_log_details = [
+            commit_log_model.user_id, commit_log_model.commit_type,
+            commit_log_model.commit_message, commit_log_model.commit_cmds,
+            commit_log_model.version, commit_log_model.post_commit_status,
+            commit_log_model.post_commit_community_owned,
+            commit_log_model.post_commit_is_private,
+            commit_log_model.exploration_id
+        ]
+
+        commit_log_model.delete()
+
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        regenerated_commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-2'))
+        regenerated_commit_log_details = [
+            regenerated_commit_log_model.user_id,
+            regenerated_commit_log_model.commit_type,
+            regenerated_commit_log_model.commit_message,
+            regenerated_commit_log_model.commit_cmds,
+            regenerated_commit_log_model.version,
+            regenerated_commit_log_model.post_commit_status,
+            regenerated_commit_log_model.post_commit_community_owned,
+            regenerated_commit_log_model.post_commit_is_private,
+            regenerated_commit_log_model.exploration_id
+        ]
+        self.assertFalse(regenerated_commit_log_model.deleted)
+        self.assertEqual(
+            actual_commit_log_details, regenerated_commit_log_details)
+        self.assertEqual(
+            output, [
+                '[u\'Regenerated Exploration Commit Log Model: version 2\', '
+                '[u\'0\']]'])
+
+    def test_migration_job_regenerates_missing_model_when_rights_are_updated(
+            self):
+        # Commit log v2 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Updated title.')
+        # Rights updated.
+        rights_manager.publish_exploration(self.user, '0')
+        # Commit log v3 will be created.
+        exp_services.update_exploration(
+            self.user_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Updated title.')
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-3'))
+        actual_commit_log_details = [
+            commit_log_model.user_id, commit_log_model.commit_type,
+            commit_log_model.commit_message, commit_log_model.commit_cmds,
+            commit_log_model.version, commit_log_model.post_commit_status,
+            commit_log_model.post_commit_community_owned,
+            commit_log_model.post_commit_is_private,
+            commit_log_model.exploration_id
+        ]
+
+        commit_log_model.delete()
+
+        job_id = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.create_new())
+        (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .RegenerateMissingExpCommitLogModels.get_output(job_id))
+        regenerated_commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0-3'))
+        regenerated_commit_log_details = [
+            regenerated_commit_log_model.user_id,
+            regenerated_commit_log_model.commit_type,
+            regenerated_commit_log_model.commit_message,
+            regenerated_commit_log_model.commit_cmds,
+            regenerated_commit_log_model.version,
+            regenerated_commit_log_model.post_commit_status,
+            regenerated_commit_log_model.post_commit_community_owned,
+            regenerated_commit_log_model.post_commit_is_private,
+            regenerated_commit_log_model.exploration_id
+        ]
+        self.assertFalse(regenerated_commit_log_model.deleted)
+        self.assertEqual(
+            actual_commit_log_details, regenerated_commit_log_details)
+        self.assertEqual(
+            output, [
+                '[u\'Regenerated Exploration Commit Log Model: version 3\', '
+                '[u\'0\']]'])
+
+
+class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExpCommitLogModelRegenerationValidatorTests, self).setUp()
+
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+        self.set_admins(['user'])
+        self.exp_id = '0b'
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.exp_id,
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.user_id, exp)
+
+    def test_standard_operation(self):
+        job_id = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.create_new())
+        (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-%s-1' % self.exp_id))
+        commit_log_model.delete()
+        exp_services.delete_exploration(self.user_id, self.exp_id)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
+            exp_id=self.exp_id)
+
+    def test_no_action_is_performed_for_exp_not_satisfying_id_constraint(self):
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0z',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.user_id, exp)
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-0z-1'))
+        commit_log_model.delete()
+
+        job_id = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.create_new())
+        (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_validation_job_skips_check_for_deleted_commit_log_model(self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-%s-1' % self.exp_id))
+        commit_log_model.delete()
+
+        job_id = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.create_new())
+        (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_validation_job_catches_mismatch_in_non_datetime_fields(self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-%s-1' % self.exp_id))
+        commit_log_model.commit_message = 'Test change'
+        commit_log_model.update_timestamps()
+        commit_log_model.put()
+
+        job_id = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.create_new())
+        (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.get_output(job_id))
+        expected_output = [(
+            '[u\'Mismatch between original model and regenerated model\', '
+            '[u"commit_message in original model: Test change, '
+            'in regenerated model: New exploration created with title '
+            '\'title 0\'."]]')]
+        self.assertEqual(output, expected_output)
+
+    def test_validation_job_catches_mismatch_in_datetime_fields(self):
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-%s-1' % self.exp_id))
+        commit_log_model.created_on = commit_log_model.created_on + (
+            datetime.timedelta(days=1))
+        commit_log_model.update_timestamps()
+        commit_log_model.put()
+
+        job_id = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.create_new())
+        (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            exp_jobs_one_off
+            .ExpCommitLogModelRegenerationValidator.get_output(job_id))
+
+        metadata_model = exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+            '%s-1' % self.exp_id)
+        expected_output = [(
+            '[u\'Mismatch between original model and regenerated model\', '
+            '[u\'created_on in original model: %s, '
+            'in regenerated model: %s\']]' % (
+                commit_log_model.created_on, metadata_model.created_on))]
+        self.assertEqual(output, expected_output)

@@ -24,6 +24,8 @@ require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { LearnerDashboardActivityIds } from
+  'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Learner playlist service factory', function() {
@@ -37,7 +39,6 @@ describe('Learner playlist service factory', function() {
   var addToLearnerPlaylistUrl = '';
   var AlertsService = null;
   var CsrfService = null;
-  var LearnerDashboardActivityIdsObjectFactory = null;
   var $uibModal = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -63,8 +64,6 @@ describe('Learner playlist service factory', function() {
     spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
     CsrfService = $injector.get('CsrfTokenService');
     $uibModal = $injector.get('$uibModal');
-    LearnerDashboardActivityIdsObjectFactory = $injector.get(
-      'LearnerDashboardActivityIdsObjectFactory');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       var deferred = $q.defer();
@@ -176,7 +175,7 @@ describe('Learner playlist service factory', function() {
       };
     });
 
-    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+    var learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
@@ -202,7 +201,7 @@ describe('Learner playlist service factory', function() {
         result: deferred.promise
       };
     });
-    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+    var learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
@@ -229,7 +228,7 @@ describe('Learner playlist service factory', function() {
         result: deferred.promise
       };
     });
-    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+    var learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],

@@ -236,7 +236,7 @@ def does_story_exist_with_url_fragment(url_fragment):
 
 def validate_explorations_for_story(exp_ids, raise_error):
     """Validates the explorations in the given story and checks whether they
-    are compatible with the mobile app.
+    are compatible with the mobile app and ready for publishing.
 
     Args:
         exp_ids: list(str). The exp IDs to validate.
@@ -326,6 +326,14 @@ def validate_explorations_for_story(exp_ids, raise_error):
                 error_string = (
                     'Expected no exploration to have parameter '
                     'values in it. Invalid exploration: %s' % exp.id)
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+            if not exp.correctness_feedback_enabled:
+                error_string = (
+                    'Expected all explorations to have correctness feedback '
+                    'enabled. Invalid exploration: %s' % exp.id)
                 if raise_error:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
@@ -532,6 +540,8 @@ def update_story(
         id=exp_id,
         story_id=story_id
     ) for exp_id in exp_ids_added_to_story]
+    exp_models.ExplorationContextModel.update_timestamps_multi(
+        new_exploration_context_models)
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
 
@@ -666,10 +676,13 @@ def save_story_summary(story_summary):
         story_models.StorySummaryModel.get_by_id(story_summary.id))
     if story_summary_model is not None:
         story_summary_model.populate(**story_summary_dict)
+        story_summary_model.update_timestamps()
         story_summary_model.put()
     else:
         story_summary_dict['id'] = story_summary.id
-        story_models.StorySummaryModel(**story_summary_dict).put()
+        model = story_models.StorySummaryModel(**story_summary_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def record_completed_node_in_story_context(user_id, story_id, node_id):
@@ -686,4 +699,5 @@ def record_completed_node_in_story_context(user_id, story_id, node_id):
 
     if node_id not in progress_model.completed_node_ids:
         progress_model.completed_node_ids.append(node_id)
+        progress_model.update_timestamps()
         progress_model.put()

@@ -23,18 +23,19 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/newly-created-topic.model';
+
 const topicPropertiesConstants = require('constants.ts');
 
 angular.module('oppia').controller('CreateNewTopicModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',
-  'ContextService', 'ImageLocalStorageService',
-  'NewlyCreatedTopicObjectFactory', 'TopicEditorStateService',
+  'ContextService', 'ImageLocalStorageService', 'TopicEditorStateService',
   'WindowRef', 'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
   'MAX_CHARS_IN_TOPIC_URL_FRAGMENT',
   function(
       $controller, $rootScope, $scope, $uibModalInstance,
-      ContextService, ImageLocalStorageService,
-      NewlyCreatedTopicObjectFactory, TopicEditorStateService,
+      ContextService, ImageLocalStorageService, TopicEditorStateService,
       WindowRef, MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
       MAX_CHARS_IN_TOPIC_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
@@ -43,6 +44,8 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
     });
     $scope.allowedBgColors = (
       topicPropertiesConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+    $scope.validUrlFragmentRegex = new RegExp(
+      topicPropertiesConstants.VALID_URL_FRAGMENT_REGEX);
 
     $scope.isValid = function() {
       return Boolean(
@@ -52,7 +55,7 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
 
     ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newlyCreatedTopic = (
-      NewlyCreatedTopicObjectFactory.createDefault());
+      NewlyCreatedTopic.createDefault());
     $scope.hostname = WindowRef.nativeWindow.location.hostname;
     $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
     $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (

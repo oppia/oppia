@@ -190,9 +190,6 @@ class AdminHandler(base.BaseHandler):
                     self.payload.get('action') ==
                     'generate_dummy_new_skill_data'):
                 self._generate_dummy_skill_and_questions()
-            elif self.payload.get('action') == (
-                    'flush_migration_bot_contribution_data'):
-                user_services.flush_migration_bot_contributions_model()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
@@ -459,6 +456,24 @@ class AdminHandler(base.BaseHandler):
             self._reload_exploration('15')
             self._reload_exploration('25')
             self._reload_exploration('13')
+            exp_services.update_exploration(
+                self.user_id, '15', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'correctness_feedback_enabled',
+                    'new_value': True
+                })], 'Changed correctness_feedback_enabled.')
+            exp_services.update_exploration(
+                self.user_id, '25', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'correctness_feedback_enabled',
+                    'new_value': True
+                })], 'Changed correctness_feedback_enabled.')
+            exp_services.update_exploration(
+                self.user_id, '13', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'correctness_feedback_enabled',
+                    'new_value': True
+                })], 'Changed correctness_feedback_enabled.')
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
