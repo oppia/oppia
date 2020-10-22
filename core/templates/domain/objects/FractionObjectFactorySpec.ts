@@ -23,7 +23,7 @@ import { Fraction, FractionObjectFactory } from
 
 describe('Fraction Object Factory', () => {
   let errors = null;
-  let fraction = null;
+  let fraction: FractionObjectFactory = null;
 
   beforeEach(() => {
     errors = ObjectsDomainConstants.FRACTION_PARSING_ERRORS;

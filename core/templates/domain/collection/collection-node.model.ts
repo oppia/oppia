@@ -22,7 +22,6 @@ import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
 
-
 export interface CollectionNodeBackendDict {
   'exploration_id': string;
   'exploration_summary': LearnerExplorationSummaryBackendDict;

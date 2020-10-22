@@ -25,7 +25,6 @@ import { ObjectsDomainConstants } from
 import { FractionAnswer } from
   'interactions/answer-defs';
 
-
 export class Fraction {
   isNegative: boolean;
   wholeNumber: number;
