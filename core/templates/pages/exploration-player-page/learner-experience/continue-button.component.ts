@@ -20,19 +20,18 @@ import { downgradeComponent } from '@angular/upgrade/static';
  * editor.
  */
 
-angular.module('oppia').directive('continueButton', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        onClickContinueButton: '&',
-        isLearnAgainButton: '&',
-        focusLabel: '@'
-      },
-      template: require('./continue-button.directive.html')
-    };
-  }
-]);
+// [Question]: How do I migrate the scope part of this directive?
+// angular.module('oppia').directive('continueButton', [
+//   function() {
+//     return {
+//       scope: {
+//         onClickContinueButton: '&',
+//         isLearnAgainButton: '&',
+//         focusLabel: '@'
+//       }
+//     };
+//   }
+// ]);
 
 @Component({
   selector: 'continue-button',
