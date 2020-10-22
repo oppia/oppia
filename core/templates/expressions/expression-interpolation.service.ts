@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,96 +16,90 @@
  * @fileoverview Service for interpolating expressions.
  */
 
-require('filters/convert-html-to-unicode.filter.ts');
-require('expressions/expression-evaluator.service.ts');
-require('expressions/expression-parser.service.ts');
-require('expressions/expression-syntax-tree.service.ts');
-require('services/html-escaper.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-// Interpolates an HTML or a unicode string containing expressions.
-// The input value is evaluated against the supplied environments.
-//
-// Examples:
-//   processHtml('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
-//   processHtml('abc{{a}}', [{}]) returns null.
-//   processHtml('abc', [{}]) returns 'abc'.
-//   processHtml('{[a}}', [{'a': '<button></button>'}])
-//     returns '&lt;button&gt;&lt;/button&gt;'.
-//   processUnicode('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
-//   processUnicode('abc{{a}}', [{}]) returns null.
-//   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns
-//     '<button></button>'.
-angular.module('oppia').factory('ExpressionInterpolationService', [
-  '$filter', 'ExpressionEvaluatorService', 'ExpressionParserService',
-  'ExpressionSyntaxTreeService', 'HtmlEscaperService',
-  function(
-      $filter, ExpressionEvaluatorService, ExpressionParserService,
-      ExpressionSyntaxTreeService, HtmlEscaperService) {
-    return {
-      // This method should only be used if its result would immediately be
-      // displayed on the screen without passing through further computation.
-      // It differs from other methods in this service in that it
-      // auto-escapes the returned HTML, and returns an 'error' label if the
-      // evaluation fails.
-      processHtml: function(sourceHtml, envs) {
-        return sourceHtml.replace(/{{([^}]*)}}/g, function(match, p1) {
-          try {
-            // TODO(sll): Remove the call to $filter once we have a
-            // custom UI for entering expressions. It is only needed because
-            // expressions are currently input inline via the RTE.
-            return HtmlEscaperService.unescapedStrToEscapedStr(
-              ExpressionEvaluatorService.evaluateExpression(
-                $filter('convertHtmlToUnicode')(p1), envs));
-          } catch (e) {
-            var EXPRESSION_ERROR_TAG = (
-              '<oppia-expression-error-tag></oppia-expression-error-tag>');
-            if ((e instanceof ExpressionParserService.SyntaxError) ||
-                (e instanceof ExpressionSyntaxTreeService.ExpressionError)) {
-              return EXPRESSION_ERROR_TAG;
-            }
-            throw e;
-          }
-        });
-      },
-      // Returns null if the evaluation fails.
-      processUnicode: function(sourceUnicode, envs) {
-        try {
-          return sourceUnicode.replace(/{{([^}]*)}}/g, function(match, p1) {
-            // TODO(sll): Remove the call to $filter once we have a
-            // custom UI for entering expressions. It is only needed because
-            // expressions are currently input inline via the RTE.
-            return ExpressionEvaluatorService.evaluateExpression(
-              $filter('convertHtmlToUnicode')(p1), envs);
-          });
-        } catch (e) {
-          if ((e instanceof ExpressionParserService.SyntaxError) ||
-              (e instanceof ExpressionSyntaxTreeService.ExpressionError)) {
-            return null;
-          }
-          throw e;
+import { convertHtmlToUnicode } from 'filters/convert-html-to-unicode.filter';
+import { ExpressionEvaluatorService } from
+  'expressions/expression-evaluator.service';
+import { ExpressionParserService } from 'expressions/expression-parser.service';
+import { ExpressionSyntaxTreeService } from
+  'expressions/expression-syntax-tree.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExpressionInterpolationService {
+  constructor(
+    private expressionEvaluatorService: ExpressionEvaluatorService,
+    private expressionParserService: ExpressionParserService,
+    private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
+    private htmlEscaperService: HtmlEscaperService
+  ) {}
+
+  processHtml(sourceHtml: string, envs: Record<string, string>[]): string {
+    return sourceHtml.replace(/{{([^}]*)}}/g, (match, p1)=> {
+      try {
+        // TODO(sll): Remove the call to $filter once we have a
+        // custom UI for entering expressions. It is only needed because
+        // expressions are currently input inline via the RTE.
+        return this.htmlEscaperService.unescapedStrToEscapedStr(
+          this.expressionEvaluatorService.evaluateExpression(
+            convertHtmlToUnicode(p1), envs) as string);
+      } catch (e) {
+        const EXPRESSION_ERROR_TAG = (
+          '<oppia-expression-error-tag></oppia-expression-error-tag>');
+        if ((e instanceof this.expressionParserService.SyntaxError) ||
+            (e instanceof this.expressionSyntaxTreeService.ExpressionError)) {
+          return EXPRESSION_ERROR_TAG;
         }
-      },
-      // This works for both unicode and HTML.
-      getParamsFromString: function(sourceString) {
-        var matches = sourceString.match(/{{([^}]*)}}/g) || [];
-
-        var allParams = [];
-        for (var i = 0; i < matches.length; i++) {
-          // Trim the '{{' and '}}'.
-          matches[i] = matches[i].substring(2, matches[i].length - 2);
-
-          var params = ExpressionSyntaxTreeService.getParamsUsedInExpression(
-            $filter('convertHtmlToUnicode')(matches[i]));
-
-          for (var j = 0; j < params.length; j++) {
-            if (allParams.indexOf(params[j]) === -1) {
-              allParams.push(params[j]);
-            }
-          }
-        }
-
-        return allParams.sort();
+        throw e;
       }
-    };
+    });
   }
-]);
+
+  processUnicode(
+      sourceUnicode: string, envs: Record<string, string>[]): string {
+    try {
+      return sourceUnicode.replace(/{{([^}]*)}}/g, (match, p1)=> {
+        // TODO(sll): Remove the call to $filter once we have a
+        // custom UI for entering expressions. It is only needed because
+        // expressions are currently input inline via the RTE.
+        return this.expressionEvaluatorService.evaluateExpression(
+          convertHtmlToUnicode(p1), envs) as string;
+      });
+    } catch (e) {
+      if ((e instanceof this.expressionParserService.SyntaxError) ||
+          (e instanceof this.expressionSyntaxTreeService.ExpressionError)) {
+        return null;
+      }
+      throw e;
+    }
+  }
+
+  getParamsFromString(sourceString: string): string[] {
+    let matches = sourceString.match(/{{([^}]*)}}/g) || [];
+
+    let allParams = [];
+    for (let i = 0; i < matches.length; i++) {
+      // Trim the '{{' and '}}'.
+      matches[i] = matches[i].substring(2, matches[i].length - 2);
+
+      let params = this.expressionSyntaxTreeService.getParamsUsedInExpression(
+        convertHtmlToUnicode(matches[i]));
+
+      for (let j = 0; j < params.length; j++) {
+        if (allParams.indexOf(params[j]) === -1) {
+          allParams.push(params[j]);
+        }
+      }
+    }
+
+    return allParams.sort();
+  }
+}
+
+angular.module('oppia').factory(
+  'ExpressionInterpolationService',
+  downgradeInjectable(ExpressionInterpolationService));

@@ -58,8 +58,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/exploration-editor-page/services/graph-data.service');
 require('pages/exploration-editor-page/services/exploration-property.service');
@@ -73,6 +73,9 @@ describe('Exploration Warnings Service', function() {
   var StateTopAnswersStatsBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
@@ -117,12 +120,6 @@ describe('Exploration Warnings Service', function() {
       'WrittenTranslationsObjectFactory',
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
 
   describe('when exploration param changes has jinja values', function() {
