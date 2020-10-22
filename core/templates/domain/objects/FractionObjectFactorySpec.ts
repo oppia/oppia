@@ -22,8 +22,8 @@ import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 
 describe('Fraction Object Factory', () => {
-  let errors: typeof ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
-  let fraction: FractionObjectFactory;
+  let errors = null;
+  let fraction = null;
 
   beforeEach(() => {
     errors = ObjectsDomainConstants.FRACTION_PARSING_ERRORS;

@@ -77,7 +77,7 @@ export class Fraction {
   }
 
   convertToSimplestForm(): Fraction {
-    var gcd = (x: number, y: number): number => {
+    var gcd = (x: number, y: number) => {
       return y === 0 ? x : gcd(y, x % y);
     };
     var g = gcd(this.numerator, this.denominator);
