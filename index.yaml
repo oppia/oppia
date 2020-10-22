@@ -2,6 +2,11 @@ indexes:
 
 - kind: GeneralSuggestionModel
   properties:
+  - name: suggestion_type
+  - name: last_updated
+
+- kind: GeneralSuggestionModel
+  properties:
   - name: deleted
   - name: status
   - name: suggestion_type
