@@ -1536,6 +1536,7 @@ class RemoveGaeIdOneOffJobTests(test_utils.GenericTestBase):
                     gae_id='gae_id'
                 )
             )
+            original_setting_model.update_timestamps()
             original_setting_model.put()
 
             self.assertIsNotNone(original_setting_model.gae_id)
@@ -1562,6 +1563,7 @@ class RemoveGaeIdOneOffJobTests(test_utils.GenericTestBase):
                 email='test@email.com',
             )
         )
+        original_setting_model.update_timestamps()
         original_setting_model.put()
 
         self.assertNotIn('gae_id', original_setting_model._values)  # pylint: disable=protected-access

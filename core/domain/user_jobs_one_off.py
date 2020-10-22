@@ -451,7 +451,9 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             del user_settings_model._properties['gae_id']  # pylint: disable=protected-access
             if 'gae_id' in user_settings_model._values:  # pylint: disable=protected-access
                 del user_settings_model._values['gae_id']  # pylint: disable=protected-access
-            user_settings_model.put(update_last_updated_time=False)
+            user_settings_model.update_timestamps(
+                update_last_updated_time=False)
+            user_settings_model.put()
             yield (
                 'SUCCESS_REMOVED - UserSettingsModel', user_settings_model.id)
         else:
