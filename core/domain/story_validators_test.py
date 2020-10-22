@@ -325,6 +325,7 @@ class StorySnapshotMetadataModelValidatorTests(
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -395,6 +396,7 @@ class StorySnapshotMetadataModelValidatorTests(
             story_models.StorySnapshotMetadataModel(
                 id='0-3', committer_id=self.owner_id, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -416,6 +418,7 @@ class StorySnapshotMetadataModelValidatorTests(
             'cmd': 'delete_story_node',
             'invalid_attribute': 'invalid'
         }]
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -496,6 +499,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -550,6 +554,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             story_models.StorySnapshotContentModel(
                 id='0-3'))
         model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -621,6 +626,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -673,6 +679,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.story_id = '0'
+        model_with_invalid_version_in_id.update_timestamps()
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
@@ -697,6 +704,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
                 post_commit_is_private=False))
         model_with_invalid_id.story_id = '0'
+        model_with_invalid_id.update_timestamps()
         model_with_invalid_id.put()
         expected_output = [
             (
@@ -714,6 +722,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -727,6 +736,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -741,6 +751,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_invalid_true_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'public'
         self.model_instance_0.post_commit_is_private = True
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
 
         expected_output = [
@@ -757,6 +768,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_invalid_false_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'private'
         self.model_instance_0.post_commit_is_private = False
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
 
         expected_output = [
@@ -777,6 +789,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             'cmd': 'delete_story_node',
             'invalid_attribute': 'invalid'
         }]
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -854,6 +867,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
@@ -889,6 +903,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         story_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
         self.model_instance_0.story_model_last_updated = (
             story_model.last_updated)
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -903,6 +918,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_node_titles(self):
         self.model_instance_0.node_titles = ['Title 1']
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -916,6 +932,7 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_story_related_property(self):
         self.model_instance_0.title = 'invalid'
+        self.model_instance_0.update_timestamps()
         self.model_instance_0.put()
         expected_output = [
             (
@@ -927,3 +944,4 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated StorySummaryModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
+			
