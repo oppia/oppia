@@ -101,6 +101,14 @@ commands:
               circleci-agent step halt
             fi
 
+  webpack_build:
+    description: "Build Javascript files"
+    steps:
+      - run:
+          name: Builds Javascript files
+          command: |
+            python -m scripts.run_e2e_tests --prod_env --build-only
+
 jobs:
   setup_and_typescript_tests:
     <<: *job_defaults
@@ -145,10 +153,11 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - webpack_build
       - run:
           name: Run e2e navigation test
           command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --skip-build --suite="navigation"
       - check_release_changelog_update_branch
       - run:
           name: Run e2e admin page test
@@ -176,6 +185,7 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - webpack_build
       - run:
           name: Run e2e publication test
           command: |
@@ -209,6 +219,7 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - webpack_build
       - run:
           name: Run e2e users test
           command: |
@@ -245,10 +256,11 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - webpack_build
       - run:
           name: Run e2e file upload features test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadFeatures"
       - run:
           name: Run e2e play voiceovers test
           command: |
@@ -274,10 +286,11 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - webpack_build
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
