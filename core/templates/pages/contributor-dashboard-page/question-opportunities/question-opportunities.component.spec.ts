@@ -236,9 +236,9 @@ describe('Question opportunities component', function() {
         result: $q.resolve()
       });
       $rootScope.$apply();
-      // Remove not from expect.
-      expect(openSpy).not.toHaveBeenCalled();
-      expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
+
+      expect(openSpy).toHaveBeenCalled();
+      expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     });
 
   it('should suggest a question when dismissing create question modal',
@@ -282,9 +282,9 @@ describe('Question opportunities component', function() {
         result: $q.reject()
       });
       $rootScope.$apply();
-      // Remove not from expect.
-      expect(openSpy).not.toHaveBeenCalled();
-      expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
+
+      expect(openSpy).toHaveBeenCalled();
+      expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     });
 
   it('should not create a question when dismissing select skill and skill' +
