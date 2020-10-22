@@ -21,7 +21,7 @@ import { ExplorationTaskModel } from
 import { HighBounceRateTask } from
   'domain/improvements/high-bounce-rate-task.model';
 import { TaskEntryBackendDict } from
-  'domain/improvements/TaskEntryObjectFactory';
+  'domain/improvements/task-entry.model';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/ineffective-feedback-loop-task.model';
 import { NeedsGuidingResponsesTask } from
