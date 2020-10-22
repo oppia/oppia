@@ -116,6 +116,8 @@ def _save_voiceover_applications(voiceover_applications):
             voiceover_application)
         voiceover_application_models.append(voiceover_application_model)
 
+    suggestion_models.GeneralVoiceoverApplicationModel.update_timestamps_multi(
+        voiceover_application_models)
     suggestion_models.GeneralVoiceoverApplicationModel.put_multi(
         voiceover_application_models)
 

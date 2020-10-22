@@ -47,7 +47,6 @@ require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -1342,6 +1341,7 @@ angular.module('oppia').directive('conversationSkin', [
             ctrl.directiveSubscriptions.add(
               LearnerViewRatingService.onRatingUpdated.subscribe(() => {
                 $scope.userRating = LearnerViewRatingService.getUserRating();
+                AlertsService.addSuccessMessage('Rating saved!', 1000);
               })
             );
             $window.addEventListener('beforeunload', function(e) {

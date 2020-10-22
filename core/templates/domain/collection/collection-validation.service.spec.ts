@@ -18,17 +18,15 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
-import { CollectionBackendDict, Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
+import { CollectionNode } from
+  'domain/collection/collection-node.model';
+import { CollectionBackendDict, Collection } from
+  'domain/collection/collection.model';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 
 describe('Collection validation service', function() {
   let collectionValidationService: CollectionValidationService = null;
-  let collectionObjectFactory: CollectionObjectFactory = null;
-  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
   let sampleCollectionBackendObject: CollectionBackendDict = null;
   let _sampleCollection: Collection = null;
 
@@ -43,8 +41,6 @@ describe('Collection validation service', function() {
     });
 
     collectionValidationService = TestBed.get(CollectionValidationService);
-    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
-    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -61,13 +57,13 @@ describe('Collection validation service', function() {
         completed_exploration_ids: ['expId2']
       }
     };
-    _sampleCollection = collectionObjectFactory.create(
+    _sampleCollection = Collection.create(
       sampleCollectionBackendObject);
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
   });
 
   var _addCollectionNode = (explorationId, exists, isPublic) => {
-    var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
+    var collectionNode = CollectionNode.createFromExplorationId(
       explorationId);
     if (exists) {
       collectionNode.setExplorationSummaryObject({
