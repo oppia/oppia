@@ -16,28 +16,72 @@
  * @fileoverview Service to revert/change admin-config-tab properties
  */
 
-require('pages/admin-page/admin-page.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+//import { ADMIN_HANDLER_URL } from '';
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
+ //require('pages/admin-page/admin-page.constants.ajs.ts');
 
-angular.module('oppia').factory('AdminConfigTabBackendApiService', [
-  '$http', 'ADMIN_HANDLER_URL',
-  function($http, ADMIN_HANDLER_URL) {
-    var _revertConfigProperty = function(configPropertyId) {
-      return $http.post(ADMIN_HANDLER_URL, {
-        action: 'revert_config_property',
-        config_property_id: configPropertyId
-      });
-    };
+ @Injectable({
+  providedIn: 'root'
+})
+ export class AdminConfigTabBackendApiService{
 
-    var _saveConfigProperties = function(newConfigPropertyValues) {
-      return $http.post(ADMIN_HANDLER_URL, {
-        action: 'save_config_properties',
-        new_config_property_values: newConfigPropertyValues
-      });
-    };
+   constructor(private http: HttpClient,
+    private AdminPageConstants: AdminPageConstants ) {}
+    private ADMIN_HANDLER_URL: ADMIN_HANDLER_URL) {}
 
-    return {
+    return _revertConfigProperty(
+      {configPropertyId: number,
+      
+        this:http.post(
+          ADMIN_HANDLER_URL).toPromise().then(
+           (response => {
+            action: 'revert_config_property',
+            config_property_id: configPropertyId
+         })
+      )
+        
+
+      return _saveConfigProperties(
+        newConfigPropertyValues: object
+      )
+      {
+        return this:http.post(
+          ADMIN_HANDLER_URL).toPromise().then(
+           (response => {
+          action: 'save_config_properties',
+          new_config_property_values: newConfigPropertyValues
+      })
+          )
+ };
+
+ angular.module('oppia').factory(
+  'AdminConfigTabBackendApiService', downgradeInjectable(
+    AdminConfigTabBackendApiService));
+
+
+//angular.module('oppia').factory('AdminConfigTabBackendApiService', [
+  //'$http', 'ADMIN_HANDLER_URL',
+  //function($http, ADMIN_HANDLER_URL) {
+    //var _revertConfigProperty = function(configPropertyId) {
+      //return $http.post(ADMIN_HANDLER_URL, {
+        //action: 'revert_config_property',
+        //config_property_id: configPropertyId
+      //});
+    //};
+
+    //var _saveConfigProperties = function(newConfigPropertyValues) {
+      //return $http.post(ADMIN_HANDLER_URL, {
+        //action: 'save_config_properties',
+        //new_config_property_values: newConfigPropertyValues
+      //});
+    //};
+
+ /*   return {
       revertConfigProperty: _revertConfigProperty,
       saveConfigProperties: _saveConfigProperties,
     };
   }
-]);
+]);*/
