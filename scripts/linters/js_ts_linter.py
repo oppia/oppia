@@ -1096,7 +1096,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             # string('') which is at the index 1 and message-id from the end.
             if re.search(r'^\d+:\d+', line.lstrip()):
                 # Replacing message-id with an empty string('').
-                line = re.sub(r'(\w+-*)+$', '', line)
+                if not 'Parsing error:' in line:
+                    line = re.sub(r'(\w+-*)+$', '', line)
                 error_string = re.search(r'error', line).group(0)
                 error_message = line.replace(error_string, '', 1)
             else:
