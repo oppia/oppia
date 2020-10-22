@@ -31,7 +31,7 @@ interface HumanReadableContributorsSummary {
 }
 
 export interface LearnerExplorationSummaryBackendDict {
-  'category': string;
+  'category'?: string | undefined;
   'community_owned': boolean;
   'activity_type': string;
   'last_updated_msec': number;
@@ -51,7 +51,7 @@ export interface LearnerExplorationSummaryBackendDict {
 
 export class LearnerExplorationSummary {
   constructor(
-      public category: string,
+      public category: string | undefined,
       public communityOwned: boolean,
       public id: string,
       public languageCode: string,

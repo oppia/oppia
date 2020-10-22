@@ -38,15 +38,41 @@ export class CollectionNode {
   }
 
   static create(
-      collectionNodeBackendObject: CollectionNodeBackendDict):
-      CollectionNode {
+    collectionNodeBackendObject: CollectionNodeBackendDict):
+    CollectionNode {
     return new CollectionNode(collectionNodeBackendObject);
   }
 
   static createFromExplorationId(explorationId: string): CollectionNode {
     return CollectionNode.create({
       exploration_id: explorationId,
-      exploration_summary: null
+      exploration_summary: {
+        'community_owned': false,
+        'activity_type': '',
+        'last_updated_msec': 123,
+        'ratings': {
+          '1': 1,
+          '2': 1,
+          '3': 1,
+          '4': 1,
+          '5': 1
+        },
+        'id': '',
+        'created_on_msec': 123,
+        'human_readable_contributors_summary': {
+          'abc': {
+            'num_commits': 123
+          }
+        },
+        'language_code': '',
+        'num_views': 123,
+        'objective': '',
+        'status': '',
+        'tags': [],
+        'thumbnail_bg_color': '',
+        'thumbnail_icon_url': '',
+        'title': ''
+      }
     });
   }
 
@@ -59,7 +85,7 @@ export class CollectionNode {
   // Returns the title of the exploration represented by this collection node.
   // This property is immutable. The value returned by this function is
   // null if doesExplorationExist() returns false.
-  getExplorationTitle(): string {
+  getExplorationTitle(): string | null {
     if (this._explorationSummaryObject) {
       return this._explorationSummaryObject.title;
     } else {
@@ -76,7 +102,7 @@ export class CollectionNode {
   // Returns whether the exploration referenced by this node is private and
   // not published. This property is immutable. The value returned by this
   // function is undefined if doesExplorationExist() returns false.
-  isExplorationPrivate(): boolean {
+  isExplorationPrivate(): boolean | undefined {
     if (this._explorationSummaryObject) {
       return this._explorationSummaryObject.status === (
         AppConstants.ACTIVITY_STATUS_PRIVATE);
@@ -98,7 +124,7 @@ export class CollectionNode {
 
   // Sets the raw exploration summary object stored within this node.
   setExplorationSummaryObject(
-      explorationSummaryBackendObject:
+    explorationSummaryBackendObject:
       LearnerExplorationSummaryBackendDict): void {
     this._explorationSummaryObject = cloneDeep(
       explorationSummaryBackendObject);
