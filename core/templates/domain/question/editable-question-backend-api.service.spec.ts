@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,52 +16,41 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
-require('domain/question/QuestionObjectFactory');
-require('domain/question/editable-question-backend-api.service.ts');
-require('services/csrf-token.service.ts');
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service.ts';
 
 describe('Editable question backend API service', function() {
-  var EditableQuestionBackendApiService = null;
-  var QuestionObjectFactory;
-  var sampleDataResults = null;
-  var sampleDataResultsObjects = null;
-  var $httpBackend = null;
-  var CsrfService = null;
+  let editableQuestionBackendApiService: EditableQuestionBackendApiService;
+  let questionObjectFactory: QuestionObjectFactory = null;
+  let sampleDataResults = null;
+  let sampleDataResultsObjects = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(
-    'oppia', TranslatorProviderForTests));
+  importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    EditableQuestionBackendApiService = $injector.get(
-      'EditableQuestionBackendApiService');
-    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [EditableQuestionBackendApiService]
     });
-
+    editableQuestionBackendApiService = TestBed.get(
+      EditableQuestionBackendApiService);
+    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+    httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.get(CsrfTokenService);
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token');
+    });
     // Sample question object returnable from the backend.
     sampleDataResults = {
-      question_dict: {
+      questionDict: {
         id: '0',
         question_state_data: {
           content: {
@@ -120,20 +109,19 @@ describe('Editable question backend API service', function() {
 
     sampleDataResultsObjects = {
       questionObject:
-        QuestionObjectFactory.createFromBackendDict(
-          sampleDataResults.question_dict),
+        questionObjectFactory.createFromBackendDict(
+          sampleDataResults.questionDict),
       associated_skill_dicts: []
     };
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully create a new question', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should successfully create a new question', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
     let imageBlob = new Blob(
       ['data:image/png;base64,xyz'], {type: 'image/png'});
@@ -141,29 +129,31 @@ describe('Editable question backend API service', function() {
       filename: 'image.png',
       imageBlob: imageBlob
     };
-    var skillsId = ['0', '01', '02'];
-    var skillDifficulties = [1, 1, 2];
-    var questionObject = sampleDataResultsObjects.questionObject;
+    let skillsId = ['0', '01', '02'];
+    let skillDifficulties = [1, 1, 2];
+    let questionObject = sampleDataResultsObjects.questionObject;
 
-    $httpBackend.expectPOST('/question_editor_handler/create_new').respond(
-      200, {question_id: '0'});
-    EditableQuestionBackendApiService.createQuestion(
+    editableQuestionBackendApiService.createQuestion(
       skillsId, skillDifficulties, questionObject, [imageData]).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    var req = httpTestingController.expectOne(
+      '/question_editor_handler/create_new');
+    expect(req.request.method).toEqual('POST');
+    req.flush({ questionId: '0' });
+    flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith('0');
+    expect(successHandler).toHaveBeenCalledWith({questionId: '0'});
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use the rejection handler when create question fails',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(()=> {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      var skillsId = ['0', '01', '02'];
-      var skillDifficulties = [1, 1, 2];
-      var questionObject = sampleDataResultsObjects.questionObject;
+      let skillsId = ['0', '01', '02'];
+      let skillDifficulties = [1, 1, 2];
+      let questionObject = sampleDataResultsObjects.questionObject;
       let imageBlob = new Blob(
         ['data:image/png;base64,xyz'], {type: 'image/png'});
       let imageData = {
@@ -171,180 +161,203 @@ describe('Editable question backend API service', function() {
         imageBlob: imageBlob
       };
 
-      $httpBackend.expectPOST('/question_editor_handler/create_new').respond(
-        500, 'Error creating a new question.');
-      EditableQuestionBackendApiService.createQuestion(
+      editableQuestionBackendApiService.createQuestion(
         skillsId, skillDifficulties, questionObject, [imageData]).then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/question_editor_handler/create_new');
+      expect(req.request.method).toEqual('POST');
+
+      req.flush({
+        error: 'Error creating a new question.'},
+      { status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Error creating a new question.');
-    });
+    }));
 
   it('should successfully fetch an existing question from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      $httpBackend.expect('GET', '/question_editor_handler/data/0').respond(
-        sampleDataResults);
-      EditableQuestionBackendApiService.fetchQuestion('0').then(
+    fakeAsync(()=> {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      editableQuestionBackendApiService.fetchQuestion('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/question_editor_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects);
+        sampleDataResultsObjects.questionObject);
       expect(failHandler).not.toHaveBeenCalled();
     }
-  );
+    ));
 
   it('should use the rejection handler if the backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      $httpBackend.expect('GET', '/question_editor_handler/data/1').respond(
-        500, 'Error loading question 1.');
-      EditableQuestionBackendApiService.fetchQuestion('1').then(
+    fakeAsync(()=> {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      editableQuestionBackendApiService.fetchQuestion('1').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/question_editor_handler/data/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Error loading question 1.'},
+      {status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading question 1.');
     }
-  );
+    ));
 
   it('should update a question after fetching it from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var question = null;
+    fakeAsync(()=> {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let question = null;
 
       // Loading a question the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/question_editor_handler/data/0').respond(
-        sampleDataResults);
-
-      EditableQuestionBackendApiService.fetchQuestion('0').then(
-        function(data) {
-          question = data.questionObject.toBackendDict(false);
+      editableQuestionBackendApiService.fetchQuestion('0').then(
+        data => {
+          question = data.toBackendDict(false);
         });
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/question_editor_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+
       question.question_state_data.content.html = 'New Question Content';
       question.version = '2';
-      var questionWrapper = {
-        question_dict: question
+      let questionWrapper = {
+        questionDict: question
       };
 
-      $httpBackend.expect('PUT', '/question_editor_handler/data/0').respond(
-        questionWrapper);
-
       // Send a request to update question.
-      EditableQuestionBackendApiService.updateQuestion(
+      editableQuestionBackendApiService.updateQuestion(
         question.id, question.version, 'Question Data is updated', []
       ).then(successHandler, failHandler);
-      $httpBackend.flush();
-
+      req = httpTestingController.expectOne(
+        '/question_editor_handler/data/0');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(questionWrapper);
+      flushMicrotasks();
       expect(successHandler).toHaveBeenCalledWith(question);
       expect(failHandler).not.toHaveBeenCalled();
     }
-  );
+    ));
 
   it('should use the rejection handler if the question to update ' +
-     'doesn\'t exist', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    // Loading a question the first time should fetch it from the backend.
-    $httpBackend.expect('PUT', '/question_editor_handler/data/1').respond(
-      404, 'Question with given id doesn\'t exist.');
-
-    EditableQuestionBackendApiService.updateQuestion(
+     'doesn\'t exist', fakeAsync(()=> {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    editableQuestionBackendApiService.updateQuestion(
       '1', '1', 'Update an invalid question.', []
     ).then(successHandler, failHandler);
-    $httpBackend.flush();
 
+    var req = httpTestingController.expectOne(
+      '/question_editor_handler/data/1');
+    expect(req.request.method).toEqual('PUT');
+    req.flush({
+      error: 'Question with given id doesn\'t exist.'},
+    {status: 404, statusText: 'Not Found'});
+    flushMicrotasks();
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       'Question with given id doesn\'t exist.');
-  });
+  }));
 
-  it('should edit an existing question', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  it('should edit an existing question', fakeAsync(()=> {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    var questionId = '0';
-    var skillIdsTaskArray = ['1', '2', 1];
-    var difficulty = 1;
+    let questionId = '0';
+    let skillIdsTaskArray = ['1', '2', 1];
+    let difficulty = 1;
 
-    $httpBackend.expectPUT('/manage_question_skill_link/' + questionId)
-      .respond(200);
-    EditableQuestionBackendApiService.editQuestionSkillLinks(
+    editableQuestionBackendApiService.editQuestionSkillLinks(
       questionId, skillIdsTaskArray, difficulty).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/manage_question_skill_link/' + questionId);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({status: 200});
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use the rejection handler when editing an existing' +
-    ' question fails', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    ' question fails', fakeAsync(()=> {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    var questionId = '0';
-    var skillIdsTaskArray = ['1', '2', 1];
-    var difficulty = 1;
+    let questionId = '0';
+    let skillIdsTaskArray = ['1', '2', 1];
+    let difficulty = 1;
 
-    $httpBackend.expectPUT('/manage_question_skill_link/' + questionId)
-      .respond(500, 'Error loading question 0.');
-    EditableQuestionBackendApiService.editQuestionSkillLinks(
+    editableQuestionBackendApiService.editQuestionSkillLinks(
       questionId, skillIdsTaskArray, difficulty).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/manage_question_skill_link/' + questionId);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({
+      error: 'Error loading question 0.'},
+    {status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Error loading question 0.');
-  });
+  }));
 
-  it('should change difficulty from an existing question', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  it('should change difficulty from an existing question', fakeAsync(()=> {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    var questionId = '0';
-    var skillId = '1';
-    var difficulty = 1;
+    let questionId = '0';
+    let skillId = '1';
+    let difficulty = 1;
 
-    $httpBackend.expectPUT('/manage_question_skill_link/' + questionId)
-      .respond(200);
-    EditableQuestionBackendApiService.changeDifficulty(
+    editableQuestionBackendApiService.changeDifficulty(
       questionId, skillId, difficulty).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/manage_question_skill_link/' + questionId);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({status: 200});
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use the rejection handler when changing the difficulty of ' +
-    'an existing question fails', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    'an existing question fails', fakeAsync(()=> {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    var questionId = '0';
-    var skillId = '1';
-    var difficulty = 1;
-
-    $httpBackend.expectPUT('/manage_question_skill_link/' + questionId)
-      .respond(500, 'Error changing difficulty.');
-    EditableQuestionBackendApiService.changeDifficulty(
+    let questionId = '0';
+    let skillId = '1';
+    let difficulty = 1;
+    editableQuestionBackendApiService.changeDifficulty(
       questionId, skillId, difficulty).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/manage_question_skill_link/' + questionId);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({
+      error: 'Error changing difficulty.'},
+    {status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Error changing difficulty.');
-  });
+  }));
 });
