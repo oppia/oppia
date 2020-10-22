@@ -871,6 +871,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         model1.entity_type = 'exploration'
         model1.entity_id = 'exp1'
         model1.subject = 'subject'
+        model1.update_timestamps()
         model1.put()
 
         suggestion_models.GeneralSuggestionModel.create(

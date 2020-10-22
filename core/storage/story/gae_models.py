@@ -56,7 +56,7 @@ class StoryModel(base_models.VersionedModel):
     # The thumbnail background color of the story.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     # A high-level description of the story.
-    description = datastore_services.StringProperty(indexed=False)
+    description = datastore_services.StringProperty(indexed=True)
     # A set of notes, that describe the characters, main storyline, and setting.
     notes = datastore_services.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this story is written in.
@@ -122,6 +122,7 @@ class StoryModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         story_commit_log_entry.story_id = self.id
+        story_commit_log_entry.update_timestamps()
         story_commit_log_entry.put()
 
     @classmethod
@@ -234,7 +235,7 @@ class StorySummaryModel(base_models.BaseModel):
         datastore_services.DateTimeProperty(required=True, indexed=True))
     # The titles of the nodes in the story, in the same order as present there.
     node_titles = (
-        datastore_services.StringProperty(repeated=True, indexed=False))
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # The thumbnail filename of the story.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the story.
