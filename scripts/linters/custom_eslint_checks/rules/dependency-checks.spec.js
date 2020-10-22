@@ -18,7 +18,7 @@
 
 'use strict';
 
-var rule = require('./no-unused-dependency');
+var rule = require('./dependency-checks');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
