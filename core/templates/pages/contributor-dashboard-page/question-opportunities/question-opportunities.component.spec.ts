@@ -238,7 +238,6 @@ describe('Question opportunities component', function() {
       });
       $rootScope.$apply();
       expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
-
     });
 
   it('should suggest a question when dismissing create question modal',
