@@ -193,7 +193,7 @@ describe('Editable story backend API service', () => {
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.updateStory(
-        'storyId_1', '1', 'Update an invalid Story.', []
+        'storyId_1', 1, 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId_1');

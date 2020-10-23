@@ -95,7 +95,7 @@ export class EditableStoryBackendApiService {
   }
 
   private _updateStory(
-      storyId: string, storyVersion: string,
+      storyId: string, storyVersion: number,
       commitMessage: string,
       changeList: StoryChange[],
       successCallback: (value: StoryBackendDict) => void,
@@ -131,7 +131,7 @@ export class EditableStoryBackendApiService {
       new_story_status_is_public: newStoryStatusIsPublic
     };
     // eslint-disable-next-line max-len
-    this.http.put(storyPublishUrl, putData, { observe: 'response'}).toPromise().then(
+    this.http.put(storyPublishUrl, putData).toPromise().then(
       response => successCallback(),
       errorResponse => errorCallback(errorResponse.error.error));
   }
@@ -219,7 +219,7 @@ export class EditableStoryBackendApiService {
      * object. Errors are passed to the error callback, if one is provided.
      */
   updateStory(
-      storyId: string, storyVersion: string,
+      storyId: string, storyVersion: number,
       commitMessage: string,
       changeList: StoryChange[]):
     Promise<StoryBackendDict> {
