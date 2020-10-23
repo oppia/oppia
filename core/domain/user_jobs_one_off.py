@@ -19,9 +19,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import copy
+import imghdr
 
 from core import jobs
 from core.domain import exp_fetchers
+from core.domain import image_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -635,3 +637,73 @@ class CleanUpUserContributionsModelOneOffJob(
     def reduce(key, values):
         values.sort()
         yield (key, values)
+
+
+class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that verifies various aspects of profile_picture_data_url in the
+    UserSettingsModel.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(ProfilePictureAuditOneOffJob, cls).enqueue(job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model):  # pylint: disable=too-many-return-statements
+        if model.deleted:
+            yield ('SUCCESS - DELETED', model.username)
+            return
+
+        if model.username is None:
+            yield ('SUCCESS - NOT REGISTERED', model.username)
+            return
+
+        if model.profile_picture_data_url is None:
+            yield ('FAILURE - MISSING PROFILE PICTURE', model.username)
+            return
+
+        try:
+            profile_picture_binary = utils.convert_png_data_url_to_binary(
+                model.profile_picture_data_url)
+        except Exception:
+            yield ('FAILURE - INVALID PROFILE PICTURE DATA URL', model.username)
+            return
+
+        if imghdr.what(None, h=profile_picture_binary) != 'png':
+            yield ('FAILURE - PROFILE PICTURE NOT PNG', model.username)
+            return
+
+        try:
+            # Load the image to retrieve dimensions for later verification.
+            height, width = image_services.get_image_dimensions(
+                profile_picture_binary)
+        except Exception:
+            yield ('FAILURE - CANNOT LOAD PROFILE PICTURE', model.username)
+            return
+
+        if (
+                height != user_services.GRAVATAR_SIZE_PX or
+                width != user_services.GRAVATAR_SIZE_PX
+        ):
+            yield (
+                'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - %s,%s' % (
+                    height, width
+                ),
+                model.username
+            )
+            return
+
+        yield ('SUCCESS', model.username)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
