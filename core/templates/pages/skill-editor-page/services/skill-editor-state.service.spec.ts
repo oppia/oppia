@@ -95,7 +95,7 @@ describe('Skill editor state service', function() {
     var self = {
       backendSkillRightsObject: null,
       failure: null,
-      fetchSkillRights: null
+      fetchSkillRightsAsync: null
     };
 
     var _fetchSkillRights = function() {
@@ -110,7 +110,7 @@ describe('Skill editor state service', function() {
 
     self.backendSkillRightsObject = {};
     self.failure = null;
-    self.fetchSkillRights = _fetchSkillRights;
+    self.fetchSkillRightsAsync = _fetchSkillRights;
 
     return self;
   };
@@ -366,11 +366,11 @@ describe('Skill editor state service', function() {
 
   it('should request to load the skill rights from the backend',
     function() {
-      spyOn(fakeSkillRightsBackendApiService, 'fetchSkillRights')
+      spyOn(fakeSkillRightsBackendApiService, 'fetchSkillRightsAsync')
         .and.callThrough();
 
       SkillEditorStateService.loadSkill('skill_id_1');
-      expect(fakeSkillRightsBackendApiService.fetchSkillRights)
+      expect(fakeSkillRightsBackendApiService.fetchSkillRightsAsync)
         .toHaveBeenCalled();
     });
 
