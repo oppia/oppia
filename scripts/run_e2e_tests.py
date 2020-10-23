@@ -48,7 +48,7 @@ sys.path.insert(0, _PYTHON_LIBS_PATH)
 
 import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-MAXIMUM_RUNS = 3
+MAX_RETRY_COUNT = 3
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
@@ -701,8 +701,8 @@ def run_tests(args=None):
 
 
 def main(args=None):
-    """Run tests, rerunning at most MAXIMUM_RUNS times if they flake."""
-    for _ in python_utils.RANGE(MAXIMUM_RUNS):
+    """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
+    for _ in python_utils.RANGE(MAX_RETRY_COUNT):
         flake_state = run_tests(args=args)
         if flake_state != 'flake':
             break
