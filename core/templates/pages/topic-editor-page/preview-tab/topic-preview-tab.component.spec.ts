@@ -23,7 +23,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Topic preview tab', function() {
   importAllAngularServices();
-  
+
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;

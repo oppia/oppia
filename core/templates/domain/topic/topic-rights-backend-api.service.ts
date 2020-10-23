@@ -124,7 +124,6 @@ export class TopicRightsBackendApiService {
      * Gets a topic's rights, given its ID.
      */
     fetchTopicRights(topicId: string): Promise<TopicRights> {
-      console.log('entered fetchTopicRights');
       return new Promise((resolve, reject) => {
         this._fetchTopicRights(topicId, resolve, reject);
       });

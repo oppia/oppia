@@ -24,7 +24,7 @@ const CONSTANTS = require('constants.ts');
 
 describe('Create New Story Modal Controller', function() {
   importAllAngularServices();
-  
+
   var $scope = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;

@@ -206,8 +206,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
           });
         TopicRightsBackendApiService.fetchTopicRights(
           topicId).then(function(newBackendTopicRightsObject) {
-          console.log('newBackendTopicRightsObject');
-          console.log(newBackendTopicRightsObject);
           _updateTopicRights(newBackendTopicRightsObject);
           _topicIsLoading = false;
         }, function(error) {

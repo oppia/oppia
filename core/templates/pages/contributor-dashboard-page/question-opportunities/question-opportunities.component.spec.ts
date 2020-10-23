@@ -33,7 +33,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question opportunities component', function() {
   importAllAngularServices();
-  
+
   var ctrl = null;
   var $q = null;
   var $rootScope = null;

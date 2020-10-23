@@ -22,7 +22,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Suggestion Editor Modal Controller', function() {
   importAllAngularServices();
-  
+
   let $httpBackend = null;
   let $uibModal = null;
   let $uibModalInstance = null;

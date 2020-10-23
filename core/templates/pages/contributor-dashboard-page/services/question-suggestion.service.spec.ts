@@ -23,7 +23,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Suggestion Service', function() {
   importAllAngularServices();
-  
+
   let $httpBackend = null;
   let $q = null;
   let CsrfTokenService = null;
