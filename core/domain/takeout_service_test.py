@@ -53,7 +53,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
     USER_ID_1 = 'user_1'
     PROFILE_ID_1 = 'profile_1'
-    USER_GAE_ID_1 = 'gae_1'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     USER_1_EMAIL = 'user1@example.com'
@@ -156,7 +155,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE,
             username=self.GENERIC_USERNAME,
@@ -179,7 +177,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE,
             username=None,
@@ -206,13 +203,11 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         super(TakeoutServiceProfileUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE
         ).put()
@@ -239,7 +234,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     USER_ID_1 = 'user_1'
     PROFILE_ID_1 = 'profile_1'
-    USER_GAE_ID_1 = 'gae_1'
     THREAD_ID_1 = 'thread_id_1'
     THREAD_ID_2 = 'thread_id_2'
     TOPIC_ID_1 = 'topic_id_1'
@@ -375,7 +369,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         for creator_id in self.CREATOR_IDS:
             user_models.UserSettingsModel(
                 id=creator_id,
-                gae_id='gae_' + creator_id,
                 username='username' + creator_id,
                 email=creator_id + '@example.com'
             ).put()
@@ -527,7 +520,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE,
             username=self.GENERIC_USERNAME,
@@ -551,7 +543,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE,
             username=None,
@@ -722,13 +713,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         super(TakeoutServiceFullUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE
         ).put()
