@@ -2180,6 +2180,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model = (
             user_models.UserSettingsModel.get_by_id(self.owner_id))
         user_settings_model.username = None
+        user_settings_model.update_timestamps()
         user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS - NOT REGISTERED', 1]])
@@ -2188,6 +2189,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model = (
             user_models.UserSettingsModel.get_by_id(self.owner_id))
         user_settings_model.deleted = True
+        user_settings_model.update_timestamps()
         user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS - DELETED', 1]])
@@ -2212,6 +2214,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model = (
             user_models.UserSettingsModel.get_by_id(moderator_id))
         user_settings_model.deleted = True
+        user_settings_model.update_timestamps()
         user_settings_model.put()
 
         output = self._run_one_off_job()
