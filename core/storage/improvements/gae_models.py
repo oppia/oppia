@@ -264,5 +264,6 @@ class TaskEntryModel(base_models.BaseModel):
             status=status,
             resolver_id=resolver_id,
             resolved_on=resolved_on)
+        task_entry.update_timestamps()
         task_entry.put()
         return task_id

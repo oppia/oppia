@@ -42,8 +42,9 @@ transaction_services = models.Registry.import_transaction_services()
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
-# The maximum number of suggestions to recommend to a reviewer to review.
-MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = 5
+# The maximum number of suggestions to recommend to a reviewer to review in an
+# email.
+MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER = 5
 
 # A dictionary that maps the suggestion type to a lambda function, which is
 # used to retrieve the html content that corresponds to the suggestion's
@@ -288,9 +289,11 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
 
-    suggestion_models.GeneralSuggestionModel.put_multi(
+    suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update,
         update_last_updated_time=update_last_updated_time)
+    suggestion_models.GeneralSuggestionModel.put_multi(
+        suggestion_models_to_update)
 
 
 def get_commit_message_for_suggestion(author_username, commit_message):
@@ -784,9 +787,10 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         if user_contribution_rights.can_review_questions:
             for question_suggestion in question_suggestions:
                 # Break early because we only want the top
-                # MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER number of suggestions.
+                # MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER number of
+                # suggestions.
                 if len(suggestions_waiting_longest_heap) == (
-                        MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
+                        MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
                     break
                 # We can't include suggestions that were authored by the
                 # reviewer because reviewers aren't allowed to review their own
@@ -815,7 +819,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
                 )
                 for translation_suggestion in translation_suggestions:
                     if len(suggestions_waiting_longest_heap) == (
-                            MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
+                            MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
                         # The shortest review wait time corresponds to the most
                         # recent review submission date, which is the max of
                         # the heap.
@@ -837,7 +841,8 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         # Get the key information from each suggestion that will be used to
         # email reviewers.
         reviewer_reviewable_suggestion_infos = []
-        for _ in python_utils.RANGE(MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER):
+        for _ in python_utils.RANGE(
+                MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER):
             if len(suggestions_waiting_longest_heap) == 0:
                 break
             _, suggestion = heapq.heappop(suggestions_waiting_longest_heap)
@@ -870,6 +875,35 @@ def get_submitted_suggestions(user_id, suggestion_type):
             .get_user_created_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+
+
+def get_info_about_suggestions_waiting_too_long_for_review():
+    """Gets the information about the suggestions that have been waiting longer
+    than suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days
+    for a review on the Contributor Dashboard. There can be information about at
+    most suggestion_models.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN suggestions.
+    The information about the suggestions are returned in descending order by
+    the suggestion's review wait time.
+
+    Returns:
+        list(ReviewableSuggestionEmailContentInfo). A list of reviewable
+        suggestion email content info objects that represent suggestions that
+        have been waiting too long for a review. Each object contains the type
+        of the suggestion, the language of the suggestion, the suggestion
+        content (question/translation), and the date that the suggestion was
+        submitted for review. The objects are sorted in descending order based
+        on review wait time.
+    """
+    suggestions_waiting_too_long_for_review = [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_suggestions_waiting_too_long_for_review())
+    ]
+    return [
+        create_reviewable_suggestion_email_info_from_suggestion(
+            suggestion) for suggestion in
+        suggestions_waiting_too_long_for_review
+    ]
 
 
 def get_user_proficiency_from_model(user_proficiency_model):
@@ -911,6 +945,7 @@ def _update_user_proficiency(user_proficiency):
             user_proficiency.onboarding_email_sent
         )
 
+        user_proficiency_model.update_timestamps()
         user_proficiency_model.put()
 
     else:
@@ -1108,6 +1143,42 @@ def get_community_contribution_stats():
         community_contribution_stats_model)
 
 
+def get_suggestion_types_that_need_reviewers():
+    """Uses the community contribution stats to determine which suggestion
+    types need more reviewers. Suggestion types need more reviewers if the
+    number of suggestions in that type divided by the number of reviewers is
+    greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+
+    Returns:
+        dict. A dictionary that uses the presence of its keys to indicate which
+        suggestion types need more reviewers. The possible key values are the
+        suggestion types listed in
+        suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
+        values for each suggestion type are the following:
+        - for question suggestions the value is an empty set
+        - for translation suggestions the value is a nonempty set containing the
+            language codes of the translation suggestions that need more
+            reviewers.
+    """
+    suggestion_types_needing_reviewers = {}
+    stats = get_community_contribution_stats()
+
+    language_codes_that_need_reviewers = (
+        stats.get_translation_language_codes_that_need_reviewers()
+    )
+    if len(language_codes_that_need_reviewers) != 0:
+        suggestion_types_needing_reviewers[
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = (
+                language_codes_that_need_reviewers
+            )
+
+    if stats.are_question_reviewers_needed():
+        suggestion_types_needing_reviewers[
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] = {}
+
+    return suggestion_types_needing_reviewers
+
+
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given
@@ -1146,6 +1217,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
     stats = create_community_contribution_stats_from_model(stats_model)
     stats.validate()
 
+    stats_model.update_timestamps()
     stats_model.put()
 
 
