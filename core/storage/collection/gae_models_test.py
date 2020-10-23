@@ -81,13 +81,11 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         super(CollectionRightsModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id='gae_1_id',
             email='some@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
-            gae_id='gae_2_id',
             email='some_other@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
@@ -470,13 +468,11 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         super(CollectionSummaryModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
-            gae_id='gae_1_id',
             email='some@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2_NEW,
-            gae_id='gae_2_id',
             email='some_other@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
