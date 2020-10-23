@@ -208,10 +208,10 @@ class OrphanStoriesAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key == DeleteOrphanStoriesOneOffJob._DELETED_KEY:
+        if key == OrphanStoriesAuditJob._DELETED_KEY:
             yield (key, ['Encountered %d deleted stories.' % (
                 sum(ast.literal_eval(v) for v in values))])
-        elif key == DeleteOrphanStoriesOneOffJob._SKIPPED_KEY:
+        elif key == OrphanStoriesAuditJob._SKIPPED_KEY:
             yield (key, ['Skipped valid %d stories.' % (
                 sum(ast.literal_eval(v) for v in values))])
         else:
