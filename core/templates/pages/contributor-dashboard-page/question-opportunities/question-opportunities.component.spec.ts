@@ -197,13 +197,13 @@ describe('Question opportunities component', function() {
 
   it('should create a question when closing create question modal',
     function() {
-      alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
       ctrl.$onInit();
       $rootScope.$apply();
+      alertsService.clearWarnings();
 
       openSpy.and.returnValue({
         result: $q.resolve({
@@ -229,7 +229,6 @@ describe('Question opportunities component', function() {
         })
       });
       ctrl.onClickSuggestQuestionButton('1');
-      expect(openSpy).toHaveBeenCalled();
       openSpy.calls.reset();
 
       spyOn(questionUndoRedoService, 'clearChanges');
@@ -237,18 +236,20 @@ describe('Question opportunities component', function() {
         result: $q.resolve()
       });
       $rootScope.$apply();
+
+      expect(openSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     });
 
   it('should suggest a question when dismissing create question modal',
     function() {
-      alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
       ctrl.$onInit();
       $rootScope.$apply();
+      alertsService.clearWarnings();
 
       openSpy.and.returnValue({
         result: $q.resolve({
@@ -274,7 +275,6 @@ describe('Question opportunities component', function() {
         })
       });
       ctrl.onClickSuggestQuestionButton('1');
-      expect(openSpy).toHaveBeenCalled();
       openSpy.calls.reset();
 
       spyOn(questionUndoRedoService, 'clearChanges');
@@ -282,6 +282,8 @@ describe('Question opportunities component', function() {
         result: $q.reject()
       });
       $rootScope.$apply();
+
+      expect(openSpy).toHaveBeenCalled();
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     });
 
