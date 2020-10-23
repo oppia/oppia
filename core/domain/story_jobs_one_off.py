@@ -26,6 +26,7 @@ from core import jobs
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import topic_fetchers
 from core.platform import models
 import feconf
 
@@ -128,6 +129,99 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         elif key == RegenerateStorySummaryOneOffJob._PROCESSED_KEY:
             yield (key, ['Successfully processed %d stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)
+
+
+class DeleteOrphanStoriesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to delete orphaned Story models and associated Summary
+    models.
+    """
+
+    _DELETED_KEY = 'story_deleted'
+    _ERROR_KEY = 'story_errored'
+    _SKIPPED_KEY = 'story_skipped'
+    _PROCESSED_KEY = 'successfully_deleted_stories'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (DeleteOrphanStoriesOneOffJob._DELETED_KEY, 1)
+            return
+
+        topic = topic_fetchers.get_topic_by_id(
+            item.corresponding_topic_id, strict=False)
+        if topic is None or item.id not in topic.get_canonical_story_ids():
+            try:
+                story_services.delete_story(
+                    feconf.SYSTEM_COMMITTER_ID, item.id)
+                yield (DeleteOrphanStoriesOneOffJob._PROCESSED_KEY, item.id)
+                return
+            except Exception as e:
+                yield (
+                    DeleteOrphanStoriesOneOffJob._ERROR_KEY,
+                    'Deletion of story %s failed: %s' % (item.id, e))
+                return
+
+        yield (DeleteOrphanStoriesOneOffJob._SKIPPED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == DeleteOrphanStoriesOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == DeleteOrphanStoriesOneOffJob._SKIPPED_KEY:
+            yield (key, ['Skipped valid %d stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)
+
+
+class InitStoryMetaTagContentOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to assign an empty string to meta_tag_content field."""
+
+    _DELETED_KEY = 'story_deleted'
+    _UPDATED_KEY = 'successfully_updated_stories'
+    _SKIPPED_KEY = 'skipped_stories'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (InitStoryMetaTagContentOneOffJob._DELETED_KEY, 1)
+            return
+
+        story = story_fetchers.get_story_by_id(item.id)
+
+        if item.meta_tag_content is None:
+            commit_cmds = [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': story_domain.STORY_PROPERTY_META_TAG_CONTENT,
+                'old_value': None,
+                'new_value': ''
+            })]
+            story_services.update_story(
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                'Initialise meta tag content to an empty string.')
+            yield (InitStoryMetaTagContentOneOffJob._UPDATED_KEY, item.id)
+            return
+        yield (InitStoryMetaTagContentOneOffJob._SKIPPED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == InitStoryMetaTagContentOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == InitStoryMetaTagContentOneOffJob._SKIPPED_KEY:
+            yield (key, ['Skipped %d stories.' % (
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
