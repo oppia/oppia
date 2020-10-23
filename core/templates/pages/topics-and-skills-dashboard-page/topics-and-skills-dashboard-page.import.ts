@@ -26,8 +26,7 @@ require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/navbar/' +
-  'topics-and-skills-dashboard-navbar-breadcrumb.component.ts'
-);
+  'topics-and-skills-dashboard-navbar-breadcrumb.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.component.ts');

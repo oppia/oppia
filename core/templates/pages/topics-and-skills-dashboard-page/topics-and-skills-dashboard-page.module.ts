@@ -35,6 +35,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from './navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -75,7 +76,6 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from './navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
