@@ -263,6 +263,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
+        if 'signup' in self.request.uri or 'csrf' in self.request.uri:
+            if self.gae_id and not self.user_id:
+                raise self.UnauthorizedUserException('User details not found.')
+
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
                 # If user opens a new tab during signup process, the user_id

@@ -28,7 +28,7 @@ import $ from 'jquery';
   providedIn: 'root'
 })
 export class CsrfTokenService {
-  tokenPromise: PromiseLike<string> | null = null;
+  tokenPromise: JQuery.jqXHR | null = null;
 
   initializeToken(): void {
     if (this.tokenPromise !== null) {
@@ -38,18 +38,27 @@ export class CsrfTokenService {
     // in csrf-token.service.spec.ts once all the services are migrated
     // We use jQuery here instead of Angular's $http, since the latter creates
     // a circular dependency.
-    this.tokenPromise = $.ajax({
-      url: '/csrfhandler',
-      type: 'GET',
-      dataType: 'text',
-      dataFilter: function(data: string) {
-        // Remove the protective XSSI (cross-site scripting inclusion) prefix.
-        let actualData = data.substring(5);
-        return JSON.parse(actualData);
-      },
-    }).then(function(response: {token: string}) {
-      return response.token;
-    });
+    let numberOfTries = 0;
+    while (numberOfTries < 3) {
+      this.tokenPromise = $.ajax({
+        url: '/csrfhandler',
+        type: 'GET',
+        dataType: 'text',
+        dataFilter: function (data: string) {
+          // Remove the protective XSSI (cross-site scripting inclusion) prefix.
+          let actualData = data.substring(5);
+          return JSON.parse(actualData);
+        },
+      })
+      this.tokenPromise.done(function (response: { token: string }) {
+        return response.token;
+      })
+      this.tokenPromise.fail(function (rejection) {
+        if (rejection.status === 401) {
+          numberOfTries += 1;
+        }
+      });
+    }
   }
 
   getTokenAsync(): PromiseLike<string> {
