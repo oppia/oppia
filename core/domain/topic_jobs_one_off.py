@@ -207,39 +207,3 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
-
-
-class TopicInvalidMetaTagContentAuditJob(jobs.BaseMapReduceOneOffJobManager):
-    """An audit job that reports ids of topics with invalid
-    meta_tag_content.
-    """
-
-    _DELETED_KEY = 'topic_deleted'
-    _SEEN_KEY = 'topics_with_invalid_meta_tag_content'
-    _SKIPPED_KEY = 'topic_skipped'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [topic_models.TopicModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            yield (TopicInvalidMetaTagContentAuditJob._DELETED_KEY, 1)
-            return
-
-        if item.meta_tag_content is None:
-            yield (TopicInvalidMetaTagContentAuditJob._SEEN_KEY, item.id)
-            return
-        yield (TopicInvalidMetaTagContentAuditJob._SKIPPED_KEY, 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == TopicInvalidMetaTagContentAuditJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted topics.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        elif key == TopicInvalidMetaTagContentAuditJob._SKIPPED_KEY:
-            yield (key, ['Skipped %d topics.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)
