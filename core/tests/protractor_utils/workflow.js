@@ -27,6 +27,7 @@ var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
 var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
+  
 var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
