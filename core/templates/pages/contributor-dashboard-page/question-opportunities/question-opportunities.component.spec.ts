@@ -22,8 +22,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
+import { SkillOpportunity } from
+  'domain/opportunity/skill-opportunity.model';
 import { AlertsService } from 'services/alerts.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
@@ -42,7 +42,6 @@ describe('Question opportunities component', function() {
   var contributionOpportunitiesService = null;
   var questionUndoRedoService = null;
   var skillObjectFactory = null;
-  var skillOpportunityObjectFactory = null;
   var userService = null;
 
   var opportunitiesArray = [];
@@ -54,8 +53,6 @@ describe('Question opportunities component', function() {
 
     alertsService = TestBed.get(AlertsService);
     skillObjectFactory = TestBed.get(SkillObjectFactory);
-    skillOpportunityObjectFactory = TestBed.get(
-      SkillOpportunityObjectFactory);
   });
 
   beforeEach(angular.mock.module(
@@ -75,13 +72,13 @@ describe('Question opportunities component', function() {
     userService = $injector.get('UserService');
 
     opportunitiesArray = [
-      skillOpportunityObjectFactory.createFromBackendDict({
+      SkillOpportunity.createFromBackendDict({
         id: '1',
         skill_description: 'Skill description 1',
         topic_name: 'topic_1',
         question_count: 5
       }),
-      skillOpportunityObjectFactory.createFromBackendDict({
+      SkillOpportunity.createFromBackendDict({
         id: '2',
         skill_description: 'Skill description 2',
         topic_name: 'topic_1',
