@@ -237,7 +237,7 @@ describe('Question opportunities component', function() {
         result: $q.resolve()
       });
       $rootScope.$apply();
-      expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
+      expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     });
 
   it('should suggest a question when dismissing create question modal',
@@ -282,7 +282,7 @@ describe('Question opportunities component', function() {
         result: $q.reject()
       });
       $rootScope.$apply();
-      expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
+      expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     });
 
   it('should not create a question when dismissing select skill and skill' +
