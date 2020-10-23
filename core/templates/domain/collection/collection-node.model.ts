@@ -75,13 +75,13 @@ export class CollectionNode {
 
   // Returns whether the exploration referenced by this node is private and
   // not published. This property is immutable. The value returned by this
-  // function is undefined if doesExplorationExist() returns false.
-  isExplorationPrivate(): boolean | undefined {
+  // function is null if doesExplorationExist() returns false.
+  isExplorationPrivate(): boolean | null {
     if (this._explorationSummaryObject) {
       return this._explorationSummaryObject.status === (
         AppConstants.ACTIVITY_STATUS_PRIVATE);
     } else {
-      return undefined;
+      return null;
     }
   }
 
