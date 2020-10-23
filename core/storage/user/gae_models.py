@@ -2290,6 +2290,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, score_category=score_category,
             score=score,
             onboarding_email_sent=onboarding_email_sent)
+        user_proficiency_model.update_timestamps()
         user_proficiency_model.put()
         return user_proficiency_model
 

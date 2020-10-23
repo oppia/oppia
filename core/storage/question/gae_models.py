@@ -165,6 +165,7 @@ class QuestionModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
+        question_commit_log.update_timestamps()
         question_commit_log.put()
 
     @classmethod
@@ -210,6 +211,7 @@ class QuestionModel(base_models.VersionedModel):
             questions: list(Question). The list of question objects
                 to put into the datastore.
         """
+        cls.update_timestamps_multi(questions)
         cls.put_multi(questions)
 
 
@@ -632,6 +634,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_skill_links: list(QuestionSkillLink). The list of
                 question skill link domain objects to put into the datastore.
         """
+        cls.update_timestamps_multi(question_skill_links)
         cls.put_multi(question_skill_links)
 
     @classmethod

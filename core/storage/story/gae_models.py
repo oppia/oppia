@@ -122,6 +122,7 @@ class StoryModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         story_commit_log_entry.story_id = self.id
+        story_commit_log_entry.update_timestamps()
         story_commit_log_entry.put()
 
     @staticmethod

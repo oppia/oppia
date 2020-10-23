@@ -20,14 +20,13 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { StoryPlaythroughObjectFactory } from
-  'domain/story_viewer/StoryPlaythroughObjectFactory';
+import { StoryPlaythrough } from
+  'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 
 describe('Story viewer backend API service', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService = null;
-  let storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory = null;
   let httpTestingController: HttpTestingController;
 
   let sampleDataResults = {
@@ -45,7 +44,6 @@ describe('Story viewer backend API service', () => {
     });
 
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
-    storyPlaythroughObjectFactory = TestBed.get(StoryPlaythroughObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -69,7 +67,7 @@ describe('Story viewer backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        storyPlaythroughObjectFactory.createFromBackendDict(
+        StoryPlaythrough.createFromBackendDict(
           sampleDataResults));
       expect(failHandler).not.toHaveBeenCalled();
     })

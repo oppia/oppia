@@ -166,6 +166,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             data_schema_version=data_schema_version
             )
 
+        training_job_instance.update_timestamps()
         training_job_instance.put()
         return instance_id
 
@@ -219,6 +220,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
             job_models.append(training_job_instance)
             job_ids.append(instance_id)
+        cls.update_timestamps_multi(job_models)
         cls.put_multi(job_models)
         return job_ids
 
@@ -329,6 +331,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
                 state_name=state_name, job_id=job_id)
 
+            mapping_instance.update_timestamps()
             mapping_instance.put()
             return instance_id
         raise Exception('A model with the same ID already exists.')
@@ -359,5 +362,6 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
             mapping_models.append(mapping_instance)
             mapping_ids.append(instance_id)
+        cls.update_timestamps_multi(mapping_models)
         cls.put_multi(mapping_models)
         return mapping_ids
