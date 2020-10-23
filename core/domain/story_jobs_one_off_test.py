@@ -592,6 +592,186 @@ class InitStoryMetaTagContentOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
 
+class StoryInvalidMetaTagContentAuditJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    STORY_ID = 'story_id'
+
+    def setUp(self):
+        super(StoryInvalidMetaTagContentAuditJobTests, self).setUp()
+
+        # Setup user who will own the test stories.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.story_id_1 = 'story_id_1'
+        self.story_id_2 = 'story_id_2'
+        self.story_id_3 = 'story_id_3'
+        self.skill_id_1 = 'skill_id_1'
+        self.skill_id_2 = 'skill_id_2'
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='Name',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_job_skips_deleted_story(self):
+        """Tests that the one-off job skips deleted stories."""
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-four')
+        story_services.save_new_story(self.albert_id, story)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
+
+        story_services.delete_story(
+            self.albert_id, self.STORY_ID)
+
+        # Ensure the story is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            story_fetchers.get_story_by_id(self.STORY_ID)
+
+        # Start migration job on sample story.
+        job_id = (
+            story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.create_new())
+        story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.enqueue(job_id)
+
+        # This running without errors indicates the deleted story is
+        # being ignored.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        # Ensure the story is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            story_fetchers.get_story_by_id(self.STORY_ID)
+
+        output = (
+            story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.get_output(
+                job_id))
+        expected = [[u'story_deleted',
+                     [u'Encountered 1 deleted stories.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_skips_meta_tag_content_initialisation_if_not_none(self):
+        """Tests that the one off job skips stories with valid meta tag
+        content.
+        """
+        story_contents = {
+            'nodes': [{
+                'outline': u'',
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2'
+        }
+        story_model = story_models.StoryModel(
+            id=self.STORY_ID,
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
+            description='Story description',
+            title='Story title',
+            language_code='en',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            notes='Story notes',
+            corresponding_topic_id=self.TOPIC_ID,
+            story_contents=story_contents,
+            url_fragment='story-frag-one',
+            meta_tag_content='meta tag content for topic'
+        )
+        commit_message = (
+            'New story created with title \'Story title\'.')
+        story_model.commit(
+            self.albert_id, commit_message, [{
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': 'Story title'
+            }])
+
+        # Start migration job.
+        job_id = (
+            story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.create_new())
+        story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.get_output(
+                job_id))
+        expected = [[u'skipped_stories', [u'Skipped 1 stories.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_initialises_meta_tag_content_correctly(self):
+        """Tests that the one off job reports topics with invalid meta tag
+        content.
+        """
+        story_contents = {
+            'nodes': [{
+                'outline': u'',
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2'
+        }
+        story_model = story_models.StoryModel(
+            id=self.STORY_ID,
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
+            description='Story description',
+            title='Story title',
+            language_code='en',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            notes='Story notes',
+            corresponding_topic_id=self.TOPIC_ID,
+            story_contents=story_contents,
+            url_fragment='story-frag-one',
+            meta_tag_content=None
+        )
+        commit_message = (
+            'New story created with title \'Story title\'.')
+        story_model.commit(
+            self.albert_id, commit_message, [{
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': 'Story title'
+            }])
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, self.STORY_ID)
+
+        # Start migration job.
+        job_id = (
+            story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.create_new())
+        story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            story_jobs_one_off.StoryInvalidMetaTagContentAuditJob.get_output(
+                job_id))
+        expected = [
+            [u'stories_with_invalid_meta_tag_content', [self.STORY_ID]]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
 class DeleteOrphanStoriesOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'

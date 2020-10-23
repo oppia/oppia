@@ -223,3 +223,39 @@ class InitStoryMetaTagContentOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class StoryInvalidMetaTagContentAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """An audit job that reports ids of stories with invalid
+    meta_tag_content.
+    """
+
+    _DELETED_KEY = 'story_deleted'
+    _SEEN_KEY = 'stories_with_invalid_meta_tag_content'
+    _SKIPPED_KEY = 'skipped_stories'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (StoryInvalidMetaTagContentAuditJob._DELETED_KEY, 1)
+            return
+
+        if item.meta_tag_content is None:
+            yield (StoryInvalidMetaTagContentAuditJob._SEEN_KEY, item.id)
+            return
+        yield (StoryInvalidMetaTagContentAuditJob._SKIPPED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == StoryInvalidMetaTagContentAuditJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == StoryInvalidMetaTagContentAuditJob._SKIPPED_KEY:
+            yield (key, ['Skipped %d stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)

@@ -637,3 +637,154 @@ class InitTopicMetaTagContentOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         expected = [[u'successfully_updated_topics', [self.TOPIC_ID]]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class TopicInvalidMetaTagContentAuditJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    def setUp(self):
+        super(TopicInvalidMetaTagContentAuditJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_job_skips_deleted_topic(self):
+        """Tests that the one-off job skips deleted topic."""
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A title', 'url-frag-one', 'description')
+        topic_services.save_new_topic(self.albert_id, topic)
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+        # Ensure the topic is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.create_new())
+        topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.enqueue(job_id)
+
+        # This running without errors indicates the deleted topic is
+        # being ignored.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        # Ensure the topic is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        output = (
+            topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.get_output(
+                job_id))
+        expected = [[u'topic_deleted',
+                     [u'Encountered 1 deleted topics.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_skips_meta_tag_content_initialisation_if_not_none(self):
+        """Tests that the one off job skips topics with valid meta tag
+        content.
+        """
+        topic_model = topic_models.TopicModel(
+            id=self.TOPIC_ID,
+            name='Topic name',
+            abbreviated_name='Topic',
+            url_fragment='topic-frag',
+            thumbnail_bg_color='#C6DCDA',
+            thumbnail_filename='topic.svg',
+            canonical_name='topic name',
+            description='Topic description',
+            language_code='en',
+            canonical_story_references=[],
+            additional_story_references=[],
+            uncategorized_skill_ids=[],
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            next_subtopic_id=1,
+            subtopics=[],
+            meta_tag_content='meta tag content for topic'
+        )
+        commit_message = (
+            'New topic created with name \'Topic name\'.')
+
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_ID,
+            manager_ids=[self.albert_id],
+            topic_is_published=False
+        ).commit(
+            self.albert_id, 'Created new topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
+        topic_model.commit(
+            self.albert_id, commit_message, [{
+                'cmd': topic_domain.CMD_CREATE_NEW,
+                'name': 'Topic name'
+            }])
+
+        # Start migration job.
+        job_id = (
+            topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.create_new())
+        topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.get_output(
+                job_id))
+        expected = [[u'topic_skipped', [u'Skipped 1 topics.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_initialises_meta_tag_content_correctly(self):
+        """Tests that the one off job reports topics with invalid meta tag
+        content.
+        """
+        topic_model = topic_models.TopicModel(
+            id=self.TOPIC_ID,
+            name='Topic name',
+            abbreviated_name='Topic',
+            url_fragment='topic-frag',
+            thumbnail_bg_color='#C6DCDA',
+            thumbnail_filename='topic.svg',
+            canonical_name='topic name',
+            description='Topic description',
+            language_code='en',
+            canonical_story_references=[],
+            additional_story_references=[],
+            uncategorized_skill_ids=[],
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            next_subtopic_id=1,
+            subtopics=[],
+            meta_tag_content=None
+        )
+        commit_message = (
+            'New topic created with name \'Topic name\'.')
+
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_ID,
+            manager_ids=[self.albert_id],
+            topic_is_published=False
+        ).commit(
+            self.albert_id, 'Created new topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
+        topic_model.commit(
+            self.albert_id, commit_message, [{
+                'cmd': topic_domain.CMD_CREATE_NEW,
+                'name': 'Topic name'
+            }])
+
+        # Start migration job.
+        job_id = (
+            topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.create_new())
+        topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.TopicInvalidMetaTagContentAuditJob.get_output(
+                job_id))
+        expected = [[u'topics_with_invalid_meta_tag_content', [self.TOPIC_ID]]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
