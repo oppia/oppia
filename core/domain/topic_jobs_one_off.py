@@ -252,6 +252,7 @@ class InitTopicMetaTagContentOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (key, values)
 
+
 class TopicInvalidMetaTagContentAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """An audit job that reports ids of topics with invalid
     meta_tag_content.
