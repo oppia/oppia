@@ -38,17 +38,19 @@ export interface QuestionBackendDict {
 export class Question {
   _id: string;
   _stateData: State;
+  _stateDataSchemaVersion: number;
   _languageCode: string;
   _version: number;
   _linkedSkillIds: string[];
   _inapplicableSkillMisconceptionIds: string[];
 
   constructor(
-      id: string, stateData: State, languageCode: string,
-      version: number, linkedSkillIds: string[],
+      id: string, stateData: State, stateDataSchemaVersion: number,
+      languageCode: string, version: number, linkedSkillIds: string[],
       inapplicableSkillMisconceptionIds: string[]) {
     this._id = id;
     this._stateData = stateData;
+    this._stateDataSchemaVersion = stateDataSchemaVersion;
     this._languageCode = languageCode;
     this._version = version;
     this._linkedSkillIds = linkedSkillIds;
@@ -66,6 +68,10 @@ export class Question {
 
   setStateData(newStateData: State): void {
     this._stateData = angular.copy(newStateData);
+  }
+
+  getStateDataSchemaVersion(): number {
+    return this._stateDataSchemaVersion;
   }
 
   getLanguageCode(): string {
@@ -162,6 +168,7 @@ export class Question {
     var questionBackendDict = {
       id: null,
       question_state_data: this._stateData.toBackendDict(),
+      question_state_data_schema_version: this._stateDataSchemaVersion,
       language_code: this._languageCode,
       linked_skill_ids: this._linkedSkillIds,
       inapplicable_skill_misconception_ids: (
@@ -194,6 +201,7 @@ export class QuestionObjectFactory {
       questionBackendDict.id,
       this.stateObject.createFromBackendDict(
         'question', questionBackendDict.question_state_data),
+      questionBackendDict.question_state_data_schema_version,
       questionBackendDict.language_code, questionBackendDict.version,
       questionBackendDict.linked_skill_ids,
       questionBackendDict.inapplicable_skill_misconception_ids
