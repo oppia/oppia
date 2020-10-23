@@ -39,6 +39,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { CollectionFooterComponent } from
   'pages/collection-player-page/collection-footer/collection-footer.component';
+import { CollectionNavbarComponent } from
+  'pages/collection-player-page/collection-navbar/collection-navbar.component';
 import { CollectionNodeListComponent } from
 // eslint-disable-next-line max-len
   'pages/collection-player-page/collection-node-list/collection-node-list.component';
@@ -54,12 +56,14 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     OppiaAngularRootComponent,
     CollectionFooterComponent,
-    CollectionNodeListComponent
+    CollectionNodeListComponent,
+    CollectionNavbarComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CollectionFooterComponent,
-    CollectionNodeListComponent
+    CollectionNodeListComponent,
+    CollectionNavbarComponent
   ],
   providers: [
     {
