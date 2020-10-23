@@ -182,6 +182,42 @@ class DeleteOrphanStoriesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
+class OrphanStoriesAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """An audit job that outputs story ids of orphaned Story models."""
+
+    _DELETED_KEY = 'story_deleted'
+    _SKIPPED_KEY = 'story_skipped'
+    _SEEN_KEY = 'orphaned_story_ids'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (OrphanStoriesAuditJob._DELETED_KEY, 1)
+            return
+
+        topic = topic_fetchers.get_topic_by_id(
+            item.corresponding_topic_id, strict=False)
+        if topic is None or item.id not in topic.get_canonical_story_ids():
+            yield (OrphanStoriesAuditJob._SEEN_KEY, item.id)
+            return
+        yield (OrphanStoriesAuditJob._SKIPPED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == DeleteOrphanStoriesOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == DeleteOrphanStoriesOneOffJob._SKIPPED_KEY:
+            yield (key, ['Skipped valid %d stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)
+
+
 class InitStoryMetaTagContentOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job to assign an empty string to meta_tag_content field."""
 
