@@ -192,7 +192,7 @@ export class QuestionObjectFactory {
 
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
-      null, this.stateObject.createDefaultState(null),
+      null, this.stateObject.createDefaultState(null), 1,
       constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 
