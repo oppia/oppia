@@ -218,7 +218,6 @@ class OrphanStoriesAuditJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-
 class StoryInvalidMetaTagContentAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """An audit job that reports ids of stories with invalid
     meta_tag_content.
