@@ -168,7 +168,7 @@ export class Question {
     var questionBackendDict = {
       id: null,
       question_state_data: this._stateData.toBackendDict(),
-      question_state_data_schema_version: this._stateDataSchemaVersion,
+      question_state_data_schema_version: 0,
       language_code: this._languageCode,
       linked_skill_ids: this._linkedSkillIds,
       inapplicable_skill_misconception_ids: (
@@ -178,6 +178,7 @@ export class Question {
     if (!isNewQuestion) {
       questionBackendDict.id = this._id;
       questionBackendDict.version = this._version;
+      questionBackendDict.stateDataSchemaVersion = this._stateDataSchemaVersion;
     }
     return questionBackendDict;
   }

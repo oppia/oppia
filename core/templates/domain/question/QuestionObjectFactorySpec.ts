@@ -201,6 +201,7 @@ describe('Question object factory', function() {
         },
         solicit_answer_details: false
       },
+      question_state_data_schema_version: 1,
       inapplicable_skill_misconception_ids: ['a-1', 'b-2'],
       language_code: 'en',
       version: 1
@@ -215,6 +216,7 @@ describe('Question object factory', function() {
     sampleQuestion.setLanguageCode('cn');
     expect(sampleQuestion.getLanguageCode()).toEqual('cn');
     expect(sampleQuestion.getVersion()).toEqual(1);
+    expect(sampleQuestion.getStateDataSchemaVersion()).toEqual(1);
     sampleQuestion.setLinkedSkillIds(['skill_id1', 'skill_id2']);
     expect(sampleQuestion.getLinkedSkillIds()).toEqual(
       ['skill_id1', 'skill_id2']);
@@ -296,6 +298,7 @@ describe('Question object factory', function() {
     expect(sampleQuestion1.getId()).toEqual(null);
     expect(sampleQuestion1.getLanguageCode()).toEqual('en');
     expect(sampleQuestion1.getVersion()).toEqual(1);
+    expect(sampleQuestion1.getStateDataSchemaVersion()).toEqual(1);
     expect(sampleQuestion1.getStateData()).toEqual(state);
     expect(sampleQuestion1.getLinkedSkillIds()).toEqual(
       ['skill_id3', 'skill_id4']);
