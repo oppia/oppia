@@ -353,6 +353,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
 
         with self.allow_revert_swap, self.allowed_commands_swap:
@@ -377,6 +378,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
 
         with self.allow_revert_swap, self.allowed_commands_swap:
@@ -402,6 +404,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
         with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
@@ -430,6 +433,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.exploration_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             exp_models.ExplorationCommitLogEntryModel
@@ -449,7 +453,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
         public_commit.exploration_id = 'b'
+        private_commit.update_timestamps()
         private_commit.put()
+        public_commit.update_timestamps()
         public_commit.put()
         results, _, more = (
             exp_models.ExplorationCommitLogEntryModel
@@ -480,7 +486,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit1.exploration_id = 'a'
         commit2.exploration_id = 'a'
+        commit1.update_timestamps()
         commit1.put()
+        commit2.update_timestamps()
         commit2.put()
 
         actual_models = (
@@ -575,6 +583,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        public_exploration_summary_model.update_timestamps()
         public_exploration_summary_model.put()
 
         private_exploration_summary_model = (
@@ -596,6 +605,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        private_exploration_summary_model.update_timestamps()
         private_exploration_summary_model.put()
         exploration_summary_models = (
             exp_models.ExpSummaryModel.get_non_private())
@@ -624,6 +634,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_created_on=None,
             ))
         good_rating_exploration_summary_model.scaled_average_rating = 100
+        good_rating_exploration_summary_model.update_timestamps()
         good_rating_exploration_summary_model.put()
 
         bad_rating_exploration_summary_model = (
@@ -646,6 +657,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_created_on=None,
             ))
         bad_rating_exploration_summary_model.scaled_average_rating = 0
+        bad_rating_exploration_summary_model.update_timestamps()
         bad_rating_exploration_summary_model.put()
 
         self.assertEqual(
@@ -663,6 +675,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         # Test that private summaries should be ignored.
         good_rating_exploration_summary_model.status = (
             constants.ACTIVITY_STATUS_PRIVATE)
+        good_rating_exploration_summary_model.update_timestamps()
         good_rating_exploration_summary_model.put()
         self.assertEqual(
             exp_models.ExpSummaryModel.get_top_rated(2),
@@ -688,6 +701,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        viewable_exploration_summary_model.update_timestamps()
         viewable_exploration_summary_model.put()
 
         unviewable_exploration_summary_model = (
@@ -709,6 +723,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        unviewable_exploration_summary_model.update_timestamps()
         unviewable_exploration_summary_model.put()
         exploration_summary_models = (
             exp_models.ExpSummaryModel
@@ -736,6 +751,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        editable_collection_summary_model.update_timestamps()
         editable_collection_summary_model.put()
 
         uneditable_collection_summary_model = (
@@ -757,6 +773,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        uneditable_collection_summary_model.update_timestamps()
         uneditable_collection_summary_model.put()
 
         exploration_summary_models = (

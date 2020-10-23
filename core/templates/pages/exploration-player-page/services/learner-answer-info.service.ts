@@ -109,7 +109,7 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         submittedAnswerInfoCount = 0;
       },
       recordLearnerAnswerInfo: function(answerDetails) {
-        LearnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
+        LearnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
           currentEntityId, stateName, interactionId, currentAnswer,
           answerDetails);
         submittedAnswerInfoCount++;
