@@ -199,8 +199,6 @@ class InitStoryMetaTagContentOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (InitStoryMetaTagContentOneOffJob._DELETED_KEY, 1)
             return
 
-        story = story_fetchers.get_story_by_id(item.id)
-
         if item.meta_tag_content is None:
             commit_cmds = [story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,

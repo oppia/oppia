@@ -226,8 +226,6 @@ class InitTopicMetaTagContentOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (InitTopicMetaTagContentOneOffJob._DELETED_KEY, 1)
             return
 
-        topic = topic_fetchers.get_topic_by_id(item.id)
-
         if item.meta_tag_content is None:
             commit_cmds = [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,

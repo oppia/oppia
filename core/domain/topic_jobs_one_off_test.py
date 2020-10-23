@@ -502,8 +502,7 @@ class InitTopicMetaTagContentOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_skips_deleted_topic(self):
-        """Tests that the initialise meta tag content job skips deleted topic.
-        """
+        """Tests that the one-off job skips deleted topic."""
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'A title', 'url-frag-one', 'description')
         topic_services.save_new_topic(self.albert_id, topic)

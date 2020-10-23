@@ -442,8 +442,7 @@ class InitStoryMetaTagContentOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_skips_deleted_story(self):
-        """Tests that the initialise meta tag content job skips deleted story.
-        """
+        """Tests that the one-off job skips deleted stories."""
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
             'title-four')
@@ -703,8 +702,7 @@ class DeleteOrphanStoriesOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_report_story_deletion_errors(self):
-        """Tests that the one off job reports errors if deletion fails.
-        """
+        """Tests that the one off job reports errors if deletion fails."""
         def _mock_delete_story(unused_committer_id, unused_story_id):
             """Mocks delete_story()."""
             raise Exception('Cannot delete this story.')
@@ -729,7 +727,7 @@ class DeleteOrphanStoriesOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         expected = [
             [u'story_errored',
-            [u'Deletion of story story_id failed: Cannot delete this story.']]
+             [u'Deletion of story story_id failed: Cannot delete this story.']]
         ]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
