@@ -209,50 +209,6 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class InitTopicMetaTagContentOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to assign an empty string to meta_tag_content field."""
-
-    _DELETED_KEY = 'topic_deleted'
-    _UPDATED_KEY = 'successfully_updated_topics'
-    _SKIPPED_KEY = 'topic_skipped'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [topic_models.TopicModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            yield (InitTopicMetaTagContentOneOffJob._DELETED_KEY, 1)
-            return
-
-        if item.meta_tag_content is None:
-            commit_cmds = [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                'property_name': topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT,
-                'old_value': None,
-                'new_value': ''
-            })]
-            topic_services.update_topic_and_subtopic_pages(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Initialise meta tag content to an empty string.')
-            yield (
-                InitTopicMetaTagContentOneOffJob._UPDATED_KEY, item.id)
-            return
-        yield (InitTopicMetaTagContentOneOffJob._SKIPPED_KEY, 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == InitTopicMetaTagContentOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted topics.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        elif key == InitTopicMetaTagContentOneOffJob._SKIPPED_KEY:
-            yield (key, ['Skipped %d topics.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)
-
-
 class TopicInvalidMetaTagContentAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """An audit job that reports ids of topics with invalid
     meta_tag_content.

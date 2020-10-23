@@ -218,48 +218,6 @@ class OrphanStoriesAuditJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class InitStoryMetaTagContentOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to assign an empty string to meta_tag_content field."""
-
-    _DELETED_KEY = 'story_deleted'
-    _UPDATED_KEY = 'successfully_updated_stories'
-    _SKIPPED_KEY = 'skipped_stories'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            yield (InitStoryMetaTagContentOneOffJob._DELETED_KEY, 1)
-            return
-
-        if item.meta_tag_content is None:
-            commit_cmds = [story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
-                'property_name': story_domain.STORY_PROPERTY_META_TAG_CONTENT,
-                'old_value': None,
-                'new_value': ''
-            })]
-            story_services.update_story(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Initialise meta tag content to an empty string.')
-            yield (InitStoryMetaTagContentOneOffJob._UPDATED_KEY, item.id)
-            return
-        yield (InitStoryMetaTagContentOneOffJob._SKIPPED_KEY, 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == InitStoryMetaTagContentOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        elif key == InitStoryMetaTagContentOneOffJob._SKIPPED_KEY:
-            yield (key, ['Skipped %d stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)
-
 
 class StoryInvalidMetaTagContentAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """An audit job that reports ids of stories with invalid
