@@ -287,7 +287,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  deleteTopic(topicId: string): Promise<Object> {
+  deleteTopic(topicId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this._deleteTopic(topicId, resolve, reject);
     });
