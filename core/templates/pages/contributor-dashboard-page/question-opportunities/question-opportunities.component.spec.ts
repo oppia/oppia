@@ -202,13 +202,13 @@ describe('Question opportunities component', function() {
 
   it('should create a question when closing create question modal',
     function() {
-      alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
       ctrl.$onInit();
       $rootScope.$apply();
+      alertsService.clearWarnings();
 
       openSpy.and.returnValue({
         result: $q.resolve({
@@ -248,13 +248,13 @@ describe('Question opportunities component', function() {
 
   it('should suggest a question when dismissing create question modal',
     function() {
-      alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
       ctrl.$onInit();
       $rootScope.$apply();
+      alertsService.clearWarnings();
 
       openSpy.and.returnValue({
         result: $q.resolve({
