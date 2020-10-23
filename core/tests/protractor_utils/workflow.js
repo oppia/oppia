@@ -47,6 +47,7 @@ var checkForAddTitleWarning = async function() {
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
   await element(by.css('.protractor-test-exploration-title-input')).click();
+  
   await element(by.css('.protractor-test-exploration-objective-input')).click();
 };
 
