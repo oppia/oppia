@@ -178,7 +178,8 @@ export class Question {
     if (!isNewQuestion) {
       questionBackendDict.id = this._id;
       questionBackendDict.version = this._version;
-      questionBackendDict.stateDataSchemaVersion = this._stateDataSchemaVersion;
+      questionBackendDict.question_state_data_schema_version = (
+        this._stateDataSchemaVersion);
     }
     return questionBackendDict;
   }
