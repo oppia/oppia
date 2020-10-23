@@ -176,7 +176,7 @@ class DeleteOrphanStoriesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, ['Encountered %d deleted stories.' % (
                 sum(ast.literal_eval(v) for v in values))])
         elif key == DeleteOrphanStoriesOneOffJob._SKIPPED_KEY:
-            yield (key, ['Skipped valid %d stories.' % (
+            yield (key, ['Skipped %d valid stories.' % (
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
@@ -212,7 +212,7 @@ class OrphanStoriesAuditJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, ['Encountered %d deleted stories.' % (
                 sum(ast.literal_eval(v) for v in values))])
         elif key == OrphanStoriesAuditJob._SKIPPED_KEY:
-            yield (key, ['Skipped valid %d stories.' % (
+            yield (key, ['Skipped %d valid stories.' % (
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

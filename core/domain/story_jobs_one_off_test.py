@@ -753,7 +753,7 @@ class DeleteOrphanStoriesOneOffJobTests(test_utils.GenericTestBase):
         output = (
             story_jobs_one_off.DeleteOrphanStoriesOneOffJob.get_output(
                 job_id))
-        expected = [[u'story_skipped', [u'Skipped valid 1 stories.']]]
+        expected = [[u'story_skipped', [u'Skipped 1 valid stories.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
 
@@ -887,5 +887,5 @@ class OrphanStoriesAuditJobTests(test_utils.GenericTestBase):
         output = (
             story_jobs_one_off.OrphanStoriesAuditJob.get_output(
                 job_id))
-        expected = [[u'story_skipped', [u'Skipped valid 1 stories.']]]
+        expected = [[u'story_skipped', [u'Skipped 1 valid stories.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
