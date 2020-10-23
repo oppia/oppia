@@ -20,8 +20,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import {
+  CapitalizePipe
+} from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe.ts';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -103,6 +107,18 @@ export class Solution {
       correctAnswer = (new NumberWithUnitsObjectFactory(
         new UnitsObjectFactory(), new FractionObjectFactory())).fromDict(
         <NumberWithUnitsAnswer> this.correctAnswer).toString();
+    } else if (interactionId === 'DragAndDropSortInput') {
+      let formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
+      correctAnswer = [];
+      for (let arr of this.correctAnswer) {
+        let transformedArray = [];
+        for (let elem of arr) {
+          transformedArray.push(formatRtePreview.transform(elem));
+        }
+        correctAnswer.push(transformedArray);
+      }
+      correctAnswer = JSON.stringify(correctAnswer);
+      correctAnswer = correctAnswer.replace(/"/g, '');
     } else {
       correctAnswer = (
         (new HtmlEscaperService(new LoggerService())).objToEscapedJson(

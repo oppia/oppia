@@ -20,8 +20,12 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {
+  CapitalizePipe
+} from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe.ts';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from
@@ -32,7 +36,12 @@ describe('Solution object factory', () => {
     let sof, solution;
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
+        providers: [
+          CamelCaseToHyphensPipe,
+          CapitalizePipe,
+          ConvertToPlainTextPipe,
+          FormatRtePreviewPipe
+        ]
       });
       sof = TestBed.get(SolutionObjectFactory);
       solution = sof.createFromBackendDict({
@@ -118,6 +127,14 @@ describe('Solution object factory', () => {
       });
       expect(solution.getSummary('NumberWithUnits')).toEqual(
         'One solution is "1". This is the explanation to the answer.');
+
+      solution.setCorrectAnswer([
+        ['<p>1</p>', '<b>3</b>'],
+        ['c', '<oppia-noninteractive-math></oppia-noninteractive-math>']
+      ]);
+      expect(solution.getSummary('DragAndDropSortInput')).toEqual(
+        'One solution is "[[1,3],[c,[Math]]]". This is the explanation to ' +
+        'the answer.');
     });
 
     it('should get oppia short answer', () => {
