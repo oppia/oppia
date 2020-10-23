@@ -27,7 +27,6 @@ var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
 var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
-  
 var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
@@ -47,7 +46,6 @@ var checkForAddTitleWarning = async function() {
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
   await element(by.css('.protractor-test-exploration-title-input')).click();
-  
   await element(by.css('.protractor-test-exploration-objective-input')).click();
 };
 
@@ -65,6 +63,7 @@ var createExploration = async function() {
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.exitTutorial();
 };
+
 
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = async function() {
