@@ -112,6 +112,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_model = user_models.UserQueryModel.get(query_model_id)
         query_model.user_ids = [
             python_utils.UNICODE(user_id) for user_id in stringified_user_ids]
+        query_model.update_timestamps()
         query_model.put()
 
     @classmethod
@@ -120,6 +121,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_COMPLETED
+        query_model.update_timestamps()
         query_model.put()
         email_manager.send_query_completion_email(
             query_model.submitter_id, query_id)
@@ -130,6 +132,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_FAILED
+        query_model.update_timestamps()
         query_model.put()
 
         query_params = {

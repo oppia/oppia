@@ -46,6 +46,7 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
 import { Subscription } from 'rxjs';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -95,6 +96,8 @@ describe('Settings Tab Component', function() {
   var mockWindowDimensionsService = {
     isWindowNarrow: () => true
   };
+
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
