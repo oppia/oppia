@@ -40,19 +40,19 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
-    debugger;
     this.directiveSubscriptions.add(
       this.readOnlyCollectionService.onCollectionLoad.subscribe(() => {
-        this.collectionTitle = this.readOnlyCollectionService.getCollectionDetails(
-          this.urlService.getCollectionIdFromUrl()
-        ).title;
-        console.log(this.collectionTitle, '=====title');
+        return (
+          this.collectionTitle =
+          this.readOnlyCollectionService.getCollectionDetails(
+            this.urlService.getCollectionIdFromUrl()
+          ).title);
       })
     );
   }
 
-  ngOnDestroy() {
-    this.directiveSubscriptions.unsubscribe();
+  ngOnDestroy(): void {
+    return this.directiveSubscriptions.unsubscribe();
   }
 }
 angular
