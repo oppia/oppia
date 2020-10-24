@@ -66,12 +66,8 @@ import schema_utils
 import utils
 
 import contextlib2
-from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
-from google.appengine.api import urlfetch_stub
-from google.appengine.api.app_identity import app_identity_stub
 from google.appengine.ext import testbed
-import requests
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -769,8 +765,7 @@ tags: []
             item.validate()
 
     def signup_superadmin_user(self):
-        """Signs up a superadmin user. Should be called at the end of setUp().
-        """
+        """Signs up a superadmin user; should be called at the end of setUp."""
         self.signup(self.SUPER_ADMIN_EMAIL, 'tmpsuperadm1n')
 
     def log_line(self, line):
@@ -2309,8 +2304,10 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_user_stub()
         self.testbed.init_app_identity_stub()
         self.testbed.init_memcache_stub()
+        consistency_policy = (
+            datastore_services.make_pseudo_random_hr_consistency_policy())
         self.testbed.init_datastore_v3_stub(
-            consistency_policy=datastore_services.make_consistency_policy())
+            consistency_policy=consistency_policy)
         self.testbed.init_blobstore_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
