@@ -67,6 +67,7 @@ import schema_utils
 import utils
 
 from google.appengine.api import mail
+from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 import webtest
 
@@ -220,12 +221,10 @@ class TaskqueueServicesStub(python_utils.OBJECT):
                 time to execute the task. Pass in None for immediate execution.
             task_name: str|None. Optional. The name of the task.
         """
-        # Causes the task to execute immediately by setting the scheduled_for
-        # time to 0. If we allow scheduled_for to be non-zero, then tests that
-        # rely on the actions made by the task will become unreliable.
-        scheduled_for = 0
+        # setting scheduled_for to 0 causes the task to execute immediately. Any
+        # other non-zero value is unreliable.
         self.client.create_task(
-            queue_name, url, payload, scheduled_for=scheduled_for,
+            queue_name, url, payload, scheduled_for=(scheduled_for or 0),
             task_name=task_name)
 
     def count_jobs_in_taskqueue(self, queue_name=None):
@@ -274,7 +273,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
     layer, namely the platform.cache cache services API.
     """
 
-    cache_dict = collections.defaultdict()
+    CACHE_DICT = collections.defaultdict()
 
     def get_memory_cache_stats(self):
         """Returns a mock profile of the cache dictionary. This mock does not
@@ -285,11 +284,11 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
             MemoryCacheStats. MemoryCacheStats object containing the total
             number of keys in the cache dictionary.
         """
-        return caching_domain.MemoryCacheStats(0, 0, len(self.cache_dict))
+        return caching_domain.MemoryCacheStats(0, 0, len(self.CACHE_DICT))
 
     def flush_cache(self):
         """Wipes the cache dictionary clean."""
-        self.cache_dict = collections.defaultdict()
+        self.CACHE_DICT.clear()
 
     def get_multi(self, keys):
         """Looks up a list of keys in cache dictionary.
@@ -301,8 +300,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
             list(str). A list of values in the cache dictionary corresponding to
             the keys that are passed in.
         """
-        assert isinstance(keys, list)
-        return [self.cache_dict.get(key, None) for key in keys]
+        return [self.CACHE_DICT.get(key, None) for key in keys]
 
     def set_multi(self, key_value_mapping):
         """Sets multiple keys' values at once in the cache dictionary.
@@ -315,8 +313,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
         Returns:
             bool. Whether the set action succeeded.
         """
-        assert isinstance(key_value_mapping, dict)
-        self.cache_dict.update(key_value_mapping)
+        self.CACHE_DICT.update(key_value_mapping)
         return True
 
     def delete_multi(self, keys):
@@ -328,13 +325,10 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
         Returns:
             int. Number of successfully deleted keys.
         """
-        number_of_deleted_keys = 0
-        for key in keys:
-            assert isinstance(key, python_utils.BASESTRING)
-            if key in self.cache_dict:
-                del self.cache_dict[key]
-                number_of_deleted_keys += 1
-        return number_of_deleted_keys
+        keys_in_cache = [key for key in keys if key in self.CACHE_DICT]
+        for key in keys_in_cache:
+            del self.CACHE_DICT[key]
+        return len(keys_in_cache)
 
 
 class TestBase(unittest.TestCase):
@@ -829,7 +823,7 @@ tags: []
         # This swap ensures that the templates are fetched from the source
         # directory rather than from webpack_bundles. The webpack_bundles
         # directory is only available after webpack compilation, but we don't
-        # run the build during backend tests.
+        # build it during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url, params, expect_errors=expect_errors,
@@ -838,8 +832,7 @@ tags: []
         # The testapp uses the status parameter to verify the response. However,
         # the return code is only verified when expect_errors=False. Since we
         # want to verify the error codes anyway, we must do so explicitly.
-        # Reference:
-        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 # pylint: disable=line-too-long
+        # Reference: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119. # pylint: disable=line-too-long
         self.assertEqual(response.status_int, expected_status_int)
         if expect_errors:
             self.assertTrue(response.status_int >= 400)
@@ -893,22 +886,20 @@ tags: []
 
     def get_response_without_checking_for_errors(
             self, url, expected_status_int_list, params=None):
-        """Get a response, transformed to a Python object and
-        checks for a list of status codes.
+        """Get a response, transformed to a Python object and checks for a list
+        of status codes.
 
         Args:
             url: str. The URL to fetch the response.
-            expected_status_int_list: list(int). A list of integer status
-                code to expect.
+            expected_status_int_list: list(int). A list of integer status codes
+                to expect.
             params: dict. A dictionary that will be encoded into a query string.
 
         Returns:
             webtest.TestResponse. The test response.
         """
         if params is not None:
-            self.assertIsInstance(
-                params, dict,
-                msg='Expected params to be a dict, received %s' % params)
+            self.assertIsInstance(params, dict)
 
         # This swap is required to ensure that the templates are fetched from
         # source directory instead of webpack_bundles since webpack_bundles
@@ -947,9 +938,7 @@ tags: []
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119. # pylint: disable=line-too-long
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
@@ -969,9 +958,7 @@ tags: []
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119. # pylint: disable=line-too-long
 
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
@@ -979,9 +966,7 @@ tags: []
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
         if params:
-            self.assertIsInstance(
-                params, dict,
-                msg='Expected params to be a dict, received %s' % params)
+            self.assertIsInstance(params, dict)
 
         expect_errors = expected_status_int >= 400
         json_response = self.testapp.delete(
@@ -992,9 +977,7 @@ tags: []
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119. # pylint: disable=line-too-long
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
@@ -1004,12 +987,12 @@ tags: []
         """Sends a post request with the data provided to the url specified.
 
         Args:
-            app: TestApp. The WSGI application which receives the
-                request and produces response.
+            app: TestApp. The WSGI application which receives the request and
+                produces response.
             url: str. The URL to send the POST request to.
             data: *. To be put in the body of the request. If params is an
-                iterator, it will be urlencoded. If it is a string, it will
-                not be encoded, but placed in the body directly. Can be a
+                iterator, it will be urlencoded. If it is a string, it will not
+                be encoded, but placed in the body directly. Can be a
                 collections.OrderedDict with webtest.forms.Upload fields
                 included.
             expect_errors: bool. Whether errors are expected.
@@ -1024,18 +1007,13 @@ tags: []
         """
         # Convert the files to bytes.
         if upload_files is not None:
-            upload_files = [
-                tuple(
-                    python_utils.convert_to_bytes(fieldname),
-                    python_utils.convert_to_bytes(filename),
-                    python_utils.convert_to_bytes(file_content))
-                for (fieldname, filename, file_content) in upload_files
-            ]
+            upload_files = tuple(
+                tuple(python_utils.convert_to_bytes(p) for p in file_pieces)
+                for file_pieces in upload_files)
 
         json_response = app.post(
-            url, data, expect_errors=expect_errors,
-            upload_files=upload_files, headers=headers,
-            status=expected_status_int)
+            url, data, expect_errors=expect_errors, upload_files=upload_files,
+            headers=headers, status=expected_status_int)
         return json_response
 
     def post_email(
@@ -1050,8 +1028,8 @@ tags: []
             body: str. The body of the email.
             html_body: str. The HTML body of the email.
             expect_errors: bool. Whether errors are expected.
-            expected_status_int: int. The expected status code of
-                the JSON response.
+            expected_status_int: int. The expected status code of the JSON
+                response.
 
         Returns:
             json. A JSON response generated by _send_post_request function.
@@ -1101,16 +1079,14 @@ tags: []
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119. # pylint: disable=line-too-long
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
     def get_new_csrf_token(self):
         """Generates CSRF token for test."""
-        response = self.get_json('/csrfhandler')
-        return response['token']
+        json_response = self.get_json('/csrfhandler')
+        return json_response['token']
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
@@ -1264,7 +1240,6 @@ tags: []
             interaction_id: str. The interaction id to set. Also sets the
                 default customization args for the given interaction id.
         """
-
         # We wrap next_content_id_index in a dict so that modifying it in the
         # inner function modifies the value.
         next_content_id_index_dict = {'value': state.next_content_id_index}
@@ -1301,8 +1276,7 @@ tags: []
                     traverse_schema_and_assign_content_ids(
                         x[schema_property.name],
                         schema_property['schema'],
-                        '%s_%s' % (contentId, schema_property.name)
-                    )
+                        '%s_%s' % (contentId, schema_property.name))
 
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(interaction_id))
@@ -1409,7 +1383,8 @@ tags: []
             self.set_interaction_for_state(
                 from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
-        end_state = exploration.states[state_names[-1]]
+        end_state_name = state_names[-1]
+        end_state = exploration.states[end_state_name]
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
@@ -2087,56 +2062,22 @@ tags: []
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
-    @contextlib.contextmanager
     def mock_datetime_utcnow(self, mocked_datetime):
         """Mocks response from datetime.datetime.utcnow method.
 
-        Example usage:
-            import datetime
-            mocked_datetime_utcnow = datetime.datetime.utcnow() -
-                datetime.timedelta(days=1)
-            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-                print datetime.datetime.utcnow() # prints time reduced by 1 day
-            print datetime.datetime.utcnow()  # prints current time.
+        Example:
+            >>> import datetime
+            >>> mocked_datetime_utcnow = (
+            >>>     datetime.datetime.utcnow() - datetime.timedelta(days=1))
+            >>> with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+            >>>     print(datetime.datetime.utcnow()) # prints yesterday.
+            >>> print(datetime.datetime.utcnow()) # prints today.
 
         Args:
             mocked_datetime: datetime.datetime. The datetime which will be used
                 instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
         """
-        if not isinstance(mocked_datetime, datetime.datetime):
-            raise utils.ValidationError(
-                'Expected mocked_datetime to be datetime.datetime, got %s' % (
-                    type(mocked_datetime)))
-
-        original_datetime_type = datetime.datetime
-
-        class PatchedDatetimeType(type):
-            """Validates the datetime instances."""
-
-            def __instancecheck__(cls, other):
-                """Validates whether the given instance is datetime
-                instance.
-                """
-                return isinstance(other, original_datetime_type)
-
-        class MockDatetime( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the mocked datetime."""
-
-                return mocked_datetime
-
-        setattr(datetime, 'datetime', MockDatetime)
-
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', original_datetime_type)
+        return datastore_services.mock_datetime_for_datastore(mocked_datetime)
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
@@ -2144,20 +2085,19 @@ tags: []
         'with' statement. The object can be anything that supports
         getattr and setattr, such as class instances, modules, ...
 
-        Example usage:
-
-            import math
-            with self.swap(math, 'sqrt', lambda x: 42):
-                print math.sqrt(16.0)  # prints 42
-            print math.sqrt(16.0)  # prints 4 as expected.
+        Example:
+            >>> import math
+            >>> with self.swap(math, 'sqrt', lambda x: 42):
+            >>>     print(math.sqrt(16.0)) # prints 42.
+            >>> print(math.sqrt(16.0)) # prints 4.
 
         Note that this does not work directly for classmethods. In this case,
         you will need to import the 'types' module, as follows:
 
-            import types
-            with self.swap(
-                SomePythonClass, 'some_classmethod',
-                types.MethodType(new_classmethod, SomePythonClass)):
+            >>> import types
+            >>> with self.swap(
+            >>>     SomePythonClass, 'some_classmethod',
+            >>>     types.MethodType(new_classmethod, SomePythonClass)):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
@@ -2455,29 +2395,28 @@ class AppEngineTestBase(TestBase):
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
-                from google.appengine.ext import deferred
                 deferred.run(task.payload)
-            else:
-                # All other tasks are expected to be mapreduce ones, or
-                # Oppia-taskqueue-related ones.
-                headers = {
-                    key: python_utils.convert_to_bytes(
-                        val) for key, val in task.headers.items()
-                }
-                headers['Content-Length'] = python_utils.convert_to_bytes(
-                    len(task.payload or ''))
+                continue
 
-                app = (
-                    webtest.TestApp(main_taskqueue.app)
-                    if task.url.startswith('/task')
-                    else self.testapp)
-                response = app.post(
-                    url=python_utils.UNICODE(
-                        task.url), params=(task.payload or ''),
-                    headers=headers, expect_errors=True)
-                if response.status_code != 200:
-                    raise RuntimeError(
-                        'MapReduce task to URL %s failed' % task.url)
+            # All other tasks are expected to be mapreduce or related to the
+            # oppia-taskqueue.
+            payload = task.payload or b''
+            headers = {
+                'Content-Length': python_utils.convert_to_bytes(len(payload)),
+            }
+            headers.update(
+                (key, python_utils.convert_to_bytes(val))
+                for key, val in task.headers.items())
+
+            app = (
+                webtest.TestApp(main_taskqueue.app)
+                if task.url.startswith('/task') else self.testapp)
+            response = app.post(
+                url=python_utils.UNICODE(task.url), params=payload,
+                headers=headers, expect_errors=True)
+            if response.status_code != 200:
+                raise RuntimeError(
+                    'MapReduce task to URL %s failed' % task.url)
 
     def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
         """Runs and flushes pending mapreduce tasks. If queue_name is None, does
@@ -2493,15 +2432,13 @@ class AppEngineTestBase(TestBase):
 
         tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
             queue_names=queue_names)
-        for queue in queue_names:
-            self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
         while tasks:
+            for queue in queue_names:
+                self.mapreduce_taskqueue_stub.FlushQueue(queue)
             self._execute_mapreduce_tasks(tasks)
             tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
                 queue_names=queue_names)
-            for queue in queue_names:
-                self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
     def run_but_do_not_flush_pending_mapreduce_tasks(self):
         """"Runs but not flushes mapreduce pending tasks."""
@@ -2768,9 +2705,8 @@ class GenericEmailTestBase(GenericTestBase):
 
         new_email = EmailMessageMock(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
-            recipient_variables=(
-                recipient_variables if (recipient_variables) else None))
+            bcc=bcc_emails, reply_to=reply_to,
+            recipient_variables=recipient_variables)
         for recipient_email in recipient_emails:
             self.emails_dict[recipient_email].append(new_email)
         return True
@@ -2904,7 +2840,7 @@ class FailingFunction(FunctionWrapper):
     exception. It can be set to succeed after a given number of calls.
     """
 
-    INFINITY = 'infinity'
+    INFINITY = object()
 
     def __init__(self, f, exception, num_tries_before_success):
         """Create a new Failing function.
@@ -2920,11 +2856,10 @@ class FailingFunction(FunctionWrapper):
         super(FailingFunction, self).__init__(f)
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
-        self._always_fail = (
-            self._num_tries_before_success == FailingFunction.INFINITY)
+        self._always_fail = num_tries_before_success == self.INFINITY
         self._times_called = 0
 
-        if not (self._num_tries_before_success >= 0 or self._always_fail):
+        if self._num_tries_before_success < 0 and not self._always_fail:
             raise ValueError(
                 'num_tries_before_success should either be an '
                 'integer greater than or equal to 0, '
@@ -2939,7 +2874,6 @@ class FailingFunction(FunctionWrapper):
             args: list(*). Set of arguments this function accepts.
         """
         self._times_called += 1
-        call_should_fail = (
-            self._num_tries_before_success >= self._times_called)
-        if call_should_fail or self._always_fail:
+        call_should_fail = self._num_tries_before_success < self._times_called
+        if self._always_fail or call_should_fail:
             raise self._exception
