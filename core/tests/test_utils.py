@@ -31,6 +31,7 @@ import os
 import unittest
 
 from constants import constants
+import contextlib2
 from core.controllers import base
 from core.domain import caching_domain
 from core.domain import collection_domain
@@ -65,7 +66,6 @@ import requests_mock
 import schema_utils
 import utils
 
-import contextlib2
 from google.appengine.api import mail
 from google.appengine.ext import testbed
 import webtest
