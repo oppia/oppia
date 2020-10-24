@@ -100,7 +100,8 @@ class TopicModel(base_models.VersionedModel):
     practice_tab_is_displayed = datastore_services.BooleanProperty(
         required=True, default=False)
     # The content of the meta tag in the Topic viewer page.
-    meta_tag_content = datastore_services.StringProperty(indexed=True)
+    meta_tag_content = datastore_services.StringProperty(
+        indexed=True, default='')
 
     @staticmethod
     def get_deletion_policy():
