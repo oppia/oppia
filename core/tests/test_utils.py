@@ -2306,6 +2306,13 @@ tags: []
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
+    def __init__(self, *args, **kwargs):
+        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+        # We can't instantiate these stubs in setUp() because run() requires the
+        # memory cache stub, but setUp() is called *by* run().
+        self.taskqueue_services_stub = TaskqueueServicesStub(self)
+        self.memory_cache_services_stub = MemoryCacheServicesStub()
+
     def run(self, result=None):
         """Enforces swap contexts for test methods to mock out cache services.
 
@@ -2317,11 +2324,6 @@ class AppEngineTestBase(TestBase):
                 provided, collects the results of the test. If result is omitted
                 or None, a temporary result object is created and used instead.
         """
-        # We can't instantiate these stubs in setUp() because run() requires the
-        # memory cache stub, but setUp() is called *after* run().
-        self.taskqueue_services_stub = TaskqueueServicesStub(self) # pylint: disable=attribute-defined-outside-init
-        self.memory_cache_services_stub = MemoryCacheServicesStub() # pylint: disable=attribute-defined-outside-init
-
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
