@@ -18,16 +18,21 @@
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/suggestion-modal.service.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
-  'suggestion-modal-for-creator-view.controller');
+'suggestion-modal-for-creator-dashboard-backend-api.service.ts');
+require(
+  'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
+'suggestion-modal-for-creator-view.controller');
+require('services/suggestion-modal.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
-  '$http', '$log', '$uibModal', 'UrlInterpolationService',
+  '$log', '$uibModal', 'SuggestionModalForCreatorDashboardBackendApiService',
+  'UrlInterpolationService',
   function(
-      $http, $log, $uibModal, UrlInterpolationService) {
+      $log, $uibModal, SuggestionModalForCreatorDashboardBackendApiService,
+      UrlInterpolationService) {
     var _showEditStateContentSuggestionModal = function(
         activeThread, suggestionsToReviewList, clearActiveThread,
         canReviewActiveThread) {
@@ -68,9 +73,6 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
       }).result.then(function(result) {
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
-        var HANDLE_SUGGESTION_URL_TEMPLATE = (
-          '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
-
         var url = null;
         var data = null;
         if (result.action === 'resubmit' &&
@@ -94,31 +96,32 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             }
           };
         } else {
-          url = UrlInterpolationService.interpolateUrl(
-            HANDLE_SUGGESTION_URL_TEMPLATE, {
-              target_type: activeThread.suggestion.targetType,
-              target_id: activeThread.suggestion.targetId,
-              suggestion_id: activeThread.suggestion.suggestionId
-            }
-          );
           data = {
             action: result.action,
-            commit_message: result.commitMessage,
-            review_message: result.reviewMessage
+            commitMessage: result.commitMessage,
+            reviewMessage: result.reviewMessage
+          };
+
+          url = {
+            targetType: activeThread.suggestion.targetType,
+            targetId: activeThread.suggestion.targetId,
+            suggestionId: activeThread.suggestion.suggestionId
           };
         }
 
-        $http.put(url, data).then(function() {
-          for (var i = 0; i < suggestionsToReviewList.length; i++) {
-            if (suggestionsToReviewList[i] === activeThread) {
-              suggestionsToReviewList.splice(i, 1);
-              break;
+        SuggestionModalForCreatorDashboardBackendApiService
+          ._updateSuggestion(url, data)
+          .then(function() {
+            for (var i = 0; i < suggestionsToReviewList.length; i++) {
+              if (suggestionsToReviewList[i] === activeThread) {
+                suggestionsToReviewList.splice(i, 1);
+                break;
+              }
             }
-          }
-          clearActiveThread();
-        })['catch'](function() {
-          $log.error('Error resolving suggestion');
-        });
+            clearActiveThread();
+          })['catch'](function() {
+            $log.error('Error resolving suggestion');
+          });
       });
     };
 
