@@ -52,7 +52,7 @@ describe('Classroom data model', () => {
   it('should create a new classroom object from a backend dictionary', () => {
     let classroomData = (
       ClassroomData.createFromBackendData(
-        'Math', publicTopicSummaryDicts, privateTopicSummaryDicts, 
+        'Math', publicTopicSummaryDicts, privateTopicSummaryDicts,
         'Course Details', 'Topics Covered'));
     expect(classroomData.getName()).toEqual('Math');
     expect(classroomData.getCourseDetails()).toEqual('Course Details');

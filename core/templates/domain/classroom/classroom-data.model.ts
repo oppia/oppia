@@ -41,7 +41,7 @@ export class ClassroomData {
 
   static createFromBackendData(
       name: string, publicTopicSummaryDicts: TopicSummaryBackendDict[],
-      privateTopicSummaryDicts: TopicSummaryBackendDict[], 
+      privateTopicSummaryDicts: TopicSummaryBackendDict[],
       courseDetails: string, topicListIntro: string): ClassroomData {
     let publicTopicSummaries = publicTopicSummaryDicts.map(
       (summaryDict) => {
@@ -56,7 +56,7 @@ export class ClassroomData {
       }
     );
     return new ClassroomData(
-      name, publicTopicSummaries, privateTopicSummaries, courseDetails, 
+      name, publicTopicSummaries, privateTopicSummaries, courseDetails,
       topicListIntro
     );
   }
