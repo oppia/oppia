@@ -1025,9 +1025,10 @@ tags: []
         # Convert the files to bytes.
         if upload_files is not None:
             upload_files = [
-                tuple(python_utils.convert_to_bytes(fieldname),
-                      python_utils.convert_to_bytes(filename),
-                      python_utils.convert_to_bytes(file_content))
+                tuple(
+                    python_utils.convert_to_bytes(fieldname),
+                    python_utils.convert_to_bytes(filename),
+                    python_utils.convert_to_bytes(file_content))
                 for (fieldname, filename, file_content) in upload_files
             ]
 
@@ -2318,8 +2319,8 @@ class AppEngineTestBase(TestBase):
         """
         # We can't instantiate these stubs in setUp() because run() requires the
         # memory cache stub, but setUp() is called *after* run().
-        self.taskqueue_services_stub = TaskqueueServicesStub(self)
-        self.memory_cache_services_stub = MemoryCacheServicesStub()
+        self.taskqueue_services_stub = TaskqueueServicesStub(self) # pylint: disable=attribute-defined-outside-init
+        self.memory_cache_services_stub = MemoryCacheServicesStub() # pylint: disable=attribute-defined-outside-init
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
@@ -2341,7 +2342,7 @@ class AppEngineTestBase(TestBase):
                 memory_cache_services, 'delete_multi',
                 self.memory_cache_services_stub.delete_multi))
 
-            return super(AppEngineTestBase, self).run(result=result)
+            super(AppEngineTestBase, self).run(result=result)
 
     def setUp(self):
         empty_environ()
