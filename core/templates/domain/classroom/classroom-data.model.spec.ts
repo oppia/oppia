@@ -59,7 +59,7 @@ describe('Classroom data model', () => {
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
     expect(classroomData.getPublicTopicSummaries()[0]).toEqual(
       TopicSummary.createFromBackendDict(publicTopicSummaryDicts[0]));
-    expect(classroomData.getPrivateTopicSummaries()[1]).toEqual(
-      TopicSummary.createFromBackendDict(privateTopicSummaryDicts[1]));
+    expect(classroomData.getPrivateTopicSummaries()[0]).toEqual(
+      TopicSummary.createFromBackendDict(privateTopicSummaryDicts[0]));
   });
 });
