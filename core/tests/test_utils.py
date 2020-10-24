@@ -23,7 +23,6 @@ import ast
 import collections
 import contextlib
 import copy
-import datetime
 import inspect
 import itertools
 import json
@@ -221,7 +220,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
                 time to execute the task. Pass in None for immediate execution.
             task_name: str|None. Optional. The name of the task.
         """
-        # setting scheduled_for to 0 causes the task to execute immediately. Any
+        # Setting scheduled_for to 0 causes the task to execute immediately. Any
         # other non-zero value is unreliable.
         self.client.create_task(
             queue_name, url, payload, scheduled_for=(scheduled_for or 0),
@@ -2076,6 +2075,10 @@ tags: []
         Args:
             mocked_datetime: datetime.datetime. The datetime which will be used
                 instead of the current UTC datetime.
+
+        Returns:
+            Context manager. A context manager that causes utcnow to always
+            return the mocked time.
         """
         return datastore_services.mock_datetime_for_datastore(mocked_datetime)
 
