@@ -45,15 +45,22 @@ var checkForAddTitleWarning = async function() {
 
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
-  await element(by.css('.protractor-test-exploration-title-input')).click();
-  await element(by.css('.protractor-test-exploration-objective-input')).click();
+  var testExplorationTitleInput = element(
+    by.css('.protractor-test-exploration-title-input'));
+  await action.click(
+    'Test Exploration Title Input', testExplorationTitleInput);
+  var testExplorationObjectiveInput = element(
+    by.css('.protractor-test-exploration-objective-input'));
+  await action.click(
+    'Test Exploration Objective Input', testExplorationObjectiveInput);
 };
 
 // Open edit roles.
 var openEditRolesForm = async function() {
-  await element(by.css('.protractor-test-edit-roles')).click();
-  await element(by.css('.protractor-test-role-username')).sendKeys(
-    'Chuck Norris');
+  var testEditRoles = element(by.css('.protractor-test-edit-roles'));
+  await action.click('Test Edit Roles', testEditRoles);
+  var testRoleUsername = element(by.css('.protractor-test-role-username'));
+  await action.sendKeys('testRoleUsername', testRoleUsername, 'Chuck Norris');
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
@@ -63,7 +70,6 @@ var createExploration = async function() {
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.exitTutorial();
 };
-
 
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = async function() {
@@ -79,12 +85,12 @@ var createExplorationAndStartTutorial = async function() {
     await waitFor.visibilityOf(
       activityCreationModal,
       'ActivityCreationModal takes too long to be visible.');
+      await waitFor.elementToBeClickable(
+        createExplorationButton,
+        'createExplorationButton takes too long to be clickable.');
     var createExplorationButton = element(
       by.css('.protractor-test-create-exploration'));
-    await waitFor.elementToBeClickable(
-      createExplorationButton,
-      'createExplorationButton takes too long to be clickable.');
-    await createExplorationButton.click();
+    await action.click('createExplorationButton', createExplorationButton);
   }
 };
 
@@ -101,7 +107,6 @@ var createCollectionAsAdmin = async function() {
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateCollectionButton();
 };
-
 /**
  * Creating exploration for Admin users.
  */
@@ -119,17 +124,24 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
-  await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
-  await element(by.css('.protractor-test-publish-exploration')).click();
+  var testPublishExplorationButton = element(
+    by.css('.protractor-test-publish-exploration'));
+  await testPublishExplorationButton.isDisplayed();
+  await action.click(
+    'testPublishExplorationButton', testPublishExplorationButton);
+
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   await prePublicationButtonElem.isPresent();
-  await prePublicationButtonElem.click();
+  await action.click(
+    'prePublicationButtonElem', prePublicationButtonElem);
 
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  await element(by.css('.protractor-test-confirm-publish')).click();
+  var testConfirmPublishButton = element(
+    by.css('.protractor-test-confirm-publish'));
+  await action.click('testConfirmPublishButton', testConfirmPublishButton);
 
   var sharePublishModal = element(
     by.css('.protractor-test-share-publish-modal'));
@@ -137,9 +149,9 @@ var publishExploration = async function() {
     by.css('.protractor-test-share-publish-close'));
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  await waitFor.elementToBeClickable(
-    closePublishModalButton, 'Close Publish Modal button is not clickable');
-  await closePublishModalButton.click();
+    await waitFor.elementToBeClickable(
+      closePublishModalButton, 'Close Publish Modal button is not clickable');
+  await action.click('closePublishModalButton', closePublishModalButton);
 };
 
 // Creates and publishes a minimal exploration.
@@ -208,11 +220,14 @@ var createAndPublishTwoCardExploration = async function(
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function(roleName, username) {
-  await element(by.css('.protractor-test-edit-roles')).click();
-  await element(by.css('.protractor-test-role-username')).sendKeys(username);
+  var testEditRoles = element(by.css('.protractor-test-edit-roles'));
+  await action.click('testEditRoles', testEditRoles);
+  var testRoleUsername = element(by.css('.protractor-test-role-username'));
+  await action.sendKeys('testRoleUsername', testRoleUsername, username);
   await element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
-  await element(by.css('.protractor-test-save-role')).click();
+  var testSaveRole = element(by.css('.protractor-test-save-role'));
+  await action.click('testSaveRole', testSaveRole);
 };
 
 var addExplorationManager = async function(username) {
@@ -276,47 +291,42 @@ var createSkillAndAssignTopic = async function(
 
 var getImageSource = async function(customImageElement) {
   await waitFor.visibilityOf(
-    customImageElement,
-    'Image element is taking too long to appear.');
+    customImageElement, 'Image element is taking too long to appear.');
   return await customImageElement.getAttribute('src');
 };
 
 var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
-  await waitFor.visibilityOf(
-    imageClickableElement,
-    'Image element is taking too long to appear.');
-  await imageClickableElement.click();
-
+      await waitFor.visibilityOf(
+        imageClickableElement,
+        'Image element is taking too long to appear.');
+  await action.click('imageClickableElement', imageClickableElement);
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
     await waitFor.elementToBeClickable(
       thumbnailResetButton,
       'Topic thumbnail reset button taking too long to appear.');
-    await thumbnailResetButton.click();
+    await action.click('thumbnailResetButton', thumbnailResetButton);
   } else {
     expect(await thumbnailResetButton.isPresent()).toBe(false);
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  return await imageUploadInput.sendKeys(absPath);
+  return await action.sendKeys('imageUploadInput', imageUploadInput, absPath);
 };
 
 var submitImage = async function(
     imageClickableElement, imageContainer, imgPath, resetExistingImage) {
   await waitFor.visibilityOf(
-    imageClickableElement,
-    'Image element is taking too long to appear.');
+    imageClickableElement, 'Image element is taking too long to appear.');
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
-  await imageSubmitButton.click();
+  await action.click('imageSubmitButton', imageSubmitButton);
   await waitFor.invisibilityOf(
-    imageUploadInput,
-    'Image uploader is taking too long to disappear');
+    imageUploadInput, 'Image uploader is taking too long to disappear');
   await waitFor.invisibilityOf(
-    imageContainer,
-    'Image container is taking too long to disappear');
+    imageContainer, 'Image container is taking too long to disappear');
   return await waitFor.pageToFullyLoad();
 };
 
