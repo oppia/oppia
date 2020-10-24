@@ -280,12 +280,12 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
     def test_cannot_perform_delete_json_with_non_dict_params(self):
         with self.assertRaisesRegexp(
-            Exception, 'Expected params to be a dict'):
+            AssertionError, 'is not an instance of <type \'dict\'>'):
             self.delete_json('random_url', params='invalid_params')
 
     def test_cannot_get_response_with_non_dict_params(self):
         with self.assertRaisesRegexp(
-            Exception, 'Expected params to be a dict'):
+            AssertionError, 'is not an instance of <type \'dict\'>'):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
 
