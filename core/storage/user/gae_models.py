@@ -41,11 +41,6 @@ class UserSettingsModel(base_models.BaseModel):
 
     # Attributes used for both full users and profile users.
 
-    # User id used to identify user by GAE. Is not required for now because we
-    # need to perform migration to fill this for existing users.
-    # TODO(#10178): Deprecate gae_id for UserSettingsModel once we have verified
-    # that UserAuthDetailsModels exists for every user.
-    gae_id = datastore_services.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = datastore_services.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
@@ -145,43 +140,39 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{
-                'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'email': base_models.EXPORT_POLICY.EXPORTED,
-                'role': base_models.EXPORT_POLICY.EXPORTED,
-                'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
-                'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
-                'display_alias': base_models.EXPORT_POLICY.EXPORTED,
-                'user_bio': base_models.EXPORT_POLICY.EXPORTED,
-                'profile_picture_data_url':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
-                'preferred_language_codes':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'preferred_site_language_code':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'preferred_audio_language_code':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'username': base_models.EXPORT_POLICY.EXPORTED,
-                'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
-                'last_started_state_editor_tutorial':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'last_started_state_translation_tutorial':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'last_edited_an_exploration':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'last_created_an_exploration':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'default_dashboard': base_models.EXPORT_POLICY.EXPORTED,
-                'creator_dashboard_display_pref':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'first_contribution_msec':
-                    base_models.EXPORT_POLICY.EXPORTED,
-                'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'pin': base_models.EXPORT_POLICY.EXPORTED
-            })
+        return dict(super(cls, cls).get_export_policy(), **{
+            'email': base_models.EXPORT_POLICY.EXPORTED,
+            'role': base_models.EXPORT_POLICY.EXPORTED,
+            'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
+            'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
+            'display_alias': base_models.EXPORT_POLICY.EXPORTED,
+            'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+            'profile_picture_data_url':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
+            'preferred_language_codes':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'preferred_site_language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'preferred_audio_language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'username': base_models.EXPORT_POLICY.EXPORTED,
+            'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
+            'last_started_state_editor_tutorial':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_started_state_translation_tutorial':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_edited_an_exploration':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_created_an_exploration':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'default_dashboard': base_models.EXPORT_POLICY.EXPORTED,
+            'creator_dashboard_display_pref':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_msec':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
