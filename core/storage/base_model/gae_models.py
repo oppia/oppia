@@ -53,14 +53,20 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 )
 
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    # Indicates that a model's field is to be exported.
     'EXPORTED',
+    # Indicates that a model's field should not be exported.
     'NOT_APPLICABLE'
 )
 
 EXPORT_METHOD = utils.create_enum(  # pylint: disable=invalid-name
+    # Indicates that a model has a single instance per user.
     'SINGLE_UNSHARED_INSTANCE',
+    # Indicates that a model can be shared by multiple users.
     'SHARED_INSTANCE',
+    # Indicates that a model has multiple instances, specific to a user.
     'MULTIPLE_UNSHARED_INSTANCES',
+    # Indicates that a model should not be exported.
     'NOT_EXPORTED'
 )
 
@@ -173,8 +179,8 @@ class BaseModel(datastore_services.Model):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single unshared instance."""
-        return EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
+        """Model does not contain user data."""
+        return EXPORT_METHOD.NOT_EXPORTED
 
     @classmethod
     def get_export_policy(cls):
@@ -184,6 +190,14 @@ class BaseModel(datastore_services.Model):
             'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': EXPORT_POLICY.NOT_APPLICABLE
         }
+    
+    @classmethod
+    def get_export_policy_exceptions(cls):
+        """Returns a dictionary containing a mapping from field names to
+        export dictionary keys for fields whose export dictionary key does
+        not match their field name.
+        """
+        return {}
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -1178,7 +1192,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @staticmethod
     def get_export_method():
-        """This model is exported as a single unshared instance."""
+        """This model is exported as multiple unshared instances."""
         return EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod

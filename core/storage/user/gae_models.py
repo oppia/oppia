@@ -925,9 +925,17 @@ class UserSubscriptionsModel(base_models.BaseModel):
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'creator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'creator_ids': base_models.EXPORT_POLICY.EXPORTED,
             'last_checked': base_models.EXPORT_POLICY.EXPORTED,
             'feedback_thread_ids': base_models.EXPORT_POLICY.EXPORTED
+        })
+    
+    @classmethod
+    def get_export_policy_exceptions(cls):
+        return dict(super(cls, cls).get_export_policy_exceptions(), ** {
+            # We do not want to expose creator_ids, so we instead return
+            # creator_usernames.
+            'creator_ids': 'creator_usernames'
         })
 
     @classmethod
@@ -972,6 +980,11 @@ class UserSubscriptionsModel(base_models.BaseModel):
         if user_model is None:
             return {}
 
+        creator_user_models = UserSettingsModel.get_multi(
+            user_model.creator_ids)
+        creator_usernames = [
+            creator.username for creator in creator_user_models]
+
         user_data = {
             'activity_ids': user_model.activity_ids,
             'collection_ids': user_model.collection_ids,
@@ -979,6 +992,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
                 user_model.general_feedback_thread_ids),
             'feedback_thread_ids': (
                 user_model.feedback_thread_ids),
+            'creator_usernames': creator_usernames,
             'last_checked':
                 None if user_model.last_checked is None else
                 utils.get_time_in_millisecs(user_model.last_checked)
@@ -2478,7 +2492,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model does not need to exported as it temporarily holds user
+        """Model does not need to be exported as it temporarily holds user
         requests for data deletion, and does not contain any information
         relevant to the user for data export.
         """

@@ -333,8 +333,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     def _get_model_module_names(self):
         """Get all module names in storage."""
-        # As models.NAMES is an enum, it cannot be iterated. So we use the
-        # __dict__ property which can be iterated.
+        # As models.NAMES is an enum, it cannot be iterated over. So we use the
+        # __dict__ property which can be iterated over.
         for name in models.NAMES.__dict__:
             if '__' not in name:
                 yield name
@@ -832,6 +832,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         subscriptions_data = {
             'activity_ids': [],
             'collection_ids': [],
+            'creator_usernames': [],
             'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked': None
@@ -913,7 +914,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
-        self.maxDiff = None
         self.assertEqual(expected_user_data, observed_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_user_data)
@@ -967,15 +967,20 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         for model in all_models:
             export_method = model.get_export_method()
             export_policy = model.get_export_policy()
-            exported_props = [
-                prop
-                for prop in model._properties # pylint: disable=protected-access
-                if (export_policy[prop] ==
-                    base_models.EXPORT_POLICY.EXPORTED)
-            ]
+            export_exceptions = model.get_export_policy_exceptions()
+            exported_property_names = []
+            for property_name in model._properties:
+                if (export_policy[property_name] ==
+                    base_models.EXPORT_POLICY.EXPORTED):
+                    if property_name in export_exceptions:
+                        exported_property_names.append(
+                            export_exceptions[property_name]
+                        )
+                    else:
+                        exported_property_names.append(property_name)
 
             if export_method == base_models.EXPORT_METHOD.NOT_EXPORTED:
-                self.assertEqual(len(exported_props), 0)
+                self.assertEqual(len(exported_property_names), 0)
             elif (export_method ==
                   base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE):
                 exported_data = model.export_data(self.USER_ID_1)
@@ -983,7 +988,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted([
                         python_utils.UNICODE(key)
                         for key in exported_data.keys()]),
-                    sorted(exported_props)
+                    sorted(exported_property_names)
                 )
             elif (export_method ==
                   base_models.EXPORT_METHOD.SHARED_INSTANCE):
@@ -992,7 +997,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 exported_data = model.export_data(self.USER_ID_1)
                 field_mapping = model.get_field_name_mapping_to_takeout_keys()
                 self.assertEqual(
-                    sorted(exported_props),
+                    sorted(exported_property_names),
                     sorted(field_mapping.keys())
                 )
                 self.assertEqual(
@@ -1004,18 +1009,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 exported_data = model.export_data(self.USER_ID_1)
 
                 # Retrieve the first ID.
-                model_id = exported_data.keys()[0]
-                self.assertEqual(
-                    sorted([
-                        python_utils.UNICODE(key)
-                        for key in exported_data[model_id].keys()]),
-                    sorted(exported_props)
-                )
+                for model_id in exported_data.keys():
+                    self.assertEqual(
+                        sorted([
+                            python_utils.UNICODE(key)
+                            for key in exported_data[model_id].keys()]),
+                        sorted(exported_property_names)
+                    )
 
     def test_export_data_for_full_user_nontrivial_is_correct(self):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
-        self.maxDiff = None
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -1118,7 +1122,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_time_in_millisecs(
                     feedback_models.
                     GeneralFeedbackThreadModel.
                     get_by_id(thread_id).last_updated)

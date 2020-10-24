@@ -415,7 +415,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a multiple unshared instances."""
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod

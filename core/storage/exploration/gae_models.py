@@ -348,7 +348,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a shared instance."""
         return base_models.EXPORT_METHOD.SHARED_INSTANCE
 
     @classmethod

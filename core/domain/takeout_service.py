@@ -44,8 +44,8 @@ def get_models_which_should_be_exported():
     """
     return [model_class for model_class in
             models.Registry.get_all_storage_model_classes()
-            if base_models.EXPORT_METHOD.NOT_EXPORTED !=
-            model_class.get_export_method()]
+            if model_class.get_export_method() !=
+            base_models.EXPORT_METHOD.NOT_EXPORTED]
 
 
 def export_data_for_user(user_id):
