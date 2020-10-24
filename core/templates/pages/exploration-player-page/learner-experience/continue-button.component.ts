@@ -12,33 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-
 /**
  * @fileoverview Component for the Continue button in exploration player and
  * editor.
  */
 
-// [Question]: How do I migrate the scope part of this directive?
-// angular.module('oppia').directive('continueButton', [
-//   function() {
-//     return {
-//       scope: {
-//         onClickContinueButton: '&',
-//         isLearnAgainButton: '&',
-//         focusLabel: '@'
-//       }
-//     };
-//   }
-// ]);
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'continue-button',
   templateUrl: './continue-button.component.html',
   styleUrls: []
 })
-export class ContinueButtonComponent {}
+export class ContinueButtonComponent {
+  @Input() focusLabel: string;
+  @Input() isLearnAgainButton: boolean = false;
+  @Output() clickContinueButton: EventEmitter<void> = new EventEmitter();
+}
 
 angular.module('oppia').directive(
   'conceptCard', downgradeComponent(
