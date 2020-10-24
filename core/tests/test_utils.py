@@ -70,7 +70,7 @@ from google.appengine.api import mail
 from google.appengine.ext import testbed
 import webtest
 
-(exp_models, question_models, skill_models, story_models, topic_models,) = (
+exp_models, question_models, skill_models, story_models, topic_models = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
@@ -119,6 +119,9 @@ def get_filepath_from_filename(filename, rootdir):
 
     Returns:
         str | None. The path of the file if file is found otherwise None.
+
+    Raises:
+        Exception. There are multiple files with the same name.
     """
     # The file we want to serve is named error-page.mainpage.html, but the test
     # app appends a status code to the file when searching. We remove the error
@@ -143,8 +146,8 @@ def mock_load_template(filename):
     file from the source directory instead.
 
     Args:
-        filename: str. The name of the file for which template is
-            to be returned.
+        filename: str. The name of the file for which template is to be
+            returned.
 
     Returns:
         str. The contents of the given file.
@@ -782,10 +785,15 @@ tags: []
         Args:
             email: str. The email of the user who is to be logged in.
             is_super_admin: bool. Whether the user is a super admin.
-       """
+
+        Returns:
+            str. The GAE ID of the logged in user.
+        """
+        user_id = self.get_gae_id_from_email(email)
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_gae_id_from_email(email)
+        os.environ['USER_ID'] = user_id
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
+        return user_id
 
     def logout(self):
         """Simulates a logout by resetting the environment variables."""
@@ -1016,9 +1024,12 @@ tags: []
         """
         # Convert the files to bytes.
         if upload_files is not None:
-            upload_files = tuple(
-                tuple(python_utils.convert_to_bytes(j) for j in i)
-                for i in upload_files)
+            upload_files = [
+                tuple(python_utils.convert_to_bytes(fieldname),
+                      python_utils.convert_to_bytes(filename),
+                      python_utils.convert_to_bytes(file_content))
+                for (fieldname, filename, file_content) in upload_files
+            ]
 
         json_response = app.post(
             url, data, expect_errors=expect_errors,
@@ -1107,19 +1118,21 @@ tags: []
             email: str. Email of the given user.
             username: str. Username of the given user.
         """
-        user_services.create_new_user(self.get_gae_id_from_email(email), email)
-        with self.login_context(email), requests_mock.Mocker() as m:
-            m.get(requests_mock.ANY)
+        with self.login_context(email) as gae_id, requests_mock.Mocker() as m:
+            # Mock out requests to real HTTP services.
+            m.request(requests_mock.ANY, requests_mock.ANY)
 
+            user_services.create_new_user(gae_id, email)
             signup_response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(signup_response.status_code, 200)
 
-            csrf_token = self.get_new_csrf_token()
-            payload = json.dumps(
-                {'username': username, 'agreed_to_terms': True})
-            data_response = self.testapp.post(
-                feconf.SIGNUP_DATA_URL,
-                params={'csrf_token': csrf_token, 'payload': payload})
+            data_response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
+                'csrf_token': self.get_new_csrf_token(),
+                'payload': json.dumps({
+                    'username': username,
+                    'agreed_to_terms': True,
+                }),
+            })
             self.assertEqual(data_response.status_int, 200)
 
     def set_config_property(self, config_obj, new_config_value):
@@ -1127,7 +1140,7 @@ tags: []
         using a POST request.
         """
         config_name = config_obj.name
-        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
+        with self.admin_context():
             self.post_json('/adminhandler', {
                 'action': 'save_config_properties',
                 'new_config_property_values': {config_name: new_config_value},
@@ -1140,7 +1153,7 @@ tags: []
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
-        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
+        with self.admin_context():
             self.post_json(
                 '/adminrolehandler', {'username': username, 'role': user_role},
                 csrf_token=self.get_new_csrf_token())
@@ -2251,7 +2264,7 @@ tags: []
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
-        """Log in with the given email under the context of a 'with' statement.
+        """Logs in with the given email under the context of a 'with' statement.
 
         Args:
             email: str. An email associated to a user account.
@@ -2261,13 +2274,15 @@ tags: []
             str. The id of the user associated to the given email, who is now
             'logged in'.
         """
-        initial_user_env = os.environ.copy()
-        self.login(email, is_super_admin=is_super_admin)
+        user_id = self.login(email, is_super_admin=is_super_admin)
         try:
-            yield self.get_user_id_from_email(email)
+            yield user_id
         finally:
             self.logout()
-            os.environ.update(initial_user_env)
+
+    def admin_context(self):
+        """Logs in as an admin under the context of a 'with' statement."""
+        return self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
 
     def assertRaises(self, exc, fun, *args, **kwds):
         raise NotImplementedError(
@@ -2290,36 +2305,21 @@ tags: []
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
-    def setUp(self):
-        empty_environ()
+    def run(self, result=None):
+        """Enforces swap contexts for test methods to mock out cache services.
 
+        Subclasses will have core.platform.memory_cache_services mocked out with
+        the MemoryCacheServicesStub class.
+
+        Args:
+            result: unittest.TestResult|None. Optional result object that, when
+                provided, collects the results of the test. If result is omitted
+                or None, a temporary result object is created and used instead.
+        """
+        # We can't instantiate these stubs in setUp() because run() requires the
+        # memory cache stub, but setUp() is called *after* run().
         self.taskqueue_services_stub = TaskqueueServicesStub(self)
         self.memory_cache_services_stub = MemoryCacheServicesStub()
-        self.memory_cache_services_stub.flush_cache()
-
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-
-        # Declare any relevant App Engine service stubs here.
-        self.testbed.init_user_stub()
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_memcache_stub()
-        consistency_policy = (
-            datastore_services.make_pseudo_random_hr_consistency_policy())
-        self.testbed.init_datastore_v3_stub(
-            consistency_policy=consistency_policy)
-        self.testbed.init_blobstore_stub()
-        self.testbed.init_urlfetch_stub()
-        self.testbed.init_files_stub()
-        self.testbed.init_search_stub()
-
-        # The root path tells the testbed where to find the queue.yaml file.
-        self.testbed.init_taskqueue_stub(enable=True, root_path=os.getcwd())
-        self.mapreduce_taskqueue_stub = (
-            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
-
-        # Set up the app to be tested.
-        self.testapp = webtest.TestApp(main.app)
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
@@ -2340,15 +2340,41 @@ class AppEngineTestBase(TestBase):
             stack.enter_context(self.swap(
                 memory_cache_services, 'delete_multi',
                 self.memory_cache_services_stub.delete_multi))
-            self.signup_superadmin_user()
-            self._exit_stack = stack.pop_all()
+
+            return super(AppEngineTestBase, self).run(result=result)
+
+    def setUp(self):
+        empty_environ()
+        self.memory_cache_services_stub.flush_cache()
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+
+        # Declare any relevant App Engine service stubs here.
+        self.testbed.init_user_stub()
+        self.testbed.init_app_identity_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_datastore_v3_stub(
+            consistency_policy=(
+                datastore_services.make_globally_consistent_hr_policy()))
+        self.testbed.init_blobstore_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_files_stub()
+        self.testbed.init_search_stub()
+
+        # The root path tells the testbed where to find the queue.yaml file.
+        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
+        self.mapreduce_taskqueue_stub = (
+            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
+
+        # Set up the app to be tested.
+        self.testapp = webtest.TestApp(main.app)
+
+        self.signup_superadmin_user()
 
     def tearDown(self):
-        with self._exit_stack:
-            self._exit_stack = None
-            # Allow the stack to unwind, which invokes each of the callbacks and
-            # exits it has collected.
-        self.logout()
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):
@@ -2687,24 +2713,17 @@ class GenericEmailTestBase(GenericTestBase):
 
     emails_dict = collections.defaultdict(list)
 
-    def run(self, result=None):
-        """Adds a context swap on top of the test_utils.run() method so that
-        test classes extending GenericEmailTestBase will automatically have
-        a mailgun api key, mailgun domain name and mocked version of
-        send_email_to_recipients().
-        """
-        with self.swap(
-            email_services, 'send_email_to_recipients',
-            self._send_email_to_recipients):
-            super(EmailTestBase, self).run(result=result)
-
     def setUp(self):
         super(GenericEmailTestBase, self).setUp()
-        self._wipe_emails_dict()
-
-    def _wipe_emails_dict(self):
-        """Reset email dictionary for a new test."""
         self.emails_dict = collections.defaultdict(list)
+        self._mock_send_email_to_recipients_context = self.swap(
+            email_services, 'send_email_to_recipients',
+            self._send_email_to_recipients)
+        self._mock_send_email_to_recipients_context.__enter__()
+
+    def tearDown(self):
+        self._mock_send_email_to_recipients_context.__exit__(None, None, None)
+        super(GenericEmailTestBase, self).tearDown()
 
     def _send_email_to_recipients(
             self, sender_email, recipient_emails, subject, plaintext_body,
@@ -2742,10 +2761,7 @@ class GenericEmailTestBase(GenericTestBase):
         Returns:
             bool. Whether the emails are sent successfully.
         """
-        bcc_emails = None
-
-        if bcc:
-            bcc_emails = bcc[0] if len(bcc) == 1 else bcc
+        bcc_emails = bcc and (bcc[0] if len(bcc) == 1 else bcc)
 
         new_email = EmailMessageMock(
             sender_email, recipient_emails, subject, plaintext_body, html_body,

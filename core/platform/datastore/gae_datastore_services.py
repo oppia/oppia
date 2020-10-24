@@ -216,7 +216,7 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
     return all_models_grouped_by_model_type
 
 
-def make_pseudo_random_hr_consistency_policy():
+def make_globally_consistent_hr_policy():
     """Returns a policy that always gives the same sequence of consistency
     decisions.
 
