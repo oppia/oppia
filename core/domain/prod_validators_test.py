@@ -2267,7 +2267,6 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -2414,7 +2413,6 @@ class ConfigPropertySnapshotContentModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.ConfigPropertySnapshotContentModel.get_by_id(
@@ -2523,7 +2521,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
-            gae_id='gae_' + self.sender_id,
             email=self.sender_email)
         self.sender_model.update_timestamps()
         self.sender_model.put()
@@ -2532,7 +2529,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.recipient_id = 'recipient'
         self.recipient_model = user_models.UserSettingsModel(
             id=self.recipient_id,
-            gae_id='gae_' + self.recipient_id,
             email=self.recipient_email)
         self.recipient_model.update_timestamps()
         self.recipient_model.put()
@@ -2674,7 +2670,6 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
-            gae_id='gae_' + self.sender_id,
             email=self.sender_email)
         self.sender_model.update_timestamps()
         self.sender_model.put()
@@ -2682,13 +2677,11 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.recipient_ids = ['recipient1', 'recipient2']
         self.recipient_model_1 = user_models.UserSettingsModel(
             id=self.recipient_ids[0],
-            gae_id='gae_' + self.recipient_ids[0],
             email='recipient1@email.com')
         self.recipient_model_1.update_timestamps()
         self.recipient_model_1.put()
         self.recipient_model_2 = user_models.UserSettingsModel(
             id=self.recipient_ids[1],
-            gae_id='gae_' + self.recipient_ids[1],
             email='recipient2@email.com')
         self.recipient_model_2.update_timestamps()
         self.recipient_model_2.put()
@@ -12555,7 +12548,7 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_existing_user_settings_model_failure(self):
         user_models.UserSettingsModel(
-            id=self.user_id, email='email@email.com', gae_id='gae_id').put()
+            id=self.user_id, email='email@email.com').put()
         expected_output = [
             (
                 '[u\'failed validation check for '
@@ -12635,7 +12628,6 @@ class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_not_same_id_as_user(self):
         user_models.UserSettingsModel(
             id=self.model_instance.id,
-            gae_id='224169184123',
             email='email@email.com',
             username='username').put()
 
@@ -12759,7 +12751,6 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
@@ -12906,7 +12897,6 @@ class PlatformParameterSnapshotContentModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.PlatformParameterSnapshotContentModel.get_by_id(
