@@ -1,7 +1,16 @@
 <a href="#"
    ng-click="$ctrl.openConceptCard($event)"
-   class="skillreview-rte-element"
    rel="noopener"
-   uib-tooltip="Open Concept Card">
-   <[$ctrl.linkText]>
+   uib-tooltip="Open Concept Card"><[$ctrl.linkText]>
 </a>
+
+<style>
+  /*
+    Following change is required so as to prevent multi-word texts from being
+    split into multiple lines in the link text in the editor and shouldn't be
+    removed.
+  */
+  .cke_widget_inline {
+    display: inline;
+  }
+</style>
