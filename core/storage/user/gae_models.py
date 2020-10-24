@@ -929,9 +929,12 @@ class UserSubscriptionsModel(base_models.BaseModel):
             'last_checked': base_models.EXPORT_POLICY.EXPORTED,
             'feedback_thread_ids': base_models.EXPORT_POLICY.EXPORTED
         })
-    
+
     @classmethod
     def get_export_policy_exceptions(cls):
+        """Indicates that creator_ids are an exception in the export policy
+        for Takeout.
+        """
         return dict(super(cls, cls).get_export_policy_exceptions(), ** {
             # We do not want to expose creator_ids, so we instead return
             # creator_usernames.

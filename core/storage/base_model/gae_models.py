@@ -190,7 +190,7 @@ class BaseModel(datastore_services.Model):
             'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': EXPORT_POLICY.NOT_APPLICABLE
         }
-    
+
     @classmethod
     def get_export_policy_exceptions(cls):
         """Returns a dictionary containing a mapping from field names to

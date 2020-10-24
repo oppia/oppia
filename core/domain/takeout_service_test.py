@@ -969,9 +969,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             export_policy = model.get_export_policy()
             export_exceptions = model.get_export_policy_exceptions()
             exported_property_names = []
-            for property_name in model._properties:
+            for property_name in model._properties: # pylint: disable-protected-access
                 if (export_policy[property_name] ==
-                    base_models.EXPORT_POLICY.EXPORTED):
+                        base_models.EXPORT_POLICY.EXPORTED):
                     if property_name in export_exceptions:
                         exported_property_names.append(
                             export_exceptions[property_name]

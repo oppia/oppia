@@ -119,6 +119,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy_exceptions(cls):
+        """Indicates that the last_updated variable is exported under the
+        name "last_updated_msec" in Takeout.
+        """
         return dict(super(cls, cls).get_export_policy_exceptions(), ** {
             'last_updated': 'last_updated_msec'
         })
