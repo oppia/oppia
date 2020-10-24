@@ -26,8 +26,9 @@ from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
 import feconf
-from google.protobuf import timestamp_pb2
 import python_utils
+
+from google.protobuf import timestamp_pb2
 
 
 class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
