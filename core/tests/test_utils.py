@@ -2069,8 +2069,8 @@ tags: []
             >>> mocked_datetime_utcnow = (
             >>>     datetime.datetime.utcnow() - datetime.timedelta(days=1))
             >>> with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-            >>>     print(datetime.datetime.utcnow()) # prints yesterday.
-            >>> print(datetime.datetime.utcnow()) # prints today.
+            >>>     python_utils.PRINT(datetime.datetime.utcnow()) # Yesterday.
+            >>> python_utils.PRINT(datetime.datetime.utcnow()) # Today.
 
         Args:
             mocked_datetime: datetime.datetime. The datetime which will be used
@@ -2091,8 +2091,8 @@ tags: []
         Example:
             >>> import math
             >>> with self.swap(math, 'sqrt', lambda x: 42):
-            >>>     print(math.sqrt(16.0)) # prints 42.
-            >>> print(math.sqrt(16.0)) # prints 4.
+            >>>     python_utils.PRINT(math.sqrt(16.0)) # 42.
+            >>> python_utils.PRINT(math.sqrt(16.0)) # 4.
 
         Note that this does not work directly for classmethods. In this case,
         you will need to import the 'types' module, as follows:
