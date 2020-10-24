@@ -40,12 +40,12 @@ var ContributorDashboardTranslateTextTab = function() {
 
   var _selectLanguage = async function(language) {
     await _openLanguageSelector();
-    var testLanguageSelector = await selectorContainer.element(
+    var languageOptionElement = await selectorContainer.element(
       by.cssContainingText(
         '.protractor-test-language-selector-option',
         language
       ));
-    await action.click('Test Language Selector', testLanguageSelector);
+    await action.click(language + ' language option', languageOptionElement);
   };
 
   this.changeLanguage = async function(language) {
@@ -89,7 +89,8 @@ var ContributorDashboardTranslateTextTab = function() {
     await waitFor.visibilityOf(
       selectedLanguageElement,
       'Selected language element taking too long to show up.');
-    expect(await selectedLanguageElement.getText()).toMatch(language);
+    var selectedLanguage = await selectedLanguageElement.getText();
+    expect(selectedLanguage).toMatch(language);
   };
 };
 

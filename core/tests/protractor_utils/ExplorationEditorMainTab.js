@@ -534,8 +534,9 @@ var ExplorationEditorMainTab = function() {
       addHintModal, 'Add hint modal takes too long to appear');
     var hintButton = await element(
       by.css('.protractor-test-hint-text')).all(by.tagName('p')).last();
-    await action.click('Hint Button', hintButton);
-    await browser.switchTo().activeElement().sendKeys(hint);
+    await action.click('Hint Text Box', hintButton);
+    await action.sendKeys(
+      'Hint RTE Element', browser.switchTo().activeElement(), hint);
 
     await action.click('Save Hint button', saveHintButton);
     await waitFor.invisibilityOf(
