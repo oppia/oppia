@@ -23,8 +23,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
+import { SkillOpportunity } from
+  'domain/opportunity/skill-opportunity.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
@@ -34,8 +34,6 @@ describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let skillOpportunityObjectFactory:
-    SkillOpportunityObjectFactory = null;
   let urlInterpolationService:
     UrlInterpolationService = null;
   const skillOpportunityResponse = {
@@ -73,10 +71,9 @@ describe('Contribution Opportunities backend API service', function() {
     contributionOpportunitiesBackendApiService =
       TestBed.get(ContributionOpportunitiesBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    skillOpportunityObjectFactory = TestBed.get(SkillOpportunityObjectFactory);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     sampleSkillOpportunitiesResponse = [
-      skillOpportunityObjectFactory.createFromBackendDict(
+      SkillOpportunity.createFromBackendDict(
         skillOpportunityResponse.opportunities[0])
     ];
     sampleTranslationOpportunitiesResponse = [

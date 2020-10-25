@@ -114,9 +114,7 @@ def monkeypatched_get_distribution(distribution_name):
     try:
         return old_get_distribution(distribution_name)
     except pkg_resources.DistributionNotFound:
-        if distribution_name == 'google-api-core':
-            return MockDistribution('1.22.2')
-        elif distribution_name == 'google-cloud-tasks':
+        if distribution_name == 'google-cloud-tasks':
             return MockDistribution('1.5.0')
         else:
             raise
