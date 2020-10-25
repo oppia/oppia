@@ -3466,6 +3466,14 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 }
 
+oppia-noninteractive-skillreview {
+  margin-right: -4px;
+}
+
+oppia-noninteractive-link {
+  margin-right: -4px;
+}
+
 .oppia-splash-bullet {
   margin: 0 auto 80px;
   max-width: 900px;

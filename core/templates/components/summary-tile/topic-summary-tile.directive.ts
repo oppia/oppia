@@ -27,7 +27,8 @@ angular.module('oppia').directive('topicSummaryTile', [
       scope: {},
       bindToController: {
         getTopicSummary: '&topicSummary',
-        getClassroomUrlFragment: '&classroomUrlFragment'
+        getClassroomUrlFragment: '&classroomUrlFragment',
+        isPublished: '&published'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/topic-summary-tile.directive.html'),

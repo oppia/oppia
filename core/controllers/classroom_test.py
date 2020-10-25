@@ -99,12 +99,15 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
         json_response = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
-        topic_summary_dict = (
+        public_topic_summary_dict = (
             topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
+        private_topic_summary_dict = (
+            topic_services.get_topic_summary_by_id(topic_id_1).to_dict())
 
         expected_dict = {
             'name': 'math',
-            'topic_summary_dicts': [topic_summary_dict],
+            'public_topic_summary_dicts': [public_topic_summary_dict],
+            'private_topic_summary_dicts': [private_topic_summary_dict],
             'course_details': 'Course details for classroom.',
             'topic_list_intro': 'Topics covered for classroom'
         }
