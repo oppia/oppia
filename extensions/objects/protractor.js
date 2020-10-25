@@ -20,7 +20,7 @@
 // NOTE: all editors for objects that are used as parameters in a rule must
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
-
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
@@ -206,34 +206,14 @@ var SanitizedUrlEditor = function(elem) {
 };
 
 var SetOfNormalizedStringEditor = function(elem) {
-  const _getLength = async function() {
-    var items = (
-      elem.all(by.repeater('item in localValue track by $index')));
-    return items.length;
-  };
-
-  const addItem = async function(value) {
-    var listLength = await _getLength();
-    await elem.element(by.css('.protractor-test-add-list-entry')).click();
-    return await NormalizedStringEditor(
-      elem.element(
-        by.repeater('item in localValue track by $index').row(listLength))
-    ).setValue(value);
-  };
-
-  const deleteAllItems = async function() {
-    const entries = elem.all(
-      await by.repeater('item in localValue track by $index'));
-    for (let entry of entries) {
-      await entry.element(by.css('.protractor-test-delete-list-entry')).click();
-    }
-  };
-
   return {
     setValue: async function(normalizedStrings) {
-      await deleteAllItems();
-      for (let normalizedString of normalizedStrings) {
-        await addItem(normalizedString);
+      // Clear all entries.
+      await forms.ListEditor(elem).setLength(0);
+      for (let i = 0; i < normalizedStrings.length; i++) {
+        const normalizedStringEditor = await forms.ListEditor(elem).addItem(
+          'NormalizedString');
+        await normalizedStringEditor.setValue(normalizedStrings[i]);
       }
     }
   };
