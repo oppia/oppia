@@ -501,9 +501,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         with popen_swap, communicate_swap:
             with self.assertRaisesRegexp(
                 Exception, 'Oops! Something went wrong'):
-            js_ts_linter.ThirdPartyJsTsLintChecksManager(
-                INVALID_SORTED_DEPENDENCIES_FILEPATH
-            ).perform_all_lint_checks()
+                js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                    INVALID_SORTED_DEPENDENCIES_FILEPATH
+                ).perform_all_lint_checks()
 
     def test_third_party_linter_with_invalid_eslint_path(self):
         def mock_exists(unused_path):
