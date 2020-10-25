@@ -205,10 +205,6 @@ angular.module('oppia').component('signupPage', {
           ctrl.showEmailPreferencesForm = data.can_send_emails;
           ctrl.hasUsername = Boolean(ctrl.username);
           FocusManagerService.setFocus('usernameInputField');
-        }, function(rejection) {
-          if (rejection.data && rejection.data.status_code === 401) {
-            $window.location.reload();
-          }
         });
 
         ctrl.blurredAtLeastOnce = false;

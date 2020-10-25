@@ -195,7 +195,7 @@ class BaseHandler(webapp2.RequestHandler):
                     logging.error(
                         'Cannot find user %s with email %s on page %s'
                         % (self.gae_id, email, self.request.uri))
-                    _clear_login_cookies(self.response.headers)
+                    # _clear_login_cookies(self.response.headers)
                     return
 
             self.values['user_email'] = user_settings.email
@@ -263,12 +263,13 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
-        if 'signup' in self.request.uri or 'csrf' in self.request.uri:
-            if self.gae_id and not self.user_id:
-                raise self.UnauthorizedUserException('User details not found.')
+        try:
+            if 'signup' in self.request.uri or 'csrf' in self.request.uri:
+                if self.gae_id and not self.user_id:
+                    raise self.UnauthorizedUserException(
+                        'User details not found.')
 
-        if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
-            try:
+            if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
                 # If user opens a new tab during signup process, the user_id
                 # parameter is set to None and this causes the signup session
                 # to expire. The code here checks if user is on the signup
@@ -291,11 +292,11 @@ class BaseHandler(webapp2.RequestHandler):
                     raise self.UnauthorizedUserException(
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
-            except Exception as e:
-                logging.error('%s: payload %s', e, self.payload)
+        except Exception as e:
+            logging.error('%s: payload %s', e, self.payload)
 
-                self.handle_exception(e, self.app.debug)
-                return
+            self.handle_exception(e, self.app.debug)
+            return
 
         super(BaseHandler, self).dispatch()
 
