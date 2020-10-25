@@ -109,7 +109,7 @@ describe('Classroom page', () => {
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
       classroomData = ClassroomDataObjectFactory.createFromBackendData(
-        'Math', [], 'Course details', 'Topics covered'
+        'Math', [], [], 'Course details', 'Topics covered'
       );
       spyOn(
         ClassroomBackendApiService,

@@ -1,6 +1,6 @@
-
-
-<div class="topic-card"  ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+<div class="topic-card"
+     ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}"
+     ng-class="{'faded-topic-card': !$ctrl.isPublished()}">
   <a ng-href="<[$ctrl.getTopicPageUrl()]>">
     <div class="topic-thumbnail">
       <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
@@ -15,6 +15,7 @@
         <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
         <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
       </span>
+      <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
     </div>
   </a>
 </div>
