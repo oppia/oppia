@@ -63,6 +63,7 @@
             </button>
             <button type="button"
                     class="btn btn-success protractor-test-save-rubric-explanation-button"
+                    ng-disabled="!$ctrl.isExplanationValid($ctrl.rubric.getDifficulty(), $index)"
                     ng-click="$ctrl.saveExplanation($ctrl.rubric.getDifficulty(), $index)">
               Save
             </button>

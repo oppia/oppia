@@ -17,11 +17,11 @@
  * QuestionsOpportunitiesSelectSkillAndDifficultyModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { AlertsService } from 'services/alerts.service';
-import { SkillDifficultyObjectFactory } from
-  'domain/skill/SkillDifficultyObjectFactory';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
 describe(
   'Questions Opportunities Select Skill And Difficulty Modal Controller',
@@ -31,7 +31,6 @@ describe(
     var $uibModalInstance = null;
     var alertsService = null;
     var SkillBackendApiService = null;
-    var skillDifficultyObjectFactory = null;
     var skillObjectFactory = null;
 
     var skillId = 'skill_1';
@@ -39,17 +38,15 @@ describe(
 
     beforeEach(angular.mock.module('oppia'));
 
-    beforeEach(function() {
-      alertsService = TestBed.get(AlertsService);
-      skillDifficultyObjectFactory = TestBed.get(SkillDifficultyObjectFactory);
-      skillObjectFactory = TestBed.get(SkillObjectFactory);
-    });
+    importAllAngularServices();
 
     describe('when fetching skill successfully', function() {
       beforeEach(angular.mock.inject(function($injector, $controller) {
         $q = $injector.get('$q');
         var $rootScope = $injector.get('$rootScope');
         SkillBackendApiService = $injector.get('SkillBackendApiService');
+        alertsService = $injector.get('AlertsService');
+        skillObjectFactory = $injector.get('SkillObjectFactory');
         var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
         $uibModalInstance = jasmine.createSpyObj(
@@ -89,14 +86,15 @@ describe(
         };
 
         spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue(
-          $q.resolve({ skill: skill}));
+          $q.resolve({
+            skill: skillObjectFactory.createFromBackendDict(skill)
+          }));
 
         $scope = $rootScope.$new();
         $controller(
           'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', {
             $scope: $scope,
             AlertsService: alertsService,
-            SkillDifficultyObjectFactory: skillDifficultyObjectFactory,
             SkillObjectFactory: skillObjectFactory,
             $uibModalInstance: $uibModalInstance,
             skillId: skillId,
@@ -109,7 +107,7 @@ describe(
         expect($scope.skill).toEqual(skillObjectFactory.createFromBackendDict(
           skill));
         expect($scope.linkedSkillsWithDifficulty).toEqual(
-          [skillDifficultyObjectFactory.create(
+          [SkillDifficulty.create(
             skillId, 'Skill 1 description', 0.3)]);
         expect($scope.skillIdToRubricsObject[skillId].length).toBe(1);
       });
@@ -129,6 +127,7 @@ describe(
       beforeEach(angular.mock.inject(function($injector, $controller) {
         $q = $injector.get('$q');
         var $rootScope = $injector.get('$rootScope');
+        alertsService = $injector.get('AlertsService');
         SkillBackendApiService = $injector.get('SkillBackendApiService');
 
         $uibModalInstance = jasmine.createSpyObj(
@@ -142,7 +141,6 @@ describe(
           'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', {
             $scope: $scope,
             AlertsService: alertsService,
-            SkillDifficultyObjectFactory: skillDifficultyObjectFactory,
             SkillObjectFactory: skillObjectFactory,
             $uibModalInstance: $uibModalInstance,
             skillId: skillId,

@@ -42,16 +42,8 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
-        question_state_data = self._create_valid_question_data('ABC')
-        linked_skill_ids = ['skill_id1', 'skill_id2']
-        self.save_new_question(
-            'question_id1', 'owner_id', question_state_data, linked_skill_ids)
-        self.assertTrue(
-            question_models.QuestionModel
-            .has_reference_to_user_id('owner_id'))
         self.assertFalse(
-            question_models.QuestionModel
-            .has_reference_to_user_id('x_id'))
+            question_models.QuestionModel.has_reference_to_user_id('any_id'))
 
     def test_create_question_empty_skill_id_list(self):
         state = state_domain.State.create_default_state('ABC')
@@ -711,6 +703,7 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.question_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             question_models.QuestionCommitLogEntryModel
@@ -736,6 +729,7 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
             question_model_created_on=datetime.datetime.utcnow(),
             question_model_last_updated=datetime.datetime.utcnow()
         )
+        question_summary_model.update_timestamps()
         question_summary_model.put()
 
         self.assertFalse(

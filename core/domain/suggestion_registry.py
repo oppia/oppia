@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -182,10 +183,7 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if (
-                self.author_id is not None and
-                not user_services.is_user_id_correct(self.author_id)
-        ):
+        if not user_services.is_user_or_pseudonymous_id(self.author_id):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
                 'received %s' % self.author_id)
@@ -196,7 +194,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
             if (
-                    not user_services.is_user_id_correct(
+                    not user_services.is_user_or_pseudonymous_id(
                         self.final_reviewer_id) and
                     self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
             ):
@@ -879,7 +877,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 conversion_fn,
                 state_uses_old_interaction_cust_args_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 37)
+                        'question_state_data_schema_version'] < 38)
             )
         )
 
@@ -1095,3 +1093,228 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
         SuggestionTranslateContent),
     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }
+
+
+class CommunityContributionStats(python_utils.OBJECT):
+    """Domain object for the CommunityContributionStatsModel.
+
+    Attributes:
+        translation_reviewer_counts_by_lang_code: dict. A dictionary where the
+            keys represent the language codes that translation suggestions are
+            offered in and the values correspond to the total number of
+            reviewers who have permission to review translation suggestions in
+            that language.
+        translation_suggestion_counts_by_lang_code: dict. A dictionary where
+            the keys represent the language codes that translation suggestions
+            are offered in and the values correspond to the total number of
+            translation suggestions that are currently in review in that
+            language.
+        question_reviewer_count: int. The total number of reviewers who have
+            permission to review question suggestions.
+        question_suggestion_count: int. The total number of question
+            suggestions that are currently in review.
+    """
+
+    def __init__(
+            self, translation_reviewer_counts_by_lang_code,
+            translation_suggestion_counts_by_lang_code,
+            question_reviewer_count, question_suggestion_count):
+        self.translation_reviewer_counts_by_lang_code = (
+            translation_reviewer_counts_by_lang_code
+        )
+        self.translation_suggestion_counts_by_lang_code = (
+            translation_suggestion_counts_by_lang_code
+        )
+        self.question_reviewer_count = question_reviewer_count
+        self.question_suggestion_count = question_suggestion_count
+
+    def validate(self):
+        """Validates the CommunityContributionStats object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                CommunityContributionStats object is invalid.
+        """
+        for language_code, reviewer_count in (
+                self.translation_reviewer_counts_by_lang_code.items()):
+            # Translation languages are a part of audio languages.
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language code for the translation reviewer '
+                    'counts: %s.' % language_code
+                )
+            if not isinstance(reviewer_count, int):
+                raise utils.ValidationError(
+                    'Expected the translation reviewer count to be '
+                    'an integer for %s language code, received: %s.' % (
+                        language_code, reviewer_count)
+                )
+            elif reviewer_count < 0:
+                raise utils.ValidationError(
+                    'Expected the translation reviewer count to be '
+                    'non-negative for %s language code, received: %s.' % (
+                        language_code, reviewer_count)
+                )
+
+        for language_code, suggestion_count in (
+                self.translation_suggestion_counts_by_lang_code.items()):
+            # Translation languages are a part of audio languages.
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language code for the translation suggestion '
+                    'counts: %s.' % language_code
+                )
+            if not isinstance(suggestion_count, int):
+                raise utils.ValidationError(
+                    'Expected the translation suggestion count to be '
+                    'an integer for %s language code, received: %s.' % (
+                        language_code, suggestion_count)
+                )
+            elif suggestion_count < 0:
+                raise utils.ValidationError(
+                    'Expected the translation suggestion count to be '
+                    'non-negative for %s language code, received: %s.' % (
+                        language_code, suggestion_count)
+                )
+
+        if not isinstance(self.question_reviewer_count, int):
+            raise utils.ValidationError(
+                'Expected the question reviewer count to be an integer, '
+                'received: %s.' % self.question_reviewer_count
+            )
+        if self.question_reviewer_count < 0:
+            raise utils.ValidationError(
+                'Expected the question reviewer count to be non-negative, '
+                'received: %s.' % (self.question_reviewer_count)
+            )
+
+        if not isinstance(self.question_suggestion_count, int):
+            raise utils.ValidationError(
+                'Expected the question suggestion count to be an integer, '
+                'received: %s.' % self.question_suggestion_count
+            )
+        if self.question_suggestion_count < 0:
+            raise utils.ValidationError(
+                'Expected the question suggestion count to be non-negative, '
+                'received: %s.' % (self.question_suggestion_count)
+            )
+
+    def set_translation_reviewer_count_for_language_code(
+            self, language_code, count):
+        """Sets the translation reviewer count to be count, for the given
+        language code.
+
+        Args:
+            language_code: str. The translation suggestion language code that
+                reviewers have the rights to review.
+            count: int. The number of reviewers that have the rights to review
+                translation suggestions in language_code.
+        """
+        self.translation_reviewer_counts_by_lang_code[language_code] = count
+
+    def set_translation_suggestion_count_for_language_code(
+            self, language_code, count):
+        """Sets the translation suggestion count to be count, for the language
+        code given.
+
+        Args:
+            language_code: str. The translation suggestion language code.
+            count: int. The number of translation suggestions in language_code
+                that are currently in review.
+        """
+        self.translation_suggestion_counts_by_lang_code[language_code] = count
+
+    def are_translation_reviewers_needed_for_lang_code(self, lang_code):
+        """Returns whether or not more reviewers are needed to review
+        translation suggestions in the given language code. Translation
+        suggestions in a given language need more reviewers if the number of
+        translation suggestions in that language divided by the number of
+        translation reviewers in that language is greater than
+        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+
+        Args:
+            lang_code: str. The language code of the translation
+                suggestions.
+
+        Returns:
+            bool. Whether or not more reviewers are needed to review
+            translation suggestions in the given language code.
+       """
+        if lang_code not in self.translation_suggestion_counts_by_lang_code:
+            return False
+
+        if lang_code not in self.translation_reviewer_counts_by_lang_code:
+            return True
+
+        number_of_reviewers = (
+            self.translation_reviewer_counts_by_lang_code[lang_code])
+        number_of_suggestions = (
+            self.translation_suggestion_counts_by_lang_code[lang_code])
+        return (
+            number_of_suggestions > (
+                config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
+                    number_of_reviewers)))
+
+    def get_translation_language_codes_that_need_reviewers(self):
+        """Returns the language codes where more reviewers are needed to review
+        translations in those language codes. Translation suggestions in a
+        given language need more reviewers if the number of translation
+        suggestions in that language divided by the number of translation
+        reviewers in that language is greater than
+        config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+
+        Returns:
+            set. A set of of the language codes where more translation reviewers
+            are needed.
+        """
+        language_codes_that_need_reviewers = set()
+        for language_code in self.translation_suggestion_counts_by_lang_code:
+            if self.are_translation_reviewers_needed_for_lang_code(
+                    language_code):
+                language_codes_that_need_reviewers.add(language_code)
+        return language_codes_that_need_reviewers
+
+    def are_question_reviewers_needed(self):
+        """Returns whether or not more reviewers are needed to review question
+        suggestions. Question suggestions need more reviewers if the number of
+        question suggestions divided by the number of question reviewers is
+        greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+
+        Returns:
+            bool. Whether or not more reviewers are needed to review
+            question suggestions.
+       """
+        if self.question_suggestion_count == 0:
+            return False
+
+        if self.question_reviewer_count == 0:
+            return True
+
+        return (
+            self.question_suggestion_count > (
+                config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
+                    self.question_reviewer_count)))
+
+
+class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
+    """Stores key information that is used to create the email content for
+    notifying admins and reviewers that there are suggestions that need to be
+    reviewed.
+
+    Attributes:
+        suggestion_type: str. The type of the suggestion.
+        language_code: str. The language code of the suggestion.
+        suggestion_content: str. The suggestion content that is emphasized for
+            a user when they are viewing a list of suggestions on the
+            Contributor Dashboard.
+        submission_datetime: datetime.datetime. Date and time when the
+            suggestion was submitted for review.
+    """
+
+    def __init__(
+            self, suggestion_type, language_code, suggestion_content,
+            submission_datetime):
+        self.suggestion_type = suggestion_type
+        self.language_code = language_code
+        self.suggestion_content = suggestion_content
+        self.submission_datetime = submission_datetime

@@ -15,17 +15,13 @@
 /**
  * @fileoverview Unit tests for the ratio expression component.
  */
-
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
-
+import { Ratio } from 'domain/objects/ratio.model';
 
 describe('RatioExpression', function() {
   var RationExpressionCtrl = null;
-  var ratioObjectFactory = null;
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    ratioObjectFactory = new RatioObjectFactory();
-    $provide.value('RatioObjectFactory', ratioObjectFactory);
+    $provide.value('Ratio', Ratio);
   }));
   beforeEach(angular.mock.inject(function($componentController) {
     RationExpressionCtrl = $componentController('ratioExpressionEditor');
@@ -68,7 +64,7 @@ describe('RatioExpression', function() {
   it('should initialize ctrl.warningText with invalid colons', function() {
     RationExpressionCtrl.isValidRatio('1:2::3');
     expect(RationExpressionCtrl.warningText)
-      .toBe('Your answer has two colons (:) next to each other.');
+      .toBe('Your answer has multiple colons (:) next to each other.');
   });
 
   it('should initialize ctrl.warningText with invalid zero ratio', function() {

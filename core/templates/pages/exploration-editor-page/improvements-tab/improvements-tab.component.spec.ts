@@ -20,18 +20,18 @@
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationTaskType } from
-  'domain/improvements/ExplorationTaskObjectFactory';
+  'domain/improvements/exploration-task.model';
 import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+  'domain/improvements/high-bounce-rate-task.model';
 import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+  'domain/improvements/ineffective-feedback-loop-task.model';
 import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+  'domain/improvements/needs-guiding-response-task.model';
 import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+  'domain/improvements/successive-incorrect-answers-task.model';
+import { StateStats } from 'domain/statistics/state-stats-model';
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 

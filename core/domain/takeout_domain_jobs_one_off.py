@@ -25,12 +25,12 @@ from core.platform import models
 import python_utils
 
 (
-    base_models, config_models, collection_models, exploration_models,
-    skill_models, story_models, topic_models,
-    question_models
+    config_models, collection_models, exploration_models,
+    skill_models, story_models, subtopic_models,
+    topic_models, question_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.config, models.NAMES.collection,
-    models.NAMES.exploration, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.config, models.NAMES.collection, models.NAMES.exploration,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.topic, models.NAMES.question
 ])
 
@@ -52,7 +52,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJob(
             exploration_models.ExplorationSnapshotMetadataModel,
             skill_models.SkillSnapshotMetadataModel,
             story_models.StorySnapshotMetadataModel,
-            topic_models.SubtopicPageSnapshotMetadataModel,
+            subtopic_models.SubtopicPageSnapshotMetadataModel,
             topic_models.TopicRightsSnapshotMetadataModel,
             topic_models.TopicSnapshotMetadataModel,
             question_models.QuestionSnapshotMetadataModel,
@@ -61,7 +61,8 @@ class SnapshotMetadataCommitMsgMigrationOneOffJob(
     @staticmethod
     def map(item):
         try:
-            item.put(update_last_updated_time=False)
+            item.update_timestamps(update_last_updated_time=False)
+            item.put()
         except Exception as e:
             model_name = item.__class__.__name__
             model_id = item.id

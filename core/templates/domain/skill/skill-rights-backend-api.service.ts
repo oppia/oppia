@@ -20,10 +20,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
-import { SkillRightsBackendDict, SkillRightsObjectFactory, SkillRights } from
-  'domain/skill/SkillRightsObjectFactory.ts';
+import { SkillRightsBackendDict, SkillRights } from
+  'domain/skill/skill-rights.model';
 import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
 import { UrlInterpolationService } from
@@ -41,7 +41,6 @@ export class SkillRightsBackendApiService {
 
   constructor(
     private http: HttpClient,
-    private skillRightsObjectFactory: SkillRightsObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
   _fetchSkillRights(
@@ -55,8 +54,7 @@ export class SkillRightsBackendApiService {
 
     this.http.get<SkillRightsBackendDict>(skillRightsUrl).toPromise()
       .then(response => {
-        let skillRightsObject = this.skillRightsObjectFactory
-          .createFromBackendDict(response);
+        let skillRightsObject = SkillRights.createFromBackendDict(response);
 
         if (successCallback) {
           successCallback(skillRightsObject);
@@ -75,7 +73,7 @@ export class SkillRightsBackendApiService {
   /**
     * Gets a skill's rights, given its ID.
     */
-  fetchSkillRights(skillId: string): Promise<SkillRights> {
+  async fetchSkillRightsAsync(skillId: string): Promise<SkillRights> {
     return new Promise((resolve, reject) => {
       this._fetchSkillRights(skillId, resolve, reject);
     });
@@ -90,7 +88,7 @@ export class SkillRightsBackendApiService {
     * rights from the backend, it will store it in the cache to avoid
     * requests from the backend in further function calls.
     */
-  loadSkillRights(skillId: string): Promise<SkillRights> {
+  async loadSkillRightsAsync(skillId: string): Promise<SkillRights> {
     return new Promise((resolve, reject) => {
       if (this._isCached(skillId)) {
         if (resolve) {

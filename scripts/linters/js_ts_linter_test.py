@@ -77,8 +77,6 @@ INVALID_CONSTANT_AJS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_duplicate.constants.ajs.ts')
 INVALID_AS_CONST_CONSTANTS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_as_const.constants.ts')
-INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 INVALID_FORMATTED_COMMENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_comments.ts')
 INVALID_DIRECTIVE_WITH_NO_RETURN_BLOCK = os.path.join(
@@ -501,10 +499,11 @@ class JsTsLintTests(test_utils.LinterTestBase):
         communicate_swap = self.swap(
             subprocess.Popen, 'communicate', mock_communicate)
         with popen_swap, communicate_swap:
-            with self.assertRaisesRegexp(SystemExit, '1'):
-                js_ts_linter.ThirdPartyJsTsLintChecksManager(
-                    [INVALID_SORTED_DEPENDENCIES_FILEPATH]
-                ).perform_all_lint_checks()
+            with self.assertRaisesRegexp(
+                Exception, 'Oops! Something went wrong'):
+            js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                INVALID_SORTED_DEPENDENCIES_FILEPATH
+            ).perform_all_lint_checks()
 
     def test_third_party_linter_with_invalid_eslint_path(self):
         def mock_exists(unused_path):
@@ -512,7 +511,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with exists_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with exists_swap, self.assertRaisesRegexp(
+            Exception,
+            'ERROR    Please run start.sh first to install node-eslint and '
+            'its dependencies.'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH]
             ).perform_all_lint_checks()
@@ -545,83 +547,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
             lint_task_report[0].get_report())
         self.assertEqual('JS TS lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
-
-    def test_http_client_used_with_excluded_file(self):
-        excluded_file = (
-            'core/templates/services/request-interceptor.service.spec.ts')
-
-        def mock_compile_all_ts_files():
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'core/templates/services/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    excluded_file)
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [], [excluded_file], FILE_CACHE).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        expected_messages = ['SUCCESS  HTTP requests check passed']
-        self.validate(lint_task_report, expected_messages, 0)
-
-    def test_http_client_used_in_backend_api_service_file(self):
-        def mock_compile_all_ts_files():
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    VALID_BACKEND_API_SERVICE_FILEPATH)
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [], [VALID_BACKEND_API_SERVICE_FILEPATH], FILE_CACHE
-            ).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        expected_messages = ['SUCCESS  HTTP requests check passed']
-        self.validate(lint_task_report, expected_messages, 0)
-
-    def test_http_client_used_with_error_message(self):
-        def mock_compile_all_ts_files():
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    INVALID_HTTP_CLIENT_FILEPATH)
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_HTTP_CLIENT_FILEPATH], FILE_CACHE
-            ).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        expected_messages = [
-            'An instance of HttpClient is found in this file. You are not '
-            'allowed to create http requests from files that are not '
-            'backend api services.']
-        self.validate(lint_task_report, expected_messages, 1)
 
     def test_ts_ignore_found_error(self):
         def mock_compile_all_ts_files():

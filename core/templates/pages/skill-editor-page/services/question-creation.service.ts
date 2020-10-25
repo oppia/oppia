@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Service for creating a new question.
  */
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -40,7 +42,6 @@ require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
-require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
@@ -61,21 +62,19 @@ require('services/question-validation.service.ts');
 
 
 angular.module('oppia').factory('QuestionCreationService', [
-  '$location', '$uibModal', 'AlertsService',
+  '$location', '$rootScope', '$uibModal', 'AlertsService',
   'EditableQuestionBackendApiService', 'ImageLocalStorageService',
-  'MisconceptionObjectFactory', 'QuestionObjectFactory',
+  'QuestionObjectFactory',
   'QuestionUndoRedoService', 'SkillBackendApiService',
-  'SkillDifficultyObjectFactory', 'SkillEditorStateService',
-  'UrlInterpolationService', 'DEFAULT_SKILL_DIFFICULTY',
-  'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
+  'SkillEditorStateService', 'UrlInterpolationService',
+  'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
   function(
-      $location, $uibModal, AlertsService,
+      $location, $rootScope, $uibModal, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
-      MisconceptionObjectFactory, QuestionObjectFactory,
+      QuestionObjectFactory,
       QuestionUndoRedoService, SkillBackendApiService,
-      SkillDifficultyObjectFactory, SkillEditorStateService,
-      UrlInterpolationService, DEFAULT_SKILL_DIFFICULTY,
-      MODE_SELECT_DIFFICULTY, SKILL_DIFFICULTIES) {
+      SkillEditorStateService, UrlInterpolationService,
+      DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY, SKILL_DIFFICULTIES) {
     var newQuestionSkillDifficulties = [];
     var question = null;
     var skill = null;
@@ -90,15 +89,12 @@ angular.module('oppia').factory('QuestionCreationService', [
     var populateMisconceptions = function() {
       SkillBackendApiService.fetchMultiSkills(
         newQuestionSkillIds).then(
-        function(skillDicts) {
-          skillDicts.forEach(function(skillDict) {
-            misconceptionsBySkill[skillDict.id] =
-                  skillDict.misconceptions.map(
-                    function(misconceptionsBackendDict) {
-                      return MisconceptionObjectFactory
-                        .createFromBackendDict(misconceptionsBackendDict);
-                    });
+        function(skills) {
+          skills.forEach(function(skill) {
+            misconceptionsBySkill[skill.getId()] =
+              skill.getMisconceptions();
           });
+          $rootScope.$apply();
         }, function(error) {
           AlertsService.addWarning();
         });
@@ -116,7 +112,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       var linkedSkillsWithDifficulty = [];
       newQuestionSkillIds.forEach(function(skillId) {
         linkedSkillsWithDifficulty.push(
-          SkillDifficultyObjectFactory.create(
+          SkillDifficulty.create(
             skillId, '', DEFAULT_SKILL_DIFFICULTY));
       });
       groupedSkillSummaries = (

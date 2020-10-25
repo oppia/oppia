@@ -24,28 +24,23 @@ import { Injectable } from '@angular/core';
 import {
   CollectionSummary,
   CollectionSummaryBackendDict,
-  CollectionSummaryObjectFactory
-} from 'domain/collection/collection-summary-object.factory';
+} from 'domain/collection/collection-summary.model';
 import {
   FeedbackThreadSummary,
-  FeedbackThreadSummaryObjectFactory,
   FeedbackThreadSummaryBackendDict
-} from 'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
+} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
-  LearnerExplorationSummaryObjectFactory
-} from 'domain/summary/learner-exploration-summary-object.factory';
+} from 'domain/summary/learner-exploration-summary.model';
 import {
   NonExistentActivities,
   NonExistentActivitiesBackendDict,
-  NonExistentActivitiesObjectFactory
-} from 'domain/learner_dashboard/non-existent-activities-object.factory';
+} from 'domain/learner_dashboard/non-existent-activities.model';
 import {
   CreatorSummaryBackendDict,
   ProfileSummary,
-  ProfileSummaryObjectFactory
-} from 'domain/user/profile-summary-object.factory';
+} from 'domain/user/profile-summary.model';
 
 interface LearnerDashboardDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
@@ -80,58 +75,50 @@ interface LearnerDashboardData {
 })
 export class LearnerDashboardBackendApiService {
   constructor(
-    private http: HttpClient,
-    private collectionSummaryObjectFactory: CollectionSummaryObjectFactory,
-    private feedbackThreadSummaryObjectFactory:
-    FeedbackThreadSummaryObjectFactory,
-    private learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory,
-    private nonExistentActivitiesObjectFactory:
-    NonExistentActivitiesObjectFactory,
-    private profileSummaryObjectFactory: ProfileSummaryObjectFactory) {}
+    private http: HttpClient) {}
 
-  _fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
+  async _fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
     return new Promise((resolve, reject) => {
       this.http.get<LearnerDashboardDataBackendDict>(
         '/learnerdashboardhandler/data').toPromise().then(dashboardData => {
         resolve({
           completedExplorationsList: (
             dashboardData.completed_explorations_list.map(
-              expSummary => this.learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           incompleteExplorationsList: (
             dashboardData.incomplete_explorations_list.map(
-              expSummary => this.learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           explorationPlaylist: (
             dashboardData.exploration_playlist.map(
-              expSummary => this.learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           completedCollectionsList: (
             dashboardData.completed_collections_list.map(
-              collectionSummary => this.collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           incompleteCollectionsList: (
             dashboardData.incomplete_collections_list.map(
-              collectionSummary => this.collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           collectionPlaylist: (
             dashboardData.collection_playlist.map(
-              collectionSummary => this.collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (
             dashboardData.thread_summaries.map(
-              threadSummary => this.feedbackThreadSummaryObjectFactory
+              threadSummary => FeedbackThreadSummary
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             dashboardData.completed_to_incomplete_collections),
           numberOfNonexistentActivities: (
-            this.nonExistentActivitiesObjectFactory.createFromBackendDict(
+            NonExistentActivities.createFromBackendDict(
               dashboardData.number_of_nonexistent_activities)),
           subscriptionList: (
             dashboardData.subscription_list.map(
-              profileSummary => this.profileSummaryObjectFactory
+              profileSummary => ProfileSummary
                 .createFromCreatorBackendDict(profileSummary)))
         });
       }, errorResponse => {
@@ -140,8 +127,8 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
-    return this._fetchLearnerDashboardData();
+  async fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
+    return this._fetchLearnerDashboardDataAsync();
   }
 }
 

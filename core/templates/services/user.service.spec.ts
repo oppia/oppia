@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // UserService.ts is upgraded to Angular 8.
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
+import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -27,13 +27,11 @@ require('services/user.service.ts');
 
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
-  var userInfoObjectFactory;
   var CsrfService = null;
   var UrlService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     $provide.value('$window', {
       location: {
         pathname: 'home'
@@ -53,15 +51,6 @@ describe('User Service', function() {
       'UrlInterpolationService');
     UrlService = $injector.get(
       'UrlService');
-    // The injector is required because this service is directly used in this
-    // spec, therefore even though UserInfoObjectFactory is upgraded to
-    // Angular, it cannot be used just by instantiating it by its class but
-    // instead needs to be injected. Note that 'userInfoObjectFactory' is
-    // the injected service instance whereas 'UserInfoObjectFactory' is the
-    // service class itself. Therefore, use the instance instead of the class in
-    // the specs.
-    userInfoObjectFactory = $injector.get(
-      'UserInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
 
     CsrfService = $injector.get('CsrfTokenService');
@@ -92,8 +81,8 @@ describe('User Service', function() {
     };
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
-    var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
-      sampleUserInfoBackendObject);
+    var sampleUserInfo = UserInfo.createFromBackendDict(
+      sampleUserInfoBackendObject as UserInfoBackendDict);
 
     UserService.getUserInfoAsync().then(function(userInfo) {
       expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
@@ -114,7 +103,7 @@ describe('User Service', function() {
 
   it('should return new userInfo data when url path is signup', function() {
     spyOn(UrlService, 'getPathname').and.returnValue('/signup');
-    var sampleUserInfo = userInfoObjectFactory.createDefault();
+    var sampleUserInfo = UserInfo.createDefault();
 
     UserService.getUserInfoAsync().then(function(userInfo) {
       expect(userInfo).toEqual(sampleUserInfo);
@@ -134,8 +123,8 @@ describe('User Service', function() {
     };
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
-    var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
-      sampleUserInfoBackendObject);
+    var sampleUserInfo = UserInfo.createFromBackendDict(
+      sampleUserInfoBackendObject as UserInfoBackendDict);
 
     UserService.getUserInfoAsync().then(function(userInfo) {
       expect(userInfo).toEqual(sampleUserInfo);
@@ -160,7 +149,7 @@ describe('User Service', function() {
     };
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
-    var sampleUserInfo = userInfoObjectFactory.createDefault();
+    var sampleUserInfo = UserInfo.createDefault();
 
     UserService.getUserInfoAsync().then(function(userInfo) {
       expect(userInfo).toEqual(sampleUserInfo);
@@ -257,9 +246,8 @@ describe('User Service', function() {
       .respond(500, errorMessage);
 
     UserService.setProfileImageDataUrlAsync(newProfileImageDataurl)
-      /* eslint-disable dot-notation */
+      /* eslint-disable-next-line dot-notation */
       .catch(function(error) {
-      /* eslint-enable dot-notation */
         expect(error.data).toEqual(errorMessage);
       });
     $httpBackend.flush();

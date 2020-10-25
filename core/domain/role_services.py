@@ -281,12 +281,62 @@ def get_role_graph_data():
     return role_graph
 
 
+def check_if_path_exists_in_roles_graph(source_node, destination_node):
+    """Breadth-first-search approach to check if a path from source
+    role node to destination role node exists in the roles based hierarchy
+    graph.
+
+    Args:
+        source_node: str. A string defining the role of the source node. It
+            should be a key of PARENT_ROLES.
+        destination_node: str. A string defining the role of the destination
+            node. It should be a key of PARENT_ROLES.
+
+    Returns:
+        Bool. Whether a path from source node role to the destination node role
+        exists in the roles based hierarchy graph or not.
+
+    Raises:
+        Exception. The given role for source node does not exist.
+        Exception. The given role for destination node does not exist.
+    """
+
+    if source_node not in PARENT_ROLES:
+        raise Exception(
+            'Role %s defined by the source node does not exist.' % source_node)
+
+    if destination_node not in PARENT_ROLES:
+        raise Exception(
+            'Role %s defined by the destination node does not exist.'
+            % destination_node)
+
+    graph = get_role_graph_data()
+    adjacency_list = {}
+    for node in graph['nodes']:
+        adjacency_list[node] = []
+    for edges in graph['links']:
+        adjacency_list[edges['source']].append(edges['target'])
+    bfs_queue = [source_node]
+    is_path_found = False
+    while len(bfs_queue) > 0:
+        node = bfs_queue.pop(0)
+        if node == destination_node:
+            is_path_found = True
+            break
+        else:
+            for target_node in adjacency_list[node]:
+                bfs_queue.append(target_node)
+    return is_path_found
+
+
 def log_role_query(user_id, intent, role=None, username=None):
     """Stores the query to role structure in RoleQueryAuditModel."""
     model_id = '%s.%s.%s.%s' % (
         user_id, int(math.floor(time.time())), intent, random.randint(0, 1000)
     )
 
-    audit_models.RoleQueryAuditModel(
+    model = audit_models.RoleQueryAuditModel(
         id=model_id, user_id=user_id, intent=intent,
-        role=role, username=username).put()
+        role=role, username=username)
+    model.update_timestamps()
+    model.put()

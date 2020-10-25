@@ -230,46 +230,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
 
-    def _check_http_requests(self):
-        """Checks if the http requests are made only by
-        backend-api.service.ts.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        http_client_pattern = r':\n? *HttpClient'
-
-        excluded_files = [
-            'core/templates/services/request-interceptor.service.spec.ts'
-        ]
-
-        error_messages = []
-        name = 'HTTP request'
-
-        failed = False
-
-        for file_path in self.all_filepaths:
-            if file_path in excluded_files:
-                continue
-
-            if file_path.endswith('backend-api.service.ts'):
-                continue
-
-            file_content = self.file_cache.read(file_path)
-
-            if re.findall(http_client_pattern, file_content):
-                failed = True
-                error_message = (
-                    '%s --> An instance of HttpClient is found in this '
-                    'file. You are not allowed to create http requests '
-                    'from files that are not backend api services.' % (
-                        file_path))
-                error_messages.append(error_message)
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _check_ts_ignore(self):
         """Checks if ts ignore is used.
 
@@ -1067,7 +1027,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         linter_stdout = []
 
         linter_stdout.append(self._check_extra_js_files())
-        linter_stdout.append(self._check_http_requests())
         linter_stdout.append(self._check_js_and_ts_component_name_and_count())
         linter_stdout.append(self._check_directive_scope())
         linter_stdout.append(self._check_sorted_dependencies())
@@ -1137,7 +1096,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             # string('') which is at the index 1 and message-id from the end.
             if re.search(r'^\d+:\d+', line.lstrip()):
                 # Replacing message-id with an empty string('').
-                line = re.sub(r'(\w+-*)+$', '', line)
+                if not 'Parsing error:' in line:
+                    line = re.sub(r'(\w+-*)+$', '', line)
                 error_string = re.search(r'error', line).group(0)
                 error_message = line.replace(error_string, '', 1)
             else:
@@ -1156,12 +1116,9 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         eslint_path = os.path.join(
             'node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
-            python_utils.PRINT(
-                '         and its dependencies.')
-            sys.exit(1)
+            raise Exception(
+                'ERROR    Please run start.sh first to install node-eslint '
+                'and its dependencies.')
 
         files_to_lint = self.all_filepaths
         error_messages = []
@@ -1178,9 +1135,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
         linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
         if linter_stderr:
-            python_utils.PRINT('LINTER FAILED')
-            python_utils.PRINT(linter_stderr)
-            sys.exit(1)
+            raise Exception(linter_stderr)
 
         if linter_stdout:
             failed = True

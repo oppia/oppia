@@ -69,6 +69,7 @@ def subscribe_to_threads(user_id, feedback_thread_ids):
     subscriptions_model.general_feedback_thread_ids.extend(
         feedback_thread_ids_to_add_to_subscriptions_model
     )
+    subscriptions_model.update_timestamps()
     subscriptions_model.put()
 
 
@@ -90,6 +91,7 @@ def subscribe_to_exploration(user_id, exploration_id):
 
     if exploration_id not in subscriptions_model.activity_ids:
         subscriptions_model.activity_ids.append(exploration_id)
+        subscriptions_model.update_timestamps()
         subscriptions_model.put()
 
 
@@ -103,6 +105,8 @@ def subscribe_to_creator(user_id, creator_id):
         user_id: str. The user ID of the new subscriber.
         creator_id: str. The user ID of the creator.
     """
+    if user_id == creator_id:
+        raise Exception('User %s is not allowed to self subscribe.' % user_id)
     subscribers_model_creator = user_models.UserSubscribersModel.get(
         creator_id, strict=False)
     subscriptions_model_user = user_models.UserSubscriptionsModel.get(
@@ -119,7 +123,9 @@ def subscribe_to_creator(user_id, creator_id):
     if user_id not in subscribers_model_creator.subscriber_ids:
         subscribers_model_creator.subscriber_ids.append(user_id)
         subscriptions_model_user.creator_ids.append(creator_id)
+        subscribers_model_creator.update_timestamps()
         subscribers_model_creator.put()
+        subscriptions_model_user.update_timestamps()
         subscriptions_model_user.put()
 
 
@@ -141,7 +147,9 @@ def unsubscribe_from_creator(user_id, creator_id):
     if user_id in subscribers_model_creator.subscriber_ids:
         subscribers_model_creator.subscriber_ids.remove(user_id)
         subscriptions_model_user.creator_ids.remove(creator_id)
+        subscribers_model_creator.update_timestamps()
         subscribers_model_creator.put()
+        subscriptions_model_user.update_timestamps()
         subscriptions_model_user.put()
 
 
@@ -242,6 +250,7 @@ def subscribe_to_collection(user_id, collection_id):
 
     if collection_id not in subscriptions_model.collection_ids:
         subscriptions_model.collection_ids.append(collection_id)
+        subscriptions_model.update_timestamps()
         subscriptions_model.put()
 
 
@@ -308,4 +317,5 @@ def record_user_has_seen_notifications(user_id, last_seen_msecs):
 
     subscriptions_model.last_checked = datetime.datetime.utcfromtimestamp(
         python_utils.divide(last_seen_msecs, 1000.0))
+    subscriptions_model.update_timestamps()
     subscriptions_model.put()

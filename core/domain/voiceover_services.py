@@ -116,6 +116,8 @@ def _save_voiceover_applications(voiceover_applications):
             voiceover_application)
         voiceover_application_models.append(voiceover_application_model)
 
+    suggestion_models.GeneralVoiceoverApplicationModel.update_timestamps_multi(
+        voiceover_application_models)
     suggestion_models.GeneralVoiceoverApplicationModel.put_multi(
         voiceover_application_models)
 
@@ -209,7 +211,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
                 voiceover_application.target_id]))
         email_manager.send_accepted_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[0].chapter_title,
+            opportunities[voiceover_application.target_id].chapter_title,
             voiceover_application.language_code)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
@@ -261,7 +263,7 @@ def reject_voiceover_application(
                 voiceover_application.target_id]))
         email_manager.send_rejected_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[0].chapter_title,
+            opportunities[voiceover_application.target_id].chapter_title,
             voiceover_application.language_code, rejection_message)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
