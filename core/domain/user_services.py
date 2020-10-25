@@ -24,7 +24,6 @@ import hashlib
 import imghdr
 import logging
 import re
-import time
 
 from constants import constants
 from core.domain import role_services
