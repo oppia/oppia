@@ -71,8 +71,6 @@ import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
 import { EventEmitter } from '@angular/core';
 import { ExternalSaveService } from 'services/external-save.service';
-import { RatioObjectFactory } from
-  'domain/objects/RatioObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -411,7 +409,6 @@ describe('State translation component', function() {
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
-    $provide.value('RatioObjectFactory', TestBed.get(RatioObjectFactory));
   }));
 
   beforeEach(function() {

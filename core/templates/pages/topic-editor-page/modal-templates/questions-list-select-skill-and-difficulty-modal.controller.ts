@@ -12,27 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Controller for questions list select skill and
  * difficulty modal.
  */
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-require('domain/skill/SkillDifficultyObjectFactory.ts');
-
 angular.module('oppia').controller(
   'QuestionsListSelectSkillAndDifficultyModalController', [
-    '$controller', '$scope', '$uibModalInstance',
-    'SkillDifficultyObjectFactory', 'allSkillSummaries',
+    '$controller', '$scope', '$uibModalInstance', 'allSkillSummaries',
     'countOfSkillsToPrioritize', 'currentMode', 'linkedSkillsWithDifficulty',
     'skillIdToRubricsObject', 'DEFAULT_SKILL_DIFFICULTY',
     'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL',
     function(
-        $controller, $scope, $uibModalInstance,
-        SkillDifficultyObjectFactory, allSkillSummaries,
+        $controller, $scope, $uibModalInstance, allSkillSummaries,
         countOfSkillsToPrioritize, currentMode, linkedSkillsWithDifficulty,
         skillIdToRubricsObject, DEFAULT_SKILL_DIFFICULTY,
         MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL,) {
@@ -71,7 +69,7 @@ angular.module('oppia').controller(
       $scope.selectOrDeselectSkill = function(summary) {
         if (!$scope.isSkillSelected(summary.id)) {
           $scope.linkedSkillsWithDifficulty.push(
-            SkillDifficultyObjectFactory.create(
+            SkillDifficulty.create(
               summary.id, summary.description,
               DEFAULT_SKILL_DIFFICULTY));
           selectedSkills.push(summary.id);

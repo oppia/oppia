@@ -28,6 +28,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { UserProfile, UserProfileBackendDict } from 'domain/user/user-profile.model';
 
 require('pages/profile-page/profile-page.component.ts');
 
@@ -38,7 +39,6 @@ describe('Profile page', function() {
   var UserService = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
-  var UserProfileObjectFactory = null;
   var $log = null;
   var windowRefMock = {
     nativeWindow: {
@@ -80,7 +80,6 @@ describe('Profile page', function() {
     UserService = $injector.get('UserService');
     CsrfTokenService = $injector.get('CsrfTokenService');
     DateTimeFormatService = $injector.get('DateTimeFormatService');
-    UserProfileObjectFactory = $injector.get('UserProfileObjectFactory');
     $log = $injector.get('$log');
 
     spyOn(CsrfTokenService, 'getTokenAsync')
@@ -172,14 +171,14 @@ describe('Profile page', function() {
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
         'fetchProfileDataAsync').and.returnValue($q.resolve(
-        UserProfileObjectFactory.createFromBackendDict(profileData)));
+        UserProfile.createFromBackendDict(profileData)));
       ctrl.$onInit();
       $scope.$apply();
     });
 
     it('should get explorations to display when edited explorations are empty',
       function() {
-        var userProfile = UserProfileObjectFactory.createFromBackendDict(
+        var userProfile = UserProfile.createFromBackendDict(
           profileData);
         expect(ctrl.getExplorationsToDisplay()).toEqual(
           userProfile.editedExpSummaries);
@@ -267,7 +266,8 @@ describe('Profile page', function() {
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
         'fetchProfileDataAsync').and.returnValue($q.resolve(
-        UserProfileObjectFactory.createFromBackendDict(profileData)));
+        UserProfile.createFromBackendDict(
+          profileData as UserProfileBackendDict)));
       ctrl.$onInit();
       $scope.$apply();
     });
@@ -312,7 +312,8 @@ describe('Profile page', function() {
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
         'fetchProfileDataAsync').and.returnValue($q.resolve(
-        UserProfileObjectFactory.createFromBackendDict(profileData)));
+        UserProfile.createFromBackendDict(
+          profileData as UserProfileBackendDict)));
       ctrl.$onInit();
       $scope.$apply();
     });
@@ -369,7 +370,8 @@ describe('Profile page', function() {
       spyOn(
         OppiaAngularRootComponent.profilePageBackendApiService,
         'fetchProfileDataAsync').and.returnValue($q.resolve(
-        UserProfileObjectFactory.createFromBackendDict(profileData)));
+        UserProfile.createFromBackendDict(
+          profileData as UserProfileBackendDict)));
       ctrl.$onInit();
       $scope.$apply();
     });
