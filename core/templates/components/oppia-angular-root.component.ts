@@ -437,6 +437,8 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { SuggestionModalForCreatorDashboardBackendApiService } from
+  'pages/creator-dashboard-page/suggestion-modal-for-creator-view/suggestion-modal-for-creator-dashboard-backend-api.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -751,6 +753,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
   static subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
+  static suggestionModalForCreatorDashboardBackendApiService:
+    SuggestionModalForCreatorDashboardBackendApiService;
   static suggestionModalService: SuggestionModalService;
   static suggestionObjectFactory: SuggestionObjectFactory;
   static suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
@@ -1044,6 +1048,8 @@ private subtopicObjectFactory: SubtopicObjectFactory,
 private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
 private subtopicPageObjectFactory: SubtopicPageObjectFactory,
 private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
+private suggestionModalForCreatorDashboardBackendApiService:
+  SuggestionModalForCreatorDashboardBackendApiService,
 private suggestionModalService: SuggestionModalService,
 private suggestionObjectFactory: SuggestionObjectFactory,
 private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
@@ -1498,6 +1504,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.subtopicPageObjectFactory);
     OppiaAngularRootComponent.subtopicViewerBackendApiService = (
       this.subtopicViewerBackendApiService);
+    OppiaAngularRootComponent
+      .suggestionModalForCreatorDashboardBackendApiService = (
+        this.suggestionModalForCreatorDashboardBackendApiService);
     OppiaAngularRootComponent.suggestionModalService = (
       this.suggestionModalService);
     OppiaAngularRootComponent.suggestionObjectFactory = (

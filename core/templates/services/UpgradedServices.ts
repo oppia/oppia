@@ -475,6 +475,8 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { SuggestionModalForCreatorDashboardBackendApiService } from
+  'pages/creator-dashboard-page/suggestion-modal-for-creator-view/suggestion-modal-for-creator-dashboard-backend-api.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -668,6 +670,11 @@ export class UpgradedServices {
       new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
       new SubtitledUnicodeObjectFactory();
+    upgradedServices['SuggestionModalForCreatorDashboardBackendApiService'] =
+      new SuggestionModalForCreatorDashboardBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['SuggestionObjectFactory']);
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
     upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
