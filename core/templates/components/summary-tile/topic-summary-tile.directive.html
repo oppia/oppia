@@ -1,6 +1,6 @@
-
-
-<div class="topic-card"  ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+<div class="topic-card"
+     ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}"
+     ng-class="{'faded-topic-card': !$ctrl.isPublished()}">
   <a ng-href="<[$ctrl.getTopicPageUrl()]>">
     <div class="topic-thumbnail">
       <picture>
@@ -14,15 +14,28 @@
         <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
         <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
       </span>
+      <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
     </div>
   </a>
 </div>
 <style>
+  .faded-topic-card {
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
   .topic-card {
     border-radius: 1.5em;
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
     cursor: pointer;
     width: 100%;
+  }
+
+  .topic-card .topic-coming-soon {
+    display: block;
+    margin-left: 35px;
+    margin-top: 8px;
+    text-transform: uppercase;
   }
 
   .topic-card a:hover {
@@ -76,6 +89,11 @@
       height: 85px;
       padding-left: 10px;
     }
+
+    .topic-card .topic-coming-soon {
+      font-size: 0.8em;
+      margin-left: 25px;
+    }
   }
 
   @media(max-width: 680px) {
@@ -92,6 +110,10 @@
 
     .topic-card .topic-thumbnail {
       height: 100px;
+    }
+
+    .topic-card .topic-coming-soon {
+      font-size: 0.7em;
     }
   }
 </style>

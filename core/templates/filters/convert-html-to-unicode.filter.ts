@@ -16,8 +16,12 @@
  * @fileoverview Converts HTML to unicode.
  */
 
+export const convertHtmlToUnicode = (html: string): string => {
+  return angular.element('<div>' + html + '</div>').text();
+};
+
 angular.module('oppia').filter('convertHtmlToUnicode', [function() {
   return function(html) {
-    return angular.element('<div>' + html + '</div>').text();
+    return convertHtmlToUnicode(html);
   };
 }]);

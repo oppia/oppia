@@ -13,21 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SkillOpportunityObjectFactory.
+ * @fileoverview Unit tests for SkillOpportunityModel.
  */
 
-import { SkillOpportunityBackendDict, SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
+import { SkillOpportunity, SkillOpportunityBackendDict } from
+  'domain/opportunity/skill-opportunity.model';
 
-describe('Skill opportunity object factory', () => {
-  describe('SkillOpportunityObjectFactory', () => {
-    let skillOpportunityObjectFactory: (
-      SkillOpportunityObjectFactory);
+describe('Skill opportunity model', () => {
+  describe('SkillOpportunityModel', () => {
     let backendDict: SkillOpportunityBackendDict;
 
     beforeEach(() => {
-      skillOpportunityObjectFactory = (
-        new SkillOpportunityObjectFactory());
       backendDict = {
         id: 'skill_id',
         skill_description: 'A new skill for question',
@@ -38,7 +34,7 @@ describe('Skill opportunity object factory', () => {
 
     it('should return a correct skill id', () => {
       let skillOpportunity = (
-        skillOpportunityObjectFactory.createFromBackendDict(backendDict));
+        SkillOpportunity.createFromBackendDict(backendDict));
 
       expect(skillOpportunity.getSkillId()).toEqual(
         'skill_id');
@@ -46,7 +42,7 @@ describe('Skill opportunity object factory', () => {
 
     it('should return a correct opportunity heading', () => {
       let skillOpportunity = (
-        skillOpportunityObjectFactory.createFromBackendDict(backendDict));
+        SkillOpportunity.createFromBackendDict(backendDict));
 
       expect(skillOpportunity.getOpportunityHeading()).toEqual(
         'A new skill for question');
@@ -54,7 +50,7 @@ describe('Skill opportunity object factory', () => {
 
     it('should return a correct opportunity subheading', () => {
       let skillOpportunity = (
-        skillOpportunityObjectFactory.createFromBackendDict(backendDict));
+        SkillOpportunity.createFromBackendDict(backendDict));
 
       expect(skillOpportunity.getOpportunitySubheading()).toEqual(
         'A new topic');
@@ -62,7 +58,7 @@ describe('Skill opportunity object factory', () => {
 
     it('should return a correct content count', () => {
       let skillOpportunity = (
-        skillOpportunityObjectFactory.createFromBackendDict(backendDict));
+        SkillOpportunity.createFromBackendDict(backendDict));
 
       expect(skillOpportunity.getQuestionCount()).toEqual(30);
     });
