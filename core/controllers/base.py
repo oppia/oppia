@@ -195,7 +195,7 @@ class BaseHandler(webapp2.RequestHandler):
                     logging.error(
                         'Cannot find user %s with email %s on page %s'
                         % (self.gae_id, email, self.request.uri))
-                    # _clear_login_cookies(self.response.headers)
+                    _clear_login_cookies(self.response.headers)
                     return
 
             self.values['user_email'] = user_settings.email
@@ -264,7 +264,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         try:
-            if 'signup' in self.request.uri or 'csrf' in self.request.uri:
+            if 'csrf' in self.request.uri:
                 if self.gae_id and not self.user_id:
                     raise self.UnauthorizedUserException(
                         'User details not found.')

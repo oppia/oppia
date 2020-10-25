@@ -738,18 +738,13 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_auth_details_model = (
-        user_models.UserAuthDetailsModel.get_by_auth_id(
-            feconf.AUTH_METHOD_GAE, gae_id))
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_auth_id(
+        feconf.AUTH_METHOD_GAE, gae_id)
     if user_auth_details_model is not None:
         user_settings = _get_user_settings_from_model(
-            user_models.UserSettingsModel.get_by_id(
-                user_auth_details_model.id))
-        if user_settings is None:
-            logging.error('UserSettingsModel None %s' % gae_id)
+            user_models.UserSettingsModel.get_by_id(user_auth_details_model.id))
         return user_settings
-
-    if strict:
+    elif strict:
         logging.error('Could not find user with id %s' % gae_id)
         raise Exception('User not found.')
     else:
