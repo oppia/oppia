@@ -5439,11 +5439,8 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         expected_email_subject = 'Account deleted'
         expected_email_html_body = (
             'Hi applicant@example.com,<br><br>'
-            'Your account was successfully deleted.'
-            '- The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
+            'Your account was successfully deleted.<br><br>'
+            '- The Oppia Team')
 
         with self.can_send_emails_ctx:
             email_manager.send_account_deleted_email(
