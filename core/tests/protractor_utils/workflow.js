@@ -86,11 +86,11 @@ var createExplorationAndStartTutorial = async function() {
     await waitFor.visibilityOf(
       activityCreationModal,
       'ActivityCreationModal takes too long to be visible.');
+    var createExplorationButton = element(
+      by.css('.protractor-test-create-exploration'));
     await waitFor.elementToBeClickable(
       createExplorationButton,
       'createExplorationButton takes too long to be clickable.');
-    var createExplorationButton = element(
-      by.css('.protractor-test-create-exploration'));
     await action.click('createExplorationButton', createExplorationButton);
   }
 };
