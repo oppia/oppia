@@ -39,7 +39,8 @@
 /core/templates/components/ @srijanreddy98
 /core/templates/domain/ @kevintab95
 /core/templates/pages/ @srijanreddy98
-/core/templates/services/ @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/templates/services/ @DubeySandeep
 /extensions/ @vojtechjelinek
 /scripts/ @DubeySandeep
 
@@ -126,22 +127,23 @@
 
 
 # Dashboard pages.
-/core/controllers/creator_dashboard*.py @nithusha21
-/core/controllers/email_dashboard*.py @nithusha21
-/core/controllers/learner_dashboard*.py @nithusha21
-/core/controllers/learner_playlist*.py @nithusha21
-/core/controllers/subscriptions*.py @nithusha21
-/core/domain/activity*.py @nithusha21
-/core/domain/learner_playlist_services*.py @nithusha21
-/core/domain/learner_progress*.py @nithusha21
-/core/domain/subscription_services*.py @nithusha21
-/core/templates/domain/creator_dashboard/ @nithusha21
-/core/templates/domain/email-dashboard/ @nithusha21
-/core/templates/domain/learner_dashboard/ @nithusha21
-/core/templates/pages/creator-dashboard-page/ @nithusha21
-/core/templates/pages/email-dashboard-pages/ @nithusha21
-/core/templates/pages/learner-dashboard-page/ @nithusha21
-/core/templates/pages/notifications-dashboard-page/ @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2, lines 131-146
+/core/controllers/creator_dashboard*.py @DubeySandeep
+/core/controllers/email_dashboard*.py @DubeySandeep
+/core/controllers/learner_dashboard*.py @DubeySandeep
+/core/controllers/learner_playlist*.py @DubeySandeep
+/core/controllers/subscriptions*.py @DubeySandeep
+/core/domain/activity*.py @DubeySandeep
+/core/domain/learner_playlist_services*.py @DubeySandeep
+/core/domain/learner_progress*.py @DubeySandeep
+/core/domain/subscription_services*.py @DubeySandeep
+/core/templates/domain/creator_dashboard/ @DubeySandeep
+/core/templates/domain/email-dashboard/ @DubeySandeep
+/core/templates/domain/learner_dashboard/ @DubeySandeep
+/core/templates/pages/creator-dashboard-page/ @DubeySandeep
+/core/templates/pages/email-dashboard-pages/ @DubeySandeep
+/core/templates/pages/learner-dashboard-page/ @DubeySandeep
+/core/templates/pages/notifications-dashboard-page/ @DubeySandeep
 
 
 # Dev workflow team.
@@ -164,14 +166,15 @@
 /.stylelintrc @DubeySandeep @Hudda
 /.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
-/codecov.yml @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/codecov.yml @U8NWXD
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/css/.stylelintrc @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /tox.ini @DubeySandeep @Hudda
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @kevintab95 @DubeySandeep
-/scripts/check_frontend_coverage*.py @nithusha21 @DubeySandeep
+/scripts/check_frontend_coverage*.py @DubeySandeep
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
@@ -231,8 +234,10 @@
 
 
 # Google-app-engine configurations
-/appengine_config*.py @nithusha21
-/cron.yaml @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/appengine_config*.py @vojtechjelinek
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/cron.yaml @vojtechjelinek
 /index.yaml @seanlip
 /queue.yaml @seanlip
 /main_taskqueue.py @seanlip
@@ -356,12 +361,13 @@
 
 
 # Navigation bar project.
-/core/templates/domain/sidebar/ @nithusha21
-/core/templates/components/button-directives/create-activity-button.directive.ts @nithusha21
-/core/templates/components/button-directives/create-activity-button.directive.html @nithusha21
-/core/templates/components/common-layout-directives/navigation-bars/ @nithusha21
-/core/templates/services/bottom-navbar-status.service*.ts @nithusha21
-/core/templates/services/navigation.service*.ts @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2, lines 361-366
+/core/templates/domain/sidebar/ @aks681
+/core/templates/components/button-directives/create-activity-button.directive.ts @aks681
+/core/templates/components/button-directives/create-activity-button.directive.html @aks681
+/core/templates/components/common-layout-directives/navigation-bars/ @aks681
+/core/templates/services/bottom-navbar-status.service*.ts @aks681
+/core/templates/services/navigation.service*.ts @aks681
 
 
 # New structures team.
@@ -439,14 +445,21 @@
 
 
 # Infrastructure.
-/core/controllers/cron*.py @nithusha21
-/core/domain/cron_services*.py @nithusha21
-/main_cron.py @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/controllers/cron*.py @vojtechjelinek
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/domain/cron_services*.py @vojtechjelinek
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/main_cron.py @vojtechjelinek
 /main_mail.py @aks681
-/main.py @nithusha21 @DubeySandeep
-/feconf.py @nithusha21 @seanlip
-/constants*.py @nithusha21
-/assets/constants.ts @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/main.py @DubeySandeep
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/feconf.py @seanlip
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/constants*.py @vojtechjelinek
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/assets/constants.ts @vojtechjelinek
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
@@ -462,9 +475,12 @@
 /core/templates/combined-tests.spec.ts @srijanreddy98
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
-/core/templates/pages/interaction-specs.constants.ts @nithusha21
-/core/templates/I18nFooter.ts @nithusha21
-/core/templates/i18n-footer.directive.html @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/templates/pages/interaction-specs.constants.ts @kevintab95
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/templates/I18nFooter.ts @kevintab95
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/templates/i18n-footer.directive.html @kevintab95
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/services/app.service*.ts @srijanreddy98
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
@@ -475,19 +491,23 @@
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
-/core/templates/services/translation-file-hash-loader.service.ts @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/templates/services/translation-file-hash-loader.service.ts @srijanreddy98
 /redis.conf @seanlip
-/release_constants.json @nithusha21 @DubeySandeep
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/release_constants.json @DubeySandeep
 
 
 # Miscellaneous.
-/__init__.py @nithusha21
-/core/__init__.py @nithusha21
-/core/controllers/__init__.py @nithusha21
-/core/domain/__init__.py @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2, lines 499-502
+/__init__.py @DubeySandeep
+/core/__init__.py @DubeySandeep
+/core/controllers/__init__.py @DubeySandeep
+/core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @seanlip
-/core/templates/tests/ @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/templates/tests/ @DubeySandeep
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/domain/utilities/ @DubeySandeep
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
@@ -498,17 +518,21 @@
 
 
 # Restricted pages.
-/core/controllers/admin*.py @DubeySandeep @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/controllers/admin*.py @DubeySandeep
 /core/controllers/moderator*.py @seanlip
 /core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
-/core/templates/domain/admin/ @DubeySandeep @nithusha21
-/core/templates/pages/admin-page/ @DubeySandeep @nithusha21
-/core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
+/core/templates/domain/admin/ @DubeySandeep
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/templates/pages/admin-page/ @DubeySandeep
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/templates/pages/moderator-page/ @DubeySandeep
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
 
 
 # Release team.
-/scripts/release_scripts/ @DubeySandeep @nithusha21
+/scripts/release_scripts/ @DubeySandeep
 
 
 # Rich text editor team.
@@ -532,23 +556,25 @@
 
 # Suggestion and feedback team.
 # Suggestion project.
-/core/controllers/suggestion*.py @nithusha21
-/core/domain/suggestion*.py @nithusha21
-/core/storage/suggestion/ @nithusha21
-/core/templates/domain/suggestion/ @nithusha21
-/core/templates/services/suggestion-modal.service*.ts @nithusha21
-/core/templates/services/suggestions.service*.ts @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2, lines 556-561
+/core/controllers/suggestion*.py @sagangwee
+/core/domain/suggestion*.py @sagangwee
+/core/storage/suggestion/ @sagangwee
+/core/templates/domain/suggestion/ @sagangwee
+/core/templates/services/suggestion-modal.service*.ts @sagangwee
+/core/templates/services/suggestions.service*.ts @sagangwee
 
 
 # Feedback project.
-/core/controllers/feedback*.py @nithusha21
-/core/domain/feedback*.py @nithusha21
-/core/storage/feedback/ @nithusha21
-/core/templates/components/ratings/rating-display/rating-display.directive.html @nithusha21
-/core/templates/components/ratings/  @nithusha21
-/core/templates/domain/feedback_message/ @nithusha21
-/core/templates/domain/feedback_thread/ @nithusha21
-/core/templates/pages/exploration-editor-page/feedback-tab/ @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2, lines 566-573
+/core/controllers/feedback*.py @sagangwee
+/core/domain/feedback*.py @sagangwee
+/core/storage/feedback/ @sagangwee
+/core/templates/components/ratings/rating-display/rating-display.directive.html @sagangwee
+/core/templates/components/ratings/  @sagangwee
+/core/templates/domain/feedback_message/ @sagangwee
+/core/templates/domain/feedback_thread/ @sagangwee
+/core/templates/pages/exploration-editor-page/feedback-tab/ @sagangwee
 
 
 # Simple pages.
@@ -623,19 +649,23 @@
 
 
 # Frontend unit tests
-/core/templates/**/*.spec.ts @nithusha21
-/core/templates/**/*Spec.ts @nithusha21
-/extensions/**/*.spec.ts @nithusha21
-/extensions/**/*Spec.ts @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2, lines 649-652
+/core/templates/**/*.spec.ts @srijanreddy98
+/core/templates/**/*Spec.ts @srijanreddy98
+/extensions/**/*.spec.ts @srijanreddy98
+/extensions/**/*Spec.ts @srijanreddy98
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
 
 
 # QA team.
-/core/tests/ @nithusha21
-/assets/ @nithusha21
-/data/ @nithusha21
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/core/tests/ @kevintab95
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/assets/ @kevintab95
+# TODO(#11045): Add @nithusha21 as owner after 2020-11-2
+/data/ @kevintab95
 /core/templates/karma.module.ts @nishantwrp @vojtechjelinek
 /core/tests/protractor_utils/ @U8NWXD @kevintab95
 /core/tests/protractor_desktop/ @U8NWXD @kevintab95
