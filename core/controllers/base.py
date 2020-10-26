@@ -269,10 +269,8 @@ class BaseHandler(webapp2.RequestHandler):
         try:
             # If this is a CSRF request and the user is not yet loaded produce
             # an error.
-            if 'csrf' in self.request.uri:
-                if self.gae_id and not self.user_id:
-                    raise self.UnauthorizedUserException(
-                        'User details not found.')
+            if 'csrf' in self.request.uri and self.gae_id and not self.user_id:
+                raise self.UnauthorizedUserException('User details not found.')
 
             if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
                 # If user opens a new tab during signup process, the user_id

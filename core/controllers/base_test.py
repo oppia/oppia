@@ -256,6 +256,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.assertIn('login_url', response)
             self.assertIsNone(response['login_url'])
 
+    def test_401_is_returned_when_user_is_not_signed_up_and_csrf_is_requested(
+            self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            feconf.CSRF_HANDLER_URL, expected_status_int=401)
+        self.assertEqual(response['error'], 'User details not found.')
+
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
@@ -1150,9 +1157,8 @@ class SignUpTests(test_utils.GenericTestBase):
         """Test that error is raised if user opens a new tab
         during signup.
         """
-        user_services.create_new_user(
-            self.get_gae_id_from_email('abc@example.com'), 'abc@example.com')
         self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
@@ -1172,9 +1178,8 @@ class SignUpTests(test_utils.GenericTestBase):
         """Test that no error is raised if user opens a new tab
         after signup.
         """
-        user_services.create_new_user(
-            self.get_gae_id_from_email('abc@example.com'), 'abc@example.com')
         self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL, {

@@ -395,9 +395,8 @@ class ProfileLinkTests(test_utils.GenericTestBase):
 class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_user_not_setting_email_prefs_on_signup(self):
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -433,9 +432,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
     def test_user_allowing_emails_on_signup(self):
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -474,9 +472,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
     def test_user_disallowing_emails_on_signup(self):
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -590,10 +587,8 @@ class ProfilePictureHandlerTests(test_utils.GenericTestBase):
 class SignupTests(test_utils.GenericTestBase):
 
     def test_signup_page_does_not_have_top_right_menu(self):
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response(feconf.SIGNUP_URL)
+        response = self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         # Sign in can't be inside an html tag, but can appear inside js code.
         response.mustcontain(no=['Logout'])
         self.logout()
@@ -601,9 +596,8 @@ class SignupTests(test_utils.GenericTestBase):
     def test_going_somewhere_else_while_signing_in_logs_user_out(self):
         exp_services.load_demo('0')
 
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         self.get_html_response(feconf.SIGNUP_URL)
         response = self.get_html_response('/create/0', expected_status_int=302)
         self.assertIn('logout', response.headers['location'])
@@ -613,9 +607,8 @@ class SignupTests(test_utils.GenericTestBase):
 
     def test_to_check_url_redirection_in_signup(self):
         """To validate the redirections from return_url."""
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         # Registering this user fully.
@@ -658,9 +651,8 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_accepting_terms_is_handled_correctly(self):
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         response_dict = self.post_json(
@@ -682,9 +674,8 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_username_is_handled_correctly(self):
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         response_dict = self.post_json(
@@ -720,9 +711,8 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_default_dashboard_for_new_users(self):
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         # This user should have the creator dashboard as default.
@@ -761,9 +751,9 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_user_settings_of_non_existing_user(self):
-        user_services.create_new_user(
-            self.get_gae_id_from_email(self.OWNER_EMAIL), self.OWNER_EMAIL)
         self.login(self.OWNER_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+
         values_dict = {
             'can_send_emails': False,
             'has_agreed_to_latest_terms': False,
