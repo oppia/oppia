@@ -180,7 +180,7 @@ var AdminPage = function() {
     const count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
       const elem = await featureFlagElements.get(i);
-      if ((await elem.element(by.css('h2.feature-name')).getText()) ===
+      if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
           'dummy_feature') {
         return elem;
       }
