@@ -1150,6 +1150,8 @@ class SignUpTests(test_utils.GenericTestBase):
         """Test that error is raised if user opens a new tab
         during signup.
         """
+        user_services.create_new_user(
+            self.get_gae_id_from_email('abc@example.com'), 'abc@example.com')
         self.login('abc@example.com')
         csrf_token = self.get_new_csrf_token()
 
@@ -1170,6 +1172,8 @@ class SignUpTests(test_utils.GenericTestBase):
         """Test that no error is raised if user opens a new tab
         after signup.
         """
+        user_services.create_new_user(
+            self.get_gae_id_from_email('abc@example.com'), 'abc@example.com')
         self.login('abc@example.com')
         csrf_token = self.get_new_csrf_token()
         self.post_json(

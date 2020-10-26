@@ -189,6 +189,9 @@ class BaseHandler(webapp2.RequestHandler):
                 # the not-fully registered user.
                 email = current_user_services.get_current_user_email()
                 if 'signup?' in self.request.uri:
+                    logging.error(
+                        'Created user %s with email %s on page %s'
+                        % (self.gae_id, email, self.request.uri))
                     user_settings = user_services.create_new_user(
                         self.gae_id, email)
                 else:
@@ -264,6 +267,8 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         try:
+            # If this is a CSRF request and the user is not yet loaded produce
+            # an error.
             if 'csrf' in self.request.uri:
                 if self.gae_id and not self.user_id:
                     raise self.UnauthorizedUserException(

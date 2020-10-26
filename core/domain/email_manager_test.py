@@ -627,6 +627,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
                 self.new_email_content)
 
+            user_services.create_new_user(
+                self.get_gae_id_from_email(self.EDITOR_EMAIL),
+                self.EDITOR_EMAIL)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
 
@@ -658,6 +661,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
         with can_send_emails_ctx, log_new_error_ctx:
             self.assertEqual(log_new_error_counter.times_called, 0)
 
+            user_services.create_new_user(
+                self.get_gae_id_from_email(self.EDITOR_EMAIL),
+                self.EDITOR_EMAIL)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
 
@@ -706,6 +712,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
         with can_send_emails_ctx, log_new_error_ctx:
             self.assertEqual(log_new_error_counter.times_called, 0)
 
+            user_services.create_new_user(
+                self.get_gae_id_from_email(self.EDITOR_EMAIL),
+                self.EDITOR_EMAIL)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
 
@@ -752,6 +761,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
         with can_send_emails_ctx, log_new_error_ctx:
             self.assertEqual(log_new_error_counter.times_called, 0)
 
+            user_services.create_new_user(
+                self.get_gae_id_from_email(self.EDITOR_EMAIL),
+                self.EDITOR_EMAIL)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
 
@@ -784,6 +796,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.admin_id, email_manager.EMAIL_SENDER_NAME.name,
                 'Email Sender')
 
+            user_services.create_new_user(
+                self.get_gae_id_from_email(self.EDITOR_EMAIL),
+                self.EDITOR_EMAIL)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
 
@@ -817,6 +832,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
                 self.new_email_content)
 
+            user_services.create_new_user(
+                self.get_gae_id_from_email(self.EDITOR_EMAIL),
+                self.EDITOR_EMAIL)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
 
@@ -852,6 +870,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name,
                 self.new_email_content)
 
+            user_services.create_new_user(
+                self.get_gae_id_from_email(self.EDITOR_EMAIL),
+                self.EDITOR_EMAIL)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
 
@@ -895,6 +916,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
+            user_services.create_new_user(
+                self.get_gae_id_from_email(self.EDITOR_EMAIL),
+                self.EDITOR_EMAIL)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
 
