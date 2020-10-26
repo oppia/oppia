@@ -13,22 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SkillRightsObjectFactory.
+ * @fileoverview Tests for SkillRightsModel.
  */
 
-import { SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory';
+import { SkillRights } from
+  'domain/skill/skill-rights.model';
 
-describe('Skill rights object factory', () => {
-  let skillRightsObjectFactory: SkillRightsObjectFactory;
-
-  beforeEach(() => {
-    skillRightsObjectFactory = new SkillRightsObjectFactory();
-  });
-
+describe('Skill rights model', () => {
   it('should create an interstitial skill rights object', () => {
     var interstitialSkillRights =
-      skillRightsObjectFactory.createInterstitialSkillRights();
+      SkillRights.createInterstitialSkillRights();
 
     expect(interstitialSkillRights.getSkillId()).toEqual(null);
     expect(interstitialSkillRights.canEditSkillDescription()).toBe(false);
@@ -40,11 +34,11 @@ describe('Skill rights object factory', () => {
       can_edit_skill_description: true
     };
 
-    var sampleSkillRights = skillRightsObjectFactory.createFromBackendDict(
+    var sampleSkillRights = SkillRights.createFromBackendDict(
       sampleSkillRightsObject);
 
     var interstitialSkillRights =
-      skillRightsObjectFactory.createInterstitialSkillRights();
+      SkillRights.createInterstitialSkillRights();
 
     interstitialSkillRights.copyFromSkillRights(sampleSkillRights);
     expect(interstitialSkillRights.getSkillId()).toEqual('1');
