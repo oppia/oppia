@@ -353,7 +353,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_models.UserSettingsModel(
             id=user_id,
-            gae_id=gae_id,
             email=email,
             username=username,
         ).put()
@@ -364,7 +363,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
-        self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
@@ -382,7 +380,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_models.UserSettingsModel(
             id=user_id,
-            gae_id=gae_id,
             email=email,
             username=username,
         ).put()
@@ -393,7 +390,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
-        self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
@@ -728,7 +724,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             new_gae_id)
         user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
             user_settings.user_id)
-        self.assertEqual(user_auth_details.gae_id, user_settings.gae_id)
+        self.assertEqual(user_auth_details.gae_id, new_gae_id)
 
     def test_get_auth_details_by_user_id_for_existing_user_works_fine(self):
         gae_id = 'new_gae_id'
@@ -1861,13 +1857,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_gae_id_raises_exception(self):
-        self.user_settings.gae_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected gae_id to be a string'
-        ):
-            self.user_settings.validate()
-
     def test_validate_non_str_pin_id(self):
         self.user_settings.pin = 0
         with self.assertRaisesRegexp(
@@ -1970,7 +1959,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_create_new_user_with_existing_gae_id_raises_error(self):
         user_id = self.user_settings.user_id
-        user_gae_id = self.user_settings.gae_id
+        user_gae_id = (
+            user_services.get_auth_details_by_user_id(user_id).gae_id)
         with self.assertRaisesRegexp(
             Exception, 'User %s already exists for gae_id %s.'
             % (user_id, user_gae_id)
@@ -2017,7 +2007,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         # Create an unregistered user who has no username.
         user_models.UserSettingsModel(
             id='unregistered_user_id',
-            gae_id='gae_unregistered_user_id',
             email='user@example.com',
             username='').put()
 
@@ -2207,6 +2196,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self):
         model = user_models.UserStatsModel.get_or_create(self.owner_id)
         model.schema_version = 0
+        model.update_timestamps()
         model.put()
 
         self.assertIsNone(user_services.get_user_impact_score(self.owner_id))

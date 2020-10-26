@@ -23,14 +23,11 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { CollectionRightsBackendApiService } from
   './collection-rights-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
-import { CollectionRightsBackendDict } from
-  'domain/collection/CollectionRightsObjectFactory';
+import { CollectionRights, CollectionRightsBackendDict } from
+  'domain/collection/collection-rights.model';
 
 describe('Collection rights backend API service', function() {
   let collectionRightsBackendApiService: CollectionRightsBackendApiService;
-  let collectionRightsObjectFactory: CollectionRightsObjectFactory;
   let httpTestingController: HttpTestingController;
   let sampleDataResults: CollectionRightsBackendDict;
   let csrfService: CsrfTokenService = null;
@@ -43,8 +40,6 @@ describe('Collection rights backend API service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
     collectionRightsBackendApiService =
       TestBed.get(CollectionRightsBackendApiService);
-    collectionRightsObjectFactory =
-      TestBed.get(CollectionRightsObjectFactory);
     csrfService = TestBed.get(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
@@ -85,7 +80,7 @@ describe('Collection rights backend API service', function() {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        collectionRightsObjectFactory.create(sampleDataResults)
+        CollectionRights.create(sampleDataResults)
       );
       expect(failHandler).not.toHaveBeenCalled();
     }));
@@ -227,7 +222,7 @@ describe('Collection rights backend API service', function() {
 
         // Cache a collection.
         let sampleCollectionRights =
-          collectionRightsObjectFactory.create(sampleDataResults);
+          CollectionRights.create(sampleDataResults);
         collectionRightsBackendApiService.cacheCollectionRights(
           '0', sampleCollectionRights);
 
@@ -266,7 +261,7 @@ describe('Collection rights backend API service', function() {
         flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalledWith(
-          collectionRightsObjectFactory.create(sampleDataResults)
+          CollectionRights.create(sampleDataResults)
         );
         expect(failHandler).not.toHaveBeenCalled();
       }
