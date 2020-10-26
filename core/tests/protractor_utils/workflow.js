@@ -21,6 +21,7 @@ var forms = require('./forms.js');
 var path = require('path');
 var users = require('./users.js');
 var waitFor = require('./waitFor.js');
+var action = require('../protractor_utils/action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
@@ -356,3 +357,4 @@ exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
+
