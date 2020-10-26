@@ -16,24 +16,17 @@
  * @fileoverview Unit tests for AdminConfigTabBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-//import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-//require('pages/admin-page/services/admin-config-tab-backend-api.service');
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { AdminConfigTabBackendApiService } from 
+import { AdminConfigTabBackendApiService } from
   'pages/admin-page/services/admin-config-tab-backend-api.service';
 
 describe('Admin Config Tab Backend API service', () => {
-  let AdminConfigTabBackendApiService = null;
+  let AdminConfigTabBackendApiService: AdminConfigTabBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
-  //let $httpBackend = null;
-  //let CsrfService = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -52,78 +45,42 @@ describe('Admin Config Tab Backend API service', () => {
     afterEach(() => {
       httpTestingController.verify();
     });
-  
 
-  /*beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    let ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));*/
-
-  /*beforeEach(angular.mock.inject(function($injector, $q) {
-    AdminConfigTabBackendApiService = $injector.get(
-      'AdminConfigTabBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });*/
-
-  it('should revert specified config property to default value',
-  fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      //$httpBackend.expect('POST', '/adminhandler').respond(200);
-      AdminConfigTabBackendApiService.revertConfigProperty(
-        'promo_bar_enabled').then(successHandler, failHandler);
+    it('should revert specified config property to default value',
+      fakeAsync(() => {
+        const successHandler = jasmine.createSpy('success');
+        const failHandler = jasmine.createSpy('fail');
+        AdminConfigTabBackendApiService.revertConfigProperty(
+          'promo_bar_enabled').then(successHandler, failHandler);
 
         let req = httpTestingController.expectOne(
           '/adminhandler');
         expect(req.request.method).toEqual('PUT');
         req.flush(200);
-  
         flushMicrotasks();
 
-      //$httpBackend.flush();
+        expect(successHandler).toHaveBeenCalled();
+        expect(failHandler).not.toHaveBeenCalled();
+      }
+      ));
+    it('should save new config properties',
+      fakeAsync(() => {
+        const successHandler = jasmine.createSpy('success');
+        const failHandler = jasmine.createSpy('fail');
+        AdminConfigTabBackendApiService.saveConfigProperties({
+          promo_bar_enabled: true
+        }).then(successHandler, failHandler);
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-  ));
-  it('should save new config properties',
-  fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+        let req = httpTestingController.expectOne(
+          '/adminhandler');
+        expect(req.request.method).toEqual('PUT');
+        req.flush(200);
 
-      //$httpBackend.expect('POST', '/adminhandler').respond(200);
-      AdminConfigTabBackendApiService.saveConfigProperties({
-        promo_bar_enabled: true
-      }).then(successHandler, failHandler);
+        flushMicrotasks();
 
-      let req = httpTestingController.expectOne(
-        '/adminhandler');
-      expect(req.request.method).toEqual('PUT');
-      req.flush(200);
-
-      flushMicrotasks();
-
-      //$httpBackend.flush();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-  ));
-});
+        expect(successHandler).toHaveBeenCalled();
+        expect(failHandler).not.toHaveBeenCalled();
+      }
+      ));
+  });
 });
