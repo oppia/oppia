@@ -47,28 +47,27 @@ export class SuggestionModalForCreatorDashboardBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
     private suggestionObjectFactory: SuggestionObjectFactory) { }
 
-  _updateSuggestion(
-      urlDetails: UrlDetails,
-      data: SuggestionData): Promise<Suggestion> {
-    return new Promise((resolve, reject) => {
-      var HANDLE_SUGGESTION_URL_TEMPLATE = (
-        '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
-      const url = this.urlInterpolationService.interpolateUrl(
-        HANDLE_SUGGESTION_URL_TEMPLATE, {
-          target_type: urlDetails.targetType,
-          target_id: urlDetails.targetId.toString(),
-          suggestion_id: urlDetails.suggestionId.toString()
-        }
-      );
+  updateSuggestion(
+    urlDetails: UrlDetails, data: SuggestionData): Promise<Suggestion> {
+      return new Promise((resolve, reject) => {
+        const HANDLE_SUGGESTION_URL_TEMPLATE = (
+          '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
+        const url = this.urlInterpolationService.interpolateUrl(
+          HANDLE_SUGGESTION_URL_TEMPLATE, {
+            target_type: urlDetails.targetType,
+            target_id: urlDetails.targetId.toString(),
+            suggestion_id: urlDetails.suggestionId.toString()
+          }
+        );
 
-      this.http.put<UpdateSuggestionBackendResponse>(url, data).toPromise()
-        .then(response => {
-          resolve(
-            this.suggestionObjectFactory
-              .createFromBackendDict(response.suggestion));
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+        this.http.put<UpdateSuggestionBackendResponse>(url, data).toPromise()
+          .then(response => {
+            resolve(
+              this.suggestionObjectFactory
+                .createFromBackendDict(response.suggestion));
+          }, errorResponse => {
+            reject(errorResponse.error.error);
+          });
     });
   }
 }

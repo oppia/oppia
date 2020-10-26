@@ -20,10 +20,10 @@ require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
-'suggestion-modal-for-creator-dashboard-backend-api.service.ts');
+  'suggestion-modal-for-creator-dashboard-backend-api.service.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
-'suggestion-modal-for-creator-view.controller');
+  'suggestion-modal-for-creator-view.controller');
 require('services/suggestion-modal.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -110,7 +110,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
         }
 
         SuggestionModalForCreatorDashboardBackendApiService
-          ._updateSuggestion(url, data)
+          .updateSuggestion(url, data)
           .then(function() {
             for (var i = 0; i < suggestionsToReviewList.length; i++) {
               if (suggestionsToReviewList[i] === activeThread) {

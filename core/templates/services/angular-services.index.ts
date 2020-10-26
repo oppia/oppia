@@ -598,6 +598,5 @@ export const angularServices: [string, unknown][] = [
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['baseInteractionValidationService', baseInteractionValidationService],
-  ['SuggestionModalForCreatorDashboardBackendApiService',
-    SuggestionModalForCreatorDashboardBackendApiService],
+  ['SuggestionModalForCreatorDashboardBackendApiService', SuggestionModalForCreatorDashboardBackendApiService],
 ];
