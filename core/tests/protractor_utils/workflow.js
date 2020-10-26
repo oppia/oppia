@@ -86,9 +86,9 @@ var createExplorationAndStartTutorial = async function() {
     await waitFor.visibilityOf(
       activityCreationModal,
       'ActivityCreationModal takes too long to be visible.');
-      await waitFor.elementToBeClickable(
-        createExplorationButton,
-        'createExplorationButton takes too long to be clickable.');
+    await waitFor.elementToBeClickable(
+      createExplorationButton,
+      'createExplorationButton takes too long to be clickable.');
     var createExplorationButton = element(
       by.css('.protractor-test-create-exploration'));
     await action.click('createExplorationButton', createExplorationButton);
@@ -150,8 +150,8 @@ var publishExploration = async function() {
     by.css('.protractor-test-share-publish-close'));
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-    await waitFor.elementToBeClickable(
-      closePublishModalButton, 'Close Publish Modal button is not clickable');
+  await waitFor.elementToBeClickable(
+    closePublishModalButton, 'Close Publish Modal button is not clickable');
   await action.click('closePublishModalButton', closePublishModalButton);
 };
 
@@ -298,9 +298,9 @@ var getImageSource = async function(customImageElement) {
 
 var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
-      await waitFor.visibilityOf(
-        imageClickableElement,
-        'Image element is taking too long to appear.');
+  await waitFor.visibilityOf(
+    imageClickableElement,
+    'Image element is taking too long to appear.');
   await action.click('imageClickableElement', imageClickableElement);
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
