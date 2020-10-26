@@ -129,7 +129,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Genel bakış",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "Anonimleştirilecek verilerin özeti:",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_3": "Topluluğa aktarılacak verilerin özeti:",
-	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4": "Hesap kaldırma işlemi hakkında sorularınız veya endişeleriniz varsa, lütfen <strong>privacy@oppia.org</strong> adresine bir e-posta gönderin.",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Bir resmi buraya sürükleyin",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Dosya yükle",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Kapalı Konu Anlatımı",

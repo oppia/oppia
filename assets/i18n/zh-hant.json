@@ -129,7 +129,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "概要",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "將會匿名的資料摘要：",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_3": "將會轉移到社群的資料摘要：",
-	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4": "如果您有關於帳號移除流程的任何相關問題或疑慮，請發送電子郵件到 <strong>privacy@oppia.org</strong>。",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "把圖片拖進此區域",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "上傳檔案",
 	"I18N_ERROR_DISABLED_EXPLORATION": "該探索已被禁用",

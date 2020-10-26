@@ -588,6 +588,51 @@ class VersionedModelTests(test_utils.GenericTestBase):
             model1.update_timestamps()
             model1.put()
 
+    def test_delete_multi(self):
+        model_1_id = 'model_1_id'
+        model_1 = TestVersionedModel(id=model_1_id)
+        model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model_1_version_numbers = [
+            python_utils.UNICODE(num + 1) for num in
+            python_utils.RANGE(model_1.version)]
+        model_1_snapshot_ids = [
+            model_1.get_snapshot_id(model_1.id, version_number)
+            for version_number in model_1_version_numbers]
+
+        model_2_id = 'model_2_id'
+        model_2 = TestVersionedModel(id=model_2_id)
+        model_2.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model_2.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model_2_version_numbers = [
+            python_utils.UNICODE(num + 1) for num in
+            python_utils.RANGE(model_2.version)]
+        model_2_snapshot_ids = [
+            model_2.get_snapshot_id(model_2.id, version_number)
+            for version_number in model_2_version_numbers]
+
+        with self.swap(feconf, 'MAX_NUMBER_OF_OPS_IN_TRANSACTION', 2):
+            TestVersionedModel.delete_multi(
+                [model_1_id, model_2_id],
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit_msg',
+                force_deletion=True)
+
+        self.assertIsNone(TestVersionedModel.get_by_id(model_1_id))
+        for model_snapshot_id in model_1_snapshot_ids:
+            self.assertIsNone(
+                TestSnapshotContentModel.get_by_id(model_snapshot_id))
+            self.assertIsNone(
+                TestSnapshotMetadataModel.get_by_id(model_snapshot_id))
+
+        self.assertIsNone(TestVersionedModel.get_by_id(model_2_id))
+        for model_snapshot_id in model_2_snapshot_ids:
+            self.assertIsNone(
+                TestSnapshotContentModel.get_by_id(model_snapshot_id))
+            self.assertIsNone(
+                TestSnapshotMetadataModel.get_by_id(model_snapshot_id))
+
     def test_commit_with_invalid_change_list_raises_error(self):
         model1 = TestVersionedModel(id='model_id1')
 
