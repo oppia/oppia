@@ -954,6 +954,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # Iterate over models and test export policies.
         for model in all_models:
+            print(model)
             export_method = model.get_export_method()
             export_policy = model.get_export_policy()
             export_exceptions = model.get_export_policy_exceptions()

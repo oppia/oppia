@@ -1440,6 +1440,11 @@ class PlaythroughModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_export_method():
+        """Model does not contain user data."""
+        return base_models.EXPORT_METHOD.NOT_EXPORTED
+
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the playthrough of the form

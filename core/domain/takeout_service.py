@@ -42,10 +42,20 @@ def get_models_which_should_be_exported():
         list(datastore_services.Model). List of models whose data should be
         exported.
     """
+    exempt_base_classes = [
+        'BaseCommitLogEntryModel',
+        'BaseMapReduceBatchResultsModel',
+        'BaseModel',
+        'BaseSnapshotContentModel',
+        'BaseSnapshotMetadataModel',
+        'VersionedModel',
+    ]
+
     return [model_class for model_class in
             models.Registry.get_all_storage_model_classes()
             if model_class.get_export_method() !=
-            base_models.EXPORT_METHOD.NOT_EXPORTED]
+            base_models.EXPORT_METHOD.NOT_EXPORTED and
+            not model_class.__name__ in exempt_base_classes]
 
 
 def export_data_for_user(user_id):

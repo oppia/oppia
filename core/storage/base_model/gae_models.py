@@ -180,7 +180,9 @@ class BaseModel(datastore_services.Model):
     @staticmethod
     def get_export_method():
         """Model does not contain user data."""
-        return EXPORT_METHOD.NOT_EXPORTED
+        raise NotImplementedError(
+            'The get_export_method() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get_export_policy(cls):
