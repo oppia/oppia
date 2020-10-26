@@ -171,7 +171,7 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'pin': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
