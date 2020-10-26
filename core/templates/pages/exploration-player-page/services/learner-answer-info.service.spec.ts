@@ -243,10 +243,10 @@ describe('Learner answer info service', function() {
     });
 
     it('should record learner answer details', function() {
-      spyOn(ladbas, 'recordLearnerAnswerDetails');
+      spyOn(ladbas, 'recordLearnerAnswerDetailsAsync');
       LearnerAnswerInfoService.recordLearnerAnswerInfo('My details');
       expect(
-        ladbas.recordLearnerAnswerDetails).toHaveBeenCalledWith(
+        ladbas.recordLearnerAnswerDetailsAsync).toHaveBeenCalledWith(
         '10', 'new state', null, 'This is my answer', 'My details');
     });
   });

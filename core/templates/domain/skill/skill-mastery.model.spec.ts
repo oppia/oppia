@@ -13,22 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SkillMasteryObjectFactory.
+ * @fileoverview Tests for SkillMasteryModel.
  */
 
-import { SkillMasteryObjectFactory } from
-  'domain/skill/SkillMasteryObjectFactory';
+import { SkillMastery } from
+  'domain/skill/skill-mastery.model';
 
-describe('Skill mastery object factory', () => {
-  let skillMasteryObjectFactory: SkillMasteryObjectFactory;
-
-  beforeEach(() => {
-    skillMasteryObjectFactory = new SkillMasteryObjectFactory();
-  });
-
+describe('Skill mastery model', () => {
   it('should be able to create a skill mastery object',
     () => {
-      const skillMastery = skillMasteryObjectFactory.createFromBackendDict(
+      const skillMastery = SkillMastery.createFromBackendDict(
         {
           skillId1: 1.0,
           skillId2: 0.3
@@ -41,7 +35,7 @@ describe('Skill mastery object factory', () => {
 
   it('should be able to convert to a dict object',
     () => {
-      const skillMastery = skillMasteryObjectFactory.createFromBackendDict(
+      const skillMastery = SkillMastery.createFromBackendDict(
         {
           skillId1: 1.0,
           skillId2: 0.3
@@ -55,7 +49,7 @@ describe('Skill mastery object factory', () => {
 
   it('should be able to set degree of mastery',
     () => {
-      const skillMastery = skillMasteryObjectFactory.createFromBackendDict(
+      const skillMastery = SkillMastery.createFromBackendDict(
         {
           skillId1: 1.0,
           skillId2: 0.3
