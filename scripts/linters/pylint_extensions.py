@@ -1882,9 +1882,8 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
             node: astroid.nodes.FunctionDef. Node for a function definition
                 in the AST.
         """
-        line_number = node.fromlineno
-        line_number += 1
-        if linecache.getline(node.root().file, line_number).strip() == b'':
+        line_number = node.lineno + len(node.doc.split('\n')) + 1
+        if line_number != node.body[0].lineno:
             self.add_message(
                 'blank-line-below-function-definition', node=node)
 

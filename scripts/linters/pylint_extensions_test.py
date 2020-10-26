@@ -2886,6 +2886,9 @@ class BlankLineBelowFunctionDefCheckerTest(unittest.TestCase):
             tmp.write(
                 u"""
                 def function_name():
+                    \"\"\"
+                    test
+                    \"\"\"
 
                     pass
                 """)
@@ -2912,6 +2915,9 @@ class BlankLineBelowFunctionDefCheckerTest(unittest.TestCase):
             tmp.write(
                 u"""
                 def function_name():
+                    \"\"\"
+                    test
+                    \"\"\"
                     pass
                 """)
         node_no_blank_line_below_function_definition.file = filename
