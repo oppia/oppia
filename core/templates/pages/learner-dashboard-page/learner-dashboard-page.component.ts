@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Component for the creator dashboard.
  */
+import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -30,7 +32,6 @@ require(
   'remove-activity-from-learner-dashboard-modal.controller.ts');
 
 require('directives/angular-html-bind.directive.ts');
-require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/learner_dashboard/learner-dashboard-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
@@ -50,8 +51,8 @@ angular.module('oppia').component('learnerDashboardPage', {
   controller: [
     '$http', '$q', '$scope', '$uibModal', 'AlertsService',
     'DateTimeFormatService', 'DeviceInfoService',
-    'FeedbackMessageSummaryObjectFactory', 'LearnerDashboardBackendApiService',
-    'LoaderService', 'SuggestionModalForLearnerDashboardService',
+    'LearnerDashboardBackendApiService', 'LoaderService',
+    'SuggestionModalForLearnerDashboardService',
     'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
     'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
     'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
@@ -62,8 +63,8 @@ angular.module('oppia').component('learnerDashboardPage', {
     function(
         $http, $q, $scope, $uibModal, AlertsService,
         DateTimeFormatService, DeviceInfoService,
-        FeedbackMessageSummaryObjectFactory, LearnerDashboardBackendApiService,
-        LoaderService, SuggestionModalForLearnerDashboardService,
+        LearnerDashboardBackendApiService, LoaderService,
+        SuggestionModalForLearnerDashboardService,
         ThreadStatusDisplayService, UrlInterpolationService, UserService,
         ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
         EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
@@ -298,7 +299,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           ctrl.messageSummaries = [];
           for (index = 0; index < messageSummaryDicts.length; index++) {
             ctrl.messageSummaries.push(
-              FeedbackMessageSummaryObjectFactory.createFromBackendDict(
+              FeedbackMessageSummary.createFromBackendDict(
                 messageSummaryDicts[index]));
           }
           ctrl.loadingFeedbacks = false;
@@ -328,7 +329,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           ctrl.messageSendingInProgress = false;
           ctrl.newMessage.text = null;
           var newMessageSummary = (
-            FeedbackMessageSummaryObjectFactory.createNewMessage(
+            FeedbackMessageSummary.createNewMessage(
               ctrl.threadSummary.totalMessageCount, newMessage,
               ctrl.username, ctrl.profilePictureDataUrl));
           ctrl.messageSummaries.push(newMessageSummary);
@@ -443,7 +444,7 @@ angular.module('oppia').component('learnerDashboardPage', {
         });
 
         var dashboardDataPromise = (
-          LearnerDashboardBackendApiService.fetchLearnerDashboardData());
+          LearnerDashboardBackendApiService.fetchLearnerDashboardDataAsync());
         dashboardDataPromise.then(
           function(responseData) {
             ctrl.isCurrentExpSortDescending = true;

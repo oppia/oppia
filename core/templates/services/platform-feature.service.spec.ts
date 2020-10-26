@@ -26,8 +26,8 @@ import { PlatformFeatureService, platformFeatureInitFactory } from
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { FeatureNames, FeatureStatusSummaryObjectFactory } from
-  'domain/platform_feature/feature-status-summary-object.factory';
+import { FeatureNames, FeatureStatusSummary } from
+  'domain/platform_feature/feature-status-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 
 
@@ -35,7 +35,6 @@ describe('PlatformFeatureService', () => {
   let windowRef: WindowRef;
   let i18n: I18nLanguageCodeService;
   let apiService: PlatformFeatureBackendApiService;
-  let summaryFactory: FeatureStatusSummaryObjectFactory;
   let platformFeatureService: PlatformFeatureService;
   let urlService: UrlService;
 
@@ -61,7 +60,6 @@ describe('PlatformFeatureService', () => {
 
     windowRef = TestBed.get(WindowRef);
     i18n = TestBed.get(I18nLanguageCodeService);
-    summaryFactory = TestBed.get(FeatureStatusSummaryObjectFactory);
     apiService = TestBed.get(PlatformFeatureBackendApiService);
     urlService = TestBed.get(UrlService);
 
@@ -98,7 +96,7 @@ describe('PlatformFeatureService', () => {
 
     spyOn(i18n, 'getCurrentI18nLanguageCode').and.returnValue('en');
     apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
-      summaryFactory.createFromBackendDict({
+      FeatureStatusSummary.createFromBackendDict({
         [FeatureNames.DummyFeature]: true,
       })
     );

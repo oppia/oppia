@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import datetime
+import functools
 
 import python_utils
 
@@ -37,9 +38,23 @@ DateTimeProperty = ndb.DateTimeProperty
 FloatProperty = ndb.FloatProperty
 IntegerProperty = ndb.IntegerProperty
 JsonProperty = ndb.JsonProperty
-StringProperty = ndb.StringProperty
-TextProperty = ndb.TextProperty
 UserProperty = ndb.UserProperty
+
+
+@functools.wraps(ndb.StringProperty)
+def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
+    """Enforces requirement for models to use StringProperty(indexed=True)."""
+    if not kwargs.get('indexed', True):
+        raise ValueError('StringProperty(indexed=False) is no longer supported')
+    return ndb.StringProperty(*args, **kwargs)
+
+
+@functools.wraps(ndb.TextProperty)
+def TextProperty(*args, **kwargs): # pylint: disable=invalid-name
+    """Enforces requirement for models to use TextProperty(indexed=False)."""
+    if kwargs.get('indexed', False):
+        raise ValueError('TextProperty(indexed=True) is no longer supported')
+    return ndb.TextProperty(*args, **kwargs)
 
 
 def get_multi(keys):
@@ -55,38 +70,28 @@ def get_multi(keys):
     return ndb.get_multi(keys)
 
 
-def put_multi(models, update_last_updated_time=True):
+def put_multi(models):
     """Stores a sequence of Model instances.
 
     Args:
         models: list(datastore_services.Model). A list of Model instances.
-        update_last_updated_time: bool. Whether to update the last_updated field
-            of the entities.
 
     Returns:
         list(str). A list with the stored keys.
     """
-    # TODO(#10863): Stop passing in update_last_updated_time through these
-    # top-level functions.
-    return ndb.put_multi(
-        models, update_last_updated_time=update_last_updated_time)
+    return ndb.put_multi(models)
 
 
-def put_multi_async(models, update_last_updated_time=True):
+def put_multi_async(models):
     """Stores a sequence of Model instances asynchronously.
 
     Args:
         models: list(datastore_services.Model). A list of Model instances.
-        update_last_updated_time: bool. Whether to update the last_updated field
-            of the entities.
 
     Returns:
         list(future). A list of futures.
     """
-    # TODO(#10863): Stop passing in update_last_updated_time through these
-    # top-level functions.
-    return ndb.put_multi_async(
-        models, update_last_updated_time=update_last_updated_time)
+    return ndb.put_multi_async(models)
 
 
 def delete_multi(keys):

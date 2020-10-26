@@ -249,7 +249,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         if self._assign_playthrough_to_corresponding_issue(
                 playthrough, exp_issues, issue_schema_version):
-            stats_services.save_exp_issues_model_transactional(exp_issues)
+            stats_services.save_exp_issues_model(exp_issues)
         self.render_json({})
 
     def _get_corresponding_exp_issue(

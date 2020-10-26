@@ -41,11 +41,6 @@ class UserSettingsModel(base_models.BaseModel):
 
     # Attributes used for both full users and profile users.
 
-    # User id used to identify user by GAE. Is not required for now because we
-    # need to perform migration to fill this for existing users.
-    # TODO(#10178): Deprecate gae_id for UserSettingsModel once we have verified
-    # that UserAuthDetailsModels exists for every user.
-    gae_id = datastore_services.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = datastore_services.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
@@ -132,16 +127,15 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserSettingsModel can be deleted since it only contains information
-        relevant to the one user.
+        """UserSettingsModel should be deleted after all the other models
+        belonging to the user are deleted or pseudonymized.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'email': base_models.EXPORT_POLICY.EXPORTED,
             'role': base_models.EXPORT_POLICY.EXPORTED,
             'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
@@ -2189,6 +2183,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, score_category=score_category,
             score=score,
             onboarding_email_sent=onboarding_email_sent)
+        user_proficiency_model.update_timestamps()
         user_proficiency_model.put()
         return user_proficiency_model
 
@@ -2364,10 +2359,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """PendingDeletionRequestModel should be deleted after the user is
-        deleted.
+        """PendingDeletionRequestModel should be deleted after all the other
+        models belonging to the user are deleted or pseudonymized.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):
@@ -2384,6 +2379,15 @@ class PendingDeletionRequestModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of PendingDeletionRequestModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2492,7 +2496,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """The model can be deleted since it only contains information
         relevant to one user account.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.DELETE_AT_END
 
     @classmethod
     def get_export_policy(cls):

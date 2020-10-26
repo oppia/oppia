@@ -69,7 +69,10 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
             feconf.EMAIL_INTENT_REMOVE_REVIEWER,
-            feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
             feconf.BULK_EMAIL_INTENT_TEST
@@ -176,14 +179,14 @@ class SentEmailModel(base_models.BaseModel):
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
 
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
-    def put(self, update_last_updated_time=True):
-        """Saves this SentEmailModel instance to the datastore."""
-        email_hash = self._generate_hash(
+    def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage."""
+        super(SentEmailModel, self)._pre_put_hook()
+        self.email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
-        self.email_hash = email_hash
-        super(SentEmailModel, self).put(update_last_updated_time)
 
     @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
@@ -370,6 +373,7 @@ class BulkEmailModel(base_models.BaseModel):
             id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
 
@@ -488,6 +492,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id=thread_id,
             reply_to_id=reply_to_id)
 
+        feedback_email_reply_model_instance.update_timestamps()
         feedback_email_reply_model_instance.put()
         return feedback_email_reply_model_instance
 

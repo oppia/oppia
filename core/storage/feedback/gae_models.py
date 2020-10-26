@@ -243,7 +243,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         datastore_services.StringProperty(choices=STATUS_CHOICES, indexed=True))
     # New thread subject. Must exist in the first message of a thread. For the
     # rest of the thread, should exist only when the subject changes.
-    updated_subject = datastore_services.StringProperty(indexed=False)
+    updated_subject = datastore_services.StringProperty(indexed=True)
     # Message text. Allowed not to exist (e.g. post only to update the status).
     text = datastore_services.TextProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
@@ -637,6 +637,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
                 id=instance_id, user_id=user_id, thread_id=thread_id)
             new_instances.append(new_instance)
 
+        GeneralFeedbackThreadUserModel.update_timestamps_multi(new_instances)
         GeneralFeedbackThreadUserModel.put_multi(new_instances)
         return new_instances
 

@@ -979,9 +979,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         migration_bot_contributions_model = (
             user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
-        self.assertTrue(
-            self.EXP_0_ID not in (
-                migration_bot_contributions_model.edited_exploration_ids))
+        self.assertIsNone(migration_bot_contributions_model)
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
@@ -993,9 +991,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         migration_bot_contributions_model = (
             user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
-        self.assertTrue(
-            self.EXP_0_ID not in (
-                migration_bot_contributions_model.edited_exploration_ids))
+        self.assertIsNone(migration_bot_contributions_model)
 
     def test_update_exploration_by_migration_bot_not_updates_settings_model(
             self):

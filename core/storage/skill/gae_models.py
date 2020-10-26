@@ -73,7 +73,7 @@ class SkillModel(base_models.VersionedModel):
     skill_contents = datastore_services.JsonProperty(indexed=False)
     # The prerequisite skills for the skill.
     prerequisite_skill_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=False))
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # The id to be used by the next misconception added.
     next_misconception_id = (
         datastore_services.IntegerProperty(required=True, indexed=False))
@@ -143,6 +143,7 @@ class SkillModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
+        skill_commit_log_entry.update_timestamps()
         skill_commit_log_entry.put()
 
     @classmethod

@@ -151,6 +151,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         deleted_user_model = (
             user_models.UserSettingsModel.get_by_id(deleted_user_id))
         deleted_user_model.deleted = True
+        deleted_user_model.update_timestamps()
         deleted_user_model.put()
 
     def test_that_no_get_results_in_500_error(self):

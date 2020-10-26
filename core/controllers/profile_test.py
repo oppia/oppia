@@ -824,7 +824,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_settings.validate()
         user_models.UserSettingsModel(
             id=user_settings.user_id,
-            gae_id=user_settings.gae_id,
             email=user_settings.email,
             role=user_settings.role,
             username=user_settings.username,

@@ -292,6 +292,8 @@ def _update_classifier_training_jobs_status(job_ids, status):
 
         classifier_training_job_models[index].status = status
 
+    classifier_models.ClassifierTrainingJobModel.update_timestamps_multi(
+        classifier_training_job_models)
     classifier_models.ClassifierTrainingJobModel.put_multi(
         classifier_training_job_models)
 
@@ -337,6 +339,7 @@ def _update_scheduled_check_time_for_new_training_job(job_id):
     classifier_training_job_model.next_scheduled_check_time = (
         datetime.datetime.utcnow() + datetime.timedelta(
             minutes=feconf.CLASSIFIER_JOB_TTL_MINS))
+    classifier_training_job_model.update_timestamps()
     classifier_training_job_model.put()
 
 
