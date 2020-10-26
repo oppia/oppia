@@ -215,8 +215,8 @@ angular.module('oppia').directive('tutorCard', [
                 AudioBarStatusService.isAudioBarExpanded()
               );
             };
-            $scope.canAskLearnerForAnswerInfo = (
-              LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
+            $scope.getCanAskLearnerForAnswerInfo = (
+              LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo);
 
             $scope.OPPIA_AVATAR_IMAGE_URL = (
               UrlInterpolationService.getStaticImageUrl(

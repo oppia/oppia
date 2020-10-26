@@ -413,7 +413,7 @@ angular.module('oppia').directive('conversationSkin', [
             );
           };
 
-          $scope.canAskLearnerForAnswerInfo = function() {
+          $scope.getCanAskLearnerForAnswerInfo = function() {
             return LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
           };
 
