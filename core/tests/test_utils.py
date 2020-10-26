@@ -58,11 +58,11 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import cloud_tasks_emulator
-from proto import text_classifier_pb2
 import feconf
 import main
 import main_mail
 import main_taskqueue
+from proto import text_classifier_pb2
 import python_utils
 import requests_mock
 import schema_utils

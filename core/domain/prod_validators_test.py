@@ -57,8 +57,8 @@ from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
-from proto import text_classifier_pb2
 import feconf
+from proto import text_classifier_pb2
 import python_utils
 import utils
 

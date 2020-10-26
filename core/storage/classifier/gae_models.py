@@ -37,7 +37,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     """
 
     # The ID of the algorithm used to create the model.
-    algorithm_id = datastore_services.StringProperty(required=True, indexed=True)
+    algorithm_id = datastore_services.StringProperty(
+        required=True, indexed=True)
     # The ID of the interaction to which the algorithm belongs.
     interaction_id = (
         datastore_services.StringProperty(required=True, indexed=True))
@@ -64,7 +65,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # the format of the classifier_data as well as the prediction API to be
     # used.
     algorithm_version = datastore_services.IntegerProperty(
-      required=True, indexed=True)
+        required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():

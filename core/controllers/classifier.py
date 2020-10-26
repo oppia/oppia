@@ -22,8 +22,8 @@ from core.controllers import base
 from core.domain import classifier_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
-from proto import training_job_response_payload_pb2
 import feconf
+from proto import training_job_response_payload_pb2
 
 
 def validate_job_result_message_proto(job_result_proto):
