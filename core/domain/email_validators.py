@@ -25,13 +25,16 @@ from core.domain import base_model_validators
 from core.platform import models
 
 (
-    base_models, email_models,  feedback_models, suggestion_models, user_models
+    base_models, email_models, feedback_models,
+    suggestion_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.email, models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user
+    models.NAMES.base_model, models.NAMES.email, models.NAMES.feedback,
+    models.NAMES.suggestion, models.NAMES.user
 
 ])
 
 USER_ID_REGEX = 'uid_[a-z]{32}'
+
 
 class SentEmailModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SentEmailModels."""
