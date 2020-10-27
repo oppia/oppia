@@ -23,8 +23,8 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { AdminConfigTabBackendApiService } from
   'pages/admin-page/services/admin-config-tab-backend-api.service';
 
-fdescribe('Admin Config Tab Backend API service', () => {
-  let AdminConfigTabBackendApiService: AdminConfigTabBackendApiService;
+describe('Admin Config Tab Backend API service', () => {
+  let adminConfigTabBackendApiService: AdminConfigTabBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
 
@@ -34,7 +34,7 @@ fdescribe('Admin Config Tab Backend API service', () => {
       providers: [AdminConfigTabBackendApiService]
     });
     httpTestingController = TestBed.get(HttpTestingController);
-    AdminConfigTabBackendApiService = TestBed.get(
+    adminConfigTabBackendApiService = TestBed.get(
       AdminConfigTabBackendApiService
     );
     csrfService = TestBed.get(CsrfTokenService);
@@ -43,44 +43,44 @@ fdescribe('Admin Config Tab Backend API service', () => {
       return Promise.resolve('sample-csrf-token');
     });
   });
-    afterEach(() => {
-      httpTestingController.verify();
-    });
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-    it('should revert specified config property to default value',
-      fakeAsync(() => {
-        const successHandler = jasmine.createSpy('success');
-        const failHandler = jasmine.createSpy('fail');
-        AdminConfigTabBackendApiService.revertConfigProperty(
-          'promo_bar_enabled').then(successHandler, failHandler);
+  it('should revert specified config property to default value',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      adminConfigTabBackendApiService.revertConfigProperty(
+        'promo_bar_enabled').then(successHandler, failHandler);
 
-        let req = httpTestingController.expectOne(
-          '/adminhandler');
-        expect(req.request.method).toEqual('PUT');
-        req.flush(200);
-        flushMicrotasks();
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
 
-        expect(successHandler).toHaveBeenCalled();
-        expect(failHandler).not.toHaveBeenCalled();
-      }
-      ));
-    it('should save new config properties',
-      fakeAsync(() => {
-        const successHandler = jasmine.createSpy('success');
-        const failHandler = jasmine.createSpy('fail');
-        AdminConfigTabBackendApiService.saveConfigProperties({
-          promo_bar_enabled: true
-        }).then(successHandler, failHandler);
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+  it('should save new config properties',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      adminConfigTabBackendApiService.saveConfigProperties({
+        promo_bar_enabled: true
+      }).then(successHandler, failHandler);
 
-        let req = httpTestingController.expectOne(
-          '/adminhandler');
-        expect(req.request.method).toEqual('PUT');
-        req.flush(200);
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(successHandler).toHaveBeenCalled();
-        expect(failHandler).not.toHaveBeenCalled();
-      }
-      ));
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
 });
