@@ -2287,10 +2287,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
-        self.assertEqual(self.log_new_error_counter.times_called, 1)
-        self.assertEqual(
-            self.logged_errors[0],
-            'No Contributor Dashboard reviewers to notify.')
 
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
             self):

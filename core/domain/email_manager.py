@@ -316,7 +316,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA = {
         '- The Oppia Contributor Dashboard Team'
     ),
     'email_subject': (
-        'Contributor Dashboard Suggestions Have Been Waiting Too Long for a'
+        'Contributor Dashboard Suggestions Have Been Waiting Too Long for a '
         'Review')
 }
 
@@ -1537,7 +1537,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
 def send_mail_to_notify_contributor_dashboard_reviewers(
         reviewer_ids, reviewers_suggestion_email_infos):
     """Sends an email to each reviewer notifying them of the suggestions on the
-    Contributor Dashboard that have been waiting the longest for reivew, and
+    Contributor Dashboard that have been waiting the longest for review, and
     that the reviewer has permission to review.
 
     Args:
@@ -1571,7 +1571,6 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         return
 
     if not reviewer_ids:
-        log_new_error('No Contributor Dashboard reviewers to notify.')
         return
 
     reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
