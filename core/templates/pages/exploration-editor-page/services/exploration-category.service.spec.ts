@@ -29,8 +29,9 @@ describe('Exploration Category Service', function() {
 
   beforeEach(function() {
     angular.mock.module('oppia');
-    importAllAngularServices();
-
+  });
+  importAllAngularServices();
+  beforeEach(function() {
     angular.mock.inject(function($injector) {
       ecs = $injector.get('ExplorationCategoryService');
     });

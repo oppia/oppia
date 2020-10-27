@@ -24,12 +24,14 @@ require('services/csrf-token.service.ts');
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
-
+import { HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
   var ReadOnlyExplorationBackendApiService = null;
+  let httpTestingController: HttpTestingController;
   var sampleDataResults = null;
   var $httpBackend = null;
   var CsrfService = null;
@@ -46,6 +48,7 @@ describe('Editable exploration backend API service', function() {
       'ReadOnlyExplorationBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
+    httpTestingController = TestBed.get(HttpTestingController);
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       var deferred = $q.defer();
@@ -91,6 +94,7 @@ describe('Editable exploration backend API service', function() {
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing exploration from ' +
@@ -179,19 +183,19 @@ describe('Editable exploration backend API service', function() {
   );
 
   it('should not cache exploration from backend into ' +
-    'read only service', function() {
+    'read only service', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
     var exploration = null;
-
-    $httpBackend.expect('GET', '/explorehandler/init/0')
-      .respond(sampleDataResults);
 
     ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null)
       .then(function(data) {
         exploration = data;
       });
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne('/explorehandler/init/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
 
     expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
 
@@ -214,7 +218,7 @@ describe('Editable exploration backend API service', function() {
 
     expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   }
-  );
+  ));
 
   it('should delete exploration from the backend', function() {
     var successHandler = jasmine.createSpy('success');

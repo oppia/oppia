@@ -73,23 +73,6 @@ describe('Read only exploration backend API service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing exploration from the backend',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      roebas.fetchExploration('0', null).then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/explorehandler/init/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
-
   it('should successfully fetch an existing exploration with version from' +
     ' the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
@@ -106,29 +89,6 @@ describe('Read only exploration backend API service', () => {
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
   }));
-
-  it('should load a cached exploration after fetching it from the backend',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      roebas.loadExploration('0', null).then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/explorehandler/init/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-
-      // Loading a exploration the second time should not fetch it.
-      roebas.loadExploration('0', null).then(successHandler, failHandler);
-
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
 
   it('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
