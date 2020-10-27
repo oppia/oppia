@@ -95,6 +95,7 @@ export class DragAndDropSortInputRulesService {
         return ((i + 1) === inputs.y);
       }
     }
+    return false;
   }
 
   HasElementXBeforeElementY(

@@ -22,13 +22,13 @@
  * story would always be linked to a topic.
  */
 
-require('domain/editor/undo_redo/ChangeObjectFactory.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
+import { Change } from 'domain/editor/undo_redo/change.model';
 
+require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicUpdateService', [
-  'ChangeObjectFactory', 'UndoRedoService',
+  'UndoRedoService',
   'CMD_ADD_SUBTOPIC', 'CMD_DELETE_ADDITIONAL_STORY',
   'CMD_DELETE_CANONICAL_STORY', 'CMD_DELETE_SUBTOPIC',
   'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'CMD_REARRANGE_CANONICAL_STORY',
@@ -48,7 +48,7 @@ angular.module('oppia').factory('TopicUpdateService', [
   'TOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
   'TOPIC_PROPERTY_THUMBNAIL_FILENAME',
   'TOPIC_PROPERTY_URL_FRAGMENT', function(
-      ChangeObjectFactory, UndoRedoService,
+      UndoRedoService,
       CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
       CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
       CMD_MOVE_SKILL_ID_TO_SUBTOPIC, CMD_REARRANGE_CANONICAL_STORY,
@@ -75,7 +75,7 @@ angular.module('oppia').factory('TopicUpdateService', [
     var _applyChange = function(entity, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       UndoRedoService.applyChange(changeObj, entity);
     };
 

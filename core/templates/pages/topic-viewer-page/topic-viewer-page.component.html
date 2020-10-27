@@ -32,12 +32,17 @@
   <background-banner></background-banner>
   <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
     <div *ngIf="activeTab === 'story'">
-      <stories-list [topicName]="topicName"
+      <stories-list *ngIf="canonicalStorySummaries.length"
+                    [topicName]="topicName"
                     [topicDescription]="topicDescription"
                     [canonicalStorySummaries]="canonicalStorySummaries"
                     [classroomUrlFragment]="classroomUrlFragment"
                     [topicUrlFragment]="topicUrlFragment">
       </stories-list>
+      <mat-card *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
+        <h2 class="tab-title">Coming Soon!</h2>
+        <div class="coming-soon-text">Come back later when lessons are available for this topic.</div>
+      </mat-card>
     </div>
     <div *ngIf="activeTab === 'practice'">
       <practice-tab *ngIf="practiceTabIsDisplayed"
@@ -46,7 +51,7 @@
       </practice-tab>
       <mat-card *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="tab-title">Coming Soon!</h2>
-        <div class="practice-tab-not-available-text">Come back later when practice questions are available for this topic.</div>
+        <div class="coming-soon-text">Come back later when practice questions are available for this topic.</div>
       </mat-card>
     </div>
     <div *ngIf="activeTab === 'subtopics'">
@@ -164,7 +169,7 @@
 
   .topic-viewer-page-content .oppia-page-card {
     border-radius: 0.25em;
-    margin-top: 5vh;
+    margin-top: 10em;
     padding-bottom: 7.5vh;
     width: 704px;
   }
@@ -174,7 +179,7 @@
     width: 40vw;
   }
 
-  .topic-viewer-page-content .practice-tab-not-available-text {
+  .topic-viewer-page-content .coming-soon-text {
     font-family: Roboto, Arial, sans-serif;
     font-size: 18px;
   }
@@ -189,7 +194,7 @@
     }
 
     .topic-viewer-page-content .oppia-page-card {
-      margin-top: 5vh;
+      margin-top: 10em;
       width: 80vw;
     }
 

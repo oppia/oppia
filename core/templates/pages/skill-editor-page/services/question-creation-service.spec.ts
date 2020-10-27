@@ -16,18 +16,17 @@
  * @fileoverview Unit tests for QuestionCreationService.
  */
 
-
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
 describe('Question Creation Service', function() {
   var $rootScope = null;
   var qcs = null;
   var SkillEditorStateService = null;
   var $q = null;
-  var SkillDifficultyObjectFactory = null;
   var QuestionObjectFactory = null;
   var EditableQuestionBackendApiService = null;
   var SkillBackendApiService = null;
@@ -46,12 +45,8 @@ describe('Question Creation Service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+
+  importAllAngularServices();
 
   describe('when fetching skills is successful', function() {
     beforeEach(angular.mock.inject(function($injector) {
@@ -59,8 +54,6 @@ describe('Question Creation Service', function() {
       SkillEditorStateService = $injector.get('SkillEditorStateService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
       $q = $injector.get('$q');
-      SkillDifficultyObjectFactory = $injector.get(
-        'SkillDifficultyObjectFactory');
       SkillBackendApiService = $injector.get('SkillBackendApiService');
       EditableQuestionBackendApiService = $injector.get(
         'EditableQuestionBackendApiService');
@@ -193,7 +186,8 @@ describe('Question Creation Service', function() {
           solicit_answer_details: false
         },
         language_code: 'en',
-        version: 1
+        version: 1,
+        inapplicable_skill_misconception_ids: ['skillId1-Id1']
       };
       var sampleQuestion = QuestionObjectFactory.createFromBackendDict(
         sampleQuestionBackendDict);
@@ -203,8 +197,8 @@ describe('Question Creation Service', function() {
     }));
 
     it('should create question', function() {
-      var skillDiff = SkillDifficultyObjectFactory.create(
-        'skillId1', 'description', 'Easy');
+      var skillDiff = SkillDifficulty.create(
+        'skillId1', 'description', 0.3);
       var modalSpy = spyOn($uibModal, 'open').and.returnValue(
         {result: Promise.resolve([skillDiff])});
       qcs.createQuestion();
@@ -250,8 +244,6 @@ describe('Question Creation Service', function() {
       SkillEditorStateService = $injector.get('SkillEditorStateService');
       AlertsService = $injector.get('AlertsService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
-      SkillDifficultyObjectFactory = $injector.get(
-        'SkillDifficultyObjectFactory');
       SkillBackendApiService = $injector.get('SkillBackendApiService');
       EditableQuestionBackendApiService = $injector.get(
         'EditableQuestionBackendApiService');
@@ -413,8 +405,6 @@ describe('Question Creation Service', function() {
       $q = $injector.get('$q');
       SkillEditorStateService = $injector.get('SkillEditorStateService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
-      SkillDifficultyObjectFactory = $injector.get(
-        'SkillDifficultyObjectFactory');
       SkillBackendApiService = $injector.get('SkillBackendApiService');
       EditableQuestionBackendApiService = $injector.get(
         'EditableQuestionBackendApiService');
@@ -456,12 +446,14 @@ describe('Question Creation Service', function() {
       };
 
       spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue({
-        skill: skillBackendDict,
+        skill: SkillObjectFactory.createFromBackendDict(skillBackendDict),
         topicName: 'topic1',
         subtopicName: 'subtopic2',
       });
       var deferred = $q.defer();
-      deferred.resolve([skillBackendDict]);
+      deferred.resolve(
+        [SkillObjectFactory.createFromBackendDict(skillBackendDict)]
+      );
       spyOn(SkillBackendApiService, 'fetchMultiSkills').and.returnValue(
         deferred.promise);
       spyOn(
@@ -551,7 +543,8 @@ describe('Question Creation Service', function() {
           solicit_answer_details: false
         },
         language_code: 'en',
-        version: 1
+        version: 1,
+        inapplicable_skill_misconception_ids: []
       };
 
       var sampleQuestion = QuestionObjectFactory.createFromBackendDict(

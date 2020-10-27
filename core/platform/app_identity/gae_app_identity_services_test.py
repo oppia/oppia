@@ -50,3 +50,8 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             gae_app_identity_services.get_gcs_resource_bucket_name(),
             app_identity.get_default_gcs_bucket_name())
+
+    def test_get_default_gcs_bucket_name(self):
+        self.assertEqual(
+            gae_app_identity_services.get_default_gcs_bucket_name(),
+            'app_default_bucket')

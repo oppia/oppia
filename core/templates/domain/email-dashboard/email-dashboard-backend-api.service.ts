@@ -22,14 +22,12 @@ import { Injectable } from '@angular/core';
 
 import {
   EmailDashboardQueryResults,
-  EmailDashboardQueryResultsBackendDict,
-  EmailDashboardQueryResultsObjectFactory
-} from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
+  EmailDashboardQueryResultsBackendDict
+} from 'domain/email-dashboard/email-dashboard-query-results.model';
 import {
   EmailDashboardQuery,
   EmailDashboardQueryBackendDict,
-  EmailDashboardQueryObjectFactory
-} from 'domain/email-dashboard/email-dashboard-query-object.factory';
+} from 'domain/email-dashboard/email-dashboard-query.model';
 
 export interface QueryData {
   hasNotLoggedInForNDays: string;
@@ -48,10 +46,7 @@ export class EmailDashboardBackendApiService {
   QUERY_STATUS_CHECK_URL: string = '/querystatuscheck';
 
   constructor(
-    private http: HttpClient,
-    private queryResultsObjectFactory:
-    EmailDashboardQueryResultsObjectFactory,
-    private queryObjectFactory: EmailDashboardQueryObjectFactory) {}
+    private http: HttpClient) {}
 
   fetchQueriesPage(
       pageSize: number, cursor: string): Promise<EmailDashboardQueryResults> {
@@ -73,7 +68,7 @@ export class EmailDashboardBackendApiService {
           params: params
         }).toPromise().then(data => {
         let emailDashboardQueryResultsObject = (
-          this.queryResultsObjectFactory.createFromBackendDict(data));
+          EmailDashboardQueryResults.createFromBackendDict(data));
         resolve(emailDashboardQueryResultsObject);
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -89,7 +84,7 @@ export class EmailDashboardBackendApiService {
             query_id: queryId
           }
         }).toPromise().then(data => {
-        let queryObject = this.queryObjectFactory.createFromBackendDict(data);
+        let queryObject = EmailDashboardQuery.createFromBackendDict(data);
         resolve(queryObject);
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -111,7 +106,7 @@ export class EmailDashboardBackendApiService {
       this.http.post<EmailDashboardQueryBackendDict>(
         this.QUERY_DATA_URL, {
           data: postData}).toPromise().then(data => {
-        let queryObject = this.queryObjectFactory.createFromBackendDict(data);
+        let queryObject = EmailDashboardQuery.createFromBackendDict(data);
         resolve(queryObject);
       }, errorResponse => {
         reject(errorResponse.error.error);

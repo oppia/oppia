@@ -18,8 +18,16 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
+import { LearnerExplorationSummary, LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
+import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
+import { FeedbackThreadSummary } from
+  'domain/feedback_thread/feedback-thread-summary.model';
 
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
@@ -31,18 +39,11 @@ describe('Learner dashboard page', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModal = null;
-  var $window = null;
   var AlertsService = null;
-  var CollectionObjectFactory = null;
-  var collectionSummaryObjectFactory = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
   var ExplorationObjectFactory = null;
-  var feedbackThreadSummaryObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
-  var learnerExplorationSummaryObjectFactory = null;
-  var nonExistentActivitiesObjectFactory = null;
-  var profileSummaryObjectFactory = null;
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
 
@@ -65,23 +66,11 @@ describe('Learner dashboard page', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
-      $window = $injector.get('$window');
-      CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-      collectionSummaryObjectFactory = $injector.get(
-        'CollectionSummaryObjectFactory');
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
-      feedbackThreadSummaryObjectFactory = $injector.get(
-        'FeedbackThreadSummaryObjectFactory');
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
-      learnerExplorationSummaryObjectFactory = $injector.get(
-        'LearnerExplorationSummaryObjectFactory');
-      nonExistentActivitiesObjectFactory = $injector.get(
-        'NonExistentActivitiesObjectFactory');
-      profileSummaryObjectFactory = $injector.get(
-        'ProfileSummaryObjectFactory');
       SuggestionModalForLearnerDashboardService = $injector.get(
         'SuggestionModalForLearnerDashboardService');
       UserService = $injector.get('UserService');
@@ -211,11 +200,12 @@ describe('Learner dashboard page', function() {
       // Generate completed collections and collection playlist.
       for (let i = 0; i < 8; i++) {
         learnerDashboardData.completed_collections_list[i] = (
-          CollectionObjectFactory.create(
+          // TODO(#10875): Fix type mismatch.
+          Collection.create(
             Object.assign(collectionDict, {
               id: i + 1,
               title: 'Collection Title ' + (i + 1),
-            })
+            }) as unknown as CollectionBackendDict
           ));
         learnerDashboardData.collection_playlist[i] = ({
           id: Number(i + 1).toString()
@@ -225,13 +215,14 @@ describe('Learner dashboard page', function() {
       // Generate incomplete collections.
       for (let i = 0; i < 8; i++) {
         learnerDashboardData.incomplete_collections_list[i] = (
-          CollectionObjectFactory.create(
+          // TODO(#10875): Fix type mismatch.
+          Collection.create(
             Object.assign(collectionDict, {
               // Create ids from 9 to 17.
               // (0 to 8 is the complete collections).
               id: i + 10,
               title: 'Collection Title ' + (i + 7),
-            })
+            }) as unknown as CollectionBackendDict
           ));
       }
 
@@ -239,45 +230,45 @@ describe('Learner dashboard page', function() {
         $q.resolve(profilePictureDataUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
+      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.resolve({
           completedExplorationsList: (
             learnerDashboardData.completed_explorations_list.map(
-              expSummary => learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           incompleteExplorationsList: (
             learnerDashboardData.incomplete_explorations_list.map(
-              expSummary => learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           explorationPlaylist: (
             learnerDashboardData.exploration_playlist.map(
-              expSummary => learnerExplorationSummaryObjectFactory
-                .createFromBackendDict(expSummary))),
+              expSummary => LearnerExplorationSummary.createFromBackendDict(
+                expSummary))),
           completedCollectionsList: (
             learnerDashboardData.completed_collections_list.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           incompleteCollectionsList: (
             learnerDashboardData.incomplete_collections_list.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           numberOfUnreadThreads: learnerDashboardData.number_of_unread_threads,
           threadSummaries: (
             learnerDashboardData.thread_summaries.map(
-              threadSummary => feedbackThreadSummaryObjectFactory
+              threadSummary => FeedbackThreadSummary
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             learnerDashboardData.completed_to_incomplete_collections),
           numberOfNonexistentActivities: (
-            nonExistentActivitiesObjectFactory.createFromBackendDict(
+            NonExistentActivities.createFromBackendDict(
               learnerDashboardData.number_of_nonexistent_activities)),
           subscriptionList: (
             learnerDashboardData.subscription_list.map(
-              profileSummary => profileSummaryObjectFactory
+              profileSummary => ProfileSummary
                 .createFromCreatorBackendDict(profileSummary)))
         }));
 
@@ -427,22 +418,10 @@ describe('Learner dashboard page', function() {
     });
 
     it('should detect when application is being used on a mobile', function() {
-      // This approach was choosen because spyOn() doesn't work on properties
-      // that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property innerWidth does not have access type get' error.
-      // eslint-disable-next-line max-len
-      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-      // ref: https://github.com/jasmine/jasmine/issues/1415
-      Object.defineProperty($window, 'innerWidth', {
-        get: () => undefined
-      });
-      var innerWidthSpy = spyOnProperty($window, 'innerWidth');
-      innerWidthSpy.and.returnValue(400);
-      expect(ctrl.checkMobileView()).toBe(true);
-
-      innerWidthSpy.and.returnValue(700);
       expect(ctrl.checkMobileView()).toBe(false);
+
+      spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
+      expect(ctrl.checkMobileView()).toBe(true);
     });
 
     it('should show username popover based on its length', function() {
@@ -485,8 +464,8 @@ describe('Learner dashboard page', function() {
 
         var completedExplorations = learnerDashboardData
           .completed_explorations_list.map(
-            expSummary => learnerExplorationSummaryObjectFactory
-              .createFromBackendDict(expSummary));
+            expSummary => LearnerExplorationSummary.createFromBackendDict(
+              expSummary));
 
         expect(ctrl.startCompletedExpIndex).toBe(0);
         expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
@@ -748,9 +727,8 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
       // Get exploration with id 13.
-      var activity = learnerExplorationSummaryObjectFactory
-        .createFromBackendDict(
-          learnerDashboardData.incomplete_explorations_list[2]);
+      var activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.incomplete_explorations_list[2]);
       ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
@@ -767,10 +745,11 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
       // Get exploration with id 13.
-      var activity = learnerExplorationSummaryObjectFactory
-        .createFromBackendDict({
-          id: 100
-        });
+      var activity = LearnerExplorationSummary.createFromBackendDict(
+        // TODO(#10875): Fix type mismatch.
+        {
+          id: '100'
+        } as unknown as LearnerExplorationSummaryBackendDict);
       ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
@@ -789,7 +768,7 @@ describe('Learner dashboard page', function() {
       var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 11.
 
-      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+      var activity = CollectionSummary.createFromBackendDict(
         learnerDashboardData.incomplete_collections_list[2]);
 
       ctrl.openRemoveActivityModal(
@@ -811,9 +790,8 @@ describe('Learner dashboard page', function() {
       var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
 
       // Exploration with id 2.
-      var activity = learnerExplorationSummaryObjectFactory
-        .createFromBackendDict(
-          learnerDashboardData.exploration_playlist[1]);
+      var activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.exploration_playlist[1]);
 
       ctrl.openRemoveActivityModal(
         sectionNameI18nId, subsectionName, activity);
@@ -833,7 +811,7 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
       var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 2.
-      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+      var activity = CollectionSummary.createFromBackendDict(
         learnerDashboardData.collection_playlist[1]);
 
       ctrl.openRemoveActivityModal(
@@ -885,7 +863,7 @@ describe('Learner dashboard page', function() {
         $q.resolve(profilePictureDataUrl));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
         userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardData')
+      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404
         }));

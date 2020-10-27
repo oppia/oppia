@@ -344,6 +344,7 @@ title: Old Title
             contributor_ids=[],
             contributors_summary={},
         )
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
     def test_converts_exp_model_with_default_states_schema_version(self):
@@ -431,7 +432,7 @@ title: Old Title
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the latest version of the exploration has the most up-to-date
         # states schema version.

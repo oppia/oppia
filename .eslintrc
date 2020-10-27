@@ -23,8 +23,9 @@
   }],
   "rules": {
     "oppia/break-after-parens": "error",
+    "oppia/no-multiline-disable": "error",
     "oppia/test-message-style": "error",
-    "oppia/no-unused-dependency": "error",
+    "oppia/dependency-checks": "error",
     "angular/di": [
       "error",
       "array"

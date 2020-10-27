@@ -75,11 +75,13 @@ class TopicEditorStoryHandler(base.BaseHandler):
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
             summary['completed_node_titles'] = []
+            summary['pending_node_dicts'] = []
 
         for summary in additional_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
             summary['completed_node_titles'] = []
+            summary['pending_node_dicts'] = []
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
@@ -107,10 +109,16 @@ class TopicEditorStoryHandler(base.BaseHandler):
                 'Story url fragment is not unique across the site.')
 
         new_story_id = story_services.get_new_story_id()
+        # Add the story id to canonical_story_ids in the topic.
+        # Topic validation occurs right before the field is updated. If there
+        # is a validation failure, the story id will not be added to the
+        # canonical_story_ids field in the Topic and the Story model does not
+        # get created. Hence, topic_services.add_canonical_story is called
+        # before story_services.save_new_story.
+        topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
         story = story_domain.Story.create_default_story(
             new_story_id, title, description, topic_id, story_url_fragment)
         story_services.save_new_story(self.user_id, story)
-        topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
 
         try:
             file_format = image_validation_services.validate_image_and_filename(

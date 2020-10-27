@@ -67,7 +67,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
-            end_state_name='End State'
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(2)]
 
         for exp in explorations:
@@ -141,6 +142,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
                 'application_id'))
         voiceover_application_model.target_type = 'invalid_type'
+        voiceover_application_model.update_timestamps()
         voiceover_application_model.put()
         with self.assertRaisesRegexp(
             Exception,

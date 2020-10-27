@@ -30,8 +30,16 @@ import utils
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
     'email', 'exploration', 'feedback', 'improvements', 'job', 'opportunity',
-    'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
-    'topic', 'user')
+    'question', 'recommendations', 'skill', 'statistics', 'story', 'subtopic',
+    'suggestion', 'topic', 'user')
+
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
+    NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
+    NAMES.question, NAMES.skill, NAMES.story, NAMES.subtopic, NAMES.suggestion,
+    NAMES.topic)
 
 GAE_PLATFORM = 'gae'
 
@@ -123,6 +131,9 @@ class _Gae(Platform):
             elif name == NAMES.story:
                 from core.storage.story import gae_models as story_models
                 returned_models.append(story_models)
+            elif name == NAMES.subtopic:
+                from core.storage.subtopic import gae_models as subtopic_models # pylint: disable=line-too-long
+                returned_models.append(subtopic_models)
             elif name == NAMES.suggestion:
                 from core.storage.suggestion import gae_models as suggestion_models # pylint: disable=line-too-long
                 returned_models.append(suggestion_models)
@@ -253,13 +264,18 @@ class _Gae(Platform):
 
     @classmethod
     def import_taskqueue_services(cls):
-        """Imports and returns gae_taskqueue_services module.
+        """Imports and returns a taskqueue_services module from
+        core.platform.taskqueue.
 
         Returns:
-            module. The gae_taskqueue_services module.
+            module. The core.platform.taskqueue services module.
         """
-        from core.platform.taskqueue import gae_taskqueue_services
-        return gae_taskqueue_services
+        if (constants.DEV_MODE or utils.is_local_server_environment()):
+            from core.platform.taskqueue import dev_mode_taskqueue_services
+            return dev_mode_taskqueue_services
+        else:
+            from core.platform.taskqueue import cloud_taskqueue_services
+            return cloud_taskqueue_services
 
     @classmethod
     def import_search_services(cls):

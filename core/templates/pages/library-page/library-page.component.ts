@@ -26,14 +26,13 @@ require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.component.ts');
 
 require('domain/classroom/classroom-backend-api.service');
-require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
+require('domain/learner_dashboard/learner-dashboard-activity-ids.model.ts');
 require(
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
 require('domain/learner_dashboard/learner-playlist.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/keyboard-shortcut.service.ts');
-require('services/page-title.service.ts');
 require('services/search.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
@@ -47,19 +46,21 @@ angular.module('oppia').component('libraryPage', {
   controller: [
     '$http', '$log', '$scope', '$timeout', '$window',
     'I18nLanguageCodeService', 'KeyboardShortcutService', 'LoaderService',
-    'PageTitleService', 'SearchService', 'UrlInterpolationService',
+    'SearchService', 'UrlInterpolationService',
     'UserService', 'WindowDimensionsService', 'LIBRARY_PAGE_MODES',
     'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
     function(
         $http, $log, $scope, $timeout, $window,
         I18nLanguageCodeService, KeyboardShortcutService, LoaderService,
-        PageTitleService, SearchService, UrlInterpolationService,
+        SearchService, UrlInterpolationService,
         UserService, WindowDimensionsService, LIBRARY_PAGE_MODES,
         LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
       var ctrl = this;
 
       ctrl.classroomBackendApiService = (
         OppiaAngularRootComponent.classroomBackendApiService);
+      ctrl.pageTitleService = (
+        OppiaAngularRootComponent.pageTitleService);
 
       var possibleBannerFilenames = [
         'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -226,7 +227,7 @@ angular.module('oppia').component('libraryPage', {
             ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
           title = 'Find explorations to learn from - Oppia';
         }
-        PageTitleService.setPageTitle(title);
+        ctrl.pageTitleService.setPageTitle(title);
 
         // Keeps track of the index of the left-most visible card of each
         // group.

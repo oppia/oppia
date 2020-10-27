@@ -26,23 +26,22 @@ from core.platform import models
 import python_utils
 
 (
-    activity_models, audit_models,
-    classifier_models, collection_models,
-    config_models, email_models, exp_models,
-    feedback_models, improvements_models, job_models,
-    opportunity_models, question_models,
+    activity_models, audit_models, classifier_models,
+    collection_models, config_models, email_models,
+    exp_models, feedback_models, improvements_models,
+    job_models, opportunity_models, question_models,
     recommendations_models, skill_models, stats_models,
-    story_models, suggestion_models, topic_models,
-    user_models,) = (
-        models.Registry.import_models([
-            models.NAMES.activity, models.NAMES.audit,
-            models.NAMES.classifier, models.NAMES.collection,
-            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.question,
-            models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.statistics, models.NAMES.story,
-            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
+    story_models, subtopic_models, suggestion_models,
+    topic_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.activity, models.NAMES.audit, models.NAMES.classifier,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.job, models.NAMES.opportunity, models.NAMES.question,
+    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
+])
 
 
 class ProdValidationAuditOneOffJobMetaClass(type):
@@ -117,11 +116,13 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
             validator = getattr(validator_module, validator_cls_name)
             validator.validate(model_instance)
             if len(validator.errors) > 0:
-                for error_key, error_val in validator.errors.items():
+                for error_key, error_list in validator.errors.items():
+                    error_message = ((',').join(set(error_list))).encode(
+                        encoding='utf-8')
                     yield (
                         'failed validation check for %s of %s' % (
                             error_key, model_name),
-                        (',').join(set(error_val)))
+                        python_utils.convert_to_bytes(error_message))
             else:
                 yield (
                     'fully-validated %s' % model_name, 1)
@@ -609,6 +610,15 @@ class GeneralVoiceoverApplicationModelAuditOneOffJob(
         return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
+class CommunityContributionStatsModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates CommunityContributionStatsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.CommunityContributionStatsModel]
+
+
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates TopicModel."""
 
@@ -680,7 +690,7 @@ class SubtopicPageModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.SubtopicPageModel]
+        return [subtopic_models.SubtopicPageModel]
 
 
 class SubtopicPageSnapshotMetadataModelAuditOneOffJob(
@@ -689,7 +699,8 @@ class SubtopicPageSnapshotMetadataModelAuditOneOffJob(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.SubtopicPageSnapshotMetadataModel]
+        return [
+            subtopic_models.SubtopicPageSnapshotMetadataModel]
 
 
 class SubtopicPageSnapshotContentModelAuditOneOffJob(
@@ -698,7 +709,8 @@ class SubtopicPageSnapshotContentModelAuditOneOffJob(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.SubtopicPageSnapshotContentModel]
+        return [
+            subtopic_models.SubtopicPageSnapshotContentModel]
 
 
 class SubtopicPageCommitLogEntryModelAuditOneOffJob(
@@ -707,7 +719,8 @@ class SubtopicPageCommitLogEntryModelAuditOneOffJob(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.SubtopicPageCommitLogEntryModel]
+        return [
+            subtopic_models.SubtopicPageCommitLogEntryModel]
 
 
 class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -732,7 +745,12 @@ class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if len(values) > 1:
+        # If normalized name is not set, we do not compare it with normalized
+        # names for other users. It is not mandatory to set the normalized
+        # user names in UserSettingsModel since some users who have logged in
+        # but not completed the sign-up process may not have a username
+        # specified yet.
+        if key != 'None' and len(values) > 1:
             yield (
                 'failed validation check for normalized username check of '
                 'UserSettingsModel',
@@ -813,7 +831,12 @@ class UserRecentChangesBatchModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
 
 class UserStatsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates UserStatsModel."""
+    """Job that audits and validates UserStatsModel.
+
+    NOTE TO DEVELOPERS: This job is expected to take a very long time to
+    run since it iterates over weekly creator stats for validation which
+    is a very large list.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -891,6 +914,14 @@ class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PendingDeletionRequestModel]
+
+
+class DeletedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates DeletedUserModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.DeletedUserModel]
 
 
 class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):

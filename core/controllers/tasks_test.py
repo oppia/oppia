@@ -18,9 +18,14 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_domain
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -31,7 +36,6 @@ import python_utils
     [models.NAMES.job, models.NAMES.email])
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
-taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -180,7 +184,7 @@ class TasksTests(test_utils.EmailTestBase):
                     'thread_id': thread_id}
                 messages = self._get_all_sent_email_messages()
                 self.assertEqual(len(messages), 0)
-                taskqueue_services.enqueue_email_task(
+                taskqueue_services.enqueue_task(
                     feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
                 self.process_and_flush_pending_tasks()
 
@@ -305,7 +309,7 @@ class TasksTests(test_utils.EmailTestBase):
                     'exploration_id': self.exploration.id,
                     'report_text': 'He said a bad word :-( ',
                     'reporter_id': self.user_id_b}
-                taskqueue_services.enqueue_email_task(
+                taskqueue_services.enqueue_task(
                     feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
                     payload, 0)
                 # Ensure moderator has no messages sent to him yet.
@@ -329,3 +333,78 @@ class TasksTests(test_utils.EmailTestBase):
                     '.\n\nThanks!\n- The Oppia Team\n\nYou can change your'
                     ' email preferences via the Preferences page.')
                 self.assertEqual(messages[0].body.decode(), expected_message)
+
+    def test_deferred_tasks_handler_raises_correct_exceptions(self):
+        incorrect_function_identifier = 'incorrect_function_id'
+        taskqueue_services.defer(
+            incorrect_function_identifier,
+            taskqueue_services.QUEUE_NAME_DEFAULT)
+
+        raises_incorrect_function_id_exception = self.assertRaisesRegexp(
+            Exception,
+            'The function id, %s, is not valid.' %
+            incorrect_function_identifier)
+
+        with raises_incorrect_function_id_exception:
+            self.process_and_flush_pending_tasks()
+
+        headers = {
+            # Need to convert to bytes since test app doesn't allow unicode.
+            'X-Appengine-QueueName': python_utils.convert_to_bytes('queue'),
+            'X-Appengine-TaskName': python_utils.convert_to_bytes('None'),
+            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes('1')
+        }
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_task(
+            feconf.TASK_URL_DEFERRED, {}, headers,
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=500)
+
+    def test_deferred_tasks_handler_handles_tasks_correctly(self):
+        exp_id = '15'
+        self.login(self.VIEWER_EMAIL)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        exp_services.load_demo(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+        exp_version = exploration.version
+        state_name = 'Home'
+        state_stats_mapping = {
+            state_name: stats_domain.StateStats.create_default()
+        }
+        exploration_stats = stats_domain.ExplorationStats(
+            exp_id, exp_version, 0, 0, 0, 0, 0, 0,
+            state_stats_mapping)
+        stats_services.create_stats_model(exploration_stats)
+
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        self.post_json('/explorehandler/stats_events/%s' % (exp_id), {
+            'aggregated_stats': aggregated_stats,
+            'exp_version': exp_version})
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_STATS), 1)
+        self.process_and_flush_pending_tasks()
+
+        # Check that the models are updated.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exp_id, exp_version)
+        self.assertEqual(exploration_stats.num_starts_v2, 1)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
+        self.assertEqual(exploration_stats.num_completions_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                state_name].total_hit_count_v2, 1)

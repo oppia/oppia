@@ -763,7 +763,7 @@ textarea {
 
 
 .input-group-addon.oppia-search-bar-icon {
-  border-radius: 4px;
+  border-radius: 4px 0 0 4px;
   font-size: 14px;
   font-weight: normal;
   line-height: 1;
@@ -3464,6 +3464,14 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-splash-button {
     min-width: 95%;
   }
+}
+
+oppia-noninteractive-skillreview {
+  margin-right: -4px;
+}
+
+oppia-noninteractive-link {
+  margin-right: -4px;
 }
 
 .oppia-splash-bullet {

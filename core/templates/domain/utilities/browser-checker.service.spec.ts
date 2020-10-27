@@ -22,7 +22,7 @@ import { BrowserCheckerService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Browser Checker Service', function() {
-  let bcs, wrs;
+  let bcs: BrowserCheckerService, wrs: WindowRef;
 
   let mockUserAgent: (ua: string) => void;
 
@@ -61,8 +61,8 @@ describe('Browser Checker Service', function() {
   });
 
   it('should not support speech synthesis', () => {
-    spyOn(wrs.nativeWindow, 'hasOwnProperty').withArgs('speechSynthesis').and
-      .returnValue(false);
+    spyOn(<Object>wrs.nativeWindow, 'hasOwnProperty')
+      .withArgs('speechSynthesis').and.returnValue(false);
     expect(bcs.supportsSpeechSynthesis()).toBe(false);
   });
 

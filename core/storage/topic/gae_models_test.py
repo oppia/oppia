@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import subtopic_page_domain
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -44,15 +43,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        self.save_new_topic(
-            'topic_id', 'owner_id', name='name', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0, practice_tab_is_displayed=False,
-            meta_tag_content='topic meta tag content')
-        self.assertTrue(
-            topic_models.TopicModel.has_reference_to_user_id('owner_id'))
         self.assertFalse(
-            topic_models.TopicModel.has_reference_to_user_id('x_id'))
+            topic_models.TopicModel.has_reference_to_user_id('any_id'))
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
@@ -136,6 +128,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.topic_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             topic_models.TopicCommitLogEntryModel
@@ -176,112 +169,6 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
-
-
-class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
-    """Tests the SubtopicPageModel class."""
-
-    SUBTOPIC_PAGE_ID = 'subtopic_page_id'
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            topic_models.SubtopicPageModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        subtopic_page_model = topic_models.SubtopicPageModel(
-            id='subtopic_id',
-            topic_id='topic_id',
-            page_contents={},
-            page_contents_schema_version=1,
-            language_code=constants.DEFAULT_LANGUAGE_CODE)
-        subtopic_page_model.commit(
-            committer_id='committer_id',
-            commit_message='Created new subtopic page',
-            commit_cmds=[{'cmd': subtopic_page_domain.CMD_CREATE_NEW}])
-        self.assertTrue(
-            topic_models.SubtopicPageModel
-            .has_reference_to_user_id('committer_id'))
-        self.assertFalse(
-            topic_models.SubtopicPageModel.has_reference_to_user_id('x_id'))
-
-    def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
-        """Tests the _trusted_commit() method."""
-
-        # SubtopicPage is created but not committed/saved.
-        subtopic_page = topic_models.SubtopicPageModel(
-            id=self.SUBTOPIC_PAGE_ID,
-            topic_id='topic_id',
-            page_contents={},
-            page_contents_schema_version=(
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
-            language_code='en'
-        )
-        # We check that subtopic page has not been saved before calling
-        # commit().
-        self.assertIsNone(
-            topic_models.SubtopicPageModel.get(
-                entity_id=self.SUBTOPIC_PAGE_ID,
-                strict=False
-            )
-        )
-        # We call commit() expecting that _trusted_commit works fine
-        # and saves subtopic page to datastore.
-        subtopic_page.commit(
-            committer_id=feconf.SYSTEM_COMMITTER_ID,
-            commit_message='Created new topic',
-            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-        # Now we check that subtopic page is not None and that actually
-        # now subtopic page exists, that means that commit() worked fine.
-        self.assertIsNotNone(
-            topic_models.SubtopicPageModel.get(
-                entity_id=self.SUBTOPIC_PAGE_ID,
-                strict=False
-            )
-        )
-
-
-class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """Tests the SubtopicPageCommitLogEntryModel class."""
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            topic_models.SubtopicPageCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        commit = topic_models.SubtopicPageCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'msg', 'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False)
-        commit.subtopic_page_id = 'b'
-        commit.put()
-        self.assertTrue(
-            topic_models.SubtopicPageCommitLogEntryModel
-            .has_reference_to_user_id('committer_id'))
-        self.assertFalse(
-            topic_models.SubtopicPageCommitLogEntryModel
-            .has_reference_to_user_id('x_id'))
-
-    def test__get_instance_id(self):
-        # Calling create() method calls _get_instance (a protected method)
-        # and sets the instance id equal to the result of calling that method.
-        subtopic_page_commit_log_entry = (
-            topic_models.SubtopicPageCommitLogEntryModel.create(
-                entity_id='entity_id',
-                version=1,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_message='Created new SubtopicPageCommitLogEntry',
-                commit_cmds=[{'cmd': 'create_new'}],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
-                community_owned=True
-            )
-        )
-        self.assertEqual(
-            subtopic_page_commit_log_entry.id,
-            'subtopicpage-entity_id-1'
-        )
 
 
 class TopicRightsModelUnitTests(test_utils.GenericTestBase):
@@ -336,9 +223,6 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             self.assertTrue(
                 topic_models.TopicRightsModel
                 .has_reference_to_user_id('manager_id'))
-            self.assertTrue(
-                topic_models.TopicRightsModel
-                .has_reference_to_user_id('committer_id'))
             self.assertFalse(
                 topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
 
