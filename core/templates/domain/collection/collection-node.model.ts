@@ -43,10 +43,10 @@ export class CollectionNode {
     return new CollectionNode(collectionNodeBackendObject);
   }
 
-  static createFromExplorationId(explorationId: string, explorationSummary: LearnerExplorationSummaryBackendDict): CollectionNode {
+  static createFromExplorationId(explorationId: string): CollectionNode {
     return CollectionNode.create({
       exploration_id: explorationId,
-      exploration_summary: explorationSummary,
+      exploration_summary: null,
     });
   }
 
@@ -59,12 +59,8 @@ export class CollectionNode {
   // Returns the title of the exploration represented by this collection node.
   // This property is immutable. The value returned by this function is
   // null if doesExplorationExist() returns false.
-  getExplorationTitle(): string | null {
-    if (this._explorationSummaryObject) {
-      return this._explorationSummaryObject.title;
-    } else {
-      return null;
-    }
+  getExplorationTitle(): string {
+    return this._explorationSummaryObject.title;
   }
 
   // Returns whether the exploration referenced by this node is known to exist
@@ -76,13 +72,9 @@ export class CollectionNode {
   // Returns whether the exploration referenced by this node is private and
   // not published. This property is immutable. The value returned by this
   // function is null if doesExplorationExist() returns false.
-  isExplorationPrivate(): boolean | null {
-    if (this._explorationSummaryObject) {
-      return this._explorationSummaryObject.status === (
-        AppConstants.ACTIVITY_STATUS_PRIVATE);
-    } else {
-      return null;
-    }
+  isExplorationPrivate(): boolean {
+    return this._explorationSummaryObject.status === (
+      AppConstants.ACTIVITY_STATUS_PRIVATE);
   }
 
   // Returns a raw exploration summary object, as supplied by the backend for
