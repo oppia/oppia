@@ -23,8 +23,8 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { AdminConfigTabBackendApiService } from
   'pages/admin-page/services/admin-config-tab-backend-api.service';
 
-describe('Admin Config Tab Backend API service', () => {
-  let AdminConfigTabBackendApiService: AdminConfigTabBackendApiService = null;
+fdescribe('Admin Config Tab Backend API service', () => {
+  let AdminConfigTabBackendApiService: AdminConfigTabBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
 
@@ -42,6 +42,7 @@ describe('Admin Config Tab Backend API service', () => {
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
     });
+  });
     afterEach(() => {
       httpTestingController.verify();
     });
@@ -82,5 +83,4 @@ describe('Admin Config Tab Backend API service', () => {
         expect(failHandler).not.toHaveBeenCalled();
       }
       ));
-  });
 });

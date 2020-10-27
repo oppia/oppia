@@ -28,10 +28,9 @@ export class AdminConfigTabBackendApiService {
   constructor(
     private http: HttpClient) {}
 
-  async revertConfigProperty(
-      configPropertyId: string):
-      Promise<void> {
-    this.http.post(
+  private _revertConfigProperty(
+      configPropertyId: string):void {
+    this.http.put(
       AdminPageConstants.ADMIN_HANDLER_URL,
       {
         action: 'revert_config_property',
@@ -39,10 +38,9 @@ export class AdminConfigTabBackendApiService {
       }
     ).toPromise();
   }
-  async saveConfigProperties(
-      newConfigPropertyValues: object):
-    Promise<void> {
-    this.http.post(
+  private _saveConfigProperties(
+      newConfigPropertyValues: object):void {
+    this.http.put(
       AdminPageConstants.ADMIN_HANDLER_URL,
       {
         action: 'save_config_properties',
@@ -50,7 +48,25 @@ export class AdminConfigTabBackendApiService {
       }
     ).toPromise();
   }
+
+  revertConfigProperty(
+    configPropertyId: string):
+  Promise<void> {
+  return new Promise(() => {
+    this._revertConfigProperty(
+      configPropertyId);
+    });
+  }
+  saveConfigProperties(
+    newConfigPropertyValues: object):
+  Promise<void> {
+  return new Promise(() => {
+    this._saveConfigProperties(
+      newConfigPropertyValues);
+    });
+  }
 }
+
 
 angular.module('oppia').factory(
   'AdminConfigTabBackendApiService', downgradeInjectable(
