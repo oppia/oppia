@@ -43,10 +43,10 @@ export class CollectionNode {
     return new CollectionNode(collectionNodeBackendObject);
   }
 
-  static createFromExplorationId(explorationId: string): CollectionNode {
+  static createFromExplorationId(explorationId: string, explorationSummary: LearnerExplorationSummaryBackendDict): CollectionNode {
     return CollectionNode.create({
       exploration_id: explorationId,
-      exploration_summary: null,
+      exploration_summary: explorationSummary,
     });
   }
 
