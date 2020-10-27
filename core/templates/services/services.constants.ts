@@ -46,6 +46,8 @@ export const ServicesConstants = {
 
   RESOLVE_ISSUE_URL: '/resolveissuehandler/<exploration_id>',
 
+  PROMO_BAR_URL: '/promo_bar_handler',
+  
   STORE_PLAYTHROUGH_URL:
     '/explorehandler/store_playthrough/<exploration_id>',
 
