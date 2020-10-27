@@ -18,7 +18,7 @@
 import { ExplorationMetadata } from
   'domain/exploration/exploration-metadata.model';
 
-describe('Exploration Metadata object factory', () => {
+describe('Exploration Metadata model', () => {
   let sampleExplorationMetadata: ExplorationMetadata;
 
   beforeEach(() => {
