@@ -73,6 +73,9 @@ describe('Exploration Warnings Service', function() {
   var StateTopAnswersStatsBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
@@ -118,7 +121,6 @@ describe('Exploration Warnings Service', function() {
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
   }));
-  importAllAngularServices();
 
   describe('when exploration param changes has jinja values', function() {
     beforeEach(angular.mock.module('oppia', function($provide) {

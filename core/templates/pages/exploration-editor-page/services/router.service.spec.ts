@@ -19,7 +19,6 @@
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import $ from 'jquery';
 import { Subscription } from 'rxjs';
-
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Router Service', () => {

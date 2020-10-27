@@ -353,15 +353,6 @@ describe('History tab component', function() {
     expect(ctrl.hideHistoryGraph).toBe(true);
   });
 
-  it('should toggle history options', function() {
-    ctrl.toggleHistoryOptions(10);
-    expect(ctrl.highlightedIndex).toBe(10);
-    ctrl.toggleHistoryOptions(10);
-    expect(ctrl.highlightedIndex).toBe(null);
-    ctrl.toggleHistoryOptions(5);
-    expect(ctrl.highlightedIndex).toBe(5);
-  });
-
   it('should reverse the array when the date filter is applied', function() {
     var snapshots = [{
       commit_message: 'This is the commit message',

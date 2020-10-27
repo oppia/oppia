@@ -71,7 +71,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "סקירה כללית",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "סיכום המידע שיהפוך לאנונימי:",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_3": "סיכום נתונים שיועברו לקהילה:",
-	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4": "אם יש לך שאלות או דאגות על תהליך הסרת החשבון, נא לשלוח אימייל ל<strong>privacy@oppia.org</strong>.",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "גרור תמונה לאזור זה",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "העלה קובץ",
 	"I18N_ERROR_HEADER_400": "שגיאה 400",

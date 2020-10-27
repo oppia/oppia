@@ -18,7 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateGraphLayoutService } from
   'components/graph-services/graph-layout.service';
 import { AnswerGroupsCacheService } from
@@ -51,6 +50,7 @@ import * as d3 from 'd3';
 import { of } from 'rxjs';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
@@ -101,11 +101,9 @@ describe('State Graph Visualization directive', function() {
   };
 
   beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
+
+  importAllAngularServices();
+
   beforeEach(function() {
     stateGraphLayoutService = TestBed.get(StateGraphLayoutService);
   });

@@ -54,6 +54,7 @@ import argparse
 import fnmatch
 import multiprocessing
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -66,6 +67,7 @@ from . import css_linter
 from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
+from . import linter_utils
 from . import other_files_linter
 from . import python_linter
 from .. import common
@@ -408,10 +410,12 @@ def _print_summary_of_error_messages(lint_messages):
         lint_messages: list(str). List of linter error messages.
     """
     if lint_messages != '':
-        python_utils.PRINT('Please fix the errors below:')
-        python_utils.PRINT('----------------------------------------')
-        for message in lint_messages:
-            python_utils.PRINT(message)
+        error_message_lines = [
+            '----------------------------------------',
+            'Please fix the errors below:',
+            '----------------------------------------',
+            ] + lint_messages
+        linter_utils.print_failure_message('\n'.join(error_message_lines))
 
 
 def _get_task_output(lint_messages, failed, task):
@@ -453,6 +457,20 @@ def _print_errors_stacktrace(errors_stacktrace):
     python_utils.PRINT(
         'Some of the linting functions may not run until the'
         ' above errors gets fixed')
+
+
+def _get_space_separated_linter_name(linter_name):
+    """Returns the space separated name of the linter class.
+
+    Args:
+        linter_name: str. Name of the linter class.
+
+    Returns:
+        str. Space separated name of the linter class.
+    """
+    return re.sub(
+        r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))',
+        r' \1', linter_name)
 
 
 def main(args=None):
@@ -497,6 +515,12 @@ def main(args=None):
     custom_linters = []
     third_party_linters = []
     for file_extension_type in file_extension_types:
+        if (file_extension_type == 'js' or file_extension_type == 'ts'):
+            if len(_FILES['.js'] + _FILES['.ts']) == 0:
+                continue
+        elif (not file_extension_type == 'other' and not
+              len(_FILES['.%s' % file_extension_type])):
+            continue
         custom_linter, third_party_linter = _get_linters_for_file_extension(
             file_extension_type)
         custom_linters += custom_linter
@@ -507,15 +531,17 @@ def main(args=None):
     tasks_third_party = []
 
     for linter in custom_linters:
+        name = _get_space_separated_linter_name(type(linter).__name__)
         task_custom = concurrent_task_utils.create_task(
             linter.perform_all_lint_checks, verbose_mode_enabled,
-            custom_semaphore, name='custom')
+            custom_semaphore, name=name)
         tasks_custom.append(task_custom)
 
     for linter in third_party_linters:
+        name = _get_space_separated_linter_name(type(linter).__name__)
         task_third_party = concurrent_task_utils.create_task(
             linter.perform_all_lint_checks, verbose_mode_enabled,
-            third_party_semaphore, name='third_party')
+            third_party_semaphore, name=name)
         tasks_third_party.append(task_third_party)
 
     # Execute tasks.
@@ -547,14 +573,16 @@ def main(args=None):
 
     if failed:
         _print_summary_of_error_messages(lint_messages)
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('Checks Not Passed.')
-        python_utils.PRINT('---------------------------')
+        linter_utils.print_failure_message('\n'.join([
+            '---------------------------',
+            'Checks Not Passed.',
+            '---------------------------']))
         sys.exit(1)
     else:
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('All Checks Passed.')
-        python_utils.PRINT('---------------------------')
+        linter_utils.print_success_message('\n'.join([
+            '---------------------------',
+            'All Checks Passed.',
+            '---------------------------']))
 
 
 NAME_SPACE = multiprocessing.Manager().Namespace()

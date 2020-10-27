@@ -45,7 +45,7 @@ describe('Learner answer info backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
+      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
         'exp123', 'Introduction', 'TextInput', 'sample answer',
         'sample answer details').then(
         successHandler, failHandler);

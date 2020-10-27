@@ -52,6 +52,7 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration save and publish buttons component', function() {
   var ctrl = null;
@@ -68,6 +69,8 @@ describe('Exploration save and publish buttons component', function() {
   var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
