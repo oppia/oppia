@@ -50,8 +50,6 @@ current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
-MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
-
 
 def get_pending_deletion_request(user_id):
     """Return the pending deletion request.
@@ -69,8 +67,6 @@ def get_pending_deletion_request(user_id):
         pending_deletion_request_model.email,
         pending_deletion_request_model.role,
         pending_deletion_request_model.deletion_complete,
-        pending_deletion_request_model.exploration_ids,
-        pending_deletion_request_model.collection_ids,
         pending_deletion_request_model.pseudonymizable_entity_mappings
     )
 
@@ -105,8 +101,6 @@ def save_pending_deletion_requests(pending_deletion_requests):
             'email': deletion_request.email,
             'role': deletion_request.role,
             'deletion_complete': deletion_request.deletion_complete,
-            'exploration_ids': deletion_request.exploration_ids,
-            'collection_ids': deletion_request.collection_ids,
             'pseudonymizable_entity_mappings': (
                 deletion_request.pseudonymizable_entity_mappings)
         }
@@ -155,75 +149,12 @@ def pre_delete_user(user_id):
             wipeout_domain.PendingDeletionRequest.create_default(
                 profile_id,
                 profile_user_settings.email,
-                profile_user_settings.role,
-                [],
-                []
+                profile_user_settings.role
             )
         )
-    explorations_to_be_deleted_ids = []
-    collections_to_be_deleted_ids = []
     if user_settings.role != feconf.ROLE_ID_LEARNER:
-        subscribed_exploration_summaries = (
-            exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
-
-        explorations_to_be_deleted_ids = [
-            exp_summary.id for exp_summary in subscribed_exploration_summaries
-            if exp_summary.is_private() and
-            exp_summary.is_solely_owned_by_user(user_id)
-        ]
-        exp_services.delete_explorations(
-            user_id, explorations_to_be_deleted_ids)
-
-        # Release ownership of explorations that are public and are solely owned
-        # by the to-be-deleted user.
-        explorations_to_release_ownership_ids = [
-            exp_summary.id for exp_summary in subscribed_exploration_summaries
-            if not exp_summary.is_private() and
-            exp_summary.is_solely_owned_by_user(user_id)
-        ]
-        for exp_id in explorations_to_release_ownership_ids:
-            rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), exp_id)
-
-        explorations_to_remove_user_from_ids = [
-            exp_summary.id for exp_summary in subscribed_exploration_summaries
-            if not exp_summary.is_solely_owned_by_user(user_id)
-        ]
-        for exp_id in explorations_to_remove_user_from_ids:
-            rights_manager.deassign_role_for_exploration(
-                user_services.get_system_user(), exp_id, user_id)
-
-        subscribed_collection_summaries = (
-            collection_services.get_collection_summaries_subscribed_to(user_id))
-        collections_to_be_deleted_ids = [
-            col_summary.id for col_summary in subscribed_collection_summaries
-            if col_summary.is_private() and
-            col_summary.is_solely_owned_by_user(user_id)
-        ]
-        collection_services.delete_collections(
-            user_id, collections_to_be_deleted_ids)
-
-        # Release ownership of collections that are public and are solely owned
-        # by the to-be-deleted user.
-        collections_to_release_ownership_ids = [
-            col_summary.id for col_summary in subscribed_collection_summaries
-            if not col_summary.is_private() and
-            col_summary.is_solely_owned_by_user(user_id)
-        ]
-        for col_id in collections_to_release_ownership_ids:
-            rights_manager.release_ownership_of_collection(
-                user_services.get_system_user(), col_id)
-
-        collections_to_remove_user_from_ids = [
-            col_summary.id for col_summary in subscribed_collection_summaries
-            if not col_summary.is_solely_owned_by_user(user_id)
-        ]
-        for col_id in collections_to_remove_user_from_ids:
-            rights_manager.deassign_role_for_collection(
-                user_services.get_system_user(), col_id, user_id)
-
-        topic_services.deassign_user_from_all_topics(
-            user_services.get_system_user(), user_id)
+        _remove_user_from_activities_with_associated_rights_models(
+            user_id, True)
 
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
@@ -233,11 +164,7 @@ def pre_delete_user(user_id):
     user_services.mark_user_for_deletion(user_id)
     pending_deletion_requests.append(
         wipeout_domain.PendingDeletionRequest.create_default(
-            user_id,
-            user_settings.email,
-            user_settings.role,
-            explorations_to_be_deleted_ids,
-            collections_to_be_deleted_ids
+            user_id, user_settings.email, user_settings.role
         )
     )
 
@@ -320,7 +247,8 @@ def delete_user(pending_deletion_request):
     _delete_models(user_id, user_role, models.NAMES.feedback)
     _delete_models(user_id, user_role, models.NAMES.improvements)
     if user_role != feconf.ROLE_ID_LEARNER:
-        _hard_delete_explorations_and_collections(pending_deletion_request)
+        _remove_user_from_activities_with_associated_rights_models(
+            pending_deletion_request.user_id, False)
         _pseudonymize_feedback_models(pending_deletion_request)
         _pseudonymize_suggestion_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
@@ -417,22 +345,92 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
     return user_is_verified
 
 
-def _hard_delete_explorations_and_collections(pending_deletion_request):
-    """Hard delete the exploration and collection models that are private and
-    solely owned by the user.
+def _remove_user_from_activities_with_associated_rights_models(
+        user_id, use_user_subscriptions_ids):
+    """Remove the user from exploration, collection, and topic models.
 
     Args:
-        pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object for which to delete the explorations and collections.
+        user_id: str. The ID of the user for which to remove the user from
+            explorations, collections, and topics.
+        use_user_subscriptions_ids: bool. Whether to use the IDs from user's
+            UserSubscriptionsModel. When False the IDs are gathered via
+            datastore queries.
     """
+    if use_user_subscriptions_ids:
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
+    else:
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_where_user_has_role(user_id))
+
+    explorations_to_be_deleted_ids = [
+        exp_summary.id for exp_summary in subscribed_exploration_summaries if
+        exp_summary.is_private() and
+        exp_summary.is_solely_owned_by_user(user_id)
+    ]
     exp_services.delete_explorations(
-        pending_deletion_request.user_id,
-        pending_deletion_request.exploration_ids,
-        force_deletion=True)
+        user_id, explorations_to_be_deleted_ids, force_deletion=True)
+
+    # Release ownership of explorations that are public and are solely owned
+    # by the to-be-deleted user.
+    explorations_to_release_ownership_ids = [
+        exp_summary.id for exp_summary in subscribed_exploration_summaries if
+        not exp_summary.is_private() and
+        exp_summary.is_solely_owned_by_user(user_id) and
+        not exp_summary.community_owned
+    ]
+    for exp_id in explorations_to_release_ownership_ids:
+        rights_manager.release_ownership_of_exploration(
+            user_services.get_system_user(), exp_id)
+
+    explorations_to_remove_user_from_ids = [
+        exp_summary.id for exp_summary in subscribed_exploration_summaries if
+        not exp_summary.is_solely_owned_by_user(user_id) and
+        exp_summary.does_user_have_any_role(user_id)
+    ]
+    for exp_id in explorations_to_remove_user_from_ids:
+        rights_manager.deassign_role_for_exploration(
+            user_services.get_system_user(), exp_id, user_id)
+
+    if use_user_subscriptions_ids:
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_subscribed_to(user_id))
+    else:
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_where_user_has_role(
+                user_id))
+
+    collections_to_be_deleted_ids = [
+        col_summary.id for col_summary in subscribed_collection_summaries if
+        col_summary.is_private() and
+        col_summary.is_solely_owned_by_user(user_id)
+    ]
     collection_services.delete_collections(
-        pending_deletion_request.user_id,
-        pending_deletion_request.collection_ids,
-        force_deletion=True)
+        user_id, collections_to_be_deleted_ids, force_deletion=True)
+
+    # Release ownership of collections that are public and are solely owned
+    # by the to-be-deleted user.
+    collections_to_release_ownership_ids = [
+        col_summary.id for col_summary in subscribed_collection_summaries if
+        not col_summary.is_private() and
+        col_summary.is_solely_owned_by_user(user_id) and
+        not col_summary.community_owned
+    ]
+    for col_id in collections_to_release_ownership_ids:
+        rights_manager.release_ownership_of_collection(
+            user_services.get_system_user(), col_id)
+
+    collections_to_remove_user_from_ids = [
+        col_summary.id for col_summary in subscribed_collection_summaries if
+        not col_summary.is_solely_owned_by_user(user_id) and
+        col_summary.does_user_have_any_role(user_id)
+    ]
+    for col_id in collections_to_remove_user_from_ids:
+        rights_manager.deassign_role_for_collection(
+            user_services.get_system_user(), col_id, user_id)
+
+    topic_services.deassign_user_from_all_topics(
+        user_services.get_system_user(), user_id)
 
 
 def _generate_entity_to_pseudonymized_ids_mapping(entity_ids):
@@ -622,10 +620,11 @@ def _pseudonymize_config_models(pending_deletion_request):
         for i in python_utils.RANGE(
                 0,
                 len(config_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                config_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                config_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
             )
 
@@ -713,10 +712,11 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         for i in python_utils.RANGE(
                 0,
                 len(activity_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                activity_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                activity_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
 
 
@@ -899,10 +899,11 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         for i in python_utils.RANGE(
                 0,
                 len(activity_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                activity_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                activity_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
             )
 
@@ -944,10 +945,13 @@ def _remove_user_id_from_contributors_in_summary_models(
         datastore_services.put_multi(summary_models)
 
     for i in python_utils.RANGE(
-            0, len(related_summary_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            0,
+            len(related_summary_models),
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         transaction_services.run_in_transaction(
             _remove_user_id_from_models,
-            related_summary_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION])
+            related_summary_models[
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
 
 
 def _pseudonymize_feedback_models(pending_deletion_request):
@@ -1053,10 +1057,11 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         for i in python_utils.RANGE(
                 0,
                 len(feedback_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                feedback_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                feedback_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
 
 
@@ -1111,8 +1116,9 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),
-            MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         transaction_services.run_in_transaction(
             _pseudonymize_models,
-            voiceover_application_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION]
+            voiceover_application_models[
+                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
