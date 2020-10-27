@@ -541,6 +541,31 @@ def get_collection_summaries_subscribed_to(user_id):
     ]
 
 
+def get_collection_summaries_where_user_has_role(user_id):
+    """Returns a list of CollectionSummary domain objects where the user has
+    some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(CollectionSummary). List of CollectionSummary domain objects
+        where the user has some role.
+    """
+    col_summary_models = collection_models.CollectionSummaryModel.query(
+        datastore_services.any_of(
+            collection_models.CollectionSummaryModel.owner_ids == user_id,
+            collection_models.CollectionSummaryModel.editor_ids == user_id,
+            collection_models.CollectionSummaryModel.viewer_ids == user_id,
+            collection_models.CollectionSummaryModel.contributor_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_collection_summary_from_model(col_summary_model)
+        for col_summary_model in col_summary_models
+    ]
+
+
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.
@@ -997,8 +1022,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
         collection_rights.owner_ids, collection_rights.editor_ids,
         collection_rights.viewer_ids, contributor_ids, contributors_summary,
         collection.version, collection_model_node_count,
-        collection_model_created_on,
-        collection_model_last_updated
+        collection_model_created_on, collection_model_last_updated
     )
 
     return collection_summary

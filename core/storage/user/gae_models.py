@@ -41,11 +41,6 @@ class UserSettingsModel(base_models.BaseModel):
 
     # Attributes used for both full users and profile users.
 
-    # User id used to identify user by GAE. Is not required for now because we
-    # need to perform migration to fill this for existing users.
-    # TODO(#10178): Deprecate gae_id for UserSettingsModel once we have verified
-    # that UserAuthDetailsModels exists for every user.
-    gae_id = datastore_services.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = datastore_services.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
@@ -141,7 +136,6 @@ class UserSettingsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'email': base_models.EXPORT_POLICY.EXPORTED,
             'role': base_models.EXPORT_POLICY.EXPORTED,
             'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
@@ -2336,13 +2330,6 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     deletion_complete = (
         datastore_services.BooleanProperty(default=False, indexed=True))
 
-    # IDs of all the private explorations created by this user.
-    exploration_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
-    # IDs of all the private collections created by this user.
-    collection_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
-
     # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
     # is grouped under different key (e.g. config, feedback, story, skill,
     # question), the keys need to be from the core.platform.models.NAMES enum.
@@ -2379,8 +2366,6 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pseudonymizable_entity_mappings': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE

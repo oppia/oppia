@@ -14,8 +14,16 @@
     <p> <[$ctrl.classroomData.getTopicListIntro()]> </p>
   </div>
   <div class="oppia-topic-summary-tiles">
-    <div ng-repeat="topicSummary in $ctrl.classroomData.getTopicSummaries()" class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
-      <topic-summary-tile topic-summary="topicSummary" classroom-url-fragment="$ctrl.classroomUrlFragment">
+    <div ng-repeat="topicSummary in $ctrl.classroomData.getPublicTopicSummaries()" class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
+      <topic-summary-tile topic-summary="topicSummary"
+                          classroom-url-fragment="$ctrl.classroomUrlFragment"
+                          published="true">
+      </topic-summary-tile>
+    </div>
+    <div ng-repeat="topicSummary in $ctrl.classroomData.getPrivateTopicSummaries()" class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
+      <topic-summary-tile topic-summary="topicSummary"
+                          classroom-url-fragment="$ctrl.classroomUrlFragment"
+                          published="false">
       </topic-summary-tile>
     </div>
   </div>
