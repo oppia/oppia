@@ -49,18 +49,13 @@ export class AdminConfigTabBackendApiService {
     ).toPromise();
   }
 
-  revertConfigProperty(
-    configPropertyId: string):
-  Promise<void> {
+  revertConfigProperty(configPropertyId: string): Promise<void> {
     return this._revertConfigProperty(configPropertyId);
   }
-  saveConfigProperties(
-    newConfigPropertyValues: object):
-  Promise<void> {
-  return this._saveConfigProperties(newConfigPropertyValues);
+  saveConfigProperties(newConfigPropertyValues: object): Promise<void> {
+    return this._saveConfigProperties(newConfigPropertyValues);
   }
 }
-
 
 angular.module('oppia').factory(
   'AdminConfigTabBackendApiService', downgradeInjectable(
