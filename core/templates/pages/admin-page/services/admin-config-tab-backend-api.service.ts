@@ -29,8 +29,8 @@ export class AdminConfigTabBackendApiService {
     private http: HttpClient) {}
 
   private _revertConfigProperty(
-      configPropertyId: string):void {
-    this.http.put(
+      configPropertyId: string):Promise<void> {
+    return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL,
       {
         action: 'revert_config_property',
@@ -39,8 +39,8 @@ export class AdminConfigTabBackendApiService {
     ).toPromise();
   }
   private _saveConfigProperties(
-      newConfigPropertyValues: object):void {
-    this.http.put(
+      newConfigPropertyValues: object): Promise<void> {
+    return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL,
       {
         action: 'save_config_properties',
@@ -52,18 +52,12 @@ export class AdminConfigTabBackendApiService {
   revertConfigProperty(
     configPropertyId: string):
   Promise<void> {
-  return new Promise(() => {
-    this._revertConfigProperty(
-      configPropertyId);
-    });
+    return this._revertConfigProperty(configPropertyId);
   }
   saveConfigProperties(
     newConfigPropertyValues: object):
   Promise<void> {
-  return new Promise(() => {
-    this._saveConfigProperties(
-      newConfigPropertyValues);
-    });
+  return this._saveConfigProperties(newConfigPropertyValues);
   }
 }
 
