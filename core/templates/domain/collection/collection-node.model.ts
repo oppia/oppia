@@ -57,8 +57,7 @@ export class CollectionNode {
   }
 
   // Returns the title of the exploration represented by this collection node.
-  // This property is immutable. The value returned by this function is
-  // null if doesExplorationExist() returns false.
+  // This property is immutable.
   getExplorationTitle(): string {
     return this._explorationSummaryObject.title;
   }
@@ -70,8 +69,7 @@ export class CollectionNode {
   }
 
   // Returns whether the exploration referenced by this node is private and
-  // not published. This property is immutable. The value returned by this
-  // function is null if doesExplorationExist() returns false.
+  // not published. This property is immutable.
   isExplorationPrivate(): boolean {
     return this._explorationSummaryObject.status === (
       AppConstants.ACTIVITY_STATUS_PRIVATE);
