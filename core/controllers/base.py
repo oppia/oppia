@@ -268,7 +268,10 @@ class BaseHandler(webapp2.RequestHandler):
 
         try:
             # If this is a CSRF request and the user is not yet loaded produce
-            # an error.
+            # an error. The user might not be loaded due to an eventual
+            # consistency that does not guarantee that the UserAuthDetailsModel
+            # will be returned by a query even when we are sure that the model
+            # was added to the datastore. More info in #10951.
             if 'csrf' in self.request.uri and self.gae_id and not self.user_id:
                 raise self.UnauthorizedUserException('User details not found.')
 
