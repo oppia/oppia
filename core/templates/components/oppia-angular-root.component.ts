@@ -83,6 +83,7 @@ import { AnswerGroupObjectFactory } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
+import { AttributionService } from 'services/attribution.service';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
@@ -510,6 +511,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
   static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
+  static attributionService: AttributionService;
   static audioBarStatusService: AudioBarStatusService;
   static audioTranslationLanguageService: AudioTranslationLanguageService;
   static audioTranslationManagerService: AudioTranslationManagerService;
@@ -801,6 +803,7 @@ private answerGroupsCacheService: AnswerGroupsCacheService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
 private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
+private attributionService: AttributionService,
 private audioBarStatusService: AudioBarStatusService,
 private audioTranslationLanguageService: AudioTranslationLanguageService,
 private audioTranslationManagerService: AudioTranslationManagerService,
@@ -1102,6 +1105,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.answerStatsObjectFactory = (
       this.answerStatsObjectFactory);
     OppiaAngularRootComponent.appService = this.appService;
+    OppiaAngularRootComponent.attributionService = this.attributionService;
     OppiaAngularRootComponent.audioBarStatusService = (
       this.audioBarStatusService);
     OppiaAngularRootComponent.audioTranslationLanguageService = (

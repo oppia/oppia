@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
+import { AttributionService } from 'services/attribution.service';
 import { UrlService } from 'services/contextual/url.service';
 
 @Component({
@@ -31,7 +32,10 @@ import { UrlService } from 'services/contextual/url.service';
 export class AttributionGuideComponent implements OnInit {
   deviceUsedIsMobile: boolean = false;
   iframed: boolean = false;
+  generateAttibutionIsAllowed: boolean = false;
+  maskIsShown: boolean = false;
   constructor(
+    private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
     private urlService: UrlService
   ) {}
@@ -39,6 +43,18 @@ export class AttributionGuideComponent implements OnInit {
   ngOnInit(): void {
     this.deviceUsedIsMobile = this.browserCheckerService.isMobileDevice();
     this.iframed = this.urlService.isIframed();
+    this.generateAttibutionIsAllowed = (
+      this.attributionService.isGenerateAttributionAllowed());
+  }
+
+  showAttributionModal(): void {
+    this.attributionService.showAttributionModal();
+    this.maskIsShown = true;
+  }
+
+  hideAttributionModel(): void {
+    this.attributionService.hideAttributionModal();
+    this.maskIsShown = false;
   }
 }
 

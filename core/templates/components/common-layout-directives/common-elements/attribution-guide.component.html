@@ -5,12 +5,13 @@
     <a class="oppia-attribution-image-link" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
       <img alt="Creative Commons License" class="oppia-creative-commons-image" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
     </a><br>
-    <a class="oppia-attribution-link oppia-attribution-guide-text" href="/about#foundation" rel="noopener" target="_blank">Attribution Guide</a>
+    <a *ngIf="generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="#" (click)="showAttributionModal()">Generate Attribution</a>
+    <a *ngIf="!generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="/about#foundation" rel="noopener" target="_blank">Attribution Guide</a>
   </div>
+  <div *ngIf="maskIsShown" class="attribution-page-mask"></div>
 </div>
 <style>
-  .oppia-cc-icon a.oppia-attribution-image-link,
-  .oppia-cc-icon a.oppia-attribution-link {
+  .oppia-cc-icon a.oppia-attribution-image-link {
     text-decoration: none;
   }
   .oppia-cc-icon a.oppia-attribution-image-link:focus > img {
@@ -23,13 +24,11 @@
   }
   .oppia-attribution-guide .oppia-cc-icon {
     bottom: 50px;
-    opacity: 0.4;
     position: fixed;
     right: 25px;
   }
 
   .oppia-attribution-guide .oppia-cc-icon:hover {
-    opacity: 0.7;
     text-decoration: none;
   }
 
@@ -40,10 +39,20 @@
 
   .oppia-attribution-guide .oppia-creative-commons-image {
     border-width: 0;
-    height: 24px;
+    height: 31px;
   }
 
   .oppia-attribution-guide .oppia-attribution-guide-text {
+    color: #008080;
     font-size: 10px;
+    text-decoration: underline;
+  }
+
+  .oppia-attribution-guide .attribution-page-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
   }
 </style>
