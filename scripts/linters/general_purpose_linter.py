@@ -40,6 +40,7 @@ EXCLUDED_PATHS = (
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
+    'auth.json.enc',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (

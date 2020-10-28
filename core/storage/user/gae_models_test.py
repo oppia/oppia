@@ -2311,8 +2311,6 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE,
-            exploration_ids=[],
-            collection_ids=[],
         ).put()
 
     def test_get_deletion_policy(self):
