@@ -142,7 +142,7 @@ export class EditableCollectionBackendApiService {
     });
   }
 
-  fetchCollection(collectionId: string): Promise<Collection> {
+  async fetchCollectionAsync(collectionId: string): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this._fetchCollection(collectionId, resolve, reject);
     });
@@ -161,7 +161,7 @@ export class EditableCollectionBackendApiService {
    * cached within the CollectionBackendApiService to ensure the cache is
    * not out-of-date with any updates made by this backend API service.
    */
-  updateCollection(
+  async updateCollectionAsync(
       collectionId: string, collectionVersion: number,
       commitMessage: string,
       changeList: CollectionChange[]): Promise<Collection> {
