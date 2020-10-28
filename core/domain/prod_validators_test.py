@@ -2268,7 +2268,6 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -2415,7 +2414,6 @@ class ConfigPropertySnapshotContentModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.ConfigPropertySnapshotContentModel.get_by_id(
@@ -2524,7 +2522,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
-            gae_id='gae_' + self.sender_id,
             email=self.sender_email)
         self.sender_model.update_timestamps()
         self.sender_model.put()
@@ -2533,7 +2530,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.recipient_id = 'recipient'
         self.recipient_model = user_models.UserSettingsModel(
             id=self.recipient_id,
-            gae_id='gae_' + self.recipient_id,
             email=self.recipient_email)
         self.recipient_model.update_timestamps()
         self.recipient_model.put()
@@ -2675,7 +2671,6 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
-            gae_id='gae_' + self.sender_id,
             email=self.sender_email)
         self.sender_model.update_timestamps()
         self.sender_model.put()
@@ -2683,13 +2678,11 @@ class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.recipient_ids = ['recipient1', 'recipient2']
         self.recipient_model_1 = user_models.UserSettingsModel(
             id=self.recipient_ids[0],
-            gae_id='gae_' + self.recipient_ids[0],
             email='recipient1@email.com')
         self.recipient_model_1.update_timestamps()
         self.recipient_model_1.put()
         self.recipient_model_2 = user_models.UserSettingsModel(
             id=self.recipient_ids[1],
-            gae_id='gae_' + self.recipient_ids[1],
             email='recipient2@email.com')
         self.recipient_model_2.update_timestamps()
         self.recipient_model_2.put()
@@ -14177,10 +14170,6 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        self.save_new_valid_exploration('exp_id', self.user_id)
-        self.save_new_valid_collection(
-            'col_id', self.user_id, exploration_id='exp_id')
-
         user_services.update_user_role(
             self.user_id, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_actions = user_services.UserActionsInfo(self.user_id)
@@ -14254,58 +14243,6 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
                 'user settings of PendingDeletionRequestModel\', '
                 '[u\'Entity id %s: User settings model '
                 'is not marked as deleted\']]') % (self.model_instance.id)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_exploration_not_marked_deleted_failure(self):
-        exp = exp_models.ExplorationModel.get_by_id('exp_id')
-        exp.deleted = False
-        exp_models.ExplorationModel.update_timestamps_multi([exp])
-        exp_models.ExplorationModel.put_multi([exp])
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted exploration check '
-                'of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
-                'not marked as deleted"]]') % self.user_id]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_collection_not_marked_deleted_failure(self):
-        col = collection_models.CollectionModel.get_by_id('col_id')
-        col.deleted = False
-        collection_models.CollectionModel.update_timestamps_multi([col])
-        collection_models.CollectionModel.put_multi([col])
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted collection check '
-                'of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
-                'not marked as deleted"]]') % self.user_id]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_exploration_deleted_failure(self):
-        exp = exp_models.ExplorationModel.get_by_id('exp_id')
-        exp.delete(self.user_id, '', force_deletion=True)
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted exploration check '
-                'of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
-                'not marked as deleted"]]') % self.user_id]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_collection_deleted_failure(self):
-        col = collection_models.CollectionModel.get_by_id('col_id')
-        col.delete(self.user_id, '', force_deletion=True)
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted collection check '
-                'of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
-                'not marked as deleted"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -14390,7 +14327,7 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_existing_user_settings_model_failure(self):
         user_models.UserSettingsModel(
-            id=self.user_id, email='email@email.com', gae_id='gae_id').put()
+            id=self.user_id, email='email@email.com').put()
         expected_output = [
             (
                 '[u\'failed validation check for '
@@ -14470,7 +14407,6 @@ class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_not_same_id_as_user(self):
         user_models.UserSettingsModel(
             id=self.model_instance.id,
-            gae_id='224169184123',
             email='email@email.com',
             username='username').put()
 
@@ -14594,7 +14530,6 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
@@ -14741,7 +14676,6 @@ class PlatformParameterSnapshotContentModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.PlatformParameterSnapshotContentModel.get_by_id(
