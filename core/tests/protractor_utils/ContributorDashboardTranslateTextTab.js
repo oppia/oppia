@@ -44,7 +44,7 @@ var ContributorDashboardTranslateTextTab = function() {
       by.cssContainingText(
         '.protractor-test-language-selector-option',
         language
-      ))
+      ));
     await action.click('Test Language Selector Option', selectorOption);
   };
 
