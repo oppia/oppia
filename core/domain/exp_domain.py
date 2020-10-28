@@ -482,16 +482,17 @@ class StateVersionSpan(python_utils.OBJECT):
     raised to enforce this contract.
     """
 
-    def __init__(self, exp_version, state):
+    def __init__(self, exp_version, state_name, state):
         """Initializes a span for the given version of an exploration's state.
 
         Args:
             exp_version: int. The version the state corresponds to.
-            state: state_domain.State. The state as it appeared at the given
+            state_name: str. The name of the state at the given version.
+            state: state_domain.State. The structure of the state at the given
                 version.
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
-        self._version_snapshots = {exp_version: state}
+        self._version_snapshots = {exp_version: (state_name, state)}
         self._interaction_id = state.interaction.id
 
     def get_version(self, version):
@@ -503,7 +504,8 @@ class StateVersionSpan(python_utils.OBJECT):
         Returns:
             state_domain.State. The state as it appeared in the given version.
         """
-        return self._version_snapshots[version]
+        unused_state_name, state = self._version_snapshots[version]
+        return state
 
     def get_multi_versions(self, version_start, version_end):
         """Returns states for the given half-open range of exploration versions.
@@ -519,14 +521,15 @@ class StateVersionSpan(python_utils.OBJECT):
         version_range = python_utils.RANGE(
             max(self._version_start, version_start),
             min(self._version_end, version_end))
-        return [self._version_snapshots[v] for v in version_range]
+        return [self._version_snapshots[v][1] for v in version_range]
 
-    def extend_or_split(self, exp_version, state, exp_version_diff):
+    def extend_or_split(self, exp_version, state_name, state, exp_version_diff):
         """Extends span to include the given state's version if it is compatible
         with previous versions, otherwise split it into its own distinct span.
 
         Args:
             exp_version: int. The state's corresponding exploration version.
+            state_name: str. The state's name at the given version.
             state: state_domain.State. State's representation at given version.
             exp_version_diff: ExplorationVersionsDiff. The changes since the
                 last exploration version.
@@ -547,23 +550,23 @@ class StateVersionSpan(python_utils.OBJECT):
 
         prev_exp_version, prev_state_name = (
             exp_version - 1,
-            exp_version_diff.new_to_old_state_names.get(state.name, state.name))
+            exp_version_diff.new_to_old_state_names.get(state_name, state_name))
+        prev_snapshot_state_name, prev_snapshot_state = (
+            self._version_snapshots[prev_exp_version])
 
-        if self._version_snapshots[prev_exp_version].name != prev_state_name:
+        if prev_state_name != prev_snapshot_state_name:
             raise Exception(
-                'State does not map to its previous version (previous name of '
+                'State does not map to previous version (previous name of '
                 'state is different; input exploration diff thinks that the '
                 'previous name was %r, but this span thinks that the previous '
-                'name was %r)' % (
-                    self._version_snapshots[prev_exp_version].name,
-                    prev_state_name))
+                'name was %r)' % (prev_state_name, prev_snapshot_state_name))
 
         if self._interaction_id == state.interaction.id:
-            self._version_snapshots[exp_version] = state
+            self._version_snapshots[exp_version] = (state_name, state)
             self._version_end += 1
             return self
         else:
-            return StateVersionSpan(exp_version, state)
+            return StateVersionSpan(exp_version, state_name, state)
 
 
 class ExplorationStateHistory(python_utils.OBJECT):
@@ -582,7 +585,7 @@ class ExplorationStateHistory(python_utils.OBJECT):
         for exp, diff in python_utils.ZIP(exps, exp_version_diffs):
             for name, state in exp.states.items():
                 if name in diff.added_state_names:
-                    span = StateVersionSpan(exp.version, state)
+                    span = StateVersionSpan(exp.version, name, state)
                     self._state_spans_history[exp.version][name] = span
                 elif name not in diff.deleted_state_names:
                     prev_version, prev_name = (
@@ -590,7 +593,7 @@ class ExplorationStateHistory(python_utils.OBJECT):
                         diff.new_to_old_state_names.get(name, name))
                     span = self._state_spans_history[prev_version][prev_name]
                     self._state_spans_history[exp.version][name] = (
-                        span.extend_or_split(exp.version, state, diff))
+                        span.extend_or_split(exp.version, name, state, diff))
 
     def get_state_span(self, exp_version, state_name):
         """Returns the span of versions where the given state existed.
