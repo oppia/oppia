@@ -46,12 +46,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             subtopic_models.SubtopicPageModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            subtopic_models.SubtopicPageModel.has_reference_to_user_id(
-                'any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""

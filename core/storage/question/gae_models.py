@@ -85,8 +85,10 @@ class QuestionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question should be kept but the creator should be anonymized."""
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        """QuestionModel doesn't contain any data directly corresponding to
+        a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -100,19 +102,6 @@ class QuestionModel(base_models.VersionedModel):
             'inapplicable_skill_misconception_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether QuestionModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def _get_new_id(cls):
@@ -717,10 +706,10 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question summary should be kept but the creator should be
-        anonymized.
+        """QuestionSummaryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -737,17 +726,3 @@ class QuestionSummaryModel(base_models.BaseModel):
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether any existing QuestionSummaryModel refers to the given
-        user_id.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user_id.
-        """
-        return False

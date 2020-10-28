@@ -190,10 +190,10 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Skill opportunity is deleted only if the corresponding skill is not
-        public.
+        """SkillOpportunityModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -202,19 +202,6 @@ class SkillOpportunityModel(base_models.BaseModel):
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """SkillOpportunityModel doesn't reference any user_id directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-                should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):

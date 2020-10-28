@@ -48,11 +48,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            topic_models.TopicModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
@@ -167,11 +163,7 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -247,7 +239,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):

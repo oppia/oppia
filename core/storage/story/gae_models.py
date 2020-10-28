@@ -86,21 +86,9 @@ class StoryModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Story should be kept if the corresponding topic is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether StoryModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """StoryModel doesn't contain any data directly corresponding to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -246,23 +234,11 @@ class StorySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Story summary should be kept if the corresponding topic is
-        published.
+        """StorySummaryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether StorySummaryModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_export_policy(cls):

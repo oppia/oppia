@@ -44,11 +44,7 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            skill_models.SkillModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -76,11 +72,7 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_fetch_page(self):
         skill_models.SkillSummaryModel(

@@ -47,11 +47,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             question_models.QuestionModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            question_models.QuestionModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_question_empty_skill_id_list(self):
         state = state_domain.State.create_default_state('ABC')
@@ -722,19 +718,4 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             question_models.QuestionSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
-    def test_has_reference_to_user_id(self):
-        question_summary_model = question_models.QuestionSummaryModel(
-            id='question',
-            question_content='Question',
-            interaction_id='TextInput',
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_model_last_updated=datetime.datetime.utcnow()
-        )
-        question_summary_model.update_timestamps()
-        question_summary_model.put()
-
-        self.assertFalse(
-            question_models.QuestionSummaryModel
-            .has_reference_to_user_id('user_id_x'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)

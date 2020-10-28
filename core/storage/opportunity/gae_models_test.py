@@ -175,12 +175,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             opportunity_models.SkillOpportunityModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            opportunity_models.SkillOpportunityModel
-            .has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_skill_opportunities(self):
         results, cursor, more = (

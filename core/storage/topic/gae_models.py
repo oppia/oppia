@@ -110,21 +110,9 @@ class TopicModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Topic should be kept if it is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether TopicModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """TopicModel doesn't contain any data directly corresponding to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -320,21 +308,10 @@ class TopicSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Topic summary should be kept if associated topic is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether TopicSummaryModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """TopicSummaryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -417,8 +394,10 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Topic rights should be kept if associated topic is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        """TopicRightsModel contains data to pseudonymize corresponding
+        to a user: manager_ids field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
