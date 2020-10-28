@@ -24,7 +24,7 @@ import { CsrfTokenService } from
   'services/csrf-token.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
-import { EmailDashboardQuery } from
+import { EmailDashboardQuery, EmailDashboardQueryDict } from
   'domain/email-dashboard/email-dashboard-query.model';
 
 describe('Email Dashboard Services', () => {
@@ -51,19 +51,24 @@ describe('Email Dashboard Services', () => {
 
     it('should fetch correct data from backend',
       fakeAsync(() => {
-        var recentQueries = [
+        var recentQueriesDict: EmailDashboardQueryDict[] = [
           {
-            query: {
-              id: 'q123',
-              status: 'processing'
-            }
-          },
+            id: 'q123',
+            status: 'processing',
+            num_qualified_users: 0,
+            submitter_username: '',
+            created_on: ''
+          }
+          ,
           {
-            query: {
-              id: 'q456',
-              status: 'processing'
-            }
-          }].map(EmailDashboardQuery.createFromBackendDict);
+            id: 'q456',
+            status: 'processing',
+            num_qualified_users: 0,
+            submitter_username: '',
+            created_on: ''
+          }];
+        var recentQueries = recentQueriesDict.map(
+          EmailDashboardQuery.createFromQueryDict);
 
         emailDashboardDataService.getNextQueriesAsync();
 
@@ -71,7 +76,7 @@ describe('Email Dashboard Services', () => {
           req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
         expect(req.request.method).toEqual('GET');
         req.flush({
-          recent_queries: recentQueries,
+          recent_queries: recentQueriesDict,
           cursor: null
         });
 
@@ -94,10 +99,15 @@ describe('Email Dashboard Services', () => {
           editedAtLeastNExps: null,
           editedFewerThanNExps: null
         };
-        var queryData = EmailDashboardQuery.createFromQueryDict({
+        var queryDataDict = {
           id: 'qnew',
-          status: 'processing'
-        });
+          status: 'processing',
+          num_qualified_users: 0,
+          submitter_username: '',
+          created_on: ''
+        };
+        var queryData = EmailDashboardQuery.createFromQueryDict(
+          queryDataDict);
         var expectedQueries = [queryData];
 
         emailDashboardDataService.submitQueryAsync(data);
@@ -105,7 +115,7 @@ describe('Email Dashboard Services', () => {
         var req = httpTestingController.expectOne('/emaildashboarddatahandler');
         expect(req.request.method).toEqual('POST');
         req.flush({
-          query: queryData
+          query: queryDataDict
         });
 
         flushMicrotasks();
@@ -119,19 +129,32 @@ describe('Email Dashboard Services', () => {
       fakeAsync(() => {
         var recentQueries = [{
           id: 'q123',
-          status: 'processing'
+          status: 'processing',
+          num_qualified_users: 0,
+          submitter_username: '',
+          created_on: ''
         },
         {
           id: 'q456',
-          status: 'processing'
+          status: 'processing',
+          num_qualified_users: 0,
+          submitter_username: '',
+          created_on: ''
         }].map(EmailDashboardQuery.createFromQueryDict);
+
         var expectedQueries = [{
           id: 'q123',
-          status: 'completed'
+          status: 'completed',
+          num_qualified_users: 0,
+          submitter_username: '',
+          created_on: ''
         },
         {
           id: 'q456',
-          status: 'processing'
+          status: 'processing',
+          num_qualified_users: 0,
+          submitter_username: '',
+          created_on: ''
         }].map(EmailDashboardQuery.createFromQueryDict);
 
         emailDashboardDataService.getNextQueriesAsync();
@@ -142,11 +165,17 @@ describe('Email Dashboard Services', () => {
         req.flush({
           recent_queries: [{
             id: 'q123',
-            status: 'processing'
+            status: 'processing',
+            num_qualified_users: 0,
+            submitter_username: '',
+            created_on: ''
           },
           {
             id: 'q456',
-            status: 'processing'
+            status: 'processing',
+            num_qualified_users: 0,
+            submitter_username: '',
+            created_on: ''
           }],
           cursor: null
         });
@@ -168,7 +197,10 @@ describe('Email Dashboard Services', () => {
         req.flush({
           query: {
             id: 'q123',
-            status: 'completed'
+            status: 'completed',
+            num_qualified_users: 0,
+            submitter_username: '',
+            created_on: ''
           }
         });
 
@@ -212,7 +244,10 @@ describe('Email Dashboard Services', () => {
         for (var i = 0; i < 25; i++) {
           var queryData = {
             id: 'q' + i,
-            status: 'processing'
+            status: 'processing',
+            num_qualified_users: 0,
+            submitter_username: '',
+            created_on: ''
           };
 
           emailDashboardDataService.submitQueryAsync(data);
@@ -259,7 +294,10 @@ describe('Email Dashboard Services', () => {
         // Submit a new query.
         var queryData = {
           id: 'q25',
-          status: 'processing'
+          status: 'processing',
+          num_qualified_users: 0,
+          submitter_username: '',
+          created_on: ''
         };
 
         emailDashboardDataService.submitQueryAsync(data);
