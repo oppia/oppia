@@ -134,7 +134,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as a single unshared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @staticmethod
@@ -371,7 +371,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as a single unshared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
@@ -455,7 +455,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as a single unshared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
@@ -543,7 +543,9 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as multiple unshared instances, since a user
+        has multiple playthroughs associated with their account.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
@@ -681,7 +683,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as a single unshared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
@@ -762,7 +764,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as a single unshared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
@@ -921,7 +923,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as a single unshared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
@@ -1188,7 +1190,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as a single unshared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod
@@ -1337,7 +1339,9 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as multiple unshared instances since there are
+        multiple explorations (and corresponding data) relevant to a user.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @staticmethod
@@ -1710,7 +1714,9 @@ class StoryProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as multiple unshared instances since a user
+        can have multiple stories associated with their account.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
@@ -2402,7 +2408,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a single shared instance."""
+        """Model is exported as a single unshared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
 
     @classmethod

@@ -179,7 +179,15 @@ class BaseModel(datastore_services.Model):
 
     @staticmethod
     def get_export_method():
-        """Model does not contain user data."""
+        """This method should be implemented by subclasses.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
         raise NotImplementedError(
             'The get_export_method() method is missing from the '
             'derived class. It should be implemented in the derived class.')
