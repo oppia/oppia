@@ -17,6 +17,7 @@
  * tests.
  */
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var CollectionEditorPage = function() {
   var addExplorationButton = element(
