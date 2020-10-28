@@ -43,6 +43,7 @@ describe('Admin Config Tab Backend API service', () => {
       return Promise.resolve('sample-csrf-token');
     });
   });
+
   afterEach(() => {
     httpTestingController.verify();
   });

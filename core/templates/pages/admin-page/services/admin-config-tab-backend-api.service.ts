@@ -25,11 +25,9 @@ import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
    providedIn: 'root'
  })
 export class AdminConfigTabBackendApiService {
-  constructor(
-    private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-  private _revertConfigProperty(
-      configPropertyId: string):Promise<void> {
+  private _revertConfigProperty(configPropertyId: string):Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL,
       {
@@ -38,6 +36,7 @@ export class AdminConfigTabBackendApiService {
       }
     ).toPromise();
   }
+
   private _saveConfigProperties(
       newConfigPropertyValues: object): Promise<void> {
     return this.http.post<void>(
@@ -52,6 +51,7 @@ export class AdminConfigTabBackendApiService {
   revertConfigProperty(configPropertyId: string): Promise<void> {
     return this._revertConfigProperty(configPropertyId);
   }
+
   saveConfigProperties(newConfigPropertyValues: object): Promise<void> {
     return this._saveConfigProperties(newConfigPropertyValues);
   }
