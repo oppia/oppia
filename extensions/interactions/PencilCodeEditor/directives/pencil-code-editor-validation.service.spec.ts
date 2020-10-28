@@ -17,7 +17,7 @@
  */
 
 import { AnswerGroupObjectFactory } from
-'domain/exploration/AnswerGroupObjectFactory';
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -28,7 +28,7 @@ import { RuleObjectFactory, RuleInputs } from
   'domain/exploration/RuleObjectFactory';
 import { TestBed } from '@angular/core/testing';
 
-fdescribe('Pencil Code Editor Validation Service', () => {
+describe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService = null;
   let oof: OutcomeObjectFactory = null;
   let rof: RuleObjectFactory = null;
@@ -42,7 +42,7 @@ fdescribe('Pencil Code Editor Validation Service', () => {
     agof = TestBed.get(AnswerGroupObjectFactory);
   });
 
-  fit('should return empty list when feeback is given', () => {
+  it('should return empty list when feeback is given', () => {
     var customizationArgs = {
       initialCode: {
         value: ' Add the initial code snippet here.↵code is here'
@@ -51,7 +51,7 @@ fdescribe('Pencil Code Editor Validation Service', () => {
     expect(pcevs.getCustomizationArgsWarnings(customizationArgs)).toEqual([]);
   });
 
-  fit('should return error when no feedback is given', () => {
+  it('should return error when no feedback is given', () => {
     var statename = 'Introduction';
 
     var customizationArgs = {
@@ -96,7 +96,7 @@ fdescribe('Pencil Code Editor Validation Service', () => {
     ).toEqual(partialWarningsList);
   });
 
-  fit('should not return error when feedback is given', () => {
+  it('should not return error when feedback is given', () => {
     var statename = 'Introduction';
 
     var customizationArgs = {
@@ -126,7 +126,7 @@ fdescribe('Pencil Code Editor Validation Service', () => {
     ).toEqual([]);
   });
 
-  fit('should call getCustomizationArgsWarnings', () => {
+  it('should call getCustomizationArgsWarnings', () => {
     var statename = 'Introduction';
 
     var customizationArgs = {
