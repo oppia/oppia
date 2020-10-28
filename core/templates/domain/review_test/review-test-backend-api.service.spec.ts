@@ -62,7 +62,7 @@ describe('Review test backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      reviewTestBackendApiService.fetchReviewTestData('0').then(
+      reviewTestBackendApiService.fetchReviewTestDataAsync('0').then(
         successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
@@ -82,7 +82,7 @@ describe('Review test backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      reviewTestBackendApiService.fetchReviewTestData('0').then(
+      reviewTestBackendApiService.fetchReviewTestDataAsync('0').then(
         successHandler, failHandler);
 
       var req = httpTestingController.expectOne(

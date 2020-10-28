@@ -60,7 +60,8 @@ export class ReviewTestBackendApiService {
     });
   }
 
-  fetchReviewTestData(storyUrlFragment: string): Promise<ReviewTest> {
+  async fetchReviewTestDataAsync(storyUrlFragment: string)
+  : Promise<ReviewTest> {
     return this._fetchReviewTestDataAsync(storyUrlFragment);
   }
 }
