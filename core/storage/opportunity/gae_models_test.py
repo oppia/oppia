@@ -64,12 +64,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_all_translation_opportunities(self):
         results, cursor, more = (

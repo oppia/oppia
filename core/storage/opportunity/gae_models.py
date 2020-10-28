@@ -51,10 +51,10 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration opporturnity summary is deleted only if the corresponding
-        exploration is not public.
+        """ExplorationOpportunitySummaryModel doesn't contain any data directly
+        corresponding to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -74,20 +74,6 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             'need_voice_artist_in_language_codes':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """ExplorationOpportunitySummaryModel doesn't reference any user_id
-        directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-                should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_all_translation_opportunities(
