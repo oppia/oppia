@@ -2479,13 +2479,6 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     deletion_complete = (
         datastore_services.BooleanProperty(default=False, indexed=True))
 
-    # IDs of all the private explorations created by this user.
-    exploration_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
-    # IDs of all the private collections created by this user.
-    collection_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
-
     # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
     # is grouped under different key (e.g. config, feedback, story, skill,
     # question), the keys need to be from the core.platform.models.NAMES enum.
@@ -2530,8 +2523,6 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pseudonymizable_entity_mappings': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE

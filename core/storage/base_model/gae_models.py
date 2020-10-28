@@ -842,10 +842,19 @@ class VersionedModel(BaseModel):
                         model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
             versioned_models_keys = [model.key for model in versioned_models]
-            transaction_services.run_in_transaction(
-                datastore_services.delete_multi,
-                all_models_metadata_keys + all_models_content_keys +
-                versioned_models_keys)
+            all_models_keys = (
+                all_models_metadata_keys +
+                all_models_content_keys +
+                versioned_models_keys
+            )
+            for i in python_utils.RANGE(
+                    0,
+                    len(all_models_keys),
+                    feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                transaction_services.run_in_transaction(
+                    datastore_services.delete_multi,
+                    all_models_keys[
+                        i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
         else:
             for model in versioned_models:
                 model._require_not_marked_deleted()  # pylint: disable=protected-access

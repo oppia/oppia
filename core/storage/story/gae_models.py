@@ -76,7 +76,8 @@ class StoryModel(base_models.VersionedModel):
     url_fragment = (
         datastore_services.StringProperty(required=True, indexed=True))
     # The content of the meta tag in the Story viewer page.
-    meta_tag_content = datastore_services.StringProperty(indexed=True)
+    meta_tag_content = datastore_services.StringProperty(
+        indexed=True, default='')
 
     @staticmethod
     def get_deletion_policy():
