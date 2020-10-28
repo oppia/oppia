@@ -628,7 +628,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as multiple unshared instances."""
+        """Model is exported as multiple unshared instances since there are
+        multiple voiceover applications relevant to a user.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod

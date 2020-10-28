@@ -95,7 +95,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as multiple unshared instances."""
+        """Model is exported as multiple unshared instances since there
+        are multiple feedback threads relevant to a particular user.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
@@ -273,7 +275,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as multiple unshared instances."""
+        """Model is exported as multiple unshared instances since there are
+        multiple feedback messages relevant to a user.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
@@ -561,7 +565,9 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as multiple unshared instances."""
+        """Model is exported as unshared instances since there are multiple
+        feedback threads relevant to a user.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod

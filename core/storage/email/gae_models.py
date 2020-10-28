@@ -415,7 +415,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a multiple unshared instances."""
+        """Model is exported as multiple unshared instance."""
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
@@ -575,7 +575,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """(Takeout) Export GeneralFeedbackEmailReplyToIdModel's user data.
+        """(Takeout) Export FeedbackEmailReplyToIdModel's user data.
 
         Args:
             user_id: str. The user_id denotes which user's data to extract.

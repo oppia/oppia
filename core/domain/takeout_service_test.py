@@ -911,7 +911,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expected_images, observed_images)
 
     def test_exports_follow_export_policies(self):
-        """Nontrivial test to ensure that all fields that should be exported
+        """Test to ensure that all fields that should be exported
         per the export policy are exported, and exported in the proper format.
         """
         self.set_up_non_trivial()
@@ -956,14 +956,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         for model in all_models:
             export_method = model.get_export_method()
             export_policy = model.get_export_policy()
-            export_exceptions = model.get_export_policy_exceptions()
+            renamed_export_keys = model.get_export_policy_exceptions()
             exported_property_names = []
             for property_name in model._properties: # pylint: disable=protected-access
                 if (export_policy[property_name] ==
                         base_models.EXPORT_POLICY.EXPORTED):
-                    if property_name in export_exceptions:
+                    if property_name in renamed_export_keys:
                         exported_property_names.append(
-                            export_exceptions[property_name]
+                            renamed_export_keys[property_name]
                         )
                     else:
                         exported_property_names.append(property_name)
@@ -997,7 +997,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES):
                 exported_data = model.export_data(self.USER_ID_1)
 
-                # Retrieve the first ID.
                 for model_id in exported_data.keys():
                     self.assertEqual(
                         sorted([

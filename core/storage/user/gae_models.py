@@ -136,7 +136,7 @@ class UserSettingsModel(base_models.BaseModel):
     def get_export_method():
         """Model is exported as a single shared instance."""
         return base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE
-    
+
     @staticmethod
     def get_export_policy_exceptions():
         """Export renames some time related fields to clearly indicate that
@@ -1339,7 +1339,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     def get_export_method():
         """Model is exported as a single shared instance."""
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
-    
+
     @staticmethod
     def get_export_policy_exceptions():
         """Fields are renamed to clarify that they represent the time in
@@ -1530,7 +1530,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a multiple unshared instances."""
+        """Model is exported as multiple unshared instance."""
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
@@ -2065,7 +2065,9 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as multiple unshared instances."""
+        """Model is exported as multiple unshared instances since a user has
+        many relevant skill masteries.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
@@ -2164,7 +2166,9 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as multiple unshared instances."""
+        """Model is exported as multiple unshared instances since a user has
+        multiple relevant contribution proficiencies.
+        """
         return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
 
     @classmethod
