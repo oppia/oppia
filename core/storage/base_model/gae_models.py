@@ -181,9 +181,6 @@ class BaseModel(datastore_services.Model):
     def get_export_method():
         """This method should be implemented by subclasses.
 
-        Args:
-            user_id: str. The ID of the user whose data should be exported.
-
         Raises:
             NotImplementedError. The method is not overwritten in a derived
                 class.
