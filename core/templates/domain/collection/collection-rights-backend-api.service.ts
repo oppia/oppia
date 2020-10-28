@@ -111,8 +111,8 @@ export class CollectionRightsBackendApiService {
   /**
    * Gets a collection's rights, given its ID.
    */
-  async fetchCollectionRightsAsync(collectionId: string)
-  : Promise<CollectionRights> {
+  async fetchCollectionRightsAsync(collectionId: string):
+   Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._fetchCollectionRights(collectionId, resolve, reject);
     });
