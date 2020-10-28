@@ -56,7 +56,8 @@ angular.module('oppia').directive('explorationFooter', [
               ExplorationSummaryBackendApiService
                 .loadPublicAndPrivateExplorationSummaries([
                   $scope.explorationId])
-                .then(function(summaries) {
+                .then(function(responseObject) {
+                  var summaries = responseObject.summaries;
                   if (summaries.length > 0) {
                     var contributorSummary = (
                       summaries[0].human_readable_contributors_summary);
@@ -71,6 +72,7 @@ angular.module('oppia').directive('explorationFooter', [
                         })
                     );
                   }
+                  $scope.$applyAsync();
                 });
             }
           };

@@ -121,6 +121,8 @@ import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOn
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionObjectFactory } from 'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
 import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageContentsObjectFactory';
@@ -361,11 +363,13 @@ export const angularServices: [string, unknown][] = [
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
+  ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationDiffService', ExplorationDiffService],
   ['ExplorationFeaturesBackendApiService',
     ExplorationFeaturesBackendApiService],
   ['ExplorationFeaturesService', ExplorationFeaturesService],
   ['ExplorationHtmlFormatterService', ExplorationHtmlFormatterService],
+  ['ExplorationIdValidationService', ExplorationIdValidationService],
   ['ExplorationImprovementsBackendApiService',
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsTaskRegistryService',
