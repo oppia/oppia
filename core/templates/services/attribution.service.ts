@@ -39,6 +39,10 @@ export class AttributionService {
   hideAttributionModal(): void {
     this.attributionModalIsShown = false;
   }
+
+  getAttributionInPrint(): void {
+    
+  }
 }
 
 angular.module('oppia').factory(

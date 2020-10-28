@@ -52,9 +52,25 @@ export class AttributionGuideComponent implements OnInit {
     this.maskIsShown = true;
   }
 
-  hideAttributionModel(): void {
+  hideAttributionModal(): void {
     this.attributionService.hideAttributionModal();
     this.maskIsShown = false;
+  }
+
+  getPageUrl(): string {
+    return this.urlService.getCurrentLocation().href;
+  }
+
+  copyAttributionHtml(): void {
+    const codeDiv = document.getElementsByClassName('attribution-html-code')[0];
+    const range = document.createRange();
+    range.setStartBefore((<HTMLDivElement>codeDiv).firstChild);
+    range.setEndAfter((<HTMLDivElement>codeDiv).lastChild);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.execCommand('copy');
+    selection.removeAllRanges();
   }
 }
 
