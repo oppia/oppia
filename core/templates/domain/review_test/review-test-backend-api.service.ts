@@ -58,7 +58,6 @@ export class ReviewTestBackendApiService {
       throw new Error(errorResponse.error.error);
     });
   }
-  
   async fetchReviewTestDataAsync(storyUrlFragment: string):
     Promise<ReviewTest> {
     return this._fetchReviewTestDataAsync(storyUrlFragment);
