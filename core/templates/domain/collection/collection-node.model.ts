@@ -39,7 +39,7 @@ export class CollectionNode {
 
   static create(
       collectionNodeBackendObject: CollectionNodeBackendDict):
-    CollectionNode {
+      CollectionNode {
     return new CollectionNode(collectionNodeBackendObject);
   }
 
