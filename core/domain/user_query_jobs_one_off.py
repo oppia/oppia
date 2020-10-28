@@ -105,6 +105,11 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if not query_criteria_satisfied:
             return
 
+        email_preferences = user_services.get_email_preferences(user_id)
+
+        if not email_preferences.can_receive_email_updates:
+            return
+
         yield (query_id, user_id)
 
     @staticmethod

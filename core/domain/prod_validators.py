@@ -4627,6 +4627,8 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
 class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
     """Class for validating UserQueryModels."""
 
+    NINE_WEEKS = datetime.timedelta(weeks=9)
+
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
@@ -4720,8 +4722,25 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
                             item.id, recipient_user_ids[index]))
 
     @classmethod
+    def _validate_old_models_are_deleted(cls, item):
+        """
+        """
+        date_nine_weeks_ago = (
+            datetime.datetime.utcnow() - UserQueryModelValidator.NINE_WEEKS)
+        if item.last_updated < date_nine_weeks_ago:
+            cls._add_error(
+                'entity %s' % (
+                    base_model_validators.ERROR_CATEGORY_STALE_CHECK),
+                'Entity id %s: model older than 9 weeks' % (item.id))
+
+
+    @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_sender_and_recipient_ids]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_old_models_are_deleted]
 
 
 class UserBulkEmailsModelValidator(
@@ -4817,8 +4836,7 @@ class UserSkillMasteryModelValidator(
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_skill_mastery]
+        return [cls._validate_skill_mastery]
 
 
 class UserContributionProficiencyModelValidator(

@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import logging
 
 from core import jobs
@@ -228,6 +229,28 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
             cron_services.JobModelsCleanupManager.enqueue(
                 cron_services.JobModelsCleanupManager.create_new())
             logging.warning('Deletion jobs for JobModels entities kicked off.')
+
+
+class CronModelsCleanupHandler(base.BaseHandler):
+    """Handler for cleaning up models that are marked as deleted."""
+
+    EIGHT_WEEKS = datetime.timedelta(weeks=8)
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Cron handler that every week hard deletes all models that are marked
+        as deleted (have deleted field set to True) and were last_updated more
+        than eight months ago.
+        """
+        date_eight_weeks_ago = (
+            datetime.datetime.utcnow() - CronModelsCleanupHandler.EIGHT_WEEKS)
+        for model_class in models.Registry.get_all_storage_model_classes():
+            models_ = model_class.query(model_class.deleted == True).fetch()
+            models_to_delete = [
+                for model in models_
+                if model.last_updated < date_eight_weeks_ago
+            ]
+            model_class.delete_multi(models_to_delete)
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandler(
