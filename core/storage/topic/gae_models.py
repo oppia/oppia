@@ -504,7 +504,9 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a shared instance."""
+        """Model is exported as a shared instance since multiple users
+        contribute to topics and their rights.
+        """
         return base_models.EXPORT_METHOD.SHARED_INSTANCE
 
     @classmethod

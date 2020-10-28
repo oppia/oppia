@@ -348,7 +348,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a shared instance."""
+        """Model is exported as a shared instance since multiple users
+        contribute to an exploration and have varying rights.
+        """
         return base_models.EXPORT_METHOD.SHARED_INSTANCE
 
     @classmethod

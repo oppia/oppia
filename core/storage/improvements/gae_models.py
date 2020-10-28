@@ -134,7 +134,9 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_method():
-        """Model is exported as a shared instance."""
+        """Model is exported as a shared instance since multiple users
+        resolve tasks.
+        """
         return base_models.EXPORT_METHOD.SHARED_INSTANCE
 
     @classmethod
