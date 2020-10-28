@@ -138,13 +138,6 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     subtopic_page_id = (
         datastore_services.StringProperty(indexed=True, required=True))
 
-    @staticmethod
-    def get_deletion_policy():
-        """Subtopic page commit log is deleted only if the corresponding
-        topic is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
     @classmethod
     def _get_instance_id(cls, subtopic_page_id, version):
         """This function returns the generated id for the get_commit function

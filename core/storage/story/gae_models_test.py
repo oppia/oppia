@@ -104,11 +104,6 @@ class StoryModelTest(test_utils.GenericTestBase):
 class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the StoryCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            story_models.StoryCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
     def test_has_reference_to_user_id(self):
         commit = story_models.StoryCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],

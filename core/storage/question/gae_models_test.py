@@ -701,11 +701,6 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            question_models.QuestionCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
     def test_has_reference_to_user_id(self):
         commit = question_models.QuestionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],

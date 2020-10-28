@@ -234,13 +234,6 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the topic being edited.
     topic_id = datastore_services.StringProperty(indexed=True, required=True)
 
-    @staticmethod
-    def get_deletion_policy():
-        """Topic commit log is deleted only if the correspondingm topic is not
-        public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
     @classmethod
     def _get_instance_id(cls, topic_id, version):
         """This function returns the generated id for the get_commit function

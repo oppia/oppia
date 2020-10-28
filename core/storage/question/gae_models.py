@@ -655,13 +655,6 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the question being edited.
     question_id = datastore_services.StringProperty(indexed=True, required=True)
 
-    @staticmethod
-    def get_deletion_policy():
-        """Question commit log is deleted only if the corresponding collection
-        is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
     @classmethod
     def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of

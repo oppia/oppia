@@ -183,13 +183,6 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the skill being edited.
     skill_id = datastore_services.StringProperty(indexed=True, required=True)
 
-    @staticmethod
-    def get_deletion_policy():
-        """Skill commit log is deleted only if the corresponding collection
-        is not public.
-        """
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-
     @classmethod
     def _get_instance_id(cls, skill_id, version):
         """This function returns the generated id for the get_commit function

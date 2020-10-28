@@ -126,11 +126,6 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the TopicCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            topic_models.TopicCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
     def test_has_reference_to_user_id(self):
         commit = topic_models.TopicCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],

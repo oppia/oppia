@@ -419,6 +419,13 @@ class BaseCommitLogEntryModel(BaseModel):
     # The version number of the model after this commit.
     version = datastore_services.IntegerProperty()
 
+    @staticmethod
+    def get_deletion_policy():
+        """BaseCommitLogEntryModel contain data to pseudonymize corresponding to
+        a user: user_id field.
+        """
+        return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def get_export_policy(cls):
         """The history of commits is not relevant for the purposes of

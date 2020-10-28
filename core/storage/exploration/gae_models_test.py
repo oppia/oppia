@@ -470,12 +470,6 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            exp_models.ExplorationCommitLogEntryModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
     def test_has_reference_to_user_id(self):
         commit = exp_models.ExplorationCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],

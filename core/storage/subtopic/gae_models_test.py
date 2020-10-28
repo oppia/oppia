@@ -93,12 +93,6 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            subtopic_models.SubtopicPageCommitLogEntryModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
     def test_has_reference_to_user_id(self):
         commit = subtopic_models.SubtopicPageCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],

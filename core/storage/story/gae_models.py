@@ -178,13 +178,6 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the story being edited.
     story_id = datastore_services.StringProperty(indexed=True, required=True)
 
-    @staticmethod
-    def get_deletion_policy():
-        """Story commit log is deleted only if the corresponding collection
-        is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
     @classmethod
     def _get_instance_id(cls, story_id, version):
         """This function returns the generated id for the get_commit function

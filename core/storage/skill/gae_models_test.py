@@ -54,11 +54,6 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the SkillCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            skill_models.SkillCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
     def test_has_reference_to_user_id(self):
         commit = skill_models.SkillCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],

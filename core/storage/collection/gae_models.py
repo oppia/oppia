@@ -511,13 +511,6 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     collection_id = (
         datastore_services.StringProperty(indexed=True, required=True))
 
-    @staticmethod
-    def get_deletion_policy():
-        """Collection commit log is deleted only if the corresponding collection
-        is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
     @classmethod
     def get_export_policy(cls):
         """The history of commits is not relevant for the purposes of
