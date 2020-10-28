@@ -27,6 +27,10 @@ describe('Promo bar backend api service', () => {
   let promoBarBackendApiService:
     PromoBarBackendApiService = null;
   let httpTestingController: HttpTestingController;
+  let promoBarData = {
+    promoBarEnabled: true,
+    promoBarMessage: 'test message'
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -50,9 +54,9 @@ describe('Promo bar backend api service', () => {
       promoBarBackendApiService.getPromoBarData()
         .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/promo_bar_handler', {});
+      var req = httpTestingController.expectOne('/promo_bar_handler');
       expect(req.request.method).toEqual('GET');
-      req.flush();
+      req.flush(promoBarData);
 
       flushMicrotasks();
 

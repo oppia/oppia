@@ -278,7 +278,7 @@
 /core/templates/services/local-storage.service*.ts @srijanreddy98
 /core/templates/services/nested-directives*.ts @srijanreddy98
 /core/templates/services/page-title.service*.ts @srijanreddy98
-/core/templates/services/promo-bar.service*.ts @srijanreddy98
+/core/templates/services/promo-bar-backend-api.service*.ts @srijanreddy98
 /core/templates/services/site-analytics.service*.ts @srijanreddy98
 /core/templates/services/utils.service*.ts @srijanreddy98
 /core/templates/services/stateful/background-mask.service*.ts @srijanreddy98

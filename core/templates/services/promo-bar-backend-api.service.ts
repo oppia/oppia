@@ -30,29 +30,30 @@ export interface PromoBarData {
   providedIn: 'root'
 })
 export class PromoBarBackendApiService {
-
   constructor(
-    private http: HttpClient) {}
-    
-  getPromoBarData(): PromoBarData {
+    private http: HttpClient) { }
+  getPromoBarData(): Promise<PromoBarData> {
     var promoBarData = {
       promoBarEnabled: false,
       promoBarMessage: ''
     };
-    
     if (ServicesConstants.ENABLE_PROMO_BAR) {
-      this.http.get<PromoBarData>(
-        ServicesConstants.PROMO_BAR_URL, {}
-      ).toPromise().then(response => {
-        promoBarData.promoBarEnabled = response.data.promo_bar_enabled,
-        promoBarData.promoBarMessage = response.data.promo_bar_message
-      }, errorResponse => {
-        throw new Error(errorResponse.error.error);
+      return new Promise((resolve, reject) => {
+        this.http.get<PromoBarData>(
+          ServicesConstants.PROMO_BAR_URL, {}
+        ).toPromise().then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+      });
+    } else {
+      return new Promise((resolve, reject) => {
+        resolve(promoBarData);
       });
     }
-    return promoBarData;
   }
-}  
+}
 
 angular.module('oppia').factory(
   'PromoBarBackendApiService',

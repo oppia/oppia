@@ -246,7 +246,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'profile-link-text.component.ts',
     'progress-nav.directive.ts',
     'promo-bar.directive.ts',
-    'promo-bar.service.ts',
+    'promo-bar-backend-api.service.ts',
     'python-program.tokenizer.ts',
     'question-difficulty-selector.directive.ts',
     'question-editor.directive.ts',
