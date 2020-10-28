@@ -191,11 +191,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': None,
             'normalized_username': None,
-            'last_agreed_to_terms': None,
-            'last_started_state_editor_tutorial': None,
-            'last_started_state_translation_tutorial': None,
-            'last_logged_in': None,
-            'last_edited_an_exploration': None,
+            'last_agreed_to_terms_msec': None,
+            'last_started_state_editor_tutorial_msec': None,
+            'last_started_state_translation_tutorial_msec': None,
+            'last_logged_in_msec': None,
+            'last_edited_an_exploration_msec': None,
+            'last_created_an_exploration': None,
             'profile_picture_data_url': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -218,11 +219,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_EPOCH,
-            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
-            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
-            'last_logged_in': self.GENERIC_EPOCH,
-            'last_edited_an_exploration': self.GENERIC_EPOCH,
+            'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial_msec': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial_msec': self.GENERIC_EPOCH,
+            'last_logged_in_msec': self.GENERIC_EPOCH,
+            'last_edited_an_exploration_msec': self.GENERIC_EPOCH,
+            'last_created_an_exploration_msec': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -902,7 +904,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'collection_ids': [],
             'activity_ids': [],
             'general_feedback_thread_ids': [],
-            'last_checked': None
+            'last_checked_msec': None
         }
         self.assertEqual(user_data, test_data)
 
@@ -915,7 +917,8 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked': utils.get_time_in_millisecs(self.GENERIC_DATETIME)
+            'last_checked_msec':
+                utils.get_time_in_millisecs(self.GENERIC_DATETIME)
         }
         self.assertEqual(user_data, test_data)
 
@@ -1291,9 +1294,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_EPOCH,
+                'rated_on_msec': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1325,7 +1328,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                 'rating': 2,
                 'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1337,7 +1340,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                 'rating': None,
                 'rated_on': None,
                 'draft_change_list': None,
-                'draft_change_list_last_updated': None,
+                'draft_change_list_last_updated_msec': None,
                 'draft_change_list_exp_version': None,
                 'draft_change_list_id': 0,
                 'mute_suggestion_notifications': (
@@ -1349,7 +1352,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                 'rating': 5,
                 'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {'content': 3}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 2,
                 'draft_change_list_id': 2,
                 'mute_suggestion_notifications': (

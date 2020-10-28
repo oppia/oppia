@@ -1042,9 +1042,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_exploration_data = {
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
-                'rated_on': self.GENERIC_EPOCH,
+                'rated_on_msec': self.GENERIC_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.GENERIC_EPOCH,
+                'draft_change_list_last_updated_msec': self.GENERIC_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
