@@ -295,7 +295,7 @@ var getImageSource = async function(customImageElement) {
 };
 
 var uploadImage = async function(
-  imageClickableElement, imgPath, resetExistingImage) {
+    imageClickableElement, imgPath, resetExistingImage) {
   await action.click('imageClickableElement', imageClickableElement);
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
