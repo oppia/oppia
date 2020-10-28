@@ -35,7 +35,12 @@ class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """StorySnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class StoryModel(base_models.VersionedModel):

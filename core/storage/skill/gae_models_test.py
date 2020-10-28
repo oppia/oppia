@@ -30,6 +30,14 @@ import python_utils
     [models.NAMES.base_model, models.NAMES.skill])
 
 
+class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            skill_models.SkillSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class SkillModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillModel class."""
 

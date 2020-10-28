@@ -1258,25 +1258,6 @@ class BaseSnapshotContentModel(BaseModel):
     # The snapshot content, as a JSON blob.
     content = datastore_services.JsonProperty(indexed=False)
 
-    @staticmethod
-    def get_deletion_policy():
-        """The content models do not contain any user ID fields directly,
-        the user ID fields might be hidden inside the content field (because
-        content field contains all the fields from the parent model), e.g. the
-        owner_ids or viewer_ids in the ExplorationRightsModel that are then in
-        the content field of ExplorationRightsSnapshotContentModel.
-
-        The pseudonymization of these models is handled in the wipeout service
-        (in the relevant pseudonymization function, e.g. in
-        _pseudonymize_activity_models_with_associated_rights_models() for
-        CollectionRightsModel or ExplorationRightsModel), based on
-        the content_user_ids field of the relevant metadata model.
-        E.g. the content_user_ids in ExplorationRightsSnapshotMetadataModel are
-        used to pseudonymize the relevant fields in the corresponding
-        ExplorationRightsSnapshotContentModel.
-        """
-        return DELETION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_export_policy(cls):
         """The contents of snapshots are not relevant to the user for

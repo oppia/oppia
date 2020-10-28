@@ -40,7 +40,11 @@ class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """CollectionSnapshotContentModel doesn't contain any data directly
+        corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class CollectionModel(base_models.VersionedModel):
@@ -203,7 +207,35 @@ class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """CollectionRightsSnapshotContentModel contains data corresponding to
+        a user: inside the content field there are owner_ids, editor_ids,
+        voice_artist_ids, and viewer_ids fields.
+
+        The pseudonymization of this model is handled in the wipeout_service
+        in the _pseudonymize_activity_models_with_associated_rights_models(),
+        based on the content_user_ids field of the
+        CollectionRightsSnapshotMetadataModel.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionRightsSnapshotContentModel references
+        the given user. The owner_ids, editor_ids, voice_artist_ids,
+        and viewer_ids fields are checked through content_user_ids field in
+        the CollectionRightsSnapshotMetadataModel.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return CollectionRightsSnapshotMetadataModel.query(
+            CollectionRightsSnapshotMetadataModel.content_user_ids == user_id
+        ).get(keys_only=True) is not None
 
 
 class CollectionRightsModel(base_models.VersionedModel):

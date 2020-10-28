@@ -34,6 +34,15 @@ import feconf
     [models.NAMES.base_model, models.NAMES.collection, models.NAMES.user])
 
 
+class CollectionSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            collection_models.CollectionSnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class CollectionModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionModel class."""
 
@@ -56,6 +65,48 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         num_collections = (
             collection_models.CollectionModel.get_collection_count())
         self.assertEqual(num_collections, 1)
+
+
+class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    COLLECTION_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
+
+    def test_get_deletion_policy_is_locally_pseudonymize(self):
+        self.assertEqual(
+            collection_models.CollectionRightsSnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self):
+        collection_models.CollectionRightsModel(
+            id=self.COLLECTION_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.1
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new collection right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+        self.assertTrue(
+            collection_models.CollectionRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            collection_models.CollectionRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_2))
+        self.assertFalse(
+            collection_models.CollectionRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
+        self.assertFalse(
+            collection_models.CollectionRightsSnapshotContentModel
+            .has_reference_to_user_id('x_id'))
 
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):

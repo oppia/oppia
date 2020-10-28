@@ -42,7 +42,12 @@ class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """QuestionSnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class QuestionModel(base_models.VersionedModel):

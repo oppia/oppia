@@ -30,6 +30,14 @@ import feconf
     [models.NAMES.base_model, models.NAMES.topic, models.NAMES.user])
 
 
+class TopicSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            topic_models.TopicSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class TopicModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicModel class."""
 
@@ -169,6 +177,40 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
+
+
+class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    TOPIC_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
+
+    def test_get_deletion_policy_is_locally_pseudonymize(self):
+        self.assertEqual(
+            topic_models.TopicRightsSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self):
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_ID_1,
+            manager_ids=[self.USER_ID_1, self.USER_ID_2],
+        ).commit(
+            self.USER_ID_COMMITTER, 'Created new topic right',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
+        self.assertTrue(
+            topic_models.TopicRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            topic_models.TopicRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_2))
+        self.assertFalse(
+            topic_models.TopicRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
+        self.assertFalse(
+            topic_models.TopicRightsSnapshotContentModel
+            .has_reference_to_user_id('x_id'))
 
 
 class TopicRightsModelUnitTests(test_utils.GenericTestBase):

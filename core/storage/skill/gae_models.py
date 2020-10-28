@@ -35,7 +35,11 @@ class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """SkillSnapshotContentModel doesn't contain any data directly
+        corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class SkillModel(base_models.VersionedModel):

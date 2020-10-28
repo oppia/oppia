@@ -33,6 +33,14 @@ import utils
     [models.NAMES.base_model, models.NAMES.question])
 
 
+class QuestionSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            question_models.QuestionSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class QuestionModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionModel class."""
 

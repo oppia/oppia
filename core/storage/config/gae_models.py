@@ -35,7 +35,12 @@ class ConfigPropertySnapshotMetadataModel(
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """ConfigPropertySnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class ConfigPropertyModel(base_models.VersionedModel):
@@ -77,7 +82,12 @@ class PlatformParameterSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content for a platform parameter snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """PlatformParameterSnapshotContentModel doesn't contain any data
+        directly corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class PlatformParameterModel(base_models.VersionedModel):

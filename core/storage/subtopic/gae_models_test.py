@@ -29,6 +29,15 @@ import feconf
     models.NAMES.base_model, models.NAMES.subtopic])
 
 
+class SubtopicPageSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            subtopic_models.SubtopicPageSnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""
 

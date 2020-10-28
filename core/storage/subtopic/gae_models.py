@@ -35,7 +35,12 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """SubtopicPageSnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class SubtopicPageModel(base_models.VersionedModel):
