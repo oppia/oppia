@@ -169,8 +169,7 @@ angular.module('oppia').component('signupPage', {
           $window.location.href = decodeURIComponent(
             UrlService.getUrlParams().return_url);
         }, function(rejection) {
-          if (
-            rejection.data && rejection.data.status_code === 401) {
+          if (rejection.data && rejection.data.status_code === 401) {
             ctrl.showRegistrationSessionExpiredModal();
           }
           ctrl.submissionInProcess = false;
