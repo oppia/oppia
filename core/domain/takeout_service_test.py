@@ -766,7 +766,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     def test_export_data_for_full_user_trivial_is_correct(self):
         """Trivial test of export_data functionality."""
         self.set_up_trivial()
-
+        self.maxDiff = None
         # Generate expected output.
         collection_progress_data = {}
         collection_rights_data = {
@@ -797,12 +797,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': None,
             'normalized_username': None,
-            'last_agreed_to_terms': None,
-            'last_started_state_editor_tutorial': None,
-            'last_started_state_translation_tutorial': None,
-            'last_logged_in': None,
-            'last_edited_an_exploration': None,
-            'last_created_an_exploration': None,
+            'last_agreed_to_terms_msec': None,
+            'last_started_state_editor_tutorial_msec': None,
+            'last_started_state_translation_tutorial_msec': None,
+            'last_logged_in_msec': None,
+            'last_edited_an_exploration_msec': None,
+            'last_created_an_exploration_msec': None,
             'profile_picture_filename': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -824,7 +824,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'creator_usernames': [],
             'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
-            'last_checked': None
+            'last_checked_msec': None
         }
         task_entry_data = {
             'task_ids_resolved_by_user': []
@@ -1174,12 +1174,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_EPOCH,
-            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
-            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
-            'last_logged_in': self.GENERIC_EPOCH,
-            'last_edited_an_exploration': self.GENERIC_EPOCH,
-            'last_created_an_exploration': self.GENERIC_EPOCH,
+            'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial_msec': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial_msec': self.GENERIC_EPOCH,
+            'last_logged_in_msec': self.GENERIC_EPOCH,
+            'last_edited_an_exploration_msec': self.GENERIC_EPOCH,
+            'last_created_an_exploration_msec': self.GENERIC_EPOCH,
             'profile_picture_filename': 'user_settings_profile_picture.png',
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -1208,7 +1208,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
-            'last_checked': self.GENERIC_EPOCH
+            'last_checked_msec': self.GENERIC_EPOCH
         }
 
         expected_task_entry_data = {
@@ -1425,10 +1425,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'role': self.PROFILE_1_ROLE,
             'username': None,
             'normalized_username': None,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': None,
+            'last_agreed_to_terms_msec': self.GENERIC_DATE,
+            'last_started_state_editor_tutorial_msec': None,
             'last_started_state_translation_tutorial': None,
-            'last_logged_in': self.GENERIC_DATE,
+            'last_logged_in_msec': self.GENERIC_DATE,
             'last_created_an_exploration': None,
             'last_edited_an_exploration': None,
             'profile_picture_data_url': None,
