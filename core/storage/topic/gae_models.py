@@ -110,7 +110,8 @@ class TopicModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicModel doesn't contain any data directly corresponding to a user.
+        """TopicModel doesn't contain any data directly corresponding
+        to a user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 

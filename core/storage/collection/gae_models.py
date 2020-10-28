@@ -43,7 +43,8 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     @staticmethod
     def get_deletion_policy():
         """CollectionSnapshotContentModel doesn't contain any data directly
-        corresponding to a user."""
+        corresponding to a user.
+        """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -88,7 +89,8 @@ class CollectionModel(base_models.VersionedModel):
     @staticmethod
     def get_deletion_policy():
         """CollectionModel doesn't contain any data directly corresponding
-        to a user."""
+        to a user.
+        """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod

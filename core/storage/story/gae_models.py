@@ -86,7 +86,8 @@ class StoryModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StoryModel doesn't contain any data directly corresponding to a user.
+        """StoryModel doesn't contain any data directly corresponding
+        to a user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -238,7 +239,6 @@ class StorySummaryModel(base_models.BaseModel):
         to a user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
 
     @classmethod
     def get_export_policy(cls):

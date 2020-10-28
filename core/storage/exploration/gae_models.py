@@ -116,7 +116,8 @@ class ExplorationModel(base_models.VersionedModel):
     @staticmethod
     def get_deletion_policy():
         """ExplorationModel doesn't contain any data directly corresponding
-        to a user."""
+        to a user.
+        """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -236,7 +237,8 @@ class ExplorationContextModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """ExplorationContextModel doesn't contain any data directly
-        corresponding to a user."""
+        corresponding to a user.
+        """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
