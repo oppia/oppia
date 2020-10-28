@@ -39,7 +39,8 @@ export class ReviewTestBackendApiService {
     private urlService: UrlService
   ) {}
 
-  async _fetchReviewTestDataAsync(storyUrlFragment: string): Promise<ReviewTest> {
+  async _fetchReviewTestDataAsync(storyUrlFragment: string)
+  : Promise<ReviewTest> {
     return this.http.get<ReviewTestBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
