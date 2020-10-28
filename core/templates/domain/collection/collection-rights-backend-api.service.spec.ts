@@ -68,7 +68,7 @@ describe('Collection rights backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      collectionRightsBackendApiService.fetchCollectionRights('0')
+      collectionRightsBackendApiService.fetchCollectionRightsAsync('0')
         .then(successHandler, failHandler);
 
       let req = httpTestingController
@@ -90,7 +90,7 @@ describe('Collection rights backend API service', function() {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.fetchCollectionRights('1')
+        collectionRightsBackendApiService.fetchCollectionRightsAsync('1')
           .then(successHandler, failHandler);
 
         let req = httpTestingController
@@ -120,7 +120,7 @@ describe('Collection rights backend API service', function() {
       // TODO(bhenning): Figure out how to test the actual payload sent with the
       // PUT request. The typical expect() syntax with a passed-in object
       // payload does not seem to be working correctly.
-      collectionRightsBackendApiService.setCollectionPublic('0', 1)
+      collectionRightsBackendApiService.setCollectionPublicAsync('0', 1)
         .then(successHandler, failHandler);
 
       let req = httpTestingController
@@ -140,7 +140,7 @@ describe('Collection rights backend API service', function() {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.setCollectionPublic('0', 1)
+        collectionRightsBackendApiService.setCollectionPublicAsync('0', 1)
           .then(successHandler, failHandler);
 
         let req = httpTestingController
@@ -169,7 +169,7 @@ describe('Collection rights backend API service', function() {
       // TODO(bhenning): Figure out how to test the actual payload sent with the
       // PUT request. The typical expect() syntax with a passed-in object
       // payload does not seem to be working correctly.
-      collectionRightsBackendApiService.setCollectionPrivate('0', 1)
+      collectionRightsBackendApiService.setCollectionPrivateAsync('0', 1)
         .then(successHandler, failHandler);
 
       let req = httpTestingController
@@ -189,7 +189,7 @@ describe('Collection rights backend API service', function() {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.setCollectionPrivate('0', 1)
+        collectionRightsBackendApiService.setCollectionPrivateAsync('0', 1)
           .then(successHandler, failHandler);
 
         let req = httpTestingController
@@ -232,7 +232,7 @@ describe('Collection rights backend API service', function() {
 
         // A new collection should not have been fetched from the backend. Also,
         // the returned collection should match the expected collection object.
-        collectionRightsBackendApiService.loadCollectionRights('0')
+        collectionRightsBackendApiService.loadCollectionRightsAsync('0')
           .then(successHandler, failHandler);
 
         flushMicrotasks();
@@ -249,7 +249,7 @@ describe('Collection rights backend API service', function() {
         expect(collectionRightsBackendApiService.isCached('0'))
           .toBe(false);
 
-        collectionRightsBackendApiService.loadCollectionRights('0')
+        collectionRightsBackendApiService.loadCollectionRightsAsync('0')
           .then(successHandler, failHandler);
 
         let req = httpTestingController

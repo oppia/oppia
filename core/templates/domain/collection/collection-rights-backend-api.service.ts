@@ -111,7 +111,8 @@ export class CollectionRightsBackendApiService {
   /**
    * Gets a collection's rights, given its ID.
    */
-  fetchCollectionRights(collectionId: string): Promise<CollectionRights> {
+  async fetchCollectionRightsAsync(collectionId: string)
+  : Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._fetchCollectionRights(collectionId, resolve, reject);
     });
@@ -126,7 +127,8 @@ export class CollectionRightsBackendApiService {
    * rights from the backend, it will store it in the cache to avoid
    * requests from the backend in further function calls.
    */
-  loadCollectionRights(collectionId: string): Promise<CollectionRights> {
+  async loadCollectionRightsAsync(collectionId: string)
+  : Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       if (this._isCached(collectionId)) {
         if (resolve) {
@@ -167,7 +169,7 @@ export class CollectionRightsBackendApiService {
    * Updates a collection's rights to be have public learner access, given
    * its ID and version.
    */
-  setCollectionPublic(
+  async setCollectionPublicAsync(
       collectionId: string,
       collectionVersion: number): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
@@ -180,7 +182,7 @@ export class CollectionRightsBackendApiService {
    * Updates a collection's rights to be have private learner access,
    * given its ID and version.
    */
-  setCollectionPrivate(
+  async setCollectionPrivateAsync(
       collectionId: string,
       collectionVersion: number): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
