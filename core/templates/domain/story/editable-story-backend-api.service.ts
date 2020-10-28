@@ -24,7 +24,8 @@ import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { StoryBackendDict } from 'domain/story/StoryObjectFactory';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 interface FetchStoryBackendResponse {
   'story': StoryBackendDict;
@@ -36,26 +37,24 @@ interface FetchStoryBackendResponse {
 }
 
 interface FetchStoryResponse {
-  story: StoryBackendDict;
-  topicName: string;
-  storyIsPublished: boolean;
-  skillSummaries: SkillSummaryBackendDict[];
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
+  'story': StoryBackendDict;
+  'topicName': string;
+  'storyIsPublished': boolean;
+  'skillSummaries': SkillSummaryBackendDict[];
+  'topicUrlFragment': string;
+  'classroomUrlFragment': string;
 }
 
 interface UpdateStoryBackendResponse {
-  story: StoryBackendDict;
+  'story': StoryBackendDict;
 }
 
 interface StoryUrlFragmentExistsBackendResponse {
-  // eslint-disable-next-line
-  story_url_fragment_exists: StoryUrlFragmentExistsBackendResponse;
+  'story_url_fragment_exists': boolean;
 }
 
 interface ValidationErrorMessages {
-  // eslint-disable-next-line
-  validation_error_messages: ValidationErrorMessages;
+  'validation_error_messages': string[];
 }
 
 @Injectable({
@@ -121,7 +120,7 @@ export class EditableStoryBackendApiService {
   private _changeStoryPublicationStatus(
       storyId: string,
       newStoryStatusIsPublic: boolean,
-      successCallback: (value: void) =>void,
+      successCallback: (value: void) => void,
       errorCallback: (reason: string) => void): void {
     const storyPublishUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
@@ -130,7 +129,6 @@ export class EditableStoryBackendApiService {
     const putData = {
       new_story_status_is_public: newStoryStatusIsPublic
     };
-    // eslint-disable-next-line max-len
     this.http.put(storyPublishUrl, putData).toPromise().then(
       response => successCallback(),
       errorResponse => errorCallback(errorResponse.error.error));
@@ -154,21 +152,20 @@ export class EditableStoryBackendApiService {
         }
       }
     ).toPromise().then(
-      response => successCallback(response.validation_error_messages),
+      response => successCallback(response),
       errorResponse => errorCallback(errorResponse.error.error));
   }
 
   private _deleteStory(
       storyId: string,
-      successCallback: (value: number) =>void,
+      successCallback: (value: number) => void,
       errorCallback: (reason: string) => void): void {
     const storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
       });
 
-    // eslint-disable-next-line
-    this.http.delete(
+    this.http['delete'](
       storyDataUrl, {observe: 'response'}).toPromise().then(
       (response) => {
         if (successCallback) {
@@ -193,7 +190,7 @@ export class EditableStoryBackendApiService {
       storyUrlFragmentUrl).toPromise().then(
       (response) => {
         if (successCallback) {
-          successCallback(response.story_url_fragment_exists);
+          successCallback(response);
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -240,8 +237,8 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  // eslint-disable-next-line max-len
-  validateExplorations(storyId: string, expIds: string[]): Promise<ValidationErrorMessages> {
+  validateExplorations(
+      storyId: string, expIds: string[]): Promise<ValidationErrorMessages> {
     return new Promise((resolve, reject) => {
       this._validateExplorations(
         storyId, expIds, resolve, reject);
@@ -262,6 +259,7 @@ export class EditableStoryBackendApiService {
     });
   }
 }
+
 angular.module('oppia').factory(
   'EditableStoryBackendApiService', downgradeInjectable(
     EditableStoryBackendApiService));
