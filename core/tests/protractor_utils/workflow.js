@@ -108,6 +108,7 @@ var createCollectionAsAdmin = async function() {
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateCollectionButton();
 };
+
 /**
  * Creating exploration for Admin users.
  */
@@ -127,13 +128,11 @@ var createExplorationAsAdmin = async function() {
 var publishExploration = async function() {
   var testPublishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
-  await testPublishExplorationButton.isDisplayed();
   await action.click(
     'testPublishExplorationButton', testPublishExplorationButton);
 
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
-  await prePublicationButtonElem.isPresent();
   await action.click(
     'prePublicationButtonElem', prePublicationButtonElem);
 
@@ -150,8 +149,6 @@ var publishExploration = async function() {
     by.css('.protractor-test-share-publish-close'));
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  await waitFor.elementToBeClickable(
-    closePublishModalButton, 'Close Publish Modal button is not clickable');
   await action.click('closePublishModalButton', closePublishModalButton);
 };
 
@@ -225,8 +222,9 @@ var _addExplorationRole = async function(roleName, username) {
   await action.click('testEditRoles', testEditRoles);
   var testRoleUsername = element(by.css('.protractor-test-role-username'));
   await action.sendKeys('testRoleUsername', testRoleUsername, username);
-  await element(by.css('.protractor-test-role-select')).
-    element(by.cssContainingText('option', roleName)).click();
+  var testRoleSelect = element(by.css('.protractor-test-role-select'));
+  await action.click('testRoleSelect', testRoleSelect.element(
+    by.cssContainingText('option', roleName)));
   var testSaveRole = element(by.css('.protractor-test-save-role'));
   await action.click('testSaveRole', testSaveRole);
 };
@@ -297,16 +295,10 @@ var getImageSource = async function(customImageElement) {
 };
 
 var uploadImage = async function(
-    imageClickableElement, imgPath, resetExistingImage) {
-  await waitFor.visibilityOf(
-    imageClickableElement,
-    'Image element is taking too long to appear.');
+  imageClickableElement, imgPath, resetExistingImage) {
   await action.click('imageClickableElement', imageClickableElement);
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
-    await waitFor.elementToBeClickable(
-      thumbnailResetButton,
-      'Topic thumbnail reset button taking too long to appear.');
     await action.click('thumbnailResetButton', thumbnailResetButton);
   } else {
     expect(await thumbnailResetButton.isPresent()).toBe(false);
