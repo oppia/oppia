@@ -184,9 +184,20 @@ class BaseHandler(webapp2.RequestHandler):
             user_settings = user_services.get_user_settings_by_gae_id(
                 self.gae_id, strict=False)
             if user_settings is None:
+                # If the user settings are not yet created and the request leads
+                # to signup page create a new user settings. Otherwise logout
+                # the not-fully registered user.
                 email = current_user_services.get_current_user_email()
-                user_settings = user_services.create_new_user(
-                    self.gae_id, email)
+                if 'signup?' in self.request.uri:
+                    user_settings = user_services.create_new_user(
+                        self.gae_id, email)
+                else:
+                    logging.error(
+                        'Cannot find user %s with email %s on page %s'
+                        % (self.gae_id, email, self.request.uri))
+                    _clear_login_cookies(self.response.headers)
+                    return
+
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 
@@ -252,8 +263,16 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
-        if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
-            try:
+        try:
+            # If this is a CSRF request and the user is not yet loaded produce
+            # an error. The user might not be loaded due to an eventual
+            # consistency that does not guarantee that the UserAuthDetailsModel
+            # will be returned by a query even when we are sure that the model
+            # was added to the datastore. More info in #10951.
+            if 'csrf' in self.request.uri and self.gae_id and not self.user_id:
+                raise self.UnauthorizedUserException('User details not found.')
+
+            if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
                 # If user opens a new tab during signup process, the user_id
                 # parameter is set to None and this causes the signup session
                 # to expire. The code here checks if user is on the signup
@@ -276,11 +295,11 @@ class BaseHandler(webapp2.RequestHandler):
                     raise self.UnauthorizedUserException(
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
-            except Exception as e:
-                logging.error('%s: payload %s', e, self.payload)
+        except Exception as e:
+            logging.error('%s: payload %s', e, self.payload)
 
-                self.handle_exception(e, self.app.debug)
-                return
+            self.handle_exception(e, self.app.debug)
+            return
 
         super(BaseHandler, self).dispatch()
 
