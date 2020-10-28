@@ -500,6 +500,7 @@
 
 # Miscellaneous.
 # TODO(#11045): Add @nithusha21 as owner after 2020-11-2, lines 499-502
+/auth.json.enc @DubeySandeep
 /__init__.py @DubeySandeep
 /core/__init__.py @DubeySandeep
 /core/controllers/__init__.py @DubeySandeep
