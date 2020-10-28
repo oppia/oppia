@@ -47,7 +47,7 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     # Models that should be pseudonymized in their local context.
     'LOCALLY_PSEUDONYMIZE',
     # Models that should only be kept if published.
-    'KEEP_IF_PUBLIC',
+    'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE',
     # Models that are not directly or indirectly related to users.
     'NOT_APPLICABLE'
 )

@@ -49,12 +49,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             collection_models.CollectionModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            collection_models.CollectionModel
-            .has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
@@ -200,7 +195,8 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             collection_models.CollectionRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
@@ -525,7 +521,8 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             collection_models.CollectionSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         collection_models.CollectionSummaryModel(

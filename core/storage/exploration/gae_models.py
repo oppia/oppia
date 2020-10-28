@@ -115,8 +115,9 @@ class ExplorationModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration is deleted only if it is not public."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        """ExplorationModel doesn't contain any data directly corresponding
+        to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -141,19 +142,6 @@ class ExplorationModel(base_models.VersionedModel):
             'default_skin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skin_customizations': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether ExplorationModel or its snapshots references the given
-        user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_exploration_count(cls):
@@ -247,10 +235,9 @@ class ExplorationContextModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration context should be kept if the story and exploration are
-        published.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        """ExplorationContextModel doesn't contain any data directly
+        corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -258,19 +245,6 @@ class ExplorationContextModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether ExplorationContextModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
 
 class ExplorationRightsSnapshotMetadataModel(
@@ -364,10 +338,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration rights are deleted only if the corresponding exploration
-        is not public.
+        """ExplorationRightsModel contains data to pseudonymize/delete
+        corresponding to a user: viewer_ids, voice_artist_ids, editor_ids,
+        and owner_ids fields.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     @classmethod
     def get_export_policy(cls):
@@ -772,10 +749,13 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration summary is deleted only if the corresponding exploration
-        is not public.
+        """ExpSummaryModel contains data to pseudonymize/delete corresponding
+        to a user: viewer_ids, voice_artist_ids, editor_ids, owner_ids,
+        contributor_ids, and contributors_summary fields.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
