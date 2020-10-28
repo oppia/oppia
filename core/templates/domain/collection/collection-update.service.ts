@@ -19,22 +19,21 @@
  * undo/redo service.
  */
 
+import { CollectionNode } from './collection-node.model';
+
 import { Change } from 'domain/editor/undo_redo/change.model';
 
-require('domain/collection/collection-node-object.factory.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-
 require('domain/collection/collection-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('CollectionUpdateService', [
-  'CollectionNodeObjectFactory', 'UndoRedoService',
-  'CMD_ADD_COLLECTION_NODE',
+  'UndoRedoService', 'CMD_ADD_COLLECTION_NODE',
   'CMD_DELETE_COLLECTION_NODE',
   'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_SWAP_COLLECTION_NODES',
   'COLLECTION_PROPERTY_CATEGORY', 'COLLECTION_PROPERTY_LANGUAGE_CODE',
   'COLLECTION_PROPERTY_OBJECTIVE',
   'COLLECTION_PROPERTY_TAGS', 'COLLECTION_PROPERTY_TITLE', function(
-      CollectionNodeObjectFactory, UndoRedoService,
+      UndoRedoService,
       CMD_ADD_COLLECTION_NODE,
       CMD_DELETE_COLLECTION_NODE,
       CMD_EDIT_COLLECTION_PROPERTY, CMD_SWAP_COLLECTION_NODES,
@@ -99,7 +98,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
           // Apply.
           var explorationId = _getExplorationIdFromChangeDict(changeDict);
           var collectionNode = (
-            CollectionNodeObjectFactory.createFromExplorationId(
+            CollectionNode.createFromExplorationId(
               explorationId));
           collectionNode.setExplorationSummaryObject(oldSummaryBackendObject);
           collection.addCollectionNode(collectionNode);

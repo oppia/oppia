@@ -16,7 +16,8 @@
  * @fileoverview Directive for the RatioExpressionInput interaction.
  */
 
-require('domain/objects/RatioObjectFactory.ts');
+import { Ratio } from 'domain/objects/ratio.model';
+
 require(
   'interactions/interaction-attributes-extractor.service.ts');
 require(
@@ -32,11 +33,12 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
   template: require('./ratio-expression-input-interaction.component.html'),
   controller: [
     '$attrs', '$scope', 'CurrentInteractionService',
-    'InteractionAttributesExtractorService', 'RatioExpressionInputRulesService',
-    'RatioObjectFactory', function(
+    'InteractionAttributesExtractorService',
+    'RatioExpressionInputRulesService',
+    function(
         $attrs, $scope, CurrentInteractionService,
-        InteractionAttributesExtractorService, RatioExpressionInputRulesService,
-        RatioObjectFactory) {
+        InteractionAttributesExtractorService,
+        RatioExpressionInputRulesService) {
       var ctrl = this;
       var errorMessage = '';
       // Label for errors caused whilst parsing ratio expression.
@@ -48,7 +50,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
       ctrl.submitAnswer = function(answer) {
         try {
           var ratioExpression =
-            RatioObjectFactory.fromRawInputString(answer);
+            Ratio.fromRawInputString(answer);
           if (
             (
               ratioExpression.getNumberOfTerms() !==

@@ -205,6 +205,9 @@ var ContributorDashboardPage = function() {
     await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       opportunityHeading, opportunitySubheading);
+    await waitFor.visibilityOf(
+      opportunity,
+      'Opportunity taking too long to appear.');
     expect(opportunity).not.toBe(null);
     await action.click(
       'Opportunity action button',

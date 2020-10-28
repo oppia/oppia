@@ -479,6 +479,7 @@ def record_played_exploration_in_collection_context(
 
     if exploration_id not in progress_model.completed_explorations:
         progress_model.completed_explorations.append(exploration_id)
+        progress_model.update_timestamps()
         progress_model.put()
 
 
@@ -537,6 +538,31 @@ def get_collection_summaries_subscribed_to(user_id):
         get_collection_summaries_matching_ids(
             subscription_services.get_collection_ids_subscribed_to(user_id)
         ) if summary is not None
+    ]
+
+
+def get_collection_summaries_where_user_has_role(user_id):
+    """Returns a list of CollectionSummary domain objects where the user has
+    some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(CollectionSummary). List of CollectionSummary domain objects
+        where the user has some role.
+    """
+    col_summary_models = collection_models.CollectionSummaryModel.query(
+        datastore_services.any_of(
+            collection_models.CollectionSummaryModel.owner_ids == user_id,
+            collection_models.CollectionSummaryModel.editor_ids == user_id,
+            collection_models.CollectionSummaryModel.viewer_ids == user_id,
+            collection_models.CollectionSummaryModel.contributor_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_collection_summary_from_model(col_summary_model)
+        for col_summary_model in col_summary_models
     ]
 
 
@@ -996,8 +1022,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
         collection_rights.owner_ids, collection_rights.editor_ids,
         collection_rights.viewer_ids, contributor_ids, contributors_summary,
         collection.version, collection_model_node_count,
-        collection_model_created_on,
-        collection_model_last_updated
+        collection_model_created_on, collection_model_last_updated
     )
 
     return collection_summary
@@ -1073,11 +1098,14 @@ def save_collection_summary(collection_summary):
             collection_summary.id))
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)
+        collection_summary_model.update_timestamps()
         collection_summary_model.put()
     else:
         collection_summary_dict['id'] = collection_summary.id
-        collection_models.CollectionSummaryModel(
-            **collection_summary_dict).put()
+        model = collection_models.CollectionSummaryModel(
+            **collection_summary_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def delete_collection_summaries(collection_ids):

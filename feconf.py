@@ -213,7 +213,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 38
+CURRENT_STATE_SCHEMA_VERSION = 39
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -506,7 +506,17 @@ EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
 EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
-EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
+EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
+    'address_contributor_dashboard_suggestions'
+)
+EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS = (
+    'review_creator_dashboard_suggestions')
+EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
+    'review_contributor_dashboard_suggestions'
+)
+EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
+    'add_contributor_dashboard_reviewers'
+)
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 # Possible intents for email sent in bulk.
@@ -1231,3 +1241,5 @@ USER_ID_LENGTH = 36
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5
 PROFILE_USER_PIN_LENGTH = 3
+
+MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25

@@ -15,10 +15,10 @@
 /**
  * @fileoverview ParameterizeRuleDescription filter for Oppia.
  */
+import { Ratio } from 'domain/objects/ratio.model';
 
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('domain/objects/RatioObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 
 // Filter that changes {{...}} tags into the corresponding parameter input
@@ -27,11 +27,9 @@ require('filters/format-rte-preview.filter.ts');
 angular.module('oppia').filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
   'NumberWithUnitsObjectFactory', 'POSITION_OF_TERMS_MAPPING',
-  'RatioObjectFactory',
   function(
       $filter, INTERACTION_SPECS, FractionObjectFactory,
-      NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING,
-      RatioObjectFactory) {
+      NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -184,8 +182,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           }
           replacementText += ']';
         } else if (varType === 'RatioExpression') {
-          replacementText = RatioObjectFactory
-            .fromList(inputs[varName]).toAnswerString();
+          replacementText = Ratio.fromList(inputs[varName]).toAnswerString();
         } else {
           throw new Error('Unknown variable type in rule description');
         }
