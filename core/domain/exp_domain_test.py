@@ -438,8 +438,8 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
 class StateVersionSpanTests(test_utils.GenericTestBase):
     """Unit tests for StateVersionSpan domain objects."""
 
-    def make_state(self, interaction_id='TextInput'):
-        """Makes a new state_domain.State instance with the given interaction.
+    def new_state_domain_obj(self, interaction_id='TextInput'):
+        """Returns a new State domain object without putting it into storage.
 
         Args:
             interaction_id: str. The interaction id of the state.
@@ -447,35 +447,35 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         Returns:
             state_domain.State. A state with the given interaction.
         """
-        state = state_domain.State.create_default_state('End')
+        state = state_domain.State.create_default_state('A')
         self.set_interaction_for_state(state, interaction_id)
         return state
 
-    def make_state_version_spans(self, name, state_v1, *subsequent_versions):
-        """Constructs a list of StateVersionSpan from the given state versions.
+    def get_state_version_spans(self, name, state_v1, *subsequent_versions):
+        """Returns the state version spans for the given snapshots of a state.
 
         Args:
-            name: str. The name of the states.
+            name: str. The name of the state.
             state_v1: state_domain.State. The first version of the state.
             *subsequent_versions: tuple(state_domain.State). The subsequent
-                versions of the same state.
+                versions of the state.
 
         Returns:
             list(StateVersionSpan). A collection of state version spans. The
             collection will have more than one element if a version of the state
-            warrants a split.
+            is incompatible with its previous version.
         """
-        span = exp_domain.StateVersionSpan(1, name, state_v1)
+        distinct_spans = [exp_domain.StateVersionSpan(1, name, state_v1)]
         nodiff = exp_domain.ExplorationVersionsDiff([])
-        distinct_spans = [span]
-        for version, versioned_state in enumerate(subsequent_versions, start=2):
-            span = span.extend_or_split(version, name, versioned_state, nodiff)
+        for version, state_snapshot in enumerate(subsequent_versions, start=2):
+            span = distinct_spans[-1].extend_or_split(
+                version, name, state_snapshot, nodiff)
             if span is not distinct_spans[-1]:
                 distinct_spans.append(span)
         return distinct_spans
 
     def test_get_version_with_newly_constructed_span(self):
-        state = self.make_state()
+        state = self.new_state_domain_obj()
 
         span = exp_domain.StateVersionSpan(1, 'A', state)
 
@@ -483,9 +483,10 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         self.assertEqual(span.get_version_name(1), 'A')
 
     def test_get_version_with_extended_span(self):
-        distinct_states = [self.make_state() for _ in python_utils.RANGE(3)]
+        distinct_states = [
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = self.make_state_version_spans('A', *distinct_states)
+        (span,) = self.get_state_version_spans('A', *distinct_states)
 
         self.assertIs(span.get_version(1), distinct_states[0])
         self.assertIs(span.get_version(2), distinct_states[1])
@@ -496,12 +497,12 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
 
     def test_get_version_with_multi_spans(self):
         distinct_states = [
-            self.make_state(interaction_id='MathEquationInput'),
-            self.make_state(interaction_id='TextInput'),
-            self.make_state(interaction_id='ItemSelectionInput'),
+            self.new_state_domain_obj(interaction_id='MathEquationInput'),
+            self.new_state_domain_obj(interaction_id='TextInput'),
+            self.new_state_domain_obj(interaction_id='ItemSelectionInput'),
         ]
 
-        spans = self.make_state_version_spans('A', *distinct_states)
+        spans = self.get_state_version_spans('A', *distinct_states)
 
         self.assertEqual(len(spans), 3)
         self.assertIs(spans[0].get_version(1), distinct_states[0])
@@ -512,7 +513,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         self.assertEqual(spans[2].get_version_name(3), 'A')
 
     def test_get_multi_versions_with_newly_constructed_span(self):
-        state = self.make_state()
+        state = self.new_state_domain_obj()
 
         span = exp_domain.StateVersionSpan(1, 'A', state)
 
@@ -520,37 +521,39 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         self.assertEqual(span.get_multi_version_names(1, 2), ['A'])
 
     def test_get_multi_versions_with_extended_span(self):
-        distinct_states = [self.make_state() for _ in python_utils.RANGE(3)]
+        distinct_states = [
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = self.make_state_version_spans('A', *distinct_states)
+        (span,) = self.get_state_version_spans('A', *distinct_states)
 
         self.assertEqual(span.get_multi_versions(1, 4), distinct_states)
         self.assertEqual(span.get_multi_version_names(1, 4), ['A', 'A', 'A'])
 
     def test_get_multi_versions_with_multi_spans(self):
         distinct_states = [
-            self.make_state(interaction_id='MathEquationInput'),
-            self.make_state(interaction_id='TextInput'),
-            self.make_state(interaction_id='ItemSelectionInput'),
+            self.new_state_domain_obj(interaction_id='MathEquationInput'),
+            self.new_state_domain_obj(interaction_id='TextInput'),
+            self.new_state_domain_obj(interaction_id='ItemSelectionInput'),
         ]
 
-        spans = self.make_state_version_spans('A', *distinct_states)
+        spans = self.get_state_version_spans('A', *distinct_states)
 
         self.assertEqual(len(spans), 3)
         self.assertEqual(
             spans[0].get_multi_versions(1, 2), distinct_states[0:1])
-        self.assertEqual(spans[0].get_multi_version_names(1, 2), ['A'])
         self.assertEqual(
             spans[1].get_multi_versions(2, 3), distinct_states[1:2])
-        self.assertEqual(spans[1].get_multi_version_names(2, 3), ['A'])
         self.assertEqual(
             spans[2].get_multi_versions(3, 4), distinct_states[2:3])
+        self.assertEqual(spans[0].get_multi_version_names(1, 2), ['A'])
+        self.assertEqual(spans[1].get_multi_version_names(2, 3), ['A'])
         self.assertEqual(spans[2].get_multi_version_names(3, 4), ['A'])
 
     def test_get_multi_versions_accepts_pythonic_ranges(self):
-        distinct_states = [self.make_state() for _ in python_utils.RANGE(3)]
+        distinct_states = [
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = self.make_state_version_spans('A', *distinct_states)
+        (span,) = self.get_state_version_spans('A', *distinct_states)
 
         self.assertEqual(span.get_multi_versions(0, 20), distinct_states[:19])
         self.assertEqual(span.get_multi_versions(2, 7), distinct_states[1:6])
@@ -560,21 +563,22 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         self.assertEqual(span.get_multi_version_names(6, 7), [])
 
     def test_extend_or_split_with_unexpected_version(self):
-        (span,) = self.make_state_version_spans('A', self.make_state())
+        (span,) = self.get_state_version_spans('A', self.new_state_domain_obj())
         nodiff = exp_domain.ExplorationVersionsDiff([])
 
         with self.assertRaisesRegexp(Exception, 'version=2 should be next'):
-            span.extend_or_split(3, 'A', self.make_state(), nodiff)
+            span.extend_or_split(3, 'A', self.new_state_domain_obj(), nodiff)
 
         with self.assertRaisesRegexp(Exception, 'version=2 should be next'):
-            span.extend_or_split(0, 'A', self.make_state(), nodiff)
+            span.extend_or_split(0, 'A', self.new_state_domain_obj(), nodiff)
 
         with self.assertRaisesRegexp(Exception, 'version=2 should be next'):
-            span.extend_or_split(-1, 'A', self.make_state(), nodiff)
+            span.extend_or_split(-1, 'A', self.new_state_domain_obj(), nodiff)
 
     def test_extend_or_split_with_rename(self):
-        state_v1, state_v2 = self.make_state(), self.make_state()
-        rename_diff = exp_domain.ExplorationVersionsDiff([
+        state_v1, state_v2 = (
+            self.new_state_domain_obj(), self.new_state_domain_obj())
+        diff = exp_domain.ExplorationVersionsDiff([
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': 'A',
@@ -583,16 +587,16 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         ])
 
         span = exp_domain.StateVersionSpan(1, 'A', state_v1)
-        span.extend_or_split(2, 'B', state_v2, rename_diff)
+        span.extend_or_split(2, 'B', state_v2, diff)
 
         self.assertIs(span.get_version(1), state_v1)
-        self.assertEqual(span.get_version_name(1), 'A')
         self.assertIs(span.get_version(2), state_v2)
+        self.assertEqual(span.get_version_name(1), 'A')
         self.assertEqual(span.get_version_name(2), 'B')
 
     def test_extend_or_split_with_unexpected_rename(self):
-        (span,) = self.make_state_version_spans('A', self.make_state())
-        rename_diff = exp_domain.ExplorationVersionsDiff([
+        (span,) = self.get_state_version_spans('A', self.new_state_domain_obj())
+        diff = exp_domain.ExplorationVersionsDiff([
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': 'A',
@@ -601,10 +605,24 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         ])
 
         with self.assertRaisesRegexp(Exception, 'does not map to previous'):
-            span.extend_or_split(2, 'Z', self.make_state(), rename_diff)
+            span.extend_or_split(2, 'Z', self.new_state_domain_obj(), diff)
 
 
 class ExplorationStateHistoryTests(test_utils.GenericTestBase):
+
+    def new_exp_domain_obj(self, exp_id='exp_id', version=1):
+        """Returns an exploration domain object without putting it into storage.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+            version: int. The version of the exploration.
+
+        Returns:
+            exp_domain.Exploration. The new exploration instance.
+        """
+        exp = exp_domain.Exploration.create_default_exploration(exp_id)
+        exp.version = version
+        return exp
 
     def test_create_from_new_exploration(self):
         self.save_new_linear_exp_with_state_names_and_interactions(
@@ -622,7 +640,7 @@ class ExplorationStateHistoryTests(test_utils.GenericTestBase):
             exp_domain.ExplorationStateHistory([], [])
 
     def test_mismatched_input_lengths_raises_an_error(self):
-        exp = exp_domain.Exploration.create_default_exploration('exp_id')
+        exp = self.new_exp_domain_obj()
         nodiff = exp_domain.ExplorationVersionsDiff([])
 
         with self.assertRaisesRegexp(Exception, 'len of inputs do not match'):
@@ -633,9 +651,7 @@ class ExplorationStateHistoryTests(test_utils.GenericTestBase):
 
     def test_non_contiguous_version_inputs_raises_an_error(self):
         exp_v1, exp_v2, exp_v4 = (
-            exp_domain.Exploration.create_default_exploration('exp_id')
-            for _ in python_utils.RANGE(3))
-        exp_v2.version, exp_v4.version = 2, 4
+            self.new_exp_domain_obj(version=v) for v in (1, 2, 4))
         nodiff = exp_domain.ExplorationVersionsDiff([])
 
         with self.assertRaisesRegexp(Exception, 'got invalid input versions'):
@@ -644,9 +660,7 @@ class ExplorationStateHistoryTests(test_utils.GenericTestBase):
 
     def test_version_starting_after_1_raises_an_error(self):
         exp_v2, exp_v3, exp_v4 = (
-            exp_domain.Exploration.create_default_exploration('exp_id')
-            for _ in python_utils.RANGE(3))
-        exp_v2.version, exp_v3.version, exp_v4.version = 2, 3, 4
+            self.new_exp_domain_obj(version=v) for v in (2, 3, 4))
         nodiff = exp_domain.ExplorationVersionsDiff([])
 
         with self.assertRaisesRegexp(Exception, 'got invalid input versions'):
@@ -654,10 +668,8 @@ class ExplorationStateHistoryTests(test_utils.GenericTestBase):
                 [exp_v2, exp_v3, exp_v4], [nodiff, nodiff, nodiff])
 
     def test_version_not_sorted_raises_an_error(self):
-        exp_v1, exp_v2, exp_v3 = (
-            exp_domain.Exploration.create_default_exploration('exp_id')
-            for _ in python_utils.RANGE(3))
-        exp_v2.version, exp_v3.version = 2, 3
+        exp_v1, exp_v3, exp_v2 = (
+            self.new_exp_domain_obj(version=v) for v in (1, 3, 2))
         nodiff = exp_domain.ExplorationVersionsDiff([])
 
         with self.assertRaisesRegexp(Exception, 'got invalid input versions'):

@@ -640,19 +640,19 @@ class ExplorationStateHistory(python_utils.OBJECT):
 
         self._state_spans_history = []
         for exp, diff in python_utils.ZIP(exps, exp_version_diffs):
-            curr_version, curr_state_spans = int(exp.version), dict()
+            new_state_spans = dict()
             for name, state in exp.states.items():
-                if curr_version == 1 or name in diff.added_state_names:
-                    curr_state_spans[name] = (
-                        StateVersionSpan(curr_version, name, state))
+                if exp.version == 1 or name in diff.added_state_names:
+                    new_state_spans[name] = (
+                        StateVersionSpan(exp.version, name, state))
                 elif name not in diff.deleted_state_names:
                     prev_state_spans, prev_name = (
-                        self._state_spans_history[curr_version - 1],
+                        self._state_spans_history[exp.version - 1],
                         diff.new_to_old_state_names.get(name, name))
-                    curr_state_spans[name] = (
+                    new_state_spans[name] = (
                         prev_state_spans[prev_name].extend_or_split(
-                            curr_version, name, state, diff))
-            self._state_spans_history.append(curr_state_spans)
+                            exp.version, name, state, diff))
+            self._state_spans_history.append(new_state_spans)
 
     def get_state_span(self, exp_version, state_name):
         """Returns the span of versions where the given state existed.
