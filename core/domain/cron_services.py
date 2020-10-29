@@ -73,7 +73,7 @@ def delete_models_marked_as_deleted():
     for model_class in models.Registry.get_all_storage_model_classes():
         deleted_models = model_class.query(model_class.deleted == True).fetch()
         models_to_hard_delete = [
-            for model in deleted_models
+            deleted_model for deleted_model in deleted_models
             if model.last_updated < date_before_which_hard_delete
         ]
         model_class.delete_multi(models_to_hard_delete)

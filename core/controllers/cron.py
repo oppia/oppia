@@ -37,7 +37,7 @@ import utils
 
 from pipeline import pipeline
 
-(job_models, user_models) = models.Registry.import_models([models.NAMES.job])
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
