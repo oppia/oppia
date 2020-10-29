@@ -16,12 +16,12 @@
  * @fileoverview Component for the collection player navbar
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 
-import { UrlService } from 'services/contextual/url.service.ts';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service.ts';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { UrlService } from 'services/contextual/url.service.ts';
 
 @Component({
   selector: 'collection-navbar',
@@ -30,24 +30,23 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class CollectionNavbarComponent implements OnInit, OnDestroy {
   collectionTitle: string = '';
-  collectionId: string = '';
   directiveSubscriptions = new Subscription();
 
   constructor(
     private urlService: UrlService,
-    private readOnlyCollectionService: ReadOnlyCollectionBackendApiService
+    private readOnlyCollectionBackendApiService:
+      ReadOnlyCollectionBackendApiService
   ) {}
 
   ngOnInit(): void {
-    this.collectionId = this.urlService.getCollectionIdFromUrl();
     this.directiveSubscriptions.add(
-      this.readOnlyCollectionService.onCollectionLoad.subscribe(() => {
-        return (
-          this.collectionTitle =
-          this.readOnlyCollectionService.getCollectionDetails(
-            this.urlService.getCollectionIdFromUrl()
-          ).title);
-      })
+      this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
+        () => {
+          this.collectionTitle = this.readOnlyCollectionBackendApiService
+            .getCollectionDetails(this.urlService.getCollectionIdFromUrl())
+            .title;
+        }
+      )
     );
   }
 
@@ -55,9 +54,5 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
     return this.directiveSubscriptions.unsubscribe();
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'collectionNavbar',
-    downgradeComponent({ component: CollectionNavbarComponent })
-  );
+angular.module('oppia').directive('collectionNavbar', downgradeComponent(
+  {component: CollectionNavbarComponent}));
