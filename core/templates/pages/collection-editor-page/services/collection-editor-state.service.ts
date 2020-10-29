@@ -69,7 +69,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        */
       loadCollection: function(collectionId) {
         _collectionIsLoading = true;
-        EditableCollectionBackendApiService.fetchCollectionAsync(
+        EditableCollectionBackendApiService.fetchCollection(
           collectionId).then(
           function(newCollectionObject) {
             _updateCollection(newCollectionObject);
