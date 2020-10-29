@@ -39,7 +39,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'admin-misc-tab.directive.ts',
     'admin-navbar.directive.ts',
     'admin-page.directive.ts',
-
     'admin-roles-tab.directive.ts',
     'alert-message.directive.ts',
     'angular-html-bind.directive.ts',
@@ -362,7 +361,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-summary-tile.directive.ts',
     'TopicObjectFactory.ts',
     'topics-and-skills-dashboard-backend-api.service.ts',
-
     'translate-text.service.ts',
     'translation-file-hash-loader.service.ts',
     'truncate-and-capitalize.filter.ts',

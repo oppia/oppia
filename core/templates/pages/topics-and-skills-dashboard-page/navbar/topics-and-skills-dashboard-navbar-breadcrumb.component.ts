@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the navbar breadcrumb of the collection editor.
+ * @fileoverview Component for the navbar breadcrumb of the topics and skills
+ * dashboard.
  */
 
 import { Component } from '@angular/core';
@@ -24,10 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './topics-and-skills-dashboard-navbar-breadcrumb.component.html',
   styleUrls: []
 })
-
-export class TopicsAndSkillsDashboardNavbarBreadcrumbComponent {
-  constructor() {}
-}
+export class TopicsAndSkillsDashboardNavbarBreadcrumbComponent {}
 
 angular.module('oppia').directive(
   'topicsAndSkillsDashboardNavbarBreadcrumb', downgradeComponent({

@@ -1,4 +1,3 @@
-
 // Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,16 +20,12 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-
 @Component({
   selector: 'admin-prod-mode-activities-tab',
   templateUrl: './admin-prod-mode-activities-tab.component.html',
   styleUrls: []
 })
-
-export class AdminProdModeActivitiesTabComponent {
-  constructor() {}
-}
+export class AdminProdModeActivitiesTabComponent {}
 
 angular.module('oppia').directive(
   'adminProdModeActivitiesTab', downgradeComponent({
