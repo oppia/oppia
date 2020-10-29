@@ -984,12 +984,12 @@ class VersionedModel(BaseModel):
             raise e
 
     @classmethod
-    def get_multi_versions(cls, entity_id, version_numbers):
-        """Gets model instances for each version specified in version_numbers.
+    def get_multi_versions(cls, entity_id, versions):
+        """Gets model instances for each version specified.
 
         Args:
             entity_id: str. ID of the entity.
-            version_numbers: list(int). List of version numbers.
+            versions: list(int). List of version numbers.
 
         Returns:
             list(VersionedModel). Model instances representing the given
@@ -1001,36 +1001,36 @@ class VersionedModel(BaseModel):
                 current version number.
             ValueError. At least one version number is invalid.
         """
-        instances = []
+        if not versions:
+            return []
 
         entity = cls.get(entity_id, strict=False)
         if not entity:
-            raise ValueError('The given entity_id %s is invalid.' % (entity_id))
-        current_version = entity.version
-        max_version = max(version_numbers)
-        if max_version > current_version:
+            raise ValueError(
+                '%s(id="%s") does not exist' % (cls.__name__, entity_id))
+
+        max_requested_version = max(versions)
+        if max_requested_version > entity.version:
             raise ValueError(
                 'Requested version number %s cannot be higher than the current '
-                'version number %s.' % (max_version, current_version))
+                'version number %s.' % (max_requested_version, entity.version))
 
-        snapshot_ids = []
-        for version in version_numbers:
-            snapshot_id = cls.get_snapshot_id(entity_id, version)
-            snapshot_ids.append(snapshot_id)
-
-        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
-        for snapshot_model in snapshot_models:
+        def reconstitute(snapshot_model, version):
+            """Reconstitutes given snapshot or raises exception when invalid."""
             if snapshot_model is None:
-                raise ValueError(
-                    'At least one version number is invalid.')
-            snapshot_dict = snapshot_model.content
-            reconstituted_model = cls(id=entity_id)._reconstitute(  # pylint: disable=protected-access
-                snapshot_dict)
+                raise ValueError('version number %r is invalid.' % version)
+            reconstituted_model = (
+                cls(id=entity_id)._reconstitute(snapshot_model.content)) # pylint: disable=protected-access
             reconstituted_model.created_on = snapshot_model.created_on
             reconstituted_model.last_updated = snapshot_model.last_updated
+            return reconstituted_model
 
-            instances.append(reconstituted_model)
-        return instances
+        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(
+            [cls.get_snapshot_id(entity_id, v) for v in versions])
+        return [
+            reconstitute(snapshot_model, v)
+            for snapshot_model, v in python_utils.ZIP(snapshot_models, versions)
+        ]
 
     @classmethod
     def get(cls, entity_id, strict=True, version=None):

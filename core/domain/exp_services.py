@@ -28,6 +28,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import datetime
 import logging
+import itertools
 import math
 import os
 import pprint
@@ -88,6 +89,31 @@ def is_exp_summary_editable(exp_summary, user_id=None):
         user_id in exp_summary.editor_ids
         or user_id in exp_summary.owner_ids
         or exp_summary.community_owned)
+
+
+def get_exploration_state_history(exp_id):
+    """Fetches the given exploration's history of state changes.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+
+    Returns:
+        exp_domain.ExplorationStateHistory. The history of state changes.
+    """
+    latest_exp = exp_fetchers.get_exploration_by_id(exp_id)
+
+    exps = exp_fetchers.get_multiple_explorations_by_version(
+        exp_id, python_utils.RANGE(1, latest_exp.version))
+    exps.append(latest_exp)
+
+    exp_version_diffs = [
+        exp_domain.ExplorationVersionsDiff(
+            [exp_domain.ExplorationChange(c) for c in snapshot['commit_cmds']])
+        for snapshot in exp_models.ExplorationModel.get_snapshots_metadata(
+            exp_id, python_utils.RANGE(1, latest_exp.version + 1))
+    ]
+
+    return exp_domain.ExplorationStateHistory(exps, exp_version_diffs)
 
 
 # Query methods.

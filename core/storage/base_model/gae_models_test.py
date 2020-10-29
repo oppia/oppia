@@ -542,9 +542,9 @@ class VersionedModelTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_multiple_version_models_for_fake_id(self):
         with self.assertRaisesRegexp(
-            ValueError, 'The given entity_id fake_id is invalid'):
-            TestVersionedModel.get_multi_versions(
-                'fake_id', [1, 2, 3])
+            ValueError,
+            r'TestVersionedModel\(id="fake_id"\) does not exist'):
+            TestVersionedModel.get_multi_versions('fake_id', [1, 2, 3])
 
     def test_commit_with_model_instance_deleted_raises_error(self):
         model1 = TestVersionedModel(id='model_id1')
@@ -716,8 +716,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             TestVersionedModel.get_multi_versions('model_id1', [1, 2, 3])
 
         with self.assertRaisesRegexp(
-            ValueError,
-            'At least one version number is invalid'):
+            ValueError, 'version number 1.5 is invalid'):
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2])
 
 

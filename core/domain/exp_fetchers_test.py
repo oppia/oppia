@@ -85,7 +85,8 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
         with self.assertRaisesRegexp(
-            ValueError, 'The given entity_id fake_exp_id is invalid'):
+            ValueError,
+            r'ExplorationModel\(id="fake_exp_id"\) does not exist'):
             exp_fetchers.get_multiple_explorations_by_version(
                 'fake_exp_id', [1, 2, 3])
 
@@ -142,8 +143,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 self.EXP_1_ID, [1, 2, 3, 4])
 
         with self.assertRaisesRegexp(
-            ValueError,
-            'At least one version number is invalid'):
+            ValueError, 'version number 2.5 is invalid'):
             exp_fetchers.get_multiple_explorations_by_version(
                 self.EXP_1_ID, [1, 2, 2.5, 3])
 
