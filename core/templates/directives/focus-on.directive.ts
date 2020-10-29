@@ -18,7 +18,43 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
+import { Directive, ElementRef, Input, OnDestroy } from '@angular/core';
+
 import { Subscription } from 'rxjs';
+
+import { AppConstants } from 'app.constants';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+
+@Directive({
+  selector: 'oppiaFocusOn'
+})
+export class FocusOnDirective implements OnDestroy {
+  @Input('oppiaFocusOn') focusOn: string;
+  directiveSubscriptions = new Subscription();
+  constructor(
+    private el: ElementRef, private focusManagerService: FocusManagerService) {
+    this.directiveSubscriptions.add(
+      this.focusManagerService.onFocus.subscribe(
+        (name: string) => {
+          if (name === this.focusOn) {
+            this.el.nativeElement.focus();
+          }
+
+          // If the purpose of the focus switch was to clear focus, blur the
+          // element.
+          if (name === AppConstants.LABEL_FOR_CLEARING_FOCUS) {
+            this.el.nativeElement.blur();
+          }
+        }
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
 
 require('services/stateful/focus-manager.service.ts');
 

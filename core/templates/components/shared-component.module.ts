@@ -22,6 +22,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from
@@ -46,13 +48,13 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { FocusOnDirective } from 'core/templates/directives/focus-on.directive';
 
 
 @NgModule({
@@ -63,6 +65,7 @@ import { ProfileLinkTextComponent } from
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
+    FocusOnDirective,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -79,9 +82,13 @@ import { ProfileLinkTextComponent } from
   entryComponents: [
     BackgroundBannerComponent,
     SharingLinksComponent,
-    SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    SkillMasteryViewerComponent,
+    AttributionGuideComponent,
+    LazyLoadingComponent,
+    LoadingDotsComponent,
+    SocialButtonsComponent,
+    ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -95,6 +102,7 @@ import { ProfileLinkTextComponent } from
     MaterialModule,
     // Components, directives, and pipes.
     BackgroundBannerComponent,
+    FocusOnDirective,
     ExplorationSummaryTileDirective,
     SharingLinksComponent,
     StorySummaryTileDirective,
