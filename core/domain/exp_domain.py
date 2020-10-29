@@ -647,7 +647,7 @@ class ExplorationStateHistory(python_utils.OBJECT):
                         StateVersionSpan(exp.version, name, state))
                 elif name not in diff.deleted_state_names:
                     prev_state_spans, prev_name = (
-                        self._state_spans_history[exp.version - 1],
+                        self._state_spans_history[-1],
                         diff.new_to_old_state_names.get(name, name))
                     new_state_spans[name] = (
                         prev_state_spans[prev_name].extend_or_split(
@@ -666,6 +666,18 @@ class ExplorationStateHistory(python_utils.OBJECT):
             the given version.
         """
         return self._state_spans_history[exp_version - 1][state_name]
+
+    def has_state_span(self, exp_version, state_name):
+        """Returns whether the given version had a state with the given name.
+
+        Args:
+            exp_version: int. Exploration version to query.
+            state_name: str. The name of the state to query.
+
+        Returns:
+            bool. Whether a state with the given name existed at given version.
+        """
+        return state_name in self._state_spans_history[exp_version - 1]
 
 
 class Exploration(python_utils.OBJECT):
