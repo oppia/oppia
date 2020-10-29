@@ -479,21 +479,19 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
 
         span = exp_domain.StateVersionSpan(1, 'A', state)
 
-        self.assertIs(span.get_version(1), state)
-        self.assertEqual(span.get_version_name(1), 'A')
+        self.assertEqual(dict(span.names), {1: 'A'})
+        self.assertEqual(dict(span.states), {1: state})
 
     def test_get_version_with_extended_span(self):
-        distinct_states = [
-            self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
+        state_v1, state_v2, state_v3 = (
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3))
 
-        (span,) = self.get_state_version_spans('A', *distinct_states)
+        (span,) = (
+            self.get_state_version_spans('A', state_v1, state_v2, state_v3))
 
-        self.assertIs(span.get_version(1), distinct_states[0])
-        self.assertIs(span.get_version(2), distinct_states[1])
-        self.assertIs(span.get_version(3), distinct_states[2])
-        self.assertEqual(span.get_version_name(1), 'A')
-        self.assertEqual(span.get_version_name(2), 'A')
-        self.assertEqual(span.get_version_name(3), 'A')
+        self.assertEqual(
+            dict(span.states), {1: state_v1, 2: state_v2, 3: state_v3})
+        self.assertEqual(dict(span.names), {1: 'A', 2: 'A', 3: 'A'})
 
     def test_get_version_with_multi_spans(self):
         distinct_states = [
@@ -589,10 +587,8 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         span = exp_domain.StateVersionSpan(1, 'A', state_v1)
         span.extend_or_split(2, 'B', state_v2, diff)
 
-        self.assertIs(span.get_version(1), state_v1)
-        self.assertIs(span.get_version(2), state_v2)
-        self.assertEqual(span.get_version_name(1), 'A')
-        self.assertEqual(span.get_version_name(2), 'B')
+        self.assertEqual(dict(span.states), {1: state_v1, 2: state_v2})
+        self.assertEqual(dict(span.names), {1: 'A', 2: 'B'})
 
     def test_extend_or_split_with_unexpected_rename(self):
         (span,) = self.get_state_version_spans('A', self.new_state_domain_obj())

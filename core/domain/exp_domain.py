@@ -492,8 +492,21 @@ class StateVersionSpan(python_utils.OBJECT):
                 version.
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
-        self._version_snapshots = {exp_version: (state_name, state)}
+        self._version_snapshots = (
+            collections.OrderedDict({exp_version: (state_name, state)}))
         self._interaction_id = state.interaction.id
+
+    @property
+    def names(self):
+        """Yields all (version, state name) pairs that this span holds."""
+        for version, (name, unused_state) in self._version_snapshots.items():
+            yield (version, name)
+
+    @property
+    def states(self):
+        """Yields all (version, state) pairs that this span holds."""
+        for version, (unused_name, state) in self._version_snapshots.items():
+            yield (version, state)
 
     def get_version(self, version):
         """Returns the state as it appeared in the given exploration version.
