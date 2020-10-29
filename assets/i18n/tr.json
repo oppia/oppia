@@ -124,7 +124,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_1": "İletiler ve öneriler",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "Kullanıcı istatistikleri",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_3": "Halka açık keşifler, koleksiyonlar, konular, hikayeler, beceriler ve sorular",
-	"I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT": "Hesabınızı gerçekten silmek istiyor musunuz? <strong>Bu işlem geri alınamaz.</strong>",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "Bu işlem, bu kullanıcı hesabını ve bu hesapla ilişkili tüm özel verileri siler. Zaten herkese açık olan veriler anonimleştirilir, böylece bu hesapla ilişkilendirilemez. Bu verilerin bir kısmının mülkiyeti topluluğa aktarılabilir. Silinecek verilerin bir özeti:",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Genel bakış",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "Anonimleştirilecek verilerin özeti:",

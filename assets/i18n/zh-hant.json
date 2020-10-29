@@ -124,7 +124,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_1": "執行緒與建議",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "用戶統計",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_3": "公開探索、收藏、主題、故事、技能與問題",
-	"I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT": "您確定要刪除您的帳號嗎？<strong>此操作將無法還原。</strong>",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "此操作將會刪除該用戶帳號，與所有關聯該帳號的私有資料。已公開的資料因為無法與帳號關聯，因此會匿名處理。一些資料的所有權則可能會轉移到社群。以下是將會被刪除的資料摘要：",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "概要",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "將會匿名的資料摘要：",
