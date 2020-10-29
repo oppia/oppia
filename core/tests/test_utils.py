@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import collections
 import contextlib
+import contextlib2
 import copy
 import datetime
 import inspect
@@ -66,6 +67,8 @@ import schema_utils
 import utils
 
 from google.appengine.api import mail
+from google.appengine.ext import deferred
+from google.appengine.ext import testbed
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -2454,24 +2457,33 @@ tags: []
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
-    # We can't instantiate the stub in setUp because the overrided
-    # method run() executes before setUp() and run() requires the memory
-    # cache stub.
-    def __init__(self, *args, **kwargs):
-        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+    def setUp(self):
         self.memory_cache_services_stub = MemoryCacheServicesStub()
         self.taskqueue_services_stub = TaskqueueServicesStub(self)
 
-    def _delete_all_models(self):
-        """Deletes all models from the NDB datastore."""
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
+        with contextlib2.ExitStack() as stack:
+            swap_create_task = stack.enter_context(self.swap(
+                platform_taskqueue_services, 'create_http_task',
+                self.taskqueue_services_stub.create_http_task))
+            swap_flush_cache = stack.enter_context(self.swap(
+                memory_cache_services, 'flush_cache',
+                self.memory_cache_services_stub.flush_cache))
+            swap_get_multi = stack.enter_context(self.swap(
+                memory_cache_services, 'get_multi',
+                self.memory_cache_services_stub.get_multi))
+            swap_set_multi = stack.enter_context(self.swap(
+                memory_cache_services, 'set_multi',
+                self.memory_cache_services_stub.set_multi))
+            swap_get_memory_cache_stats = stack.enter_context(self.swap(
+                memory_cache_services, 'get_memory_cache_stats',
+                self.memory_cache_services_stub.get_memory_cache_stats))
+            swap_delete_multi = stack.enter_context(self.swap(
+                memory_cache_services, 'delete_multi',
+                self.memory_cache_services_stub.delete_multi))
+            self._stack = stack.pop_all()
 
-    def setUp(self):
         empty_environ()
         self.memory_cache_services_stub.flush_cache()
-
-        from google.appengine.ext import testbed
 
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -2500,47 +2512,14 @@ class AppEngineTestBase(TestBase):
 
         self.signup_superadmin_user()
 
-    def run(self, result=None):
-        """Adds a context switch to all test classes. This context switch occurs
-        to allow all test classes to automatically have access to a mock version
-        of the cache services functionality. All test classes that inherit
-        AppEngineTestBase will use a mocked version of the platform.cache cache
-        services API that can be found in the MemoryCacheServicesStub class.
-
-        Args:
-            result: TestResult|None. Optional result object that, if provided,
-                will collect the results of the test and returned to the caller
-                of run(). If None is provided, a default result object is
-                created and used. More details can be found here:
-                https://docs.python.org/3/library/unittest.html#unittest.
-                TestCase.run.
-        """
-        swap_create_task = self.swap(
-            platform_taskqueue_services, 'create_http_task',
-            self.taskqueue_services_stub.create_http_task)
-        swap_flush_cache = self.swap(
-            memory_cache_services, 'flush_cache',
-            self.memory_cache_services_stub.flush_cache)
-        swap_get_multi = self.swap(
-            memory_cache_services, 'get_multi',
-            self.memory_cache_services_stub.get_multi)
-        swap_set_multi = self.swap(
-            memory_cache_services, 'set_multi',
-            self.memory_cache_services_stub.set_multi)
-        swap_get_memory_cache_stats = self.swap(
-            memory_cache_services, 'get_memory_cache_stats',
-            self.memory_cache_services_stub.get_memory_cache_stats)
-        swap_delete_multi = self.swap(
-            memory_cache_services, 'delete_multi',
-            self.memory_cache_services_stub.delete_multi)
-        with swap_flush_cache, swap_get_multi, swap_set_multi, swap_create_task:
-            with swap_get_memory_cache_stats, swap_delete_multi:
-                super(AppEngineTestBase, self).run(result=result)
-
     def tearDown(self):
         self.logout()
-        self._delete_all_models()
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
+        with self._stack.pop_all() as unused_stack:
+            self._stack = None
+            # Allow callbacks and exit methods in the stack to unwind.
 
     def _get_all_queue_names(self):
         """Returns all the queue names.
@@ -2617,7 +2596,6 @@ class AppEngineTestBase(TestBase):
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
-                from google.appengine.ext import deferred
                 deferred.run(task.payload)
             else:
                 # All other tasks are expected to be mapreduce ones, or
