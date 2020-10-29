@@ -494,7 +494,6 @@ class StateVersionSpan(python_utils.OBJECT):
         self._version_start, self._version_end = exp_version, exp_version + 1
         self._version_snapshots = (
             collections.OrderedDict({exp_version: (state_name, state)}))
-        self._interaction_id = state.interaction.id
 
     @property
     def names(self):
@@ -591,7 +590,7 @@ class StateVersionSpan(python_utils.OBJECT):
         prev_exp_version, prev_state_name = (
             exp_version - 1,
             exp_version_diff.new_to_old_state_names.get(state_name, state_name))
-        prev_snapshot_state_name, unused_prev_snapshot_state = (
+        prev_snapshot_state_name, prev_snapshot_state = (
             self._version_snapshots[prev_exp_version])
 
         if prev_state_name != prev_snapshot_state_name:
@@ -601,7 +600,7 @@ class StateVersionSpan(python_utils.OBJECT):
                 'previous name was %r, but this span thinks that the previous '
                 'name was %r)' % (prev_state_name, prev_snapshot_state_name))
 
-        if self._interaction_id == state.interaction.id:
+        if prev_snapshot_state.is_structurally_compatible_with(state):
             self._version_snapshots[exp_version] = (state_name, state)
             self._version_end += 1
             return self
