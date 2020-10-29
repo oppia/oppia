@@ -154,8 +154,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 {
                     self.dev_feature.name: True,
                     self.prod_feature.name: True,
-                }
-            )
+                })
 
     def test_get_all_feature_flag_values_in_prod_returns_correct_values(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -171,8 +170,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 {
                     self.dev_feature.name: False,
                     self.prod_feature.name: True,
-                }
-            )
+                })
 
     def test_evaluate_dev_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):

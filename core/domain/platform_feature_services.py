@@ -172,8 +172,8 @@ def _create_evaluation_context_for_server(user_settings):
     """
     language_code = 'en' # Default language code if no preference is set.
     if (
-        user_settings is not None and
-        user_settings.preferred_site_language_code is not None):
+            user_settings is not None and
+            user_settings.preferred_site_language_code is not None):
         language_code = user_settings.preferred_site_language_code
 
     # TODO(#11073): Properly set app version below, and rename the user_locale
