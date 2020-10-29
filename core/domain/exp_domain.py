@@ -566,9 +566,9 @@ class StateVersionSpan(python_utils.OBJECT):
 
         Raises:
             Exception. When any of the following occurs:
-            -   The state is different.
-            -   The given version has already been recorded.
-            -   The given version is being added out-of-sequence.
+                The state is different.
+                The given version has already been recorded.
+                The given version is being added out-of-sequence.
         """
         if exp_version != self._version_end:
             raise Exception(
@@ -578,7 +578,7 @@ class StateVersionSpan(python_utils.OBJECT):
         prev_exp_version, prev_state_name = (
             exp_version - 1,
             exp_version_diff.new_to_old_state_names.get(state_name, state_name))
-        prev_snapshot_state_name, prev_snapshot_state = (
+        prev_snapshot_state_name, unused_prev_snapshot_state = (
             self._version_snapshots[prev_exp_version])
 
         if prev_state_name != prev_snapshot_state_name:
@@ -641,7 +641,7 @@ class ExplorationStateHistory(python_utils.OBJECT):
         self._state_spans_history = []
         for exp, diff in python_utils.ZIP(exps, exp_version_diffs):
             curr_version, curr_state_spans = int(exp.version), dict()
-            for name, state in exp.states.iteritems():
+            for name, state in exp.states.items():
                 if curr_version == 1 or name in diff.added_state_names:
                     curr_state_spans[name] = (
                         StateVersionSpan(curr_version, name, state))

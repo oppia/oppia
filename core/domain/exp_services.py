@@ -28,7 +28,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import datetime
 import logging
-import itertools
 import math
 import os
 import pprint

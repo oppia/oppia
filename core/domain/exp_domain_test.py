@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import os
 import re
-import unittest
 
 from constants import constants
 from core.domain import exp_domain
@@ -608,7 +607,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
 class ExplorationStateHistoryTests(test_utils.GenericTestBase):
 
     def test_create_from_new_exploration(self):
-        exp = self.save_new_linear_exp_with_state_names_and_interactions(
+        self.save_new_linear_exp_with_state_names_and_interactions(
             'exp_id', 'owner_id', ['A', 'B'], ['TextInput', 'EndExploration'])
 
         history = exp_services.get_exploration_state_history('exp_id')
