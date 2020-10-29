@@ -181,12 +181,12 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         validator = MockBaseUserModelValidator()
         validator.validate_deleted(model)
         self.assertEqual(
-            validator.errors.items(),
-            [(
-                'entity stale check',
+            validator.errors,
+            {
+                'entity stale check':
                 [
                     'Entity id 12345: '
                     'model marked as deleted older more than 8 weeks'
                 ]
-            )]
+            }
         )
