@@ -248,7 +248,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         if not feconf.CAN_SEND_EMAILS:
             return
         if not (config_domain
-            .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
+                .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
             return
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
         if not reviewer_ids:
