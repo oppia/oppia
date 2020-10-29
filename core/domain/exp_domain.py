@@ -495,16 +495,38 @@ class StateVersionSpan(python_utils.OBJECT):
         self._version_snapshots = (
             collections.OrderedDict({exp_version: (state_name, state)}))
 
+    def __iter__(self):
+        """Yields consecutive items from self."""
+        return iter(self._version_snapshots.items())
+
+    def __contains__(self, version):
+        """Returns whether the given version is covered by self."""
+        return self._version_start <= version < self._version_end
+
+    def __getitem__(self, version):
+        """Returns the name and snapshot of the state at the given version."""
+        if version not in self:
+            raise KeyError('Span does not cover version=%r' % version)
+        return self._version_snapshots[version]
+
+    def __setitem__(self, unused_version, unused_snapshot):
+        """Raises an exception. Only `extend_or_split` can mutate a span."""
+        raise Exception('Only `extend_or_split` can mutate a span')
+
+    def __len__(self):
+        """Returns the number of versions covered by self."""
+        return len(self._version_snapshots)
+
     @property
     def names(self):
         """Yields all (version, state name) pairs that this span holds."""
-        for version, (name, unused_state) in self._version_snapshots.items():
+        for version, (name, unused_state) in self:
             yield (version, name)
 
     @property
     def states(self):
         """Yields all (version, state) pairs that this span holds."""
-        for version, (unused_name, state) in self._version_snapshots.items():
+        for version, (unused_name, state) in self:
             yield (version, state)
 
     def get_version(self, version):
@@ -516,7 +538,7 @@ class StateVersionSpan(python_utils.OBJECT):
         Returns:
             state_domain.State. The state as it appeared in the given version.
         """
-        unused_name, state = self._version_snapshots[version]
+        unused_name, state = self[version]
         return state
 
     def get_version_name(self, version):
@@ -528,7 +550,7 @@ class StateVersionSpan(python_utils.OBJECT):
         Returns:
             str. The name of the state at the given exploration version.
         """
-        name, unused_state = self._version_snapshots[version]
+        name, unused_state = self[version]
         return name
 
     def get_multi_versions(self, version_start, version_end):
@@ -590,8 +612,8 @@ class StateVersionSpan(python_utils.OBJECT):
         prev_exp_version, prev_state_name = (
             exp_version - 1,
             exp_version_diff.new_to_old_state_names.get(state_name, state_name))
-        prev_snapshot_state_name, prev_snapshot_state = (
-            self._version_snapshots[prev_exp_version])
+
+        prev_snapshot_state_name, prev_snapshot_state = self[prev_exp_version]
 
         if prev_state_name != prev_snapshot_state_name:
             raise Exception(
@@ -621,7 +643,7 @@ class StateVersionSpan(python_utils.OBJECT):
         version_range = python_utils.RANGE(
             max(self._version_start, version_start),
             min(self._version_end, version_end))
-        return [self._version_snapshots[v] for v in version_range]
+        return [self[v] for v in version_range]
 
 
 class ExplorationStateHistory(python_utils.OBJECT):

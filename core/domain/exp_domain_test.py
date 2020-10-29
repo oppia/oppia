@@ -474,11 +474,30 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
                 distinct_spans.append(span)
         return distinct_spans
 
+    def test_set_version_directly_raises_an_error(self):
+        state = self.new_state_domain_obj()
+
+        span = exp_domain.StateVersionSpan(1, 'A', state)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Only `extend_or_split` can mutate a span'):
+            span[2] = ('A', state)
+
+    def test_get_invalid_version_raises_an_error(self):
+        state = self.new_state_domain_obj()
+
+        span = exp_domain.StateVersionSpan(1, 'A', state)
+
+        with self.assertRaisesRegexp(Exception, 'does not cover version=5'):
+            _ = span[5]
+
     def test_get_version_with_newly_constructed_span(self):
         state = self.new_state_domain_obj()
 
         span = exp_domain.StateVersionSpan(1, 'A', state)
 
+        self.assertEqual(len(span), 1)
+        self.assertIn(1, span)
         self.assertEqual(dict(span.names), {1: 'A'})
         self.assertEqual(dict(span.states), {1: state})
 
