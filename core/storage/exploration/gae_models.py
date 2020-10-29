@@ -582,6 +582,15 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     exploration_id = (
         datastore_services.StringProperty(indexed=True, required=True))
 
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationCommitLogEntryModel contains data corresponding to a user
+        that requires pseudonymization/deletion: user_id field.
+        """
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
     @classmethod
     def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of

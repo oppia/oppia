@@ -505,6 +505,15 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     collection_id = (
         datastore_services.StringProperty(indexed=True, required=True))
 
+    @staticmethod
+    def get_deletion_policy():
+        """CollectionCommitLogEntryModel contains data corresponding to a user
+        that requires pseudonymization/deletion: user_id field.
+        """
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
     @classmethod
     def get_export_policy(cls):
         """The history of commits is not relevant for the purposes of

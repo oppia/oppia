@@ -423,6 +423,13 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionCommitLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionCommitLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
     def test_has_reference_to_user_id(self):
         commit = collection_models.CollectionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],

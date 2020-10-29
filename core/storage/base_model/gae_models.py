@@ -46,7 +46,8 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'DELETE_AT_END',
     # Models that should be pseudonymized in their local context.
     'LOCALLY_PSEUDONYMIZE',
-    # Models that should only be kept if published.
+    # Models that should be pseudonymized if they are published and otherwise
+    # (when private) deleted.
     'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE',
     # Models that are not directly or indirectly related to users.
     'NOT_APPLICABLE'
@@ -421,8 +422,8 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """BaseCommitLogEntryModel contain data to pseudonymize corresponding to
-        a user: user_id field.
+        """BaseCommitLogEntryModel contains data corresponding to a user that
+        requires pseudonymization: user_id field.
         """
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
