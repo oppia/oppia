@@ -18,6 +18,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { Subscription } from 'rxjs';
 
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service.ts';
@@ -42,11 +43,9 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
         () => {
-         this.collectionTitle = (
+          this.collectionTitle = (
             this.readOnlyCollectionBackendApiService.getCollectionDetails(
               this.urlService.getCollectionIdFromUrl()).title);
-            .getCollectionDetails(this.urlService.getCollectionIdFromUrl())
-            .title;
         }
       )
     );
