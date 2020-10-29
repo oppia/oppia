@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Services for tracking the progress of the learner."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -96,13 +97,21 @@ def _save_completed_activities(activities_completed):
         activities_completed: CompletedActivities. The activities
             completed domain object to be saved in the datastore.
     """
-    completed_activities_model = user_models.CompletedActivitiesModel(
-        id=activities_completed.id,
-        exploration_ids=(
+    activities_completed_dict = {
+        'exploration_ids': (
             activities_completed.exploration_ids),
-        collection_ids=activities_completed.collection_ids)
+        'collection_ids': activities_completed.collection_ids
+    }
 
-    completed_activities_model.put()
+    completed_activities_model = (
+        user_models.CompletedActivitiesModel.get_by_id(activities_completed.id))
+    if completed_activities_model is not None:
+        completed_activities_model.populate(**activities_completed_dict)
+        completed_activities_model.update_timestamps()
+        completed_activities_model.put()
+    else:
+        activities_completed_dict['id'] = activities_completed.id
+        user_models.CompletedActivitiesModel(**activities_completed_dict).put()
 
 
 def _save_incomplete_activities(incomplete_activities):
@@ -120,6 +129,7 @@ def _save_incomplete_activities(incomplete_activities):
         collection_ids=(
             incomplete_activities.collection_ids))
 
+    incomplete_activities_model.update_timestamps()
     incomplete_activities_model.put()
 
 
@@ -140,6 +150,7 @@ def _save_last_playthrough_information(last_playthrough_information):
                 last_playthrough_information.last_played_exp_version),
             last_played_state_name=(
                 last_playthrough_information.last_played_state_name)))
+    last_playthrough_information_model.update_timestamps()
     last_playthrough_information_model.put()
 
 
@@ -329,11 +340,11 @@ def add_collection_to_learner_playlist(
 
     Returns:
         (bool, bool, bool). The first boolean indicates whether the collection
-            already exists in either of the "completed collections" or
-            "incomplete collections" lists, the second boolean indicates
-            whether the playlist limit of the user has been
-            exceeded, and the third boolean indicates whether the collection
-            belongs to the created or edited collections of the user.
+        already exists in either of the "completed collections" or "incomplete
+        collections" lists, the second boolean indicates whether the playlist
+        limit of the user has been exceeded, and the third boolean indicates
+        whether the collection belongs to the created or edited collections of
+        the user.
     """
     completed_collection_ids = get_all_completed_collection_ids(user_id)
     incomplete_collection_ids = get_all_incomplete_collection_ids(user_id)
@@ -375,11 +386,11 @@ def add_exp_to_learner_playlist(
 
     Returns:
         (bool, bool, bool). The first boolean indicates whether the exploration
-            already exists in either of the "completed explorations" or
-            "incomplete explorations" lists, the second boolean indicates
-            whether the playlist limit of the user has been
-            exceeded, and the third boolean indicates whether the exploration
-            belongs to the created or edited explorations of the user.
+        already exists in either of the "completed explorations" or
+        "incomplete explorations" lists, the second boolean indicates
+        whether the playlist limit of the user has been
+        exceeded, and the third boolean indicates whether the exploration
+        belongs to the created or edited explorations of the user.
     """
     completed_exploration_ids = get_all_completed_exp_ids(user_id)
     incomplete_exploration_ids = get_all_incomplete_exp_ids(user_id)
@@ -522,8 +533,8 @@ def remove_collection_from_incomplete_list(user_id, collection_id):
             _save_incomplete_activities(incomplete_activities)
 
 
-def _remove_activity_ids_from_incomplete_list(user_id, exploration_ids=None,
-                                              collection_ids=None):
+def _remove_activity_ids_from_incomplete_list(
+        user_id, exploration_ids=None, collection_ids=None):
     """Removes the collections and explorations from the incomplete list of the
     user.
 
@@ -558,7 +569,7 @@ def get_all_completed_exp_ids(user_id):
 
     Returns:
         list(str). A list of the ids of the explorations completed by the
-            learner.
+        learner.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -612,7 +623,7 @@ def get_all_completed_collection_ids(user_id):
 
     Returns:
         list(str). A list of the ids of the collections completed by the
-            learner.
+        learner.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -695,7 +706,7 @@ def get_all_incomplete_exp_ids(user_id):
 
     Returns:
         list(str). A list of the ids of the explorations partially completed by
-            the learner.
+        the learner.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(
@@ -749,7 +760,7 @@ def get_all_incomplete_collection_ids(user_id):
 
     Returns:
         list(str). A list of the ids of the collections partially completed by
-            the learner.
+        the learner.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(user_id, strict=False))
@@ -867,7 +878,7 @@ def get_collection_summary_dicts(collection_summaries):
 
     Returns:
         list(dict). The summary dict objects corresponding to the given summary
-            domain objects.
+        domain objects.
     """
     summary_dicts = []
     for collection_summary in collection_summaries:
@@ -904,7 +915,7 @@ def get_learner_dashboard_activities(user_id):
 
     Returns:
         ActivityIdsInLearnerDashboard. The domain object containing the ids of
-            all activities in the learner dashboard.
+        all activities in the learner dashboard.
     """
     learner_progress_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -962,9 +973,9 @@ def get_activity_progress(user_id):
 
     Returns:
         (LearnerProgress, dict, list(str)). The first return value is the
-            learner progress domain object corresponding to the particular
-            learner. The second return value is the numbers of the activities
-            that are no longer present. It contains four keys:
+        learner progress domain object corresponding to the particular
+        learner. The second return value is the numbers of the activities
+        that are no longer present. It contains four keys:
             - incomplete_explorations: int. The number of incomplete
                 explorations no longer present.
             - incomplete_collections: int. The number of incomplete collections

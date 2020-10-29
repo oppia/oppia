@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for Oppia storage model audit jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -43,7 +44,6 @@ MODEL_CLASS_NAMES_TO_EXCLUDE = {
     'LeaveForRefresherExplorationEventLogEntryModel',
     'ExplorationStatsModel',
     'ExplorationIssuesModel',
-    'PlaythroughModel',
     'LearnerAnswerDetailsModel',
     'ExplorationAnnotationsModel',
     'StateAnswersModel',
@@ -83,13 +83,9 @@ class StorageModelAuditJobsTest(test_utils.GenericTestBase):
                     if 'Model' in all_base_classes:
                         names_of_ndb_model_subclasses.append(clazz.__name__)
 
-        names_of_all_audit_job_classes = []
-        for name, clazz in inspect.getmembers(
-                prod_validation_jobs_one_off, predicate=inspect.isclass):
-            all_base_classes = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
-            if 'ProdValidationAuditOneOffJob' in all_base_classes:
-                names_of_all_audit_job_classes.append(name)
+        names_of_all_audit_job_classes = (
+            prod_validation_jobs_one_off.ProdValidationAuditOneOffJobMetaClass
+            .get_model_audit_job_names())
 
         model_class_names_with_missing_audit_jobs = [
             model_class_name

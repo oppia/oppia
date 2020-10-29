@@ -18,11 +18,12 @@
 
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
+import { UtilsService } from 'services/utils.service';
 
 describe('Music Notes Input rules service', () => {
   let mnirs: MusicNotesInputRulesService = null;
   beforeEach(() => {
-    mnirs = new MusicNotesInputRulesService();
+    mnirs = new MusicNotesInputRulesService(new UtilsService());
   });
 
   it('should have a correct \'equals\' rule', () => {
@@ -627,13 +628,6 @@ describe('Music Notes Input rules service', () => {
         den: 1
       }
     }], {
-      x: [{
-        readableNoteName: 'A4',
-        noteDuration: {
-          num: 1,
-          den: 1
-        }
-      }],
       k: 1
     })).toBe(true);
 
@@ -656,25 +650,6 @@ describe('Music Notes Input rules service', () => {
         den: 1
       }
     }], {
-      x: [{
-        readableNoteName: 'C4',
-        noteDuration: {
-          num: 1,
-          den: 1
-        }
-      }, {
-        readableNoteName: 'D4',
-        noteDuration: {
-          num: 1,
-          den: 1
-        }
-      }, {
-        readableNoteName: 'E4',
-        noteDuration: {
-          num: 1,
-          den: 1
-        }
-      }],
       k: 5
     })).toBe(false);
   });
@@ -693,13 +668,6 @@ describe('Music Notes Input rules service', () => {
           den: 1
         }
       }], {
-        x: [{
-          readableNoteName: 'A4',
-          noteDuration: {
-            num: 1,
-            den: 1
-          }
-        }],
         a: 1,
         b: 3
       })).toBe(true);
@@ -723,25 +691,6 @@ describe('Music Notes Input rules service', () => {
           den: 1
         }
       }], {
-        x: [{
-          readableNoteName: 'C4',
-          noteDuration: {
-            num: 1,
-            den: 1
-          }
-        }, {
-          readableNoteName: 'D4',
-          noteDuration: {
-            num: 1,
-            den: 1
-          }
-        }, {
-          readableNoteName: 'E4',
-          noteDuration: {
-            num: 1,
-            den: 1
-          }
-        }],
         a: 5,
         b: 10
       })).toBe(false);

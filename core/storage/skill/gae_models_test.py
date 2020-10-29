@@ -15,12 +15,16 @@
 # limitations under the License.
 
 """Tests for Skill models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import rights_manager
+import datetime
+
+from constants import constants
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (base_models, skill_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.skill])
@@ -32,7 +36,35 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            skill_models.SkillModel.has_reference_to_user_id('any_id'))
+
+
+class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
+    """Tests the SkillCommitLogEntryModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            skill_models.SkillCommitLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self):
+        commit = skill_models.SkillCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False
+        )
+        commit.skill_id = 'b'
+        commit.update_timestamps()
+        commit.put()
+        self.assertTrue(
+            skill_models.SkillCommitLogEntryModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            skill_models.SkillCommitLogEntryModel
+            .has_reference_to_user_id('x_id'))
 
 
 class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
@@ -41,61 +73,60 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
 
-class SkillRightsModelUnitTest(test_utils.GenericTestBase):
-    """Test the SkillRightsModel class."""
+    def test_fetch_page(self):
+        skill_models.SkillSummaryModel(
+            id='skill_id1',
+            description='description1',
+            misconception_count=1,
+            version=1,
+            worked_examples_count=1,
+            language_code='en',
+            skill_model_last_updated=datetime.datetime.utcnow(),
+            skill_model_created_on=datetime.datetime.utcnow()
+        ).put()
+        skill_models.SkillSummaryModel(
+            id='skill_id2',
+            description='description2',
+            misconception_count=1,
+            worked_examples_count=1,
+            version=1,
+            language_code='en',
+            skill_model_last_updated=datetime.datetime.utcnow(),
+            skill_model_created_on=datetime.datetime.utcnow()
+        ).put()
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            skill_models.SkillRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(1, None, None))
+        self.assertEqual(skill_summaries[0].id, 'skill_id2')
+        self.assertTrue(more)
+        self.assertTrue(isinstance(next_cursor, python_utils.BASESTRING))
 
-    def setUp(self):
-        super(SkillRightsModelUnitTest, self).setUp()
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(10, None, None))
+        self.assertEqual(skill_summaries[0].id, 'skill_id2')
+        self.assertFalse(more)
+        self.assertEqual(next_cursor, None)
 
-        skill_models.SkillRightsModel(
-            id='id_1',
-            creator_id='janet',
-            skill_is_private=True
-        ).commit(
-            'janet', 'Created new skill rights',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        skill_models.SkillRightsModel(
-            id='id_2',
-            creator_id='janet',
-            skill_is_private=True
-        ).commit(
-            'janet', 'Edited skill rights',
-            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
-        skill_models.SkillRightsModel(
-            id='id_3',
-            creator_id='joe',
-            skill_is_private=False
-        ).commit(
-            'joe', 'Created new skill rights',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        skill_models.SkillRightsModel(
-            id='id_4',
-            creator_id='joe',
-            skill_is_private=True
-        ).commit(
-            'joe', 'Created new skill rights',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(
+                10, None, 'Oldest Created'))
+        self.assertEqual(skill_summaries[0].id, 'skill_id1')
+        self.assertEqual(skill_summaries[1].id, 'skill_id2')
 
-    def test_get_unpublished_by_creator_id(self):
-        results = (
-            skill_models.SkillRightsModel
-            .get_unpublished_by_creator_id('janet').fetch(2))
-        self.assertEqual(len(results), 2)
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(
+                10, None, 'Most Recently Updated'))
+        self.assertEqual(skill_summaries[0].id, 'skill_id2')
+        self.assertEqual(skill_summaries[1].id, 'skill_id1')
 
-    def test_get_unpublished_by_creator_id_should_ignore_public_skills(self):
-        results = (
-            skill_models.SkillRightsModel
-            .get_unpublished_by_creator_id('joe').fetch(2))
-        self.assertEqual(len(results), 1)
-
-    def test_get_unpublished_fetches_all_unpublished_skills(self):
-        self.assertEqual(
-            len(skill_models.SkillRightsModel.get_unpublished().fetch(4)), 3)
+        skill_summaries, next_cursor, more = (
+            skill_models.SkillSummaryModel.fetch_page(
+                10, None, 'Least Recently Updated'))
+        self.assertEqual(skill_summaries[0].id, 'skill_id1')
+        self.assertEqual(skill_summaries[1].id, 'skill_id2')

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the learner dashboard."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -28,6 +29,15 @@ from core.domain import user_services
 import feconf
 import python_utils
 import utils
+
+
+class OldLearnerDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old learner dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.LEARNER_DASHBOARD_URL, permanent=True)
 
 
 class LearnerDashboardPage(base.BaseHandler):
@@ -78,7 +88,7 @@ class LearnerDashboardHandler(base.BaseHandler):
             self.user_id)
         if len(full_thread_ids) > 0:
             thread_summaries, number_of_unread_threads = (
-                feedback_services.get_thread_summaries(
+                feedback_services.get_exp_thread_summaries(
                     self.user_id, full_thread_ids))
         else:
             thread_summaries, number_of_unread_threads = [], 0
@@ -112,7 +122,7 @@ class LearnerDashboardHandler(base.BaseHandler):
                 number_of_nonexistent_activities),
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
-            'thread_summaries': thread_summaries,
+            'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
             'subscription_list': subscription_list
         })
@@ -126,6 +136,7 @@ class LearnerDashboardIdsHandler(base.BaseHandler):
     the activities currently being pursued, and the activities present in
     the playlist.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_learner_dashboard
@@ -174,7 +185,9 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'description': suggestion_thread.subject,
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url)
+                    authors_settings[0].profile_picture_data_url),
+                'created_on_msecs': utils.get_time_in_millisecs(
+                    messages[0].created_on)
             }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
@@ -196,7 +209,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'updated_status': m.updated_status,
                 'author_username': author_username,
                 'author_picture_data_url': author_picture_data_url,
-                'created_on': utils.get_time_in_millisecs(m.created_on)
+                'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 

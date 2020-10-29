@@ -10,6 +10,11 @@
 
 /**
  * @fileoverview Definitions for rich text components.
+ *
+ * NOTE TO DEVELOPERS: If a new inline element is added (i.e 'is_block_element'
+ * is false), then make sure to add .cke_widget_<element id> {display: inline;}
+ * style to the element's directive HTML and add a CSS style similar to
+ * oppia-noninteractive-link in oppia.css for the new directive.
  */
 
 export = {
@@ -22,6 +27,7 @@ export = {
     "icon_data_url": "/rich_text_components/Collapsible/Collapsible.png",
     "is_complex": true,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "heading",
@@ -51,10 +57,11 @@ export = {
     "icon_data_url": "/rich_text_components/Image/Image.png",
     "is_complex": false,
     "requires_fs": true,
+    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "filepath",
-      "description": "The image (Allowed extensions: gif, jpeg, jpg, png)",
+      "description": "The image (Allowed extensions: gif, jpeg, jpg, png, svg)",
       "schema": {
         "type": "custom",
         "obj_type": "Filepath"
@@ -91,6 +98,7 @@ export = {
     "icon_data_url": "/rich_text_components/Link/Link.png",
     "is_complex": false,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
       "name": "url",
@@ -118,13 +126,79 @@ export = {
     "icon_data_url": "/rich_text_components/Math/Math.png",
     "is_complex": false,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
-      "name": "raw_latex",
-      "description": "The raw string to be displayed as LaTeX.",
+      "name": "math_content",
+      "description": "The Math Expression to be displayed.",
       "schema": {
         "type": "custom",
-        "obj_type": "MathLatexString"
+        "obj_type": "MathExpressionContent"
+      },
+      "default_value": {
+        "raw_latex": "",
+        "svg_filename": ""
+      }
+    }]
+  },
+  "Skillreview": {
+    "backend_id": "skillreview",
+    "category": "Basic Input",
+    "description": "A link to the concept card of the linked skill.",
+    "frontend_id": "skillreview",
+    "tooltip": "Insert Concept Card Link",
+    "icon_data_url": "/rich_text_components/Skillreview/Skillreview.png",
+    "is_complex": false,
+    "requires_fs": false,
+    "is_lesson_related": true,
+    "is_block_element": false,
+    "customization_arg_specs": [{
+      "name": "text",
+      "description": "The text to be displayed",
+      "schema": {
+        "type": "unicode"
+      },
+      "default_value": "concept card"
+    }, {
+      "name": "skill_id",
+      "description": "The skill that this link refers to",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SkillSelector"
+      },
+      "default_value": ""
+    }]
+  },
+  "Svgdiagram": {
+    "backend_id": "svgdiagram",
+    "category": "Basic Input",
+    "description": "A custom SVG diagram.",
+    "frontend_id": "svgdiagram",
+    "tooltip": "Insert diagram",
+    "icon_data_url": "/rich_text_components/Svgdiagram/Svgdiagram.png",
+    "is_complex": false,
+    "requires_fs": true,
+    "is_lesson_related": false,
+    "is_block_element": true,
+    "customization_arg_specs": [{
+      "name": "svg_filename",
+      "description": "The SVG Diagram Editor",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SvgFilename"
+      },
+      "default_value": ""
+    }, {
+      "name": "alt",
+      "description": "Briefly explain this diagram to a visually impaired learner",
+      "schema": {
+        "type": "unicode",
+        "validators": [{
+          "id": "is_nonempty"
+        }],
+        "ui_config": {
+          "placeholder": "Description of the diagram"
+        }
       },
       "default_value": ""
     }]
@@ -138,6 +212,7 @@ export = {
     "icon_data_url": "/rich_text_components/Tabs/Tabs.png",
     "is_complex": true,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "tab_contents",
@@ -164,10 +239,11 @@ export = {
     "icon_data_url": "/rich_text_components/Video/Video.png",
     "is_complex": false,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "video_id",
-      "description": "The YouTube id for this video. This is the 11-character string after \"v=\" in the video URL.",
+      "description": "The Youtube URL or the YouTube id for this video. (The Youtube id is the 11-character string after \"v=\" in the video URL.)",
       "schema": {
         "type": "unicode"
       },

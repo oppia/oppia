@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for fetching the features Oppia provides to its users."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -30,6 +31,7 @@ def exploration_features_url(exp_id):
 
 class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
     """Does common exploration set up for testing feature handlers."""
+
     EXP_ID = 'expId'
 
     def setUp(self):
@@ -49,7 +51,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            new_config_value=[self.EXP_ID])
+            [self.EXP_ID])
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
@@ -58,7 +60,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
     def test_can_not_record_playthroughs_with_empty_whitelist(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            new_config_value=[])
+            [])
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
@@ -67,28 +69,8 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
     def test_can_not_record_playthroughs_for_exploration_not_in_whitelist(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            new_config_value=[self.EXP_ID + '-differentiate'])
+            [self.EXP_ID + '-differentiate'])
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
         self.assertFalse(json_response['is_exploration_whitelisted'])
-
-
-class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
-    """Tests for fetching whether the improvements tab is enabled."""
-
-    def test_improvements_tab_is_enabled(self):
-        self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=True)
-
-        json_response = self.get_json(exploration_features_url(self.EXP_ID))
-
-        self.assertTrue(json_response['is_improvements_tab_enabled'])
-
-    def test_improvements_tab_is_disabled(self):
-        self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=False)
-
-        json_response = self.get_json(exploration_features_url(self.EXP_ID))
-
-        self.assertFalse(json_response['is_improvements_tab_enabled'])

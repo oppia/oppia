@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // all the rules are upgraded to Angular 8.
-import { CodeNormalizerService } from 'services/CodeNormalizerService';
+import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -33,19 +33,31 @@ import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-/* eslint-disable max-len */
-import { DragAndDropSortInputRulesService } from
-  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
-import { MultipleChoiceInputRulesService } from
-  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
-import { ItemSelectionInputRulesService } from
-  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
-/* eslint-enable max-len */
+import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { DragAndDropSortInputRulesService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
+import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { MathEquationInputRulesService } from
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import { NumberWithUnitsRulesService } from
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { FractionInputRulesService } from
+  'interactions/FractionInput/directives/fraction-input-rules.service';
+import { GraphInputRulesService } from
+  'interactions/GraphInput/directives/graph-input-rules.service';
+import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
+import { UtilsService } from 'services/utils.service';
+import { UpgradedServices } from 'services/UpgradedServices';
+import { ImageClickAnswer } from './answer-defs';
+import { ImageClickRuleInputs } from './rule-input-defs';
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
   var rulesServices = {};
-  var ruleTemplates;
+  var ruleTemplates: RuleTemplates;
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -53,12 +65,21 @@ describe('Rule spec services', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
+    $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
     $provide.value(
+      'AlgebraicExpressionInputRulesService',
+      new AlgebraicExpressionInputRulesService());
+    $provide.value(
+      'RatioExpressionInputRulesService',
+      new RatioExpressionInputRulesService());
+    $provide.value(
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());
+    $provide.value(
+      'MathEquationInputRulesService', new MathEquationInputRulesService());
     $provide.value(
       'MultipleChoiceInputRulesService', new MultipleChoiceInputRulesService());
     $provide.value('NumericInputRulesService', new NumericInputRulesService());
@@ -66,9 +87,24 @@ describe('Rule spec services', function() {
       'InteractiveMapRulesService', new InteractiveMapRulesService());
     $provide.value('LogicProofRulesService', new LogicProofRulesService());
     $provide.value(
-      'MusicNotesInputRulesService', new MusicNotesInputRulesService());
+      'MusicNotesInputRulesService', new MusicNotesInputRulesService(
+        new UtilsService()));
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
+    $provide.value(
+      'NumberWithUnitsRulesService', new NumberWithUnitsRulesService(
+        new NumberWithUnitsObjectFactory(
+          new UnitsObjectFactory(), new FractionObjectFactory(),
+        ), new UtilsService()));
+    $provide.value(
+      'NumericExpressionInputRulesService',
+      new NumericExpressionInputRulesService());
+    $provide.value(
+      'FractionInputRulesService', new FractionInputRulesService(
+        new FractionObjectFactory(), new UtilsService()));
+    $provide.value(
+      'GraphInputRulesService', new GraphInputRulesService(
+        new GraphUtilsService(), new UtilsService()));
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The
@@ -78,24 +114,18 @@ describe('Rule spec services', function() {
     $provide.value('ContinueRulesService', {});
     $provide.value('EndExplorationRulesService', {});
     $provide.value('ImageClickInputRulesService', {
-      // TODO(#7165): Replace 'any' with the exact type. This has been
-      // typed as 'any' since 'answer' is a complex object having varying types.
-      // A general type needs to be found. Same goes for 'inputs'.
-      IsInRegion: function(answer: any, inputs: any) {
+      IsInRegion: function(
+          answer: ImageClickAnswer, inputs: ImageClickRuleInputs) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
-    $provide.value('MathExpressionInputRulesService', {
-      // TODO(#7165): Replace 'any' with the exact type. This has been
-      // typed as 'any' since 'answer' is a complex object having varying types.
-      // A general type needs to be found. Same goes for 'inputs'.
-      IsMathematicallyEquivalentTo: function(answer: any, inputs: any) {
-        return (
-          MathExpression.fromLatex(answer.latex).equals(
-            MathExpression.fromLatex(inputs.x)));
-      }
-    });
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
   }));
 
   var getRulesServiceName = function(interactionId) {

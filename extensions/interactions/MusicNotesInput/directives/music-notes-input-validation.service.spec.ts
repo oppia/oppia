@@ -20,10 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-/* eslint-disable max-len*/
-import { MusicNotesInputValidationService } from
-  'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
-/* eslint-enable max-len*/
+import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -49,19 +46,26 @@ describe('MusicNotesInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      currentState, {
+        sequenceToGuess: {
+          value: []
+        },
+        initialSequence: {
+          value: []
+        }
+      }, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 });

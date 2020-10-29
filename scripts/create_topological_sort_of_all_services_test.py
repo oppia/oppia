@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/create_topological_sort_of_all_services.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -30,6 +31,7 @@ class TopologicalSortTests(test_utils.GenericTestBase):
     """Test the methods which performs topological sort of services based
     on dependencies.
     """
+
     def test_dfs_with_connected_graph(self):
         topo_sort_stack = []
         visit_stack = []

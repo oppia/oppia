@@ -22,47 +22,46 @@
 // in via initArgs.
 
 angular.module('oppia').directive('graphPropertyEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/graph-property-editor.directive.html'),
+      template: require('./graph-property-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.alwaysEditable = true;
+        ctrl.$onInit = function() {
+          $scope.$watch('$ctrl.localValue.property', function() {
+            ctrl.value = ctrl.localValue.property.name;
+          });
+          ctrl.alwaysEditable = true;
 
-        ctrl.graphProperties = [{
-          name: 'regular',
-          humanReadableName: 'regular'
-        }, {
-          name: 'acyclic',
-          humanReadableName: 'acyclic'
-        }, {
-          name: 'strongly_connected',
-          humanReadableName: 'strongly connected'
-        }, {
-          name: 'weakly_connected',
-          humanReadableName: 'weakly connected'
-        }];
-        ctrl.localValue = {
-          property: ctrl.graphProperties[0]
-        };
+          ctrl.graphProperties = [{
+            name: 'regular',
+            humanReadableName: 'regular'
+          }, {
+            name: 'acyclic',
+            humanReadableName: 'acyclic'
+          }, {
+            name: 'strongly_connected',
+            humanReadableName: 'strongly connected'
+          }, {
+            name: 'weakly_connected',
+            humanReadableName: 'weakly connected'
+          }];
+          ctrl.localValue = {
+            property: ctrl.graphProperties[0]
+          };
 
-        for (var i = 0; i < ctrl.graphProperties.length; i++) {
-          if (ctrl.graphProperties[i].name === ctrl.value) {
-            ctrl.localValue.property = ctrl.graphProperties[i];
+          for (var i = 0; i < ctrl.graphProperties.length; i++) {
+            if (ctrl.graphProperties[i].name === ctrl.value) {
+              ctrl.localValue.property = ctrl.graphProperties[i];
+            }
           }
-        }
-
-        $scope.$watch('$ctrl.localValue.property', function() {
-          ctrl.value = ctrl.localValue.property.name;
-        });
+        };
       }]
     };
   }]);

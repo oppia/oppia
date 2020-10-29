@@ -13,15 +13,27 @@
 # limitations under the License.
 
 """Tests for Oppia storage models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
+from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(
+    base_models, collection_models, email_models,
+    exploration_models, feedback_models, skill_models,
+    topic_models, suggestion_models, user_models,
+    story_models, question_models, config_models
+) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
+    models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
+    models.NAMES.story, models.NAMES.question, models.NAMES.config])
 
 
 class StorageModelsTest(test_utils.GenericTestBase):
@@ -29,18 +41,14 @@ class StorageModelsTest(test_utils.GenericTestBase):
 
     def _get_model_module_names(self):
         """Get all module names in storage."""
-        all_model_module_names = []
-
         # As models.NAMES is an enum, it cannot be iterated. So we use the
         # __dict__ property which can be iterated.
         for name in models.NAMES.__dict__:
             if '__' not in name:
-                all_model_module_names.append(name)
-        return all_model_module_names
+                yield name
 
     def _get_model_classes(self):
         """Get all model classes in storage."""
-        model_subclasses = []
         for module_name in self._get_model_module_names():
             (module,) = models.Registry.import_models([module_name])
             for member_name, member_obj in inspect.getmembers(module):
@@ -50,18 +58,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
                         base_class.__name__ for base_class in inspect.getmro(
                             clazz)]
                     if 'Model' in all_base_classes:
-                        model_subclasses.append(clazz)
-        return model_subclasses
+                        yield clazz
 
-    def test_all_model_module_names_unique(self):
-        names_of_ndb_model_subclasses = [
-            clazz.__name__ for clazz in self._get_model_classes()]
-
-        self.assertEqual(
-            len(set(names_of_ndb_model_subclasses)),
-            len(names_of_ndb_model_subclasses))
-
-    # List of model classes that can't have Wipeout related class methods
+    # List of model classes that don't have Wipeout related class methods
     # defined because they're not used directly but only as a base classes for
     # the other models.
     BASE_CLASSES = (
@@ -73,26 +72,27 @@ class StorageModelsTest(test_utils.GenericTestBase):
         'VersionedModel',
     )
 
-    def test_all_child_models_have_get_deletion_policy(self):
-        model_subclasses = self._get_model_classes()
+    def _get_base_or_versioned_model_child_classes(self):
+        """Get child model classes that inherit directly from BaseModel or
+        VersionedModel, these are classes that are used directly for saving data
+        and not just inherited from.
+        """
 
-        for clazz in model_subclasses:
+        for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 continue
-            base_classes = [base.__name__ for base in inspect.getmro(clazz)]
-            # BaseSnapshotMetadataModel and models that inherit from it
-            # adopt the policy of the associated VersionedModel.
-            if 'BaseSnapshotMetadataModel' in base_classes:
-                continue
-            # BaseSnapshotContentModel and models that inherit from it
-            # adopt the policy of the associated VersionedModel.
-            if 'BaseSnapshotContentModel' in base_classes:
-                continue
-            # BaseCommitLogEntryModel and models that inherit from it
-            # adopt the policy of the associated VersionedModel.
-            if 'BaseCommitLogEntryModel' in base_classes:
-                continue
+            yield clazz
 
+    def test_all_model_module_names_unique(self):
+        names_of_ndb_model_subclasses = [
+            clazz.__name__ for clazz in self._get_model_classes()]
+
+        self.assertEqual(
+            len(set(names_of_ndb_model_subclasses)),
+            len(names_of_ndb_model_subclasses))
+
+    def test_base_or_versioned_child_classes_have_get_deletion_policy(self):
+        for clazz in self._get_base_or_versioned_model_child_classes():
             try:
                 self.assertIn(
                     clazz.get_deletion_policy(),
@@ -101,10 +101,66 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 self.fail(msg='get_deletion_policy is not defined for %s' % (
                     clazz.__name__))
 
-    def test_all_base_models_do_not_have_get_deletion_policy(self):
-        model_subclasses = self._get_model_classes()
+    def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
+            self):
+        for clazz in self._get_base_or_versioned_model_child_classes():
+            if (clazz.get_deletion_policy() ==
+                    base_models.DELETION_POLICY.NOT_APPLICABLE):
+                with self.assertRaisesRegexp(
+                    NotImplementedError,
+                    r'The has_reference_to_user_id\(\) method is missing from '
+                    r'the derived class. It should be implemented in the '
+                    r'derived class.'):
+                    clazz.has_reference_to_user_id('any_id')
+            else:
+                try:
+                    self.assertIsNotNone(
+                        clazz.has_reference_to_user_id('any_id'))
+                except NotImplementedError:
+                    self.fail(
+                        msg='has_reference_to_user_id is not defined for %s' % (
+                            clazz.__name__))
 
-        for clazz in model_subclasses:
-            if clazz.__name__ in self.BASE_CLASSES:
-                with self.assertRaises(NotImplementedError):
-                    clazz.get_deletion_policy()
+    def test_get_models_which_should_be_exported(self):
+        """Ensure that the set of models to export is the set of models with
+        export policy CONTAINS_USER_DATA, and that all other models have
+        export policy NOT_APPLICABLE.
+        """
+        all_models = [
+            clazz
+            for clazz in self._get_model_classes()
+            if not clazz.__name__ in self.BASE_CLASSES
+        ]
+        models_with_export = (
+            takeout_service.get_models_which_should_be_exported())
+        for model in all_models:
+            export_policy = model.get_export_policy()
+            if model in models_with_export:
+                self.assertIn(
+                    base_models.EXPORT_POLICY.EXPORTED, export_policy.values())
+            else:
+                self.assertNotIn(
+                    base_models.EXPORT_POLICY.EXPORTED, export_policy.values())
+
+    def test_all_fields_have_export_policy(self):
+        """Ensure every field in every model has an export policy defined."""
+        all_models = [
+            clazz
+            for clazz in self._get_model_classes()
+            if not clazz.__name__ in self.BASE_CLASSES
+        ]
+        for model in all_models:
+            export_policy = model.get_export_policy()
+            self.assertEqual(
+                sorted([
+                    python_utils.UNICODE(prop) for prop
+                    in model._properties]), # pylint: disable=protected-access
+                sorted(export_policy.keys())
+            )
+            self.assertTrue(
+                set(export_policy.values()).issubset(
+                    {
+                        base_models.EXPORT_POLICY.EXPORTED,
+                        base_models.EXPORT_POLICY.NOT_APPLICABLE
+                    })
+            )

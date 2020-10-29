@@ -1,0 +1,48 @@
+<style>
+  search-results .oppia-search-results-no-match, search-results .oppia-search-results-no-match p {
+    font-size: 0.85em;
+    text-align: center;
+  }
+  search-results .oppia-search-results-intro {
+    font-size: 1.6em;
+    padding-bottom: 40px;
+    padding-top: 40px;
+  }
+  search-results .oppia-search-bar-container {
+    height: 50px;
+    margin: 0 auto 20px;
+    width: max-content;
+  }
+  @media (max-width: 800px) {
+    search-results .oppia-search-results-intro {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+  }
+</style>
+
+<div>
+  <div class="d-lg-none oppia-search-bar-container">
+    <search-bar enable-dropup="false"></search-bar>
+  </div>
+  <div ng-if="!$ctrl.someResultsExist" class="oppia-search-results-intro" ng-cloak>
+    <div class="oppia-search-results-no-match">
+      <picture>
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_explorations_found.webp')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_explorations_found.png')]>">
+        <img ng-if="!$ctrl.profilePictureDataUrl" ng-src="<[$ctrl.getStaticImageUrl('/general/no_explorations_found.png')]>">
+      </picture>
+      <p class="text-center">
+        <span translate="I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY"></span><br><br>
+        <a ng-if="!$ctrl.userIsLoggedIn" href="" ng-click="$ctrl.onRedirectToLogin('/creator-dashboard?mode=create')"
+           translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION">
+        </a>
+        <a ng-if="$ctrl.userIsLoggedIn" href="/creator-dashboard?mode=create"
+           translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION">
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <activity-tiles-infinity-grid></activity-tiles-infinity-grid>
+</div>

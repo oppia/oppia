@@ -13,20 +13,28 @@
 # limitations under the License.
 
 """Controllers for the profile page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
+import json
 import re
+import zipfile
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
+from core.domain import takeout_service
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -81,7 +89,7 @@ class ProfileHandler(base.BaseHandler):
 
         self.values.update({
             'profile_is_of_current_user': profile_is_of_current_user,
-            'profile_username': user_settings.username,
+            'username_of_viewed_profile': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'first_contribution_msec': (
@@ -101,7 +109,7 @@ class ProfileHandler(base.BaseHandler):
 class PreferencesPage(base.BaseHandler):
     """The preferences page."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         self.render_template('preferences-page.mainpage.html')
@@ -112,7 +120,7 @@ class PreferencesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -159,9 +167,9 @@ class PreferencesHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def put(self):
-        """Handles POST requests."""
+        """Handles PUT requests."""
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
 
@@ -206,7 +214,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -249,7 +257,7 @@ class SignupPage(base.BaseHandler):
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
-        if user_services.has_fully_registered(self.user_id):
+        if user_services.has_fully_registered_account(self.user_id):
             self.redirect(return_url)
             return
 
@@ -288,9 +296,10 @@ class SignupHandler(base.BaseHandler):
             'can_receive_email_updates')
 
         has_ever_registered = user_services.has_ever_registered(self.user_id)
-        has_fully_registered = user_services.has_fully_registered(self.user_id)
+        has_fully_registered_account = (
+            user_services.has_fully_registered_account(self.user_id))
 
-        if has_fully_registered:
+        if has_fully_registered_account:
             self.render_json({})
             return
 
@@ -329,6 +338,77 @@ class SignupHandler(base.BaseHandler):
         self.render_json({})
 
 
+class DeleteAccountPage(base.BaseHandler):
+    """The delete account page."""
+
+    @acl_decorators.can_manage_own_account
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+        self.render_template('delete-account-page.mainpage.html')
+
+
+class DeleteAccountHandler(base.BaseHandler):
+    """Provides data for the delete account page."""
+
+    @acl_decorators.can_manage_own_account
+    def delete(self):
+        """Handles DELETE requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+
+        wipeout_service.pre_delete_user(self.user_id)
+        self.render_json({'success': True})
+
+
+class ExportAccountHandler(base.BaseHandler):
+    """Provides user with relevant data for Takeout."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_manage_own_account
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_EXPORT:
+            raise self.PageNotFoundException
+
+        # Retrieve user data.
+        user_takeout_object = takeout_service.export_data_for_user(
+            self.user_id)
+        user_data = user_takeout_object.user_data
+        user_images = user_takeout_object.user_images
+
+        # Create zip file.
+        temp_file = python_utils.string_io()
+        with zipfile.ZipFile(
+            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+            zfile.writestr('oppia_takeout_data.json', json.dumps(user_data))
+            for image in user_images:
+                b64_png_no_header = image.b64_image_data.split(',')[1]
+                decoded_png = base64.b64decode(
+                    python_utils.url_unquote_plus(b64_png_no_header))
+                zfile.writestr('images/' + image.image_export_path, decoded_png)
+
+        # Render file for download.
+        self.render_downloadable_file(
+            temp_file.getvalue(), 'oppia_takeout_data.zip', 'text/plain')
+
+
+class PendingAccountDeletionPage(base.BaseHandler):
+    """The account pending deletion page. This page is accessible by all users
+    even if they are not scheduled for deletion. This is because users that are
+    scheduled for deletion are logged out instantly when they try to login.
+    """
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+        self.render_template('pending-account-deletion-page.mainpage.html')
+
+
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
 
@@ -352,7 +432,7 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
         site_language_code = self.payload.get('site_language_code')
@@ -371,6 +451,8 @@ class UserInfoHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
+        # The following headers are added to prevent caching of this response.
+        self.response.cache_control.no_store = True
         if self.username:
             user_actions = user_services.UserActionsInfo(self.user_id).actions
             user_settings = user_services.get_user_settings(
@@ -410,10 +492,7 @@ class UrlHandler(base.BaseHandler):
             self.render_json({'login_url': None})
         else:
             if self.request and self.request.get('current_url'):
-                target_url = (
-                    '/' if self.request.get('current_url').endswith(
-                        feconf.SPLASH_URL)
-                    else self.request.get('current_url'))
+                target_url = self.request.get('current_url')
                 login_url = (
                     current_user_services.create_login_url(target_url))
                 self.render_json({'login_url': login_url})

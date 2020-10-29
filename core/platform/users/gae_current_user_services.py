@@ -15,17 +15,14 @@
 # limitations under the License.
 
 """Provides a seam for user-related services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 import feconf
-import python_utils
 import utils
 
 from google.appengine.api import users
-from google.appengine.ext import ndb
 
 
 def create_login_url(slug):
@@ -52,42 +49,14 @@ def is_current_user_super_admin():
     return users.is_current_user_admin()
 
 
-def get_user_id_from_email(email):
-    """Given an email address, returns a user id.
-
-    Returns None if the email address does not correspond to a valid user id.
-    """
-    class _FakeUser(ndb.Model):
-        """A fake user class."""
-        _use_memcache = False
-        _use_cache = False
-        user = ndb.UserProperty(required=True)
-
-    try:
-        fake_user = users.User(email)
-    except users.UserNotFoundError:
-        logging.error(
-            'The email address %s does not correspond to a valid user_id'
-            % email)
-        return None
-
-    key = _FakeUser(id=email, user=fake_user).put()
-    obj = _FakeUser.get_by_id(key.id())
-    user_id = obj.user.user_id()
-    return python_utils.convert_to_bytes(user_id) if user_id else None
-
-
-def get_current_user_id():
+def get_current_gae_id():
     """Gets the user_id of current user.
 
     Returns:
         str or None. User id for the current user.
     """
     user = get_current_user()
-    if user is None:
-        return None
-    else:
-        return user.user_id()
+    return user and user.user_id()
 
 
 def get_current_user_email():
@@ -97,7 +66,4 @@ def get_current_user_email():
         str or None. Email for the current user.
     """
     user = get_current_user()
-    if user is None:
-        return None
-    else:
-        return user.email()
+    return user and user.email()

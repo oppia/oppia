@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.search_services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -34,29 +35,24 @@ gae_search_services = models.Registry.import_search_services()
 
 class SearchServicesUnitTests(test_utils.GenericTestBase):
     """Test the search services module."""
+
     EXP_ID = 'An_exploration_id'
     COLLECTION_ID = 'A_collection_id'
 
     def setUp(self):
         super(SearchServicesUnitTests, self).setUp()
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(
-            self.VOICE_ARTIST_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(
-            self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
-        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
-
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
@@ -128,8 +124,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
-        def mock_search(query_string, index, cursor=None, limit=20, sort='',
-                        ids_only=False, retries=3):
+        def mock_search(
+                query_string, index, cursor=None, limit=20, sort='',
+                ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(cursor, expected_cursor)
@@ -159,8 +156,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
-        def mock_search(query_string, index, cursor=None, limit=20, sort='',
-                        ids_only=False, retries=3):
+        def mock_search(
+                query_string, index, cursor=None, limit=20, sort='',
+                ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)

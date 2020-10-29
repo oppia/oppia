@@ -16,105 +16,102 @@
  * @fileoverview Unit tests code repl prediction service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// code-repl-prediction.service.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
+import { CodeReplPredictionService } from
+  'interactions/CodeRepl/code-repl-prediction.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
-import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
+import { LoggerService } from 'services/contextual/logger.service';
+import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
-// ^^^ This block is to be removed.
 
-describe('CodeRepl prediction service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('CountVectorizerService', new CountVectorizerService());
-    $provide.value(
-      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
-    $provide.value(
-      'SVMPredictionService', new SVMPredictionService(
-        new PredictionResultObjectFactory()));
-    $provide.value(
-      'WinnowingPreprocessingService', new WinnowingPreprocessingService());
-  }));
-  describe('CodeRepl prediction service test', function() {
-    var service, tokenizer;
-    beforeEach(angular.mock.inject(function($injector) {
-      service = $injector.get('CodeReplPredictionService');
-      tokenizer = $injector.get('PythonProgramTokenizer');
+describe('CodeRepl prediction service', () => {
+  describe('CodeRepl prediction service test', () => {
+    let service: CodeReplPredictionService, tokenizer: PythonProgramTokenizer;
+    beforeEach(angular.mock.inject(() => {
+      TestBed.configureTestingModule({
+        providers: [
+          CodeReplPredictionService, CountVectorizerService,
+          LoggerService, PythonProgramTokenizer, SVMPredictionService,
+          WinnowingPreprocessingService
+        ]
+      });
+      tokenizer = TestBed.get(PythonProgramTokenizer);
+      service = TestBed.get(CodeReplPredictionService);
     }));
 
-    it('should calculate correct jaccard index', function() {
-      var multisetA = [1, 2];
-      var multisetB = [3, 4];
-      var expectedValue = 0.0;
-      var value = service.calcJaccardIndex(multisetA, multisetB);
+    it('should calculate correct jaccard index', () => {
+      let multisetA = [1, 2];
+      let multisetB = [3, 4];
+      let expectedValue = 0.0;
+      let value = service.calcJaccardIndex(multisetA, multisetB);
       expect(value).toEqual(expectedValue);
 
-      var multisetA = [1, 2];
-      var multisetB = [2, 3];
-      var expectedValue = 1.0 / 3;
-      var value = service.calcJaccardIndex(multisetA, multisetB);
+      multisetA = [1, 2];
+      multisetB = [2, 3];
+      expectedValue = 1.0 / 3;
+      value = service.calcJaccardIndex(multisetA, multisetB);
       expect(value).toEqual(expectedValue);
 
-      var multisetA = [1, 2, 2, 4];
-      var multisetB = [2, 3, 4];
-      var expectedValue = 2.0 / 5;
-      var value = service.calcJaccardIndex(multisetA, multisetB);
+      multisetA = [1, 2, 2, 4];
+      multisetB = [2, 3, 4];
+      expectedValue = 2.0 / 5;
+      value = service.calcJaccardIndex(multisetA, multisetB);
       expect(value).toEqual(expectedValue);
 
-      var multisetA = [1, 2, 3];
-      var multisetB = [3, 3, 5];
-      var expectedValue = 1.0 / 5;
-      var value = service.calcJaccardIndex(multisetA, multisetB);
+      multisetA = [1, 2, 3];
+      multisetB = [3, 3, 5];
+      expectedValue = 1.0 / 5;
+      value = service.calcJaccardIndex(multisetA, multisetB);
       expect(value).toEqual(expectedValue);
     });
 
-    it('should normalize python program tokens correctly.', function() {
-      var program = (
+    it('should normalize python program tokens correctly.', () => {
+      const program = (
         '# This is a comment.\nvariable = 15\nif variable > 5:' +
         '\n    print "Hello"\nprint " World"');
 
-      var programTokens = tokenizer.generateTokens(program.split('\n'));
-      var tokenToId = {
+      const programTokens = tokenizer.generateTokens(program.split('\n'));
+      const tokenToId = {
         '=': 0, 15: 1, 'if': 2, '>': 3, 5: 4, print: 5, ':': 6
       };
 
-      var expectedTokens = [
+      const expectedTokens = [
         'V', '=', '15', 'if', 'V', '>', '5', ':', 'print', 'UNK',
         'print', 'UNK'];
 
-      var normalizedTokens = service.getTokenizedProgram(
+      const normalizedTokens = service.getTokenizedProgram(
         programTokens, tokenToId);
 
       expect(normalizedTokens).toEqual(expectedTokens);
     });
 
-    it('should produce program tokens for count vector correctly.', function() {
-      var program = (
+    it('should produce program tokens for count vector correctly.', () => {
+      const program = (
         '# This is a comment.\nvariable = 15\nif variable > 5:' +
         '\n    print "Hello"\nprint " World"');
 
-      var programTokens = tokenizer.generateTokens(program.split('\n'));
-      var expectedTokens = [
+      const programTokens = tokenizer.generateTokens(program.split('\n'));
+      const expectedTokens = [
         'V', '=', '15', 'if', 'V', '>', '5', ':', 'print', '"Hello"',
         'print', '" World"'];
 
-      var CVTokens = service.getTokenizedProgramForCV(programTokens);
+      const CVTokens = service.getTokenizedProgramForCV(programTokens);
 
       expect(CVTokens).toEqual(expectedTokens);
     });
 
-    it('should predict correct answer group for the answers', function() {
-      var classifierData = window.__fixtures__[
+    it('should predict correct answer group for the answers', () => {
+      const classifierData = window.__fixtures__[
         'core/tests/data/code_classifier_data'];
 
       // Test algorithm agains first test set. This test set contains
       // example which can be successfully classified by KNN classifier.
-      var testData = window.__fixtures__[
+      let testData = window.__fixtures__[
         'core/tests/data/code_classifier_test_knn'];
-      var predictedAnswerGroup = null;
+      let predictedAnswerGroup = null;
       for (var i = 0; i < testData.length; i++) {
         for (var j = 0; j < testData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
@@ -126,11 +123,11 @@ describe('CodeRepl prediction service', function() {
 
       // Test algorithm against first test set. This test set contains
       // examples for which KNN fails but SVM succeeds.
-      var testData = window.__fixtures__[
+      testData = window.__fixtures__[
         'core/tests/data/code_classifier_test_svm'];
-      var predictedAnswerGroup = null;
-      for (var i = 0; i < testData.length; i++) {
-        for (var j = 0; j < testData[i].answers.length; j++) {
+      predictedAnswerGroup = null;
+      for (let i = 0; i < testData.length; i++) {
+        for (let j = 0; j < testData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
             classifierData, testData[i].answers[j]);
           // Ignore the prediction if predicted answer group is -1 since
@@ -144,18 +141,18 @@ describe('CodeRepl prediction service', function() {
       }
     });
 
-    it('should not have accuracy less than 85', function() {
-      var classifierData = window.__fixtures__[
+    it('should not have accuracy less than 85', () => {
+      const classifierData = window.__fixtures__[
         'core/tests/data/code_classifier_data'];
-      var trainingData = window.__fixtures__[
+      const trainingData = window.__fixtures__[
         'core/tests/data/code_classifier_accuracy_test'];
-      var correctPredictions = 0, totalAnswers = 0;
+      let correctPredictions = 0, totalAnswers = 0;
 
       // To keep things simple, we will calculate accuracy score
       // and not F1 score.
-      var predictedAnswerGroup = null;
-      for (var i = 0; i < trainingData.length; i++) {
-        for (var j = 0; j < trainingData[i].answers.length; j++) {
+      let predictedAnswerGroup = null;
+      for (let i = 0; i < trainingData.length; i++) {
+        for (let j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
             classifierData, trainingData[i].answers[j]);
           // Ignore the prediction if predicted answer group is -1 since

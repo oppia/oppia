@@ -15,14 +15,15 @@
 # limitations under the License.
 
 """Models for Oppia recommendations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
+datastore_services = models.Registry.import_datastore_services()
 
 TOPIC_SIMILARITIES_ID = 'topics'
 
@@ -33,9 +34,10 @@ class ExplorationRecommendationsModel(
 
     Instances of this class are keyed by exploration id.
     """
+
     # Ids of recommended explorations.
-    recommended_exploration_ids = ndb.StringProperty(
-        repeated=True, indexed=False)
+    recommended_exploration_ids = datastore_services.StringProperty(
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -44,14 +46,22 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
+    @classmethod
+    def get_export_policy(cls):
+        """Model does not contain user data."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'recommended_exploration_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
         """ExplorationRecommendationsModel doesn't reference any user_id
         directly.
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -71,7 +81,8 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     Currently, topics are the same as the default categories. However, this may
     change in the future.
     """
-    content = ndb.JsonProperty(required=True)
+
+    content = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -80,16 +91,9 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def has_reference_to_user_id(unused_user_id):
-        """TopicSimilaritiesModel doesn't reference any user_id
-        directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
+    @classmethod
+    def get_export_policy(cls):
+        """Model does not contain user data."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

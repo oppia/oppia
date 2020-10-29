@@ -16,14 +16,28 @@
  * @fileoverview Unit tests for the MusicNotesInput interaction.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 describe('MusicNotesInput interaction', function() {
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
   describe('MusicNotesInput tests', function() {
     var $httpBackend, $templateCache;
     var elt, scope, ctrlScope;
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(angular.mock.module(
-      'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS, function($provide) {
+      'oppia', TranslatorProviderForTests, function($provide) {
         $provide.value('ExplorationEngineService', {});
       }
     ));
@@ -56,17 +70,17 @@ describe('MusicNotesInput interaction', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('loads the music staff template', function() {
+    it('should load the music staff template', function() {
       expect(elt.html()).toContain('oppia-music-input-valid-note-area');
       expect(elt.html()).toContain('I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE');
       expect(elt.html()).toContain('playCurrentSequence()');
     });
 
-    it('loads the palette when initialized', function() {
+    it('should load the palette when initialized', function() {
       expect(elt.html()).toContain('oppia-music-input-natural-note');
     });
 
-    it('adds notes to note sequence in the correct order', function() {
+    it('should add notes to note sequence in the correct order', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -122,7 +136,7 @@ describe('MusicNotesInput interaction', function() {
       }]);
     });
 
-    it('clears the sequence', function() {
+    it('should clear the sequence', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -142,7 +156,7 @@ describe('MusicNotesInput interaction', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
     });
 
-    it('removes notes with particular ids', function() {
+    it('should remove notes with particular ids', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -173,7 +187,7 @@ describe('MusicNotesInput interaction', function() {
       }]);
     });
 
-    it('does not do anything when asked to remove a note that does not exist',
+    it('should not do anything when asked to remove a note that does not exist',
       function() {
         expect(ctrlScope.noteSequence).toEqual([]);
 
@@ -201,7 +215,7 @@ describe('MusicNotesInput interaction', function() {
       }
     );
 
-    it('correctly handles duplicate removals', function() {
+    it('should correctly handles duplicate removals', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -220,14 +234,14 @@ describe('Music phrase player service', function() {
   describe('music phrase player service', function() {
     var mpps = null;
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.inject(function($injector, $window) {
       mpps = $injector.get('MusicPhrasePlayerService');
       // This is here so that, if the test environment is modified
       // to include MIDI in the future, we will remember to swap
       // it out with a dummy MIDI and back again after the test.
       if ($window.MIDI) {
-        throw 'Expected MIDI library not to show up in tests.';
+        throw new Error('Expected MIDI library not to show up in tests.');
       }
 
       $window.MIDI = {

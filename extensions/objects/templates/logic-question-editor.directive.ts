@@ -29,33 +29,19 @@ import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
 
 
 angular.module('oppia').directive('logicQuestionEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  '$timeout', function($timeout) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/logic-question-editor.directive.html'),
+      template: require('./logic-question-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.alwaysEditable = true;
-        ctrl.localValue = {
-          assumptionsString: logicProofShared.displayExpressionArray(
-            ctrl.value.assumptions,
-            logicProofData.BASE_STUDENT_LANGUAGE.operators),
-          targetString: logicProofShared.displayExpression(
-            ctrl.value.results[0],
-            logicProofData.BASE_STUDENT_LANGUAGE.operators),
-          errorMessage: '',
-          proofString: ctrl.value.default_proof_string
-        };
-
-        // NOTE: we use ng-change rather than $watch because the latter runs in
-        // response to any change to the watched value, and we only want to
+        // NOTE: we use ng-change rather than $watch because the latter runs
+        // in response to any change to the watched value, and we only want to
         // respond to changes made by the user.
         ctrl.changeAssumptions = function() {
           ctrl.convertThenBuild(
@@ -77,7 +63,7 @@ angular.module('oppia').directive('logicQuestionEditor', [
           ctrl.buildQuestion();
           // NOTE: angular will reset the position of the cursor after this
           // function runs, so we need to delay our re-resetting.
-          setTimeout(function() {
+          $timeout(function() {
             (<HTMLInputElement>element).selectionEnd = cursorPosition;
           }, 2);
         };
@@ -98,6 +84,19 @@ angular.module('oppia').directive('logicQuestionEditor', [
           } catch (err) {
             ctrl.localValue.errorMessage = err.message;
           }
+        };
+        ctrl.$onInit = function() {
+          ctrl.alwaysEditable = true;
+          ctrl.localValue = {
+            assumptionsString: logicProofShared.displayExpressionArray(
+              ctrl.value.assumptions,
+              logicProofData.BASE_STUDENT_LANGUAGE.operators),
+            targetString: logicProofShared.displayExpression(
+              ctrl.value.results[0],
+              logicProofData.BASE_STUDENT_LANGUAGE.operators),
+            errorMessage: '',
+            proofString: ctrl.value.default_proof_string
+          };
         };
       }]
     };

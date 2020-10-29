@@ -27,16 +27,16 @@ import { Outcome, OutcomeObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { InteractiveMapCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('InteractiveMapValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let validatorService: InteractiveMapValidationService, WARNING_TYPES: any;
+  let validatorService: InteractiveMapValidationService;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let customizationArguments: any;
+  let customizationArguments: InteractiveMapCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
@@ -55,7 +55,7 @@ describe('InteractiveMapValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -68,6 +68,9 @@ describe('InteractiveMapValidationService', () => {
         value: 0
       },
       longitude: {
+        value: 0
+      },
+      zoom: {
         value: 0
       }
     };
@@ -84,7 +87,7 @@ describe('InteractiveMapValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });
@@ -100,8 +103,14 @@ describe('InteractiveMapValidationService', () => {
     () => {
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'InteractiveMapCustomizationArgs'." We are
+          // purposely assigning the wrong type of customization args in
+          // order to test validations.
+          // @ts-expect-error
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      }).toThrow('Expected customization arguments to have properties: ' +
+      }).toThrowError(
+        'Expected customization arguments to have properties: ' +
         'latitude, longitude');
     }
   );

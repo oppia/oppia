@@ -1,0 +1,39 @@
+<svg class="score-ring"
+     width="300"
+     height="300">
+  <text x="100" y="160" fill="#015C53"> <[$ctrl.getScore()]>%</text>
+  <circle class="score-outer-ring-circle"
+          stroke="<[$ctrl.getScoreOuterRingColor()]>"
+          stroke-width="10"
+          fill="transparent"
+          r="125"
+          cx="150"
+          cy="150">
+  </circle>
+  <circle class="score-ring-circle"
+          stroke="<[$ctrl.getScoreRingColor()]>"
+          stroke-width="10"
+          fill="transparent"
+          r="125"
+          cx="150"
+          cy="150">
+  </circle>
+</svg>
+<style>
+  .score-ring {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 48px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 60px;
+    text-align: center;
+  }
+
+  .score-ring-circle {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: 0.35s stroke-dashoffset;
+    transition-delay: 2s;
+    transition-duration: 5s;
+  }
+</style>

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for Oppia job models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -80,6 +81,7 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
             'JobType2'))
         job2 = job_models.JobModel.get('MyJobId2', strict=True)
         job2.status_code = job_models.STATUS_CODE_COMPLETED
+        job2.update_timestamps()
         job2.put()
         self.assertFalse(job_models.JobModel.do_unfinished_jobs_exist(
             'JobType2'))

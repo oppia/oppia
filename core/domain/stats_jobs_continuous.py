@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Jobs for statistics views."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,6 +40,7 @@ class InteractionAnswerSummariesMRJobManager(
     """Job to calculate interaction view statistics, e.g. most frequent answers
     of multiple-choice interactions.
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the InteractionAnswerSummariesAggregator class associated
@@ -69,13 +71,13 @@ class InteractionAnswerSummariesMRJobManager(
             }
 
         Args:
-            item: The submitted answer.
+            item: str. The submitted answer.
 
         Yields:
             dict(str, str). The submitted answer in dict format.
         """
-        if InteractionAnswerSummariesMRJobManager.entity_created_before_job_queued( # pylint: disable=line-too-long
-                item):
+        if (InteractionAnswerSummariesMRJobManager
+                .entity_created_before_job_queued(item)):
             # Output answers submitted to the exploration for this exp version.
             versioned_key = u'%s:%s:%s' % (
                 item.exploration_id, item.exploration_version, item.state_name)
@@ -102,7 +104,7 @@ class InteractionAnswerSummariesMRJobManager(
 
         Args:
             key: str. The unique key of the form:
-                <exploration_id>:<exploration_version>:<state_name>
+                <exploration_id>:<exploration_version>:<state_name>.
             stringified_values: list(str). A list of stringified_values of the
                 submitted answers.
 
@@ -120,8 +122,12 @@ class InteractionAnswerSummariesMRJobManager(
                 - Ignoring answers submitted to version:
                     Occurs when version mismatches and the new
                     version has a different interaction ID.
+                - Expected valid exploration id, version, and state name triple:
+                    Occurs when the key to reduce cannot be split into
+                    components.
         """
-        exploration_id, exploration_version, state_name = key.split(':')
+        exploration_id, exploration_version, state_name = (
+            key.decode('utf-8').split(':'))
 
         value_dicts = [
             ast.literal_eval(stringified_value)
@@ -264,11 +270,12 @@ class InteractionAnswerSummariesMRJobManager(
             calc_output.save()
 
 
+# TODO(bhenning): Implement a real-time model for
+# InteractionAnswerSummariesAggregator.
 class InteractionAnswerSummariesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    # TODO(bhenning): Implement a real-time model for
-    # InteractionAnswerSummariesAggregator.
     """Realtime model class for InteractionAnswerSummariesAggregator."""
+
     pass
 
 
@@ -277,6 +284,7 @@ class InteractionAnswerSummariesAggregator(
     """A continuous-computation job that listens to answers to states and
     updates StateAnswer view calculations.
     """
+
     @classmethod
     def get_event_types_listened_to(cls):
         """Returns a list of event types that this class subscribes to.

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Python configuration for DragAndDropSortInput interaction."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -51,18 +52,24 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'min_value': 1
             }],
             'items': {
-                'type': 'html',
-                'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Enter an option for the learner to drag' +
-                                   ' and drop.',
-                },
+                'type': 'custom',
+                'obj_type': 'SubtitledHtml',
+                'replacement_ui_config': {
+                    'html': {
+                        'hide_complex_extensions': True,
+                        'placeholder': (
+                            'Enter an option for the learner to drag and drop.')
+                    }
+                }
             },
             'ui_config': {
                 'add_element_text': 'Add a new item',
             }
         },
-        'default_value': [''],
+        'default_value': [{
+            'content_id': None,
+            'html': ''
+        }],
     }, {
         'name': 'allowMultipleItemsInSamePosition',
         'description': 'Allow multiple sort items in the same position',

@@ -17,6 +17,7 @@
 """This script generates topological sort of all the services based on how
 services are dependent on each other.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -34,11 +35,9 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-# pylint: disable=wrong-import-position
-import esprima # isort:skip
-# pylint: enable=wrong-import-position
+import esprima # isort:skip  pylint: disable=wrong-import-position
 
-DIRECTORY_NAMES = ['core/templates/dev/head', 'extensions']
+DIRECTORY_NAMES = ['core/templates', 'extensions']
 SERVICE_FILES_SUFFICES = ('.service.ts', 'Service.ts', 'Factory.ts')
 
 
@@ -147,6 +146,7 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when build.py is used as a script.
+# it will only be called when create_topological_sort_of_all_services.py
+# is used as a script.
 if __name__ == '__main__':  # pragma: no cover
     main()

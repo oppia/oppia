@@ -1,0 +1,223 @@
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for topic editor page component.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// App.ts is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
+require('pages/topic-editor-page/topic-editor-page.component.ts');
+
+import { EventEmitter } from '@angular/core';
+
+describe('Topic editor page', function() {
+  var ctrl = null;
+  var $scope = null;
+  var ContextService = null;
+  var PageTitleService = null;
+  var TopicEditorRoutingService = null;
+  var UndoRedoService = null;
+  var TopicEditorStateService = null;
+  var UrlService = null;
+  var SubtopicObjectFactory = null;
+  var TopicObjectFactory = null;
+  var StoryReferenceObjectFactory = null;
+  var topic = null;
+  var ShortSkillSummaryObjectFactory = null;
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    var $rootScope = $injector.get('$rootScope');
+    ContextService = $injector.get('ContextService');
+    UndoRedoService = $injector.get('UndoRedoService');
+    PageTitleService = $injector.get('PageTitleService');
+    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
+    TopicEditorStateService = $injector.get('TopicEditorStateService');
+    UrlService = $injector.get('UrlService');
+    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
+    TopicObjectFactory = $injector.get('TopicObjectFactory');
+    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
+    ShortSkillSummaryObjectFactory = $injector.get(
+      'ShortSkillSummaryObjectFactory');
+
+    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
+    subtopic._thumbnailFilename = 'b.svg';
+    var skillSummary = ShortSkillSummaryObjectFactory.create(
+      'skill1', 'Addition');
+    subtopic._skillSummaries = [skillSummary];
+    topic = TopicObjectFactory.createInterstitialTopic();
+    topic._subtopics = [subtopic];
+    topic._thumbnailFilename = 'a.svg';
+    topic._metaTagContent = 'topic';
+    var story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
+    var story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    topic._canonicalStoryReferences = [story1, story2];
+    topic.setName('New Name');
+    topic.setUrlFragment('topic-url-fragment');
+    TopicEditorStateService.setTopic(topic);
+    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    $scope = $rootScope.$new();
+    ctrl = $componentController('topicEditorPage', {
+      $scope: $scope
+    });
+  }));
+
+  it('should load topic based on its id on url when component is initialized' +
+    ' and set page title', function() {
+    let topicInitializedEventEmitter = new EventEmitter();
+    let topicReinitializedEventEmitter = new EventEmitter();
+    let undoRedoChangeEventEmitter = new EventEmitter();
+    spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function() {
+      topicInitializedEventEmitter.emit();
+      topicReinitializedEventEmitter.emit();
+      undoRedoChangeEventEmitter.emit();
+    });
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicInitialized').and.returnValue(
+      topicInitializedEventEmitter);
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.returnValue(
+      topicReinitializedEventEmitter);
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+
+    ctrl.$onInit();
+
+    expect(TopicEditorStateService.loadTopic).toHaveBeenCalledWith('topic_1');
+    expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+
+    ctrl.$onDestroy();
+  });
+
+  it('should get active tab name', function() {
+    ctrl.selectQuestionsTab();
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions');
+    expect(ctrl.getActiveTabName()).toBe('questions');
+    expect(ctrl.isInTopicEditorTabs()).toBe(true);
+    expect(ctrl.isInPreviewTab()).toBe(false);
+    expect(ctrl.isMainEditorTabSelected()).toBe(false);
+    expect(ctrl.getNavbarText()).toBe('Question Editor');
+  });
+
+  it('should call confirm before leaving', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    spyOn(window, 'addEventListener');
+    ctrl.setUpBeforeUnload();
+    ctrl.confirmBeforeLeaving({returnValue: ''});
+    expect(window.addEventListener).toHaveBeenCalledWith(
+      'beforeunload', ctrl.confirmBeforeLeaving);
+  });
+
+  it('should return the change count', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    expect(ctrl.getChangeListLength()).toBe(10);
+  });
+
+  it('should get entity type from context service', function() {
+    spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
+    expect(ctrl.getEntityType()).toBe('exploration');
+  });
+
+  it('should open subtopic preview tab if active tab is subtopic editor',
+    function() {
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'subtopic_editor');
+      const topicPreviewSpy = spyOn(
+        TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+      ctrl.openTopicViewer();
+      expect(topicPreviewSpy).toHaveBeenCalled();
+    });
+
+  it('should open topic preview if active tab is topic editor', function() {
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'topic_editor');
+    const topicPreviewSpy = spyOn(
+      TopicEditorRoutingService, 'navigateToTopicPreviewTab');
+    ctrl.openTopicViewer();
+    expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should open subtopic preview tab if active tab is subtopic editor',
+    function() {
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'subtopic_editor');
+      const topicPreviewSpy = spyOn(
+        TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+      ctrl.openTopicViewer();
+      expect(topicPreviewSpy).toHaveBeenCalled();
+    });
+
+  it('should navigate to topic editor tab in topic editor', function() {
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'topic_preview');
+    const topicPreviewSpy = spyOn(
+      TopicEditorRoutingService, 'navigateToMainTab');
+    ctrl.selectMainTab();
+    expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should select navigate to the subtopic editor tab in subtopic editor',
+    function() {
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'subtopic_preview');
+      const topicPreviewSpy = spyOn(
+        TopicEditorRoutingService, 'navigateToSubtopicEditorWithId');
+      ctrl.selectMainTab();
+      expect(topicPreviewSpy).toHaveBeenCalled();
+    });
+
+  it('should validate the topic and return validation issues', function() {
+    ctrl.topic = topic;
+    spyOn(
+      TopicEditorStateService, 'getTopicWithNameExists').and.returnValue(true);
+    spyOn(
+      TopicEditorStateService, 'getTopicWithUrlFragmentExists').and.returnValue(
+      true);
+    ctrl._validateTopic();
+    expect(ctrl.validationIssues.length).toEqual(2);
+    expect(ctrl.validationIssues[0]).toEqual(
+      'A topic with this name already exists.');
+    expect(ctrl.validationIssues[1]).toEqual(
+      'Topic URL fragment already exists.');
+    expect(ctrl.getWarningsCount()).toEqual(2);
+    expect(ctrl.getTotalWarningsCount()).toEqual(2);
+  });
+
+  it('should return the navbar text', function() {
+    ctrl.selectQuestionsTab();
+    var routingSpy = spyOn(
+      TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions');
+    expect(ctrl.getNavbarText()).toBe('Question Editor');
+    routingSpy.and.returnValue('subtopic_editor');
+    expect(ctrl.getNavbarText()).toEqual('Subtopic Editor');
+    routingSpy.and.returnValue('subtopic_preview');
+    expect(ctrl.getNavbarText()).toEqual('Subtopic Preview');
+    routingSpy.and.returnValue('topic_preview');
+    expect(ctrl.getNavbarText()).toEqual('Topic Preview');
+    routingSpy.and.returnValue('main');
+    expect(ctrl.getNavbarText()).toEqual('Topic Editor');
+  });
+});

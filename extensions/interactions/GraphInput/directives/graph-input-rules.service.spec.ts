@@ -16,30 +16,26 @@
  * @fileoverview Unit tests for Graph Input rules.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// GraphInputRulesService is upgraded to Angular 8.
+import { GraphInputRulesService } from
+  'interactions/GraphInput/directives/graph-input-rules.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+import { GraphAnswer } from 'interactions/answer-defs';
 
-describe('Graph Input service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('GraphUtilsService', new GraphUtilsService());
-  }));
+describe('Graph Input service', () => {
+  let girs: GraphInputRulesService = null;
+  beforeEach(() => {
+    girs = TestBed.get(GraphInputRulesService);
+  });
 
-  var girs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    girs = $injector.get('GraphInputRulesService');
-  }));
+  describe('graph utilities', () => {
+    let utils: GraphUtilsService = null;
+    beforeEach(() => {
+      utils = TestBed.get(GraphUtilsService);
+    });
 
-  describe('graph utilities', function() {
-    var utils = null;
-    beforeEach(angular.mock.inject(function($injector) {
-      utils = $injector.get('GraphUtilsService');
-    }));
-
-    it('should construct an adjacency matrix from a graph', function() {
+    it('should construct an adjacency matrix from a graph', () => {
       expect(utils.constructAdjacencyMatrix({
         vertices: [{
           label: 'a',
@@ -104,8 +100,8 @@ describe('Graph Input service', function() {
       ]);
     });
 
-    it('should find the next lexicographical permutation', function() {
-      var permutation = [0, 1, 2, 3];
+    it('should find the next lexicographical permutation', () => {
+      let permutation: number[] = [0, 1, 2, 3];
       permutation = utils.nextPermutation(permutation);
       expect(permutation).toEqual([0, 1, 3, 2]);
       permutation = utils.nextPermutation(permutation);
@@ -156,7 +152,7 @@ describe('Graph Input service', function() {
       expect(permutation).toBe(null);
     });
 
-    it('should compare adjacency matrices with a permutation', function() {
+    it('should compare adjacency matrices with a permutation', () => {
       expect(utils.areAdjacencyMatricesEqualWithPermutation([
         [null, 1, 1],
         [2, null, 1],
@@ -187,7 +183,7 @@ describe('Graph Input service', function() {
     });
   });
 
-  var undirectedEmptyGraph = function() {
+  let undirectedEmptyGraph = (): GraphAnswer => {
     return {
       vertices: [],
       edges: [],
@@ -197,7 +193,7 @@ describe('Graph Input service', function() {
     };
   };
 
-  var undirectedNullGraph = function(numVertices) {
+  let undirectedNullGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -209,7 +205,7 @@ describe('Graph Input service', function() {
     return graph;
   };
 
-  var undirectedCycleGraph = function(numVertices) {
+  let undirectedCycleGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;
@@ -224,7 +220,7 @@ describe('Graph Input service', function() {
     return graph;
   };
 
-  var undirectedCompleteGraph = function(numVertices) {
+  let undirectedCompleteGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 0; i < numVertices; i++) {
       for (var j = i + 1; j < numVertices; j++) {
@@ -238,7 +234,7 @@ describe('Graph Input service', function() {
     return graph;
   };
 
-  var undirectedStarGraph = function(numVertices) {
+  let undirectedStarGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 1; i < numVertices; i++) {
       graph.edges.push({
@@ -250,7 +246,7 @@ describe('Graph Input service', function() {
     return graph;
   };
 
-  var directedEmptyGraph = function() {
+  let directedEmptyGraph = (): GraphAnswer => {
     return {
       vertices: [],
       edges: [],
@@ -260,7 +256,7 @@ describe('Graph Input service', function() {
     };
   };
 
-  var directedNullGraph = function(numVertices) {
+  let directedNullGraph = (numVertices: number): GraphAnswer => {
     var graph = directedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -272,7 +268,7 @@ describe('Graph Input service', function() {
     return graph;
   };
 
-  var directedCycleGraph = function(numVertices) {
+  let directedCycleGraph = (numVertices: number): GraphAnswer => {
     var graph = directedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;
@@ -287,8 +283,8 @@ describe('Graph Input service', function() {
     return graph;
   };
 
-  describe('\'is isomorphic to\' rule', function() {
-    it('should match graphs which are the same', function() {
+  describe('\'is isomorphic to\' rule', () => {
+    it('should match graphs which are the same', () => {
       expect(girs.IsIsomorphicTo(undirectedEmptyGraph(), {
         g: undirectedEmptyGraph()
       })).toBe(true);
@@ -302,7 +298,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should match isomorphic graphs', function() {
+    it('should match isomorphic graphs', () => {
       expect(girs.IsIsomorphicTo(undirectedCycleGraph(5), {
         g: {
           vertices: [{
@@ -354,7 +350,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should match isomorphic graphs with labels', function() {
+    it('should match isomorphic graphs with labels', () => {
       expect(girs.IsIsomorphicTo({
         vertices: [{
           label: 'a',
@@ -404,7 +400,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should match isomorphic graphs with labels and weights', function() {
+    it('should match isomorphic graphs with labels and weights', () => {
       expect(girs.IsIsomorphicTo({
         vertices: [{
           label: 'a',
@@ -462,7 +458,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should match directed and undirected graphs', function() {
+    it('should match directed and undirected graphs', () => {
       expect(girs.IsIsomorphicTo({
         vertices: [{
           label: '',
@@ -508,7 +504,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should not match simple graphs with different edges', function() {
+    it('should not match simple graphs with different edges', () => {
       expect(girs.IsIsomorphicTo(undirectedCycleGraph(3), {
         g: undirectedNullGraph(3)
       })).toBe(false);
@@ -530,13 +526,13 @@ describe('Graph Input service', function() {
       })).toBe(false);
     });
 
-    it('should not match graphs with different numbers of nodes', function() {
+    it('should not match graphs with different numbers of nodes', () => {
       expect(girs.IsIsomorphicTo(undirectedNullGraph(3), {
         g: undirectedNullGraph(6)
       })).toBe(false);
     });
 
-    it('should not match graphs with different edges', function() {
+    it('should not match graphs with different edges', () => {
       expect(girs.IsIsomorphicTo({
         vertices: [{
           label: 'a',
@@ -594,7 +590,7 @@ describe('Graph Input service', function() {
       })).toBe(false);
     });
 
-    it('should not match graphs with different edge weights', function() {
+    it('should not match graphs with different edge weights', () => {
       expect(girs.IsIsomorphicTo({
         vertices: [{
           label: '',
@@ -636,7 +632,7 @@ describe('Graph Input service', function() {
       })).toBe(false);
     });
 
-    it('should not match graphs with different labels', function() {
+    it('should not match graphs with different labels', () => {
       expect(girs.IsIsomorphicTo({
         vertices: [{
           label: 'a',
@@ -679,8 +675,8 @@ describe('Graph Input service', function() {
     });
   });
 
-  describe('\'is weakly connected\' rule', function() {
-    it('should return true on undirected connected graphs', function() {
+  describe('\'is weakly connected\' rule', () => {
+    it('should return true on undirected connected graphs', () => {
       expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
         p: 'weakly_connected'
       })).toBe(true);
@@ -728,7 +724,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should return true on directed weakly connected graphs', function() {
+    it('should return true on directed weakly connected graphs', () => {
       expect(girs.HasGraphProperty(directedCycleGraph(4), {
         p: 'weakly_connected'
       })).toBe(true);
@@ -764,7 +760,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should return false for disconnected graphs', function() {
+    it('should return false for disconnected graphs', () => {
       expect(girs.HasGraphProperty(undirectedNullGraph(2), {
         p: 'weakly_connected'
       })).toBe(false);
@@ -797,8 +793,8 @@ describe('Graph Input service', function() {
     });
   });
 
-  describe('\'is strongly connected\' rule', function() {
-    it('should return true for undirected connected graphs', function() {
+  describe('\'is strongly connected\' rule', () => {
+    it('should return true for undirected connected graphs', () => {
       expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
         p: 'strongly_connected'
       })).toBe(true);
@@ -812,7 +808,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should return true for directed strongly connected graphs', function() {
+    it('should return true for directed strongly connected graphs', () => {
       expect(girs.HasGraphProperty(directedCycleGraph(6), {
         p: 'strongly_connected'
       })).toBe(true);
@@ -864,7 +860,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should return false for disconnected graphs', function() {
+    it('should return false for disconnected graphs', () => {
       expect(girs.HasGraphProperty(undirectedNullGraph(2), {
         p: 'strongly_connected'
       })).toBe(false);
@@ -897,7 +893,7 @@ describe('Graph Input service', function() {
     });
 
     it('should return false for graphs that are only weakly connected',
-      function() {
+      () => {
         expect(girs.HasGraphProperty({
           vertices: [{
             label: 'a',
@@ -931,8 +927,8 @@ describe('Graph Input service', function() {
     );
   });
 
-  describe('\'is acyclic\' rule', function() {
-    it('should return true on acyclic graphs', function() {
+  describe('\'is acyclic\' rule', () => {
+    it('should return true on acyclic graphs', () => {
       expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
         p: 'acyclic'
       })).toBe(true);
@@ -1056,7 +1052,7 @@ describe('Graph Input service', function() {
       })).toBe(true);
     });
 
-    it('should return false on graphs with cycles', function() {
+    it('should return false on graphs with cycles', () => {
       expect(girs.HasGraphProperty(undirectedCycleGraph(5), {
         p: 'acyclic'
       })).toBe(false);
@@ -1105,8 +1101,8 @@ describe('Graph Input service', function() {
     });
   });
 
-  describe('\'is regular\' rule', function() {
-    it('should detect undirected regular graphs', function() {
+  describe('\'is regular\' rule', () => {
+    it('should detect undirected regular graphs', () => {
       expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
         p: 'regular'
       })).toBe(true);
@@ -1196,7 +1192,7 @@ describe('Graph Input service', function() {
       })).toBe(false);
     });
 
-    it('should detect directed regular graphs', function() {
+    it('should detect directed regular graphs', () => {
       expect(girs.HasGraphProperty(directedCycleGraph(4), {
         p: 'regular'
       })).toBe(true);

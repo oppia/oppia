@@ -1,0 +1,60 @@
+<div>
+  <div class="content-box">
+    <div class="content">
+      <span class="content-title"><[editableTitle]></span>
+      <div class="html-content">
+        <angular-html-bind html-data="pageContents.getHtml()">
+        </angular-html-bind>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  subtopic-preview-tab .content-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    top: 20vh;
+    width: 70%;
+  }
+  subtopic-preview-tab .content {
+    background-color: #FFF;
+    border-radius: 5px;
+    padding: 30px 35px;
+    width: 65%;
+  }
+  subtopic-preview-tab .content-title {
+    color: #00645C;
+    display: block;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 30px;
+    margin-bottom: 15px;
+  }
+  subtopic-preview-tab .html-content {
+    background-color: #ECF5FC;
+    padding: 15px 25px;
+  }
+
+  @media screen and (max-width: 1100px) {
+    subtopic-preview-tab .content-box {
+      width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    subtopic-preview-tab .back-to-subtopic-container {
+      margin-bottom: 20px;
+      margin-left: 1%;
+      margin-top: 40px;
+    }
+    subtopic-preview-tab .content,
+    subtopic-preview-tab .content-box {
+      width: 100%;
+    }
+    subtopic-preview-tab .content {
+      padding: 30px;
+    }
+  }
+</style>

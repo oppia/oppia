@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for gae_suite."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -47,6 +48,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
 
         def _mock_create_test_suites(**unused_test_target):
             """Mocks create_test_suites()."""
+
             loader = unittest.TestLoader()
             return [loader.loadTestsFromName('core.tests.data.failing_tests')]
 

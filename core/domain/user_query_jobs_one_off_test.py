@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for query MR job."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -22,6 +23,7 @@ import datetime
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import taskqueue_services
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
@@ -31,10 +33,8 @@ import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-taskqueue_services = models.Registry.import_taskqueue_services()
 
-
-class UserQueryJobOneOffTests(test_utils.GenericTestBase):
+class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     EXP_ID_3 = 'exp_id_3'
@@ -60,10 +60,10 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
     def _run_one_off_job_resulting_in_failure(self, query_id):
         """Runs the one-off MapReduce job and fails it. After failing the job,
@@ -131,17 +131,17 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         user_e_settings.last_created_an_exploration = (
             user_e_settings.last_created_an_exploration -
             datetime.timedelta(days=10))
-        # Last edited time also changes when user creates an explorationan.
+        # Last edited time also changes when user creates an exploration.
         user_e_settings.last_edited_an_exploration = (
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
-        user_e_settings.last_logged_in = (
+        user_services.update_last_logged_in(
+            user_e_settings,
             user_e_settings.last_logged_in - datetime.timedelta(days=10))
-        user_services._save_user_settings(user_e_settings) # pylint: disable=protected-access
 
         user_a_settings = user_services.get_user_settings(self.user_a_id)
-        user_a_settings.last_logged_in = (
+        user_services.update_last_logged_in(
+            user_a_settings,
             user_a_settings.last_logged_in - datetime.timedelta(days=3))
-        user_services._save_user_settings(user_a_settings) # pylint: disable=protected-access
 
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
@@ -172,8 +172,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
         # Test for legacy user.
         user_settings = user_services.get_user_settings(self.user_a_id)
-        user_settings.last_logged_in = None
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+        user_services.update_last_logged_in(user_settings, None)
 
         query_id = user_query_services.save_new_query_model(
             self.submitter_id, has_not_logged_in_for_n_days=6)
@@ -298,7 +297,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.'
         ) % (query_id, query_id)
 
         expected_email_text_body = (
@@ -315,8 +314,8 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             'Preferences page.'
         ) % query_id
 
-        messages = self.mail_stub.get_sent_messages(
-            to=self.USER_SUBMITTER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.USER_SUBMITTER_EMAIL)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
         self.assertEqual(
@@ -343,7 +342,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.'
         ) % query_id
 
         expected_email_text_body = (
@@ -359,8 +358,8 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.'
         ) % query_id
 
-        messages = self.mail_stub.get_sent_messages(
-            to=self.USER_SUBMITTER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.USER_SUBMITTER_EMAIL)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
         self.assertEqual(

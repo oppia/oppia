@@ -16,15 +16,17 @@
  * @fileoverview Unit tests text input tokenizer.
  */
 
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
+
 describe('Text Input tokenizer', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  describe('Test text input tokenizer', function() {
-    var tokenizer;
-    beforeEach(angular.mock.inject(function($injector) {
-      tokenizer = $injector.get('TextInputTokenizer');
-    }));
-    it('should generate correct tokens for a text', function() {
+  describe('Test text input tokenizer', () => {
+    var tokenizer: TextInputTokenizer;
+    beforeEach(() => {
+      tokenizer = new TextInputTokenizer();
+    });
+    it('should generate correct tokens for a text', () => {
       var textInput = 'I don\'t know the answer to this question';
       var expectedTokens = [
         'don', 'know', 'the', 'answer', 'to', 'this', 'question'];

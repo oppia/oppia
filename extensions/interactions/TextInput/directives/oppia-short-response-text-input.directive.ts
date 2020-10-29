@@ -22,23 +22,22 @@
 
 require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/HtmlEscaperService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseTextInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/TextInput/directives/' +
-        'text-input-short-response.directive.html'),
+      template: require('./text-input-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.$onInit = function() {
+          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        };
       }]
     };
   }

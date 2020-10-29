@@ -15,10 +15,10 @@
 # limitations under the License.
 
 """Jobs to execute and get result of a query."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import datetime
 
 from core import jobs
@@ -32,8 +32,6 @@ import python_utils
     models.Registry.import_models(
         [models.NAMES.user, models.NAMES.exploration, models.NAMES.job]))
 
-# pylint: disable=too-many-return-statements
-
 
 class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for excuting query with given query parameters.
@@ -42,6 +40,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     The reducer function stores all user_ids that satisfy the query in the
     corresponding UserQueryModel.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserSettingsModel]
@@ -82,36 +81,38 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 return
 
+        query_criteria_satisfied = True
         if query_model.created_at_least_n_exps is not None:
-            if (len(user_contributions.created_exploration_ids) <
-                    query_model.created_at_least_n_exps):
-                return
+            query_criteria_satisfied &= (
+                len(user_contributions.created_exploration_ids) >=
+                query_model.created_at_least_n_exps)
 
         if query_model.created_fewer_than_n_exps is not None:
-            if (len(user_contributions.created_exploration_ids) >=
-                    query_model.created_fewer_than_n_exps):
-                return
+            query_criteria_satisfied &= (
+                len(user_contributions.created_exploration_ids) <
+                query_model.created_fewer_than_n_exps)
 
         if query_model.edited_at_least_n_exps is not None:
-            if (len(user_contributions.edited_exploration_ids) <
-                    query_model.edited_at_least_n_exps):
-                return
+            query_criteria_satisfied &= (
+                len(user_contributions.edited_exploration_ids) >=
+                query_model.edited_at_least_n_exps)
 
         if query_model.edited_fewer_than_n_exps is not None:
-            if (len(user_contributions.edited_exploration_ids) >=
-                    query_model.edited_fewer_than_n_exps):
-                return
+            query_criteria_satisfied &= (
+                len(user_contributions.edited_exploration_ids) <
+                query_model.edited_fewer_than_n_exps)
+
+        if not query_criteria_satisfied:
+            return
 
         yield (query_id, user_id)
 
     @staticmethod
     def reduce(query_model_id, stringified_user_ids):
         query_model = user_models.UserQueryModel.get(query_model_id)
-        user_ids = [ast.literal_eval(v) for v in stringified_user_ids]
-        # We are casting UNICODE here as literal_eval appends a 'l' to the
-        # output.
         query_model.user_ids = [
-            python_utils.UNICODE(user_id) for user_id in user_ids]
+            python_utils.UNICODE(user_id) for user_id in stringified_user_ids]
+        query_model.update_timestamps()
         query_model.put()
 
     @classmethod
@@ -120,6 +121,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_COMPLETED
+        query_model.update_timestamps()
         query_model.put()
         email_manager.send_query_completion_email(
             query_model.submitter_id, query_id)
@@ -130,6 +132,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_FAILED
+        query_model.update_timestamps()
         query_model.put()
 
         query_params = {

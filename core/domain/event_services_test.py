@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for event handling."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -24,20 +25,19 @@ import os
 import re
 
 from core.domain import event_services
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from google.appengine.ext import ndb
-
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
 
-taskqueue_services = models.Registry.import_taskqueue_services()
+datastore_services = models.Registry.import_datastore_services()
 
 
-class MockNumbersModel(ndb.Model):
-    number = ndb.IntegerProperty()
+class MockNumbersModel(datastore_services.Model):
+    number = datastore_services.IntegerProperty()
 
 
 class BaseEventHandlerTests(test_utils.GenericTestBase):
@@ -208,19 +208,22 @@ class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
 
     def test_events_go_into_the_events_queue(self):
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EVENTS),
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EVENTS),
             0)
 
         event_services.CompleteExplorationEventHandler.record(
             'eid1', 1, 'sid1', 'session1', 100, {}, feconf.PLAY_TYPE_NORMAL)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EVENTS),
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EVENTS),
             1)
 
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EVENTS),
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EVENTS),
             0)
 
 
@@ -229,8 +232,9 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
     def _get_all_python_files(self):
         """Recursively collects all Python files in the core/ and extensions/
         directory.
+
         Returns:
-            a list of Python files.
+            list(str). A list of Python files.
         """
         files_in_directory = []
         for directory, _, files in os.walk('.'):

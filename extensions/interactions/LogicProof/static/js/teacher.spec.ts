@@ -17,9 +17,9 @@
  * interaction.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofTeacher from 'interactions/LogicProof/static/js/teacher';
+import logicProofData from 'interactions/LogicProof/static/js/data';
 
 describe('Build questions', function() {
   it('should build assumptions correctly', function() {
@@ -61,8 +61,8 @@ describe('Build questions', function() {
 
   it('should forbid the use of reserved words', function() {
     expect(function() {
-      logicProofTeacher.buildQuestion('we\u2227you', 'p=q',
-        logicProofData.BASE_VOCABULARY);
+      logicProofTeacher.buildQuestion(
+        'we\u2227you', 'p=q', logicProofData.BASE_VOCABULARY);
     }).toThrow(
       {
         message: (

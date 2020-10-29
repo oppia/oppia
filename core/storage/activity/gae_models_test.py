@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.activity.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -55,6 +56,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
             'type': constants.ACTIVITY_TYPE_EXPLORATION,
             'id': '0',
         }]
+        featured_model_instance.update_timestamps()
         featured_model_instance.put()
 
         featured_model_instance = (

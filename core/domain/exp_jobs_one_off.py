@@ -15,11 +15,12 @@
 # limitations under the License.
 
 """One-off jobs for explorations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import itertools
+import datetime
 import logging
 import re
 
@@ -28,129 +29,83 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_validation_service
+from core.domain import image_validation_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
 import utils
 
-(file_models, base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
-gae_image_services = models.Registry.import_gae_image_services()
+(
+    base_models,
+    exp_models,
+    feedback_models,
+    improvements_models,
+    skill_models,
+    stats_models,
+    story_models,
+) = models.Registry.import_models([
+    models.NAMES.base_model,
+    models.NAMES.exploration,
+    models.NAMES.feedback,
+    models.NAMES.improvements,
+    models.NAMES.skill,
+    models.NAMES.statistics,
+    models.NAMES.story,
+])
 
 
-ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
-_COMMIT_TYPE_REVERT = 'revert'
-ALL_IMAGES_VERIFIED = 'Images verified'
-ERROR_IN_FILENAME = 'There is an error in the filename'
-FILE_COPIED = 'File Copied'
-FILE_ALREADY_EXISTS = 'File already exists in GCS'
-FILE_FOUND_IN_GCS = 'File found in GCS'
-FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
-FILE_REFERENCES_NON_EXISTENT_EXP_KEY = 'File references nonexistent exp'
-FILE_REFERENCES_DELETED_EXP_KEY = 'File references deleted exp'
-FILE_DELETED = 'File has been deleted'
-FILE_FOUND_IN_GCS = 'File is there in GCS'
-EXP_REFERENCES_UNICODE_FILES = 'Exploration references unicode files'
-INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
-NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
-WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
-ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
-    'Added compressed versions of images in exploration')
-ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
-ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
-GCS_AUDIO_ID_REGEX = re.compile(
-    r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
-        ALLOWED_AUDIO_EXTENSIONS) + '))$')
-GCS_IMAGE_ID_REGEX = re.compile(
-    r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
-        ALLOWED_IMAGE_EXTENSIONS) + '))$')
-GCS_EXTERNAL_IMAGE_ID_REGEX = re.compile(
-    r'^/([^/]+)/exploration/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
-        ALLOWED_IMAGE_EXTENSIONS) + '))$')
-SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
-
-
-class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that calculates summaries of explorations. For every
-    ExplorationModel entity, create a ExpSummaryModel entity containing
-    information described in ExpSummariesAggregator.
-
-    The summaries store the following information:
-        title, category, objective, language_code, tags, last_updated,
-        created_on, status (private, public), community_owned, owner_ids,
-        editor_ids, viewer_ids, version.
-
-        Note: contributor_ids field populated by
-        ExpSummariesContributorsOneOffJob.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exploration_model):
-        if not exploration_model.deleted:
-            exp_services.create_exploration_summary(
-                exploration_model.id, None)
-            yield ('SUCCESS', exploration_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
-class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that finds the user ids of the contributors
-    (defined as any human who has made a 'positive' -- i.e.
-    non-revert-- commit) for each exploration.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationSnapshotMetadataModel]
-
-    @staticmethod
-    def map(item):
-        if (item.commit_type != _COMMIT_TYPE_REVERT and
-                item.committer_id not in constants.SYSTEM_USER_IDS):
-            exp_id = item.get_unversioned_instance_id()
-            yield (exp_id, item.committer_id)
-
-    @staticmethod
-    def reduce(exp_id, committer_id_list):
-        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
-        if exp_summary_model is None:
-            return
-
-        exp_summary_model.contributor_ids = list(set(committer_id_list))
-        exp_summary_model.put()
-
-
-class ExplorationContributorsSummaryOneOffJob(
+class RegenerateStringPropertyIndexOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that computes the number of commits
-    done by contributors for each Exploration.
+    """One-off job for regenerating the index of models changed to use an
+    indexed StringProperty.
+
+    Cloud NDB dropped support for StringProperty(indexed=False) and
+    TextProperty(indexed=True). Therefore, to prepare for the migration to Cloud
+    NDB, we need to regenerate the indexes for every model that has been changed
+    in this way.
+
+    https://cloud.google.com/appengine/docs/standard/python/datastore/indexes#unindexed-properties:
+    > changing a property from unindexed to indexed does not affect any existing
+    > entities that may have been created before the change. Queries filtering
+    > on the property will not return such existing entities, because the
+    > entities weren't written to the query's index when they were created. To
+    > make the entities accessible by future queries, you must rewrite them to
+    > Datastore so that they will be entered in the appropriate indexes. That
+    > is, you must do the following for each such existing entity:
+    > 1.  Retrieve (get) the entity from Datastore.
+    > 2.  Write (put) the entity back to Datastore.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
+        return [
+            exp_models.ExplorationModel,
+            feedback_models.GeneralFeedbackMessageModel,
+            improvements_models.TaskEntryModel,
+            skill_models.SkillModel,
+            stats_models.ExplorationAnnotationsModel,
+            story_models.StoryModel,
+            story_models.StorySummaryModel,
+        ]
 
     @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        summary = exp_fetchers.get_exploration_summary_by_id(item.id)
-        summary.contributors_summary = (
-            exp_services.compute_exploration_contributors_summary(item.id))
-        exp_services.save_exploration_summary(summary)
-        yield ('SUCCESS', item.id)
+    def map(model):
+        model_kind = type(model).__name__
+        if isinstance(model, base_models.VersionedModel):
+            # Change the method resolution order of model to use BaseModel's
+            # implementation of `put`.
+            model = super(base_models.VersionedModel, model)
+        model.update_timestamps(update_last_updated_time=False)
+        model.put()
+        yield (model_kind, 1)
 
     @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
+    def reduce(key, counts):
+        yield (key, len(counts))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -164,7 +119,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if item.content['status'] == rights_domain.ACTIVITY_STATUS_PUBLIC:
             yield (
                 item.get_unversioned_instance_id(),
                 utils.get_time_in_millisecs(item.created_on))
@@ -203,7 +158,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         exp_rights = rights_manager.get_exploration_rights(item.id)
 
         try:
-            if exp_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            if exp_rights.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                 exploration.validate()
             else:
                 exploration.validate(strict=True)
@@ -213,6 +168,58 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-off job for testing exploration migration from any
+    exploration schema version to the latest. This job runs the state
+    migration, but does not commit the new exploration to the store.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationAuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+
+        states_schema_version = item.states_schema_version
+        versioned_exploration_states = {
+            'states_schema_version': states_schema_version,
+            'states': item.states
+        }
+        while states_schema_version < current_state_schema_version:
+            try:
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states, states_schema_version,
+                    item.id)
+                states_schema_version += 1
+            except Exception as e:
+                error_message = (
+                    'Exploration %s failed migration to states v%s: %s' %
+                    (item.id, states_schema_version + 1, e))
+                logging.exception(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+                break
+
+            if states_schema_version == current_state_schema_version:
+                yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
 
 
 class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
@@ -227,6 +234,11 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationJobManager, cls).enqueue(
+            job_id, shard_count=64)
 
     @staticmethod
     def map(item):
@@ -272,12 +284,10 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
-class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of (exploration, state) pairs, grouped by the
-    interaction they use.
-
-    This job is for demonstration purposes. It is not enabled by default in the
-    jobs registry.
+class ExplorationMathSvgFilenameValidationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates the
+    svg_filename fields in each math rich-text components.
     """
 
     @classmethod
@@ -290,19 +300,47 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
+        invalid_tags_info_in_exp = []
         for state_name, state in exploration.states.items():
-            exp_and_state_key = '%s %s' % (item.id, state_name)
-            yield (state.interaction.id, exp_and_state_key)
+            html_string = ''.join(state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.
+                validate_svg_filenames_in_math_rich_text(
+                    feconf.ENTITY_TYPE_EXPLORATION, item.id, html_string))
+            if len(error_list) > 0:
+                invalid_tags_info_in_state = {
+                    'state_name': state_name,
+                    'error_list': error_list,
+                    'no_of_invalid_tags': len(error_list)
+                }
+                invalid_tags_info_in_exp.append(invalid_tags_info_in_state)
+        if len(invalid_tags_info_in_exp) > 0:
+            yield ('Found invalid tags', (item.id, invalid_tags_info_in_exp))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        no_of_invalid_tags = 0
+        invalid_tags_info = {}
+        for exp_id, invalid_tags_info_in_exp in final_values:
+            invalid_tags_info[exp_id] = []
+            for value in invalid_tags_info_in_exp:
+                no_of_invalid_tags += value['no_of_invalid_tags']
+                del value['no_of_invalid_tags']
+                invalid_tags_info[exp_id].append(value)
+
+        final_value_dict = {
+            'no_of_explorations_with_no_svgs': len(final_values),
+            'no_of_invalid_tags': no_of_invalid_tags,
+        }
+        yield ('Overall result.', final_value_dict)
+        yield ('Detailed information on invalid tags. ', invalid_tags_info)
 
 
-class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of (exploration, state) pairs that use the item
-    selection interaction and that have rules that do not match the answer
-    choices. These probably need to be fixed manually.
+class ExplorationRteMathContentValidationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates the
+    Math content object for each math rich-text components.
     """
 
     @classmethod
@@ -315,23 +353,40 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
+        invalid_tags_info_in_exp = []
         for state_name, state in exploration.states.items():
-            if state.interaction.id == 'ItemSelectionInput':
-                choices = (
-                    state.interaction.customization_args['choices']['value'])
-                for group in state.interaction.answer_groups:
-                    for rule_spec in group.rule_specs:
-                        for rule_item in rule_spec.inputs['x']:
-                            if rule_item not in choices:
-                                yield (
-                                    item.id,
-                                    '%s: %s' % (
-                                        state_name.encode('utf-8'),
-                                        rule_item.encode('utf-8')))
+            html_string = ''.join(state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.
+                validate_math_content_attribute_in_html(html_string))
+            if len(error_list) > 0:
+                invalid_tags_info_in_state = {
+                    'state_name': state_name,
+                    'error_list': error_list,
+                    'no_of_invalid_tags': len(error_list)
+                }
+                invalid_tags_info_in_exp.append(invalid_tags_info_in_state)
+        if len(invalid_tags_info_in_exp) > 0:
+            yield ('Found invalid tags', (item.id, invalid_tags_info_in_exp))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        no_of_invalid_tags = 0
+        invalid_tags_info = {}
+        for exp_id, invalid_tags_info_in_exp in final_values:
+            invalid_tags_info[exp_id] = []
+            for value in invalid_tags_info_in_exp:
+                no_of_invalid_tags += value['no_of_invalid_tags']
+                del value['no_of_invalid_tags']
+                invalid_tags_info[exp_id].append(value)
+
+        final_value_dict = {
+            'no_of_explorations_with_no_svgs': len(final_values),
+            'no_of_invalid_tags': no_of_invalid_tags,
+        }
+        yield ('Overall result.', final_value_dict)
+        yield ('Detailed information on invalid tags.', invalid_tags_info)
 
 
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
@@ -433,11 +488,12 @@ class ExplorationContentValidationJobForCKEditor(
             yield (key[:exp_id_index - 1], output_values)
 
 
-class InteractionCustomizationArgsValidationJob(
+class RTECustomizationArgsValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for validating all the customizations arguments of
     Rich Text Components.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
@@ -459,67 +515,315 @@ class InteractionCustomizationArgsValidationJob(
         html_list = exploration.get_all_html_content_strings()
         err_dict = html_validation_service.validate_customization_args(
             html_list)
-
         for key in err_dict:
-            if err_dict[key]:
-                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
+            err_value_with_exp_id = err_dict[key]
+            err_value_with_exp_id.append('Exp ID: %s' % item.id)
+            yield (key, err_value_with_exp_id)
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
-        # Combine all values from multiple lists into a single list
-        # for that error type.
-        output_values = list(set().union(*final_values))
-        exp_id_index = key.find('Exp Id:')
-        if exp_id_index == -1:
-            yield (key, output_values)
-        else:
-            output_values.append(key[exp_id_index:])
-            yield (key[:exp_id_index - 1], output_values)
+        flattened_values = [
+            item for sublist in final_values for item in sublist]
+
+        # Errors produced while loading exploration only contain exploration id
+        # in error message, so no further formatting is required. For errors
+        # from validation the output is in format [err1, expid1, err2, expid2].
+        # So, we further format it as [(expid1, err1), (expid2, err2)].
+        if 'loading exploration' in key:
+            yield (key, flattened_values)
+            return
+
+        output_values = []
+        index = 0
+        while index < len(flattened_values):
+            # flattened_values[index] = error message.
+            # flattened_values[index + 1] = exp id in which error message
+            # is present.
+            output_values.append((
+                flattened_values[index + 1], flattened_values[index]))
+            index += 2
+        output_values.sort()
+        yield (key, output_values)
 
 
-class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for migrating translator_ids to voice_artist_ids."""
+class PopulateXmlnsAttributeInExplorationMathSvgImagesJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate xmlns attribute in the math-expression svg
+    images.
+    """
+
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationRightsModel]
+        return [exp_models.ExplorationModel]
 
     @staticmethod
     def map(item):
         if item.deleted:
             return
 
-        translator_ids = item.translator_ids
-        commit_message = 'Migrate from translator to voice artist'
-        commit_cmds = [{
-            'cmd': 'change_role',
-            'assignee_id': translator_id,
-            # Using magic string because ROLE_TRANSLATOR is removed.
-            'old_role': 'translator',
-            'new_role': rights_manager.ROLE_VOICE_ARTIST
-        } for translator_id in translator_ids]
-
-        if len(translator_ids) > 0:
-            exp_summary_model = exp_models.ExpSummaryModel.get_by_id(item.id)
-
-            if exp_summary_model is None or exp_summary_model.deleted:
-                item.voice_artist_ids = translator_ids
-                item.translator_ids = []
-                item.commit('Admin', commit_message, commit_cmds)
-                yield ('Summary model does not exist or is deleted', item.id)
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, item.id))
+        filepaths = fs.listdir('image')
+        count_of_unchanged_svgs = 0
+        filenames_of_modified_svgs = []
+        for filepath in filepaths:
+            filename = filepath.split('/')[-1]
+            if not re.match(constants.MATH_SVG_FILENAME_REGEX, filename):
+                continue
+            old_svg_image = fs.get(filepath)
+            new_svg_image = (
+                html_validation_service.get_svg_with_xmlns_attribute(
+                    old_svg_image))
+            if new_svg_image == old_svg_image:
+                count_of_unchanged_svgs += 1
+                continue
+            try:
+                image_validation_services.validate_image_and_filename(
+                    new_svg_image, filename)
+            except Exception as e:
+                yield (
+                    'FAILED validation',
+                    'Exploration with id %s failed image validation for the '
+                    'filename %s with following error: %s' % (
+                        item.id, filename, e))
             else:
-                exp_summary_model.voice_artist_ids = translator_ids
-                exp_summary_model.translator_ids = []
-                exp_summary_model.put()
-
-                item.voice_artist_ids = translator_ids
-                item.translator_ids = []
-                item.commit('Admin', commit_message, commit_cmds)
-                yield ('SUCCESS', item.id)
+                fs.commit(
+                    filepath.encode('utf-8'), new_svg_image,
+                    mimetype='image/svg+xml')
+                filenames_of_modified_svgs.append(filename)
+        if count_of_unchanged_svgs:
+            yield ('UNCHANGED', count_of_unchanged_svgs)
+        if len(filenames_of_modified_svgs) > 0:
+            yield (
+                'SUCCESS - CHANGED Exp Id: %s' % item.id,
+                filenames_of_modified_svgs)
 
     @staticmethod
     def reduce(key, values):
-        if key == 'SUCCESS':
-            yield (key, len(values))
+        if key == 'UNCHANGED':
+            final_values = [ast.literal_eval(value) for value in values]
+            yield (key, sum(final_values))
         else:
-            yield (key, values)
+            exp_id_index = key.find('Exp Id:')
+            if exp_id_index == -1:
+                yield (key, values)
+            else:
+                final_values = [ast.literal_eval(value) for value in values]
+                output_values = list(set().union(*final_values))
+                output_values.append(key[exp_id_index:])
+                yield (key[:exp_id_index - 1], output_values)
+
+
+class XmlnsAttributeInExplorationMathSvgImagesAuditJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to audit math SVGs on the server that do not have xmlns
+    attribute.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, item.id))
+        filepaths = fs.listdir('image')
+        for filepath in filepaths:
+            filename = filepath.split('/')[-1]
+            if not re.match(constants.MATH_SVG_FILENAME_REGEX, filename):
+                continue
+            old_svg_image = fs.get(filepath)
+            xmlns_attribute_is_present = (
+                html_validation_service.does_svg_tag_contains_xmlns_attribute(
+                    old_svg_image))
+            if not xmlns_attribute_is_present:
+                yield (item.id, filename)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the translator_ids from the ExpSummaryModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExpSummaryModel]
+
+    @staticmethod
+    def map(exp_summary_model):
+        # This is the only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'translator_ids' in exp_summary_model._properties:  # pylint: disable=protected-access
+            del exp_summary_model._properties['translator_ids']  # pylint: disable=protected-access
+            if 'translator_ids' in exp_summary_model._values:  # pylint: disable=protected-access
+                del exp_summary_model._values['translator_ids']  # pylint: disable=protected-access
+            exp_summary_model.update_timestamps(update_last_updated_time=False)
+            exp_summary_model.put()
+            yield ('SUCCESS_REMOVED - ExpSummaryModel', exp_summary_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - ExpSummaryModel',
+                exp_summary_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+def regenerate_exp_commit_log_model(exp_model, version):
+    """Helper function to regenerate a commit log model for an
+    exploration model.
+
+    NOTE TO DEVELOPERS: Do not delete this function until issue #10808 is fixed.
+
+    Args:
+        exp_model: ExplorationModel. The exploration model for which
+            commit log model is to be generated.
+        version: int. The commit log version to be generated.
+
+    Returns:
+        ExplorationCommitLogEntryModel. The regenerated commit log model.
+    """
+    metadata_model = (
+        exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+            '%s-%s' % (exp_model.id, version)))
+
+    required_rights_model = exp_models.ExplorationRightsModel.get(
+        exp_model.id, strict=True, version=1)
+    for rights_version in python_utils.RANGE(2, version + 1):
+        rights_model = exp_models.ExplorationRightsModel.get(
+            exp_model.id, strict=False, version=rights_version)
+        if rights_model is None:
+            break
+        if rights_model.created_on <= metadata_model.created_on:
+            required_rights_model = rights_model
+        else:
+            break
+    commit_log_model = (
+        exp_models.ExplorationCommitLogEntryModel.create(
+            exp_model.id, version, metadata_model.committer_id,
+            metadata_model.commit_type,
+            metadata_model.commit_message,
+            metadata_model.commit_cmds,
+            required_rights_model.status,
+            required_rights_model.community_owned))
+    commit_log_model.exploration_id = exp_model.id
+    commit_log_model.created_on = metadata_model.created_on
+    commit_log_model.last_updated = metadata_model.last_updated
+    return commit_log_model
+
+
+class RegenerateMissingExpCommitLogModels(jobs.BaseMapReduceOneOffJobManager):
+    """Job that regenerates missing commit log models for an exploration.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10808 is fixed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        for version in python_utils.RANGE(1, item.version + 1):
+            commit_log_model = (
+                exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                    'exploration-%s-%s' % (item.id, version)))
+            if commit_log_model is None:
+                commit_log_model = regenerate_exp_commit_log_model(
+                    item, version)
+                commit_log_model.update_timestamps(
+                    update_last_updated_time=False)
+                commit_log_model.put()
+                yield (
+                    'Regenerated Exploration Commit Log Model: version %s' % (
+                        version), item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ExpCommitLogModelRegenerationValidator(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that validates the process of regeneration of commit log
+    models for an exploration.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10808 is fixed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        # This is done to ensure that all explorations are not checked and
+        # a random sample of the explorations is checked.
+        last_char_in_id = item.id[-1]
+        if last_char_in_id < 'a' or last_char_in_id > 'j':
+            return
+
+        for version in python_utils.RANGE(1, item.version + 1):
+            commit_log_model = (
+                exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                    'exploration-%s-%s' % (item.id, version)))
+            if commit_log_model is None:
+                continue
+            regenerated_commit_log_model = regenerate_exp_commit_log_model(
+                item, version)
+
+            fields = [
+                'user_id', 'commit_type', 'commit_message', 'commit_cmds',
+                'version', 'post_commit_status', 'post_commit_community_owned',
+                'post_commit_is_private', 'exploration_id'
+            ]
+
+            for field in fields:
+                commit_model_field_val = getattr(commit_log_model, field)
+                regenerated_commit_log_model_field_val = getattr(
+                    regenerated_commit_log_model, field)
+                if commit_model_field_val != (
+                        regenerated_commit_log_model_field_val):
+                    yield (
+                        'Mismatch between original model and regenerated model',
+                        '%s in original model: %s, in regenerated model: %s' % (
+                            field, commit_model_field_val,
+                            regenerated_commit_log_model_field_val))
+
+            time_fields = ['created_on', 'last_updated']
+            for field in time_fields:
+                commit_model_field_val = getattr(commit_log_model, field)
+                regenerated_commit_log_model_field_val = getattr(
+                    regenerated_commit_log_model, field)
+                max_allowed_val = regenerated_commit_log_model_field_val + (
+                    datetime.timedelta(minutes=1))
+                min_allowed_val = regenerated_commit_log_model_field_val - (
+                    datetime.timedelta(minutes=1))
+                if commit_model_field_val > max_allowed_val or (
+                        commit_model_field_val < min_allowed_val):
+                    yield (
+                        'Mismatch between original model and regenerated model',
+                        '%s in original model: %s, in regenerated model: %s' % (
+                            field, commit_model_field_val,
+                            regenerated_commit_log_model_field_val))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

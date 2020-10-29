@@ -16,30 +16,22 @@
  * @fileoverview Unit tests for Number with Units rules.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// number-with-units-rules.service.ts is upgraded to Angular 8.
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'interactions/NumberWithUnits/directives/' +
-  'number-with-units-rules.service.ts');
+import { NumberWithUnitsRulesService } from
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
 
-describe('Number with Units rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-  }));
+describe('Number with Units rules service', () => {
+  let nurs: NumberWithUnitsRulesService = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [NumberWithUnitsRulesService]
+    });
+    nurs = TestBed.get(NumberWithUnitsRulesService);
+  });
 
-  var nurs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    nurs = $injector.get('NumberWithUnitsRulesService');
-  }));
-
-  var createFractionDict = function(
-      isNegative, wholeNumber, numerator, denominator) {
+  var createFractionDict = (
+      isNegative, wholeNumber, numerator, denominator) => {
     return {
       isNegative: isNegative,
       wholeNumber: wholeNumber,
@@ -48,8 +40,8 @@ describe('Number with Units rules service', function() {
     };
   };
 
-  var createNumberWithUnitsDict = function(
-      type, real, fractionDict, unitList) {
+  var createNumberWithUnitsDict = (
+      type, real, fractionDict, unitList) => {
     return {
       type: type,
       real: real,
@@ -74,7 +66,7 @@ describe('Number with Units rules service', function() {
       exponent: -2}])
   };
 
-  it('should have a correct \'equal to\' rule', function() {
+  it('should have a correct \'equal to\' rule', () => {
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
       'real', 2.5, createFractionDict(false, 0, 0, 1),
       [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}]
@@ -113,7 +105,7 @@ describe('Number with Units rules service', function() {
     CURRENCY_RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'equivalent to\' rule', function() {
+  it('should have a correct \'equivalent to\' rule', () => {
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
       'real', 2, createFractionDict(false, 0, 0, 1),
       [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: 2}]), REAL_RULE_INPUT)

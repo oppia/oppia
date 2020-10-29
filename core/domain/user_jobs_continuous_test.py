@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for user dashboard computations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -29,9 +30,11 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 from core.platform import models
@@ -42,7 +45,6 @@ import utils
 
 (exp_models, stats_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics, models.NAMES.user])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 COLLECTION_ID = 'cid'
 COLLECTION_TITLE = 'Title'
@@ -69,6 +71,7 @@ class MockRecentUpdatesAggregator(
     """A modified DashboardRecentUpdatesAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
@@ -125,13 +128,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -157,7 +160,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             job_id = (
                 exp_jobs_one_off.ExplorationMigrationJobManager.create_new())
             exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             # Confirm that the exploration is at version 2.
             exploration = exp_fetchers.get_exploration_by_id(EXP_ID)
@@ -171,16 +174,16 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .stop_computation(USER_ID))
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -201,13 +204,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'last_updated_ms': v3_last_updated_ms,
@@ -235,13 +238,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'last_updated_ms': expected_last_updated_ms,
@@ -285,13 +288,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(editor_id)[1])
+                .get_recent_user_changes(editor_id)[1])
             self.assertEqual([(
                 self._get_expected_activity_created_dict(
                     editor_id, EXP_2_ID, EXP_2_TITLE, 'exploration',
@@ -340,16 +343,16 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications_for_user_a = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(user_a_id)[1])
+                .get_recent_user_changes(user_a_id)[1])
             recent_notifications_for_user_b = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(user_b_id)[1])
+                .get_recent_user_changes(user_b_id)[1])
             expected_thread_notification = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -388,7 +391,6 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
             user_a = user_services.UserActionsInfo(user_a_id)
 
-
             # User A creates an exploration.
             self.save_new_valid_exploration(
                 EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
@@ -405,22 +407,22 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
-                user_a, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
+                user_a, EXP_ID, user_b_id, rights_domain.ROLE_EDITOR)
 
             (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications_for_user_a = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(user_a_id)[1])
+                .get_recent_user_changes(user_a_id)[1])
             recent_notifications_for_user_b = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(user_b_id)[1])
+                .get_recent_user_changes(user_b_id)[1])
             expected_thread_notification = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -463,13 +465,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -500,13 +502,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_COLLECTION_COMMIT,
                 'last_updated_ms': expected_last_updated_ms,
@@ -531,13 +533,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(sorted(recent_notifications[0].keys()), [
                 'activity_id', 'activity_title', 'author_id',
@@ -574,14 +576,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
 
             with logging_swap:
-                self.process_and_flush_pending_tasks()
+                self.process_and_flush_pending_mapreduce_tasks()
 
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             self.assertEqual(
@@ -594,6 +596,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
@@ -667,6 +670,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         with get_statistics_swap, user_stats_aggregator_swap:
             MockUserStatsAggregator.start_computation()
             self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
     def _generate_user_ids(self, count):
         """Generate unique user ids to rate an exploration. Each user id needs
@@ -848,6 +852,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self._create_exploration(self.EXP_ID_3, self.user_a_id)
         model1 = exp_models.ExpSummaryModel.get(self.EXP_ID_3)
         model1.contributors_summary = {}
+        model1.update_timestamps()
         model1.put()
 
         self._run_computation()
@@ -913,7 +918,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID_1, self.user_b_id,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
 
         exp_version = self.EXP_DEFAULT_VERSION
         exp_id = self.EXP_ID_1
@@ -1044,6 +1049,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self._create_exploration(self.EXP_ID_3, self.user_a_id)
         model1 = exp_models.ExpSummaryModel.get(self.EXP_ID_3)
         model1.deleted = True
+        model1.update_timestamps()
         model1.put()
 
         self._run_computation()

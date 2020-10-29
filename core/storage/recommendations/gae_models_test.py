@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for core.storage.question.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -26,6 +27,10 @@ from core.tests import test_utils
 class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationRecommendationsModel class."""
 
+    RECOMMENDATION_1_ID = 'rec_1_id'
+    RECOMMENDATION_2_ID = 'rec_2_id'
+    RECOMMENDATION_3_ID = 'rec_3_id'
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             recommendations_models.ExplorationRecommendationsModel
@@ -35,8 +40,7 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             recommendations_models.ExplorationRecommendationsModel
-            .has_reference_to_user_id('any_id')
-        )
+            .has_reference_to_user_id('any_id'))
 
 
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
@@ -46,9 +50,3 @@ class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             recommendations_models.TopicSimilaritiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            recommendations_models.TopicSimilaritiesModel
-            .has_reference_to_user_id('any_id')
-        )

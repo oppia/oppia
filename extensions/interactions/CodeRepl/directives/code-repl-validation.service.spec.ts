@@ -26,13 +26,13 @@ import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { CodeReplCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('CodeReplValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any, validatorService: CodeReplValidationService;
-  let currentState: string, customizationArguments: any;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
+  let validatorService: CodeReplValidationService;
+  let currentState: string, customizationArguments: CodeReplCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
@@ -51,7 +51,7 @@ describe('CodeReplValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -74,7 +74,7 @@ describe('CodeReplValidationService', () => {
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -85,6 +85,10 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for programming language', () => {
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
+    // @ts-expect-error
     customizationArguments.language.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -95,6 +99,10 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for placeholder text', () => {
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
+    // @ts-expect-error
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -105,6 +113,10 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for preCode text', () => {
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
+    // @ts-expect-error
     customizationArguments.preCode.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -115,6 +127,10 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for postCode text', () => {
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
+    // @ts-expect-error
     customizationArguments.postCode.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);

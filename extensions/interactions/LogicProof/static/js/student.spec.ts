@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for LogicProof interaction student components.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofStudent from 'interactions/LogicProof/static/js/student';
+import logicProofData from 'interactions/LogicProof/static/js/data';
 import logicProofParser from
-  'interactions/LogicProof/static/js/generatedParser.ts';
+  'interactions/LogicProof/static/js/generatedParser';
 
 describe('Match expression to expression template', function() {
   var expressionR = {
@@ -928,7 +928,8 @@ describe('Match expression to expression template', function() {
               'a was arbitrary hence \u2200x.p',
               '  from p and q we have p\u2227q',
               '  b was arbitrary hence \u2200x.q'].join('\n'))[0]
-        ).toEqual('We originally took a as our arbitrary variable so this, ' +
+        ).toEqual(
+          'We originally took a as our arbitrary variable so this, ' +
           'rather than b, needs to be the one that we quantify out over.');
 
         expect(
@@ -936,7 +937,8 @@ describe('Match expression to expression template', function() {
             sampleInteraction.mistake_table[1].entries[0], 1,
             'a was arbitrary hence \u2200x.p\n  from p and q we ' +
             'have p\u2227q')[0]
-        ).toEqual('The last line of a proof should not be indented; you need ' +
+        ).toEqual(
+          'The last line of a proof should not be indented; you need ' +
           'to prove that the given formulas holds just from the original ' +
           'assumptions, not the additional assumption of \u2200x.p.');
 

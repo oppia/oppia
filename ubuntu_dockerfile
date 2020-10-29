@@ -24,7 +24,7 @@
 #   - run_frontend_tests.py might not run correctly every time
 #
 # For more detailed instructions, go to the Windows page on here:
-# https://github.com/oppia/oppia/wiki/Installing-Oppia
+# https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29
 #
 ##########################################################################
 ###################### TO SET UP THE OPPIA REPOSITORY ####################
@@ -33,8 +33,11 @@
 ########## START DOCKER
 #
 # STEP 1
-# Download Docker Desktop for Windows here:
-# https://hub.docker.com/editions/community/docker-ce-desktop-windows
+# Download Docker Desktop for Windows.
+# Windows Enterprise and Pro: 
+#   https://hub.docker.com/editions/community/docker-ce-desktop-windows
+# Windows 10 Home: 
+#   https://docs.docker.com/toolbox/toolbox_install_windows/
 #
 # STEP 2
 # Start Docker by clicking on the Docker application (a Docker icon should
@@ -53,19 +56,18 @@
 # Expect up to a 2 minute delay until the first line of output is printed.
 # Runtime: 15-25 minutes
 #
-# If this is not your first time running this command, add --no-cache flag
-# to rebuild from the beginning:
-#   docker build -t {image_name} -f ubuntu_dockerfile . --no-cache
-#
 ########## BUILD A DOCKER CONTAINER BASED ON IMAGE
 #
 # STEP 4
 # Create a Docker container using the Docker image:
 #
-#   docker run -u 0 -it -p 8181:8181 --name {container_name} {image_name}:latest bash
+#   docker run -u 0 -it -p 8181:8181 --name {container_name} 
+#   -v {path_to_oppia_parent_dir}:/home {image_name}:latest bash
 #      where you should replace {container_name} with whatever you want to
-#      call your Docker container (say oppia_container) and {image_name}
-#      with the name of your Docker image.
+#      call your Docker container (say oppia_container),
+#      {path_to_oppia_parent_dir} with the absolute path to your oppia
+#      folder's parent directory, and {image_name} with the name of your
+#      Docker image.
 #
 # STEP 5
 # At this point, a container is built with your current oppia directory.
@@ -88,6 +90,7 @@
 # “NAMES” column of the output of “docker ps”.
 #
 # If this does not output a container, move on to step 2.
+# Otherwise, move on to step 3.
 #
 # STEP 2
 # Run:
@@ -105,34 +108,14 @@
 #
 # Then return to step 1 to ensure that the container is running.
 #
-########## UPDATE THE FILES IN THE CONTAINER WITH YOUR LOCAL REPO
-#
-# STEP 3
-# Update the container to have your most recent code. Skip this step if
-# you have not made any changes to your local repo.
-# Note: Please keep in mind the direction of the slashes ( ‘/’ vs ‘\’).
-#
-# If you remember what files/directories you have edited, run:
-#   docker cp {path\to\src} {container_name}:/home/oppia/{path/to/dest}
-#      where {path\to\src} can be the relative path to a file or folder
-#      and {path/to/dest} is the path within the /home/oppia directory
-#      in the container.
-#   ex: docker cp .\core\domain\. oppia_container:/home/oppia/core/domain/
-#
-# If you do not remember what files you have edited, run:
-#   docker cp .\. {container_name}:/home/oppia/
-#      in the oppia root directory to copy over the entire oppia/ directory
-#      into the container.
-# Note: This will take ~10 minutes to copy over all of the files.
-#
 ########## START BASH AND RUN THE START SCRIPT
 #
-# STEP 4
+# STEP 3
 # Start bash in the updated Docker container:
 #
 #   docker exec -it {container_name} bash
 #
-# STEP 5
+# STEP 4
 # Now you should have a new terminal prompt "root@...". Run the start.sh
 # script:
 #
@@ -149,30 +132,33 @@
 ##########################################################################
 #
 # STEP 1
-# Start bash in the Docker image (follow steps 1-4 above).
+# If you are in the Docker container bash, type exit to return to your
+# Command Prompt.
 #
 # STEP 2
-# Run the run_frontend_tests.py script:
-#
-#   python -m scripts.run_frontend_tests
-#
-# Runtime: 3-7 minutes
-# If this outputs an error ("failed before timeout of 2000ms"), continue
-# to STEP 3.
-# If this runs correctly (displays "SUCCESS"), do not go onto STEP 3.
+# Ensure that node.js is installed on your Windows computer by running
+# node -v. If not, install it: https://nodejs.org/en/download/
 #
 # STEP 3
+# Run pip install future
+#
+# STEP 4
 # Compile the frontend tests and then run the tests:
 #
-#   ./node_modules/typescript/bin/tsc --project .
-#   ./node_modules/karma/bin/karma start ./core/tests/karma.conf.ts
+#   node .\node_modules\typescript\bin\tsc --project .
+#   node .\node_modules\karma\bin\karma start .\core\tests\karma.conf.ts
 #
-# If this outputs an error, try STEP 2 again.
 # If this runs correctly, you will see a SIGKILL at the end. That is okay.
+# If this does not run correctly, visit:
+#   https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29
 
 ##########################################################################
 
 FROM ubuntu:latest
+
+# To bypass tzdata configuration. 
+ENV DEBIAN_FRONTEND noninteractive
+ENV TZ "UTC"
 
 # Install packages needed in Dockerfile
 RUN apt-get update && \
@@ -182,6 +168,7 @@ RUN apt-get update && \
    apt-get install -y nodejs && \
    apt-get install -y npm && \
    apt-get install -y yes && \
+   apt install -y tzdata && \
    apt-get clean
 
 # Create oppia directory in Docker container

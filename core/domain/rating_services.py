@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """System for assigning and displaying ratings of explorations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -74,6 +75,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
                 user_id, exploration_id)
         exp_user_data_model.rating = new_rating
         exp_user_data_model.rated_on = datetime.datetime.utcnow()
+        exp_user_data_model.update_timestamps()
         exp_user_data_model.put()
         return old_rating
     old_rating = transaction_services.run_in_transaction(_update_user_rating)
@@ -140,7 +142,7 @@ def get_overall_ratings_for_exploration(exploration_id):
         exploration_id: str. The id of the exploration.
 
     Returns:
-        a dict whose keys are '1', '2', '3', '4', '5' and whose
+        dict. A dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing the frequency counts
         of each rating.
     """

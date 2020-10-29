@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for feature detection utilities for Python 2 and Python 3."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -102,18 +103,22 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_with_metaclass(self):
         class BaseForm(python_utils.OBJECT):
             """Test baseclass."""
+
             pass
 
         class FormType1(type):
             """Test metaclass."""
+
             pass
 
         class FormType2(type):
             """Test metaclass."""
+
             pass
 
         class Form(python_utils.with_metaclass(FormType1, BaseForm)): # pylint: disable=inherit-non-class
             """Test class."""
+
             pass
 
         self.assertTrue(isinstance(Form, FormType1))

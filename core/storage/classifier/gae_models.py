@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for storing the classification data models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -23,9 +24,9 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
+datastore_services = models.Registry.import_datastore_services()
 
 # Available choices of algorithms for classification.
 ALGORITHM_CHOICES = [classifier_details['algorithm_id'] for (
@@ -36,58 +37,73 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
 
     The id of instances of this class has the form
-    {{exp_id}}.{{random_hash_of_12_chars}}
+    '[exp_id].[random hash of 12 chars]'.
     """
 
     # The ID of the algorithm used to create the model.
-    algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
-                                      indexed=True)
+    algorithm_id = datastore_services.StringProperty(
+        required=True, choices=ALGORITHM_CHOICES, indexed=True)
     # The ID of the interaction to which the algorithm belongs.
-    interaction_id = ndb.StringProperty(required=True, indexed=True)
+    interaction_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True, indexed=True)
+    exp_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration version at the time this training job was created.
-    exp_version = ndb.IntegerProperty(required=True, indexed=True)
+    exp_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True, indexed=True)
+    state_name = datastore_services.StringProperty(required=True, indexed=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING.
-    status = ndb.StringProperty(required=True,
-                                choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                                default=feconf.TRAINING_JOB_STATUS_PENDING,
-                                indexed=True)
+    status = datastore_services.StringProperty(
+        required=True, choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
+        default=feconf.TRAINING_JOB_STATUS_PENDING, indexed=True)
     # The training data which is to be populated when retrieving the job.
     # The list contains dicts where each dict represents a single training
     # data group.
-    training_data = ndb.JsonProperty(default=None)
+    training_data = datastore_services.JsonProperty(default=None)
     # The time when the job's status should next be checked.
     # It is incremented by TTL when a job with status NEW is picked up by VM.
-    next_scheduled_check_time = ndb.DateTimeProperty(required=True,
-                                                     indexed=True)
-    # The classifier data which will be populated when storing the results of
-    # the job.
-    classifier_data = ndb.JsonProperty(default=None)
+    next_scheduled_check_time = datastore_services.DateTimeProperty(
+        required=True, indexed=True)
     # The schema version for the data that is being classified.
-    data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    data_schema_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
-        """Classifier training job is not related to users."""
+        """ClassifierTrainingJobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model does not contain user data."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_scheduled_check_time':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'data_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the training job of the form
-        {{exp_id}}.{{random_hash_of_16_chars}}
+        '[exp_id].[random hash of 16 chars]'.
 
         Args:
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new ClassifierTrainingJobModel instance.
+            str. ID of the new ClassifierTrainingJobModel instance.
 
         Raises:
-            Exception: The id generator for ClassifierTrainingJobModel is
-            producing too many collisions.
+            Exception. The id generator for ClassifierTrainingJobModel is
+                producing too many collisions.
         """
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
@@ -108,7 +124,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     def create(
             cls, algorithm_id, interaction_id, exp_id, exp_version,
             next_scheduled_check_time, training_data, state_name, status,
-            classifier_data, data_schema_version):
+            data_schema_version):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -124,14 +140,13 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             state_name: str. The name of the state to which the classifier
                 belongs.
             status: str. The status of the training job.
-            classifier_data: dict|None. The data stored as result of training.
             data_schema_version: int. The schema version for the data.
 
         Returns:
-            ID of the new ClassifierModel entry.
+            str. ID of the new ClassifierModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id)
@@ -143,10 +158,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             next_scheduled_check_time=next_scheduled_check_time,
             state_name=state_name, status=status,
             training_data=training_data,
-            classifier_data=classifier_data,
             data_schema_version=data_schema_version
             )
 
+        training_job_instance.update_timestamps()
         training_job_instance.put()
         return instance_id
 
@@ -158,8 +173,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         Args:
             cursor: str or None. The list of returned entities starts from this
                 datastore cursor.
+
         Returns:
-            List of the ClassifierTrainingJobModels with status new or pending.
+            list(ClassifierTrainingJobModel). List of the
+            ClassifierTrainingJobModels with status new or pending.
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
@@ -194,11 +211,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 next_scheduled_check_time=job_dict['next_scheduled_check_time'],
                 state_name=job_dict['state_name'], status=job_dict['status'],
                 training_data=job_dict['training_data'],
-                classifier_data=job_dict['classifier_data'],
                 data_schema_version=job_dict['data_schema_version'])
 
             job_models.append(training_job_instance)
             job_ids.append(instance_id)
+        cls.update_timestamps_multi(job_models)
         cls.put_multi(job_models)
         return job_ids
 
@@ -206,29 +223,40 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 class TrainingJobExplorationMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierTrainingJob.
 
-    The id of instances of this class has the form
-    {{exp_id}}.{{exp_version}}.{{utf8_encoded_state_name}}
+    The ID of instances of this class has the form
+    [exp_id].[exp_version].[state_name].
     """
 
     # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True, indexed=True)
+    exp_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration version at the time the corresponding classifier's
     # training job was created.
-    exp_version = ndb.IntegerProperty(required=True, indexed=True)
+    exp_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True, indexed=True)
+    state_name = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the training job corresponding to the exploration attributes.
-    job_id = ndb.StringProperty(required=True, indexed=True)
+    job_id = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Training job exploration mapping is not related to users."""
+        """TrainingJobExplorationMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model does not contain user data."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
         """Generates a unique ID for the Classifier Exploration Mapping of the
-        form {{exp_id}}.{{exp_version}}.{{utf8_encoded_state_name}}
+        form [exp_id].[exp_version].[state_name].
 
         Args:
             exp_id: str. ID of the exploration.
@@ -257,7 +285,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
         Returns:
             list(ClassifierExplorationMappingModel|None). The model instances
-                for the classifier exploration mapping.
+            for the classifier exploration mapping.
         """
         mapping_ids = []
         for state_name in state_names:
@@ -281,10 +309,10 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 combination of <exp_id, exp_version, state_name>.
 
         Returns:
-            ID of the new ClassifierExplorationMappingModel entry.
+            str. ID of the new ClassifierExplorationMappingModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id, exp_version, state_name)
@@ -293,6 +321,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
                 state_name=state_name, job_id=job_id)
 
+            mapping_instance.update_timestamps()
             mapping_instance.put()
             return instance_id
         raise Exception('A model with the same ID already exists.')
@@ -323,5 +352,6 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
             mapping_models.append(mapping_instance)
             mapping_ids.append(instance_id)
+        cls.update_timestamps_multi(mapping_models)
         cls.put_multi(mapping_models)
         return mapping_ids

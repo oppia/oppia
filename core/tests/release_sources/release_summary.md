@@ -32,12 +32,13 @@ This indicates that a migration may be needed
 ### New Authors:
 * Alice <alice@gmail.com>
 * Bob <bob@gmail.com>
+* Casie <casie@gmail.com>
 * Quent <qunet@outlook.com>
 * Zoe <zoe@gmail.com>
 
 ### Existing Authors:
 * Akshay Anand <akshayanand681@gmail.com>
-* Amey <43315144+amey-kudari@users.noreply.github.com>
+* Amey <amey-kudari@gmail.com>
 * Ankita Saxena <ankitasonu24@gmail.com>
 * Anubhav Sinha <anubhavsinha98@gmail.com>
 * Apurv Bajaj <apurvabajaj007@gmail.com>

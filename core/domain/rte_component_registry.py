@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Registry for custom rich-text components."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -78,7 +79,7 @@ class Registry(python_utils.OBJECT):
 
         Returns:
             dict. A dict mapping from rte component types to rte component
-                classes.
+            classes.
         """
         rte_path = [feconf.RTE_EXTENSIONS_DIR]
 
@@ -110,7 +111,7 @@ class Registry(python_utils.OBJECT):
 
         Returns:
             list(str). A list of component tag names which have the expected
-                value of a key.
+            value of a key.
         """
         rich_text_components_specs = cls.get_all_rte_components()
         component_tag_names = []

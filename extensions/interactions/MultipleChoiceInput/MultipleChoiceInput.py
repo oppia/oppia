@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Python configuration for MultipleChoiceInput interaction."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -48,29 +49,36 @@ class MultipleChoiceInput(base.BaseInteraction):
                 'min_value': 1,
             }],
             'items': {
-                'type': 'html',
-                'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Enter an option for the learner to select',
-                },
+                'type': 'custom',
+                'obj_type': 'SubtitledHtml',
+                'replacement_ui_config': {
+                    'html': {
+                        'hide_complex_extensions': True,
+                        'placeholder': (
+                            'Enter an option for the learner to select'),
+                    }
+                }
             },
             'ui_config': {
                 'add_element_text': 'Add multiple choice option',
             }
         },
-        'default_value': [''],
+        'default_value': [{
+            'content_id': None,
+            'html': ''
+        }],
+    }, {
+        'name': 'showChoicesInShuffledOrder',
+        'description': 'Shuffle answer choices',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
     }]
 
     _answer_visualization_specs = [{
-        # Bar chart with answer counts.
-        'id': 'BarChart',
-        'options': {
-            'x_axis_label': 'Answer',
-            'y_axis_label': 'Count',
-        },
+        'id': 'SortedTiles',
+        'options': {'header': 'Top answers', 'use_percentages': True},
         'calculation_id': 'AnswerFrequencies',
-        # Bar charts don't have any useful way to display which answers are
-        # addressed yet. By setting this option to False, we consequentially
-        # avoid doing extra computation.
-        'addressed_info_is_supported': False,
+        'addressed_info_is_supported': True,
     }]

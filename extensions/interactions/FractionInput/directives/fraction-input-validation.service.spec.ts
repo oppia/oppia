@@ -15,22 +15,19 @@
 /**
  * @fileoverview Unit tests for fraction input validation service.
  */
+import cloneDeep from 'lodash/cloneDeep';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// fraction-input-validation.service.ts is upgraded to Angular 8.
+import { AppConstants } from 'app.constants';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { FractionInputValidationService } from
+  'interactions/FractionInput/directives/fraction-input-validation.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-describe('FractionInputValidationService', function() {
+describe('FractionInputValidationService', () => {
   var validatorService, WARNING_TYPES;
 
   var currentState;
@@ -47,32 +44,13 @@ describe('FractionInputValidationService', function() {
     numeratorEqualsFiveRule, zeroDenominatorRule;
   var createFractionDict;
   var oof, agof, rof;
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('FractionInputValidationService');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+  beforeEach(() => {
+    validatorService = TestBed.get(FractionInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     createFractionDict = function(
         isNegative, wholeNumber, numerator, denominator) {
@@ -244,7 +222,7 @@ describe('FractionInputValidationService', function() {
       false,
       null
     )];
-  }));
+  });
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
@@ -302,8 +280,8 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-  it('should catch redundant rules in separate answer groups', function() {
-    answerGroups[1] = angular.copy(answerGroups[0]);
+  it('should catch redundant rules in separate answer groups', () => {
+    answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [greaterThanMinusOneRule];
     answerGroups[1].rules = [equalsOneRule];
     var warnings = validatorService.getAllWarnings(
@@ -317,7 +295,7 @@ describe('FractionInputValidationService', function() {
   });
 
   it('should catch redundant rules caused by greater/less than range',
-    function() {
+    () => {
       answerGroups[0].rules = [greaterThanMinusOneRule, equalsOneRule];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
@@ -329,7 +307,7 @@ describe('FractionInputValidationService', function() {
       }]);
     });
 
-  it('should catch redundant rules caused by exactly equals', function() {
+  it('should catch redundant rules caused by exactly equals', () => {
     answerGroups[0].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
@@ -341,7 +319,7 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-  it('should catch non integer inputs in the numerator', function() {
+  it('should catch non integer inputs in the numerator', () => {
     answerGroups[0].rules = [nonIntegerRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
@@ -355,7 +333,7 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-  it('should catch non integer inputs in the whole number', function() {
+  it('should catch non integer inputs in the whole number', () => {
     nonIntegerRule.type = 'HasIntegerPartEqualTo';
     answerGroups[0].rules = [nonIntegerRule];
     var warnings = validatorService.getAllWarnings(
@@ -370,7 +348,7 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-  it('should catch non integer inputs in the denominator', function() {
+  it('should catch non integer inputs in the denominator', () => {
     nonIntegerRule.type = 'HasDenominatorEqualTo';
     answerGroups[0].rules = [nonIntegerRule];
     var warnings = validatorService.getAllWarnings(
@@ -385,7 +363,7 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-  it('should catch zero input in denominator', function() {
+  it('should catch zero input in denominator', () => {
     answerGroups[0].rules = [zeroDenominatorRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
@@ -400,7 +378,7 @@ describe('FractionInputValidationService', function() {
   });
 
   it('should catch not allowImproperFraction and rule has improper fraction',
-    function() {
+    () => {
       customizationArgs.allowImproperFraction.value = false;
       answerGroups[0].rules = [equalsThreeByTwoRule];
       var warnings = validatorService.getAllWarnings(
@@ -416,7 +394,7 @@ describe('FractionInputValidationService', function() {
     });
 
   it('should catch not allowNonzeroIntegerPart and rule has integer part',
-    function() {
+    () => {
       customizationArgs.allowNonzeroIntegerPart.value = false;
       answerGroups[0].rules = [equalsOneAndHalfRule];
       var warnings = validatorService.getAllWarnings(
@@ -432,7 +410,7 @@ describe('FractionInputValidationService', function() {
     });
 
   it('should catch if not allowNonzeroIntegerPart and ' +
-    'rule is HasIntegerPartEqualTo a non zero value', function() {
+    'rule is HasIntegerPartEqualTo a non zero value', () => {
     customizationArgs.allowNonzeroIntegerPart.value = false;
     answerGroups[0].rules = [integerPartEqualsOne];
     var warnings = validatorService.getAllWarnings(
@@ -448,7 +426,7 @@ describe('FractionInputValidationService', function() {
   });
 
   it('should allow if not allowNonzeroIntegerPart and ' +
-    'rule is HasIntegerPartEqualTo a zero value', function() {
+    'rule is HasIntegerPartEqualTo a zero value', () => {
     customizationArgs.allowNonzeroIntegerPart.value = false;
     answerGroups[0].rules = [integerPartEqualsZero];
     var warnings = validatorService.getAllWarnings(
@@ -458,9 +436,9 @@ describe('FractionInputValidationService', function() {
   });
 
   it('should allow equivalent fractions with if not requireSimplestForm ' +
-    'and rules are IsExactlyEqualTo', function() {
+    'and rules are IsExactlyEqualTo', () => {
     customizationArgs.requireSimplestForm = false;
-    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [equalsOneRule];
     answerGroups[1].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
     var warnings = validatorService.getAllWarnings(
@@ -470,9 +448,9 @@ describe('FractionInputValidationService', function() {
   });
 
   it('should allow if numerator and denominator should equal the same value ' +
-    'and are set in different rules', function() {
+    'and are set in different rules', () => {
     customizationArgs.requireSimplestForm = false;
-    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [numeratorEqualsFiveRule];
     answerGroups[1].rules = [denominatorEqualsFiveRule];
     var warnings = validatorService.getAllWarnings(
@@ -482,7 +460,7 @@ describe('FractionInputValidationService', function() {
   });
 
   it('should correctly check validity of HasFractionalPartExactlyEqualTo rule',
-    function() {
+    () => {
       customizationArgs.requireSimplestForm = false;
       answerGroups[0].rules = [HasFractionalPartExactlyEqualToOneAndHalfRule];
       var warnings = validatorService.getAllWarnings(
@@ -525,7 +503,7 @@ describe('FractionInputValidationService', function() {
         goodDefaultOutcome);
       expect(warnings).toEqual([]);
 
-      answerGroups[1] = angular.copy(answerGroups[0]);
+      answerGroups[1] = cloneDeep(answerGroups[0]);
       answerGroups[0].rules = [denominatorEqualsFiveRule];
       answerGroups[1].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
       var warnings = validatorService.getAllWarnings(
