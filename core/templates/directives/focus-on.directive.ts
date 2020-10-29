@@ -35,7 +35,7 @@ import { AppConstants } from 'app.constants';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 @Directive({
-  selector: 'oppiaFocusOn'
+  selector: '[oppiaFocusOn]'
 })
 export class FocusOnDirective implements OnDestroy {
   @Input('oppiaFocusOn') focusOn: string;
