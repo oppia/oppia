@@ -37,8 +37,8 @@ export class TranslationsBackendApiService {
     return this.http.get<TranslationsDict>(
       `${this.prefix}${languageCode}${this.suffix}`).toPromise();
   }
-  loadTranslationFileHash(url: string): Promise<String> {
-    return this.http.get<String>(url).toPromise();
+  loadTranslationFileHash(url: string): Promise<string> {
+    return this.http.get<string>(url).toPromise();
   }
 }
 

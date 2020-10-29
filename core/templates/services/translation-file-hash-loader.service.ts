@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('./translations-backend-api.service.ts')
+require('./translations-backend-api.service.ts');
 
 angular.module('oppia').factory('TranslationFileHashLoaderService', [
   '$q', 'TranslationsBackendApiService', 'UrlInterpolationService',
@@ -25,7 +25,7 @@ angular.module('oppia').factory('TranslationFileHashLoaderService', [
     /* Options object contains:
      *  prefix: added before key, defined by developer
      *  key: language key, determined internally by i18n library
-     *  suffix: added after key, defined by developer
+     *  suffix: added after key, defined by developer.
      */
     return function(options) {
       var fileUrl = [
