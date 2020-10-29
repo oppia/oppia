@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import collections
 import contextlib
-import contextlib2
 import copy
 import datetime
 import inspect
@@ -66,6 +65,7 @@ import requests_mock
 import schema_utils
 import utils
 
+import contextlib2
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
@@ -2462,24 +2462,25 @@ class AppEngineTestBase(TestBase):
         self.taskqueue_services_stub = TaskqueueServicesStub(self)
 
         with contextlib2.ExitStack() as stack:
-            swap_create_task = stack.enter_context(self.swap(
+            stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self.taskqueue_services_stub.create_http_task))
-            swap_flush_cache = stack.enter_context(self.swap(
+            stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 self.memory_cache_services_stub.flush_cache))
-            swap_get_multi = stack.enter_context(self.swap(
+            stack.enter_context(self.swap(
                 memory_cache_services, 'get_multi',
                 self.memory_cache_services_stub.get_multi))
-            swap_set_multi = stack.enter_context(self.swap(
+            stack.enter_context(self.swap(
                 memory_cache_services, 'set_multi',
                 self.memory_cache_services_stub.set_multi))
-            swap_get_memory_cache_stats = stack.enter_context(self.swap(
+            stack.enter_context(self.swap(
                 memory_cache_services, 'get_memory_cache_stats',
                 self.memory_cache_services_stub.get_memory_cache_stats))
-            swap_delete_multi = stack.enter_context(self.swap(
+            stack.enter_context(self.swap(
                 memory_cache_services, 'delete_multi',
                 self.memory_cache_services_stub.delete_multi))
+
             self._stack = stack.pop_all()
 
         empty_environ()
