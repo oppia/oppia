@@ -54,7 +54,7 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { FocusOnDirective } from 'core/templates/directives/focus-on.directive';
+import { FocusOnDirective } from '../directives/focus-on.directive';
 
 
 @NgModule({
