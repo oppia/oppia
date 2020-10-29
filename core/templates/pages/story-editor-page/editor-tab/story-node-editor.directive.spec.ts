@@ -22,6 +22,7 @@ describe('Story node editor directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
+
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;

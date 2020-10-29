@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for CreateNewChapterModalController.
  */
 
-
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
@@ -27,6 +26,10 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { ExplorationIdValidationService } from
+  'domain/exploration/exploration-id-validation.service.ts';
+import { ExplorationSummaryBackendApiService } from
+  'domain/summary/exploration-summary-backend-api.service.ts';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
@@ -34,18 +37,26 @@ describe('Create New Chapter Modal Controller', function() {
   var $rootScope = null;
   var $uibModalInstance = null;
   var StoryEditorStateService = null;
-  var ExplorationIdValidationService = null;
   var StoryUpdateService = null;
   var storyObjectFactory = null;
+  var explorationIdValidationService = null;
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [StoryObjectFactory, EditableStoryBackendApiService]
+      imports: [HttpClientTestingModule]
     });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ExplorationIdValidationService',
+      TestBed.get(ExplorationIdValidationService));
+    $provide.value(
+      'ExplorationSummaryBackendApiService',
+      TestBed.get(ExplorationSummaryBackendApiService));
+  }));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
@@ -62,7 +73,7 @@ describe('Create New Chapter Modal Controller', function() {
     StoryUpdateService = $injector.get('StoryUpdateService');
     storyObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
-    ExplorationIdValidationService = $injector.get(
+    explorationIdValidationService = $injector.get(
       'ExplorationIdValidationService');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -115,7 +126,7 @@ describe('Create New Chapter Modal Controller', function() {
       nodeTitles: nodeTitles,
       StoryUpdateService: StoryUpdateService,
       StoryEditorStateService: StoryEditorStateService,
-      ExplorationIdValidationService: ExplorationIdValidationService
+      explorationIdValidationService: explorationIdValidationService
     });
     $scope.init();
   }));
@@ -174,7 +185,7 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(false);
-    spyOn(ExplorationIdValidationService, 'isExpPublished').and.returnValue(
+    spyOn(explorationIdValidationService, 'isExpPublished').and.returnValue(
       deferred.promise);
     $scope.save();
     $rootScope.$apply();
@@ -196,7 +207,7 @@ describe('Create New Chapter Modal Controller', function() {
       spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
       var deferred = $q.defer();
       deferred.resolve(true);
-      spyOn(ExplorationIdValidationService, 'isExpPublished').and.returnValue(
+      spyOn(explorationIdValidationService, 'isExpPublished').and.returnValue(
         deferred.promise);
       $scope.save();
       $rootScope.$apply();
