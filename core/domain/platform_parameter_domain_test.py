@@ -167,6 +167,23 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid version \'a.a.a\''):
             context.validate()
 
+    def test_validate_with_invalid_app_sub_version_numbers_raises_exception(
+            self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Android',
+                'browser_type': None,
+                'app_version': '1.0.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid version \'1.0.0.0\''):
+            context.validate()
+
     def test_validate_with_invalid_app_version_flavor_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {

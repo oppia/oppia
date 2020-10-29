@@ -69,7 +69,10 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
             feconf.EMAIL_INTENT_REMOVE_REVIEWER,
-            feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
             feconf.BULK_EMAIL_INTENT_TEST
@@ -176,6 +179,7 @@ class SentEmailModel(base_models.BaseModel):
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
 
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
     def _pre_put_hook(self):
@@ -369,6 +373,7 @@ class BulkEmailModel(base_models.BaseModel):
             id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
 
@@ -487,6 +492,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id=thread_id,
             reply_to_id=reply_to_id)
 
+        feedback_email_reply_model_instance.update_timestamps()
         feedback_email_reply_model_instance.put()
         return feedback_email_reply_model_instance
 

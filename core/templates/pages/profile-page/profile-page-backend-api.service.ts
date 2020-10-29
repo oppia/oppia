@@ -26,8 +26,8 @@ import { ProfilePageDomainConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service.ts';
-import { UserProfile, UserProfileBackendDict, UserProfileObjectFactory } from
-  'domain/user/user-profile-object.factory';
+import { UserProfile, UserProfileBackendDict } from
+  'domain/user/user-profile.model';
 
 @Injectable({
   providedIn: 'root'
@@ -36,8 +36,7 @@ export class ProfilePageBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private urlService: UrlService,
-    private userProfileObjectFactory: UserProfileObjectFactory
+    private urlService: UrlService
   ) {}
 
   async _postSubscribeAsync(creatorUsername: string): Promise<void> {
@@ -66,8 +65,8 @@ export class ProfilePageBackendApiService {
         {username: this.urlService.getUsernameFromProfileUrl()}
       )
     ).toPromise().then(
-      userProfileDict => this.userProfileObjectFactory
-        .createFromBackendDict(userProfileDict), errorResponse => {
+      userProfileDict => UserProfile.createFromBackendDict(
+        userProfileDict), errorResponse => {
         throw new Error(errorResponse.error.error);
       });
   }

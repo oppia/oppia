@@ -100,7 +100,8 @@ class TopicModel(base_models.VersionedModel):
     practice_tab_is_displayed = datastore_services.BooleanProperty(
         required=True, default=False)
     # The content of the meta tag in the Topic viewer page.
-    meta_tag_content = datastore_services.StringProperty(indexed=True)
+    meta_tag_content = datastore_services.StringProperty(
+        indexed=True, default='')
 
     @staticmethod
     def get_deletion_policy():
@@ -152,6 +153,7 @@ class TopicModel(base_models.VersionedModel):
             commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
+        topic_commit_log_entry.update_timestamps()
         topic_commit_log_entry.put()
 
     @classmethod
@@ -482,6 +484,7 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
+        snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()
 
     @classmethod

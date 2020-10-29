@@ -540,6 +540,8 @@ def update_story(
         id=exp_id,
         story_id=story_id
     ) for exp_id in exp_ids_added_to_story]
+    exp_models.ExplorationContextModel.update_timestamps_multi(
+        new_exploration_context_models)
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
 
@@ -674,10 +676,13 @@ def save_story_summary(story_summary):
         story_models.StorySummaryModel.get_by_id(story_summary.id))
     if story_summary_model is not None:
         story_summary_model.populate(**story_summary_dict)
+        story_summary_model.update_timestamps()
         story_summary_model.put()
     else:
         story_summary_dict['id'] = story_summary.id
-        story_models.StorySummaryModel(**story_summary_dict).put()
+        model = story_models.StorySummaryModel(**story_summary_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def record_completed_node_in_story_context(user_id, story_id, node_id):
@@ -694,4 +699,5 @@ def record_completed_node_in_story_context(user_id, story_id, node_id):
 
     if node_id not in progress_model.completed_node_ids:
         progress_model.completed_node_ids.append(node_id)
+        progress_model.update_timestamps()
         progress_model.put()

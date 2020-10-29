@@ -45,6 +45,7 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -1522,7 +1523,12 @@ tags: []
             contributor_ids=[],
             contributors_summary={},
         )
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
+
+        # Create an ExplorationIssues model to match the behavior of creating
+        # new explorations.
+        stats_services.create_exp_issues_for_new_exploration(exp_id, 1)
 
     def save_new_exp_with_custom_states_schema_version(
             self, exp_id, user_id, states_dict, version):
@@ -1584,6 +1590,7 @@ tags: []
             contributor_ids=[],
             contributors_summary={},
         )
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
@@ -1645,6 +1652,7 @@ tags: []
             contributor_ids=[],
             contributors_summary={},
         )
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
     def publish_exploration(self, owner_id, exploration_id):

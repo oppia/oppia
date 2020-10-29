@@ -51,7 +51,8 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 thread_model, last_nonempty_message),
         ])
         if cache_updated:
-            thread_model.put(update_last_updated_time=False)
+            thread_model.update_timestamps(update_last_updated_time=False)
+            thread_model.put()
             yield ('Updated', 1)
         else:
             yield ('Already up-to-date', 1)
