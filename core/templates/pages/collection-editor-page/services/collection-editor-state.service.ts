@@ -82,7 +82,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
               error || 'There was an error when loading the collection.');
             _collectionIsLoading = false;
           });
-        CollectionRightsBackendApiService.fetchCollectionRightsAsync(
+        CollectionRightsBackendApiService.fetchCollectionRights(
           collectionId).then(function(newBackendCollectionRightsObject) {
           _setCollectionRights(newBackendCollectionRightsObject);
           _collectionIsLoading = false;
