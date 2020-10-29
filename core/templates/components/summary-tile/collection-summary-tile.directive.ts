@@ -50,12 +50,11 @@ angular.module('oppia').directive('collectionSummaryTile', [
         '/components/summary-tile/collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'DateTimeFormatService', 'UserService',
-        'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_VIEWER_URL',
-        'COLLECTION_EDITOR_URL', function(
-            DateTimeFormatService, UserService,
-            ACTIVITY_TYPE_COLLECTION, COLLECTION_VIEWER_URL,
-            COLLECTION_EDITOR_URL) {
+        'DateTimeFormatService', 'UserService', 'ACTIVITY_TYPE_COLLECTION',
+        'COLLECTION_EDITOR_URL', 'COLLECTION_VIEWER_URL',
+        function(
+            DateTimeFormatService, UserService, ACTIVITY_TYPE_COLLECTION,
+            COLLECTION_EDITOR_URL, COLLECTION_VIEWER_URL) {
           var ctrl = this;
           ctrl.getLastUpdatedDatetime = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(

@@ -117,7 +117,8 @@ export class TranslateService {
     if (!interpolateParams) {
       return translatedValue;
     }
-    return translatedValue.replace(this.templateMatcher,
+    return translatedValue.replace(
+      this.templateMatcher,
       (substring: string, interpolateParamsKey: string) => {
         let interpolateParamsValue = interpolateParams[interpolateParamsKey];
         if (this.utilsService.isDefined(interpolateParamsValue)) {

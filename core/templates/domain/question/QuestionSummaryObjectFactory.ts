@@ -23,16 +23,23 @@ import { Injectable } from '@angular/core';
 export interface QuestionSummaryBackendDict {
   'id': string;
   'question_content': string;
+  'interaction_id': string;
+  'misconception_ids': string[];
 }
 
 export class QuestionSummary {
   _questionId: string;
   _questionContent: string;
+  _interactionId: string;
+  _misconceptionIds: string[];
 
   constructor(
-      questionId: string, questionContent: string) {
+      questionId: string, questionContent: string, interactionId: string,
+      misconceptionIds: string[]) {
     this._questionId = questionId;
     this._questionContent = questionContent;
+    this._interactionId = interactionId;
+    this._misconceptionIds = misconceptionIds;
   }
 
   getQuestionId(): string {
@@ -41,6 +48,14 @@ export class QuestionSummary {
 
   getQuestionContent(): string {
     return this._questionContent;
+  }
+
+  getInteractionId(): string {
+    return this._interactionId;
+  }
+
+  getMisconceptionIds(): string[] {
+    return this._misconceptionIds;
   }
 
   setQuestionContent(questionContent: string): void {
@@ -56,7 +71,9 @@ export class QuestionSummaryObjectFactory {
       backendDict: QuestionSummaryBackendDict): QuestionSummary {
     return new QuestionSummary(
       backendDict.id,
-      backendDict.question_content);
+      backendDict.question_content,
+      backendDict.interaction_id,
+      backendDict.misconception_ids);
   }
 }
 

@@ -28,8 +28,8 @@ angular.module('oppia').directive('scoreRing', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/score-ring/score-ring.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
-        function($scope, $window, COLORS_FOR_PASS_FAIL_MODE) {
+      controller: ['$scope', 'COLORS_FOR_PASS_FAIL_MODE',
+        function($scope, COLORS_FOR_PASS_FAIL_MODE) {
           var ctrl = this;
           const circle = <SVGCircleElement>(
             document.querySelector('.score-ring-circle'));

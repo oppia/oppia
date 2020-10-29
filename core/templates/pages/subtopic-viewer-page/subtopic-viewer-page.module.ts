@@ -28,7 +28,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -40,10 +40,8 @@ import { OppiaAngularRootComponent } from
 import { SubtopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
-
-
-import { SubtopicViewerDomainConstants } from
-  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -60,10 +58,15 @@ import { SubtopicViewerDomainConstants } from
     SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
-    SubtopicViewerDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]

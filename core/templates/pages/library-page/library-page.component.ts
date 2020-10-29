@@ -15,7 +15,6 @@
 /**
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
-import 'mousetrap';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
@@ -27,13 +26,13 @@ require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.component.ts');
 
 require('domain/classroom/classroom-backend-api.service');
-require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
+require('domain/learner_dashboard/learner-dashboard-activity-ids.model.ts');
 require(
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
 require('domain/learner_dashboard/learner-playlist.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
-require('services/page-title.service.ts');
+require('services/keyboard-shortcut.service.ts');
 require('services/search.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
@@ -46,20 +45,22 @@ angular.module('oppia').component('libraryPage', {
   template: require('./library-page.component.html'),
   controller: [
     '$http', '$log', '$scope', '$timeout', '$window',
-    'I18nLanguageCodeService', 'LoaderService',
-    'PageTitleService', 'SearchService', 'UrlInterpolationService',
+    'I18nLanguageCodeService', 'KeyboardShortcutService', 'LoaderService',
+    'SearchService', 'UrlInterpolationService',
     'UserService', 'WindowDimensionsService', 'LIBRARY_PAGE_MODES',
     'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
     function(
         $http, $log, $scope, $timeout, $window,
-        I18nLanguageCodeService, LoaderService,
-        PageTitleService, SearchService, UrlInterpolationService,
+        I18nLanguageCodeService, KeyboardShortcutService, LoaderService,
+        SearchService, UrlInterpolationService,
         UserService, WindowDimensionsService, LIBRARY_PAGE_MODES,
         LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
       var ctrl = this;
 
       ctrl.classroomBackendApiService = (
         OppiaAngularRootComponent.classroomBackendApiService);
+      ctrl.pageTitleService = (
+        OppiaAngularRootComponent.pageTitleService);
 
       var possibleBannerFilenames = [
         'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -70,7 +71,7 @@ angular.module('oppia').component('libraryPage', {
       var MAX_NUM_TILES_PER_ROW = 4;
       var isAnyCarouselCurrentlyScrolling = false;
 
-      ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
+      ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
       ctrl.setActiveGroup = function(groupIndex) {
         ctrl.activeGroupIndex = groupIndex;
@@ -176,25 +177,6 @@ angular.module('oppia').component('libraryPage', {
           Math.max(ctrl.leftmostCardIndices[ind] - 1, 0));
       };
 
-      var bindLibraryPageShortcuts = function() {
-        Mousetrap.bind('/', function() {
-          var searchBar = <HTMLElement>document.querySelector(
-            '.protractor-test-search-input');
-          searchBar.focus();
-          return false;
-        });
-
-        Mousetrap.bind('c', function() {
-          document.getElementById('categoryBar').focus();
-          return false;
-        });
-
-        Mousetrap.bind('s', function() {
-          document.getElementById('skipToMainContentId').focus();
-          return false;
-        });
-      };
-
       // The following loads explorations belonging to a particular group.
       // If fullResultsUrl is given it loads the page corresponding to
       // the url. Otherwise, it will initiate a search query for the
@@ -221,12 +203,14 @@ angular.module('oppia').component('libraryPage', {
         ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
           '/library/' + ctrl.bannerImageFilename);
 
-        var classroomPageIsShownPromise = (
-          ctrl.classroomBackendApiService.fetchClassroomPageIsShownStatusAsync()
-        );
-        classroomPageIsShownPromise.then(
-          function(classroomIsShown) {
-            ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
+
+        let service = ctrl.classroomBackendApiService;
+        service.fetchClassroomPromosAreEnabledStatusAsync().then(
+          function(classroomPromosAreEnabled) {
+            ctrl.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
           });
 
         ctrl.activeGroupIndex = null;
@@ -243,7 +227,7 @@ angular.module('oppia').component('libraryPage', {
             ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
           title = 'Find explorations to learn from - Oppia';
         }
-        PageTitleService.setPageTitle(title);
+        ctrl.pageTitleService.setPageTitle(title);
 
         // Keeps track of the index of the left-most visible card of each
         // group.
@@ -294,13 +278,14 @@ angular.module('oppia').component('libraryPage', {
                           ctrl.activitiesOwned.collections[
                             activitySummaryDict.id] = false;
                         } else {
-                          $log.error('INVALID ACTIVITY TYPE: Activity' +
-                          '(id: ' + activitySummaryDict.id +
-                          ', name: ' + activitySummaryDict.title +
-                          ', type: ' + activitySummaryDict.activity_type +
-                          ') has an invalid activity type, which could ' +
-                          'not be recorded as an exploration or a ' +
-                          'collection.'
+                          $log.error(
+                            'INVALID ACTIVITY TYPE: Activity' +
+                            '(id: ' + activitySummaryDict.id +
+                            ', name: ' + activitySummaryDict.title +
+                            ', type: ' + activitySummaryDict.activity_type +
+                            ') has an invalid activity type, which could ' +
+                            'not be recorded as an exploration or a ' +
+                            'collection.'
                           );
                         }
                       });
@@ -330,7 +315,7 @@ angular.module('oppia').component('libraryPage', {
             // Initialize the carousel(s) on the library index page.
             // Pause is necessary to ensure all elements have loaded.
             $timeout(initCarousels, 390);
-            bindLibraryPageShortcuts();
+            KeyboardShortcutService.bindLibraryPageShortcuts();
 
 
             // Check if actual and expected widths are the same.

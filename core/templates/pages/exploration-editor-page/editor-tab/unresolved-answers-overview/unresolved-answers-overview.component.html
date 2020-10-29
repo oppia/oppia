@@ -9,13 +9,25 @@
   unresolved-answers-overview .refresh-container a {
     font-weight: bold;
   }
+  unresolved-answers-overview .oppia-improvements-overview-header {
+    font-size: 16px;
+  }
+  unresolved-answers-overview .oppia-unresolved-answers-card {
+    background-color: #FFF;
+    margin: 20px 0;
+    padding: 8px;
+  }
+  unresolved-answers-overview .oppia-unresolved-answers {
+    margin: 20px 0;
+    padding: 0;
+  }
 </style>
 
 <div ng-if="isUnresolvedAnswersOverviewShown()">
-  <span style="font-size: 16px;">
+  <span class="oppia-improvements-overview-header">
     <strong>Improvements Overview</strong>
   </span>
-  <md-card style="background-color: white; margin: 20px 0; padding: 8px;">
+  <md-card class="oppia-unresolved-answers-card">
     <strong>Unresolved Student Answers</strong>
     <ul>
       <li ng-repeat="data in getUnresolvedStateStats()" class="answer-container">
@@ -27,7 +39,7 @@
     </ul>
   </md-card>
 
-  <md-card style="margin: 20px 0; padding: 0;" ng-if="SHOW_TRAINABLE_UNRESOLVED_ANSWERS && isCurrentInteractionTrainable()">
+  <md-card class="oppia-unresolved-answers" ng-if="SHOW_TRAINABLE_UNRESOLVED_ANSWERS && isCurrentInteractionTrainable()">
     <div ng-if="isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
       <button type="button" class="btn btn-secondary btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
         Train Oppia

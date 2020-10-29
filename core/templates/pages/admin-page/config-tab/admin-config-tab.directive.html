@@ -1,8 +1,8 @@
-<md-card class="oppia-page-card oppia-long-text" style="max-width: 1050px">
+<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Configuration properties</h3>
-  <div class="container" ng-if="$ctrl.isNonemptyObject($ctrl.configProperties)" style="margin-left: 0;">
+  <div class="container ml-0" ng-if="$ctrl.isNonemptyObject($ctrl.configProperties)">
     <div ng-repeat="(configPropertyId, configPropertyData) in $ctrl.configProperties">
-      <div class="row protractor-test-config-property" style="padding-bottom: 10px;">
+      <div class="row protractor-test-config-property oppia-description-text-container">
         <span class="col-lg-2 col-md-2 col-sm-2">
           <em class="protractor-test-config-title"><[configPropertyData.description]></em>
         </span>
@@ -26,3 +26,11 @@
     No configuration properties are available.
   </div>
 </md-card>
+<style>
+  admin-config-tab .oppia-long-text-card {
+    max-width: 1050px;
+  }
+  admin-config-tab .oppia-description-text-container {
+    padding-bottom: 10px;
+  }
+</style>

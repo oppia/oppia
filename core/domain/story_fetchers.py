@@ -98,7 +98,8 @@ def get_story_from_model(story_model):
             versioned_story_contents['story_contents']),
         versioned_story_contents['schema_version'],
         story_model.language_code, story_model.corresponding_topic_id,
-        story_model.version, story_model.url_fragment, story_model.created_on,
+        story_model.version, story_model.url_fragment,
+        story_model.meta_tag_content, story_model.created_on,
         story_model.last_updated)
 
 

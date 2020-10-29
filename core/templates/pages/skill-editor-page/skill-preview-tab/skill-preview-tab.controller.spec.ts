@@ -17,15 +17,14 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// skill-preview-tab.component.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Skill preview tab', function() {
   var $scope = null;
   var ctrl = null;
   var UrlService = null;
-  var QuestionBackendApiService = null;
   var questionDict1 = {
     question_state_data: {
       content: {
@@ -81,14 +80,10 @@ describe('Skill preview tab', function() {
             param_changes: [],
             refresher_exploration_id: null
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Equals: [
-              {
-                x: 10
-              }
-            ]
-          }
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {x: 10}
+          }],
         }],
         confirmed_unclassified_answers: [],
         customization_args: {},
@@ -135,18 +130,11 @@ describe('Skill preview tab', function() {
     language_code: 'en',
   };
 
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     UrlService = $injector.get('UrlService');
-    QuestionBackendApiService = $injector.get('QuestionBackendApiService');
     var skillId = 'df432fe';
     $scope = $rootScope.$new();
     var MockQuestionBackendApiService = {

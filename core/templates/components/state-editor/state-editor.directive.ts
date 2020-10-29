@@ -66,6 +66,7 @@ angular.module('oppia').directive('stateEditor', [
         isInteractionShown: '&interactionIsShown',
         navigateToState: '=',
         onSaveHints: '=',
+        onSaveInapplicableSkillMisconceptionIds: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
@@ -81,14 +82,14 @@ angular.module('oppia').directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', 'StateContentService',
+        '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
         'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
-            $rootScope, $scope, StateContentService,
+            $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
             StateNextContentIdIndexService,

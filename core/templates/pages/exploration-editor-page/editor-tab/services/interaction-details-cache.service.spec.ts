@@ -16,10 +16,7 @@
  * @fileoverview Unit tests for Interaction Details Cache Service.
  */
 
-/* eslint-disable max-len */
-import { InteractionDetailsCacheService } from
-  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
-/* eslint-enable max-len */
+import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 
 describe('Interaction Details Cache Service', () => {
   describe('InteractionDetailsCache', () => {

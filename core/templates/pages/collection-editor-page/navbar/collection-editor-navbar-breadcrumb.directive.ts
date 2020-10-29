@@ -39,11 +39,11 @@ angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
         'collection-editor-navbar-breadcrumb.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'RouterService', 'CollectionEditorStateService',
-        'FocusManagerService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
+        'CollectionEditorStateService', 'FocusManagerService',
+        'RouterService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         function(
-            RouterService, CollectionEditorStateService,
-            FocusManagerService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+            CollectionEditorStateService, FocusManagerService,
+            RouterService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
           var ctrl = this;
           var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
             main: 'Edit',

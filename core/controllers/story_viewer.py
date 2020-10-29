@@ -35,9 +35,6 @@ class StoryPage(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, _):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         self.render_template('story-viewer-page.mainpage.html')
 
 
@@ -51,9 +48,6 @@ class StoryPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         story = story_fetchers.get_story_by_id(story_id)
         topic_id = story.corresponding_topic_id
         topic_name = topic_fetchers.get_topic_by_id(topic_id).name
@@ -84,7 +78,8 @@ class StoryPageDataHandler(base.BaseHandler):
             'story_title': story.title,
             'story_description': story.description,
             'story_nodes': ordered_node_dicts,
-            'topic_name': topic_name
+            'topic_name': topic_name,
+            'meta_tag_content': story.meta_tag_content
         })
         self.render_json(self.values)
 

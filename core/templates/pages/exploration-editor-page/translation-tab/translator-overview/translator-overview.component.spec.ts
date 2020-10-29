@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for translatorOverview.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
@@ -25,7 +27,8 @@ import { StateWrittenTranslationsService } from
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { EventEmitter } from '@angular/core';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 var MockWindow = function() {
   var language = 'en';
@@ -60,9 +63,13 @@ describe('Translator Overview component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', languageUtilService);
-    $provide.value('StateRecordedVoiceoversService',
+    $provide.value(
+      'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     mockWindow = new MockWindow();
     $provide.value('$window', mockWindow);
@@ -105,7 +112,7 @@ describe('Translator Overview component', function() {
     });
 
   it('should show tab mode switcher when language code is different' +
-    ' from exploration\'s language code ', function() {
+    ' from exploration\'s language code', function() {
     expect($scope.canShowTabModeSwitcher()).toBe(true);
   });
 

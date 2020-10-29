@@ -20,19 +20,21 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+require('services/guppy-initialization.service.ts');
+
 angular.module('oppia').component('customOskLettersEditor', {
   bindings: {
     value: '='
   },
   template: require('./custom-osk-letters-editor.component.html'),
   controller: [
-    '$scope', '$window', 'MAX_CUSTOM_LETTERS_FOR_OSK',
+    '$scope', '$window', 'GuppyInitializationService',
     'CUSTOM_LETTERS_GREEK_TAB', 'CUSTOM_LETTERS_LATIN_TAB',
-    'GREEK_LETTER_NAMES_TO_SYMBOLS',
+    'GREEK_LETTER_NAMES_TO_SYMBOLS', 'MAX_CUSTOM_LETTERS_FOR_OSK',
     function(
-        $scope, $window, MAX_CUSTOM_LETTERS_FOR_OSK,
+        $scope, $window, GuppyInitializationService,
         CUSTOM_LETTERS_GREEK_TAB, CUSTOM_LETTERS_LATIN_TAB,
-        GREEK_LETTER_NAMES_TO_SYMBOLS) {
+        GREEK_LETTER_NAMES_TO_SYMBOLS, MAX_CUSTOM_LETTERS_FOR_OSK) {
       const ctrl = this;
       ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
       ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());
@@ -60,32 +62,42 @@ angular.module('oppia').component('customOskLettersEditor', {
         } else {
           ctrl.value.splice(index, 1);
         }
+        GuppyInitializationService.setCustomOskLetters(ctrl.value);
       };
 
       ctrl.getRemainingLettersCount = function() {
         return Math.max(MAX_CUSTOM_LETTERS_FOR_OSK - ctrl.value.length, 0);
       };
 
+      ctrl.isCustomizationArgOpen = function() {
+        return document.getElementsByClassName(
+          'custom-letters-div').length !== 0;
+      };
+
       ctrl.keyDownCallBack = function(e) {
-        let keyPressed = e.key;
-        if (keyPressed === 'Shift') {
-          ctrl.lettersAreLowercase = false;
-        } else if (keyPressed === 'Backspace') {
-          ctrl.value.pop();
-        } else if (
-          ctrl.latinLowerCase.join('').indexOf(
-            keyPressed.toLowerCase()) !== -1 &&
-          ctrl.value.indexOf(keyPressed) === -1) {
-          ctrl.updateLettersList(keyPressed);
+        if (ctrl.isCustomizationArgOpen()) {
+          let keyPressed = e.key;
+          if (keyPressed === 'Shift') {
+            ctrl.lettersAreLowercase = false;
+          } else if (keyPressed === 'Backspace') {
+            ctrl.value.pop();
+          } else if (
+            ctrl.latinLowerCase.join('').indexOf(
+              keyPressed.toLowerCase()) !== -1 &&
+            ctrl.value.indexOf(keyPressed) === -1) {
+            ctrl.updateLettersList(keyPressed);
+          }
+          $scope.$apply();
         }
-        $scope.$apply();
       };
 
       ctrl.keyUpCallBack = function(e) {
-        let keyPressed = e.key;
-        if (keyPressed === 'Shift') {
-          ctrl.lettersAreLowercase = true;
-          $scope.$apply();
+        if (ctrl.isCustomizationArgOpen()) {
+          let keyPressed = e.key;
+          if (keyPressed === 'Shift') {
+            ctrl.lettersAreLowercase = true;
+            $scope.$apply();
+          }
         }
       };
 

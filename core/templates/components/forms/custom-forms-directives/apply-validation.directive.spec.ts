@@ -26,7 +26,7 @@ require(
   'apply-validation.directive.ts');
 
 describe('Testing apply-validation directive', function() {
-  var $compile, element, scope, testInput;
+  var element, scope, testInput;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {

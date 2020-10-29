@@ -25,8 +25,8 @@ angular.module('oppia').component('pieChart', {
     // chartAreaWidth, colors, height, legendPosition, width.
     options: '&'
   },
-  controller: ['$scope', '$element', 'WindowDimensionsService', function(
-      $scope, $element, WindowDimensionsService) {
+  controller: ['$element', '$scope', 'WindowDimensionsService', function(
+      $element, $scope, WindowDimensionsService) {
     var ctrl = this;
     ctrl.resizeSubscription = null;
 

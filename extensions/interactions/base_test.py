@@ -46,7 +46,8 @@ INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 TEXT_INPUT_ID = 'TextInput'
 INTERACTIONS_THAT_USE_COMPONENTS = [
-    'AlgebraicExpressionInput', 'MathEquationInput', 'NumericExpressionInput']
+    'AlgebraicExpressionInput', 'MathEquationInput', 'NumericExpressionInput',
+    'RatioExpressionInput']
 
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', python_utils.BASESTRING),
@@ -355,6 +356,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         for interaction_id in all_interaction_ids:
+
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
             hyphenated_interaction_id = (
@@ -503,11 +505,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(response_ts_file))
             self.assertTrue(os.path.isfile(
                 short_response_ts_file))
-            self.assertTrue(os.path.isfile(rules_service_ts_file))
-            self.assertTrue(os.path.isfile(validation_service_ts_file))
             self.assertTrue(os.path.isfile(interaction_html))
             self.assertTrue(os.path.isfile(response_html))
             self.assertTrue(os.path.isfile(short_response_html))
+            self.assertTrue(os.path.isfile(rules_service_ts_file))
+            self.assertTrue(os.path.isfile(validation_service_ts_file))
 
             # Check that the PNG thumbnail image has the correct dimensions.
             static_dir = os.path.join(interaction_dir, 'static')
@@ -740,11 +742,6 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        if list(missing_interaction_ids) != ['MathExpressionInput']:
-            # Ignoring the lack of the MathExpressionInput since it is going
-            # to be deprecated and explorations that use it will now be using
-            # one of AlgebraicExpressionInput, NumericExpressionInput, or
-            # MathEquationInput.
-            self.assertEqual(len(missing_interaction_ids), 0, msg=(
-                'Missing interaction IDs in demo exploration: %s' %
-                missing_interaction_ids))
+        self.assertEqual(len(missing_interaction_ids), 0, msg=(
+            'Missing interaction IDs in demo exploration: %s' %
+            missing_interaction_ids))

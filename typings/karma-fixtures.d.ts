@@ -100,6 +100,9 @@ interface RuleTemplates {
   AlgebraicExpressionInput: {
     MatchesExactlyWith: RuleDescription;
     IsEquivalentTo: RuleDescription;
+    ContainsSomeOf: RuleDescription;
+    OmitsSomeOf: RuleDescription;
+    MatchesWithGeneralForm: RuleDescription;
   };
   CodeRepl: {
     CodeEquals: RuleDescription;
@@ -154,9 +157,8 @@ interface RuleTemplates {
   MathEquationInput: {
     MatchesExactlyWith: RuleDescription;
     IsEquivalentTo: RuleDescription;
-  };
-  MathExpressionInput: {
-    IsMathematicallyEquivalentTo: RuleDescription;
+    ContainsSomeOf: RuleDescription;
+    OmitsSomeOf: RuleDescription;
   };
   MultipleChoiceInput: {
     Equals: RuleDescription;
@@ -200,7 +202,6 @@ interface RuleTemplates {
   SetInput: {
     Equals: RuleDescription;
     IsSubsetOf: RuleDescription;
-    IsSupersetOf: RuleDescription;
     IsSupersetOf: RuleDescription;
     HasElementsNotIn: RuleDescription;
     OmitsElementsIn: RuleDescription;

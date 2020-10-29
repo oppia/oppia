@@ -1,4 +1,4 @@
-<md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
+<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Continuous computations</h3>
   <table class="table">
     <tr>
@@ -31,7 +31,7 @@
   </table>
 </md-card>
 
-<md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
+<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>One-off jobs</h3>
   <h4>Current time: <[$ctrl.HUMAN_READABLE_CURRENT_TIME]></h4>
   <table class="table table-striped">
@@ -53,7 +53,7 @@
   </table>
 </md-card>
 
-<md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
+<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Audit jobs</h3>
   <h4>Current time: <[$ctrl.HUMAN_READABLE_CURRENT_TIME]></h4>
   <table class="table table-striped">
@@ -76,7 +76,7 @@
 </md-card>
 
 <md-card ng-if="$ctrl.UNFINISHED_JOB_DATA.length > 0"
-         class="oppia-page-card oppia-long-text protractor-test-unfinished-jobs-card" style="max-width: 900px">
+         class="oppia-page-card oppia-long-text protractor-test-unfinished-jobs-card oppia-long-text-card">
   <h3>Unfinished jobs</h3>
   <em>Note: This table may be stale; refresh to see the latest state.</em>
   <table class="table">
@@ -104,7 +104,7 @@
 </md-card>
 
 <md-card ng-if="$ctrl.RECENT_JOB_DATA.length > 0"
-         class="oppia-page-card oppia-long-text" style="max-width: 900px">
+         class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Recent jobs</h3>
   <em>Note: This table may be stale; refresh to see the latest state.</em>
   <table class="table">
@@ -135,3 +135,8 @@
     <em ng-if="$ctrl.jobOutput.length == 0">None</em>
   </div>
 </md-card>
+<style>
+  admin-jobs-tab .oppia-long-text-card {
+    max-width: 900px;
+  }
+</style>

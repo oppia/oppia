@@ -106,8 +106,8 @@ export class RecordedVoiceovers {
       throw new Error('Trying to add duplicate language code.');
     }
     languageCodeToVoiceover[languageCode] =
-      this._voiceoverObjectFactory.createNew(filename,
-        fileSizeBytes, durationSecs);
+      this._voiceoverObjectFactory.createNew(
+        filename, fileSizeBytes, durationSecs);
   }
 
   deleteVoiceover(contentId: string, languageCode: string): void {

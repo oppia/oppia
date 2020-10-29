@@ -33,9 +33,7 @@ describe('Read only exploration backend API service', function() {
   let ReadOnlyExplorationBackendApiService = null;
   let sampleDataResults = null;
   let $rootScope = null;
-  let $scope = null;
   let $httpBackend = null;
-  let shof;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -56,9 +54,7 @@ describe('Read only exploration backend API service', function() {
     ReadOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
-    shof = $injector.get('SubtitledHtmlObjectFactory');
 
     // Sample exploration object returnable from the backend.
     sampleDataResults = {

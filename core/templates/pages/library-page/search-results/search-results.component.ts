@@ -30,9 +30,10 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('searchResults', {
   template: require('./search-results.component.html'),
   controller: [
-    '$scope', '$q', '$timeout', '$window', 'LoaderService', 'SearchService',
+    '$timeout', '$window', 'LoaderService', 'SearchService',
     'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
-    function($scope, $q, $timeout, $window, LoaderService, SearchService,
+    function(
+        $timeout, $window, LoaderService, SearchService,
         SiteAnalyticsService, UrlInterpolationService, UserService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

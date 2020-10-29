@@ -133,9 +133,21 @@ describe('Url Service', () => {
       urlService.getStoryUrlFragmentFromLearnerUrl()
     ).toBe('bakery');
     mockLocation.pathname = '/topc/abcdefgijklm';
-    expect(function() {
-      urlService.getStoryUrlFragmentFromLearnerUrl();
-    }).toThrowError('Invalid URL for story');
+    expect(
+      urlService.getStoryUrlFragmentFromLearnerUrl()
+    ).toBe(null);
+
+    mockLocation.pathname = '/explore/16';
+    mockLocation.search = (
+      '?topic_url_fragment=topic&story_url_fragment=story-one');
+    expect(
+      urlService.getStoryUrlFragmentFromLearnerUrl()
+    ).toBe('story-one');
+    mockLocation.search = (
+      '?topic_url_fragment=topic&story_url_fragment=story_one');
+    expect(
+      urlService.getStoryUrlFragmentFromLearnerUrl()
+    ).toBe(null);
   });
 
   it('should correctly retrieve subtopic url fragment from url', () => {
@@ -281,17 +293,6 @@ describe('Url Service', () => {
     expect(function() {
       urlService.getSkillIdFromUrl();
     }).toThrowError('Invalid Skill Id');
-  });
-
-  it('should correctly retrieve story id from url in player', () => {
-    mockLocation.search = '?story_id=mnopqrstuvwx';
-    expect(
-      urlService.getStoryIdInPlayer()
-    ).toBe('mnopqrstuvwx');
-    mockLocation.search = '?story=mnopqrstuvwx';
-    expect(
-      urlService.getStoryIdInPlayer()
-    ).toBe(null);
   });
 
   it('should correctly retrieve collection id from url in exploration player',

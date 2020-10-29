@@ -109,10 +109,10 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('visits the exploration player and plays the correct exploration',
+  it('should visit the exploration player and plays the correct exploration',
     async function() {
-      await users.createUser('expCreator@learnerDashboard.com',
-        'expCreator');
+      await users.createUser(
+        'expCreator@learnerDashboard.com', 'expCreator');
       await users.login('expCreator@learnerDashboard.com', true);
       // Create or load an exploration named 'Exploration Player Test'.
       if (browser.isMobile) {
@@ -134,9 +134,10 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playExploration('Exploration Player Test');
     });
 
-  it('visits the collection player and plays the correct collection',
+  it('should visit the collection player and plays the correct collection',
     async function() {
-      await users.createUser('expOfCollectionCreator@learnerDashboard.com',
+      await users.createUser(
+        'expOfCollectionCreator@learnerDashboard.com',
         'expOfCollectionCreator');
       await users.login('expOfCollectionCreator@learnerDashboard.com', true);
       // Create or load a collection named
@@ -176,9 +177,9 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playCollection('Introduction to Collections in Oppia');
     });
 
-  it('displays incomplete and completed explorations', async function() {
-    await users.createUser('originalCreator@learnerDashboard.com',
-      'originalCreator');
+  it('should display incomplete and completed explorations', async function() {
+    await users.createUser(
+      'originalCreator@learnerDashboard.com', 'originalCreator');
     await users.login('originalCreator@learnerDashboard.com', true);
     // Create or load explorations.
     if (browser.isMobile) {
@@ -197,8 +198,8 @@ describe('Learner dashboard functionality', function() {
       );
     }
     await users.logout();
-    await users.createAndLoginUser('learner@learnerDashboard.com',
-      'learnerlearnerDashboard');
+    await users.createAndLoginUser(
+      'learner@learnerDashboard.com', 'learnerlearnerDashboard');
     // Go to 'Dummy Exploration'.
     await libraryPage.get();
     await libraryPage.findExploration('Dummy Exploration');
@@ -262,8 +263,8 @@ describe('Learner dashboard functionality', function() {
     // delete 'Dummy Exploration'.
     if (!browser.isMobile) {
       // Login as Admin and delete exploration 'Dummy Exploration'.
-      await users.createAndLoginAdminUser('inspector@learnerDashboard.com',
-        'inspector');
+      await users.createAndLoginAdminUser(
+        'inspector@learnerDashboard.com', 'inspector');
       await libraryPage.get();
       await libraryPage.findExploration('Dummy Exploration');
       await libraryPage.playExploration('Dummy Exploration');
@@ -287,9 +288,9 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('displays incomplete and completed collections', async function() {
-    await users.createUser('explorationCreator@learnerDashboard.com',
-      'explorationCreator');
+  it('should display incomplete and completed collections', async function() {
+    await users.createUser(
+      'explorationCreator@learnerDashboard.com', 'explorationCreator');
     await users.login('explorationCreator@learnerDashboard.com', true);
     // Create or load a collection.
     if (browser.isMobile) {

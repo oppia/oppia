@@ -49,7 +49,7 @@ import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
-interface ExplorationBackendDict {
+export interface ExplorationBackendDict {
   'init_state_name': string;
   'param_changes': ParamChangeBackendDict[];
   'param_specs': ParamSpecsBackendDict;
@@ -225,11 +225,12 @@ export class Exploration {
   providedIn: 'root'
 })
 export class ExplorationObjectFactory {
-  constructor(private logger: LoggerService,
-              private paramChangesObjectFactory: ParamChangesObjectFactory,
-              private paramSpecsObjectFactory: ParamSpecsObjectFactory,
-              private statesObjectFactory: StatesObjectFactory,
-              private urlInterpolationService: UrlInterpolationService) {}
+  constructor(
+    private logger: LoggerService,
+    private paramChangesObjectFactory: ParamChangesObjectFactory,
+    private paramSpecsObjectFactory: ParamSpecsObjectFactory,
+    private statesObjectFactory: StatesObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
 
   createFromBackendDict(
       explorationBackendDict: ExplorationBackendDict): Exploration {

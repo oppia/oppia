@@ -29,6 +29,8 @@ import { QuestionBackendDict } from
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 
+const constants = require('constants.ts');
+
 interface PretestQuestionsBackendResponse {
   'pretest_question_dicts': QuestionBackendDict[];
 }
@@ -42,10 +44,13 @@ export class PretestQuestionBackendApiService {
     private http: HttpClient
   ) {}
 
-  _fetchPretestQuestions(explorationId: string, storyId: string,
+  _fetchPretestQuestions(
+      explorationId: string, storyUrlFragment: string,
       successCallback: (value: QuestionBackendDict[]) => void,
       errorCallback: (reason: string) => void): void {
-    if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
+    if (
+      !storyUrlFragment ||
+      !storyUrlFragment.match(constants.VALID_URL_FRAGMENT_REGEX)) {
       successCallback([]);
       return;
     }
@@ -53,7 +58,7 @@ export class PretestQuestionBackendApiService {
     var pretestDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE, {
         exploration_id: explorationId,
-        story_id: storyId,
+        story_url_fragment: storyUrlFragment,
       });
 
     this.http.get<PretestQuestionsBackendResponse>(
@@ -71,10 +76,12 @@ export class PretestQuestionBackendApiService {
     });
   }
 
-  fetchPretestQuestions(explorationId: string,
-      storyId: string): Promise<QuestionBackendDict[]> {
+  fetchPretestQuestions(
+      explorationId: string,
+      storyUrlFragment: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
-      this._fetchPretestQuestions(explorationId, storyId, resolve, reject);
+      this._fetchPretestQuestions(
+        explorationId, storyUrlFragment, resolve, reject);
     });
   }
 }

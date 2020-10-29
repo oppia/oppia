@@ -16,7 +16,6 @@
  * @fileoverview Constants for the topic editor page.
  */
 
-export class TopicEditorPageConstants {
-  public static TOPIC_NAME_INPUT_FOCUS_LABEL =
-    'topicNameInputFocusLabel';
-}
+export const TopicEditorPageConstants = {
+  TOPIC_NAME_INPUT_FOCUS_LABEL: 'topicNameInputFocusLabel'
+} as const;

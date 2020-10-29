@@ -78,46 +78,58 @@ describe('Information Card Modal Controller', function() {
     });
   }));
 
-  it('should evaluate scope variables values correctly', function() {
-    expect($scope.averageRating).toBe(3.3333333333333335);
-    expect($scope.contributorNames).toEqual(['contributor_1', 'contributor_2']);
-    expect($scope.explorationId).toBe('0');
-    expect($scope.explorationTags).toEqual({
-      tagsToShow: [
-        'h1', 'h2', 'p', 'attrs', 'quote', 'body', 'select', 'option', 'form'],
-      tagsInTooltip: ['section', 'input', 'img', 'div']
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.averageRating).toBe(3.3333333333333335);
+      expect($scope.contributorNames).toEqual(
+        ['contributor_1', 'contributor_2']);
+      expect($scope.explorationId).toBe('0');
+      expect($scope.explorationTags).toEqual({
+        tagsToShow: [
+          'h1',
+          'h2',
+          'p',
+          'attrs',
+          'quote',
+          'body',
+          'select',
+          'option',
+          'form'],
+        tagsInTooltip: ['section', 'input', 'img', 'div']
+      });
+      expect($scope.explorationTitle).toBe('Test of all interactions');
+      expect($scope.infoCardBackgroundCss).toEqual({
+        'background-color': '#a33f40'
+      });
+      expect($scope.infoCardBackgroundImageUrl).toBe('/subjects/Lightbulb.svg');
+      expect($scope.lastUpdatedString).toBe('Feb 17');
+      expect($scope.numViews).toBe(2);
+      expect($scope.objective).toBe(
+        'Dummy exploration for testing all interactions');
+      expect($scope.explorationIsPrivate).toBe(false);
     });
-    expect($scope.explorationTitle).toBe('Test of all interactions');
-    expect($scope.infoCardBackgroundCss).toEqual({
-      'background-color': '#a33f40'
-    });
-    expect($scope.infoCardBackgroundImageUrl).toBe('/subjects/Lightbulb.svg');
-    expect($scope.lastUpdatedString).toBe('Feb 17');
-    expect($scope.numViews).toBe(2);
-    expect($scope.objective).toBe(
-      'Dummy exploration for testing all interactions');
-    expect($scope.explorationIsPrivate).toBe(false);
-  });
 
-  it('should get title wrapper css', function() {
-    spyOn(document, 'querySelectorAll')
-      // This throws "Type '{ clientWidth: number; }' is missing the following
-      // properties from type 'Element': assignedSlot, attributes, classList,
-      // className, and 122 more.". This is because typescript
-      // expects around 120 more properties than just one
-      // (clientWidth). We need only one 'clientWidth' for
-      // testing purposes.
-      // @ts-expect-error
-      .withArgs('.oppia-info-card-logo-thumbnail').and.returnValue([{
-        clientWidth: 200
-      }]);
-    expect($scope.titleWrapper()).toEqual({
-      'word-wrap': 'break-word',
-      width: '180'
+  it('should wrapper text of given html element when getting css properties',
+    function() {
+      spyOn(document, 'querySelectorAll')
+        // This throws "Type '{ clientWidth: number; }' is missing the following
+        // properties from type 'Element': assignedSlot, attributes, classList,
+        // className, and 122 more.". This is because typescript
+        // expects around 120 more properties than just one
+        // (clientWidth). We need only one 'clientWidth' for
+        // testing purposes.
+        // @ts-expect-error
+        .withArgs('.oppia-info-card-logo-thumbnail').and.returnValue([{
+          clientWidth: 200
+        }]);
+      expect($scope.titleWrapper()).toEqual({
+        'word-wrap': 'break-word',
+        width: '180'
+      });
     });
-  });
 
-  it('should get static image url', function() {
+  it('should get complete image path corresponding to a given' +
+    ' relative path', function() {
     expect($scope.getStaticImageUrl('/path/to/image.png')).toBe(
       '/assets/images/path/to/image.png');
   });

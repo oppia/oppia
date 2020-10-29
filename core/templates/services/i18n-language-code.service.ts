@@ -35,7 +35,8 @@ export class I18nLanguageCodeService {
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode = 'en';
 
-  private _preferredLanguageCodesLoadedEventEmitter = new EventEmitter();
+  private _preferredLanguageCodesLoadedEventEmitter =
+    new EventEmitter<string[]>();
 
   constructor() {}
 
@@ -55,7 +56,7 @@ export class I18nLanguageCodeService {
     I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
   }
 
-  get onPreferredLanguageCodesLoaded() {
+  get onPreferredLanguageCodesLoaded(): EventEmitter<string[]> {
     return this._preferredLanguageCodesLoadedEventEmitter;
   }
 }

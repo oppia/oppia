@@ -38,7 +38,8 @@ describe('Topic Editor Save Modal Controller', function() {
     });
   }));
 
-  it('should evaluate initialized properties', function() {
-    expect($scope.isTopicPublished).toBe(topicIsPublished);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.isTopicPublished).toBe(topicIsPublished);
+    });
 });

@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for unicode strings.
  */
 
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
@@ -47,11 +47,11 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       template: require('./schema-based-unicode-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$sce', '$timeout', '$translate',
+        '$filter', '$sce', '$timeout', '$translate',
         'DeviceInfoService', 'SchemaFormSubmittedService',
         'StateCustomizationArgsService',
         function(
-            $scope, $filter, $sce, $timeout, $translate,
+            $filter, $sce, $timeout, $translate,
             DeviceInfoService, SchemaFormSubmittedService,
             StateCustomizationArgsService) {
           var ctrl = this;

@@ -39,11 +39,8 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
-        self.save_new_skill('skill_id', 'owner_id', description='description')
-        self.assertTrue(
-            skill_models.SkillModel.has_reference_to_user_id('owner_id'))
         self.assertFalse(
-            skill_models.SkillModel.has_reference_to_user_id('x_id'))
+            skill_models.SkillModel.has_reference_to_user_id('any_id'))
 
 
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -60,6 +57,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False
         )
         commit.skill_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             skill_models.SkillCommitLogEntryModel

@@ -21,7 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('pages/exploration-editor-page/' +
+require(
+  'pages/exploration-editor-page/' +
   'services/exploration-init-state-name.service.ts');
 
 describe('Exploration Init State Name Service', function() {

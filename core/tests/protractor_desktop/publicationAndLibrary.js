@@ -221,15 +221,11 @@ describe('Permissions for private explorations', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
-  var explorationPlayerPage = null;
-  var libraryPage = null;
 
   beforeEach(function() {
-    libraryPage = new LibraryPage.LibraryPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   it('should not be changeable if title is not given to exploration',

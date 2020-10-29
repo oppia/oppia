@@ -36,13 +36,13 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('stateNameEditor', {
   template: require('./state-name-editor.component.html'),
   controller: [
-    '$filter', '$rootScope', 'EditabilityService',
-    'StateEditorService', 'StateNameService', 'FocusManagerService',
-    'ExplorationStatesService', 'ExternalSaveService', 'RouterService',
+    '$filter', 'EditabilityService', 'ExplorationStatesService',
+    'ExternalSaveService', 'FocusManagerService', 'RouterService',
+    'StateEditorService', 'StateNameService',
     function(
-        $filter, $rootScope, EditabilityService,
-        StateEditorService, StateNameService, FocusManagerService,
-        ExplorationStatesService, ExternalSaveService, RouterService) {
+        $filter, EditabilityService, ExplorationStatesService,
+        ExternalSaveService, FocusManagerService, RouterService,
+        StateEditorService, StateNameService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
 

@@ -35,10 +35,11 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
       template: require('./video.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'ContextService', '$element',
-        'AutoplayedVideosService', 'PAGE_CONTEXT', '$window',
-        function($attrs, ContextService, $element,
-            AutoplayedVideosService, PAGE_CONTEXT, $window) {
+        '$attrs', '$element', '$window', 'AutoplayedVideosService',
+        'ContextService', 'PAGE_CONTEXT',
+        function(
+            $attrs, $element, $window, AutoplayedVideosService,
+            ContextService, PAGE_CONTEXT) {
           var ctrl = this;
           ctrl.$onInit = function() {
             var start = (
@@ -60,7 +61,8 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
               var rect = angular.element($element)[0].getBoundingClientRect();
               var clientHeight = $window.innerHeight;
               var clientWidth = $window.innerWidth;
-              var isVisible = ((rect.left + rect.right) / 2 < clientWidth &&
+              var isVisible = (
+                (rect.left + rect.right) / 2 < clientWidth &&
                 (rect.top + rect.bottom) / 2 < clientHeight) &&
                 (rect.left > 0 && rect.right > 0);
 

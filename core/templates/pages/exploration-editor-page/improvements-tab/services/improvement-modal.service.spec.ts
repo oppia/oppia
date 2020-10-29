@@ -23,12 +23,10 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Improvement Modal Service', function() {
   var ImprovementModalService = null;
-  var FeedbackThreadObjectFactory = null;
   var $uibModal = null;
   var $q = null;
   var $rootScope = null;
   var openModalSpy = null;
-  var thread = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -54,16 +52,11 @@ describe('Improvement Modal Service', function() {
   }));
   beforeEach(angular.mock.inject(function($injector) {
     ImprovementModalService = $injector.get('ImprovementModalService');
-    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
 
     openModalSpy = spyOn($uibModal, 'open').and.callThrough();
-
-    thread = FeedbackThreadObjectFactory.createFromBackendDict({
-      thread_id: '0'
-    });
   }));
 
   it('should open playthrough modal', function() {

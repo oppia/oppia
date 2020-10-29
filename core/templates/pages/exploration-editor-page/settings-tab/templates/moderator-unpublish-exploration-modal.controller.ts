@@ -22,10 +22,9 @@ require(
 
 angular.module('oppia').controller(
   'ModeratorUnpublishExplorationModalController', [
-    '$controller', '$scope', '$uibModalInstance',
-    'draftEmailBody',
-    function($controller, $scope, $uibModalInstance,
-        draftEmailBody) {
+    '$controller', '$scope', '$uibModalInstance', 'draftEmailBody',
+    function(
+        $controller, $scope, $uibModalInstance, draftEmailBody) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance

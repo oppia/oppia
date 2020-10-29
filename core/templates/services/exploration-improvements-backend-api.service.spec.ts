@@ -23,11 +23,11 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {
   ExplorationImprovementsConfig,
   ExplorationImprovementsConfigBackendDict,
-} from 'domain/improvements/exploration-improvements-config-object.factory';
+} from 'domain/improvements/exploration-improvements-config.model';
 import {
   ExplorationTaskBackendDict,
-  ExplorationTaskObjectFactory,
-} from 'domain/improvements/ExplorationTaskObjectFactory';
+  ExplorationTaskModel,
+} from 'domain/improvements/exploration-task.model';
 import {
   ExplorationImprovementsBackendApiService,
   ExplorationImprovementsHistoryResponse,
@@ -36,15 +36,13 @@ import {
   ExplorationImprovementsResponseBackendDict
 } from 'services/exploration-improvements-backend-api.service';
 
-describe('Exploration stats backend api service', () => {
-  let explorationTaskObjectFactory: ExplorationTaskObjectFactory;
+describe('Exploration stats back-end API service', () => {
   let httpTestingController: HttpTestingController;
   let explorationImprovementsBackendApiService:
     ExplorationImprovementsBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-    explorationTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
     explorationImprovementsBackendApiService = (
       TestBed.get(ExplorationImprovementsBackendApiService));
     httpTestingController = TestBed.get(HttpTestingController);
@@ -83,7 +81,7 @@ describe('Exploration stats backend api service', () => {
 
     expect(await response).toEqual(
       new ExplorationImprovementsResponse(
-        [explorationTaskObjectFactory.createFromBackendDict(taskDict)],
+        [ExplorationTaskModel.createFromBackendDict(taskDict)],
         new Map([['Introduction', ['high_bounce_rate']]])));
   }));
 
@@ -118,7 +116,7 @@ describe('Exploration stats backend api service', () => {
 
       expect(await response).toEqual(
         new ExplorationImprovementsHistoryResponse(
-          [explorationTaskObjectFactory.createFromBackendDict(taskDict)],
+          [ExplorationTaskModel.createFromBackendDict(taskDict)],
           'cursor123',
           true));
     }));
@@ -155,13 +153,13 @@ describe('Exploration stats backend api service', () => {
 
     expect(await response).toEqual(
       new ExplorationImprovementsHistoryResponse(
-        [explorationTaskObjectFactory.createFromBackendDict(taskDict)],
+        [ExplorationTaskModel.createFromBackendDict(taskDict)],
         'cursor456',
         false));
   }));
 
-  it('should try to post a task dict to the backend', fakeAsync(async() => {
-    const task = explorationTaskObjectFactory.createFromBackendDict({
+  it('should try to post a task dict to the back-end', fakeAsync(async() => {
+    const task = ExplorationTaskModel.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
       entity_version: 1,
@@ -187,6 +185,19 @@ describe('Exploration stats backend api service', () => {
       task_entries: [task.toPayloadDict()]
     });
     req.flush({});
+    flushMicrotasks();
+
+    expect(onSuccess).toHaveBeenCalled();
+    expect(onFailure).not.toHaveBeenCalled();
+  }));
+
+  it('should not make HTTP call when posting empty list', fakeAsync(async() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    const onFailure = jasmine.createSpy('onFailure');
+    explorationImprovementsBackendApiService.postTasksAsync('eid', [])
+      .then(onSuccess, onFailure);
+
+    httpTestingController.expectNone('/improvements/exploration/eid');
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalled();

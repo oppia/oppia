@@ -48,7 +48,12 @@ module.exports = {
     extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
       '@angular/upgrade/static': (
-        '@angular/upgrade/bundles/upgrade-static.umd.js')
+        '@angular/upgrade/bundles/upgrade-static.umd.js'),
+      // This is needed because in app.constants.ts we need to import
+      // assets/constants.ts. We can't directly write import 'constants'
+      // because a module named 'constants' is defined in '@types/node'
+      // package.
+      'assets/constants': 'constants.ts'
     }
   },
   entry: {
@@ -722,7 +727,12 @@ module.exports = {
       ],
       use: [
         'cache-loader',
-        'style-loader',
+        {
+          loader: 'style-loader',
+          options: {
+            esModule: false
+          }
+        },
         {
           loader: 'css-loader',
           options: {

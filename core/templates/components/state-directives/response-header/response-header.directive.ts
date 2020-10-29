@@ -47,13 +47,11 @@ angular.module('oppia').directive('responseHeader', [
         'response-header.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'EditabilityService', 'StateEditorService',
-        'PLACEHOLDER_OUTCOME_DEST',
-        'StateInteractionIdService', 'INTERACTION_SPECS',
+        'EditabilityService', 'StateEditorService', 'StateInteractionIdService',
+        'INTERACTION_SPECS', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            EditabilityService, StateEditorService,
-            PLACEHOLDER_OUTCOME_DEST,
-            StateInteractionIdService, INTERACTION_SPECS) {
+            EditabilityService, StateEditorService, StateInteractionIdService,
+            INTERACTION_SPECS, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();

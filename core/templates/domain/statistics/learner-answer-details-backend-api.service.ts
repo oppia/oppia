@@ -33,7 +33,7 @@ export class LearnerAnswerDetailsBackendApiService {
     private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  recordLearnerAnswerDetails(
+  async recordLearnerAnswerDetailsAsync(
       explorationId: string, stateName: string, interactionId: string,
       answer: string, answerDetails: string): Promise<void> {
     let recordLearnerAnswerDetailsUrl = (
@@ -51,8 +51,8 @@ export class LearnerAnswerDetailsBackendApiService {
     };
 
     return this.httpClient.put<void>(
-      recordLearnerAnswerDetailsUrl, payload).toPromise().then(() => {},
-      errorResponse => {
+      recordLearnerAnswerDetailsUrl, payload).toPromise().then(
+      () => {}, errorResponse => {
         throw new Error(errorResponse.error.error);
       });
   }

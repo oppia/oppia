@@ -18,18 +18,16 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 
 import {
-  LearnerExplorationSummaryBackendDict,
   LearnerExplorationSummary,
-  LearnerExplorationSummaryObjectFactory
-} from 'domain/summary/learner-exploration-summary-object.factory';
+  LearnerExplorationSummaryBackendDict
+} from 'domain/summary/learner-exploration-summary.model';
 import {
-  StoryPlaythroughBackendDict,
   StoryPlaythrough,
-  StoryPlaythroughObjectFactory
-} from 'domain/story_viewer/StoryPlaythroughObjectFactory';
+  StoryPlaythroughBackendDict
+} from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants';
 import { UrlInterpolationService } from
@@ -47,17 +45,21 @@ interface StoryChapterCompletionResponse {
   summaries: LearnerExplorationSummary[];
 }
 
+interface StoryDataDict {
+  topicName: string;
+  storyTitle: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class StoryViewerBackendApiService {
   constructor(
-    private learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory,
     private http: HttpClient,
-    private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  private _storyDataEventEmitter = new EventEmitter<StoryDataDict>();
 
   _fetchStoryData(
       topicUrlFragment: string,
@@ -75,8 +77,7 @@ export class StoryViewerBackendApiService {
     this.http.get<StoryPlaythroughBackendDict>(
       storyDataUrl).toPromise().then(data => {
       if (successCallback) {
-        let storyPlaythrough = this.storyPlaythroughObjectFactory
-          .createFromBackendDict(data);
+        let storyPlaythrough = StoryPlaythrough.createFromBackendDict(data);
         successCallback(storyPlaythrough);
       }
     }, errorResponse => {
@@ -103,8 +104,8 @@ export class StoryViewerBackendApiService {
     ).toPromise().then(data => {
       successCallback({
         summaries: data.summaries.map(
-          expSummary => this.learnerExplorationSummaryObjectFactory
-            .createFromBackendDict(expSummary)),
+          expSummary => LearnerExplorationSummary.createFromBackendDict(
+            expSummary)),
         nextNodeId: data.next_node_id,
         readyForReviewTest: data.ready_for_review_test});
     }, errorResponse => {
@@ -133,6 +134,10 @@ export class StoryViewerBackendApiService {
         topicUrlFragment, classroomUrlFragment, storyUrlFragment,
         nodeId, resolve, reject);
     });
+  }
+
+  get onSendStoryData(): EventEmitter<StoryDataDict> {
+    return this._storyDataEventEmitter;
   }
 }
 

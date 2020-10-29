@@ -16,18 +16,18 @@
  * @fileoverview Constants for the practice session.
  */
 
-export class PracticeSessionPageConstants {
-  public static TOTAL_QUESTIONS = 20;
+export const PracticeSessionPageConstants = {
+  TOTAL_QUESTIONS: 20,
 
-  public static PRACTICE_SESSIONS_DATA_URL = (
+  PRACTICE_SESSIONS_DATA_URL: (
     '/practice_session/data/<classroom_url_fragment>/' +
     '<topic_url_fragment>?selected_subtopic_ids=' +
-    '<comma_separated_subtopic_ids>');
+    '<comma_separated_subtopic_ids>'),
 
-  public static TOPIC_VIEWER_PAGE = (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>');
+  TOPIC_VIEWER_PAGE: (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>'),
 
-  public static PRACTICE_SESSIONS_URL = (
+  PRACTICE_SESSIONS_URL: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/practice/' +
-    'session?selected_subtopic_ids=<comma_separated_subtopic_ids>');
-}
+    'session?selected_subtopic_ids=<comma_separated_subtopic_ids>')
+} as const;

@@ -43,6 +43,15 @@ describe('NumericExpressionInputInteractive', function() {
     }
   };
   let mockNumericExpressionInputRulesService = {};
+  let mockInteractionAttributesExtractorService = {
+    getValuesFromAttributes: function(interactionId, attrs) {
+      return {
+        placeholder: {
+          getUnicode: function() {}
+        }
+      };
+    }
+  };
   let mockGuppyObject = {
     guppyInstance: {
       asciimath: function() {
@@ -78,10 +87,15 @@ describe('NumericExpressionInputInteractive', function() {
     guppyInitializationService = new GuppyInitializationService();
     deviceInfoService = new DeviceInfoService(new WindowRef());
 
-    $provide.value('CurrentInteractionService',
-      mockCurrentInteractionService);
-    $provide.value('NumericExpressionInputRulesService',
+    $provide.value(
+      'CurrentInteractionService', mockCurrentInteractionService);
+    $provide.value(
+      'NumericExpressionInputRulesService',
       mockNumericExpressionInputRulesService);
+    $provide.value(
+      'InteractionAttributesExtractorService',
+      mockInteractionAttributesExtractorService);
+    $provide.value('$attrs', 'placeholder');
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);

@@ -23,9 +23,20 @@ import {
   GraphAnswer } from
   'interactions/answer-defs';
 
-export interface AlgebraicExpressionRuleInputs {
+// AlgebraicExpressionInput interaction has multiple types of inputs based on
+// rule type.
+export interface AlgebraicExpressionRuleInputsWithPlaceholder {
+  x: string;
+  y: string[];
+}
+
+export interface AlgebraicExpressionRuleInputsWithoutPlaceholder {
   x: string;
 }
+
+export type AlgebraicExpressionRuleInputs = (
+  AlgebraicExpressionRuleInputsWithPlaceholder |
+  AlgebraicExpressionRuleInputsWithoutPlaceholder);
 
 export interface CodeReplRuleInputs {
   x: string;
@@ -102,23 +113,26 @@ export interface LogicProofRuleInputs {
 }
 
 // MathEquation interaction has multiple types of inputs based on
-// rule type.
-export interface MathEquationMatchesExactlyWithRuleInputs {
+// rule type. Parameter y is supposed to represent the side of the equation that
+// needs to be checked.
+export interface MathEquationRuleInputsWithSide {
   x: string;
   y: string;
 }
 
-export interface MathEquationIsEquivalentToRuleInputs {
+export interface MathEquationRuleInputsWithPlaceholder {
+  x: string;
+  y: string[];
+}
+
+export interface MathEquationRuleInputsWithoutSide {
   x: string;
 }
 
 export type MathEquationRuleInputs = (
-  MathEquationMatchesExactlyWithRuleInputs |
-  MathEquationIsEquivalentToRuleInputs);
-
-export interface MathExpressionRuleInputs {
-  x: string;
-}
+  MathEquationRuleInputsWithSide |
+  MathEquationRuleInputsWithoutSide |
+  MathEquationRuleInputsWithPlaceholder);
 
 export interface MultipleChoiceRuleInputs {
   x: number;
@@ -196,6 +210,18 @@ export interface PencilCodeEditorRuleInputs {
   x: string;
 }
 
+export interface RatioInputEqualRuleInputs {
+  x: number[];
+}
+
+export interface RatioInputHasNumberOfTermsEqualToRuleInputs {
+  y: number;
+}
+
+export type RatioInputRuleInputs = (
+  RatioInputEqualRuleInputs |
+  RatioInputHasNumberOfTermsEqualToRuleInputs);
+
 export interface SetInputRuleInputs {
   x: string[];
 }
@@ -217,12 +243,12 @@ export type InteractionRuleInputs = (
   ItemSelectionRuleInputs |
   LogicProofRuleInputs |
   MathEquationRuleInputs |
-  MathExpressionRuleInputs |
   MultipleChoiceRuleInputs |
   MusicNotesRuleInputs |
   NumericExpressionRuleInputs |
   NumberWithUnitsRuleInputs |
   NumericInputRuleInputs |
   PencilCodeEditorRuleInputs |
+  RatioInputRuleInputs|
   SetInputRuleInputs |
   TextInputRuleInputs);

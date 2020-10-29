@@ -30,9 +30,9 @@ angular.module('oppia').directive('questionDifficultySelector', [
         '/components/question-difficulty-selector/' +
         'question-difficulty-selector.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$rootScope', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+        '$scope', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
         function(
-            $scope, $uibModal, $rootScope, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+            $scope, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
           var ctrl = this;
 
           ctrl.$onInit = function() {

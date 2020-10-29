@@ -24,7 +24,7 @@ angular.module('oppia').directive('mathjaxBind', [function() {
   return {
     restrict: 'E',
     controller: [
-      '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+      '$attrs', '$element', '$scope', function($attrs, $element, $scope) {
         var ctrl = this;
         ctrl.$onInit = function() {
           $scope.$watch($attrs.mathjaxData, function(value) {

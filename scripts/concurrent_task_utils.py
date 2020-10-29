@@ -27,6 +27,8 @@ import python_utils
 
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
+SUCCESS_MESSAGE_PREFIX = 'SUCCESS '
+FAILED_MESSAGE_PREFIX = 'FAILED '
 
 
 def log(message, show_time=False):
@@ -42,30 +44,82 @@ def log(message, show_time=False):
             python_utils.PRINT(message)
 
 
+class TaskResult(python_utils.OBJECT):
+    """Task result for concurrent_task_utils."""
+
+    def __init__(self, name, failed, trimmed_messages, messages):
+        """Constructs a TaskResult object.
+
+        Args:
+            name: str. The name of the task.
+            failed: bool. The boolean value representing whether the task
+                failed.
+            trimmed_messages: list(str). List of error messages that are
+                trimmed to keep main part of messages.
+            messages: list(str). List of full messages returned by the objects.
+        """
+        self.name = name
+        self.failed = failed
+        self.trimmed_messages = trimmed_messages
+        self.messages = messages
+
+    def get_report(self):
+        """Returns a list of message with pass or fail status for the current
+        check.
+
+        Returns:
+            list(str). List of full messages corresponding to the given
+            task.
+        """
+        all_messages = self.messages[:]
+        status_message = (
+            '%s %s check %s' % (
+                (FAILED_MESSAGE_PREFIX, self.name, 'failed')
+                if self.failed else (
+                    SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
+        all_messages.append(status_message)
+        return all_messages
+
+
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, verbose, semaphore, name):
+    def __init__(self, func, verbose, semaphore, name, report_enabled):
         super(TaskThread, self).__init__()
         self.func = func
-        self.output = None
+        self.task_results = []
         self.exception = None
         self.stacktrace = None
         self.verbose = verbose
         self.name = name
         self.semaphore = semaphore
         self.finished = False
+        self.report_enabled = report_enabled
 
     def run(self):
         try:
-            self.output = self.func()
+            self.task_results = self.func()
             if self.verbose:
-                log('LOG %s:' % self.name, show_time=True)
-                log(self.output)
-                log('----------------------------------------')
+                for task_result in self.task_results:
+                    # The following section will print the output of the lint
+                    # checks.
+                    if self.report_enabled:
+                        log(
+                            'Report from %s check\n'
+                            '----------------------------------------\n'
+                            '%s' % (task_result.name, '\n'.join(
+                                task_result.get_report())), show_time=True)
+                    # The following section will print the output of backend
+                    # tests.
+                    else:
+                        log(
+                            'LOG %s:\n%s'
+                            '----------------------------------------' %
+                            (self.name, task_result.messages[0]),
+                            show_time=True)
             log(
-                'FINISHED %s: %.1f secs' %
-                (self.name, time.time() - self.start_time), show_time=True)
+                'FINISHED %s: %.1f secs' % (
+                    self.name, time.time() - self.start_time), show_time=True)
         except Exception as e:
             self.exception = e
             self.stacktrace = traceback.format_exc()
@@ -133,7 +187,7 @@ def execute_tasks(tasks, semaphore):
     _check_all_tasks(currently_running_tasks)
 
 
-def create_task(func, verbose, semaphore, name=None):
+def create_task(func, verbose, semaphore, name=None, report_enabled=True):
     """Create a Task in its Thread.
 
     Args:
@@ -142,9 +196,10 @@ def create_task(func, verbose, semaphore, name=None):
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
         name: str. Name of the task that is going to be created.
+        report_enabled: bool. Decide whether task result will print or not.
 
     Returns:
         task: TaskThread object. Created task.
     """
-    task = TaskThread(func, verbose, semaphore, name)
+    task = TaskThread(func, verbose, semaphore, name, report_enabled)
     return task

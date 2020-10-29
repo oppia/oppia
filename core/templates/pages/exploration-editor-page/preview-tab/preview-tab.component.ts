@@ -58,7 +58,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('previewTab', {
   template: require('./preview-tab.component.html'),
   controller: [
-    '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
+    '$q', '$timeout', '$uibModal', 'ContextService',
     'EditableExplorationBackendApiService',
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
@@ -68,7 +68,7 @@ angular.module('oppia').component('previewTab', {
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
     'StateEditorService', 'UrlInterpolationService',
     function(
-        $q, $scope, $timeout, $uibModal, ContextService,
+        $q, $timeout, $uibModal, ContextService,
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
@@ -106,8 +106,9 @@ angular.module('oppia').component('previewTab', {
       };
 
       ctrl.showParameterSummary = function() {
-        return (ExplorationFeaturesService.areParametersEnabled() &&
-                !angular.equals({}, ctrl.allParams));
+        return (
+          ExplorationFeaturesService.areParametersEnabled() &&
+          !angular.equals({}, ctrl.allParams));
       };
 
       ctrl.showSetParamsModal = function(manualParamChanges, callback) {
@@ -176,7 +177,6 @@ angular.module('oppia').component('previewTab', {
         ExplorationDataService.getData().then(function() {
           var initStateNameForPreview = StateEditorService
             .getActiveStateName();
-          var manualParamChanges = [];
 
           // Show a warning message if preview doesn't start from the first
           // state.
@@ -190,7 +190,7 @@ angular.module('oppia').component('previewTab', {
 
           // Prompt user to enter any unset parameters, then populate
           // exploration.
-          manualParamChanges = ctrl.getManualParamChanges(
+          ctrl.getManualParamChanges(
             initStateNameForPreview)
             .then(function(manualParamChanges) {
               ctrl.loadPreviewState(

@@ -136,20 +136,20 @@ angular.module('oppia').directive('audioTranslationBar', [
         '/pages/exploration-editor-page/translation-tab/' +
         'audio-translation-bar/audio-translation-bar.directive.html'),
       controller: [
-        '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
+        '$filter', '$interval', '$q', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService',
-        'ExternalSaveService', 'ExplorationStatesService',
+        'ExplorationStatesService', 'ExternalSaveService',
         'IdGenerationService', 'SiteAnalyticsService',
         'StateEditorService', 'StateRecordedVoiceoversService',
         'TranslationLanguageService', 'TranslationStatusService',
         'TranslationTabActiveContentIdService', 'VoiceoverRecordingService',
         'RECORDING_TIME_LIMIT',
         function(
-            $filter, $interval, $rootScope, $scope, $uibModal, $window,
+            $filter, $interval, $q, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService,
-            ExternalSaveService, ExplorationStatesService,
+            ExplorationStatesService, ExternalSaveService,
             IdGenerationService, SiteAnalyticsService,
             StateEditorService, StateRecordedVoiceoversService,
             TranslationLanguageService, TranslationStatusService,
@@ -309,9 +309,10 @@ angular.module('oppia').directive('audioTranslationBar', [
             var recordedAudioFile = new File(
               [$scope.audioBlob], filename, {type: fileType});
             $scope.showRecorderWarning = false;
-            AssetsBackendApiService.saveAudio(
-              ContextService.getExplorationId(), filename,
-              recordedAudioFile).then(function(response) {
+            $q.when(
+              AssetsBackendApiService.saveAudio(
+                ContextService.getExplorationId(), filename, recordedAudioFile)
+            ).then(function(response) {
               if ($scope.audioIsUpdating) {
                 StateRecordedVoiceoversService.displayed.deleteVoiceover(
                   contentId, languageCode);
@@ -387,10 +388,10 @@ angular.module('oppia').directive('audioTranslationBar', [
           $scope.getUploadedAudioTimer = function() {
             if (AudioPlayerService.isTrackLoaded()) {
               $scope.audioTimerIsShown = true;
-              var currentTime = $filter('formatTimer')(AudioPlayerService
-                .getCurrentTime());
-              var duration = $filter('formatTimer')(AudioPlayerService
-                .getAudioDuration());
+              var currentTime = $filter('formatTimer')(
+                AudioPlayerService.getCurrentTime());
+              var duration = $filter('formatTimer')(
+                AudioPlayerService.getAudioDuration());
               return currentTime + ' / ' + duration;
             } else {
               $scope.audioTimerIsShown = false;
@@ -407,7 +408,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             var audioTranslation = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslation) {
-              AudioPlayerService.load(audioTranslation.filename)
+              $q.when(AudioPlayerService.load(audioTranslation.filename))
                 .then(function() {
                   $scope.audioLoadingIndicatorIsShown = false;
                   $scope.audioIsLoading = false;

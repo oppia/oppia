@@ -411,13 +411,6 @@ export class StateGraphLayoutService {
     var GRID_NODE_Y_PADDING_FRACTION = 0.2;
     // As above, but for the horizontal padding.
     var GRID_NODE_X_PADDING_FRACTION = 0.1;
-    // The vertical padding, measured as a fraction of the height of a grid
-    // rectangle, between the top of the node and the top of the node label.
-    // An equivalent amount of padding will be used for the space between
-    // the bottom of the node and the bottom of the node label.
-    var NODE_LABEL_Y_PADDING_FRACTION = 0.15;
-    // As above, but for the horizontal padding.
-    var NODE_LABEL_X_PADDING_FRACTION = 0.05;
 
     // Helper function that returns a horizontal position, in terms of a
     // fraction of the total width, given a horizontal offset in terms of

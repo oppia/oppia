@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_fetchers
@@ -33,9 +32,6 @@ class PracticeSessionsPage(base.BaseHandler):
     def get(self, _):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         self.render_template('practice-session-page.mainpage.html')
 
 
@@ -46,9 +42,6 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
-
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
 
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.

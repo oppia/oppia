@@ -47,9 +47,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
         'skill-prerequisite-skills-editor/' +
         'skill-prerequisite-skills-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', 'AlertsService',
         function(
-            $scope, $filter, $uibModal, AlertsService) {
+            $scope, $uibModal, AlertsService) {
           var ctrl = this;
           var categorizedSkills = null;
           var untriagedSkillSummaries = null;
@@ -114,8 +114,10 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
           };
 
           $scope.togglePrerequisiteSkills = function() {
-            $scope.prerequisiteSkillsAreShown = (
-              !$scope.prerequisiteSkillsAreShown);
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.prerequisiteSkillsAreShown = (
+                !$scope.prerequisiteSkillsAreShown);
+            }
           };
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();

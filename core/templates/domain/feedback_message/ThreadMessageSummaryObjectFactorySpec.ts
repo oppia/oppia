@@ -22,14 +22,18 @@ import { ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
 describe('Thread message summary object factory', () => {
+  let threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
+
   beforeEach(() => {
-    this.factory = TestBed.get(ThreadMessageSummaryObjectFactory);
+    threadMessageSummaryObjectFactory = TestBed.get(
+      ThreadMessageSummaryObjectFactory);
   });
 
   describe('.createNew', () => {
     it('should create new thread message summary from arguments.', () => {
       let threadMessageSummary =
-        this.factory.createNew('author', 'message content');
+        threadMessageSummaryObjectFactory.createNew(
+          'author', 'message content');
 
       expect(threadMessageSummary.authorUsername).toEqual('author');
       expect(threadMessageSummary.text).toEqual('message content');
@@ -38,13 +42,15 @@ describe('Thread message summary object factory', () => {
 
   describe('.hasText', () => {
     it('should be true when text is nonempty string', () => {
-      let threadMessageSummary = this.factory.createNew('author', 'nonempty!');
+      let threadMessageSummary =
+        threadMessageSummaryObjectFactory.createNew('author', 'nonempty!');
 
       expect(threadMessageSummary.hasText()).toBe(true);
     });
 
     it('should be false when text is empty string', () => {
-      let threadMessageSummary = this.factory.createNew('author', '');
+      let threadMessageSummary =
+        threadMessageSummaryObjectFactory.createNew('author', '');
 
       expect(threadMessageSummary.hasText()).toBe(false);
     });

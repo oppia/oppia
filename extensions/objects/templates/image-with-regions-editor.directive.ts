@@ -37,8 +37,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
       template: require('./image-with-regions-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$uibModal',
-        function($scope, $element, $uibModal) {
+        '$element', '$scope', '$uibModal',
+        function($element, $scope, $uibModal) {
           var ctrl = this;
           // Dynamically defines the CSS style for the region rectangle.
           ctrl.getRegionStyle = function(index) {
@@ -531,6 +531,10 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
             // The initializeEditor function is written separately since it
             // is also called in resetEditor function.
             ctrl.initializeEditor();
+            ctrl.SCHEMA = {
+              type: 'custom',
+              obj_type: 'Filepath'
+            };
           };
         }
       ]

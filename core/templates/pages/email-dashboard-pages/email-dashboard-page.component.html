@@ -1,22 +1,22 @@
 <div class="oppia-query-form">
-  <form class="form" ng-submit="$ctrl.submitQuery()">
-    <label for="not-logged-n-days">Has not logged in for n days: </label>
-    <input id="not-logged-n-days" type="number" min="0" ng-model="$ctrl.hasNotLoggedInForNDays">
+  <form class="form" ng-submit="$ctrl.submitQueryAsync()">
+    <label for="label-target-not-logged-n-days">Has not logged in for n days: </label>
+    <input id="label-target-not-logged-n-days" type="number" min="0" ng-model="$ctrl.hasNotLoggedInForNDays">
     <br>
-    <label for="inactive-for-ndays">Inactive in last n days:</label>
-    <input id="inactive-for-ndays" type="number" min="0" ng-model="$ctrl.inactiveInLastNDays">
+    <label for="label-target-inactive-for-ndays">Inactive in last n days:</label>
+    <input id="label-target-inactive-for-ndays" type="number" min="0" ng-model="$ctrl.inactiveInLastNDays">
     <br>
-    <label for="created-more-n-exps">Has created at least n explorations:</label>
-    <input id="created-more-n-exps" type="number" min="0" ng-model="$ctrl.createdAtLeastNExps">
+    <label for="label-target-created-more-n-exps">Has created at least n explorations:</label>
+    <input id="label-target-created-more-n-exps" type="number" min="0" ng-model="$ctrl.createdAtLeastNExps">
     <br>
-    <label for="created-fewer-n-exps">Has created fewer than n explorations:</label>
-    <input id="created-fewer-n-exps" type="number" min="0" ng-model="$ctrl.createdFewerThanNExps">
+    <label for="label-target-created-fewer-n-exps">Has created fewer than n explorations:</label>
+    <input id="label-target-created-fewer-n-exps" type="number" min="0" ng-model="$ctrl.createdFewerThanNExps">
     <br>
-    <label for="edited-more-n-exps">Has edited at least n explorations:</label>
-    <input id="edited-more-n-exps" type="number" min="0" ng-model="$ctrl.editedAtLeastNExps">
+    <label for="label-target-edited-more-n-exps">Has edited at least n explorations:</label>
+    <input id="label-target-edited-more-n-exps" type="number" min="0" ng-model="$ctrl.editedAtLeastNExps">
     <br>
-    <label for="edited-fewer-n-exps">Has edited fewer than n explorations: </label>
-    <input id="edited-fewer-n-exps" type="number" min="0" ng-model="$ctrl.editedFewerThanNExps">
+    <label for="label-target-edited-fewer-n-exps">Has edited fewer than n explorations: </label>
+    <input id="label-target-edited-fewer-n-exps" type="number" min="0" ng-model="$ctrl.editedFewerThanNExps">
     <br>
     <input type="submit" value="submit query">
     <input type="reset" value="reset" ng-click="$ctrl.resetForm()">

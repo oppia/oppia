@@ -23,7 +23,6 @@ var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
-var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
 var imageUploadInput = element(
@@ -270,8 +269,8 @@ var createSkillAndAssignTopic = async function(
   await topicsAndSkillsDashboardPage.navigateToSkillsTab();
   await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
   await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
-  await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-    0, topicName);
+  await topicsAndSkillsDashboardPage.assignSkillToTopic(
+    skillDescription, topicName);
 };
 
 var getImageSource = async function(customImageElement) {

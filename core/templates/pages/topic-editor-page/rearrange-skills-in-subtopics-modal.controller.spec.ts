@@ -67,7 +67,7 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     expect(ctrl.topic).toEqual(topic);
   });
 
-  it('get skill editor url', function() {
+  it('should get skill editor url', function() {
     expect(ctrl.getSkillEditorUrl('1')).toBe('/skill_editor/1');
   });
 

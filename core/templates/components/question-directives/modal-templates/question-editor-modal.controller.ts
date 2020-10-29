@@ -169,9 +169,9 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       }
     };
     $scope.isSaveAndCommitButtonDisabled = function() {
-      return !(QuestionUndoRedoService.hasChanges() ||
-          (returnModalObject.skillLinkageModificationsArray.length
-          ) > 0) ||
+      return !(
+        QuestionUndoRedoService.hasChanges() || (
+          returnModalObject.skillLinkageModificationsArray.length) > 0) ||
           !$scope.isQuestionValid();
     };
 

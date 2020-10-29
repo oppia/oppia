@@ -36,10 +36,10 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -317,20 +317,20 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
-                '%s/%s?story_id=%s' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
+                '%s/%s?story_url_fragment=title' % (
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id))
         self.assertTrue(
             json_response_1['pretest_question_dicts'][0]['id'] in
             [question_id, question_id_2])
 
         self.get_json(
-            '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, story_id),
+            '%s/%s?story_url_fragment=title' % (
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
             expected_status_int=400)
 
         self.get_json(
-            '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, 'story'),
+            '%s/%s?story_url_fragment=invalid-story' % (
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
             expected_status_int=400)
 
 
@@ -689,7 +689,8 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """Sets the recommendations in the exploration corresponding to the
         given exploration id.
         """
-        recommendations_services.set_recommendations(exp_id, recommended_ids)
+        recommendations_services.set_exploration_recommendations(
+            exp_id, recommended_ids)
 
     def _complete_exploration_in_collection(self, exp_id):
         """Completes the exploration within the collection. Records that the
@@ -1138,7 +1139,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hello Moderator,\n'
@@ -1625,6 +1626,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1693,6 +1695,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1735,6 +1738,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.unresolved_issues[0]['playthrough_ids'] = [
             'id1', 'id2', 'id3', 'id4', 'id5'
         ]
+        model.update_timestamps()
         model.put()
 
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {

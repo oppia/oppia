@@ -27,6 +27,10 @@ from core.tests import test_utils
 class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationRecommendationsModel class."""
 
+    RECOMMENDATION_1_ID = 'rec_1_id'
+    RECOMMENDATION_2_ID = 'rec_2_id'
+    RECOMMENDATION_3_ID = 'rec_3_id'
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             recommendations_models.ExplorationRecommendationsModel

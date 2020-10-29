@@ -71,6 +71,12 @@ describe('ImageLocalStorageService', function() {
       ImageLocalStorageService.getStoredImagesData().length).toEqual(0);
   });
 
+  it('should return correctly check whether file exist in storage', function() {
+    expect(ImageLocalStorageService.isInStorage(imageFilename)).toBeFalse();
+    ImageLocalStorageService.saveImage(imageFilename, sampleImageData);
+    expect(ImageLocalStorageService.isInStorage(imageFilename)).toBeTrue();
+  });
+
   it(
     'should show error message if number of stored images crosses ' +
     'limit', function() {

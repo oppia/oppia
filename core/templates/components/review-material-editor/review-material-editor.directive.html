@@ -1,4 +1,4 @@
-<div ng-if="!$ctrl.conceptCardExplanationEditorIsShown" class="review-material" style="padding-top: 0.5em;">
+<div ng-if="!$ctrl.conceptCardExplanationEditorIsShown" class="review-material">
   <div ng-class="oppia-editable-section"
        ng-click="$ctrl.openConceptCardExplanationEditor()">
     <i class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-concept-card"
@@ -29,12 +29,13 @@
       Save
     </button>
     <button type="button" class="btn btn-secondary float-right" ng-click="$ctrl.closeConceptCardExplanationEditor()">Cancel</button>
-    <div style="clear: both;"></div>
+    <div class="oppia-clear"></div>
   </div>
 </div>
 <style>
   review-material-editor .review-material {
     padding-bottom: 36px;
+    padding-top: 0.5em;
   }
 
   review-material-editor .editor-buttons {

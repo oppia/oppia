@@ -33,7 +33,8 @@ for (var constantName in constants) {
 angular.module('oppia').constant(
   'DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
 
-angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+angular.module('oppia').constant(
+  'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
 
 angular.module('oppia').constant(
@@ -100,28 +101,18 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'COMPONENT_NAME_CONTENT', AppConstants.COMPONENT_NAME_CONTENT);
 angular.module('oppia').constant(
+  'COMPONENT_NAME_FEEDBACK', AppConstants.COMPONENT_NAME_FEEDBACK);
+angular.module('oppia').constant(
   'COMPONENT_NAME_HINT', AppConstants.COMPONENT_NAME_HINT);
 angular.module('oppia').constant(
-  'COMPONENT_NAME_SOLUTION', AppConstants.COMPONENT_NAME_SOLUTION);
+  'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
+  AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
 angular.module('oppia').constant(
-  'COMPONENT_NAME_FEEDBACK', AppConstants.COMPONENT_NAME_FEEDBACK);
+  'COMPONENT_NAME_SOLUTION', AppConstants.COMPONENT_NAME_SOLUTION);
 angular.module('oppia').constant(
   'COMPONENT_NAME_EXPLANATION', AppConstants.COMPONENT_NAME_EXPLANATION);
 angular.module('oppia').constant(
   'COMPONENT_NAME_WORKED_EXAMPLE', AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
-
-// Do not modify these without a state migration of all existing content ids.
-// Content id prefixes should indicate what type of content they are
-// associated with.
-angular.module('oppia').constant(
-  'CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS',
-  AppConstants.CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS);
-angular.module('oppia').constant(
-  'CONTENT_ID_PREFIX_HINT',
-  AppConstants.CONTENT_ID_PREFIX_HINT);
-angular.module('oppia').constant(
-  'CONTENT_ID_PREFIX_FEEDBACK',
-  AppConstants.CONTENT_ID_PREFIX_FEEDBACK);
 
 angular.module('oppia').constant(
   'ACTION_TYPE_EXPLORATION_START', AppConstants.ACTION_TYPE_EXPLORATION_START);
@@ -165,6 +156,8 @@ angular.module('oppia').constant(
   'COLLECTION_DATA_URL_TEMPLATE', AppConstants.COLLECTION_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant('ENTITY_TYPE', AppConstants.ENTITY_TYPE);
+
+angular.module('oppia').constant('IMAGE_CONTEXT', AppConstants.IMAGE_CONTEXT);
 
 angular.module('oppia').constant(
   'IMAGE_SAVE_DESTINATION_SERVER', AppConstants.IMAGE_SAVE_DESTINATION_SERVER);

@@ -16,210 +16,189 @@
  * @fileoverview Unit tests for topic viewer page component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-require('pages/topic-viewer-page/topic-viewer-page.component.ts');
+import { TopicViewerPageComponent } from
+  'pages/topic-viewer-page/topic-viewer-page.component';
+import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { PageTitleService } from 'services/page-title.service';
 
-describe('Topic viewer page', function() {
-  var ctrl = null;
-  var $q = null;
-  var $scope = null;
-  var AlertsService = null;
-  var PageTitleService = null;
-  var ReadOnlyTopicObjectFactory = null;
-  var TopicViewerBackendApiService = null;
-  var UrlService = null;
-  var WindowDimensionsService = null;
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
 
-  var topicName = 'Topic Name';
+describe('Topic viewer page', () => {
+  let httpTestingController = null;
+  let alertsService = null;
+  let pageTitleService = null;
+  let urlService = null;
+  let windowDimensionsService = null;
+  let topicViewerPageComponent = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  let topicName = 'Topic Name';
+  let topicUrlFragment = 'topic-frag';
+  let topicDict = {
+    topic_id: '1',
+    topic_name: 'Topic Name',
+    topic_description: 'Topic Description',
+    canonical_story_dicts: [{
+      id: '2',
+      title: 'Story Title',
+      node_titles: ['Node title 1', 'Node title 2'],
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      description: 'Story Description',
+      story_is_published: true,
+      pending_node_dicts: []
+    }],
+    additional_story_dicts: [],
+    uncategorized_skill_ids: [],
+    subtopics: [],
+    degrees_of_mastery: {},
+    skill_descriptions: {},
+    practice_tab_is_displayed: true,
+    meta_tag_content: 'Topic Meta Tag'
+  };
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
-    AlertsService = $injector.get('AlertsService');
-    PageTitleService = $injector.get('PageTitleService');
-    ReadOnlyTopicObjectFactory = $injector.get('ReadOnlyTopicObjectFactory');
-    TopicViewerBackendApiService = $injector.get(
-      'TopicViewerBackendApiService');
-    UrlService = $injector.get('UrlService');
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [TopicViewerPageComponent, MockTranslatePipe],
+      imports: [HttpClientTestingModule],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    httpTestingController = TestBed.get(HttpTestingController);
+    alertsService = TestBed.get(AlertsService);
+    pageTitleService = TestBed.get(PageTitleService);
+    urlService = TestBed.get(UrlService);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
+    let fixture = TestBed.createComponent(TopicViewerPageComponent);
+    topicViewerPageComponent = fixture.componentInstance;
+  });
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('topicViewerPage', {
-      $scope: $scope
-    });
-  }));
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-  it('should successfully get topic data', function() {
-    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      topicName);
-    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+  it('should successfully get topic data', fakeAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment);
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    var topicDataObject = (
-      ReadOnlyTopicObjectFactory.createFromBackendDict({
-        topic_id: '1',
-        topic_name: 'Topic Name',
-        topic_description: 'Topic Description',
-        canonical_story_dicts: [{
-          id: '2',
-          title: 'Story Title',
-          node_titles: ['Node title 1', 'Node title 2'],
-          thumbnail_filename: '',
-          thumbnail_bg_color: '',
-          description: 'Story Description',
-          story_is_published: true
-        }],
-        additional_story_dicts: [],
-        uncategorized_skill_ids: [],
-        subtopics: [],
-        degrees_of_mastery: {},
-        skill_descriptions: {},
-        train_tab_should_be_displayed: true
-      }));
-    spyOn(TopicViewerBackendApiService, 'fetchTopicData').and.returnValue(
-      $q.resolve(topicDataObject));
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
-    ctrl.$onInit();
+    spyOn(pageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
 
-    expect(ctrl.canonicalStorySummaries).toEqual([]);
-    expect(ctrl.activeTab).toBe('info');
-    expect(ctrl.topicIsLoading).toBe(true);
-    $scope.$apply();
+    topicViewerPageComponent.ngOnInit();
+    expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
+    expect(topicViewerPageComponent.activeTab).toBe('story');
 
-    expect(ctrl.topicId).toBe('1');
-    expect(ctrl.topicName).toBe('Topic Name');
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
+    var req = httpTestingController.expectOne(
+      `/topic_data_handler/math/${topicUrlFragment}`);
+    req.flush(topicDict);
+    flushMicrotasks();
+
+    expect(topicViewerPageComponent.topicId).toBe('1');
+    expect(topicViewerPageComponent.topicName).toBe('Topic Name');
+    expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
       `Learn ${topicName} | Topic Description | Oppia`);
-    expect(ctrl.topicDescription).toBe('Topic Description');
-    expect(ctrl.canonicalStorySummaries.length).toBe(1);
-    expect(ctrl.chapterCount).toBe(2);
-    expect(ctrl.degreesOfMastery).toEqual({});
-    expect(ctrl.subtopics).toEqual([]);
-    expect(ctrl.skillDescriptions).toEqual({});
-    expect(ctrl.topicIsLoading).toBe(false);
-    expect(ctrl.trainTabShouldBeDisplayed).toBe(true);
-  });
+    expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
+      'Topic Meta Tag');
+    expect(topicViewerPageComponent.topicDescription).toBe(
+      'Topic Description');
+    expect(topicViewerPageComponent.canonicalStorySummaries.length).toBe(1);
+    expect(topicViewerPageComponent.chapterCount).toBe(2);
+    expect(topicViewerPageComponent.degreesOfMastery).toEqual({});
+    expect(topicViewerPageComponent.subtopics).toEqual([]);
+    expect(topicViewerPageComponent.skillDescriptions).toEqual({});
+    expect(topicViewerPageComponent.topicIsLoading).toBe(false);
+    expect(topicViewerPageComponent.practiceTabIsDisplayed).toBe(true);
+  }));
 
-  it('should set story tab correctly', function() {
-    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      topicName);
-    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+  it('should set story tab correctly', fakeAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment);
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(UrlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicName}/story`);
-    ctrl.$onInit();
-    expect(ctrl.activeTab).toBe('story');
-  });
+    spyOn(urlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicUrlFragment}/story`);
+    topicViewerPageComponent.ngOnInit();
+    var req = httpTestingController.expectOne(
+      `/topic_data_handler/math/${topicUrlFragment}`);
+    req.flush(topicDict);
+    flushMicrotasks();
+    expect(topicViewerPageComponent.activeTab).toBe('story');
+  }));
 
-  it('should set revision tab correctly', function() {
-    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      topicName);
-    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+  it('should set revision tab correctly', fakeAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment);
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(UrlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicName}/revision`);
-    ctrl.$onInit();
-    expect(ctrl.activeTab).toBe('subtopics');
-  });
+    spyOn(urlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicUrlFragment}/revision`);
+    topicViewerPageComponent.ngOnInit();
+    var req = httpTestingController.expectOne(
+      `/topic_data_handler/math/${topicUrlFragment}`);
+    req.flush(topicDict);
+    expect(topicViewerPageComponent.activeTab).toBe('subtopics');
+  }));
 
-  it('should set practice tab correctly', function() {
-    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      topicName);
-    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+  it('should set practice tab correctly', fakeAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment);
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(UrlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicName}/practice`);
-    ctrl.$onInit();
-    expect(ctrl.activeTab).toBe('practice');
-  });
-
-  it('should switch to info tab if practice tab is hidden', function() {
-    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      topicName);
-    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'math');
-    spyOn(UrlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicName}/practice`);
-    var topicDataObject = (
-      ReadOnlyTopicObjectFactory.createFromBackendDict({
-        topic_id: '1',
-        topic_name: 'Topic Name',
-        topic_description: 'Topic Description',
-        canonical_story_dicts: [{
-          id: '2',
-          title: 'Story Title',
-          node_titles: ['Node title 1', 'Node title 2'],
-          thumbnail_filename: '',
-          thumbnail_bg_color: '',
-          description: 'Story Description',
-          story_is_published: true
-        }],
-        additional_story_dicts: [],
-        uncategorized_skill_ids: [],
-        subtopics: [],
-        degrees_of_mastery: {},
-        skill_descriptions: {},
-        train_tab_should_be_displayed: false
-      }));
-    spyOn(TopicViewerBackendApiService, 'fetchTopicData').and.returnValue(
-      $q.resolve(topicDataObject));
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-
-    ctrl.$onInit();
-
-    expect(ctrl.canonicalStorySummaries).toEqual([]);
-    expect(ctrl.activeTab).toBe('practice');
-    $scope.$apply();
-
-    expect(ctrl.trainTabShouldBeDisplayed).toBe(false);
-    expect(ctrl.activeTab).toBe('info');
-  });
+    spyOn(urlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicUrlFragment}/practice`);
+    topicViewerPageComponent.ngOnInit();
+    var req = httpTestingController.expectOne(
+      `/topic_data_handler/math/${topicUrlFragment}`);
+    req.flush(topicDict);
+    expect(topicViewerPageComponent.activeTab).toBe('practice');
+  }));
 
   it('should use reject handler when fetching subtopic data fails',
-    function() {
-      spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-        topicName);
+    fakeAsync(() => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        topicUrlFragment);
       spyOn(
-        UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+        urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
         'math');
-      spyOn(TopicViewerBackendApiService, 'fetchTopicData').and
-        .returnValue(
-          $q.reject({
-            status: 404
-          }));
-      spyOn(AlertsService, 'addWarning').and.callThrough();
+      spyOn(alertsService, 'addWarning').and.callThrough();
 
-      ctrl.$onInit();
-      $scope.$apply();
+      topicViewerPageComponent.ngOnInit();
+      let req = httpTestingController.expectOne(
+        `/topic_data_handler/math/${topicUrlFragment}`);
+      let errorObject = { status: 404, statusText: 'Not Found' };
+      req.flush({ error: errorObject }, errorObject);
+      flushMicrotasks();
 
-      expect(AlertsService.addWarning).toHaveBeenCalledWith(
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get dashboard data');
-    });
+    }));
 
-  it('should get static image url', function() {
+  it('should get static image url', () => {
     var imagePath = '/path/to/image.png';
-    var staticImageUrl = ctrl.getStaticImageUrl(imagePath);
+    var staticImageUrl = topicViewerPageComponent.getStaticImageUrl(imagePath);
 
     expect(staticImageUrl).toBe('/assets/images/path/to/image.png');
   });
 
-  it('should check if the view is mobile or not', function() {
-    var widthSpy = spyOn(WindowDimensionsService, 'getWidth');
+  it('should check if the view is mobile or not', () => {
+    var widthSpy = spyOn(windowDimensionsService, 'getWidth');
     widthSpy.and.returnValue(400);
-    expect(ctrl.checkMobileView()).toBe(true);
+    expect(topicViewerPageComponent.checkMobileView()).toBe(true);
 
     widthSpy.and.returnValue(700);
-    expect(ctrl.checkMobileView()).toBe(false);
+    expect(topicViewerPageComponent.checkMobileView()).toBe(false);
   });
 });

@@ -21,8 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { EntityContextObjectFactory } from
-  'domain/utilities/EntityContextObjectFactory.ts';
+import { EntityContext } from 'domain/utilities/entity-context.model';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
 
@@ -31,8 +30,7 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class ContextService {
   constructor(
-    private urlService: UrlService,
-    private entityContextObjectFactory: EntityContextObjectFactory) {}
+    private urlService: UrlService) {}
 
   pageContext = null;
   explorationIsLinkedToStory = false;
@@ -41,7 +39,7 @@ export class ContextService {
   questionId = null;
   editorContext = null;
   customEntityContext = null;
-  imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+  imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
     this.editorContext = editorName;
@@ -109,6 +107,10 @@ export class ContextService {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
+        } else if (pathnameArray[i] === 'contributor-dashboard') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
         }
       }
 
@@ -146,17 +148,18 @@ export class ContextService {
   }
 
   isInExplorationContext(): boolean {
-    return (this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
-        this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
   // This function is used in cases where the URL does not specify the
   // correct context for some case. eg: Viewing a skill's concept card on
   // any page via the RTE.
   setCustomEntityContext(entityType: string, entityId: string): void {
-    this.customEntityContext = this.entityContextObjectFactory.create(
+    this.customEntityContext = new EntityContext(
       entityId, entityType);
   }
 
@@ -242,10 +245,11 @@ export class ContextService {
   // Following method helps to know whether exploration editor is
   // in main editing mode or preview mode.
   isInExplorationEditorMode(): boolean {
-    return (this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
-        this.getEditorTabContext() === (
-          ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
+      this.getEditorTabContext() === (
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
   }
 
   isInQuestionPlayerMode(): boolean {
@@ -253,6 +257,12 @@ export class ContextService {
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER ||
         this.questionPlayerIsManuallySet);
+  }
+
+  isInExplorationPlayerPage(): boolean {
+    return (
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
   isInExplorationEditorPage(): boolean {
@@ -263,14 +273,15 @@ export class ContextService {
 
   canAddOrEditComponents(): boolean {
     var currentPageContext = this.getPageContext();
-    var allowedPageContext = [
+    var allowedPageContext: string[] = [
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR,
       ServicesConstants.PAGE_CONTEXT.STORY_EDITOR,
       ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR,
-      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD
+      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD,
+      ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD
     ];
     return (allowedPageContext.includes(currentPageContext));
   }

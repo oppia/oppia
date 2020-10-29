@@ -27,7 +27,7 @@ angular.module('oppia', [
 
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 
@@ -36,12 +36,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
-import { AppConstants } from 'app.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -58,12 +54,15 @@ import { InteractionsExtensionsConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]

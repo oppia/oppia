@@ -32,8 +32,8 @@ angular.module('oppia').component('emailDashboardResultPage', {
         '/emaildashboardtestbulkemailhandler/<query_id>';
 
       var getQueryId = function() {
-        return (WindowRef.nativeWindow.location.pathname
-          .split('/').slice(-1)[0]);
+        return (
+          WindowRef.nativeWindow.location.pathname.split('/').slice(-1)[0]);
       };
 
       var validateEmailSubjectAndBody = function() {

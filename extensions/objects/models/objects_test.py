@@ -762,6 +762,48 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.AlgebraicIdentifier, mappings,
             invalid_values_with_error_messages)
 
+    def test_ratio_validation(self):
+        """Tests objects of type RatioExpression."""
+
+        mappings = [([1, 2], [1, 2]), ([1, 2, 3], [1, 2, 3])]
+
+        invalid_values_with_error_messages = [
+            (None, 'Expected list, received None'),
+            (2, 'Expected list, received 2'),
+            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
+            ('1: 2: 1', r'Expected list, received 1: 2: 1')]
+
+        self.check_normalization(
+            objects.RatioExpression, mappings,
+            invalid_values_with_error_messages)
+
+    def test_set_of_algebraic_identifier_validation(self):
+        """Tests objects of type SetOfAlgebraicIdentifier."""
+
+        mappings = [
+            (['a', 'b', 'gamma'], ['a', 'b', 'gamma']),
+            (['alpha', 'x', 'Pi'], ['alpha', 'x', 'Pi']),
+            (['x', 'Y', 'z'], ['x', 'Y', 'z'])]
+
+        invalid_values_with_error_messages = [
+            ('123', 'Expected list, received 123'),
+            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
+            (3.0, 'Expected list, received 3.0'),
+            (None, 'Expected list, received None'),
+            ([3, 'a'], 'Expected unicode string, received 3'),
+            (
+                ['a', 'a', 'b'],
+                r'Validation failed: is_uniquified \(\{\}\) '
+                r'for object \[\'a\', \'a\', \'b\'\]'),
+            (
+                ['a', 'invalid_identifier', 'b'],
+                'Received invalid_identifier which is not in the allowed '
+                'range of choices')]
+
+        self.check_normalization(
+            objects.SetOfAlgebraicIdentifier, mappings,
+            invalid_values_with_error_messages)
+
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
@@ -773,7 +815,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEqual(count, 48)
+        self.assertEqual(count, 49)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

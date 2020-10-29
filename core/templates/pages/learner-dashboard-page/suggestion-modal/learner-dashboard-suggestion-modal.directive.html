@@ -2,19 +2,19 @@
   <h3 translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></h3>
 </div>
 
-<div class="modal-body">
+<div class="modal-body oppia-learner-dashboard-suggestion-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+    <div class="oppia-suggestion-review-panel-container float-left">
       <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER"></strong>
       <div class="oppia-suggestion-review-panel">
         <div>
           <angular-html-bind ng-if="oldContent" html-data="oldContent">
           </angular-html-bind>
         </div>
-        <div ng-if="!oldContent" style="color: red;" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
+        <div ng-if="!oldContent" class="oppia-no-current-state" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
       </div>
     </div>
-    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+    <div class="oppia-suggestion-review-panel-container float-right">
       <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER"></strong>
       <div class="oppia-suggestion-review-panel">
         <angular-html-bind html-data="newContent">
@@ -22,7 +22,7 @@
       </div>
     </div>
   </section>
-  <div style="margin-top: 20px; margin-left: 10px;">
+  <div class="oppia-dashboard-suggestin-description-text">
     <span translate="I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION"></span>
     <div class="oppia-suggestion-review-panel">
       <angular-html-bind html-data="description">
@@ -34,3 +34,12 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
 </div>
+<style>
+  .oppia-learner-dashboard-suggestion-body .oppia-no-current-state {
+    color: red;
+  }
+  .oppia-learner-dashboard-suggestion-body .oppia-dashboard-suggestin-description-text {
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+</style>

@@ -23,7 +23,8 @@ require(
 angular.module('oppia').controller('QuestionsListSelectSkillModalController', [
   '$controller', '$scope', '$uibModalInstance', 'skillsInSameTopicCount',
   'sortedSkillSummaries',
-  function($controller, $scope, $uibModalInstance, skillsInSameTopicCount,
+  function(
+      $controller, $scope, $uibModalInstance, skillsInSameTopicCount,
       sortedSkillSummaries) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,

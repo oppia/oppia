@@ -28,7 +28,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -37,17 +37,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-
-import { AppConstants } from 'app.constants';
-import { CollectionDomainConstants } from
-  'domain/collection/collection-domain.constants';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
 
 import { CollectionHistoryTabComponent } from
   'pages/collection-editor-page/history-tab/collection-history-tab.component';
@@ -62,6 +51,8 @@ import { CollectionSettingsTabComponent } from
 import { CollectionStatisticsTabComponent } from
   // eslint-disable-next-line max-len
   'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -84,15 +75,15 @@ import { CollectionStatisticsTabComponent } from
     CollectionStatisticsTabComponent,
   ],
   providers: [
-    AppConstants,
-    CollectionDomainConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    CollectionEditorPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]

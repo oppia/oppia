@@ -16,12 +16,12 @@
  * @fileoverview Constants for the statistics domain.
  */
 
-export class StatisticsDomainConstants {
-  public static LEARNER_ACTION_SCHEMA_LATEST_VERSION = 1;
-  public static ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE = 'answer-details';
-  public static PLAYTHROUGH_IMPROVEMENT_TASK_TYPE = 'playthrough';
-  public static FEEDBACK_IMPROVEMENT_TASK_TYPE = 'feedback';
-  public static SUBMIT_LEARNER_ANSWER_DETAILS_URL =
-    '/learneranswerdetailshandler/<entity_type>/<entity_id>';
-  public static SUGGESTION_IMPROVEMENT_TASK_TYPE = 'suggestion';
-}
+export const StatisticsDomainConstants = {
+  LEARNER_ACTION_SCHEMA_LATEST_VERSION: 1,
+  ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE: 'answer-details',
+  PLAYTHROUGH_IMPROVEMENT_TASK_TYPE: 'playthrough',
+  FEEDBACK_IMPROVEMENT_TASK_TYPE: 'feedback',
+  SUBMIT_LEARNER_ANSWER_DETAILS_URL:
+    '/learneranswerdetailshandler/<entity_type>/<entity_id>',
+  SUGGESTION_IMPROVEMENT_TASK_TYPE: 'suggestion',
+} as const;

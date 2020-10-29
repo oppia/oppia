@@ -19,9 +19,7 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
@@ -40,7 +38,7 @@ describe('Subscriptions functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage());
   });
 
-  it('handle subscriptions to creators correctly', async function() {
+  it('should handle subscriptions to creators correctly', async function() {
     // Create two creators.
     await users.createUser(
       'creator1Id@subscriptions.com', 'creator1Idsubscriptions');

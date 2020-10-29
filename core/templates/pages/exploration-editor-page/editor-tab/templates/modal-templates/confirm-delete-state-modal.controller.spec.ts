@@ -37,8 +37,9 @@ describe('Confirm Delete State Modal Controller', function() {
     });
   }));
 
-  it('should evaluate scope variable values correctly', function() {
-    expect($scope.deleteStateWarningText).toBe(
-      'Are you sure you want to delete the card "Introduction"?');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.deleteStateWarningText).toBe(
+        'Are you sure you want to delete the card "Introduction"?');
+    });
 });

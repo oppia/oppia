@@ -23,7 +23,8 @@ require('services/alerts.service.ts');
 angular.module('oppia').factory('ExplorationRightsService', [
   '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
   'ACTIVITY_STATUS_PUBLIC',
-  function($http, AlertsService, ExplorationDataService,
+  function(
+      $http, AlertsService, ExplorationDataService,
       ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC) {
     return {
       init: function(

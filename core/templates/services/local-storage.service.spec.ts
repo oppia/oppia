@@ -18,14 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
 import { LocalStorageService } from 'services/local-storage.service';
 
 describe('LocalStorageService', () => {
   describe('behavior in editor', () => {
     let localStorageService = null;
-    let explorationDraftObjectFactory = null;
     const explorationIdOne = '100';
     const draftChangeListIdOne = 2;
     const changeList = [];
@@ -44,13 +42,9 @@ describe('LocalStorageService', () => {
 
     beforeEach(() => {
       localStorageService = TestBed.get(LocalStorageService);
-      explorationDraftObjectFactory = TestBed.get(
-        ExplorationDraftObjectFactory);
 
-      draftOne = explorationDraftObjectFactory.createFromLocalStorageDict(
-        draftDictOne);
-      draftTwo = explorationDraftObjectFactory.createFromLocalStorageDict(
-        draftDictTwo);
+      draftOne = ExplorationDraft.createFromLocalStorageDict(draftDictOne);
+      draftTwo = ExplorationDraft.createFromLocalStorageDict(draftDictTwo);
     });
 
     it('should verify that storage is available', () => {
@@ -58,10 +52,10 @@ describe('LocalStorageService', () => {
     });
 
     it('should correctly save the draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdOne,
-        changeList, draftChangeListIdOne);
-      localStorageService.saveExplorationDraft(explorationIdTwo,
-        changeList, draftChangeListIdTwo);
+      localStorageService.saveExplorationDraft(
+        explorationIdOne, changeList, draftChangeListIdOne);
+      localStorageService.saveExplorationDraft(
+        explorationIdTwo, changeList, draftChangeListIdTwo);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
       expect(localStorageService.getExplorationDraft(
@@ -69,26 +63,26 @@ describe('LocalStorageService', () => {
     });
 
     it('should correctly change and save a draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdOne,
-        changeList, draftChangeListIdOne);
+      localStorageService.saveExplorationDraft(
+        explorationIdOne, changeList, draftChangeListIdOne);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
 
       const draftChangeListIdOneChanged = 3;
-      const draftOneChanged = explorationDraftObjectFactory
+      const draftOneChanged = ExplorationDraft
         .createFromLocalStorageDict({
           draftChanges: changeList,
           draftChangeListId: draftChangeListIdOneChanged
         });
-      localStorageService.saveExplorationDraft(explorationIdOne,
-        changeList, draftChangeListIdOneChanged);
+      localStorageService.saveExplorationDraft(
+        explorationIdOne, changeList, draftChangeListIdOneChanged);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOneChanged);
     });
 
     it('should correctly remove the draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdTwo,
-        changeList, draftChangeListIdTwo);
+      localStorageService.saveExplorationDraft(
+        explorationIdTwo, changeList, draftChangeListIdTwo);
       localStorageService.removeExplorationDraft(explorationIdTwo);
       expect(localStorageService.getExplorationDraft(
         explorationIdTwo)).toBeNull();

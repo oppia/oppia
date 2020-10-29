@@ -19,10 +19,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage =
@@ -149,7 +146,6 @@ describe('Skill Editor functionality', function() {
   it('should create a question for the skill', async function() {
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.clickCreateQuestionButton();
-    await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Question 1'));
     await explorationEditorMainTab.setInteraction(

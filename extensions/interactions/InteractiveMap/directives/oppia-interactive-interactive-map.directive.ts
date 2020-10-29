@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('interactions/uiLeafletRequires.ts');
+require('third-party-imports/leaflet.import');
 
 require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -136,8 +136,8 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
               )
             );
 
-            $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
-              function() {
+            $scope.$on(
+              'leafletDirectiveMap.interactiveMap.mouseover', function() {
                 if (!ctrl.interactionIsActive) {
                   ctrl.setOverlay();
                 }
@@ -149,8 +149,8 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
                   ctrl.hideOverlay();
                 }
               });
-            $scope.$on('leafletDirectiveMap.interactiveMap.click',
-              function(evt, args) {
+            $scope.$on(
+              'leafletDirectiveMap.interactiveMap.click', function(evt, args) {
                 if (ctrl.interactionIsActive) {
                   var newLat = args.leafletEvent.latlng.lat;
                   var newLng = args.leafletEvent.latlng.lng;

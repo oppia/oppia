@@ -28,13 +28,12 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { ContinueCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('ContinueValidationService', () => {
   let validatorService: ContinueValidationService;
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
@@ -63,7 +62,7 @@ describe('ContinueValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
     customizationArguments = {
       buttonText: {
         value: new SubtitledUnicode('Some Button Text', 'ca_buttonText')

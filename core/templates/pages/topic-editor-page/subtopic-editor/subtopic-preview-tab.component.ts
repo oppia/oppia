@@ -18,16 +18,7 @@
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
-require('domain/topic/topic-update.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/topic/SubtopicPageObjectFactory.ts');
-require('domain/topic/topic-update.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/url.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
@@ -38,16 +29,10 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('subtopicPreviewTab', {
   template: require('./subtopic-preview-tab.component.html'),
   controller: [
-    '$location', '$scope', '$uibModal', 'SubtopicPageObjectFactory',
-    'EntityCreationService', 'TopicEditorStateService',
-    'TopicEditorRoutingService', 'TopicUpdateService',
-    'UndoRedoService', 'UrlInterpolationService', 'UrlService',
+    '$scope', 'TopicEditorRoutingService', 'TopicEditorStateService',
     'WindowDimensionsService',
     function(
-        $location, $scope, $uibModal, SubtopicPageObjectFactory,
-        EntityCreationService, TopicEditorStateService,
-        TopicEditorRoutingService, TopicUpdateService,
-        UndoRedoService, UrlInterpolationService, UrlService,
+        $scope, TopicEditorRoutingService, TopicEditorStateService,
         WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

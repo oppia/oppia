@@ -28,45 +28,46 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { AdminFeaturesTabComponent } from
+  'pages/admin-page/features-tab/admin-features-tab.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
     BrowserModule,
+    FormsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    AdminFeaturesTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    AdminFeaturesTabComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    AdminPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]

@@ -23,13 +23,14 @@ import { Injectable } from '@angular/core';
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { StorySummaryBackendDict, StorySummary } from
-  'domain/story/StorySummaryObjectFactory';
+  'domain/story/story-summary.model';
 import {
   SkillIdToDescriptionMap,
   SubtopicBackendDict,
   Subtopic,
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
+import { StoryNode } from 'domain/story/story-node.model';
 
 export interface DegreesOfMastery {
   [skillId: string]: number | null;
@@ -45,7 +46,8 @@ export interface ReadOnlyTopicBackendDict {
   'topic_name': string;
   'topic_id': string;
   'topic_description': string;
-  'train_tab_should_be_displayed': boolean;
+  'practice_tab_is_displayed': boolean;
+  'meta_tag_content': string;
 }
 
 export class ReadOnlyTopic {
@@ -58,7 +60,8 @@ export class ReadOnlyTopic {
   _subtopics: Subtopic[];
   _degreesOfMastery: DegreesOfMastery;
   _skillDescriptions: SkillIdToDescriptionMap;
-  _trainTabShouldBeDisplayed: boolean;
+  _practiceTabIsDisplayed: boolean;
+  _metaTagContent: string;
 
   constructor(
       topicName: string, topicId: string, topicDescription: string,
@@ -68,7 +71,8 @@ export class ReadOnlyTopic {
       subtopics: Subtopic[],
       degreesOfMastery: DegreesOfMastery,
       skillDescriptions: SkillIdToDescriptionMap,
-      trainTabShouldBeDisplayed: boolean) {
+      practiceTabIsDisplayed: boolean,
+      metaTagContent: string) {
     this._topicName = topicName;
     this._topicId = topicId;
     this._topicDescription = topicDescription;
@@ -78,7 +82,8 @@ export class ReadOnlyTopic {
     this._subtopics = subtopics;
     this._degreesOfMastery = degreesOfMastery;
     this._skillDescriptions = skillDescriptions;
-    this._trainTabShouldBeDisplayed = trainTabShouldBeDisplayed;
+    this._practiceTabIsDisplayed = practiceTabIsDisplayed;
+    this._metaTagContent = metaTagContent;
   }
 
   getTopicName(): string {
@@ -117,8 +122,12 @@ export class ReadOnlyTopic {
     return this._skillDescriptions;
   }
 
-  getTrainTabShouldBeDisplayed(): boolean {
-    return this._trainTabShouldBeDisplayed;
+  getPracticeTabIsDisplayed(): boolean {
+    return this._practiceTabIsDisplayed;
+  }
+
+  getMetaTagContent(): string {
+    return this._metaTagContent;
   }
 }
 
@@ -146,25 +155,36 @@ export class ReadOnlyTopicObjectFactory {
         topicDataDict.skill_descriptions;
     let canonicalStories =
         topicDataDict.canonical_story_dicts.map(storyDict => {
+          let pendingNodes = (
+            storyDict.pending_node_dicts.map(storyNodeDict => {
+              return StoryNode.createFromBackendDict(
+                storyNodeDict);
+            }));
           return new StorySummary(
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment);
+            storyDict.url_fragment, pendingNodes);
         });
     let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
+          let pendingNodes = (
+            storyDict.pending_node_dicts.map(storyNodeDict => {
+              return StoryNode.createFromBackendDict(
+                storyNodeDict);
+            }));
           return new StorySummary(
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment);
+            storyDict.url_fragment, pendingNodes);
         });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,
       topicDataDict.topic_description, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
-      skillDescriptions, topicDataDict.train_tab_should_be_displayed);
+      skillDescriptions, topicDataDict.practice_tab_is_displayed,
+      topicDataDict.meta_tag_content);
   }
 }
 

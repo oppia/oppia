@@ -1,4 +1,4 @@
-name: CI Frontend
+name: Frontend Karma tests
 on:
   push:
     branches:
@@ -21,6 +21,8 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - name: Setup python by installing wheel
+        run: pip install wheel==0.35.0
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.

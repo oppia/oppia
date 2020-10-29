@@ -26,7 +26,7 @@ import { ExplorationPlayerConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface StateStats {
+interface SessionStateStats {
   'total_answers_count': number;
   'useful_feedback_count': number;
   'total_hit_count': number;
@@ -40,7 +40,7 @@ export interface AggregatedStats {
   'num_completions': number;
   'num_actual_starts': number;
   'state_stats_mapping': {
-    [stateName: string]: StateStats
+    [stateName: string]: SessionStateStats
   };
 }
 
@@ -63,7 +63,8 @@ export class StatsReportingBackendApiService {
           exploration_id: explorationId
         });
     } catch (e) {
-      let additionalInfo = ('\nUndefined exploration id error debug logs:' +
+      let additionalInfo = (
+        '\nUndefined exploration id error debug logs:' +
         '\nThe event being recorded: ' + urlIdentifier +
         '\nExploration ID: ' + this.contextService.getExplorationId()
       );
@@ -210,7 +211,7 @@ export class StatsReportingBackendApiService {
   recordAnswerSubmitted(
       answer: string, params: Object, version: number, sessionId: string,
       clientTimeSpentInSecs: number, oldStateName: string,
-      answerGroupIndex: number,
+      answerGroupIndex: number, ruleSpecIndex: number,
       classificationCategorization: string,
       explorationId: string, currentStateName: string, nextExpId: string,
       previousStateName: string, nextStateName: string): Promise<Object> {
@@ -224,16 +225,7 @@ export class StatsReportingBackendApiService {
       client_time_spent_in_secs: clientTimeSpentInSecs,
       old_state_name: oldStateName,
       answer_group_index: answerGroupIndex,
-      // Rules used to be stored in a list of Rules, but have been moved to a
-      // dictionary mapping rule type to a list of rule inputs that share the
-      // same rule type. The AnswerClassificationResult domain object contained
-      // a field named ruleIndex that tracked the index of the rule that was
-      // triggered, and that result was posted to the backend here.
-      // However, now that the structure has changed as a result of PR10246,
-      // (https://github.com/oppia/oppia/pull/10246), rule_spec_index has been
-      // deprecated and will eventually be deleted from the backend in a future
-      // PR.
-      rule_spec_index: null,
+      rule_spec_index: ruleSpecIndex,
       classification_categorization: classificationCategorization
     }).toPromise();
   }

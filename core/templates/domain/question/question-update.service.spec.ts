@@ -20,8 +20,6 @@
 // question-update.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -61,7 +59,6 @@ describe('Question update service', function() {
   var StateObjectFactory = null;
   var subtitledHtmlObjectFactory = null;
   var sampleQuestion = null;
-  var sampleStateTwo = null;
   var sampleStateDict = null;
   var expectedOutputStateDict = null;
   var expectedOutputState = null;
@@ -73,7 +70,6 @@ describe('Question update service', function() {
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
         new RuleObjectFactory()));
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
@@ -124,14 +120,10 @@ describe('Question update service', function() {
       param_changes: [],
       interaction: {
         answer_groups: [{
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Contains: [
-              {
-                x: 'hola'
-              }
-            ]
-          },
+          rule_specs: [{
+            rule_type: 'Contains',
+            inputs: {x: 'hola'}
+          }],
           outcome: {
             dest: 'Me Llamo',
             feedback: {
@@ -186,14 +178,10 @@ describe('Question update service', function() {
       param_changes: [],
       interaction: {
         answer_groups: [{
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Contains: [
-              {
-                x: 'hola'
-              }
-            ]
-          },
+          rule_specs: [{
+            rule_type: 'Contains',
+            inputs: {x: 'hola'}
+          }],
           outcome: {
             dest: 'Me Llamo',
             feedback: {

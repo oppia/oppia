@@ -9,9 +9,20 @@
   }
   feedback-popup label {
     font-weight: normal;
-}
+  }
+  feedback-popup .oppia-feedback-popup-container {
+    min-width: 200px;
+  }
+  feedback-popup .oppia-exploration-feedback-submit-btn {
+    margin-top: 6px;
+    z-index: 30;
+  }
+  feedback-popup .oppia-checkbox {
+    font-size: 0.9em;
+    margin: 12px 0 4px 0;
+  }
 </style>
-<div style="min-width: 200px;">
+<div class="oppia-feedback-popup-container">
   <div ng-show="!feedbackSubmitted">
     <button type="button" class="oppia-close-popover-button protractor-test-exploration-feedback-close-button" ng-click="closePopover()">
       <i class="material-icons md-18">&#xE5CD;</i>
@@ -25,13 +36,13 @@
     </div>
 
     <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
-    <md-button class="float-right protractor-test-exploration-feedback-submit-btn"
-               ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;"
+    <md-button class="float-right oppia-exploration-feedback-submit-btn protractor-test-exploration-feedback-submit-btn"
+               ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}"
                ng-click="saveFeedback()"
                ng-disabled="!feedbackText"
                translate="I18N_PLAYER_SUBMIT_BUTTON">
     </md-button>
-    <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
+    <div class="checkbox oppia-checkbox" ng-show="isLoggedIn">
       <label>
         <input type="checkbox" ng-model="isSubmitterAnonymized">
         <span translate="I18N_PLAYER_STAY_ANONYMOUS"></span>

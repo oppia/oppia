@@ -120,6 +120,9 @@ def _save_multi_exploration_opportunity_summary(
 
         exploration_opportunity_summary_model_list.append(model)
 
+    (
+        opportunity_models.ExplorationOpportunitySummaryModel
+        .update_timestamps_multi(exploration_opportunity_summary_model_list))
     opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
         exploration_opportunity_summary_model_list)
 
@@ -190,8 +193,62 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     """
     story = story_fetchers.get_story_by_id(story_id)
     topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
-    explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
+    _create_exploration_opportunities(story, topic, exp_ids)
 
+
+def create_exploration_opportunities_for_story(story_id, topic_id):
+    """Creates exploration opportunities corresponding to the supplied published
+    story ID iff the topic linked to the story is published.
+
+    Args:
+        story_id: str. The ID of the story domain object.
+        topic_id: str. The ID of the topic domain object corresponding to the
+            supplied story.
+
+    Raises:
+        Exception. A topic with the given ID doesn't exist.
+        Exception. The topic rights could not be found.
+    """
+    story = story_fetchers.get_story_by_id(story_id)
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    topic_rights = topic_fetchers.get_topic_rights(topic.id)
+    if topic_rights.topic_is_published:
+        exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+        _create_exploration_opportunities(story, topic, exp_ids_in_story)
+
+
+def create_exploration_opportunities_for_topic(topic_id):
+    """Creates exploration opportunities corresponding to each of the supplied
+    published topic's published stories.
+
+    Args:
+        topic_id: str. The ID of the topic domain object.
+    """
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    for story_reference in topic.get_all_story_references():
+        if not story_reference.story_is_published:
+            continue
+        story = story_fetchers.get_story_by_id(
+            story_reference.story_id, strict=False)
+        if story is not None:
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            _create_exploration_opportunities(story, topic, exp_ids_in_story)
+
+
+def _create_exploration_opportunities(story, topic, exp_ids):
+    """Creates new exploration opportunities corresponding to the supplied
+    story, topic, and exploration IDs.
+
+    Args:
+        story: Story. The story domain object corresponding to the exploration
+            opportunities.
+        topic: Topic. The topic domain object corresponding to the exploration
+            opportunities.
+        exp_ids: list(str). A list of exploration ids for which new
+            opportunities are to be created. All exp_ids must be part of the
+            given story.
+    """
+    explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
     exploration_opportunity_summary_list = []
     for exploration in explorations.values():
         exploration_opportunity_summary_list.append(
@@ -316,8 +373,11 @@ def delete_exploration_opportunities(exp_ids):
     exp_opportunity_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(
             exp_ids))
+    exp_opportunity_models_to_be_deleted = [
+        model for model in exp_opportunity_models
+        if model is not None]
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
-        exp_opportunity_models)
+        exp_opportunity_models_to_be_deleted)
 
 
 def delete_exploration_opportunities_corresponding_to_topic(topic_id):
@@ -332,6 +392,23 @@ def delete_exploration_opportunities_corresponding_to_topic(topic_id):
             topic_id))
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
         exp_opportunity_models)
+
+
+def get_exploration_opportunity_ids_corresponding_to_topic(topic_id):
+    """Returns the exploration IDs corresponding to the
+    ExplorationOpportunitySummaryModels that are associated with the supplied
+    topic ID.
+
+    Args:
+        topic_id: str. The ID of the topic.
+
+    Returns:
+        list(str). The exploration IDs.
+    """
+    exp_opportunity_models = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+            topic_id))
+    return [model.id for model in exp_opportunity_models if model is not None]
 
 
 def update_exploration_opportunities(old_story, new_story):
@@ -437,30 +514,25 @@ def get_voiceover_opportunities(language_code, cursor):
 
 
 def get_exploration_opportunity_summaries_by_ids(ids):
-    """Returns a list of ExplorationOpportunitySummary objects corresponding to
-    the given list of ids.
+    """Returns a dict with key as id and value representing
+    ExplorationOpportunitySummary objects corresponding to the opportunity id.
 
     Args:
         ids: list(str). A list of opportunity ids.
 
     Returns:
-        list(ExplorationOpportunitySummary). A list of
-        ExplorationOpportunitySummary domain objects corresponding to the
-        supplied ids.
+        dict(str, ExplorationOpportunitySummary|None). A dict with key as the
+        opportunity id and values representing the ExplorationOpportunitySummary
+        domain objects corresponding to the opportunity id if exist else None.
     """
+    opportunities = {opportunity_id: None for opportunity_id in ids}
     exp_opportunity_summary_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
-    opportunities = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         if exp_opportunity_summary_model is not None:
-            exp_opportunity_summary = (
+            opportunities[exp_opportunity_summary_model.id] = (
                 get_exploration_opportunity_summary_from_model(
                     exp_opportunity_summary_model))
-            opportunities.append(exp_opportunity_summary)
-        else:
-            logging.warning(
-                'When getting the exploration opportunity summary models for '
-                'ids: %s, one of the models was None.' % ids)
     return opportunities
 
 
@@ -542,16 +614,18 @@ def get_skill_opportunities_by_ids(ids):
         ids: list(str). A list of the opportunity ids.
 
     Returns:
-        list(SkillOpportunity). A list of SkillOpportunity domain objects
-        corresponding to the supplied ids.
+        dict(str, SkillOpportunity|None). A dict with key as the
+        opportunity id and values representing the SkillOpportunity
+        domain objects corresponding to the opportunity id if exist else None.
     """
+    opportunities = {opportunity_id: None for opportunity_id in ids}
     skill_opportunity_models = (
         opportunity_models.SkillOpportunityModel.get_multi(ids))
-    opportunities = []
+
     for skill_opportunity_model in skill_opportunity_models:
-        skill_opportunity = (
-            get_skill_opportunity_from_model(skill_opportunity_model))
-        opportunities.append(skill_opportunity)
+        if skill_opportunity_model is not None:
+            opportunities[skill_opportunity_model.id] = (
+                get_skill_opportunity_from_model(skill_opportunity_model))
     return opportunities
 
 
@@ -601,6 +675,8 @@ def _save_skill_opportunities(skill_opportunities):
             question_count=skill_opportunity.question_count,
         )
         skill_opportunity_models.append(model)
+    opportunity_models.SkillOpportunityModel.update_timestamps_multi(
+        skill_opportunity_models)
     opportunity_models.SkillOpportunityModel.put_multi(skill_opportunity_models)
 
 

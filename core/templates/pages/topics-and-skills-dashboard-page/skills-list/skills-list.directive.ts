@@ -74,11 +74,11 @@ angular.module('oppia').directive('skillsList', [
         'skills-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', '$rootScope', '$timeout',
+        '$rootScope', '$scope', '$timeout', '$uibModal',
         'EditableTopicBackendApiService', 'SkillBackendApiService',
         'TopicsAndSkillsDashboardBackendApiService',
         function(
-            $scope, $uibModal, $rootScope, $timeout,
+            $rootScope, $scope, $timeout, $uibModal,
             EditableTopicBackendApiService, SkillBackendApiService,
             TopicsAndSkillsDashboardBackendApiService) {
           var ctrl = this;
@@ -102,15 +102,16 @@ angular.module('oppia').directive('skillsList', [
               },
               windowClass: 'delete-skill-modal',
               controller: 'DeleteSkillModalController'
-            }).result.then(function() {
+            }).result.then(() => {
               SkillBackendApiService.deleteSkill(skillId).then(
-                function(status) {
-                  $timeout(function() {
+                () => {
+                  setTimeout(() => {
                     TopicsAndSkillsDashboardBackendApiService.
                       onTopicsAndSkillsDashboardReinitialized.emit();
                     var successToast = 'The skill has been deleted.';
                     AlertsService.addSuccessMessage(successToast, 1000);
                   }, 100);
+                  $rootScope.$apply();
                 }
               );
             }, function() {

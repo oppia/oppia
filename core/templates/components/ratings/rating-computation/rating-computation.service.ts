@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationRatings } from
-  'domain/summary/learner-exploration-summary-object.factory';
+  'domain/summary/learner-exploration-summary.model';
 
 @Injectable({
   providedIn: 'root'

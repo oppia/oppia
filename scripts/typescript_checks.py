@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import json
 import os
 import shutil
@@ -26,8 +27,21 @@ import sys
 import python_utils
 from . import common
 
+_PARSER = argparse.ArgumentParser(
+    description="""
+Run the script from the oppia root folder:
+    python -m scripts.typescript_checks
+Note that the root folder MUST be named 'oppia'.
+""")
+
+_PARSER.add_argument(
+    '--strict_checks',
+    help='optional; if specified, compiles typescript using strict config.',
+    action='store_true')
+
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
+STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 
 
 def validate_compiled_js_dir():
@@ -41,8 +55,13 @@ def validate_compiled_js_dir():
             'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
-def compile_and_check_typescript():
-    """Compiles typescript files and checks the compilation errors."""
+def compile_and_check_typescript(config_path):
+    """Compiles typescript files and checks the compilation errors.
+
+    Args:
+        config_path: str. The config that should be used to run the typescript
+            checks.
+    """
     node_path = common.NODE_PATH
     os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
@@ -54,11 +73,12 @@ def compile_and_check_typescript():
     python_utils.PRINT('Compiling and testing typescript...')
     cmd = [
         './node_modules/typescript/bin/tsc', '--project',
-        TSCONFIG_FILEPATH]
+        config_path]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     error_messages = []
     for line in iter(process.stdout.readline, ''):
-        error_messages.append(line)
+        if not line.startswith('node_modules'):
+            error_messages.append(line)
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
     if error_messages:
@@ -70,7 +90,17 @@ def compile_and_check_typescript():
         python_utils.PRINT('Compilation successful!')
 
 
+def main(args=None):
+    """Run the typescript checks."""
+
+    parsed_args = _PARSER.parse_args(args=args)
+    compile_and_check_typescript(
+        STRICT_TSCONFIG_FILEPATH
+        if parsed_args.strict_checks else
+        TSCONFIG_FILEPATH)
+
+
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when typescript_checks.py is used as a script.
 if __name__ == '__main__':  # pragma: no cover
-    compile_and_check_typescript()
+    main()

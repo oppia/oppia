@@ -2,7 +2,7 @@
   <span class="protractor-test-state-name-container">
     <span ng-if="$ctrl.EditabilityService.isEditable()">
       <span ng-if="!$ctrl.StateNameService.isStateNameEditorShown()" ng-click="$ctrl.openStateNameEditor()" class="oppia-editable-section">
-        <strong style="font-size: 1.2em;"><[$ctrl.StateEditorService.getActiveStateName()]></strong>
+        <strong class="oppia-state-name-text"><[$ctrl.StateEditorService.getActiveStateName()]></strong>
         <i ng-if="$ctrl.EditabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
            title="Edit State Name">&#xE254;
         </i>
@@ -21,3 +21,8 @@
     </span>
   </span>
 </div>
+<style>
+  state-name-editor .oppia-state-name-text {
+    font-size: 1.2em;
+  }
+</style>

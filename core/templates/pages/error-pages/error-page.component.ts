@@ -43,7 +43,7 @@ export class ErrorPageComponent implements OnInit {
   }
 
   getStatusCode(): number {
-    return +this.statusCode;
+    return Number(this.statusCode);
   }
 }
 

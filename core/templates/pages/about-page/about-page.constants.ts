@@ -16,13 +16,13 @@
  * @fileoverview Constants for the Oppia about page.
  */
 
-export class AboutPageConstants {
+export const AboutPageConstants = {
   // These credits should not be changed directly. If any change is
   // made to structure/formatting, the respective constants
   // CREDITS_START_LINE, CREDITS_END_LINE and CREDITS_INDENT should be
   // updated in update_changelog_and_credits.py file. If the patterns do
   // not match, update_changelog_and_credits_test will fail.
-  public static CREDITS_CONSTANTS = [
+  CREDITS_CONSTANTS: [
     'Aadya Mishra',
     'Aaron Zuspan',
     'Aashish Gaba',
@@ -42,9 +42,11 @@ export class AboutPageConstants {
     'Adarsh Kumar',
     'Aditya Jain',
     'Adrija Acharyya',
+    'Aishwary Saxena',
     'Ajay Sharma',
     'Ajo John',
     'Akshay Anand',
+    'Akshay Nandwana',
     'Alex Gower',
     'Alex Lee',
     'Alexandra Wu',
@@ -66,11 +68,13 @@ export class AboutPageConstants {
     'Anthony Alridge',
     'Anthony Zheng',
     'Anubhav Sinha',
+    'Anumeha Agrawal',
     'Anurag Thakur',
     'Apurv Bajaj',
     'Areesha Tariq',
     'Arnesh Agrawal',
     'Arpan Banerjee',
+    'Arpit Bandejiya',
     'Arun Kumar',
     'Arunabh Ghosh',
     'Ashish Verma',
@@ -113,6 +117,7 @@ export class AboutPageConstants {
     'Domenico Vitarella',
     'Edward Allison',
     'Elizabeth Kemp',
+    'Emily Glue',
     'Eric Lou',
     'Eric Yang',
     'Estelle Lee',
@@ -154,6 +159,7 @@ export class AboutPageConstants {
     'Jenna Mandel',
     'Jeremy Emerson',
     'Jerry Chen',
+    'Jiazhi Chen',
     'Jim Zhan',
     'John Glennon',
     'John Prince Mesape',
@@ -168,6 +174,7 @@ export class AboutPageConstants {
     'Justin Du',
     'Jérôme',
     'K.N. Anantha Nandanan',
+    'Kajol Kumari',
     'Karen Rustad',
     'Kartikey Pandey',
     'Kashif Jamal Soofi',
@@ -193,6 +200,7 @@ export class AboutPageConstants {
     'Lakshay Angrish',
     'Laura Kinkead',
     'Lorrany Azevedo',
+    'Lucklita Theng',
     'Luis Ulloa',
     'Lunrong Chen',
     'Madhav Sainanee',
@@ -250,6 +258,7 @@ export class AboutPageConstants {
     'Prayush Dawda',
     'Pulkit Aggarwal',
     'Pulkit Gera',
+    'Purhan',
     'Rafay Ghafoor',
     'Rafał Kaszuba',
     'Rahul Gurung',
@@ -275,6 +284,7 @@ export class AboutPageConstants {
     'Rohit Katlaa',
     'Ross Strader',
     'Rudra Sadhu',
+    'Rémi Gourdon',
     'Sachin Gopal',
     'Saeed Jassani',
     'Safwan Mansuri',
@@ -295,6 +305,7 @@ export class AboutPageConstants {
     'Satyam Bhalla',
     'Satyam Yadav',
     'Saurav Pratihar',
+    'Savitha K Jayasankar',
     'Scott Brenner',
     'Scott Junner',
     'Scott Roberts',
@@ -314,6 +325,7 @@ export class AboutPageConstants {
     'Shivansh Dhiman',
     'Shivansh Rakesh',
     'Shouvik Roy',
+    'Shruti Grover',
     'Shruti Satish',
     'Shubha Gupta',
     'Shubha Rajan',
@@ -322,6 +334,7 @@ export class AboutPageConstants {
     'Siddhant Khandelwal',
     'Siddhant Srivastav',
     'Siddharth Batra',
+    'Simran Mahindrakar',
     'Soumyo Dey',
     'Sourab Jha',
     'Sourav Badami',
@@ -390,5 +403,5 @@ export class AboutPageConstants {
     'Zachery Vekovius',
     'Zhu Chu',
     'Zoe Madden-Wood',
-  ];
-}
+  ]
+} as const;

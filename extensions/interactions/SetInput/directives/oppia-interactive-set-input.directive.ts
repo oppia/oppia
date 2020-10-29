@@ -36,11 +36,11 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
       template: require('./set-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$translate', 'SetInputRulesService',
-        'CurrentInteractionService',
+        '$attrs', '$translate', 'CurrentInteractionService',
+        'SetInputRulesService',
         function(
-            $attrs, $translate, SetInputRulesService,
-            CurrentInteractionService) {
+            $attrs, $translate, CurrentInteractionService,
+            SetInputRulesService) {
           var ctrl = this;
           var hasDuplicates = function(answer) {
             for (var i = 0; i < answer.length; i++) {
@@ -71,8 +71,8 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
           };
 
           ctrl.isAnswerValid = function() {
-            return (ctrl.answer.length > 0 &&
-              !hasBlankOption(ctrl.answer));
+            return (
+              ctrl.answer.length > 0 && !hasBlankOption(ctrl.answer));
           };
 
           var submitAnswerFn = function() {

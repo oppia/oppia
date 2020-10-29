@@ -104,7 +104,7 @@ export class NumberWithUnits {
     return numberWithUnitsString;
   }
 
-  toDict() {
+  toDict(): NumberWithUnitsAnswer {
     return {
       type: this.type,
       real: this.real,
@@ -121,7 +121,7 @@ export class NumberWithUnitsObjectFactory {
   constructor(
     private unitsFactory: UnitsObjectFactory,
     private fractionFactory: FractionObjectFactory) {}
-  createCurrencyUnits() {
+  createCurrencyUnits(): void {
     try {
       this.unitsFactory.createCurrencyUnits();
     } catch (parsingError) {}
@@ -135,7 +135,6 @@ export class NumberWithUnitsObjectFactory {
     var fractionObj = this.fractionFactory.fromRawInputString('0/1');
     var units = '';
     var value = '';
-    var unitObj = [];
 
     // Allow validation only when rawInput is not null or an empty string.
     if (rawInput !== '' && rawInput !== null) {

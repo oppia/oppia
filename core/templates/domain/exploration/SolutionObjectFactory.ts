@@ -20,8 +20,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import {
+  CapitalizePipe
+} from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe.ts';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -36,7 +40,6 @@ import {
   FractionAnswer,
   InteractionAnswer,
   LogicProofAnswer,
-  MathExpressionAnswer,
   NumberWithUnitsAnswer,
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
@@ -51,6 +54,11 @@ export interface SolutionBackendDict {
   'answer_is_exclusive': boolean;
   'correct_answer': InteractionAnswer;
   'explanation': ExplanationBackendDict;
+}
+
+interface ShortAnswerResponse {
+  prefix: string;
+  answer: string;
 }
 
 export class Solution {
@@ -85,8 +93,6 @@ export class Solution {
     var correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
-    } else if (interactionId === 'MathExpressionInput') {
-      correctAnswer = (<MathExpressionAnswer> this.correctAnswer).latex;
     } else if (interactionId === 'CodeRepl' ||
       interactionId === 'PencilCodeEditor') {
       correctAnswer = (<PencilCodeEditorAnswer> this.correctAnswer).code;
@@ -101,6 +107,18 @@ export class Solution {
       correctAnswer = (new NumberWithUnitsObjectFactory(
         new UnitsObjectFactory(), new FractionObjectFactory())).fromDict(
         <NumberWithUnitsAnswer> this.correctAnswer).toString();
+    } else if (interactionId === 'DragAndDropSortInput') {
+      let formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
+      correctAnswer = [];
+      for (let arr of this.correctAnswer) {
+        let transformedArray = [];
+        for (let elem of arr) {
+          transformedArray.push(formatRtePreview.transform(elem));
+        }
+        correctAnswer.push(transformedArray);
+      }
+      correctAnswer = JSON.stringify(correctAnswer);
+      correctAnswer = correctAnswer.replace(/"/g, '');
     } else {
       correctAnswer = (
         (new HtmlEscaperService(new LoggerService())).objToEscapedJson(
@@ -121,7 +139,8 @@ export class Solution {
     this.explanation = explanation;
   }
 
-  getOppiaShortAnswerResponseHtml(interaction: Interaction) {
+  getOppiaShortAnswerResponseHtml(interaction: Interaction):
+  ShortAnswerResponse {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
       answer: this.ehfs.getShortAnswerHtml(

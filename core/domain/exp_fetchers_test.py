@@ -344,6 +344,7 @@ title: Old Title
             contributor_ids=[],
             contributors_summary={},
         )
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
     def test_converts_exp_model_with_default_states_schema_version(self):
@@ -431,7 +432,7 @@ title: Old Title
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the latest version of the exploration has the most up-to-date
         # states schema version.
@@ -654,9 +655,9 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'MathEquationInput')
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs, {
-                'MatchesExactlyWith': [{'x': 'x=y', 'y': 'both'}]
-            })
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
 
         answer_groups_2 = [{
             'outcome': {
@@ -765,10 +766,11 @@ title: Old Title
         self.assertEqual(
             exploration.states['Introduction'].interaction.id,
             'AlgebraicExpressionInput')
+        self.assertEqual(len(answer_groups[0].rule_specs), 1)
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs, {
-                'MatchesExactlyWith': [{'x': 'x+y'}]
-            })
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
 
         answer_groups_3 = [{
             'outcome': {
@@ -862,10 +864,11 @@ title: Old Title
         self.assertEqual(
             exploration.states['Introduction'].interaction.id,
             'NumericExpressionInput')
+        self.assertEqual(len(answer_groups[0].rule_specs), 1)
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs, {
-                'MatchesExactlyWith': [{'x': '1.2 + 3'}]
-            })
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': '1.2 + 3'})
 
         answer_groups_4 = [{
             'outcome': {
@@ -972,10 +975,11 @@ title: Old Title
         self.assertEqual(
             exploration.states['Introduction'].interaction.id,
             'AlgebraicExpressionInput')
+        self.assertEqual(len(answer_groups), 1)
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs, {
-                'MatchesExactlyWith': [{'x': 'x+y'}]
-            })
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
         self.assertEqual(sorted(exploration.states[
             'Introduction'].recorded_voiceovers.voiceovers_mapping.keys()), [
                 'content_1', 'feedback_1', 'feedback_3'])

@@ -25,7 +25,7 @@ import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from
-  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+  'domain/opportunity/featured-translation-language.model';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
 @Component({
@@ -52,7 +52,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     private languageUtilService: LanguageUtilService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.options = this.languageUtilService
       .getAllVoiceoverLanguageCodes().map(languageCode => {
         const description = this.languageUtilService
@@ -68,16 +68,16 @@ export class TranslationLanguageSelectorComponent implements OnInit {
       });
   }
 
-  toggleDropdown() {
+  toggleDropdown(): void {
     this.dropdownShown = !this.dropdownShown;
   }
 
-  selectOption(activeLanguageCode: string) {
+  selectOption(activeLanguageCode: string): void {
     this.setActiveLanguageCode.emit(activeLanguageCode);
     this.dropdownShown = false;
   }
 
-  showExplanationPopup(index: number) {
+  showExplanationPopup(index: number): void {
     /**
      * Align popup to mouse-overed info icon.
      * 75: approximate height of selector and featured languages label.
@@ -89,7 +89,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.explanationPopupShown = true;
   }
 
-  hideExplanationPopup() {
+  hideExplanationPopup(): void {
     this.explanationPopupShown = false;
   }
 

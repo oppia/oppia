@@ -18,8 +18,9 @@
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/pending-account-deletion-page/' +
-        'pending-account-deletion-page.module.ts');
+require(
+  'pages/pending-account-deletion-page/' +
+  'pending-account-deletion-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 

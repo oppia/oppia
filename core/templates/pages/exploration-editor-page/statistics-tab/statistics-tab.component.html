@@ -5,12 +5,12 @@
         <h3>Exploration Completion Rate</h3>
         <pie-chart data="pieChartData" options="pieChartOptions">
         </pie-chart>
-        <p style="text-align: center;">
+        <p class="text-center">
           <span ng-if="numPassersby"
-                style="font-weight: bold;" class="protractor-test-num-passersby">
+                class="protractor-test-num-passersby font-weight-bold">
             <[numPassersby]> learners browsed this exploration. They left before reaching the second card.
           </span>
-          <span ng-if="!numPassersby" style="font-weight: bold;">
+          <span ng-if="!numPassersby" class="font-weight-bold">
             No learners have browsed this exploration yet.
           </span>
         </p>

@@ -20,6 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+const constants = require('constants.ts');
+
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 // This makes the UrlParamsType like a dict whose keys and values both are
@@ -60,7 +62,7 @@ export class UrlService {
   https://github.com/oppia/oppia/pull/7834#issuecomment-547896982 */
   getUrlParams(): UrlParamsType {
     let params = {};
-    let parts = this.getCurrentQueryString().replace(
+    this.getCurrentQueryString().replace(
       /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         return params[decodeURIComponent(key)] = decodeURIComponent(value);
       }
@@ -115,12 +117,26 @@ export class UrlService {
 
   getStoryUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
+    // The following segment is for getting the fragment from the new learner
+    // pages.
     if (
       pathname.startsWith('/learn') &&
       pathname.match(/\/story\/|\/review-test\//g)) {
       return decodeURIComponent(pathname.split('/')[5]);
     }
-    throw new Error('Invalid URL for story');
+    // The following section is for getting the URL fragment from the
+    // exploration player.
+    if (pathname.startsWith('/explore')) {
+      if (
+        this.getUrlParams().hasOwnProperty('story_url_fragment') &&
+        this.getUrlParams().story_url_fragment.match(
+          constants.VALID_URL_FRAGMENT_REGEX)) {
+        return this.getUrlParams().story_url_fragment;
+      }
+    }
+    // Shouldn't throw an error, since this is called whenever an exploration
+    // starts, to check if it is linked to a story.
+    return null;
   }
 
   getSubtopicUrlFragmentFromLearnerUrl(): string {
@@ -209,23 +225,6 @@ export class UrlService {
       return pathname.split('/')[5];
     }
     throw new Error('Invalid story id url');
-  }
-
-
-  /**
-   * This function is used to find the story id from the player.
-   * @return {string} the story id if the id exists.
-   */
-  getStoryIdInPlayer(): string | null {
-    let query = this.getCurrentQueryString();
-    let queryItems = query.split('&');
-    for (let i = 0; i < queryItems.length; i++) {
-      let part = queryItems[i];
-      if (part.match(/\?story_id=((\w|-){12})/g)) {
-        return part.split('=')[1];
-      }
-    }
-    return null;
   }
 
   /**

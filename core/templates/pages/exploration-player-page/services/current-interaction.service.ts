@@ -27,10 +27,18 @@ import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+
+interface InteractionRulesService {
+  [ruleName: string]: (
+    answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
+}
 
 type SubmitAnswerFn = () => void;
 
-type OnSubmitFn = (answer: string, interactionRulesService) => void;
+type OnSubmitFn = (
+  answer: string, interactionRulesService: InteractionRulesService) => void;
 
 type ValidityCheckFn = () => boolean;
 
@@ -89,7 +97,8 @@ export class CurrentInteractionService {
      */
     CurrentInteractionService.presubmitHooks = [];
   }
-  onSubmit(answer: string, interactionRulesService): void {
+  onSubmit(
+      answer: string, interactionRulesService: InteractionRulesService): void {
     for (
       let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
       CurrentInteractionService.presubmitHooks[i]();
@@ -103,7 +112,8 @@ export class CurrentInteractionService {
     if (CurrentInteractionService.submitAnswerFn === null) {
       let index = this.playerPositionService.getDisplayedCardIndex();
       let displayedCard = this.playerTranscriptService.getCard(index);
-      let additionalInfo = ('\nUndefined submit answer debug logs:' +
+      let additionalInfo = (
+        '\nUndefined submit answer debug logs:' +
         '\nInteraction ID: ' + displayedCard.getInteractionId() +
         '\nExploration ID: ' + this.contextService.getExplorationId() +
         '\nState Name: ' + displayedCard.getStateName() +

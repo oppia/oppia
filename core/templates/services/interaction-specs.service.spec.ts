@@ -21,119 +21,114 @@ import { TestBed } from '@angular/core/testing';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 
 describe('InteractionSpecsService', () => {
+  let interactionSpecsService: InteractionSpecsService;
+
   beforeEach(() => {
-    this.interactionSpecsService = TestBed.get(InteractionSpecsService);
+    interactionSpecsService = TestBed.get(InteractionSpecsService);
   });
 
   describe('checking whether an interaction can be trained with ML', () => {
     it('should throw an error when interaction does not exist.', () => {
-      expect(() => this.interactionSpecsService.isInteractionTrainable('Fake'))
+      expect(() => interactionSpecsService.isInteractionTrainable('Fake'))
         .toThrowError('Fake is not a valid interaction id');
     });
 
     it('should return false for ImageClickInput', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable('ImageClickInput')
+        interactionSpecsService.isInteractionTrainable('ImageClickInput')
       ).toBeFalse();
     });
 
     it('should return false for NumberWithUnits', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable('NumberWithUnits')
+        interactionSpecsService.isInteractionTrainable('NumberWithUnits')
       ).toBeFalse();
     });
 
     it('should return false for NumericInput', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable('NumericInput')
+        interactionSpecsService.isInteractionTrainable('NumericInput')
       ).toBeFalse();
     });
 
     it('should return false for DragAndDropSortInput', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable(
+        interactionSpecsService.isInteractionTrainable(
           'DragAndDropSortInput')
       ).toBeFalse();
     });
 
     it('should return false for ItemSelectionInput', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable(
+        interactionSpecsService.isInteractionTrainable(
           'ItemSelectionInput')
       ).toBeFalse();
     });
 
     it('should return false for Continue', () => {
-      expect(this.interactionSpecsService.isInteractionTrainable('Continue'))
+      expect(interactionSpecsService.isInteractionTrainable('Continue'))
         .toBeFalse();
     });
 
     it('should return false for GraphInput', () => {
-      expect(this.interactionSpecsService.isInteractionTrainable('GraphInput'))
+      expect(interactionSpecsService.isInteractionTrainable('GraphInput'))
         .toBeFalse();
     });
 
     it('should return false for EndExploration', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable('EndExploration')
+        interactionSpecsService.isInteractionTrainable('EndExploration')
       ).toBeFalse();
     });
 
     it('should return false for SetInput', () => {
-      expect(this.interactionSpecsService.isInteractionTrainable('SetInput'))
+      expect(interactionSpecsService.isInteractionTrainable('SetInput'))
         .toBeFalse();
     });
 
     it('should return true for CodeRepl', () => {
-      expect(this.interactionSpecsService.isInteractionTrainable('CodeRepl'))
+      expect(interactionSpecsService.isInteractionTrainable('CodeRepl'))
         .toBeTrue();
     });
 
     it('should return false for LogicProof', () => {
-      expect(this.interactionSpecsService.isInteractionTrainable('LogicProof'))
+      expect(interactionSpecsService.isInteractionTrainable('LogicProof'))
         .toBeFalse();
     });
 
     it('should return false for MultipleChoiceInput', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable(
+        interactionSpecsService.isInteractionTrainable(
           'MultipleChoiceInput')
       ).toBeFalse();
     });
 
     it('should return false for PencilCodeEditor', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable('PencilCodeEditor')
+        interactionSpecsService.isInteractionTrainable('PencilCodeEditor')
       ).toBeFalse();
     });
 
     it('should return true for TextInput', () => {
-      expect(this.interactionSpecsService.isInteractionTrainable('TextInput'))
+      expect(interactionSpecsService.isInteractionTrainable('TextInput'))
         .toBeTrue();
     });
 
     it('should return false for InteractiveMap', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable('InteractiveMap')
+        interactionSpecsService.isInteractionTrainable('InteractiveMap')
       ).toBeFalse();
     });
 
     it('should return false for MusicNotesInput', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable('MusicNotesInput')
-      ).toBeFalse();
-    });
-
-    it('should return false for MathExpressionInput', () => {
-      expect(
-        this.interactionSpecsService.isInteractionTrainable(
-          'MathExpressionInput')
+        interactionSpecsService.isInteractionTrainable('MusicNotesInput')
       ).toBeFalse();
     });
 
     it('should return false for FractionInput', () => {
       expect(
-        this.interactionSpecsService.isInteractionTrainable('FractionInput')
+        interactionSpecsService.isInteractionTrainable('FractionInput')
       ).toBeFalse();
     });
   });

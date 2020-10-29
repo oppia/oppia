@@ -16,8 +16,6 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-require('domain/collection/collection-node-object.factory.ts');
-require('domain/collection/collection-update.service.ts');
 require('domain/collection/search-explorations-backend-api.service.ts');
 require('domain/summary/exploration-summary-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -41,19 +39,17 @@ angular.module('oppia').directive('collectionNodeCreator', [
         'collection-node-creator.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$window', '$filter', 'AlertsService',
-        'ValidatorsService', 'CollectionEditorStateService',
-        'CollectionLinearizerService', 'CollectionUpdateService',
-        'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+        '$filter', '$http', '$rootScope', 'AlertsService',
+        'CollectionEditorStateService', 'CollectionLinearizerService',
+        'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
-        'INVALID_NAME_CHARS',
+        'ValidatorsService', 'INVALID_NAME_CHARS',
         function(
-            $http, $window, $filter, AlertsService,
-            ValidatorsService, CollectionEditorStateService,
-            CollectionLinearizerService, CollectionUpdateService,
-            CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
+            $filter, $http, $rootScope, AlertsService,
+            CollectionEditorStateService, CollectionLinearizerService,
+            ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
-            INVALID_NAME_CHARS) {
+            ValidatorsService, INVALID_NAME_CHARS) {
           var ctrl = this;
           /**
            * Fetches a list of exploration metadata dicts from backend, given
@@ -111,7 +107,8 @@ angular.module('oppia').directive('collectionNodeCreator', [
 
             ExplorationSummaryBackendApiService
               .loadPublicAndPrivateExplorationSummaries([newExplorationId])
-              .then(function(summaries) {
+              .then(function(responseObject) {
+                var summaries = responseObject.summaries;
                 var summaryBackendObject = null;
                 if (summaries.length !== 0 &&
                     summaries[0].id === newExplorationId) {
@@ -125,6 +122,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
                     'That exploration does not exist or you do not have edit ' +
                     'access to it.');
                 }
+                $rootScope.$applyAsync();
               }, function() {
                 AlertsService.addWarning(
                   'There was an error while adding an exploration to the ' +

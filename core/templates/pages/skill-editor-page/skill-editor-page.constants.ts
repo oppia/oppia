@@ -16,7 +16,7 @@
  * @fileoverview Constants for the skill editor page.
  */
 
-export class SkillEditorPageConstants {
-  public static SKILL_RIGHTS_URL_TEMPLATE =
-    '/skill_editor_handler/rights/<skill_id>';
-}
+export const SkillEditorPageConstants = {
+  SKILL_RIGHTS_URL_TEMPLATE:
+    '/skill_editor_handler/rights/<skill_id>'
+} as const;

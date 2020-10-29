@@ -38,12 +38,10 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
       template: require('./number-with-units-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
-        'NumberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
-        'CurrentInteractionService', function(
-            $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
-            NumberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
-            CurrentInteractionService) {
+        '$attrs', '$scope', '$uibModal', 'CurrentInteractionService',
+        'NumberWithUnitsObjectFactory', 'NumberWithUnitsRulesService', function(
+            $attrs, $scope, $uibModal, CurrentInteractionService,
+            NumberWithUnitsObjectFactory, NumberWithUnitsRulesService) {
           var ctrl = this;
           var errorMessage = '';
           // Label for errors caused whilst parsing number with units.
@@ -69,8 +67,8 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
             if (ctrl.NumberWithUnitsForm === undefined) {
               return true;
             }
-            return (!ctrl.NumberWithUnitsForm.$invalid &&
-              ctrl.answer !== '');
+            return (
+              !ctrl.NumberWithUnitsForm.$invalid && ctrl.answer !== '');
           };
 
           var submitAnswerFn = function() {
@@ -91,8 +89,7 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.answer', function(newValue) {
               try {
-                var numberWithUnits =
-                  NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
                 errorMessage = '';
                 ctrl.NumberWithUnitsForm.answer.$setValidity(
                   FORM_ERROR_TYPE, true);

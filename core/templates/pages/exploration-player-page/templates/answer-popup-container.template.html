@@ -1,4 +1,12 @@
-<div style="max-height: 300px; overflow-y: scroll;">
-  <angular-html-bind html-data="getAnswerHtml()">
-  </angular-html-bind>
+<div class="oppia-answer-popup-container">
+  <div class="oppia-answer-popup">
+    <angular-html-bind html-data="getAnswerHtml()">
+    </angular-html-bind>
+  </div>
 </div>
+<style>
+  .oppia-answer-popup-container .oppia-answer-popup {
+    max-height: 300px;
+    overflow-y: scroll;
+  }
+</style>

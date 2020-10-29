@@ -43,7 +43,7 @@ angular.module('oppia').factory('StoryCreationService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
             'create-new-story-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'CreateNewStoryModalController'
         }).result.then(function(newlyCreatedStory) {
           if (!newlyCreatedStory.isValid()) {

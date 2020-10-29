@@ -1,5 +1,5 @@
-<div class="form-inline" style="margin-bottom: 10px;">
-  <div style="margin-top: 10px;">
+<div class="form-inline oppia-training-panel-container">
+  <div class="oppia-training-panel-header">
     <span><strong>If Oppia encounters the answer:</strong></span>
   </div>
 
@@ -27,10 +27,10 @@
 
             <br>
 
-            <span style="float: right;" ng-if="outcome.dest != getCurrentStateName()">
+            <span class="oppia-float-right" ng-if="outcome.dest != getCurrentStateName()">
               → <[outcome.dest]>
             </span>
-            <span style="float: right;" ng-if="outcome.dest == getCurrentStateName()">
+            <span class="oppia-float-right" ng-if="outcome.dest == getCurrentStateName()">
               <em>→ (try again)</em>
             </span>
           </button>
@@ -44,3 +44,14 @@
     </div>
   </div>
 </div>
+<style>
+  training-panel .oppia-training-panel-container {
+    margin-bottom: 10px;
+  }
+  training-panel .oppia-training-panel-header {
+    margin-top: 10px;
+  }
+  training-panel .oppia-float-right {
+    float: right;
+  }
+</style>

@@ -28,6 +28,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
@@ -229,7 +230,7 @@ class ExplorationDisplayableSummariesTest(
         # then Albert has access to the corresponding summary.
         rights_manager.assign_role_for_exploration(
             self.bob, self.EXP_ID_5, self.albert_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(

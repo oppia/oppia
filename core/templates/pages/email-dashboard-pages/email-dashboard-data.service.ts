@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { QueryData, EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQuery } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
+  'domain/email-dashboard/email-dashboard-query.model';
 
 @Injectable({
   providedIn: 'root'
@@ -53,7 +53,7 @@ export class EmailDashboardDataService {
     return this.latestCursor;
   }
 
-  submitQuery(data: QueryData): Promise<EmailDashboardQuery[]> {
+  async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
@@ -65,7 +65,7 @@ export class EmailDashboardDataService {
     });
   }
 
-  getNextQueries(): Promise<EmailDashboardQuery[]> {
+  async getNextQueriesAsync(): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 
@@ -102,7 +102,7 @@ export class EmailDashboardDataService {
     return (this.currentPageIndex > 0);
   }
 
-  fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
+  async fetchQueryAsync(queryId: string): Promise<EmailDashboardQuery> {
     return this.emailDashboardBackendApiService.fetchQuery(queryId)
       .then(newQuery => {
         this.queries.forEach(function(query, index, queries) {

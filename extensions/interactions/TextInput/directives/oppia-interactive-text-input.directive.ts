@@ -37,9 +37,9 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
       template: require('./text-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'TextInputRulesService', 'CurrentInteractionService',
+        '$attrs', 'CurrentInteractionService', 'TextInputRulesService',
         function(
-            $attrs, TextInputRulesService, CurrentInteractionService) {
+            $attrs, CurrentInteractionService, TextInputRulesService) {
           var ctrl = this;
           ctrl.submitAnswer = function(answer) {
             if (!answer) {

@@ -1,6 +1,6 @@
 <div ng-if="!$ctrl.misconceptionEditorIsOpen && $ctrl.misconceptionName && !$ctrl.outcome.labelledAsCorrect"
      title="<[$ctrl.isEditable ? 'Edit Misconception' : '']>"
-     style="height: 100%; max-width: 95%;">
+     class="oppia-misconception-editor-container">
   <div class="oppia-readonly-rule-tile protractor-test-edit-misconception-button"
        ng-class="{'oppia-editable-section': $ctrl.isEditable}">
     <div class="oppia-transition-200">
@@ -29,24 +29,29 @@
 <button type="button"
         ng-if="!$ctrl.misconceptionName && $ctrl.isEditable && $ctrl.rules && !$ctrl.outcome.labelledAsCorrect && $ctrl.containsMisconceptions()"
         class="btn btn-primary btn-lg oppia-add-rule-button protractor-test-add-answer"
-        style="padding-top: 5px;"
         ng-click="$ctrl.tagAnswerGroupWithMisconception()">
   Tag with misconception
 </button>
 <style>
-  .oppia-add-rule-button {
+  question-misconception-editor .oppia-add-rule-button {
     background-color: #058CA6;
     border: 0;
     border-radius: 0;
     margin-top: 10px;
+    padding-top: 5px;
     width: 100%;
   }
-  .oppia-add-rule-button:active,
-  .oppia-add-rule-button:focus,
-  .oppia-add-rule-button:hover {
+  question-misconception-editor .oppia-add-rule-button:active,
+  question-misconception-editor .oppia-add-rule-button:focus,
+  question-misconception-editor .oppia-add-rule-button:hover {
     background-color: rgba(5,140,166,1);
   }
-  .oppia-tagged-misconception-title {
+  question-misconception-editor .oppia-tagged-misconception-title {
     margin-top: 10px;
+  }
+
+  question-misconception-editor .oppia-misconception-editor-container {
+    height: 100%;
+    max-width: 95%;
   }
 </style>

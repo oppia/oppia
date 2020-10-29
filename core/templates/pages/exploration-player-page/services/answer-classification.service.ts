@@ -20,9 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import {
-  AnswerClassificationResult, AnswerClassificationResultObjectFactory
-} from 'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerClassificationResult }
+  from 'domain/classifier/answer-classification-result.model';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AppService } from 'services/app.service';
 import { ExplorationPlayerConstants } from
@@ -37,13 +36,17 @@ import { PredictionAlgorithmRegistryService }
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+
+interface InteractionRulesService {
+  [ruleName: string]: (
+    answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
+}
 
 @Injectable({providedIn: 'root'})
 export class AnswerClassificationService {
   constructor(
       private alertsService: AlertsService,
-      private answerClassificationResultObjectFactory:
-        AnswerClassificationResultObjectFactory,
       private appService: AppService,
       private interactionSpecsService: InteractionSpecsService,
       private predictionAlgorithmRegistryService:
@@ -71,12 +74,11 @@ export class AnswerClassificationService {
     // TODO(bhenning): Implement training data classification.
     for (var i = 0; i < answerGroups.length; ++i) {
       const answerGroup = answerGroups[i];
-      const rules = answerGroup.getRulesAsList();
-      for (var j = 0; j < rules.length; ++j) {
-        const rule = rules[j];
+      for (var j = 0; j < answerGroup.rules.length; ++j) {
+        const rule = answerGroup.rules[j];
         if (interactionRulesService[rule.type](answer, rule.inputs)) {
-          return this.answerClassificationResultObjectFactory.createNew(
-            answerGroup.outcome, i,
+          return new AnswerClassificationResult(
+            answerGroup.outcome, i, j,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION);
         }
       }
@@ -85,8 +87,8 @@ export class AnswerClassificationService {
     // If no rule in any answer group returns true, the default 'group' is
     // returned. Throws an error if the default outcome is not defined.
     if (defaultOutcome) {
-      return this.answerClassificationResultObjectFactory.createNew(
-        defaultOutcome, answerGroups.length,
+      return new AnswerClassificationResult(
+        defaultOutcome, answerGroups.length, 0,
         ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION);
     } else {
       this.alertsService.addWarning(
@@ -112,7 +114,8 @@ export class AnswerClassificationService {
       stateName: string,
       interactionInOldState: Interaction,
       answer: InteractionAnswer,
-      interactionRulesService): AnswerClassificationResult {
+      interactionRulesService: InteractionRulesService):
+      AnswerClassificationResult {
     var answerClassificationResult = null;
 
     const answerGroups = interactionInOldState.answerGroups;
@@ -142,8 +145,8 @@ export class AnswerClassificationService {
         }
         for (const trainingDatum of answerGroup.trainingData) {
           if (angular.equals(answer, trainingDatum)) {
-            return this.answerClassificationResultObjectFactory.createNew(
-              answerGroup.outcome, i,
+            return new AnswerClassificationResult(
+              answerGroup.outcome, i, null,
               ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION);
           }
         }
@@ -163,14 +166,14 @@ export class AnswerClassificationService {
               classifier.classifierData, answer);
             if (predictedAnswerGroupIndex === -1) {
               answerClassificationResult = (
-                this.answerClassificationResultObjectFactory.createNew(
-                  defaultOutcome, answerGroups.length,
+                new AnswerClassificationResult(
+                  defaultOutcome, answerGroups.length, 0,
                   ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
             }
             answerClassificationResult = (
-              this.answerClassificationResultObjectFactory.createNew(
+              new AnswerClassificationResult(
                 answerGroups[predictedAnswerGroupIndex].outcome,
-                predictedAnswerGroupIndex,
+                predictedAnswerGroupIndex, null,
                 ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
           }
         }
@@ -182,7 +185,7 @@ export class AnswerClassificationService {
 
   isClassifiedExplicitlyOrGoesToNewState(
       stateName: string, state: State, answer: InteractionAnswer,
-      interactionRulesService): boolean {
+      interactionRulesService: InteractionRulesService): boolean {
     const result = this.getMatchingClassificationResult(
       stateName, state.interaction, answer, interactionRulesService);
     return (

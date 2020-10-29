@@ -24,7 +24,8 @@ import io
 import os
 import sys
 
-_FUTURE_PATH = os.path.join(os.getcwd(), 'third_party', 'future-0.17.1')
+_FUTURE_PATH = os.path.join(
+    os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _FUTURE_PATH)
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
@@ -284,6 +285,11 @@ def url_retrieve(source_url, filename=None):
     """
     try:
         import urllib
+        # Change the User-Agent to prevent servers from blocking requests.
+        # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
+        urllib.URLopener.version = (
+            'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
+            'Gecko/20100101 Firefox/47.0')
         return urllib.urlretrieve(source_url, filename=filename)
     except ImportError:
         import urllib.request

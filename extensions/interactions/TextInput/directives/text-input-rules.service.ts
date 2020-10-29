@@ -55,8 +55,8 @@ export class TextInputRulesService {
         if (inputString.charAt(i - 1) === answerString.charAt(j - 1)) {
           editDistance[i][j] = editDistance[i - 1][j - 1];
         } else {
-          editDistance[i][j] = Math.min(editDistance[i - 1][j - 1],
-            editDistance[i][j - 1],
+          editDistance[i][j] = Math.min(
+            editDistance[i - 1][j - 1], editDistance[i][j - 1],
             editDistance[i - 1][j]) + 1;
         }
       }

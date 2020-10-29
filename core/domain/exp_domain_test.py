@@ -519,12 +519,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Contains': [{
+            'rule_specs': [{
+                'inputs': {
                     'x': 'Test'
-                }]
-            },
+                },
+                'rule_type': 'Contains'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         })
@@ -547,30 +547,27 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Validate RuleSpec.
-        answer_group.rule_types_to_inputs['Contains'][0] = {}
+        rule_spec = answer_group.rule_specs[0]
+        rule_spec.inputs = {}
         self._assert_validation_error(
             exploration, 'RuleSpec \'Contains\' is missing inputs')
 
-        answer_group.rule_types_to_inputs['Contains'][0] = 'Inputs string'
+        rule_spec.inputs = 'Inputs string'
         self._assert_validation_error(
             exploration, 'Expected inputs to be a dict')
 
-        answer_group.rule_types_to_inputs = {
-            'FakeRuleType': [{'x': 'Test'}]
-        }
+        rule_spec.inputs = {'x': 'Test'}
+        rule_spec.rule_type = 'FakeRuleType'
         self._assert_validation_error(exploration, 'Unrecognized rule type')
 
-        answer_group.rule_types_to_inputs = {
-            'Contains': [{'x': 15}]
-        }
+        rule_spec.inputs = {'x': 15}
+        rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
             Exception, 'Expected unicode string, received 15'
             ):
             exploration.validate()
 
-        answer_group.rule_types_to_inputs['Contains'][0] = {
-            'x': '{{ExampleParam}}'
-        }
+        rule_spec.inputs = {'x': '{{ExampleParam}}'}
         self._assert_validation_error(
             exploration,
             'RuleSpec \'Contains\' has an input with name \'x\' which refers '
@@ -768,12 +765,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Contains': [{
+            'rule_specs': [{
+                'inputs': {
                     'x': 'Test'
-                }]
-            },
+                },
+                'rule_type': 'Contains'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': 1
         }
@@ -795,12 +792,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Contains': [{
+            'rule_specs': [{
+                'inputs': {
                     'x': 'Test'
-                }]
-            },
+                },
+                'rule_type': 'Contains'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id':
                 'invalid_tagged_skill_misconception_id'
@@ -813,20 +810,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'to be <skill_id>-<misconception_id>, received '
             'invalid_tagged_skill_misconception_id')
 
-        init_state.interaction.answer_groups[0].rule_types_to_inputs = []
+        init_state.interaction.answer_groups[0].rule_specs = {}
         self._assert_validation_error(
-            exploration,
-            'Expected answer group rule_types_to_inputs to be a dict')
-        init_state.interaction.answer_groups[0].rule_types_to_inputs = {}
-
-        init_state.interaction.answer_groups[0].rule_input_translations = []
-        self._assert_validation_error(
-            exploration,
-            (
-                'Expected answer group rule_input_translations '
-                'to be a dict')
-        )
-        init_state.interaction.answer_groups[0].rule_input_translations = {}
+            exploration, 'Expected answer group rules to be a list')
 
         first_answer_group = init_state.interaction.answer_groups[0]
         first_answer_group.tagged_skill_misconception_id = None
@@ -1079,7 +1065,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
-                },
+                }
             }
         })
         exploration.states[
@@ -1230,12 +1216,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Contains': [{
+            'rule_specs': [{
+                'inputs': {
                     'x': 'Test'
-                }]
-            },
+                },
+                'rule_type': 'Contains'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1607,12 +1593,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Contains': [{
+            'rule_specs': [{
+                'inputs': {
                     'x': 'Test'
-                }]
-            },
+                },
+                'rule_type': 'Contains'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
@@ -6409,10 +6395,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -6977,10 +6963,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7133,10 +7119,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7312,10 +7298,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7480,10 +7466,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7670,10 +7656,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7966,10 +7952,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -8243,10 +8229,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -8898,11 +8884,13 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: 0
-          - x: 1
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        - inputs:
+            x: 1
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
@@ -8914,10 +8902,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: 0
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -8994,13 +8982,15 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x:
+        rule_specs:
+        - inputs:
+            x:
             - <p>This is value1 for ItemSelectionInput</p>
-          - x:
+          rule_type: Equals
+        - inputs:
+            x:
             - <p>This is value3 for ItemSelectionInput</p>
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -9329,10 +9319,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations: {}
-        rule_types_to_inputs:
-          Equals:
-          - x: InputString
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -9558,67 +9548,6 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.delete_state('fake state')
 
 
-class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
-
-    def test_create_html_math_rich_text_info(self):
-        exploration_math_rich_text_info = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id1', True, ['abc', 'x']))
-
-        self.assertEqual(
-            exploration_math_rich_text_info.to_dict(), {
-                'exp_id': 'exp_id1',
-                'math_images_generation_required': True,
-                'latex_strings_without_svg': ['abc', 'x']
-            })
-
-    def test_validate_when_latex_strings_not_list(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected latex_strings to be a list, received '
-            'invalid_latex_format'):
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id1', True, 'invalid_latex_format')
-
-    def test_validate_when_each_latex_expressions_are_not_strings(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected each element in the list of latex strings to be a str, '
-            'received 3'):
-            exp_domain.ExplorationMathRichTextInfo('exp_id1', True, ['x^2', 3])
-
-    def test_validate_exp_id_is_string(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected exp_id to be a str, received 0'):
-            exp_domain.ExplorationMathRichTextInfo(0, True, ['x^2', 3])
-
-    def test_validate_math_images_generation_required_is_bool(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected math_images_generation_required to be an bool, '
-            'received invalid'):
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id1', 'invalid', ['x^2', 3])
-
-    def test_get_svg_size_in_bytes(self):
-        exploration_math_rich_text_info = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id1', True, ['x^2 + 2ax', 'x']))
-
-        self.assertEqual(
-            exploration_math_rich_text_info.get_svg_size_in_bytes(), 10000)
-
-    def test_get_longest_latex_expression(self):
-        exploration_math_rich_text_info = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id1', True, ['x^2 + 2ax', 'x']))
-
-        self.assertEqual(
-            exploration_math_rich_text_info.get_longest_latex_expression(),
-            'x^2 + 2ax')
-
-
 class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
 
@@ -9755,14 +9684,13 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state1.update_interaction_solution(solution)
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': 0
-                }, {
-                    'x': 1
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': 1}
+            }],
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -9777,12 +9705,10 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': 0
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }],
             'outcome': {
                 'dest': 'state3',
                 'feedback': {
@@ -9798,14 +9724,17 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': ['<p>This is value1 for ItemSelectionInput</p>']
-                }, {
-                    'x': ['<p>This is value3 for ItemSelectionInput</p>']
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelectionInput</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelectionInput</p>'
+                ]}
+            }],
             'outcome': {
                 'dest': 'state1',
                 'feedback': {

@@ -16,10 +16,7 @@
  * @fileoverview Unit tests for TrainingModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Training Modal Controller', function() {
   var $rootScope = null;
@@ -33,6 +30,9 @@ describe('Training Modal Controller', function() {
   var InteractionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationDataService', {
       explorationId: 0,
@@ -40,12 +40,7 @@ describe('Training Modal Controller', function() {
       discardDraft: function() {}
     });
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     StateEditorService = $injector.get('StateEditorService');
@@ -73,8 +68,7 @@ describe('Training Modal Controller', function() {
             interaction: {
               id: 'TextInput',
               answer_groups: [{
-                rule_input_translations: {},
-                rule_types_to_inputs: {},
+                rule_specs: [],
                 outcome: {
                   dest: '',
                   feedback: {
@@ -84,8 +78,7 @@ describe('Training Modal Controller', function() {
                 },
                 training_data: ['Not the answer']
               }, {
-                rule_input_translations: {},
-                rule_types_to_inputs: {},
+                rule_specs: [],
                 outcome: {
                   dest: '',
                   feedback: {
@@ -131,8 +124,7 @@ describe('Training Modal Controller', function() {
               },
             },
             training_data: ['This is the answer'],
-            rule_input_translations: {},
-            rule_types_to_inputs: {},
+            rule_specs: [],
           }],
           customization_args: {
             placeholder: {
@@ -240,8 +232,7 @@ describe('Training Modal Controller', function() {
                 }
               },
               training_data: ['Not the answer'],
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
             }, {
               outcome: {
                 dest: '',
@@ -251,8 +242,7 @@ describe('Training Modal Controller', function() {
                 },
               },
               training_data: ['Answer'],
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
             }, {
               outcome: {
                 dest: '',
@@ -262,8 +252,7 @@ describe('Training Modal Controller', function() {
                 }
               },
               training_data: ['This is the answer'],
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
             }],
             customization_args: {
               placeholder: {
@@ -302,8 +291,7 @@ describe('Training Modal Controller', function() {
             },
           },
           training_data: ['This is the answer'],
-          rule_input_translations: {},
-          rule_types_to_inputs: {},
+          rule_specs: [],
         }],
         customization_args: {
           placeholder: {
@@ -381,8 +369,7 @@ describe('Training Modal Controller', function() {
             param_changes: [],
             interaction: {
               answer_groups: [{
-                rule_input_translations: {},
-                rule_types_to_inputs: {},
+                rule_specs: [],
                 outcome: {
                   dest: '',
                   feedback: {
@@ -428,8 +415,7 @@ describe('Training Modal Controller', function() {
                 html: ''
               },
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {},
+            rule_specs: [],
             training_data: []
           }, {
             outcome: {
@@ -439,8 +425,7 @@ describe('Training Modal Controller', function() {
                 html: ''
               },
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {},
+            rule_specs: [],
             training_data: []
           }],
           default_outcome: {

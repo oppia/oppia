@@ -118,8 +118,8 @@
           </div>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" ng-if="chapterOutlineIsShown">
             Outline Finalized
-            <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
-            <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+            <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18" aria-label="Finalize outline">check_box_outline_blank</i>
+            <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18" aria-label="Unfinalize outline">check_box</i>
             <div tabindex="-1" ng-blur="toggleChapterOutlineButtons()" ng-click="toggleChapterOutlineButtons()">
               <schema-based-editor id="storyNodeOutline"
                                    schema="OUTLINE_SCHEMA"
@@ -276,7 +276,7 @@
           <div class="todo-item-container">
             <i class="fa fa-minus" ng-if="!isOutlineFinalized()"></i>
             <i class="fa fa-check todo-completed" ng-if="isOutlineFinalized()"></i>
-            <span>Compete Chapter Outline</span>
+            <span>Complete Chapter Outline</span>
           </div>
           <div class="todo-item-container">
             <i class="fa fa-minus" ng-if="!explorationId"></i>

@@ -18,17 +18,15 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
-import { CollectionBackendDict, Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
+import { CollectionNode } from
+  'domain/collection/collection-node.model';
+import { CollectionBackendDict, Collection } from
+  'domain/collection/collection.model';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 
 describe('Collection validation service', function() {
   let collectionValidationService: CollectionValidationService = null;
-  let collectionObjectFactory: CollectionObjectFactory = null;
-  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
   let sampleCollectionBackendObject: CollectionBackendDict = null;
   let _sampleCollection: Collection = null;
 
@@ -43,8 +41,6 @@ describe('Collection validation service', function() {
     });
 
     collectionValidationService = TestBed.get(CollectionValidationService);
-    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
-    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -61,13 +57,13 @@ describe('Collection validation service', function() {
         completed_exploration_ids: ['expId2']
       }
     };
-    _sampleCollection = collectionObjectFactory.create(
+    _sampleCollection = Collection.create(
       sampleCollectionBackendObject);
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
   });
 
   var _addCollectionNode = (explorationId, exists, isPublic) => {
-    var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
+    var collectionNode = CollectionNode.createFromExplorationId(
       explorationId);
     if (exists) {
       collectionNode.setExplorationSummaryObject({
@@ -129,8 +125,8 @@ describe('Collection validation service', function() {
   it('should detect nonexistent/inaccessible explorations', () => {
     expect(_addCollectionNode(
       'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
-    var node0 = _getCollectionNode('exp_id0');
-    var node1 = _getCollectionNode('exp_id1');
+    _getCollectionNode('exp_id0');
+    _getCollectionNode('exp_id1');
 
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
@@ -143,9 +139,9 @@ describe('Collection validation service', function() {
     () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
       expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
-      var node0 = _getCollectionNode('exp_id0');
-      var node1 = _getCollectionNode('exp_id1');
-      var node2 = _getCollectionNode('exp_id2');
+      _getCollectionNode('exp_id0');
+      _getCollectionNode('exp_id1');
+      _getCollectionNode('exp_id2');
 
       var issues = _findPrivateValidationIssues();
       expect(issues).toEqual([]);
@@ -155,8 +151,8 @@ describe('Collection validation service', function() {
   it('should not allow private explorations in a public collection',
     () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
-      var node1 = _getCollectionNode('exp_id1');
-      var node0 = _getCollectionNode('exp_id0');
+      _getCollectionNode('exp_id1');
+      _getCollectionNode('exp_id0');
 
       var issues = _findPublicValidationIssues();
       expect(issues).toEqual([
@@ -173,9 +169,9 @@ describe('Collection validation service', function() {
     expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
     expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
 
-    var node0 = _getCollectionNode('exp_id0');
-    var node1 = _getCollectionNode('exp_id1');
-    var node2 = _getCollectionNode('exp_id2');
+    _getCollectionNode('exp_id0');
+    _getCollectionNode('exp_id1');
+    _getCollectionNode('exp_id2');
 
     var issues = _findPublicValidationIssues();
     expect(issues).toEqual([

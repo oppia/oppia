@@ -10,6 +10,11 @@
 
 /**
  * @fileoverview Definitions for rich text components.
+ *
+ * NOTE TO DEVELOPERS: If a new inline element is added (i.e 'is_block_element'
+ * is false), then make sure to add .cke_widget_<element id> {display: inline;}
+ * style to the element's directive HTML and add a CSS style similar to
+ * oppia-noninteractive-link in oppia.css for the new directive.
  */
 
 export = {
@@ -177,7 +182,7 @@ export = {
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "svg_filename",
-      "description": "The custom svg diagram filename",
+      "description": "The SVG Diagram Editor",
       "schema": {
         "type": "custom",
         "obj_type": "SvgFilename"

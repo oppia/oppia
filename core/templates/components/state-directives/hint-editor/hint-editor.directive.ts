@@ -45,10 +45,10 @@ angular.module('oppia').directive('hintEditor', [
         '/components/state-directives/hint-editor/hint-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContextService', 'EditabilityService',
+        'ContextService', 'EditabilityService',
         'ExternalSaveService', 'StateHintsService',
         function(
-            $scope, ContextService, EditabilityService,
+            ContextService, EditabilityService,
             ExternalSaveService, StateHintsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -68,7 +68,7 @@ angular.module('oppia').directive('hintEditor', [
             if (contentHasChanged) {
               var hintContentId = ctrl.hint.hintContent.getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                hintContentId);
+                [hintContentId]);
             }
             ctrl.getOnSaveFn()();
           };

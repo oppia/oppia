@@ -33,8 +33,21 @@ var login = async function(email, isSuperAdmin = false) {
   await (await driver.findElement(protractor.By.name('email'))).sendKeys(email);
   if (isSuperAdmin) {
     await (await driver.findElement(protractor.By.name('admin'))).click();
+    let adminCheckboxStatus = await driver.findElement(
+      protractor.By.name('admin')).getAttribute('checked');
+    expect(adminCheckboxStatus).toBeTruthy();
   }
   await (await driver.findElement(protractor.By.id('submit-login'))).click();
+  // The statement below uses a browser.wait() to determine if the user has
+  // logged in. Use of waitFor is not possible because the active page is
+  // non-angular.
+  await browser.wait(
+    async() => {
+      let loginStatusHeaderElement = (
+        await driver.findElement(protractor.By.tagName('h3')));
+      let text = await loginStatusHeaderElement.getText();
+      return text !== 'Logged In';
+    }, waitFor.DEFAULT_WAIT_TIME_MSECS, 'Login takes too long.');
 };
 
 var logout = async function() {
@@ -53,6 +66,7 @@ var _completeSignup = async function(username) {
   await browser.waitForAngularEnabled(false);
   await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
   await browser.waitForAngularEnabled(true);
+  await waitFor.pageToFullyLoad();
   var usernameInput = element(by.css('.protractor-test-username-input'));
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));

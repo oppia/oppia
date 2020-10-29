@@ -27,7 +27,8 @@ require('services/site-analytics.service.ts');
 angular.module('oppia').controller('WelcomeTranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ContextService',
   'SiteAnalyticsService', 'UrlInterpolationService',
-  function($controller, $scope, $uibModalInstance, ContextService,
+  function(
+      $controller, $scope, $uibModalInstance, ContextService,
       SiteAnalyticsService, UrlInterpolationService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,

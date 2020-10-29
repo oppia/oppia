@@ -16,16 +16,16 @@
  * @fileoverview Constants for the topic viewer domain.
  */
 
-export class TopicViewerDomainConstants {
-  public static TOPIC_DATA_URL_TEMPLATE = (
-    '/topic_data_handler/<classroom_url_fragment>/<topic_url_fragment>');
-  public static STORY_VIEWER_URL_TEMPLATE = (
+export const TopicViewerDomainConstants = {
+  TOPIC_DATA_URL_TEMPLATE: (
+    '/topic_data_handler/<classroom_url_fragment>/<topic_url_fragment>'),
+  STORY_VIEWER_URL_TEMPLATE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/story/' +
-    '<story_url_fragment>');
-  public static SUBTOPIC_VIEWER_URL_TEMPLATE = (
+    '<story_url_fragment>'),
+  SUBTOPIC_VIEWER_URL_TEMPLATE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/' +
-    '<subtopic_url_fragment>');
-  public static REVIEW_TESTS_URL_TEMPLATE = (
+    '<subtopic_url_fragment>'),
+  REVIEW_TESTS_URL_TEMPLATE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/review-test/' +
-    '<story_url_fragment>');
-}
+    '<story_url_fragment>')
+} as const;

@@ -23,6 +23,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_jobs_one_off
 from core.domain import rights_manager
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -32,7 +33,6 @@ from core.tests import test_utils
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
 search_services = models.Registry.import_search_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 # This mock should be used only in InteractionCustomizationArgsValidationJob.
@@ -63,8 +63,9 @@ def run_job_for_deleted_exp(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     job_class.enqueue(job_id)
     self.assertEqual(
-        self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
+        self.count_jobs_in_mapreduce_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+    self.process_and_flush_pending_mapreduce_tasks()
     self.process_and_flush_pending_tasks()
 
     if check_error:
@@ -94,7 +95,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for
@@ -121,15 +122,10 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'IsEqualToOrdering': [{
-                    'x': [
-                        ['a'],
-                        ['b']
-                    ]
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [['a'], ['b']]}
+            }],
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -157,23 +153,24 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'HasElementXBeforeElementY': [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': []
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [['a']]}
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
                     'x': '',
                     'y': ''
-                }],
-                'IsEqualToOrdering': [{
-                    'x': [
-                        ['a']
-                    ]
-                }, {
-                    'x': []
-                }],
-                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
-                    'x': []
-                }]
-            },
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }],
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -188,16 +185,19 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'HasElementXAtPositionY': [{
+            'rule_specs': [{
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
                     'x': '',
                     'y': 1
-                }, {
+                }
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
                     'x': 'a',
                     'y': 2
-                }]
-            },
+                }
+            }],
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -227,7 +227,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
@@ -249,23 +249,20 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
             .get_output(job_id))
         expected_output = [(
-            u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule in'
-            'put x in rule with rule type IsEqualToOrderingWithOneItemAtIncorre'
-            'ctPosition and rule input index 0 is empty. \', u\'State name: Sta'
-            'te2, AnswerGroup: 0, Rule input y in rule with rule type HasElemen'
-            'tXBeforeElementY and rule input index 0 is empty. \', u\'State nam'
-            'e: State2, AnswerGroup: 0, Rule input x in rule with rule type Has'
-            'ElementXBeforeElementY and rule input index 0 is empty. \', u\'Sta'
-            'te name: State2, AnswerGroup: 0, Rule input x in rule with rule ty'
-            'pe IsEqualToOrdering and rule input index 1 is empty. \', u\'State'
-            ' name: State2, AnswerGroup: 1, Rule input x in rule with rule type'
-            ' HasElementXAtPositionY and rule input index 0 is empty. \']"]]'
+            u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule '
+            'input x in rule with index 0 is empty. \', u\'State name: State2,'
+            ' AnswerGroup: 0, Rule input y in rule with index 2 is empty. \', '
+            'u\'State name: State2, AnswerGroup: 0, Rule input x in rule with '
+            'index 2 is empty. \', u\'State name: State2, AnswerGroup: 0, Rule'
+            ' input x in rule with index 3 is empty. \', u\'State name: State2'
+            ', AnswerGroup: 1, Rule input x in rule with index 0 is empty. \']'
+            '"]]'
         )]
         self.assertEqual(actual_output, expected_output)
 
@@ -278,7 +275,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
             .get_output(job_id))
@@ -308,14 +305,13 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'IsEqualToOrdering': [{
-                    'x': []
-                }, {
-                    'x': []
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }],
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -359,7 +355,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for
@@ -385,12 +381,10 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': '1'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': '1'}
+            }],
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -418,7 +412,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             .MultipleChoiceInteractionOneOffJob.create_new())
         interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -443,14 +437,13 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': '0'
-                }, {
-                    'x': '9007199254740991'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': '0'}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': '9007199254740991'}
+            }],
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -479,14 +472,15 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             .MultipleChoiceInteractionOneOffJob.create_new())
         interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.get_output(job_id))
         expected_output = [(
-            u'[u\'exp_id0\', [u\'State name: State2, AnswerGroup: 0, Rule with '
-            '(rule type: Equals, rule input index: 1) is invalid.\']]'
+            u'[u\'exp_id0\', '
+            u'[u\'State name: State2, AnswerGroup: 0, Rule: 1 is invalid.' +
+            '(Indices here are 0-indexed.)\']]'
         )]
         self.assertEqual(actual_output, expected_output)
 
@@ -514,14 +508,13 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': '0'
-                }, {
-                    'x': '9007199254740991'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': '0'}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': '9007199254740991'}
+            }],
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -564,7 +557,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks (exp, state) pairs are produced only for
@@ -591,14 +584,17 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': ['<p>This is value1 for ItemSelection</p>']
-                }, {
-                    'x': ['<p>This is value2 for ItemSelection</p>']
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value2 for ItemSelection</p>'
+                ]}
+            }],
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -626,7 +622,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             .ItemSelectionInteractionOneOffJob.create_new())
         interaction_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -646,14 +642,17 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': ['<p>This is value1 for ItemSelection</p>']
-                }, {
-                    'x': ['<p>This is value3 for ItemSelection</p>']
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelection</p>'
+                ]}
+            }],
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -682,7 +681,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             .ItemSelectionInteractionOneOffJob.create_new())
         interaction_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -718,14 +717,17 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': ['<p>This is value1 for ItemSelection</p>']
-                }, {
-                    'x': ['<p>This is value3 for ItemSelection</p>']
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelection</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelection</p>'
+                ]}
+            }],
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -770,7 +772,7 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_for_customization_arg_validation_job(self):
         """Check that expected errors are produced for invalid
@@ -806,7 +808,7 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         (
             interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -814,7 +816,7 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
-            'minAllowableSelectionCount': {'value': '1b'},
+            'minAllowableSelectionCount': {'value': '1bθ'},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': {'value': [{
                 'html': '<p>This is value1 for ItemSelection</p>',
@@ -833,14 +835,15 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         (
             interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'Failed customization args validation for exp id exp_id0\', '
-            '[u\'ItemSelectionInput: Could not convert unicode to int: 1b\']]')]
+            '[u\'ItemSelectionInput: Could not convert unicode to int: '
+            '1b\\u03b8\']]')]
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):

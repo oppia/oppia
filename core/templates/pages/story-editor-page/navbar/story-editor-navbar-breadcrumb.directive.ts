@@ -24,7 +24,6 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
-require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -39,12 +38,11 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
         '/pages/story-editor-page/navbar/' +
         'story-editor-navbar-breadcrumb.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$window', 'UrlService',
-        'UrlInterpolationService', 'UndoRedoService', 'StoryEditorStateService',
+        '$scope', '$uibModal', '$window', 'StoryEditorStateService',
+        'UndoRedoService', 'UrlInterpolationService',
         function(
-            $scope, $uibModal, $window, UrlService,
-            UrlInterpolationService, UndoRedoService, StoryEditorStateService
-        ) {
+            $scope, $uibModal, $window, StoryEditorStateService,
+            UndoRedoService, UrlInterpolationService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';

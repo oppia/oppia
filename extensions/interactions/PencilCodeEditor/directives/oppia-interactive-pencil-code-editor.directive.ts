@@ -38,10 +38,9 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
-  '$timeout', 'InteractionAttributesExtractorService',
-  'PlayerPositionService',
-  function($timeout, InteractionAttributesExtractorService,
-      PlayerPositionService) {
+  '$timeout', 'InteractionAttributesExtractorService', 'PlayerPositionService',
+  function(
+      $timeout, InteractionAttributesExtractorService, PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -51,12 +50,11 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
       template: require('./pencil-code-editor-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$element', '$uibModal',
+        '$attrs', '$element', '$uibModal', 'CurrentInteractionService',
         'FocusManagerService', 'PencilCodeEditorRulesService',
-        'CurrentInteractionService',
-        function($scope, $attrs, $element, $uibModal,
-            FocusManagerService, PencilCodeEditorRulesService,
-            CurrentInteractionService) {
+        function(
+            $attrs, $element, $uibModal, CurrentInteractionService,
+            FocusManagerService, PencilCodeEditorRulesService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var iframeDiv, pce;

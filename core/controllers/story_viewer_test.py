@@ -22,6 +22,7 @@ from core.domain import question_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import summary_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -56,11 +57,14 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.EXP_ID_7 = '7'
 
         self.save_new_valid_exploration(
-            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End',
+            correctness_feedback_enabled=True)
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End')
+            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End',
+            correctness_feedback_enabled=True)
         self.save_new_valid_exploration(
-            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End')
+            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
@@ -68,6 +72,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'Title', 'Description', self.TOPIC_ID,
             self.STORY_URL_FRAGMENT)
+        story.meta_tag_content = 'story meta content'
 
         exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -129,11 +134,15 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story.story_contents.initial_node_id = 'node_2'
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.TOPIC_ID, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            subtopics=[subtopic_1], next_subtopic_id=2)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
@@ -146,38 +155,29 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
 class StoryPageTests(BaseStoryViewerControllerTests):
     def test_any_user_can_access_story_viewer_page(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
 
     def test_accessibility_of_unpublished_story_viewer_page(self):
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
-                expected_status_int=404)
-            self.login(self.ADMIN_EMAIL)
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
-            self.logout()
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
+            expected_status_int=404)
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
+        self.logout()
 
     def test_accessibility_of_story_viewer_in_unpublished_topic(self):
         topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
-                expected_status_int=404)
-            self.login(self.ADMIN_EMAIL)
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
-            self.logout()
-
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
-                expected_status_int=404)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
+            expected_status_int=404)
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
+        self.logout()
 
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
@@ -189,11 +189,10 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             new_story_id, 'Title', 'Description', self.TOPIC_ID,
             new_story_url_fragment)
         story_services.save_new_story(self.admin_id, story)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/topic/%s'
+            % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
+            expected_status_int=404)
 
     def test_can_not_access_story_viewer_page_with_unpublished_topic(self):
         new_story_id = 'new_story_id'
@@ -210,32 +209,24 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         story_services.save_new_story(self.admin_id, story)
         topic_services.publish_story(
             'topic_id_1', new_story_id, self.admin_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/staging/topics/%s'
-                % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/topics/%s'
+            % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
+            expected_status_int=404)
 
     def test_get(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
-                '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
-            expected_dict = {
-                'story_id': self.STORY_ID,
-                'story_title': 'Title',
-                'story_description': 'Description',
-                'story_nodes': [self.node_2, self.node_1, self.node_3],
-                'topic_name': 'Topic'
-            }
-            self.assertDictContainsSubset(expected_dict, json_response)
-
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_json(
-                '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT),
-                expected_status_int=404)
+        json_response = self.get_json(
+            '%s/staging/topic/%s'
+            % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
+        expected_dict = {
+            'story_id': self.STORY_ID,
+            'story_title': 'Title',
+            'story_description': 'Description',
+            'story_nodes': [self.node_2, self.node_1, self.node_3],
+            'topic_name': 'Topic',
+            'meta_tag_content': 'story meta content'
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
 
 
 class StoryProgressHandlerTests(BaseStoryViewerControllerTests):

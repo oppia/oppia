@@ -16,6 +16,8 @@
  * @fileoverview Directive for the codemirror mergeview component.
  */
 
+import 'third-party-imports/ui-codemirror.import';
+
 angular.module('oppia').directive('codemirrorMergeview', [
   function() {
     return {

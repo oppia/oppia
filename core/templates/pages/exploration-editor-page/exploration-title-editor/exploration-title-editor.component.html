@@ -4,7 +4,7 @@
          ng-model="explorationTitleService.displayed" ng-blur="$ctrl.onInputFieldBlur()"
          placeholder="Choose a title for your exploration." focus-on="<[::$ctrl.focusLabel]>"
          maxlength="40" ng-trim="false">
-  <span class="form-text" style="font-size: smaller">
+  <span class="form-text oppia-form-text">
     <em>Please use at most 40 characters, so that this fits in the summary card.</em>
     <span ng-if="explorationTitleService.displayed.length > 0">
       <em>Characters used: <[explorationTitleService.displayed.length]>/40</em>
@@ -30,5 +30,8 @@
   }
   .modal-body exploration-title-editor #explorationTitle {
     width: 100%;
+  }
+  exploration-title-editor .oppia-form-text {
+    font-size: smaller;
   }
 </style>

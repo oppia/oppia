@@ -62,13 +62,14 @@ describe('Add Hint Modal Controller', function() {
     });
   }));
 
-  it('should evaluate scope variable values correctly', function() {
-    expect($scope.tmpHint).toBe('');
-    expect($scope.addHintForm).toEqual({});
-    expect($scope.hintIndex).toBe(5);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.tmpHint).toBe('');
+      expect($scope.addHintForm).toEqual({});
+      expect($scope.hintIndex).toBe(5);
+    });
 
-  it('should save hint successfully', function() {
+  it('should save hint when closing the modal', function() {
     var contentId = 'cont_1';
     var hintExpected = hintObjectFactory.createNew(contentId, '');
 

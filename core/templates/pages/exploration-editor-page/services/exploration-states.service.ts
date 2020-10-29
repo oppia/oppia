@@ -39,6 +39,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/validators.service.ts');
@@ -46,17 +48,17 @@ require('services/validators.service.ts');
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('ExplorationStatesService', [
-  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
+  '$filter', '$injector', '$location', '$q', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
-  'SolutionValidityService', 'StateEditorService', 'StatesObjectFactory',
-  'UrlInterpolationService', 'ValidatorsService',
+  'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
+  'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $filter, $injector, $location, $q, $rootScope, $uibModal,
+      $filter, $injector, $location, $q, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
-      SolutionValidityService, StateEditorService, StatesObjectFactory,
-      UrlInterpolationService, ValidatorsService) {
+      SolutionValidityService, StateEditorRefreshService, StateEditorService,
+      StatesObjectFactory, UrlInterpolationService, ValidatorsService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
@@ -163,6 +165,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
           contentIds.add(solution.explanation.getContentId());
         }
         return contentIds;
+      },
+      widget_customization_args: function(customizationArgs) {
+        return new Set(
+          Interaction.getCustomizationArgContentIds(customizationArgs));
       }
     };
 
@@ -188,11 +194,12 @@ angular.module('oppia').factory('ExplorationStatesService', [
           propertyRef = propertyRef[key];
         });
       } catch (e) {
-        var additionalInfo = ('\nUndefined states error debug logs:' +
+        var additionalInfo = (
+          '\nUndefined states error debug logs:' +
           '\nRequested state name: ' + stateName +
           '\nExploration ID: ' + ContextService.getExplorationId() +
           '\nChange list: ' + JSON.stringify(
-          ChangeListService.getChangeList()) +
+            ChangeListService.getChangeList()) +
           '\nAll states names: ' + _states.getStateNames());
         e.message += additionalInfo;
         throw e;
@@ -464,7 +471,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           refreshGraphEventEmitter.emit();
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
-          $rootScope.$broadcast('refreshStateEditor');
+          StateEditorRefreshService.onRefreshStateEditor.emit();
         }, function() {
           AlertsService.clearWarnings();
         });

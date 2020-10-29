@@ -16,6 +16,8 @@
  * @fileoverview Directive for the learner's view of a collection.
  */
 
+import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
@@ -23,9 +25,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
-
-require('domain/collection/CollectionObjectFactory.ts');
-require('domain/collection/CollectionPlaythroughObjectFactory.ts');
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -56,18 +55,14 @@ angular.module('oppia').directive('collectionPlayerPage', [
         '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
-        'AlertsService', 'CollectionObjectFactory',
-        'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
-        'LoaderService', 'PageTitleService',
+        '$anchorScroll', '$http', '$location', '$scope', 'AlertsService',
+        'GuestCollectionProgressService', 'LoaderService', 'PageTitleService',
         'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
         'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location, $rootScope, $scope,
-            AlertsService, CollectionObjectFactory,
-            CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
-            LoaderService, PageTitleService,
+            $anchorScroll, $http, $location, $scope, AlertsService,
+            GuestCollectionProgressService, LoaderService, PageTitleService,
             ReadOnlyCollectionBackendApiService, UrlInterpolationService,
             UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
@@ -334,7 +329,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                       GuestCollectionProgressService.getNextExplorationId(
                         ctrl.collection, completedExplorationIds));
                     ctrl.collectionPlaythrough = (
-                      CollectionPlaythroughObjectFactory.create(
+                      CollectionPlaythrough.create(
                         nextExplorationId, completedExplorationIds));
                   } else {
                     ctrl.collectionPlaythrough = collection.getPlaythrough();

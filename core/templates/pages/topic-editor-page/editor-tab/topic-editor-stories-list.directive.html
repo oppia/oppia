@@ -1,8 +1,8 @@
 <table class="dashboard-table protractor-test-story-list-table">
   <colgroup>
-    <col style="width: 40%;">
-    <col style="width: 30%;">
-    <col style="width: 30%;">
+    <col class="oppia-colgroup-col-1">
+    <col class="oppia-colgroup-col-2">
+    <col class="oppia-colgroup-col-3">
   </colgroup>
   <tr>
     <th ng-repeat="key in STORY_TABLE_COLUMN_HEADINGS"
@@ -87,5 +87,14 @@
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
+  }
+
+  topic-editor-stories-list .oppia-colgroup-col-1 {
+    width: 40%;
+  }
+
+  topic-editor-stories-list .oppia-colgroup-col-2
+  topic-editor-stories-list .oppia-colgroup-col-3 {
+    width: 30%;
   }
 </style>

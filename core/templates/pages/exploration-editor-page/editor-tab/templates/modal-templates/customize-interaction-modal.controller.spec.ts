@@ -110,7 +110,6 @@ describe('Customize Interaction Modal Controller', function() {
       stateInteractionIdService.init(stateName, 'ImageClickInput');
 
       $scope = $rootScope.$new();
-      spyOn($scope, '$broadcast').and.callThrough();
 
       $controller('CustomizeInteractionModalController', {
         $injector: $injector,
@@ -123,30 +122,33 @@ describe('Customize Interaction Modal Controller', function() {
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
-        StateNextContentIdIndexService: stateNextContentIdIndexService
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     }));
 
-    it('should evaluate scope variable values correctly', function() {
-      expect($scope.customizationModalReopened).toBe(true);
-      // Image Click Input has 2 arg specs.
-      expect($scope.customizationArgSpecs.length).toBe(2);
-      expect(stateCustomizationArgsService.displayed).toEqual({
-        imageAndRegions: {
-          value: {
-            imagePath: '',
-            labeledRegions: []
-          }
-        },
-        highlightRegionsOnHover: {value: false}
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.customizationModalReopened).toBe(true);
+        // Image Click Input has 2 arg specs.
+        expect($scope.customizationArgSpecs.length).toBe(2);
+        expect(stateCustomizationArgsService.displayed).toEqual({
+          imageAndRegions: {
+            value: {
+              imagePath: '',
+              labeledRegions: []
+            }
+          },
+          highlightRegionsOnHover: {value: false}
+        });
+
+        expect(schemaBasedFormsSpy).toHaveBeenCalled();
+        expect($scope.form).toEqual({});
+        expect($scope.hasCustomizationArgs).toBe(true);
       });
 
-      expect(schemaBasedFormsSpy).toHaveBeenCalled();
-      expect($scope.form).toEqual({});
-      expect($scope.hasCustomizationArgs).toBe(true);
-    });
-
-    it('should get interaction thumbnail image url', function() {
+    it('should get complete interaction thumbnail icon path corresponding to' +
+      ' a given relative path', function() {
       var interactionId = 'i1';
       expect($scope.getInteractionThumbnailImageUrl(interactionId)).toBe(
         '/extensions/interactions/i1/static/i1.png');
@@ -173,8 +175,8 @@ describe('Customize Interaction Modal Controller', function() {
       stateCustomizationArgsService.displayed = {};
     });
 
-    it('should set state customization args when changing interaction id that' +
-      ' is not in cache', function() {
+    it('should update state customization args when changing interaction id' +
+      ' that is not in cache', function() {
       $scope.onChangeInteractionId('LogicProof');
 
       expect($scope.customizationArgSpecs.length).toBe(1);
@@ -205,7 +207,7 @@ describe('Customize Interaction Modal Controller', function() {
       interactionDetailsCacheService.removeDetails('LogicProof');
     });
 
-    it('should save interaction if there is no customization args left',
+    it('should save interaction when there are no customization args left',
       function() {
         spyOn(
           editorFirstTimeEventsService, 'registerFirstSaveInteractionEvent')
@@ -230,8 +232,8 @@ describe('Customize Interaction Modal Controller', function() {
         interactionDetailsCacheService.removeDetails('NumberWithUnits');
       });
 
-    it('should set state customization args when changing interaction id that' +
-      ' is in cache', function() {
+    it('should update state customization args when changing interaction id' +
+      ' that is in cache', function() {
       // Save logicProof on cache.
       stateInteractionIdService.displayed = 'LogicProof';
       $scope.returnToInteractionSelector();
@@ -250,7 +252,7 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should have save interaction button enabled and return warning' +
-      ' message', function() {
+      ' message when image is not provided', function() {
       $scope.form.schemaForm = {
         $valid: true
       };
@@ -341,7 +343,8 @@ describe('Customize Interaction Modal Controller', function() {
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
-        StateNextContentIdIndexService: stateNextContentIdIndexService
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     }));
 
@@ -431,7 +434,8 @@ describe('Customize Interaction Modal Controller', function() {
           StateCustomizationArgsService: stateCustomizationArgsService,
           StateEditorService: stateEditorService,
           StateInteractionIdService: stateInteractionIdService,
-          StateNextContentIdIndexService: stateNextContentIdIndexService
+          StateNextContentIdIndexService: stateNextContentIdIndexService,
+          showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
         });
       }).toThrowError(
         'Interaction is missing customization argument highlightRegionsOnHover'
@@ -505,7 +509,8 @@ describe('Customize Interaction Modal Controller', function() {
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
         StateNextContentIdIndexService: stateNextContentIdIndexService,
-        INTERACTION_SPECS: INTERACTION_SPECS
+        INTERACTION_SPECS: INTERACTION_SPECS,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     });
     stateNextContentIdIndexService.displayed = 0;
@@ -523,6 +528,60 @@ describe('Customize Interaction Modal Controller', function() {
       }]}
     });
     expect(stateNextContentIdIndexService.displayed).toEqual(2);
+
+    // Change customizationArgs to the older one in order to not affect other
+    // specs.
+    stateCustomizationArgsService.displayed = {};
+  });
+
+  it('should call showMarkAllAudioAsNeedingUpdateModalIfRequired ' +
+     'on updated customization arguments when saving', () => {
+    const mockShowMarkAllAudioAsNeedingUpdateModalIfRequired = (
+      jasmine.createSpy());
+
+    angular.mock.inject(function($injector, $controller) {
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
+
+      stateCustomizationArgsService.init(stateName, {
+        placeholder: {
+          value: new SubtitledUnicode('old value', 'ca_placeholder')
+        },
+        rows: {value: 1}
+      });
+      stateInteractionIdService.init(stateName, 'TextInput');
+
+      $scope = $rootScope.$new();
+
+      $controller('CustomizeInteractionModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        InteractionDetailsCacheService: interactionDetailsCacheService,
+        InteractionObjectFactory: interactionObjectFactory,
+        StateCustomizationArgsService: stateCustomizationArgsService,
+        StateEditorService: stateEditorService,
+        StateInteractionIdService: stateInteractionIdService,
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired:
+          mockShowMarkAllAudioAsNeedingUpdateModalIfRequired
+      });
+    });
+    stateNextContentIdIndexService.displayed = 0;
+    stateCustomizationArgsService.displayed = {
+      placeholder: {
+        value: new SubtitledUnicode('new value', 'ca_placeholder')
+      },
+      rows: {value: 1}
+    };
+
+    $scope.save();
+    expect(
+      mockShowMarkAllAudioAsNeedingUpdateModalIfRequired
+    ).toHaveBeenCalledWith(['ca_placeholder']);
 
     // Change customizationArgs to the older one in order to not affect other
     // specs.

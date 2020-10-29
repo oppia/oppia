@@ -215,8 +215,8 @@ class PretestHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET request."""
-        story_id = self.request.get('story_id')
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        story_url_fragment = self.request.get('story_url_fragment')
+        story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
         if story is None:
             raise self.InvalidInputException
         if not story.has_exploration(exploration_id):
@@ -262,7 +262,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         if self._assign_playthrough_to_corresponding_issue(
                 playthrough, exp_issues, issue_schema_version):
-            stats_services.save_exp_issues_model_transactional(exp_issues)
+            stats_services.save_exp_issues_model(exp_issues)
         self.render_json({})
 
     def _get_corresponding_exp_issue(

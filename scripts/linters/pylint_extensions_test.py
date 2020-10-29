@@ -2128,173 +2128,6 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class SingleSpaceAfterYieldTests(unittest.TestCase):
-
-    def setUp(self):
-        super(SingleSpaceAfterYieldTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.SingleSpaceAfterYieldChecker)
-        self.checker_test_object.setup_method()
-
-    def test_well_formed_yield_statement_on_single_line(self):
-        node_well_formed_one_line_yield_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    \"\"\"Below is the yield statement.\"\"\"
-                    yield (5, 2)
-                """)
-        node_well_formed_one_line_yield_file.file = filename
-        node_well_formed_one_line_yield_file.path = filename
-        node_well_formed_one_line_yield_file.fromlineno = 3
-
-        self.checker_test_object.checker.visit_yield(
-            node_well_formed_one_line_yield_file)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_well_formed_yield_statement_on_multiple_lines(self):
-        node_well_formed_mult_lines_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    yield (
-                        'This line was too long to be put on one line.')
-                """)
-        node_well_formed_mult_lines_file.file = filename
-        node_well_formed_mult_lines_file.path = filename
-        node_well_formed_mult_lines_file.fromlineno = 2
-
-        self.checker_test_object.checker.visit_yield(
-            node_well_formed_mult_lines_file)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_yield_nothing(self):
-        yield_nothing_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    yield
-                """)
-        yield_nothing_file.file = filename
-        yield_nothing_file.path = filename
-        yield_nothing_file.fromlineno = 2
-
-        self.checker_test_object.checker.visit_yield(
-            yield_nothing_file)
-
-        # No errors on yield statements that do nothing.
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_yield_in_multi_line_comment(self):
-        yield_in_multiline_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    \"\"\"
-                        yield(\"invalid yield format\")
-                    \"\"\"
-                    extract_node(\"\"\"
-                        yield   (invalid)
-                    \"\"\")
-                    extract_node(
-                    b\"\"\"
-                        yield(1, 2)
-                    \"\"\")
-                    extract_node(
-                    u\"\"\"
-                        yield(3, 4)
-                    \"\"\")
-                    )
-                """)
-        yield_in_multiline_file.file = filename
-        yield_in_multiline_file.path = filename
-
-        self.checker_test_object.checker.visit_yield(
-            yield_in_multiline_file)
-
-        # No errors on yield statements in multi-line comments.
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_too_many_spaces_after_yield_statement(self):
-        node_too_many_spaces_after_yield_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    yield  (5, 2)
-                """)
-        node_too_many_spaces_after_yield_file.file = filename
-        node_too_many_spaces_after_yield_file.path = filename
-        node_too_many_spaces_after_yield_file.fromlineno = 2
-
-        self.checker_test_object.checker.visit_yield(
-            node_too_many_spaces_after_yield_file)
-
-        message = testutils.Message(
-            msg_id='single-space-after-yield',
-            node=node_too_many_spaces_after_yield_file)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_no_space_after_yield_statement(self):
-        node_no_spaces_after_yield_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    yield(5, 2)
-                """)
-        node_no_spaces_after_yield_file.file = filename
-        node_no_spaces_after_yield_file.path = filename
-        node_no_spaces_after_yield_file.fromlineno = 2
-
-        self.checker_test_object.checker.visit_yield(
-            node_no_spaces_after_yield_file)
-
-        message = testutils.Message(
-            msg_id='single-space-after-yield',
-            node=node_no_spaces_after_yield_file)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-
 class DivisionOperatorCheckerTests(unittest.TestCase):
 
     def setUp(self):
@@ -2351,17 +2184,20 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# Something/
+                u"""# This is a multiline
+                # comment/
+
+                # Comment.
                 """)
         node_invalid_punctuation.file = filename
         node_invalid_punctuation.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_invalid_punctuation)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_invalid_punctuation))
 
         message = testutils.Message(
             msg_id='invalid-punctuation-used',
-            line=1)
+            line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2380,8 +2216,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_no_space_at_beginning.file = filename
         node_no_space_at_beginning.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_no_space_at_beginning)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_no_space_at_beginning))
 
         message = testutils.Message(
             msg_id='no-space-at-beginning',
@@ -2399,17 +2235,19 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# something.
+                u"""# coding: utf-8
+
+                    # something.
                 """)
         node_no_capital_letter_at_beginning.file = filename
         node_no_capital_letter_at_beginning.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_no_capital_letter_at_beginning)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_no_capital_letter_at_beginning))
 
         message = testutils.Message(
             msg_id='no-capital-letter-at-beginning',
-            line=1)
+            line=3)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2425,12 +2263,13 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""# coding: utf-8
                 # pylint: disable
+                a = 1 + 2  # pylint: disable
                 """)
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_comment_with_excluded_phrase)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_comment_with_excluded_phrase))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2444,13 +2283,15 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# variable_name is used.
+                u"""# coding: utf-8
+
+                # variable_name is used.
                 """)
         node_variable_name_in_comment.file = filename
         node_variable_name_in_comment.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_variable_name_in_comment)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_variable_name_in_comment))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2464,13 +2305,15 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# v2 is used.
+                u"""# coding: utf-8
+
+                # v2 is used.
                 """)
         node_comment_with_version_info.file = filename
         node_comment_with_version_info.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_comment_with_version_info)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_comment_with_version_info))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2484,13 +2327,15 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# str. variable is type of str.
+                u"""# coding: utf-8
+
+                # str. variable is type of str.
                 """)
         node_data_type_in_comment.file = filename
         node_data_type_in_comment.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_data_type_in_comment)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_data_type_in_comment))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2504,7 +2349,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""
+                u"""# coding: utf-8
                     \"\"\"# str. variable is type of str.\"\"\"
                     \"\"\"# str. variable is type
                     of str.\"\"\"
@@ -2512,8 +2357,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_inside_docstring.file = filename
         node_comment_inside_docstring.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_comment_inside_docstring)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_comment_inside_docstring))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2527,15 +2372,17 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# Multi
-                    # line
-                    # comment.
+                u"""# coding: utf-8
+
+                # Multi
+                # line
+                # comment.
                 """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2566,13 +2413,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_no_empty_line_below_fileoverview.file = filename
         node_no_empty_line_below_fileoverview.path = filename
+        node_no_empty_line_below_fileoverview.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_no_empty_line_below_fileoverview)
 
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
-            line=2)
+            node=node_no_empty_line_below_fileoverview)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2587,6 +2435,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
+
                     \"\"\" this file does something \"\"\"
 
 
@@ -2595,12 +2444,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_extra_empty_lines_below_fileoverview.file = filename
         node_extra_empty_lines_below_fileoverview.path = filename
+        node_extra_empty_lines_below_fileoverview.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_extra_empty_lines_below_fileoverview)
 
         message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided', line=2)
+            msg_id='only-a-single-empty-line-should-be-provided',
+            node=node_extra_empty_lines_below_fileoverview)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2623,12 +2474,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_extra_empty_lines_below_fileoverview.file = filename
         node_extra_empty_lines_below_fileoverview.path = filename
+        node_extra_empty_lines_below_fileoverview.fromlineno = 3
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_extra_empty_lines_below_fileoverview)
 
         message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided', line=3)
+            msg_id='only-a-single-empty-line-should-be-provided',
+            node=node_extra_empty_lines_below_fileoverview)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2650,13 +2503,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_no_empty_line_below_fileoverview.file = filename
         node_no_empty_line_below_fileoverview.path = filename
+        node_no_empty_line_below_fileoverview.fromlineno = 3
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_no_empty_line_below_fileoverview)
 
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
-            line=3)
+            node=node_no_empty_line_below_fileoverview)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2678,8 +2532,9 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
+        node_with_no_error_message.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
@@ -2688,7 +2543,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
     def test_file_with_no_file_overview(self):
         node_file_with_no_file_overview = astroid.scoped_nodes.Module(
             name='test',
-            doc='Custom test')
+            doc=None)
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
@@ -2701,7 +2556,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_file_with_no_file_overview.file = filename
         node_file_with_no_file_overview.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_file_with_no_file_overview)
 
         with self.checker_test_object.assertNoMessages():
@@ -2720,13 +2575,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                     \"\"\" this file does something \"\"\"   """)
         node_file_overview_at_end_of_file.file = filename
         node_file_overview_at_end_of_file.path = filename
+        node_file_overview_at_end_of_file.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_file_overview_at_end_of_file)
 
         message = testutils.Message(
-            msg_id='no-empty-line-provided-below-fileoverview',
-            line=2)
+            msg_id='only-a-single-empty-line-should-be-provided',
+            node=node_file_overview_at_end_of_file)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2885,4 +2741,124 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
             line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+
+class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(SingleSpaceAfterKeyWordCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SingleSpaceAfterKeyWordChecker)
+        self.checker_test_object.setup_method()
+
+    def test_no_space_after_keyword(self):
+        node_no_space_after_keyword = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                if(False):
+                    pass
+                elif(True):
+                    pass
+                while(True):
+                    pass
+                yield(1)
+                return True if(True) else False
+                """)
+        node_no_space_after_keyword.file = filename
+        node_no_space_after_keyword.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_no_space_after_keyword))
+
+        if_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('if'), line=2)
+        elif_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('elif'), line=4)
+        while_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('while'), line=6)
+        yield_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('yield'), line=8)
+        if_exp_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('if'), line=9)
+
+        with self.checker_test_object.assertAddsMessages(
+            if_message, elif_message, while_message, yield_message,
+            if_exp_message):
+            temp_file.close()
+
+    def test_multiple_spaces_after_keyword(self):
+        node_multiple_spaces_after_keyword = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                if  False:
+                    pass
+                elif  True:
+                    pass
+                while  True:
+                    pass
+                yield  1
+                return True if  True else False
+                """)
+        node_multiple_spaces_after_keyword.file = filename
+        node_multiple_spaces_after_keyword.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_multiple_spaces_after_keyword))
+
+        if_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('if'), line=2)
+        elif_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('elif'), line=4)
+        while_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('while'), line=6)
+        yield_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('yield'), line=8)
+        if_exp_message = testutils.Message(
+            msg_id='single-space-after-keyword', args=('if'), line=9)
+
+        with self.checker_test_object.assertAddsMessages(
+            if_message, elif_message, while_message, yield_message,
+            if_exp_message):
+            temp_file.close()
+
+    def test_single_space_after_keyword(self):
+        node_single_space_after_keyword = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                if False:
+                    pass
+                elif True:
+                    pass
+                while True:
+                    pass
+                yield 1
+                return True if True else False
+                """)
+        node_single_space_after_keyword.file = filename
+        node_single_space_after_keyword.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_single_space_after_keyword))
+
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()

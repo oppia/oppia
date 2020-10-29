@@ -30,8 +30,8 @@ angular.module('oppia').directive('schemaBasedUnicodeViewer', [
         'schema-based-unicode-viewer.directive.html'),
       restrict: 'E',
       controller: [
-        '$scope', '$filter', '$sce',
-        function($scope, $filter, $sce) {
+        '$filter', '$sce', '$scope',
+        function($filter, $sce, $scope) {
           $scope.getDisplayedValue = function() {
             return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
               $scope.localValue));

@@ -25,6 +25,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
@@ -265,7 +266,7 @@ def get_exploration_metadata_dicts(exploration_ids, user):
                 exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
-                    rights_manager.ACTIVITY_STATUS_PRIVATE):
+                    rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user.user_id is None:
                     continue
 
@@ -327,7 +328,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
                 exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
-                    rights_manager.ACTIVITY_STATUS_PRIVATE):
+                    rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user is None:
                     continue
                 if not rights_manager.check_can_edit_activity(
@@ -443,7 +444,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
     displayable_collection_summaries = []
     for collection_summary in collection_summaries:
         if collection_summary and collection_summary.status != (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
+                rights_domain.ACTIVITY_STATUS_PRIVATE):
             displayable_collection_summaries.append({
                 'id': collection_summary.id,
                 'title': collection_summary.title,
@@ -605,7 +606,7 @@ def require_activities_to_be_public(activity_references):
                 raise Exception(
                     'Cannot feature non-existent %s with id %s' %
                     (activities_info['type'], activities_info['ids'][index]))
-            if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            if summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                 raise Exception(
                     'Cannot feature private %s with id %s' %
                     (activities_info['type'], activities_info['ids'][index]))

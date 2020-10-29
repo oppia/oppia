@@ -59,8 +59,8 @@ describe('Testing filters', function() {
           val: 0
         }
       ];
-      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
-        interactionIdMultipleChoice, choicesMultipleChoice)
+      expect($filter('parameterizeRuleDescription')(
+        ruleMultipleChoice, interactionIdMultipleChoice, choicesMultipleChoice)
       ).toEqual(
         'is equal to \'$10 should not become $$10\', without taking case' +
         ' into account'
@@ -72,8 +72,8 @@ describe('Testing filters', function() {
           val: 0
         }
       ];
-      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
-        interactionIdMultipleChoice, choicesMultipleChoice)
+      expect($filter('parameterizeRuleDescription')(
+        ruleMultipleChoice, interactionIdMultipleChoice, choicesMultipleChoice)
       ).toEqual(
         'is equal to \'$xyz should not become $$xyz\', ' +
         'without taking case into account');
@@ -147,15 +147,16 @@ describe('Testing filters', function() {
       ];
 
       expect($filter('convertToPlainText')($filter('formatRtePreview')(
-        $filter('parameterizeRuleDescription')(ruleMath, interactionIdMath,
-          choicesMath)))
+        $filter('parameterizeRuleDescription')(
+          ruleMath, interactionIdMath, choicesMath)))
       ).toEqual(
         'is ' + 'equal to \'[Math]\', without taking case into account');
 
       expect($filter('convertToPlainText')($filter('formatRtePreview')(
-        $filter('parameterizeRuleDescription')(ruleMixed, interactionIdMixed,
-          choicesMixed)))
-      ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
+        $filter('parameterizeRuleDescription')(
+          ruleMixed, interactionIdMixed, choicesMixed)))
+      ).toEqual(
+        'is ' + 'equal to \'[Image] This is a text ' +
         'input. [Image]  [Link]\', without taking case into account');
     })
   );

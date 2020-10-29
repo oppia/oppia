@@ -41,12 +41,11 @@ angular.module('oppia').directive('learnerViewInfo', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$uibModal', 'ContextService',
-        'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-        'UrlService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
+        'ReadOnlyExplorationBackendApiService', 'UrlService',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-        function($http, $log, $uibModal, ContextService,
-            ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-            UrlService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
+        function(
+            $http, $log, $uibModal, ContextService,
+            ReadOnlyExplorationBackendApiService, UrlService,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var ctrl = this;
           var explorationId = ContextService.getExplorationId();

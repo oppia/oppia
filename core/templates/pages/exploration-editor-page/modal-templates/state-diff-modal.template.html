@@ -5,30 +5,30 @@
   </h3>
 </div>
 
-<table class="table" style="margin-left: 20px; table-layout: fixed; width: 97%">
+<table class="table oppia-state-diff-table">
   <!--
     Spacing on the left of table and in the middle of the table is to
     ensure text above each pane is aligned to codemirror gutter.
    -->
-  <td style="width: 47%; word-wrap: break-word">
+  <td class="colgroup-1">
     <div>
       <[headers.leftPane]>
     </div>
   </td>
-  <td style="width: 6%"></td>
-  <td style="width: 47%; word-wrap: break-word">
+  <td class="colgroup-2"></td>
+  <td class="colgroup-3">
     <div>
       <[headers.rightPane]>
     </div>
   </td>
 </table>
 
-<div class="modal-body" style="margin-top: -30px" ng-cloak>
+<div class="modal-body" ng-cloak>
   <codemirror-mergeview options="CODEMIRROR_MERGEVIEW_OPTIONS"
                         left-value="yamlStrs.leftPane"
                         right-value="yamlStrs.rightPane">
   </codemirror-mergeview>
-  <div align="center" style="margin-bottom: 20px">
+  <div align="center" class="oppia-click-arrows-text">
     <strong>Click arrows to desynchronize scrolling</strong>
   </div>
 </div>
@@ -53,5 +53,20 @@
   }
   .state-diff-modal .modal-body {
     height: 60vh;
+    margin-top: -30px;
+  }
+  .state-diff-modal .colgroup-1 {
+    width: 47%;
+    word-wrap: break-word;
+  }
+  .state-diff-modal .colgroup-2 {
+    width: 6%;
+  }
+  .state-diff-modal .colgroup-3 {
+    width: 47%;
+    word-wrap: break-word;
+  }
+  .state-diff-modal .oppia-click-arrows-text {
+    margin-bottom: 20px;
   }
 </style>

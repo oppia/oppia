@@ -312,7 +312,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_and_set_exploration_recommendations(self):
         recommended_exp_ids = ['exp_id_2', 'exp_id_3']
-        recommendations_services.set_recommendations(
+        recommendations_services.set_exploration_recommendations(
             'exp_id_1', recommended_exp_ids)
         saved_recommendation_ids = (
             recommendations_services.get_exploration_recommendations(
@@ -320,9 +320,38 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
 
         recommended_exp_ids = ['exp_id_3']
-        recommendations_services.set_recommendations(
+        recommendations_services.set_exploration_recommendations(
             'exp_id_1', recommended_exp_ids)
         saved_recommendation_ids = (
             recommendations_services.get_exploration_recommendations(
                 'exp_id_1'))
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
+
+    def test_delete_recommendations_for_exploration(self):
+        recommendations_services.delete_explorations_from_recommendations([
+            'exp_id_1', 'exp_id_2'])
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                'exp_id_1'))
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                'exp_id_2'))
+
+    def test_delete_exploration_from_recommendations(self):
+        recommendations_services.set_exploration_recommendations(
+            'exp_id_1', ['exp_id_3', 'exp_id_4'])
+        recommendations_services.set_exploration_recommendations(
+            'exp_id_2', ['exp_id_1', 'exp_id_3', 'exp_id_4'])
+
+        recommendations_services.delete_explorations_from_recommendations([
+            'exp_id_3', 'exp_id_4'])
+        recommendations_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                'exp_id_1'))
+        recommendations_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                'exp_id_2'))
+        self.assertEqual(
+            [], recommendations_1.recommended_exploration_ids)
+        self.assertEqual(
+            ['exp_id_1'], recommendations_2.recommended_exploration_ids)

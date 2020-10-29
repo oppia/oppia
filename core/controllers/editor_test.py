@@ -31,6 +31,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import user_services
@@ -1018,13 +1019,21 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                     exp_id, 'invalid_state_name'),
                 expected_status_int=404)
 
+        self.assertEqual(len(observed_log_messages), 3)
         self.assertEqual(
-            observed_log_messages,
+            observed_log_messages[:2],
             [
                 'Could not find state: invalid_state_name',
                 'Available states: [u\'Introduction\']'
             ]
         )
+        # The last log message is the traceback for an Exception. It cannot be
+        # exactly compared to a static string because the traceback includes
+        # filepaths which will vary depending on the machine that runs the
+        # test. So the starting portion of the traceback that will remain
+        # constant is matched instead.
+        self.assertTrue(
+            'Traceback (most recent call last):' in observed_log_messages[2])
 
         self.logout()
 
@@ -1077,11 +1086,11 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
         rights_manager.assign_role_for_exploration(
             self.owner, unpublished_exp_id, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_exploration(
             self.owner, unpublished_exp_id, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_VOICE_ARTIST)
 
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
@@ -1116,10 +1125,10 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_VOICE_ARTIST)
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
@@ -1464,25 +1473,25 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.VIEWER_USERNAME,
-                'new_member_role': rights_manager.ROLE_VIEWER
+                'new_member_role': rights_domain.ROLE_VIEWER
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.VOICE_ARTIST_USERNAME,
-                'new_member_role': rights_manager.ROLE_VOICE_ARTIST
+                'new_member_role': rights_domain.ROLE_VOICE_ARTIST
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR2_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
 
         self.logout()
@@ -1522,7 +1531,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
             }, csrf_token=csrf_token,
             expected_status_int=401)
 
@@ -1557,7 +1566,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token, expected_status_int=401)
 
         self.logout()
@@ -1576,7 +1585,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_manager.ROLE_EDITOR,
+                'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token, expected_status_int=401)
 
         self.logout()
@@ -1960,7 +1969,8 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                 'Thanks!<br>'
                 '%s (Oppia moderator)<br><br>'
                 'You can change your email preferences via the '
-                '<a href="https://www.example.com">Preferences</a> page.' % (
+                '<a href="http://localhost:8181/preferences">Preferences</a> '
+                'page.' % (
                     self.EDITOR_USERNAME,
                     new_email_body,
                     self.MODERATOR_USERNAME)))
@@ -2112,6 +2122,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID, 1)
         exp_issues_model.unresolved_issues[1]['is_valid'] = False
+        exp_issues_model.update_timestamps()
         exp_issues_model.put()
 
         response = self.get_json(
@@ -2388,6 +2399,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         exp_user_data.draft_change_list_exp_version = 20
+        exp_user_data.update_timestamps()
         exp_user_data.put()
         response = self.get_json(
             '/createhandler/data/%s' % self.EXP_ID2,

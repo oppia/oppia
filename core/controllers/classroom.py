@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -33,8 +32,7 @@ class ClassroomPage(base.BaseHandler):
     def get(self, _):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS or not (
-                config_domain.CLASSROOM_PAGE_IS_SHOWN.value):
+        if not config_domain.CLASSROOM_PAGE_IS_ACCESSIBLE.value:
             raise self.PageNotFoundException
 
         self.render_template('classroom-page.mainpage.html')
@@ -51,22 +49,24 @@ class ClassroomDataHandler(base.BaseHandler):
     def get(self, classroom_url_fragment):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
         topic_ids = classroom.topic_ids
         topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_services.get_multi_topic_rights(topic_ids)
-        topic_summary_dicts = [
+        public_topic_summary_dicts = [
             summary.to_dict() for ind, summary in enumerate(topic_summaries)
             if summary is not None and topic_rights[ind].topic_is_published
         ]
+        private_topic_summary_dicts = [
+            summary.to_dict() for ind, summary in enumerate(topic_summaries)
+            if summary is not None and not topic_rights[ind].topic_is_published
+        ]
 
         self.values.update({
-            'topic_summary_dicts': topic_summary_dicts,
+            'public_topic_summary_dicts': public_topic_summary_dicts,
+            'private_topic_summary_dicts': private_topic_summary_dicts,
             'topic_list_intro': classroom.topic_list_intro,
             'course_details': classroom.course_details,
             'name': classroom.name
@@ -74,8 +74,8 @@ class ClassroomDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ClassroomPageStatusHandler(base.BaseHandler):
-    """The handler for checking whether the classroom page is shown."""
+class ClassroomPromosStatusHandler(base.BaseHandler):
+    """The handler for checking whether the classroom promos are enabled."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     # This prevents partially logged in user from being logged out
@@ -85,6 +85,6 @@ class ClassroomPageStatusHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         self.render_json({
-            'classroom_page_is_shown': (
-                config_domain.CLASSROOM_PAGE_IS_SHOWN.value)
+            'classroom_promos_are_enabled': (
+                config_domain.CLASSROOM_PROMOS_ARE_ENABLED.value)
         })

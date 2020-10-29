@@ -106,7 +106,7 @@ export class NumberWithUnitsValidationService {
     var ranges = [];
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].getRulesAsList();
+      var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
@@ -116,7 +116,7 @@ export class NumberWithUnitsValidationService {
 
         for (var k = 0; k < ranges.length; k++) {
           var earlierRule = answerGroups[ranges[k].answerGroupIndex].
-            getRulesAsList()[ranges[k].ruleIndex];
+            rules[ranges[k].ruleIndex];
           if (earlierRule.type === 'IsEqualTo' &&
             rule.type === 'IsEqualTo') {
             if (checkEquality.call(this, earlierRule, rule)) {
@@ -132,9 +132,7 @@ export class NumberWithUnitsValidationService {
             }
           }
 
-          const currentIsEquivalentTo = rule.type === 'IsEquivalentTo';
-          const earlierIsEquivalentTo = earlierRule.type === 'IsEquivalentTo';
-          if (earlierIsEquivalentTo || currentIsEquivalentTo) {
+          if (earlierRule.type === 'IsEquivalentTo') {
             if (checkEquivalency.call(this, earlierRule, rule)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,

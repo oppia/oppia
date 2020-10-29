@@ -104,7 +104,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         scope.SOUNDFONT_URL =
-        '/third_party/static/midi-js-a8a842/examples/soundfont/';
+        '/third_party/static/midi-js-c26ebb/examples/soundfont/';
 
         const {
           sequenceToGuess,
@@ -119,6 +119,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         scope.initialSequence = scope.interactionIsActive ?
           initialSequence :
           scope.getLastAnswer();
+
+        scope.directiveSubscriptions = new Subscription();
 
         scope.directiveSubscriptions.add(
           PlayerPositionService.onNewCardAvailable.subscribe(() => {
@@ -187,7 +189,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // Highest number of notes that can fit on the staff at any given time.
         var MAXIMUM_NOTES_POSSIBLE = 8;
 
-        var noteChoicesElt = element.find('.oppia-music-input-note-choices');
         var staffContainerElt = element.find('.oppia-music-input-staff');
 
         // Staff has to be reinitialized every time that the staff is resized or
@@ -215,14 +216,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           scope.VERTICAL_GRID_SPACING = scope.CONTAINER_HEIGHT /
             verticalGridKeys.length;
 
-          var staffTop = computeStaffTop();
-          var staffBottom = computeStaffBottom();
-
-          // The farthest edge of the staff. If a note is placed beyond this
-          // position, it will be discarded.
-          var RIGHT_EDGE_OF_STAFF_POSITION =
-            element.find('.oppia-music-input-valid-note-area').width();
-
           clearNotesFromStaff();
           initPalette();
 
@@ -249,22 +242,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
             };
             scope._addNoteToNoteSequence(initialNote);
           }
-        };
-
-        // Gets the staff top by getting the first staff line's position and
-        // subtracting one vertical grid space from it.
-        var computeStaffTop = function() {
-          return (
-            getStaffLinePositions()[verticalGridKeys[0]] -
-            scope.VERTICAL_GRID_SPACING
-          );
-        };
-
-        // Gets the staff bottom position by adding the staff top position value
-        // with the total sum of all the vertical grid spaces (staff lines).
-        var computeStaffBottom = function() {
-          return computeStaffTop() + (
-            scope.VERTICAL_GRID_SPACING * verticalGridKeys.length);
         };
 
         // Removes all notes from staff.
@@ -300,7 +277,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var validNoteArea = element.find(
             '.oppia-music-input-valid-note-area');
           for (var i = 0; i < NOTE_TYPES.length; i++) {
-            var className = 'oppia-music-input-natural-note';
             var innerDiv = $('<div></div>')
               .data('noteType', NOTE_TYPES[i])
               .addClass(function(index, currentClassName) {
@@ -322,7 +298,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
                 stop: function(evt, ui) {
                   if (!isCloneOffStaff($(ui.helper))) {
                     // This makes the helper clone a new draggable note.
-                    var helperClone = $(ui.helper)
+                    $(ui.helper)
                     // Retains original note type (e.g. natural, flat, sharp).
                       .data('noteType', $(this).data('noteType'))
                       .draggable({
@@ -453,7 +429,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
 
                   // Position of current dropped note.
                   var leftPos = ui.helper.position().left;
-                  var leftPosBeforeMove = leftPos;
                   var topPos = $(evt.target).position().top;
 
                   // The staff line's value.
@@ -562,9 +537,10 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         //   than b.
         var compareNoteStarts = function(a, b) {
           if (a.note.noteStart && b.note.noteStart) {
-            return (a.note.noteStart.num * b.note.noteStart.den -
-                    a.note.noteStart.den * b.note.noteStart.num) /
-                   (a.note.noteStart.den * b.note.noteStart.den);
+            return (
+              a.note.noteStart.num * b.note.noteStart.den -
+              a.note.noteStart.den * b.note.noteStart.num) /
+              (a.note.noteStart.den * b.note.noteStart.den);
           }
         };
 
@@ -641,15 +617,16 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var lastHorizontalPositionOffset = element.find(
             '.oppia-music-input-note-choices div:first-child').position().left;
           var leftOffset =
-            lastHorizontalPositionOffset - ((MAXIMUM_NOTES_POSSIBLE - 1) *
-                            scope.HORIZONTAL_GRID_SPACING);
+            lastHorizontalPositionOffset - (
+              (MAXIMUM_NOTES_POSSIBLE - 1) * scope.HORIZONTAL_GRID_SPACING);
           return leftOffset + (
             noteStartAsFloat * scope.HORIZONTAL_GRID_SPACING);
         };
 
         var isCloneOffStaff = function(helperClone) {
-          return (!(helperClone.position().top > scope.staffTop &&
-                  helperClone.position().top < scope.staffBottom));
+          return (!(
+            helperClone.position().top > scope.staffTop &&
+            helperClone.position().top < scope.staffBottom));
         };
 
         var isLedgerLineNote = function(lineValue) {
@@ -724,8 +701,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var correspondingNoteName =
             _getCorrespondingNoteName(note.baseNoteMidiNumber);
 
-          var accidental = (note.offset === 1 ? '#' :
-            note.offset === 0 ? '' : 'b');
+          var accidental = (
+            note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b');
 
           return {
             readableNoteName:

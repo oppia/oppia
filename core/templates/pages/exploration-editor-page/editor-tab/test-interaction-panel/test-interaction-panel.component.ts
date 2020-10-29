@@ -31,12 +31,11 @@ angular.module('oppia').component('testInteractionPanel', {
   },
   template: require('./test-interaction-panel.component.html'),
   controller: [
-    '$scope', 'ExplorationStatesService',
-    'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-    'CurrentInteractionService',
-    function($scope, ExplorationStatesService,
-        INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
-        CurrentInteractionService) {
+    '$scope', 'CurrentInteractionService', 'ExplorationStatesService',
+    'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
+    function(
+        $scope, CurrentInteractionService, ExplorationStatesService,
+        INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
       var ctrl = this;
       $scope.onSubmitAnswerFromButton = function() {
         CurrentInteractionService.submitAnswer();

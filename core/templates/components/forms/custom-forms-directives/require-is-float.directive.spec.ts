@@ -26,7 +26,7 @@ require(
   'require-is-float.directive.ts');
 
 describe('Testing requireIsFloat directive', function() {
-  var $compile, scope, testInput;
+  var scope, testInput;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {

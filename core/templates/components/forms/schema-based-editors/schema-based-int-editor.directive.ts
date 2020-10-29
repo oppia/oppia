@@ -36,8 +36,8 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
       template: require('./schema-based-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'SchemaFormSubmittedService',
-        function($scope, SchemaFormSubmittedService) {
+        'SchemaFormSubmittedService',
+        function(SchemaFormSubmittedService) {
           var ctrl = this;
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {

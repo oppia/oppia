@@ -105,8 +105,6 @@ let fixture: ComponentFixture<TeachPageComponent>;
 describe('Teach Page', function() {
   let windowRef: MockWindowRef;
   let siteAnalyticsService = null;
-  let i18n = null;
-  let translate = null;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
@@ -124,8 +122,6 @@ describe('Teach Page', function() {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    i18n = TestBed.get(I18nLanguageCodeService);
-    translate = TestBed.get(TranslateService);
     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
   }));
 

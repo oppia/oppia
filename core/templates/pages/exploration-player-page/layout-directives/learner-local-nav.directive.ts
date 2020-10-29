@@ -27,8 +27,6 @@ require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
-  'pages/exploration-player-page/services/exploration-player-state.service.ts');
-require(
   'pages/exploration-player-page/layout-directives/' +
   'feedback-popup.directive.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -37,7 +35,6 @@ require(
   'suggestion-modal-for-exploration-player.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
@@ -53,18 +50,18 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$uibModal', 'AlertsService', 'LoaderService',
-        'ExplorationEngineService', 'ExplorationPlayerStateService',
-        'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
+        '$http', '$uibModal', 'AlertsService', 'ExplorationEngineService',
+        'LoaderService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
-        'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
+        'UrlInterpolationService', 'UserService',
+        'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $uibModal, AlertsService, LoaderService,
-            ExplorationEngineService, ExplorationPlayerStateService,
-            FocusManagerService, ReadOnlyExplorationBackendApiService,
+            $http, $uibModal, AlertsService, ExplorationEngineService,
+            LoaderService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
-            UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
+            UrlInterpolationService, UserService,
+            ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getFeedbackPopoverUrl = function() {
@@ -122,9 +119,15 @@ angular.module('oppia').directive('learnerLocalNav', [
                 ctrl.canEdit = exploration.can_edit;
               });
             ctrl.username = '';
+            ctrl.feedbackOptionIsShown = true;
             LoaderService.showLoadingScreen('Loading');
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
+              if (
+                ctrl.username === null &&
+                !ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS) {
+                ctrl.feedbackOptionIsShown = false;
+              }
               LoaderService.hideLoadingScreen();
             });
           };

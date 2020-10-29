@@ -23,8 +23,7 @@
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
 
       <div class="conversation-skin-main-tutor-card-embed"
-           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}"
-           style="margin-bottom: 100px">
+           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}">
         <tutor-card displayed-card="displayedCard"
                     avatar-image-is-shown="true"
                     start-card-change-animation="startCardChangeAnimation">
@@ -406,6 +405,10 @@ directive. -->
   .conversation-skin-learner-answer-content {
     background-color: rgba(236, 239, 241, 1);
     border-bottom-right-radius: 0;
+  }
+
+  conversation-skin .conversation-skin-main-tutor-card-embed {
+    margin-bottom: 100px;
   }
 
   /*

@@ -23,7 +23,8 @@ require(
 angular.module('oppia').controller('ChangeQuestionDifficultyModalController', [
   '$controller', '$scope', '$uibModalInstance', 'linkedSkillsWithDifficulty',
   'skillIdToRubricsObject',
-  function($controller, $scope, $uibModalInstance, linkedSkillsWithDifficulty,
+  function(
+      $controller, $scope, $uibModalInstance, linkedSkillsWithDifficulty,
       skillIdToRubricsObject) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,

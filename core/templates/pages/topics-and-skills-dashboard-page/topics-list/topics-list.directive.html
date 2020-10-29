@@ -13,7 +13,7 @@
           class="dashboard-table-headings">
         <p ng-if="key === 'index'"></p>
         <p ng-if="key === 'name'" id="dashboard-table-headings-details">Details</p>
-        <p ng-if="key === 'canonical_story_count'">Stories</p>
+        <p ng-if="key === 'canonical_story_count'">Published Stories</p>
         <p ng-if="key === 'subtopic_count'">Subtopics</p>
         <p ng-if="key === 'skill_count'" class="text-center">Skills</p>
         <p ng-if="key === 'topic_status'" class="text-center">Topic Status</p>
@@ -67,16 +67,18 @@
       <td class="text-center topic-list-status">
         <span class="topic-list-status-text" ng-if="topic.isPublished"> Published </span>
         <span class="topic-list-status-text" ng-if="!topic.isPublished"> Not Published </span>
-        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.changeEditOptions(topic.id)"></p>
-        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-click="$ctrl.changeEditOptions(null)">
+        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.changeEditOptions(topic.id)" aria-label="Topic edit"></p>
+        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options">
           <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
             <i class="fa fa-pen"></i>
             <span>Edit</span>
           </a>
-          <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id, topic.name)">
-            <i class="fas fa-trash-alt protractor-test-delete-topic-button"></i>
-            <span>Delete</span>
-          </a>
+          <span ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id, topic.name)">
+            <a>
+              <i class="fas fa-trash-alt protractor-test-delete-topic-button"></i>
+              <span>Delete</span>
+            </a>
+          </span>
         </div>
       </td>
     </tr>
@@ -122,7 +124,7 @@
               <span><[topic.canonicalStoryCount]></span>
             </div>
             <div class="topic-item-type">
-              Stories
+              Published Stories
             </div>
           </div>
           <div class="topic-item-entity">

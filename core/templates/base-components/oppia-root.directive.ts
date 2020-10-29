@@ -21,8 +21,8 @@
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-angular.module('oppia').directive('oppiaRoot', ['$translate',
-  function($translate) {
+angular.module('oppia').directive('oppiaRoot', [
+  '$translate', function($translate) {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
@@ -44,6 +44,7 @@ angular.module('oppia').directive('oppiaRoot', ['$translate',
             );
             i18nLanguageCodeService.setI18nLanguageCode(
               $translate.proposedLanguage() || $translate.use());
+
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;
           };

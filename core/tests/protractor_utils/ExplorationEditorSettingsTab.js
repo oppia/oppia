@@ -19,13 +19,12 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
-  var editParamChanges = element(
-    by.css('.protractor-test-exploration-edit-param-changes'));
   var explorationCategoryInput = element(
     by.css('.protractor-test-exploration-category-input'));
   var explorationLanguageInput = element(
@@ -48,15 +47,10 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Buttons
    */
-  var addParamButton = element(by.css('.protractor-test-add-param-button'));
   var closePreviewSummaryButton = element(
     by.css('.protractor-test-close-preview-summary-modal'));
-  var enableParametersSwitch = element(
-    by.css('.protractor-test-enable-parameters'));
   var openPreviewSummaryButton = element(
     by.css('.protractor-test-open-preview-summary-modal'));
-  var saveParamChangesButton = element(
-    by.css('.protractor-test-save-param-changes-button'));
   var deleteExplorationButton = element(
     by.css('.protractor-test-delete-exploration-button'));
   var confirmDeleteExplorationButton = element(
@@ -68,13 +62,15 @@ var ExplorationEditorSettingsTab = function() {
    * Workflows
    */
   this.deleteExploration = async function() {
-    await waitFor.elementToBeClickable(deleteExplorationButton,
-      'Delete Exploration button is not clickable');
+    await waitFor.elementToBeClickable(
+      deleteExplorationButton, 'Delete Exploration button is not clickable');
     await deleteExplorationButton.click();
-    await waitFor.elementToBeClickable(confirmDeleteExplorationButton,
+    await waitFor.elementToBeClickable(
+      confirmDeleteExplorationButton,
       'Confirm Delete Exploration button is not clickable');
     await confirmDeleteExplorationButton.click();
-    await waitFor.invisibilityOf(confirmDeleteExplorationButton,
+    await waitFor.invisibilityOf(
+      confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
     // Returning to /creator-dashboard.
     await waitFor.pageToFullyLoad();
@@ -82,9 +78,8 @@ var ExplorationEditorSettingsTab = function() {
 
   this.enableCorrectnessFeedback = async function() {
     expect(await enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
-    await waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
-      'Enable correctness feedback button is not clickable.');
-    await enableCorrectnessFeedbackButton.click();
+    await action.click(
+      'Enable Correctness Feedback Button', enableCorrectnessFeedbackButton);
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
@@ -97,12 +92,12 @@ var ExplorationEditorSettingsTab = function() {
 
   this.openAndClosePreviewSummaryTile = async function() {
     await openPreviewSummaryButton.click();
-    await waitFor.visibilityOf(explorationSummaryTile,
-      'Summary Tile takes too long to appear');
+    await waitFor.visibilityOf(
+      explorationSummaryTile, 'Summary Tile takes too long to appear');
     expect(await explorationSummaryTile.isPresent()).toBeTruthy();
     await closePreviewSummaryButton.click();
-    await waitFor.invisibilityOf(explorationSummaryTile,
-      'Summary Tile takes too long to disappear');
+    await waitFor.invisibilityOf(
+      explorationSummaryTile, 'Summary Tile takes too long to disappear');
     expect(await explorationSummaryTile.isPresent()).toBeFalsy();
   };
 

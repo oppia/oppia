@@ -33,7 +33,6 @@ require(
 require('domain/collection/collection-rights-backend-api.service.ts');
 require('domain/collection/collection-update.service.ts');
 require('domain/collection/collection-validation.service.ts');
-require('domain/collection/editable-collection-backend-api.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -53,17 +52,15 @@ angular.module('oppia').directive('collectionEditorNavbar', [
         'collection-editor-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'AlertsService', 'RouterService',
-        'UndoRedoService', 'CollectionEditorStateService',
-        'CollectionValidationService',
-        'CollectionRightsBackendApiService',
-        'EditableCollectionBackendApiService', 'UrlService',
+        '$rootScope', '$uibModal', 'AlertsService',
+        'CollectionEditorStateService', 'CollectionRightsBackendApiService',
+        'CollectionValidationService', 'RouterService',
+        'UndoRedoService', 'UrlService',
         function(
-            $scope, $rootScope, $uibModal, AlertsService, RouterService,
-            UndoRedoService, CollectionEditorStateService,
-            CollectionValidationService,
-            CollectionRightsBackendApiService,
-            EditableCollectionBackendApiService, UrlService) {
+            $rootScope, $uibModal, AlertsService,
+            CollectionEditorStateService, CollectionRightsBackendApiService,
+            CollectionValidationService, RouterService,
+            UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _validateCollection = function() {
@@ -214,7 +211,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
               )
             );
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+              UndoRedoService.onUndoRedoChangeApplied$().subscribe(
                 () => _validateCollection()
               )
             );

@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for RefresherExplorationConfirmationModalController.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Refresher Exploration Confirmation Modal Controller', function() {
+  importAllAngularServices();
+
   var $flushPendingTasks = null;
   var $scope = null;
   var $uibModalInstance = null;
@@ -59,24 +65,25 @@ describe('Refresher Exploration Confirmation Modal Controller', function() {
     });
   }));
 
-  it('should confirm redirect', function() {
-    spyOn(ExplorationEngineService, 'getExplorationId').and.returnValue(
-      explorationId);
-    spyOn(UrlService, 'getUrlParams').and.returnValue({
-      collection_id: 'collection_1'
+  it('should redirect page when clicking on allowing redirect button',
+    function() {
+      spyOn(ExplorationEngineService, 'getExplorationId').and.returnValue(
+        explorationId);
+      spyOn(UrlService, 'getUrlParams').and.returnValue({
+        collection_id: 'collection_1'
+      });
+      spyOn(UrlService, 'getQueryFieldValuesAsList').and.returnValue([
+        'field_1', 'field_2']);
+      spyOn(mockWindow, 'open').and.callThrough();
+      $scope.confirmRedirect();
+
+      $flushPendingTasks();
+      $verifyNoPendingTasks('$timeout');
+
+      expect(redirectConfirmationCallback).toHaveBeenCalled();
+      expect(mockWindow.open).toHaveBeenCalledWith(
+        '/explore/exp2?collection_id=collection_1&parent=field_1&' +
+        'parent=field_2&parent=exp1', '_self');
+      expect($uibModalInstance.close).toHaveBeenCalled();
     });
-    spyOn(UrlService, 'getQueryFieldValuesAsList').and.returnValue([
-      'field_1', 'field_2']);
-    spyOn(mockWindow, 'open').and.callThrough();
-    $scope.confirmRedirect();
-
-    $flushPendingTasks();
-    $verifyNoPendingTasks('$timeout');
-
-    expect(redirectConfirmationCallback).toHaveBeenCalled();
-    expect(mockWindow.open).toHaveBeenCalledWith(
-      '/explore/exp2?collection_id=collection_1&parent=field_1&' +
-      'parent=field_2&parent=exp1', '_self');
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
 });

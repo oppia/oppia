@@ -24,8 +24,8 @@ import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
-import { CollectionBackendDict, CollectionObjectFactory, Collection } from
-  'domain/collection/CollectionObjectFactory';
+import { CollectionBackendDict, Collection } from
+  'domain/collection/collection.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -59,11 +59,10 @@ interface ReadOnlyCollectionBackendResponse {
 export class ReadOnlyCollectionBackendApiService {
   constructor(
     private http: HttpClient,
-    private collectionObjectFactory: CollectionObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
   private _collectionCache: CollectionCache = {};
   private _collectionDetailsCache: CollectionDetailsCache = {};
-  private _collectionLoadedEventEmitter = new EventEmitter();
+  private _collectionLoadedEventEmitter = new EventEmitter<void>();
 
   private _fetchCollection(
       collectionId: string,
@@ -77,7 +76,7 @@ export class ReadOnlyCollectionBackendApiService {
     this.http.get<ReadOnlyCollectionBackendResponse>(
       collectionDataUrl).toPromise().then(response => {
       this._cacheCollectionDetails(response);
-      var collectionObject = this.collectionObjectFactory.create(
+      var collectionObject = Collection.create(
         response.collection);
       if (successCallback) {
         successCallback(collectionObject);
@@ -179,7 +178,7 @@ export class ReadOnlyCollectionBackendApiService {
     this._collectionCache = {};
   }
 
-  get onCollectionLoad() {
+  get onCollectionLoad(): EventEmitter<void> {
     return this._collectionLoadedEventEmitter;
   }
 }

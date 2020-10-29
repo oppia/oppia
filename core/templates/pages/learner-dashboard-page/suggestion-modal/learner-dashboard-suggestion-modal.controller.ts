@@ -22,7 +22,8 @@ angular.module('oppia').controller(
   'LearnerDashboardSuggestionModalController', [
     '$scope', '$uibModalInstance', 'SuggestionModalService',
     'description', 'newContent', 'oldContent',
-    function($scope, $uibModalInstance, SuggestionModalService,
+    function(
+        $scope, $uibModalInstance, SuggestionModalService,
         description, newContent, oldContent) {
       $scope.newContent = newContent;
       $scope.oldContent = oldContent;

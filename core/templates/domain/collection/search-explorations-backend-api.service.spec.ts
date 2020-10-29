@@ -23,8 +23,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { SearchExplorationsBackendApiService } from
   'domain/collection/search-explorations-backend-api.service';
 
-import { ExplorationMetadataObjectFactory } from
-  'domain/exploration/ExplorationMetadataObjectFactory';
+import { ExplorationMetadata } from
+  'domain/exploration/exploration-metadata.model';
 
 describe('Exploration search backend API service', () => {
   let SearchExplorationsService: SearchExplorationsBackendApiService = null;
@@ -86,7 +86,7 @@ describe('Exploration search backend API service', () => {
 
       var explorationMetadataObjects = (
         searchResults.collection_node_metadata_list.map(
-          explorationMetadataBackendDict => ExplorationMetadataObjectFactory
+          explorationMetadataBackendDict => ExplorationMetadata
             .createFromBackendDict(explorationMetadataBackendDict)));
 
       SearchExplorationsService.fetchExplorations('count')

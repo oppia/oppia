@@ -33,9 +33,9 @@ export class StateInteractionIdService extends StatePropertyService<string> {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveInteractionId';
   }
-  private _interactionIdChanged = new EventEmitter();
+  private _interactionIdChanged = new EventEmitter<string>();
 
-  get onInteractionIdChanged() {
+  get onInteractionIdChanged(): EventEmitter<string> {
     return this._interactionIdChanged;
   }
 }

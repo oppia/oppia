@@ -29,6 +29,7 @@ require('pages/admin-page/config-tab/admin-config-tab.directive.ts');
 require('pages/admin-page/jobs-tab/admin-jobs-tab.directive.ts');
 require('pages/admin-page/misc-tab/admin-misc-tab.directive.ts');
 require('pages/admin-page/roles-tab/admin-roles-tab.directive.ts');
+require('pages/admin-page/features-tab/admin-features-tab.component');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
@@ -38,8 +39,8 @@ require('pages/admin-page/services/admin-router.service.ts');
 require('services/csrf-token.service.ts');
 require('services/utils.service.ts');
 
-angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
+angular.module('oppia').directive('adminPage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -48,9 +49,10 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$location', '$rootScope', '$scope', 'AdminDataService',
+        '$location', '$rootScope', '$scope', 'AdminDataService',
         'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
-        function($http, $location, $rootScope, $scope, AdminDataService,
+        function(
+            $location, $rootScope, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {
@@ -62,6 +64,9 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           ctrl.isConfigTabOpen = function() {
             return AdminRouterService.isConfigTabOpen();
           };
+          ctrl.isFeaturesTabOpen = function() {
+            return AdminRouterService.isFeaturesTabOpen();
+          };
           ctrl.isRolesTabOpen = function() {
             return AdminRouterService.isRolesTabOpen();
           };
@@ -70,6 +75,9 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           };
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$applyAsync();
           };
 
           ctrl.$onInit = function() {

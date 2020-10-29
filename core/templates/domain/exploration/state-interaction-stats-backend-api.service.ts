@@ -23,8 +23,7 @@ import { Injectable } from '@angular/core';
 import {
   VisualizationInfoBackendDict,
   VisualizationInfo,
-  VisualizationInfoObjectFactory
-} from 'domain/exploration/visualization-info-object.factory';
+} from 'domain/exploration/visualization-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -41,7 +40,6 @@ export class StateInteractionStatsBackendApiService {
 
   constructor(
     private http: HttpClient,
-    private visualizationInfoObjectFactory: VisualizationInfoObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
   getStats(explorationId: string, name: string): Promise<VisualizationInfo[]> {
@@ -54,7 +52,7 @@ export class StateInteractionStatsBackendApiService {
           })).toPromise().then(backendDict => {
         let visualizationInfoObjects = backendDict.visualizations_info.map((
             visInfoDict) => {
-          return this.visualizationInfoObjectFactory.createFromBackendDict(
+          return VisualizationInfo.createFromBackendDict(
             visInfoDict);
         });
         resolve(visualizationInfoObjects);

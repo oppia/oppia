@@ -36,7 +36,6 @@ require(
 
 describe('HintsAndSolutionManager service', function() {
   var $timeout;
-  var $rootScope;
   var hasms;
   var hof;
   var sof;
@@ -65,7 +64,6 @@ describe('HintsAndSolutionManager service', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $timeout = $injector.get('$timeout');
-    $rootScope = $injector.get('$rootScope');
     pps = $injector.get('PlayerPositionService');
     spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter);

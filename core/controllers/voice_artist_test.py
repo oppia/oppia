@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -69,8 +70,11 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.owner,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)
@@ -189,8 +193,11 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.owner,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)
@@ -277,8 +284,11 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.owner,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)

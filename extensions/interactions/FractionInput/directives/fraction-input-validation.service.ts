@@ -25,6 +25,16 @@ import { Fraction, FractionObjectFactory } from
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';
+import { Warning } from 'services/alerts.service';
+import { FractionInputCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+
+interface FractionWarning {
+  type: string;
+  message: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +44,7 @@ export class FractionInputValidationService {
     private fof: FractionObjectFactory,
     private bivs: baseInteractionValidationService) {}
 
-  getNonIntegerInputWarning(i, j) {
+  getNonIntegerInputWarning(i: number, j: number): FractionWarning {
     return {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
@@ -43,11 +53,13 @@ export class FractionInputValidationService {
         'integer.')
     };
   }
-  getCustomizationArgsWarnings(customizationArgs) {
+  getCustomizationArgsWarnings(
+      customizationArgs: FractionInputCustomizationArgs): Warning[] {
     return [];
   }
   getAllWarnings(
-      stateName, customizationArgs, answerGroups, defaultOutcome) {
+      stateName: string, customizationArgs: FractionInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
     var shouldBeInSimplestForm =
       customizationArgs.requireSimplestForm.value;
@@ -110,7 +122,7 @@ export class FractionInputValidationService {
     var matchedDenominators = [];
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].getRulesAsList();
+      var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
@@ -131,7 +143,7 @@ export class FractionInputValidationService {
         switch (rule.type) {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
-              var fractionDict: FractionAnswer = rule.inputs.f;
+              var fractionDict = <FractionAnswer> rule.inputs.f;
               var fractionInSimplestForm = this.fof.fromDict(
                 fractionDict).convertToSimplestForm();
               if (!angular.equals(fractionDict, fractionInSimplestForm)) {
@@ -146,7 +158,8 @@ export class FractionInputValidationService {
               }
             }
             if (!allowImproperFraction) {
-              var fraction: Fraction = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = this.fof.fromDict(
+                <FractionAnswer> rule.inputs.f);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -159,7 +172,8 @@ export class FractionInputValidationService {
               }
             }
             if (!allowNonzeroIntegerPart) {
-              var fraction: Fraction = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = this.fof.fromDict(
+                <FractionAnswer> rule.inputs.f);
               if (fraction.hasNonzeroIntegerPart()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -223,7 +237,7 @@ export class FractionInputValidationService {
             matchedDenominator.denominator = rule.inputs.x;
             break;
           case 'HasFractionalPartExactlyEqualTo':
-            if (rule.inputs.f.wholeNumber !== 0) {
+            if ((<FractionAnswer> rule.inputs.f).wholeNumber !== 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -232,7 +246,7 @@ export class FractionInputValidationService {
                   ' is invalid as integer part should be zero')
               });
             }
-            if (rule.inputs.f.isNegative !== false) {
+            if ((<FractionAnswer> rule.inputs.f).isNegative !== false) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -242,7 +256,8 @@ export class FractionInputValidationService {
               });
             }
             if (!allowImproperFraction) {
-              var fraction: Fraction = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = this.fof.fromDict(
+                <FractionAnswer> rule.inputs.f);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -257,46 +272,21 @@ export class FractionInputValidationService {
           default:
             break;
         }
-
         for (var k = 0; k < ranges.length; k++) {
-          var earlierRule = answerGroups[ranges[k].answerGroupIndex]
-            .getRulesAsList()[ranges[k].ruleIndex];
-          // Rules inside an AnswerGroup do not have a set order. We should
-          // check for redundant rules in both directions if rules are in the
-          // same AnswerGroup.
-          const redundantWithinAnswerGroup = (
-            ranges[k].answerGroupIndex === i &&
-            (
-              (
-                isEnclosedBy(range, ranges[k]) &&
-                shouldCheckRangeCriteria(earlierRule, rule)
-              ) || (
-                isEnclosedBy(ranges[k], range) &&
-                shouldCheckRangeCriteria(rule, earlierRule)
-              )
-            )
-          );
-
-          // AnswerGroups do have a set order. If rules are not in the same
-          // AnswerGroup we only check in one direction.
-          const redundantBetweenAnswerGroups = (
-            ranges[k].answerGroupIndex !== i &&
-            (
-              isEnclosedBy(range, ranges[k]) &&
-              shouldCheckRangeCriteria(earlierRule, rule)
-            )
-          );
-
-          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
-            warningsList.push({
-              type: AppConstants.WARNING_TYPES.ERROR,
-              message: (
-                'Rule ' + (j + 1) + ' from answer group ' +
-                (i + 1) + ' will never be matched because it ' +
-                'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
-                ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
-                '.')
-            });
+          if (isEnclosedBy(range, ranges[k])) {
+            var earlierRule = answerGroups[ranges[k].answerGroupIndex]
+              .rules[ranges[k].ruleIndex];
+            if (shouldCheckRangeCriteria(earlierRule, rule)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
+                  (i + 1) + ' will never be matched because it ' +
+                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
+                  '.')
+              });
+            }
           }
         }
 
@@ -304,7 +294,7 @@ export class FractionInputValidationService {
           if (matchedDenominators[k].denominator !== null &&
             rule.type === 'HasFractionalPartExactlyEqualTo') {
             if (matchedDenominators[k].denominator ===
-              rule.inputs.f.denominator) {
+              (<FractionAnswer> rule.inputs.f).denominator) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (

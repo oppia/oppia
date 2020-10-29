@@ -54,7 +54,8 @@ angular.module('oppia').directive('progressNav', [
         'PlayerPositionService', 'PlayerTranscriptService', 'UrlService',
         'WindowDimensionsService', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'INTERACTION_SPECS', 'TWO_CARD_THRESHOLD_PX',
-        function($scope, BrowserCheckerService,
+        function(
+            $scope, BrowserCheckerService,
             ExplorationEngineService, ExplorationPlayerStateService,
             PlayerPositionService, PlayerTranscriptService, UrlService,
             WindowDimensionsService, CONTINUE_BUTTON_FOCUS_LABEL,
@@ -63,7 +64,6 @@ angular.module('oppia').directive('progressNav', [
           ctrl.directiveSubscriptions = new Subscription();
           var transcriptLength = 0;
           var interactionIsInline = true;
-          var interactionHasNavSubmitButton = false;
           var SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
             'ItemSelectionInput', 'MultipleChoiceInput'];
           var updateDisplayedCardInfo = function() {
@@ -77,17 +77,12 @@ angular.module('oppia').directive('progressNav', [
             $scope.conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
               !ExplorationPlayerStateService.isInQuestionMode());
-            var interaction = $scope.displayedCard.getInteraction();
             if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
                 $scope.displayedCard.isInteractionInline());
               $scope.interactionCustomizationArgs =
                 $scope.displayedCard.getInteractionCustomizationArgs();
               $scope.interactionId = $scope.displayedCard.getInteractionId();
-              if ($scope.interactionId) {
-                interactionHasNavSubmitButton = (
-                  doesInteractionHaveNavSubmitButton());
-              }
             }
 
             $scope.helpCardHasContinueButton = false;
@@ -95,12 +90,14 @@ angular.module('oppia').directive('progressNav', [
 
           var doesInteractionHaveNavSubmitButton = function() {
             try {
-              return (Boolean($scope.interactionId) &&
+              return (
+                Boolean($scope.interactionId) &&
                 INTERACTION_SPECS[$scope.interactionId].
                   show_generic_submit_button);
             } catch (e) {
-              var additionalInfo = ('\nSubmit button debug logs:' +
-                '\ninterationId: ' + $scope.interactionId);
+              var additionalInfo = (
+                '\nSubmit button debug logs:\ninterationId: ' +
+                $scope.interactionId);
               e.message += additionalInfo;
               throw e;
             }
@@ -116,7 +113,8 @@ angular.module('oppia').directive('progressNav', [
               return (SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE.indexOf(
                 $scope.interactionId) >= 0);
             } else {
-              return ($scope.interactionId === 'ItemSelectionInput' &&
+              return (
+                $scope.interactionId === 'ItemSelectionInput' &&
                       $scope.interactionCustomizationArgs
                         .maxAllowableSelectionCount.value > 1);
             }
