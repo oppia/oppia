@@ -177,7 +177,8 @@ def _create_evaluation_context_for_server(user_settings):
         language_code = user_settings.preferred_site_language_code
 
     # TODO(#11073): Properly set app version below, and rename the user_locale
-    # to correspond to a selected language code.
+    # to correspond to a selected language code. Consider also renaming
+    # client_type to something that better encapsulates frontends and backends.
     return platform_parameter_domain.EvaluationContext.from_dict(
         {
             'client_type': 'Backend',

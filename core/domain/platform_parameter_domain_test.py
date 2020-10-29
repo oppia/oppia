@@ -133,12 +133,38 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         )
         self.assertFalse(context.is_valid)
 
-    def test_is_valid_with_valid_context_returns_true(self):
+    def test_is_valid_with_valid_android_context_returns_true(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertTrue(context.is_valid)
+
+    def test_is_valid_with_valid_web_context_returns_true(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Web',
+                'browser_type': 'Chrome',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertTrue(context.is_valid)
+
+    def test_is_valid_with_valid_backend_context_returns_true(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Backend',
+                'app_version': '3.0.0',
                 'user_locale': 'en',
             },
             {
@@ -357,6 +383,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         zh_context = self._create_example_context(user_locale='zh-hans')
         self.assertFalse(filter_domain.evaluate(zh_context))
+
+    def test_eval_backend_client_filter_with_backend_client_returns_true(self):
+        filter_dict = {'type': 'client_type', 'conditions': [('=', 'Backend')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+
+        web_context = self._create_example_context(client_type='Backend')
+        self.assertTrue(filter_domain.evaluate(web_context))
 
     def test_evaluate_web_client_filter_with_web_client_returns_true(self):
         filter_dict = {'type': 'client_type', 'conditions': [('=', 'Web')]}
