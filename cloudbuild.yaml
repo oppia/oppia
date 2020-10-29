@@ -1,0 +1,23 @@
+steps:
+  - id: workspace-setup
+    name: `python:2.7-jessie`
+    entrypoint: bash
+    args: 
+      - '-c'
+      - |
+          mkdir oppia
+          mv * oppia
+          cd oppia
+          python -m scripts.install_third_party_libs
+  
+  -id: lint-check
+   name: `python:2.7-jessie`
+   dir: oppia
+   entrypoint: bash
+   args:
+    - '-c'
+    - |
+        python -m scripts.third_party_size_check
+        python -m scripts.pre_commit_linter --path=. --verbose
+  
+
