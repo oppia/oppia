@@ -28,7 +28,14 @@ import utils
 
 from mapreduce import model as mapreduce_model
 
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(job_models, user_models) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.user])
+
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
+MODEL_CLASSES_TO_MARK_AS_DELETED = [
+    user_models.UserQueryModel
+]
 
 
 def get_stuck_jobs(recency_msecs):
@@ -54,6 +61,38 @@ def get_stuck_jobs(recency_msecs):
             stuck_jobs.append(job_model)
 
     return stuck_jobs
+
+
+def delete_models_marked_as_deleted():
+    """Hard-delete all models that are marked as deleted (have deleted field set
+    to True) and were last updated more than eight weeks ago.
+    """
+    date_now = datetime.datetime.utcnow()
+    date_before_which_hard_delete = (
+        date_now - PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+    for model_class in models.Registry.get_all_storage_model_classes():
+        deleted_models = model_class.query(model_class.deleted == True).fetch()
+        models_to_hard_delete = [
+            for model in deleted_models
+            if model.last_updated < date_before_which_hard_delete
+        ]
+        model_class.delete_multi(models_to_hard_delete)
+
+
+def mark_models_as_deleted():
+    """Mark some types of models (that we shouldn't keep for long time)
+    as deleted if they were last updated more than four weeks ago.
+    """
+    date_before_which_mark = (
+        datetime.datetime.utcnow() - PERIOD_TO_MARK_MODELS_AS_DELETED)
+    for model_class in MODEL_CLASSES_TO_MARK_AS_DELETED:
+        models_to_mark_as_deleted = model_class.query(
+            model_class.last_updated < date_before_which_mark
+        ).fetch()
+        for model_to_mark_as_deleted in models_to_mark_as_deleted:
+            model_to_mark_as_deleted.deleted = True
+        model_class.update_timestamps_multi(models_to_mark_as_deleted)
+        model_class.put_multi(models_to_mark_as_deleted)
 
 
 class MapReduceStateModelsCleanupManager(jobs.BaseMapReduceOneOffJobManager):

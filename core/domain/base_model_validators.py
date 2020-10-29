@@ -66,6 +66,8 @@ VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
 VALIDATION_MODE_NON_STRICT = 'non-strict'
 
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
     """Value object providing the class and ids to fetch an external model."""
@@ -379,6 +381,25 @@ class BaseModelValidator(python_utils.OBJECT):
 
         for func in cls._get_external_instance_custom_validation_functions():
             func(item, cls.field_name_to_external_model_references)
+
+    @classmethod
+    def validate_deleted(cls, item):
+        """Validate that the models marked as deleted are hard-deleted after
+        nine weeks.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+        """
+        cls.errors.clear()
+        date_now = datetime.datetime.utcnow()
+        date_before_which_models_should_be_deleted = (
+            date_now - PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+        if item.last_updated < date_before_which_models_should_be_deleted:
+            cls._add_error(
+                'entity %s' % ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: '
+                'model marked as deleted older more than 8 weeks' % item.id
+            )
 
 
 class BaseSummaryModelValidator(BaseModelValidator):

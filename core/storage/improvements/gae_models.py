@@ -123,9 +123,9 @@ class TaskEntryModel(base_models.BaseModel):
         """TaskEntryModel contains data to delete corresponding to
         a user: resolver_id field.
 
-        It is okay to delete task entries since after they are resolved they
-        only act as a historical record and the removal does just removes
-        the historical record.
+        It is okay to delete task entries since, after they are resolved, they
+        only act as a historical record. The removal just removes the historical
+        record.
         """
         return base_models.DELETION_POLICY.DELETE
 

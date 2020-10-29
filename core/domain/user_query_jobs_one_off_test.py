@@ -48,6 +48,8 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     USER_D_USERNAME = 'd'
     USER_E_EMAIL = 'e@example.com'
     USER_E_USERNAME = 'e'
+    USER_F_EMAIL = 'f@example.com'
+    USER_F_USERNAME = 'f'
     USER_SUBMITTER_EMAIL = 'submit@example.com'
     USER_SUBMITTER_USERNAME = 'submit'
 
@@ -85,22 +87,35 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
 
     def setUp(self):
         super(UserQueryJobOneOffTests, self).setUp()
-        # User A has no created or edited explorations
-        # User B has one created exploration
-        # User C has one edited exploration
+        # User A has no created or edited explorations.
+        # User B has one created exploration.
+        # User C has one edited exploration.
         # User D has created an exploration and then edited it.
         # User E has created an exploration 10 days before.
+        # User F has one created exploration but is not subscribed to emails.
         # Submitter is the user who submits the query.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        user_services.update_email_preferences(
+            self.user_a_id, True, True, True, True)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+        user_services.update_email_preferences(
+            self.user_b_id, True, True, True, True)
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_services.update_email_preferences(
+            self.user_c_id, True, True, True, True)
         self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
         self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
+        user_services.update_email_preferences(
+            self.user_d_id, True, True, True, True)
         self.signup(self.USER_E_EMAIL, self.USER_E_USERNAME)
         self.user_e_id = self.get_user_id_from_email(self.USER_E_EMAIL)
+        user_services.update_email_preferences(
+            self.user_e_id, True, True, True, True)
+        self.signup(self.USER_F_EMAIL, self.USER_F_USERNAME)
+        self.user_f_id = self.get_user_id_from_email(self.USER_E_EMAIL)
         self.signup(self.USER_SUBMITTER_EMAIL, self.USER_SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(
             self.USER_SUBMITTER_EMAIL)

@@ -47,10 +47,15 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user_settings_model):
+        user_id = user_settings_model.id
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        if not email_preferences.can_receive_email_updates:
+            return
+
         query_id = (
             jobs.BaseMapReduceOneOffJobManager.get_mapper_param('query_id'))
         query_model = user_models.UserQueryModel.get(query_id)
-        user_id = user_settings_model.id
         user_contributions = user_models.UserContributionsModel.get(user_id)
 
         if (user_id == query_model.submitter_id or
@@ -103,11 +108,6 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 query_model.edited_fewer_than_n_exps)
 
         if not query_criteria_satisfied:
-            return
-
-        email_preferences = user_services.get_email_preferences(user_id)
-
-        if not email_preferences.can_receive_email_updates:
             return
 
         yield (query_id, user_id)

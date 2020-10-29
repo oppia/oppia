@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
 import logging
 
 from core import jobs
@@ -38,7 +37,7 @@ import utils
 
 from pipeline import pipeline
 
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(job_models, user_models) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
@@ -232,25 +231,20 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
 
 
 class CronModelsCleanupHandler(base.BaseHandler):
-    """Handler for cleaning up models that are marked as deleted."""
-
-    EIGHT_WEEKS = datetime.timedelta(weeks=8)
+    """Handler for cleaning up models that are marked as deleted and are and
+    marking specific types of models as deleted.
+    """
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
-        """Cron handler that every week hard deletes all models that are marked
-        as deleted (have deleted field set to True) and were last_updated more
-        than eight months ago.
+        """Cron handler that is run every weem and hard-deletes all models that
+        are marked as deleted (have deleted field set to True) and were
+        last updated more than some period of time. Also, for some types of
+        models (that we shouldn't keep for long time) mark them as deleted if
+        they were last updated more some period of time.
         """
-        date_eight_weeks_ago = (
-            datetime.datetime.utcnow() - CronModelsCleanupHandler.EIGHT_WEEKS)
-        for model_class in models.Registry.get_all_storage_model_classes():
-            models_ = model_class.query(model_class.deleted == True).fetch()
-            models_to_delete = [
-                for model in models_
-                if model.last_updated < date_eight_weeks_ago
-            ]
-            model_class.delete_multi(models_to_delete)
+        cron_services.delete_models_marked_as_deleted()
+        cron_services.mark_models_as_deleted()
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandler(

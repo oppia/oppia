@@ -4627,7 +4627,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
 class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
     """Class for validating UserQueryModels."""
 
-    NINE_WEEKS = datetime.timedelta(weeks=9)
+    FOUR_WEEKS = datetime.timedelta(weeks=4)
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -4723,16 +4723,19 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
 
     @classmethod
     def _validate_old_models_are_deleted(cls, item):
-        """
-        """
-        date_nine_weeks_ago = (
-            datetime.datetime.utcnow() - UserQueryModelValidator.NINE_WEEKS)
-        if item.last_updated < date_nine_weeks_ago:
-            cls._add_error(
-                'entity %s' % (
-                    base_model_validators.ERROR_CATEGORY_STALE_CHECK),
-                'Entity id %s: model older than 9 weeks' % (item.id))
+        """Validate that there are no models that were last updated more than
+        twelve weeks ago, these models should be deleted.
 
+        Args:
+            item: UserQueryModel. UserQueryModel to validate.
+        """
+        date_four_weeks_ago = (
+            datetime.datetime.utcnow() - UserQueryModelValidator.FOUR_WEEKS)
+        if item.last_updated < date_four_weeks_ago:
+            cls._add_error(
+                'entity %s' % base_model_validators.ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: Model older than 4 weeks' % item.id
+            )
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
