@@ -4,11 +4,11 @@
   <a ng-href="<[$ctrl.getTopicPageUrl()]>">
     <div class="topic-thumbnail">
       <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
-      <picture class="d-flex" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
+      <picture class="fx-row" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
         <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
       </picture>
     </div>
-    <div class="topic-details" ng-style="{background: $ctrl.getDarkerThumbnailBgColor()}" ng-class="{'grayscale-effect': !$ctrl.isPublished()}">
+    <div class="topic-details" ng-style="{'background-color': $ctrl.getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !$ctrl.isPublished()}">
       <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
       <span class="topic-story-count">
         <[$ctrl.getTopicSummary().getCanonicalStoryCount()]>
@@ -29,7 +29,16 @@
   }
 
   .topic-card .grayscale-effect {
-    filter: grayscale(100%) brightness(0.4);
+    filter: brightness(0.6);
+  }
+
+  .topic-card .mask-effect {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+  }
+
+  .topic-card .mask-effect .topic-name,
+  .topic-card .mask-effect .topic-story-count {
+    filter: brightness(0.6);
   }
 
   .topic-card {
@@ -119,6 +128,11 @@
       font-size: 0.8em;
       height: 85px;
     }
+
+    .topic-card .mask-effect .topic-name,
+    .topic-card .mask-effect .topic-story-count {
+      filter: brightness(100%);
+    }
   }
 
   @media(max-width: 500px) {
@@ -128,6 +142,11 @@
 
     .topic-card .topic-thumbnail {
       height: 100px;
+    }
+
+    .topic-card .mask-effect .topic-name,
+    .topic-card .mask-effect .topic-story-count {
+      filter: brightness(100%);
     }
   }
 </style>
