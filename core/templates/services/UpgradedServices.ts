@@ -1216,7 +1216,8 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['TranslationsBackendApiService'] =
       new TranslationsBackendApiService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
 
     // Topological level: 4.
     upgradedServices['CollectionCreationService'] =

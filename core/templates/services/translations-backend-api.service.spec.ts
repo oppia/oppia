@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 /**
  * @fileoverview Unit tests for TranslationsBackendApiService.
  */
@@ -45,13 +44,31 @@ describe('Translations backend API service', () => {
       I18N_T_1: 'Hello'
     };
 
-    translationsBackendApiService.fetchTranslations('en').then(response => {
-      expect(response).toEqual(translations);
-    });
+    translationsBackendApiService
+      .fetchTranslationsAsync('en').then(response => {
+        expect(response).toEqual(translations);
+      });
 
     let req = httpTestingController.expectOne('/assets/i18n/en.json');
     expect(req.request.method).toEqual('GET');
     req.flush(translations);
+
+    flushMicrotasks();
+  }));
+
+  it('should correctly fetch translation files.', fakeAsync(() => {
+    const loadedFile = {
+      I18N_ABOUT_PAGE_ABOUT_TAB_CREATE: 'Create an Exploration'
+    };
+
+    translationsBackendApiService.loadTranslationFileAsync('/i18n/en.json')
+      .then(response => {
+        expect(response).toContain(loadedFile);
+      });
+
+    let req = httpTestingController.expectOne('/i18n/en.json');
+    expect(req.request.method).toEqual('GET');
+    req.flush(loadedFile);
 
     flushMicrotasks();
   }));

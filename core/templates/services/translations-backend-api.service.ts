@@ -19,6 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 export interface TranslationsDict {
   [translation: string]: string;
@@ -31,14 +33,19 @@ export class TranslationsBackendApiService {
   private prefix = '/assets/i18n/';
   private suffix = '.json';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchTranslations(languageCode: string): Promise<TranslationsDict> {
+  async fetchTranslationsAsync(
+      languageCode: string): Promise<TranslationsDict> {
     return this.http.get<TranslationsDict>(
       `${this.prefix}${languageCode}${this.suffix}`).toPromise();
   }
-  loadTranslationFileHash(url: string): Promise<string> {
-    return this.http.get<string>(url).toPromise();
+
+  async loadTranslationFileAsync(url: string): Promise<TranslationsDict> {
+    return this.http.get<TranslationsDict>(
+      this.urlInterpolationService.getStaticAssetUrl(url)).toPromise();
   }
 }
 

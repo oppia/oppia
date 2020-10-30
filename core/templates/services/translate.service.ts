@@ -77,7 +77,8 @@ export class TranslateService {
    * translations
    */
   fetchTranslations(languageCode: string): Promise<TranslationsDict> {
-    return this.translationsBackendApiService.fetchTranslations(languageCode);
+    return this.translationsBackendApiService
+      .fetchTranslationsAsync(languageCode);
   }
 
   /**
