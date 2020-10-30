@@ -164,7 +164,10 @@ var ExplorationEditorFeedbackTab = function() {
       by.css('.protractor-test-oppia-feedback-status-name'));
     await waitFor.visibilityOf(
       feedbackStatusElement, 'Feedback status is not visible.');
-    expect(await feedbackStatusElement.getText()).toEqual(feedbackStatus);
+    await waitFor.textToBePresentInElement(
+      feedbackStatusElement,
+      feedbackStatus,
+      `Expected ${feedbackStatusElement.getText()} to be ${feedbackStatus}`);
   };
 };
 
