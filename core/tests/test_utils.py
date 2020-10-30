@@ -2496,7 +2496,7 @@ class AppEngineTestBase(TestBase):
             # Since the old stack is empty and the new stack is not held by the
             # current `with` context, we can exit the old stack's context while
             # accomplishing our goal: do _NOT_ invoke the callbacks/exits yet.
-            pass # pylint: disable=unnecesary-pass. Documents the context's end.
+            pass # Documents end of context, so pylint: disable=unnecesary-pass.
 
         empty_environ()
         self.memory_cache_services_stub.flush_cache()
