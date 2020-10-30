@@ -47,6 +47,10 @@ export class AttributionGuideComponent implements OnInit {
       this.attributionService.isGenerateAttributionAllowed());
   }
 
+  getAttributionModalStatus(): boolean {
+    return this.attributionService.isAttributionModalShown();
+  }
+
   showAttributionModal(): void {
     this.attributionService.showAttributionModal();
     this.maskIsShown = true;
@@ -61,8 +65,16 @@ export class AttributionGuideComponent implements OnInit {
     return this.urlService.getCurrentLocation().href;
   }
 
-  copyAttributionHtml(): void {
-    const codeDiv = document.getElementsByClassName('attribution-html-code')[0];
+  getAuthors(): string {
+    return this.attributionService.getAuthors().join(', ');
+  }
+
+  getExplorationTitle(): string {
+    return this.attributionService.getExplorationTitle();
+  }
+
+  copyAttribution(className: string): void {
+    const codeDiv = document.getElementsByClassName(className)[0];
     const range = document.createRange();
     range.setStartBefore((<HTMLDivElement>codeDiv).firstChild);
     range.setEndAfter((<HTMLDivElement>codeDiv).lastChild);
@@ -71,6 +83,8 @@ export class AttributionGuideComponent implements OnInit {
     selection.addRange(range);
     document.execCommand('copy');
     selection.removeAllRanges();
+    $(codeDiv).tooltip('show');
+    setTimeout(() => $(codeDiv).tooltip('hide'), 1000);
   }
 }
 

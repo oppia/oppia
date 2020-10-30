@@ -20,28 +20,74 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ContextService } from 'services/context.service';
 
+import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AttributionService {
   attributionModalIsShown: boolean = false;
-  constructor(private contextService: ContextService) {}
+  authors: string[] = [];
+  explorationTitle: string = '';
+  constructor(
+    private contextService: ContextService,
+    private explorationSummaryBackendApiService: (
+      ExplorationSummaryBackendApiService)
+  ) {}
+
+  private _init(successCallback, errorCallback): void {
+    this.explorationSummaryBackendApiService
+      .loadPublicAndPrivateExplorationSummaries(
+        [this.contextService.getExplorationId()]).then(responseObject => {
+        var summaries = responseObject.summaries;
+        var contributorSummary = (
+          summaries.length ?
+          summaries[0].human_readable_contributors_summary : {});
+        this.authors = (
+          Object.keys(contributorSummary).sort(
+            function(contributorUsername1, contributorUsername2) {
+              var commitsOfContributor1 = contributorSummary[
+                contributorUsername1].num_commits;
+              var commitsOfContributor2 = contributorSummary[
+                contributorUsername2].num_commits;
+              return commitsOfContributor2 - commitsOfContributor1;
+            })
+        );
+        this.explorationTitle = summaries.length ? summaries[0].title : '';
+        successCallback();
+      }, () => {
+        errorCallback();
+      });
+  }
 
   isGenerateAttributionAllowed(): boolean {
     return this.contextService.isInExplorationPlayerPage();
   }
 
   showAttributionModal(): void {
-    this.attributionModalIsShown = true;
-    console.log('done');
+    if (this.authors.length && this.explorationTitle) {
+      this.attributionModalIsShown = true;
+      return;
+    }
+    this._init(
+      () => this.attributionModalIsShown = true,
+      () => this.attributionModalIsShown = false);
   }
 
   hideAttributionModal(): void {
     this.attributionModalIsShown = false;
   }
 
-  getAttributionInPrint(): void {
-    
+  isAttributionModalShown(): boolean {
+    return this.attributionModalIsShown;
+  }
+
+  getAuthors(): string[] {
+    return this.authors;
+  }
+
+  getExplorationTitle(): string {
+    return this.explorationTitle;
   }
 }
 

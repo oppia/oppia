@@ -8,7 +8,7 @@
     <a *ngIf="generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="#" (click)="showAttributionModal()">Generate Attribution</a>
     <a *ngIf="!generateAttibutionIsAllowed" class="oppia-attribution-link oppia-attribution-guide-text" href="/about#foundation" rel="noopener" target="_blank">Attribution Guide</a>
   </div>
-  <div *ngIf="maskIsShown" class="attribution-modal-container">
+  <div *ngIf="getAttributionModalStatus()" class="attribution-modal-container">
     <div (click)="hideAttributionModal()"></div>
     <div>
       <div class="attribution-mask" (click)="hideAttributionModal()"></div>
@@ -28,11 +28,16 @@
               <li>Copy and paste the HTML</li>
               <li>Make sure the link appears as "<u>Oppia</u> // <u>CC BY 4.0</u>"</li>
             </ol>
-            <div class="attribution-html-code text-monospace text-nowrap border border-secondary p-1 overflow-auto">
+            <div data-trigger="manual"
+                 data-toggle="tooltip"
+                 data-title="COPIED!"
+                 data-placement="bottom"
+                 data-offset="0 20"
+                 class="attribution-html-code text-monospace text-nowrap border border-secondary p-1 overflow-auto">
               &lt;a href="{{getPageUrl()}}"&gt;Oppia&lt;/a&gt; // &lt;a href="https://creativecommons.org/licenses/by-sa/4.0"&gt;CC BY SA 4.0&lt;/a&gt;
             </div>
-            <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttributionHtml()">COPY</button>
-          <div>
+            <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-html-code')">COPY</button>
+          </div>
           <div class="attribution-print-section">
             <div class="font-weight-bold">Attribute in print.</div>
             <ol class="attribute-instructions">
@@ -45,10 +50,15 @@
                 </a>
               </li>
             </ol>
-            <div class="text-monospace text-nowrap border border-secondary p-1 overflow-auto">
-              &lt;a href="{{getPageUrl()}}"&gt;Oppia&lt;/a&gt; // &lt;a href="https://creativecommons.org/licenses/by-sa/4.0"&gt;CC BY SA 4.0&lt;/a&gt;
+            <div data-trigger="manual"
+                 data-toggle="tooltip"
+                 data-title="COPIED!"
+                 data-placement="bottom"
+                 data-offset="0 20"
+                 class="attribution-print-text text-monospace text-nowrap border border-secondary p-1 overflow-auto">
+              "{{getExplorationTitle()}}" by {{getAuthors()}}. Oppia. {{getPageUrl()}}
             </div>
-            <button mat-flat-button class="attribution-copy-button float-right mt-2">COPY</button>
+            <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-print-text')">COPY</button>
           </div>
           <div class="sharing-section">
             <div class="font-weight-bold">Share this lesson:</div>
@@ -103,45 +113,45 @@
 
   .oppia-attribution-guide .attribution-modal {
     background-color: #FFF;
-    top: 68px;
-    margin: 0 10px 120px 10px;
-    -webkit-box-shadow: 0 3px 5px 1px #ccc;
     -moz-box-shadow: 0 3px 5px 1px #ccc;
+    -webkit-box-shadow: 0 3px 5px 1px #ccc;
     box-shadow: 0 3px 5px 1px #ccc;
+    margin: 0 10px 120px 10px;
     max-height: 600px;
-    position: relative;
-    z-index: 1200;
     overflow: auto;
+    position: relative;
+    top: 68px;
+    z-index: 1200;
   }
 
   .oppia-attribution-guide .oppia-attribution-guide-link,
   .oppia-attribution-guide .oppia-attribution-licence-link {
-    text-decoration: underline;
-    font-size: 0.8rem;
     color: #000;
+    font-size: 0.8rem;
+    text-decoration: underline;
   }
 
   .oppia-attribution-guide .oppia-open-new-tab-icon {
-    font-size: 1rem;
     color: #000;
+    font-size: 1rem;
   }
 
   .oppia-attribution-guide .attribution-mask {
+    height: 100%;
     position: fixed;
     width: 100%;
-    height: 100%;
     z-index: 1100;
   }
 
   .oppia-attribution-guide .attribution-modal-container {
     bottom: 0;
-    position: fixed;
     display: grid;
     grid-template-columns: 1fr minmax(auto, 320px);
-    width: 100%;
     height: 100%;
-    z-index: 1000;
     overflow: auto;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
   }
 
   .oppia-attribution-guide .attribution-html-section {
@@ -153,16 +163,16 @@
   }
 
   .oppia-attribution-guide .attribute-instructions {
-    padding-inline-start: 1rem;
     font-size: 0.8rem;
+    padding-inline-start: 1rem;
   }
 
   .oppia-attribution-guide .attribution-copy-button {
-    min-width: 55px;
     background: #0D48A1;
-    color: #ffffff;
     border: none;
     border-radius: 3px;
+    color: #ffffff;
+    min-width: 55px;
   }
 
   .oppia-attribution-guide .attribution-copy-button:hover {
@@ -170,10 +180,10 @@
   }
 
   .oppia-attribution-guide .sharing-section {
-    padding-top: 2rem;
-    padding-bottom: 1rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    padding-bottom: 1rem;
+    padding-top: 2rem;
     width: 100%;
   }
 </style>
