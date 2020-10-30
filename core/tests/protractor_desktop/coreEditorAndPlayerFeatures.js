@@ -141,7 +141,7 @@ describe('Enable correctness feedback and set correctness', function() {
     // Set the response for this interaction and close it.
     await explorationEditorMainTab.setResponse(
       'TextInput', await forms.toRichText('Correct!'),
-      'End', true, 'Equals', 'One');
+      'End', true, 'Equals', ['One']);
 
     await explorationEditorMainTab.expectTickMarkIsDisplayed();
     responseEditor = await explorationEditorMainTab.getResponseEditor(
