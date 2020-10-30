@@ -19,9 +19,9 @@
 export interface EmailDashboardQueryDict {
   'id': string;
   'status': string;
-  'num_qualified_users'?: number;
-  'submitter_username'?: string;
-  'created_on'?: string;
+  'num_qualified_users': number;
+  'submitter_username': string;
+  'created_on': string;
 }
 
 export interface EmailDashboardQueryBackendDict {
