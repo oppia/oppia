@@ -2485,7 +2485,6 @@ class AppEngineTestBase(TestBase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
 
-
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
         self.testbed.init_app_identity_stub()
