@@ -2536,7 +2536,7 @@ class AppEngineTestBase(TestBase):
         # Enter the stack's context and exit immediately. Exiting the context of
         # an ExitStack invokes all of the callbacks/exits it has gathered.
         with self._stack:
-            pass
+            pass # pylint: disable=unnecessary-pass
         self._stack = None
 
     def _get_all_queue_names(self):
