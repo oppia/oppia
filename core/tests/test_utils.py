@@ -2457,9 +2457,16 @@ tags: []
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
-    def run(self, result=None):
-        self.memory_cache_services_stub = MemoryCacheServicesStub()
+    def __init__(self, *args, **kwargs):
+        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+        # Defined outside of setUp() because we want to swap it in during tests,
+        # while minimizing the swap's scope.
+        # We accomplish this by using a context manager over run().
         self.taskqueue_services_stub = TaskqueueServicesStub(self)
+
+    def run(self, result=None):
+        memory_cache_services_stub = MemoryCacheServicesStub()
+        memory_cache_services_stub.flush_cache()
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
@@ -2467,25 +2474,24 @@ class AppEngineTestBase(TestBase):
                 self.taskqueue_services_stub.create_http_task))
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
-                self.memory_cache_services_stub.flush_cache))
+                memory_cache_services_stub.flush_cache))
             stack.enter_context(self.swap(
                 memory_cache_services, 'get_multi',
-                self.memory_cache_services_stub.get_multi))
+                memory_cache_services_stub.get_multi))
             stack.enter_context(self.swap(
                 memory_cache_services, 'set_multi',
-                self.memory_cache_services_stub.set_multi))
+                memory_cache_services_stub.set_multi))
             stack.enter_context(self.swap(
                 memory_cache_services, 'get_memory_cache_stats',
-                self.memory_cache_services_stub.get_memory_cache_stats))
+                memory_cache_services_stub.get_memory_cache_stats))
             stack.enter_context(self.swap(
                 memory_cache_services, 'delete_multi',
-                self.memory_cache_services_stub.delete_multi))
+                memory_cache_services_stub.delete_multi))
 
             super(AppEngineTestBase, self).run(result=result)
 
     def setUp(self):
         empty_environ()
-        self.memory_cache_services_stub.flush_cache()
 
         self.testbed = testbed.Testbed()
         self.testbed.activate()
