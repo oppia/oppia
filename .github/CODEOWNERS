@@ -182,7 +182,7 @@
 /scripts/linters/ @DubeySandeep @Hudda
 /scripts/linters/ts_ignore_exceptions.json @nishantwrp
 /ubuntu_dockerfile @DubeySandeep
-/cloudbuild.yaml @seanlip @shubha-rajan
+/cloudbuild.yaml @seanlip
 
 
 # Exploration project.
