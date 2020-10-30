@@ -1241,3 +1241,5 @@ USER_ID_LENGTH = 36
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5
 PROFILE_USER_PIN_LENGTH = 3
+
+MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
