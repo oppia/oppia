@@ -385,7 +385,7 @@ class BaseModelValidator(python_utils.OBJECT):
     @classmethod
     def validate_deleted(cls, item):
         """Validate that the models marked as deleted are hard-deleted after
-        nine weeks.
+        eight weeks.
 
         Args:
             item: datastore_services.Model. Entity to validate.
@@ -398,7 +398,7 @@ class BaseModelValidator(python_utils.OBJECT):
             cls._add_error(
                 'entity %s' % ERROR_CATEGORY_STALE_CHECK,
                 'Entity id %s: '
-                'model marked as deleted older more than 8 weeks' % item.id
+                'model marked as deleted is older than 8 weeks' % item.id
             )
 
 

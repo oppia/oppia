@@ -92,7 +92,7 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         model_name = model_instance.__class__.__name__
         validator_cls_name = '%sValidator' % model_name
         # Module name for models is of the form:
-        # 'core.storgae.<model-type>.gae_models'.
+        # 'core.storage.<model-type>.gae_models'.
         # Module name for validators is of the form:
         # 'core.domain.<model-type>_validators'.
         # So, we extract the module name for models to obtain the module name

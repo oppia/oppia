@@ -68,13 +68,13 @@ def delete_models_marked_as_deleted():
     to True) and were last updated more than eight weeks ago.
     """
     date_now = datetime.datetime.utcnow()
-    date_before_which_hard_delete = (
+    date_before_which_to_hard_delete = (
         date_now - PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
     for model_class in models.Registry.get_all_storage_model_classes():
         deleted_models = model_class.query(model_class.deleted == True).fetch()
         models_to_hard_delete = [
             deleted_model for deleted_model in deleted_models
-            if deleted_model.last_updated < date_before_which_hard_delete
+            if deleted_model.last_updated < date_before_which_to_hard_delete
         ]
         model_class.delete_multi(models_to_hard_delete)
 
@@ -83,11 +83,11 @@ def mark_models_as_deleted():
     """Mark some types of models (that we shouldn't keep for long time)
     as deleted if they were last updated more than four weeks ago.
     """
-    date_before_which_mark = (
+    date_before_which_to_mark_as_deleted = (
         datetime.datetime.utcnow() - PERIOD_TO_MARK_MODELS_AS_DELETED)
     for model_class in MODEL_CLASSES_TO_MARK_AS_DELETED:
         models_to_mark_as_deleted = model_class.query(
-            model_class.last_updated < date_before_which_mark
+            model_class.last_updated < date_before_which_to_mark_as_deleted
         ).fetch()
         for model_to_mark_as_deleted in models_to_mark_as_deleted:
             model_to_mark_as_deleted.deleted = True

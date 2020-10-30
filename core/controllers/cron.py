@@ -237,11 +237,11 @@ class CronModelsCleanupHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
-        """Cron handler that is run every weem and hard-deletes all models that
+        """Cron handler that is run every week and hard-deletes all models that
         are marked as deleted (have deleted field set to True) and were
         last updated more than some period of time. Also, for some types of
         models (that we shouldn't keep for long time) mark them as deleted if
-        they were last updated more some period of time.
+        they were last updated more than some period of time ago.
         """
         cron_services.delete_models_marked_as_deleted()
         cron_services.mark_models_as_deleted()

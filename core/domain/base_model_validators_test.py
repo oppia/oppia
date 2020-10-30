@@ -172,7 +172,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_validate_deleted_reports_error_for_old_deleted_model(self):
         year_ago = datetime.datetime.utcnow() - datetime.timedelta(weeks=52)
         model = MockModel(
-            id='12345',
+            id='123',
             deleted=True,
             last_updated=year_ago
         )
@@ -184,9 +184,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             validator.errors.items(),
             [(
                 'entity stale check',
-                [
-                    'Entity id 12345: '
-                    'model marked as deleted older more than 8 weeks'
-                ]
+                ['Entity id 123: model marked as deleted is older than 8 weeks']
             )]
         )
