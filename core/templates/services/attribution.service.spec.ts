@@ -20,9 +20,6 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ExplorationSummaryBackendApiService } from
-  'domain/summary/exploration-summary-backend-api.service';
-
 import { AttributionService } from 'services/attribution.service';
 import { ContextService } from 'services/context.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -31,10 +28,7 @@ describe('AttributionService', () => {
   let attributionService: AttributionService;
   let contextService: ContextService;
   let csrfService: CsrfTokenService;
-  let esbas: ExplorationSummaryBackendApiService;
   let httpTestingController: HttpTestingController;
-  let successHandler = null;
-  let failHandler = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -43,14 +37,10 @@ describe('AttributionService', () => {
     attributionService = TestBed.get(AttributionService);
     contextService = TestBed.get(ContextService);
     csrfService = TestBed.get(CsrfTokenService);
-    esbas = TestBed.get(ExplorationSummaryBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
 
-    successHandler = jasmine.createSpy('success');
-    failHandler = jasmine.createSpy('fail');
-
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-        return Promise.resolve('simple-csrf-token');
+      return Promise.resolve('simple-csrf-token');
     });
   });
 
@@ -69,8 +59,8 @@ describe('AttributionService', () => {
           status: 'public',
           language_code: 'en',
           human_readable_contributors_summary: {
-            'a': { num_commits: 2 },
-            'b': { num_commits: 5 } 
+            a: { num_commits: 2 },
+            b: { num_commits: 5 }
           }
         }]
       };
@@ -103,8 +93,8 @@ describe('AttributionService', () => {
           status: 'public',
           language_code: 'en',
           human_readable_contributors_summary: {
-            'a': { num_commits: 2 },
-            'b': { num_commits: 5 } 
+            a: { num_commits: 2 },
+            b: { num_commits: 5 }
           }
         }]
       };
