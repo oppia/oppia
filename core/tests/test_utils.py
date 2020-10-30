@@ -2534,7 +2534,8 @@ class AppEngineTestBase(TestBase):
             datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
         # Enter the stack's context and exit immediately. Exiting the context of
-        # an ExitStack invokes all of the callbacks/exits it has gathered.
+        # an ExitStack invokes all of the callbacks/exits it has gathered in
+        # reverse order.
         with self._stack:
             pass # pylint: disable=unnecessary-pass
         self._stack = None
