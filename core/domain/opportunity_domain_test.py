@@ -321,8 +321,9 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_lang_code_in_assigned_voice_artist_langs_fails_validation(
             self):
-        self.valid_exp_opp_summary.language_codes_with_assigned_voice_artists = [ # pylint: disable=line-too-long
-            'hi']
+        (
+            self.valid_exp_opp_summary.
+            language_codes_with_assigned_voice_artists) = ['hi']
         with self.mock_supported_audio_languages_context:
             # Object with valid language code inside
             # language_codes_with_assigned_voice_artists passes the validation.
@@ -337,8 +338,9 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Invalid language_code: invalid_language_code')
 
     def test_all_languages_in_summary_equals_supported_languages(self):
-        self.valid_exp_opp_summary.language_codes_with_assigned_voice_artists = [ # pylint: disable=line-too-long
-            b'hi-en']
+        (
+            self.valid_exp_opp_summary.
+            language_codes_with_assigned_voice_artists) = [b'hi-en']
         self.valid_exp_opp_summary.language_codes_needing_voice_artists = ['hi']
         self.valid_exp_opp_summary.incomplete_translation_language_codes = [
             b'en']

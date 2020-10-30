@@ -110,8 +110,8 @@ class RenameExplorationOpportunitySummaryModelPropertiesJob(
             model_properties = opportunity_model._properties  # pylint: disable=protected-access
             model_values = opportunity_model._values    # pylint: disable=protected-access
 
-            # This check blocks newly created models or rerunning this job on
-            # renamed models.
+            # This check blocks updating newly created models or updating
+            # renamed models on rerunning the job.
             if property_name not in model_properties or (
                     property_name not in model_values):
                 return None
@@ -121,20 +121,25 @@ class RenameExplorationOpportunitySummaryModelPropertiesJob(
             del model_values[property_name]
             return value
 
-        old_value = pop_property('assigned_voice_artist_in_language_codes')
-        if old_value is not None:
+        assigned_voice_artist_in_language_codes = pop_property(
+            'assigned_voice_artist_in_language_codes')
+        if assigned_voice_artist_in_language_codes is not None:
             opportunity_model.language_codes_with_assigned_voice_artists = (
-                old_value)
+                assigned_voice_artist_in_language_codes)
             yield (
                 'SUCCESS_RENAMED[assigned_voice_artist_in_language_codes]', 1)
 
-        old_value = pop_property('need_voice_artist_in_language_codes')
-        if old_value is not None:
-            opportunity_model.language_codes_needing_voice_artists = old_value
+        need_voice_artist_in_language_codes = pop_property(
+            'need_voice_artist_in_language_codes')
+        if need_voice_artist_in_language_codes is not None:
+            opportunity_model.language_codes_needing_voice_artists = (
+                need_voice_artist_in_language_codes)
             yield ('SUCCESS_RENAMED[need_voice_artist_in_language_codes]', 1)
 
-        opportunity_model.update_timestamps(update_last_updated_time=False)
-        opportunity_model.put()
+        if assigned_voice_artist_in_language_codes or (
+                need_voice_artist_in_language_codes):
+            opportunity_model.update_timestamps(update_last_updated_time=False)
+            opportunity_model.put()
 
     @staticmethod
     def reduce(key, values):
