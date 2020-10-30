@@ -129,8 +129,8 @@ def get_filepath_from_filename(filename, rootdir):
     if filename.startswith('error-page'):
         filename = 'error-page.mainpage.html'
     matches = list(itertools.chain.from_iterable(
-        (os.path.join(subrootdir, f) for f in filenames if f == filename)
-        for subrootdir, _, filenames in os.walk(rootdir)))
+        (os.path.join(subdir, f) for f in filenames if f == filename)
+        for subdir, _, filenames in os.walk(rootdir)))
     if len(matches) > 1:
         raise Exception('Multiple files found with name: %s' % filename)
     return matches[0] if matches else None
