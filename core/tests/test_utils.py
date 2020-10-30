@@ -2533,7 +2533,8 @@ class AppEngineTestBase(TestBase):
             int. The total number of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self._taskqueue_services_stub.count_jobs_in_taskqueue(queue_name)
+        return self._taskqueue_services_stub.count_jobs_in_taskqueue(
+            queue_name=queue_name)
 
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Executes all of the tasks in a single queue if a queue name is
@@ -2544,7 +2545,8 @@ class AppEngineTestBase(TestBase):
             queue_name: str|None. Name of the queue. Pass in None if no specific
                 queue is designated.
         """
-        self._taskqueue_services_stub.process_and_flush_tasks(queue_name)
+        self._taskqueue_services_stub.process_and_flush_tasks(
+            queue_name=queue_name)
 
     def get_pending_tasks(self, queue_name=None):
         """Returns a list of the tasks in a single queue if a queue name is
@@ -2559,7 +2561,8 @@ class AppEngineTestBase(TestBase):
             list(Task). List of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self._taskqueue_services_stub.get_pending_tasks(queue_name)
+        return self._taskqueue_services_stub.get_pending_tasks(
+            queue_name=queue_name)
 
     def count_jobs_in_mapreduce_taskqueue(self, queue_name):
         """Counts the jobs in the given mapreduce taskqueue."""
