@@ -78,30 +78,6 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
-        ctrl.flushMigrationBotContributions = function() {
-          if (AdminTaskManagerService.isTaskRunning()) {
-            return;
-          }
-          if (!$window.confirm(irreversibleActionMessage)) {
-            return;
-          }
-
-          ctrl.setStatusMessage('Flushing migration bot contributions...');
-
-          AdminTaskManagerService.startTask();
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'flush_migration_bot_contribution_data'
-          }).then(function() {
-            ctrl.setStatusMessage(
-              'Migration bot contributions successfully flushed.');
-            AdminTaskManagerService.finishTask();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-            AdminTaskManagerService.finishTask();
-          });
-        };
-
         ctrl.regenerateOpportunitiesRelatedToTopic = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;

@@ -36,8 +36,8 @@ import utils
 import requests
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models, audit_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.audit])
+(user_models, audit_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.audit, models.NAMES.suggestion])
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -48,14 +48,11 @@ DEFAULT_IDENTICON_DATA_URL = (
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMCAYAAADHl1ErAAAAAXNSR0IArs4c6QAADhtJREFUeAHtXHlwVdUZ/859jyxmIQESyCaglC0iAgkJIntrIpvKphSwY2ttxbFOp9R/cGGqdhykLaMVO2OtoyRSCEKNEpYKyBIVQ1iNkBhNMCtb8shiQpJ3b7/fTW7m5uUlecu9L4nTM5Pce8895zvf93vnnPud833fEdQLKXb5jsC6%2BuZERZbHKaSMYRbGKERxgpQQUkSIIigEbAmFavlfrUKiVhCVcFa%2BIJEvJOlCcNCAnNKMFQ0o58vEfPgmhS5Mn0ot8n2KIs8lIZJJUfy8almIJqbxhRDSIbJKe2s%2BXvWlV/RcrGwqYGGp20bI1LyaeVmjKMrodp4EycGBAy6MjgsrSxozqG7O5GgxcVREeEigNDAwwBpmsUiRKGu3y1caGltstQ3yjbOFV6sPnypXTuRXBReU2GLqGprHkUKSRlMIUcD3WyUakGbbt7JYyzf6agpgYfe9O8kui/U8nB7UhJIkUTljwrBTTz449mZKUlyCEBTnjTCKQiX7T5ScfGP3Rf9j5ysny7IyTKXHPwYP690WSXnZtvcXp71pw1ldQwELm59%2BlyzbX%2BbeNL%2Btscb4EYOyNz2ZWD99wtAFnGdxxoQBefbs85f3rHsjJyivuGo60wsATe51WZJkWW/LWnXGgDZUEoYAFr58x0B7beOLPHGv5XnFIpGoS0mKOfze%2Bpmj/f2smNR9lm42teQ/8vLRgv0nyuZwVwtm1Ows5BZLSMBz1RkrbnjLiNeAhaWmPWgn%2BxYeejwkRMu9idH7tm%2BYE8/z0EhvmfOmPs9/RQ9tOJx3IKc8lUixkqBKC1nW2vat3u0NXY8Bi1%2B%2Bw6%2BktnETD7%2BnwEB4iP/pL/5xf03U4IBZ3jBkdN2K641Hkn/7YWh17c1JoM3D9PW4kIB1eRkrmjxpyyPAeK4aLttbPuAhOIU5aHpm1cTMZ1ffuRT8eMKED%2BooL6Wd%2B2Bj%2BtnFUGeYyVzJYl3Kc9sld9t2W8Dw%2BWkTWuz2fdxQ9ACr9P3Jfy7%2BZuSw0HnuNtwb5Ysqaw4mPJb5k%2BYW%2BVZuv9xqsaRWZ60%2B7w4vbgEWnrJ1hp3kTO5ZYUPCAnK%2B3bYiitWDWHca7O2yrI6U3r5yR8U1W2MiC2%2BzkLS4ev%2BaY67y1a749VQBYLUIZT/AGhUTduS7f68Y39/AgozgGbxDBsgCmSBbT/Jr710CDMMQPYvHf2DC2Mj9p95efA8TCNKI9MNrEGSALJAJskFGV%2BTocUhigrfbWz5jYtH4VdrAMksBdYVnI8vYJ/8q83hhmW0WEy23WKx39/Qh6LaHQXXA1xBgYc5isBL4/scCFoC3QCbIBhkhK2TGi65St4CpeharDvgaYoJnIv15GHaFQRBkg4w8p02BzF0VRH6XgEGDV5VS1rOgOvTHCb47wfXvIBtkhE4JmSG7/r3%2B3ilg6toQyx1OUEr7i56lF8zde8gIWVEPSz1g4IyGU8CwkMbaEMudNg3eWd0fXR5khcyQXcXAiYSdAMMWDY/ltVhIY23IdXr8kjqh21%2BzRKvMogUYAAtHQToBhv0sbNFg16GvLaQdmTfjGTJDdmCgYuHQSIfe07pTSqewn3V9z6qrvb1F48Crzx6xNTR4QXoE9tN4c2%2ByfufWqudC3VbmAYzNPwZrkf6dL%2B4LSm5Q9vkrVH79B6qs%2BoH8B1goatAtNCIqmOZOiabw4G5VJMNYREdhDD7ae6J0USsmtEwj3t7DYLCwK83f8WbbzauZP7/kq53SxiY7vfmfC5R24Fv6prTrDVEWgqbfEUlPLY2nlKkxGv%2BmXbFzG7H4/eE8g/tZyO92zbDSPoe1WncUgT14X4G189NimvjobnrhX6e6BQuo8DCho2crafnzB2n%2BMwe4PL5H5iVgACx4wEltli%2B1sXbA%2BGkNcmCwUN%2BY%2BI%2B3WOjZt3Lpl68cpQoefu6m4%2Bcqae7TWfTfk%2BXuVnWrvA4LFRtUVockjKxKc8sJmMJsWWsiON/U9eJvNmXTtk%2B%2BdYt5Z4WZX0p/bjYtmBbn7LURefaw%2BVuvwoQnBliTYCxu7WFskQb1WROjcvliKlibM/IMAQv8siD0643H6etiGx7NSBbYUlXCbRipgKnme859Ysl4jwwDrnKaV2SjDe%2B0tu9qnZ7KsQWch/YxVpt6KunZexieUVPDSIJjCC86k3lwyikJ0di%2BMS09/3au2iuMbuDr4mpKN2CIO%2BMLVnpgA4yAlVRX1ziV4fODrwOv2k2bDM4UVvEkXeaMJ0PyXn3/nCF0HIkAE2ADjICVpChiLArBMcSxsJHPmdmXjCTXiVZRRS19VVTdKd%2BIDA0bYCW1%2BWcRvGiMIN4Vjb1flHb1yrD8rM9LDKOlJ6RhA6ww6au%2BD3A50hcy%2Bt5sRRP8FpSYo8zqsBnDPax13oJ/ltEgafSqam5SU7NdezTtWsHrTzOShg2wYtWP3SQ5wZnNjMZA80Z9s1mkO9CtMakdDRtgJcGnFK3C869D6wY%2BRISp7loGUnROKtKkdtqxYawkzQGXdwNUN0nnrHiXGxxoJf40e0fEhdpRg29xoZT7RTRsgJV%2B8e0%2BJTdqJIwd4kZpz4pOGWN%2BG5Lq2s38wQHXMzZdq2XiAlllgP2%2BaH6yOX4xGjbAinejlVq0CG9l10T3rNT99wwnf96KMyvNuHMoDR0UaAr5dmwYK1YrhAoYXLtNaa2N6DAW5vFF6qLClGZeeHSyKXRBVMMGWLFaoUZYEPzgTWuxjfC6lROI/RgMb2bZ7JGUaOIcqWEDrDDp50MCBA0YLokDQRgx0p%2BdTezH4PDG88dxI8LotaeneU7AhZo6bPK5hwkVMERYuFDX6yLT2JDx99/fTVY2anibYiOCaPuGuayydDB%2BeUu2U30NG2AlCaFcRAmEo3QqaVLGynm30a6X5sHz2uMWksZH0pHXF9CIYeb/zho2CAqTgoMDvoTXCmJ3EI7isQRuVpw9KYqytyykhxk8qASuJoD84mNTKGvjveSLFQQwUeOaGCNE0Flqvs5o8b/9gZ8xwyMmj404NComZJyrzHtbLjTIjxZNv1X9C/S30pXqRrLVdd4lh7EjOX4oPfHAOHrzD9Np9l1RZMHnygeJ45kOZXxaPJ6byr6WueotdfAjhI73rGdu2ZXnn5oY7QM2OjZxx8hw%2BvPjCepf2bUfqJz/Llc1qHpb1OBAiosMpoFB5i%2BtOnLV%2BoTgL9ypYYZ8bZ0tOd6QmuUNbCiFMoN9GPM0TCbeXYoZcgvhr48kOyLlVF6AESf1UwV7G88jBbC/ISqsjzDb62wAC9UmydhoAaz6b/tWcIgQul7ntI8woMNCxQZstQOGSFYeqQriDeGI0Ud47jU2gIEae8kmtlZsWllpB6zNO2UXZwcg3rDXOO0jDbdhEIDoXs1zB6y1A4YHhP3iiuBMOJXh3tfJzuZ/qBbfX65nR5UGqmto8TUL2OoqAgZoWMNEY6KTMhOa%2Bt4ehCDfmxjz8c4X5y3UChp5hVk/j63Vpwuu0zdlNVTIrkuFfC1hkOobO%2B//Qw8LD/an26JDaFRsKI2KCWU76kCaOi6CoHYYnZY9d/DjAzllC/lDmFWz75EFevqdFmGIkbbL9hREsiI40yg/11wGhxex9PlXV%2BjEhatUU99ZQdUzpr%2BH08n1mkb1L%2BfiVf0rGs5Lo2nxkXT3HUPZ0S7WawAhsxrFy6HPwKJDY/zQqYehAPey1%2BDgDxfsSxkPwZPYaTmU7S7BPWDXkWLafayYLlWaaidW2cASK5nBWzJzOD3AG5YebCgqw5dvP4PoXab1Oveu3znK5xQIOPW31DZchL/6M6vv2sn%2B68scK3b1jDlo%2B6Hv6G878ij/e1M3cbtiQc3HML4vKZbWrbyTpowe3G1Z7SVH7e7cmHZmGXePSmtI4FhnQfVOAQMBNfhdse/CwvzsO/cf6ykapKlZpq0HCmlzxlc%2B6U2akK5c2XJNf3x4At3D29hdJUTrTnz0wxlwOrEIy5Kugum7BAyEtaGJwKVrH63mrSDn0besEdNTmz9XJ%2B6uGOoL%2BbAr/OXJJIoM77jryx%2Bh0iGL0mSENnc1FDX%2BO6gVWqZ2RfQ9I5oLQgj75fxO/q%2BvpJ9TnXTxlevr6cPjlyj5iUx2bb%2BsZ7UesqlgsayQWf/S8b7bHobC3QWYrv3rZ%2BwuXuhIs88/Y4v8vfWz4BvrdoBpj4BBejWE2W4/yupTGMJ%2BD21O/emf3j1t2bTNrYD8PgWkv7/FflvUwE8uFFelMAg2i8Uy05UTBlwCTAWtLUieJ8XA2MiQIxXX6xNYI%2B6XC3Wep%2Br5xz/Jsszij1qDVREprp4s4DJgGmjaMQzcUA5bgaNkRTbH3GxSf5SEVMoxRBUMlrnHMIB//ArounxbjgZZuWWtSzlokmyGkwWv4Bm8QwZ1GLpxZgUYcquHaRLgQ6A/SobJ4IiGpeyc7RE9ja55V/aKEOID5s/3R8loQjkeVsTzwmmeF2oYuFlamT5xFeII/4qh3LMmgR/oWT4/rEgPhONxWEKifUJW4mWikfpyvr5nBbNIkUQeD8BU7lm9fxyWHgDHA9fYQlzHg/0w/6qjuZzqdKwvb/J9PveiAl4Hz%2BE5q%2B8duKYXHjHSjkf6sXkqWyEZK4QFLIQ51iihWrr2CJKCeE6fzm2pax8Grm8e6acHDffth0YSLdF9CCoZvFye55okRU7gIetV1AkPuRJZSCfZUdefezJMYf3v0MhOwHVzLKlQxAWSRJlQlDr%2BzrPcUjjbGwbyBB2mCKH62/K7KwywjWM8b5CQq%2BH9x%2B%2BCSVZiFKH8eI4ldQQOz4jJ/P/Bt86QcSFPPVqZA50Qu4NwFK7i3tHK7HEEJ5reOFr5fwkK97jkk8ywAAAAAElFTkSuQmCC')  # pylint: disable=line-too-long
 
 
-# TODO(#10178): Deprecate gae_id for UserSettings once we have verified that
-# UserAuthDetailsModels exists for every user.
 class UserSettings(python_utils.OBJECT):
     """Value object representing a user's settings.
 
     Attributes:
         user_id: str. The unique ID of the user.
-        gae_id: str. The ID of the user retrieved from GAE.
         email: str. The user email.
         role: str. Role of the user. This is used in conjunction with
             PARENT_ROLES to determine which actions the user can perform.
@@ -90,7 +87,7 @@ class UserSettings(python_utils.OBJECT):
     """
 
     def __init__(
-            self, user_id, gae_id, email, role, username=None,
+            self, user_id, email, role, username=None,
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
             last_started_state_translation_tutorial=None, last_logged_in=None,
             last_created_an_exploration=None, last_edited_an_exploration=None,
@@ -105,7 +102,6 @@ class UserSettings(python_utils.OBJECT):
 
         Args:
             user_id: str. The unique ID of the user.
-            gae_id: str. The ID of the user retrieved from GAE.
             email: str. The user email.
             role: str. Role of the user. This is used in conjunction with
                 PARENT_ROLES to determine which actions the user can perform.
@@ -146,7 +142,6 @@ class UserSettings(python_utils.OBJECT):
                 account.
         """
         self.user_id = user_id
-        self.gae_id = gae_id
         self.email = email
         self.role = role
         self.username = username
@@ -174,12 +169,11 @@ class UserSettings(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that the user_id, gae_id, email, role, pin and display_alias
+        """Checks that the user_id, email, role, pin and display_alias
         fields of this UserSettings domain object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
-            ValidationError. The gae_id is not str.
             ValidationError. The email is not str.
             ValidationError. The email is invalid.
             ValidationError. The role is not str.
@@ -200,13 +194,6 @@ class UserSettings(python_utils.OBJECT):
                 'Expected role to be a string, received %s' % self.role)
         if self.role not in role_services.PARENT_ROLES:
             raise utils.ValidationError('Role %s does not exist.' % self.role)
-
-        if (self.gae_id is not None and
-                not isinstance(self.gae_id, python_utils.BASESTRING)):
-            raise utils.ValidationError(
-                'Expected gae_id to be a string, received %s' %
-                self.gae_id
-            )
 
         if self.pin is not None:
             if not isinstance(self.pin, python_utils.BASESTRING):
@@ -299,7 +286,6 @@ class UserSettings(python_utils.OBJECT):
             in a dictionary form.
         """
         return {
-            'gae_id': self.gae_id,
             'email': self.email,
             'role': self.role,
             'username': self.username,
@@ -499,6 +485,23 @@ def is_user_id_valid(user_id):
         len(user_id) == feconf.USER_ID_LENGTH))
 
 
+def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
+    """Verify that the user ID is in a correct format or it is in correct
+    pseudonymous ID format.
+
+    Args:
+        user_or_pseudonymous_id: str. The user or pseudonymous ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct user ID or pseudonymous ID
+        format, False otherwise.
+    """
+    return (
+        is_user_id_valid(user_or_pseudonymous_id) or
+        utils.is_pseudonymous_id(user_or_pseudonymous_id)
+    )
+
+
 def is_username_taken(username):
     """Returns whether the given username has already been taken.
 
@@ -610,7 +613,6 @@ def get_users_settings(user_ids, strict=False):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
             result.append(UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
-                gae_id=feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
                 role=feconf.ROLE_ID_ADMIN,
                 username='admin',
@@ -872,6 +874,8 @@ def _save_user_contribution_rights(user_contribution_rights):
     # TODO(#8794): Add limitation on number of reviewers allowed in any
     # category.
     user_contribution_rights.validate()
+    _update_reviewer_counts_in_community_contribution_stats(
+        user_contribution_rights)
     user_models.UserContributionRightsModel(
         id=user_contribution_rights.id,
         can_review_translation_for_language_codes=(
@@ -894,6 +898,80 @@ def _update_user_contribution_rights(user_contribution_rights):
         _save_user_contribution_rights(user_contribution_rights)
     else:
         remove_contribution_reviewer(user_contribution_rights.id)
+
+
+def _update_reviewer_counts_in_community_contribution_stats_transactional(
+        future_user_contribution_rights):
+    """Updates the reviewer counts in the community contribution stats based
+    on the given user contribution rights with the most up-to-date values.
+    This method is intended to be called right before the new updates to the
+    user contribution rights have been saved in the datastore. Note that this
+    method should only ever be called in a transaction.
+
+    Args:
+        future_user_contribution_rights: UserContributionRights. The most
+            up-to-date user contribution rights.
+    """
+    past_user_contribution_rights = get_user_contribution_rights(
+        future_user_contribution_rights.id)
+    stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+    future_languages_that_reviewer_can_review = set(
+        future_user_contribution_rights
+        .can_review_translation_for_language_codes)
+    past_languages_that_reviewer_can_review = set(
+        past_user_contribution_rights.can_review_translation_for_language_codes)
+
+    languages_that_reviewer_can_no_longer_review = (
+        past_languages_that_reviewer_can_review.difference(
+            future_languages_that_reviewer_can_review))
+    new_languages_that_reviewer_can_review = (
+        future_languages_that_reviewer_can_review.difference(
+            past_languages_that_reviewer_can_review))
+
+    # Update question reviewer counts.
+    if past_user_contribution_rights.can_review_questions and not (
+            future_user_contribution_rights.can_review_questions):
+        stats_model.question_reviewer_count -= 1
+    if not past_user_contribution_rights.can_review_questions and (
+            future_user_contribution_rights.can_review_questions):
+        stats_model.question_reviewer_count += 1
+    # Update translation reviewer counts.
+    for language_code in languages_that_reviewer_can_no_longer_review:
+        stats_model.translation_reviewer_counts_by_lang_code[
+            language_code] -= 1
+        # Remove the language code from the dict if the count reaches zero.
+        if stats_model.translation_reviewer_counts_by_lang_code[
+                language_code] == 0:
+            del stats_model.translation_reviewer_counts_by_lang_code[
+                language_code]
+    for language_code in new_languages_that_reviewer_can_review:
+        if language_code not in (
+                stats_model.translation_reviewer_counts_by_lang_code):
+            stats_model.translation_reviewer_counts_by_lang_code[
+                language_code] = 1
+        else:
+            stats_model.translation_reviewer_counts_by_lang_code[
+                language_code] += 1
+
+    stats_model.update_timestamps()
+    stats_model.put()
+
+
+def _update_reviewer_counts_in_community_contribution_stats(
+        user_contribution_rights):
+    """Updates the reviewer counts in the community contribution stats based
+    on the updates to the given user contribution rights. The GET and PUT is
+    done in a transaction to avoid loss of updates that come in rapid
+    succession.
+
+    Args:
+        user_contribution_rights: UserContributionRights. The user contribution
+            rights.
+    """
+    transaction_services.run_in_transaction(
+        _update_reviewer_counts_in_community_contribution_stats_transactional,
+        user_contribution_rights)
 
 
 def get_usernames_by_role(role):
@@ -989,10 +1067,13 @@ def _save_user_settings(user_settings):
     user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
+        user_model.update_timestamps()
         user_model.put()
     else:
         user_settings_dict['id'] = user_settings.user_id
-        user_models.UserSettingsModel(**user_settings_dict).put()
+        model = user_models.UserSettingsModel(**user_settings_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def _get_user_settings_from_model(user_settings_model):
@@ -1006,7 +1087,6 @@ def _get_user_settings_from_model(user_settings_model):
     """
     return UserSettings(
         user_id=user_settings_model.id,
-        gae_id=user_settings_model.gae_id,
         email=user_settings_model.email,
         role=user_settings_model.role,
         username=user_settings_model.username,
@@ -1148,7 +1228,7 @@ def create_new_user(gae_id, email):
             % (user_settings.user_id, gae_id))
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
-        user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
+        user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     user_auth_details = UserAuthDetails(user_id, gae_id)
     transaction_services.run_in_transaction(
@@ -1204,7 +1284,7 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
             raise Exception('User id cannot already exist for a new user.')
         user_id = user_models.UserSettingsModel.get_new_id('')
         user_settings = UserSettings(
-            user_id, gae_id, email, feconf.ROLE_ID_LEARNER,
+            user_id, email, feconf.ROLE_ID_LEARNER,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin
         )
@@ -1274,6 +1354,7 @@ def _save_existing_users_settings(user_settings_list):
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
+    user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
 
 
@@ -1296,6 +1377,7 @@ def _save_existing_users_auth_details(user_auth_details_list):
             'deleted': user_auth_details.deleted
         }
         user_auth_details_model.populate(**user_auth_details_dict)
+    user_models.UserAuthDetailsModel.update_timestamps_multi(user_auth_models)
     user_models.UserAuthDetailsModel.put_multi(user_auth_models)
 
 
@@ -1320,10 +1402,13 @@ def _save_user_auth_details(user_auth_details):
         user_auth_details.user_id)
     if user_auth_details_model is not None:
         user_auth_details_model.populate(**user_auth_details_dict)
+        user_auth_details_model.update_timestamps()
         user_auth_details_model.put()
     else:
         user_auth_details_dict['id'] = user_auth_details.user_id
-        user_models.UserAuthDetailsModel(**user_auth_details_dict).put()
+        model = user_models.UserAuthDetailsModel(**user_auth_details_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def get_multiple_user_auth_details(user_ids):
@@ -1403,7 +1488,7 @@ def get_pseudonymous_username(pseudonymous_id):
         str. The pseudonymous username, starting with 'User' and ending with
         the last eight letters from the pseudonymous_id.
     """
-    return 'User%s%s' % (
+    return 'User_%s%s' % (
         pseudonymous_id[-8].upper(), pseudonymous_id[-7:])
 
 
@@ -1668,16 +1753,11 @@ def mark_user_for_deletion(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
-        user_id)
-
-    # TODO(#10178): Remove the if condition below once UserAuthDetailsModel is
-    # present for every existing user.
-    if user_auth_details_model is not None:
-        user_auth_details = _get_user_auth_details_from_model(
-            user_auth_details_model)
-        user_auth_details.deleted = True
-        _save_user_auth_details(user_auth_details)
+    user_auth_details = _get_user_auth_details_from_model(
+        user_models.UserAuthDetailsModel.get_by_id(user_id)
+    )
+    user_auth_details.deleted = True
+    _save_user_auth_details(user_auth_details)
 
 
 def get_human_readable_user_ids(user_ids):
@@ -1824,6 +1904,7 @@ def update_email_preferences(
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
+    email_preferences_model.update_timestamps()
     email_preferences_model.put()
 
 
@@ -1847,17 +1928,6 @@ def get_email_preferences(user_id):
             email_preferences_model.editor_role_notifications,
             email_preferences_model.feedback_message_notifications,
             email_preferences_model.subscription_notifications)
-
-
-def flush_migration_bot_contributions_model():
-    """Cleans migration bot contributions model."""
-    user_contributions = get_user_contributions(
-        feconf.MIGRATION_BOT_USER_ID, strict=False)
-
-    if user_contributions is not None:
-        user_contributions.edited_exploration_ids = []
-        user_contributions.created_exploration_ids = []
-        _save_user_contributions(user_contributions)
 
 
 def get_users_email_preferences(user_ids):
@@ -1917,6 +1987,7 @@ def set_email_preferences_for_exploration(
     if mute_suggestion_notifications is not None:
         exploration_user_model.mute_suggestion_notifications = (
             mute_suggestion_notifications)
+    exploration_user_model.update_timestamps()
     exploration_user_model.put()
 
 
@@ -2068,6 +2139,8 @@ def get_user_contributions(user_id, strict=False):
 def create_user_contributions(
         user_id, created_exploration_ids, edited_exploration_ids):
     """Creates a new UserContributionsModel and returns the domain object.
+    Note: This does not create a contributions model if the user is
+    OppiaMigrationBot.
 
     Args:
         user_id: str. The unique ID of the user.
@@ -2077,13 +2150,16 @@ def create_user_contributions(
             user has edited.
 
     Returns:
-        UserContributions. The domain object representing the newly-created
-        UserContributionsModel.
+        UserContributions|None. The domain object representing the newly-created
+        UserContributionsModel. If the user id is for oppia migration bot, None
+        is returned.
 
     Raises:
         Exception. The UserContributionsModel for the given user_id already
             exists.
     """
+    if user_id == feconf.MIGRATION_BOT_USER_ID:
+        return None
     user_contributions = get_user_contributions(user_id, strict=False)
     if user_contributions:
         raise Exception(
@@ -2325,6 +2401,7 @@ def update_dashboard_stats_log(user_id):
         }
     }
     model.weekly_creator_stats_list.append(weekly_dashboard_stats)
+    model.update_timestamps()
     model.put()
 
 
@@ -2541,6 +2618,14 @@ def remove_contribution_reviewer(user_id):
     user_contribution_rights_model = (
         user_models.UserContributionRightsModel.get_by_id(user_id))
     if user_contribution_rights_model is not None:
+        user_contribution_rights = _create_user_contribution_rights_from_model(
+            user_contribution_rights_model)
+        # Clear the user contribution rights fields before passing them into the
+        # update community contribution stats function.
+        user_contribution_rights.can_review_questions = False
+        user_contribution_rights.can_review_translation_for_language_codes = []
+        _update_reviewer_counts_in_community_contribution_stats(
+            user_contribution_rights)
         user_contribution_rights_model.delete()
 
 

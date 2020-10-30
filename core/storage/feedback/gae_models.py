@@ -637,6 +637,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
                 id=instance_id, user_id=user_id, thread_id=thread_id)
             new_instances.append(new_instance)
 
+        GeneralFeedbackThreadUserModel.update_timestamps_multi(new_instances)
         GeneralFeedbackThreadUserModel.put_multi(new_instances)
         return new_instances
 

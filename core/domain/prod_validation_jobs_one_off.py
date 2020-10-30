@@ -116,11 +116,13 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
             validator = getattr(validator_module, validator_cls_name)
             validator.validate(model_instance)
             if len(validator.errors) > 0:
-                for error_key, error_val in validator.errors.items():
+                for error_key, error_list in validator.errors.items():
+                    error_message = ((',').join(set(error_list))).encode(
+                        encoding='utf-8')
                     yield (
                         'failed validation check for %s of %s' % (
                             error_key, model_name),
-                        (',').join(set(error_val)))
+                        python_utils.convert_to_bytes(error_message))
             else:
                 yield (
                     'fully-validated %s' % model_name, 1)

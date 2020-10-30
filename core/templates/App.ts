@@ -44,7 +44,6 @@ require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
 
-require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 require('pages/Base.ts');
@@ -113,19 +112,18 @@ angular.module('oppia').config([
       'CurrentInteractionService', 'DateTimeFormatService', 'DebouncerService',
       'DeviceInfoService', 'DocumentAttributeCustomizationService',
       'EditabilityService', 'EditorFirstTimeEventsService',
-      'EmailDashboardDataService', 'ExplorationFeaturesBackendApiService',
+      'ExplorationFeaturesBackendApiService',
       'ExplorationFeaturesService', 'ExplorationHtmlFormatterService',
       'ExplorationImprovementsBackendApiService',
       'ExplorationImprovementsService', 'ExplorationObjectFactory',
       'ExplorationRecommendationsService', 'ExpressionEvaluatorService',
       'ExpressionParserService', 'ExpressionSyntaxTreeService',
       'ExtensionTagAssemblerService', 'ExtractImageFilenamesFromStateService',
-      'FeedbackMessageSummaryObjectFactory', 'FeedbackThreadObjectFactory',
+      'FeedbackThreadObjectFactory',
       'FeedbackThreadSummaryObjectFactory', 'FileDownloadRequestObjectFactory',
-      'FocusManagerService', 'GuestCollectionProgressObjectFactory',
-      'GuestCollectionProgressService', 'HtmlEscaperService',
-      'I18nLanguageCodeService', 'IdGenerationService',
-      'ImageFileObjectFactory', 'ImagePreloaderService', 'ImprovementsService',
+      'FocusManagerService', 'GuestCollectionProgressService',
+      'HtmlEscaperService', 'I18nLanguageCodeService', 'IdGenerationService',
+      'ImageFileObjectFactory', 'ImprovementsService',
       'InteractionObjectFactory', 'InteractionRulesRegistryService',
       'LanguageUtilService', 'LearnerAnswerDetailsBackendApiService',
       'LearnerDashboardBackendApiService', 'LearnerParamsService',
@@ -146,24 +144,23 @@ angular.module('oppia').config([
       'RubricObjectFactory', 'SchemaDefaultValueService',
       'SchemaUndefinedLastElementService', 'SidebarStatusService',
       'SiteAnalyticsService', 'SkillObjectFactory',
-      'SkillRightsBackendApiService', 'SkillRightsObjectFactory',
-      'SolutionObjectFactory', 'SolutionValidityService',
-      'SpeechSynthesisChunkerService', 'StateCardObjectFactory',
-      'StateClassifierMappingService', 'StateEditorService',
-      'StateInteractionStatsService', 'StateObjectFactory',
-      'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
-      'StatesObjectFactory', 'StopwatchObjectFactory',
-      'StoryContentsObjectFactory', 'StoryObjectFactory',
-      'StorySummaryObjectFactory', 'StoryViewerBackendApiService',
-      'SubtopicObjectFactory', 'SubtopicPageContentsObjectFactory',
-      'SubtopicPageObjectFactory', 'SubtopicViewerBackendApiService',
-      'SuggestionThreadObjectFactory', 'SuggestionsService',
-      'TextInputRulesService', 'ThreadMessageObjectFactory',
-      'ThreadMessageSummaryObjectFactory', 'ThreadStatusDisplayService',
-      'TopicObjectFactory', 'TopicRightsObjectFactory',
-      'TopicViewerBackendApiService', 'TranslationLanguageService',
-      'UrlInterpolationService', 'UrlService',
-      'UserExplorationPermissionsService', 'UserInfoObjectFactory',
+      'SkillRightsBackendApiService', 'SolutionObjectFactory',
+      'SolutionValidityService', 'SpeechSynthesisChunkerService',
+      'StateCardObjectFactory', 'StateClassifierMappingService',
+      'StateEditorService', 'StateInteractionStatsService',
+      'StateObjectFactory', 'StateTopAnswersStatsBackendApiService',
+      'StateTopAnswersStatsService', 'StatesObjectFactory',
+      'StopwatchObjectFactory', 'StoryContentsObjectFactory',
+      'StoryObjectFactory', 'StorySummaryObjectFactory',
+      'StoryViewerBackendApiService', 'SubtopicObjectFactory',
+      'SubtopicPageContentsObjectFactory', 'SubtopicPageObjectFactory',
+      'SubtopicViewerBackendApiService', 'SuggestionThreadObjectFactory',
+      'SuggestionsService', 'TextInputRulesService',
+      'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory',
+      'ThreadStatusDisplayService', 'TopicObjectFactory',
+      'TopicRightsObjectFactory', 'TopicViewerBackendApiService',
+      'TranslationLanguageService', 'UrlInterpolationService', 'UrlService',
+      'UserExplorationPermissionsService',
       'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
       'WindowRef',
     ];
@@ -255,8 +252,15 @@ angular.module('oppia').config([
             // an error.
             if (rejection.status !== -1) {
               $log.error(rejection.data);
-              var warningMessage = 'Error communicating with server.';
-              if (rejection.data && rejection.data.error) {
+              var warningMessage = (
+                'Error communicating with server. Please try again.');
+              // When the status is >= 500 it is usually related to some outage
+              // and we do not want to resurface the error to the user.
+              if (
+                rejection.data &&
+                rejection.data.error &&
+                rejection.status < 500
+              ) {
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);

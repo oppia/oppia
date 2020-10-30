@@ -27,7 +27,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { LearnerExplorationSummary } from
-  'domain/summary/learner-exploration-summary-object.factory';
+  'domain/summary/learner-exploration-summary.model';
 
 @Injectable({
   providedIn: 'root'

@@ -18,6 +18,10 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // creator-dashboard-page.component.ts is upgraded to Angular 8.
+import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
@@ -52,13 +56,9 @@ describe('Creator dashboard controller', () => {
   var $rootScope = null;
   var $window = null;
   var AlertsService = null;
-  var collectionSummaryObjectFactory = null;
   var CreatorDashboardBackendApiService = null;
-  var creatorDashboardStatsObjectFactory = null;
-  var creatorExplorationSummaryObjectFactory = null;
   var CsrfService = null;
   var feedbackThreadObjectFactory = null;
-  var profileSummaryObjectFactory = null;
   var SuggestionModalForCreatorDashboardService = null;
   var suggestionObjectFactory = null;
   var suggestionsService = null;
@@ -83,19 +83,11 @@ describe('Creator dashboard controller', () => {
     $window = $injector.get('$window');
 
     AlertsService = $injector.get('AlertsService');
-    collectionSummaryObjectFactory = $injector.get(
-      'CollectionSummaryObjectFactory');
     CreatorDashboardBackendApiService = $injector.get(
       'CreatorDashboardBackendApiService');
-    creatorDashboardStatsObjectFactory = $injector.get(
-      'CreatorDashboardStatsObjectFactory');
-    creatorExplorationSummaryObjectFactory = $injector.get(
-      'CreatorExplorationSummaryObjectFactory');
     CsrfService = $injector.get('CsrfTokenService');
     feedbackThreadObjectFactory = $injector.get(
       'FeedbackThreadObjectFactory');
-    profileSummaryObjectFactory = $injector.get(
-      'ProfileSummaryObjectFactory');
     SuggestionModalForCreatorDashboardService = $injector.get(
       'SuggestionModalForCreatorDashboardService');
     suggestionObjectFactory = $injector.get(
@@ -282,15 +274,15 @@ describe('Creator dashboard controller', () => {
       beforeEach(function() {
         spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
           .and.returnValue($q.resolve({
-            dashboardStats: creatorDashboardStatsObjectFactory
+            dashboardStats: CreatorDashboardStats
               .createFromBackendDict(dashboardData.dashboard_stats),
             // Because lastWeekStats may be null.
             lastWeekStats: dashboardData.last_week_stats ? (
-              creatorDashboardStatsObjectFactory
+              CreatorDashboardStats
                 .createFromBackendDict(dashboardData.last_week_stats)) : null,
             displayPreference: dashboardData.display_preference,
             subscribersList: dashboardData.subscribers_list.map(
-              subscriber => profileSummaryObjectFactory
+              subscriber => ProfileSummary
                 .createFromSubscriberBackendDict(subscriber)),
             threadsForCreatedSuggestionsList: (
               dashboardData.threads_for_created_suggestions_list.map(
@@ -319,10 +311,10 @@ describe('Creator dashboard controller', () => {
               suggestionsService,
               SuggestionThreadObjectFactory),
             explorationsList: dashboardData.explorations_list.map(
-              expSummary => creatorExplorationSummaryObjectFactory
+              expSummary => CreatorExplorationSummary
                 .createFromBackendDict(expSummary)),
             collectionsList: dashboardData.collections_list.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))
           }));
         spyOn(UserService, 'getUserInfoAsync').and.returnValue(
@@ -584,15 +576,15 @@ describe('Creator dashboard controller', () => {
     beforeEach(function() {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
         .and.returnValue($q.resolve({
-          dashboardStats: creatorDashboardStatsObjectFactory
+          dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
           // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats ? (
-            creatorDashboardStatsObjectFactory
+            CreatorDashboardStats
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
-            subscriber => profileSummaryObjectFactory
+            subscriber => ProfileSummary
               .createFromSubscriberBackendDict(subscriber)),
           threadsForCreatedSuggestionsList: (
             dashboardData.threads_for_created_suggestions_list.map(
@@ -621,11 +613,12 @@ describe('Creator dashboard controller', () => {
             suggestionsService,
             SuggestionThreadObjectFactory),
           explorationsList: dashboardData.explorations_list.map(
-            expSummary => creatorExplorationSummaryObjectFactory
+            expSummary => CreatorExplorationSummary
               .createFromBackendDict(expSummary)),
           collectionsList: dashboardData.collections_list.map(
-            collectionSummary => collectionSummaryObjectFactory
-              .createFromBackendDict(collectionSummary))
+            (collectionSummary: unknown) => CollectionSummary
+              .createFromBackendDict(
+                collectionSummary as CollectionSummaryBackendDict))
         }));
 
       ctrl.$onInit();
@@ -682,15 +675,15 @@ describe('Creator dashboard controller', () => {
     beforeEach(function() {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
         .and.returnValue($q.resolve({
-          dashboardStats: creatorDashboardStatsObjectFactory
+          dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
           // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats ? (
-            creatorDashboardStatsObjectFactory
+            CreatorDashboardStats
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
-            subscriber => profileSummaryObjectFactory
+            subscriber => ProfileSummary
               .createFromSubscriberBackendDict(subscriber)),
           threadsForCreatedSuggestionsList: (
             dashboardData.threads_for_created_suggestions_list.map(
@@ -719,10 +712,10 @@ describe('Creator dashboard controller', () => {
             suggestionsService,
             SuggestionThreadObjectFactory),
           explorationsList: dashboardData.explorations_list.map(
-            expSummary => creatorExplorationSummaryObjectFactory
+            expSummary => CreatorExplorationSummary
               .createFromBackendDict(expSummary)),
           collectionsList: dashboardData.collections_list.map(
-            collectionSummary => collectionSummaryObjectFactory
+            collectionSummary => CollectionSummary
               .createFromBackendDict(collectionSummary))
         }));
 

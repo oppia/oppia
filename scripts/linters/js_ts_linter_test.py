@@ -490,10 +490,19 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.validate(lint_task_report, expected_messages, 1)
 
     def test_third_party_linter_with_stderr(self):
-        with self.assertRaisesRegexp(SystemExit, '1'):
-            js_ts_linter.ThirdPartyJsTsLintChecksManager(
-                INVALID_SORTED_DEPENDENCIES_FILEPATH
-            ).perform_all_lint_checks()
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
+        def mock_popen(unused_cmd, stdout, stderr):  # pylint: disable=unused-argument
+            return process
+        def mock_communicate(unused_self):
+            return ('Output', 'Invalid')
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        communicate_swap = self.swap(
+            subprocess.Popen, 'communicate', mock_communicate)
+        with popen_swap, communicate_swap:
+            with self.assertRaisesRegexp(Exception, 'Invalid'):
+                js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                    [INVALID_SORTED_DEPENDENCIES_FILEPATH]
+                ).perform_all_lint_checks()
 
     def test_third_party_linter_with_invalid_eslint_path(self):
         def mock_exists(unused_path):
@@ -501,7 +510,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with exists_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with exists_swap, self.assertRaisesRegexp(
+            Exception,
+            'ERROR    Please run start.sh first to install node-eslint and '
+            'its dependencies.'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH]
             ).perform_all_lint_checks()
