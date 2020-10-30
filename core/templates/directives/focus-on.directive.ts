@@ -22,7 +22,7 @@
  * There are two attribute directives in this file. One for AngularJS code and
  * the other for Angular code.
  * Attribute directives can't be shared at between AngularJS and Angular
- * (similar to how pipes/ filters can't be). The best that can be done in this
+ * (similar to how pipes/filters can't be). The best that can be done in this
  * situation is shifting common code in a function and reusing those functions
  * or just keeping the repeated code in the file.
  * The old code can be safely removed when the directive is no longer used in
