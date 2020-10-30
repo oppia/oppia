@@ -1,20 +1,12 @@
 steps:
-  - id: workspace-setup
+  - id: lint-check
     name: python:2.7-jessie
     entrypoint: bash
     args: 
       - '-c'
       - |
-          mkdir oppia
-          mv * oppia
-          cd oppia
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install
           python -m scripts.install_third_party_libs
-  - id: lint-check
-    name: python:2.7-jessie
-    dir: oppia
-    entrypoint: bash
-    args:
-      - '-c'
-      - |
           python -m scripts.third_party_size_check
           python -m scripts.pre_commit_linter --path=. --verbose
