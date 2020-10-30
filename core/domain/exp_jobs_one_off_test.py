@@ -93,6 +93,57 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
+class BuildExplorationStatesHistoryOneOffJobTests(test_utils.GenericTestBase):
+
+    JOB_CLASS = exp_jobs_one_off.BuildExplorationStatesHistoryOneOffJob
+
+    def count_one_off_jobs_in_queue(self):
+        """Counts one off jobs in the taskqueue."""
+        return self.count_jobs_in_mapreduce_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+
+    def run_job(self):
+        """Begins the one off job and returns its output.
+
+        Assumes the existence of a class constant JOB_CLASS.
+
+        Returns:
+            *. The output of the one off job.
+        """
+        job_id = self.JOB_CLASS.create_new()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        self.JOB_CLASS.enqueue(job_id)
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        return [ast.literal_eval(o) for o in self.JOB_CLASS.get_output(job_id)]
+
+    def test_ok_exploration(self):
+        self.save_new_valid_exploration('exp_id1', 'owner_id')
+        self.save_new_valid_exploration('exp_id2', 'owner_id')
+
+        self.assertEqual(self.run_job(), [['VALID HISTORIES', 2]])
+
+    def test_ignores_deleted_explorations(self):
+        self.save_new_valid_exploration('exp_id', 'owner_id')
+        exp_services.delete_exploration('owner_id', 'exp_id')
+
+        self.assertEqual(self.run_job(), [])
+
+    def test_corrupted_exploration(self):
+        self.save_new_valid_exploration('exp_id', 'owner_id')
+
+        exp_model = exp_models.ExplorationModel.get_by_id('exp_id')
+        exp_model.version = -1 # Impossible in production, but easy for tests.
+        exp_model.update_timestamps()
+        super(base_models.VersionedModel, exp_model).put()
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id'])
+
+        output_key, _ = self.run_job()[0]
+        self.assertEqual(output_key, 'CORRUPTED HISTORIES')
+
+
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'

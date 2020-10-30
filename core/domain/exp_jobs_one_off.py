@@ -58,6 +58,40 @@ import utils
 ])
 
 
+class BuildExplorationStatesHistoryOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for confirming that an exploration's states history can be
+    built successfully, otherwise report any errors as a potential corruption.
+    """
+
+    REDUCE_KEY_OK = 'VALID HISTORIES'
+    REDUCE_KEY_CORRUPTED = 'CORRUPTED HISTORIES'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        if exp_model.deleted:
+            return
+        try:
+            exp_services.get_exploration_state_history(exp_model.id)
+            yield (BuildExplorationStatesHistoryOneOffJob.REDUCE_KEY_OK, 1)
+        except Exception as e:
+            yield (
+                BuildExplorationStatesHistoryOneOffJob.REDUCE_KEY_CORRUPTED,
+                (exp_model.id, repr(e)))
+
+    @staticmethod
+    def reduce(key, items):
+        if key == BuildExplorationStatesHistoryOneOffJob.REDUCE_KEY_CORRUPTED:
+            for exp_id, error in (ast.literal_eval(i) for i in items):
+                yield (key, 'ExplorationModel(id=%r): %s' % (exp_id, error))
+        else:
+            yield (key, len(items))
+
+
 class RegenerateStringPropertyIndexOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for regenerating the index of models changed to use an
