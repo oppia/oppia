@@ -22,9 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import {
   ExplorationStats,
-  ExplorationStatsObjectFactory,
   ExplorationStatsBackendDict
-} from 'domain/statistics/ExplorationStatsObjectFactory';
+} from 'domain/statistics/exploration-stats.model';
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
 import { StateStatsBackendDict } from
@@ -32,7 +31,6 @@ import { StateStatsBackendDict } from
 
 describe('Exploration stats backend api service', () => {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
-  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
@@ -40,8 +38,6 @@ describe('Exploration stats backend api service', () => {
 
     explorationStatsBackendApiService = (
       TestBed.get(ExplorationStatsBackendApiService));
-    explorationStatsObjectFactory = (
-      TestBed.get(ExplorationStatsObjectFactory));
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -64,7 +60,7 @@ describe('Exploration stats backend api service', () => {
       },
     };
     let explorationStats: ExplorationStats = (
-      explorationStatsObjectFactory.createFromBackendDict(
+      ExplorationStats.createFromBackendDict(
         explorationStatsBackendDict));
 
     let onSuccess = jasmine.createSpy('onSuccess', stats => {

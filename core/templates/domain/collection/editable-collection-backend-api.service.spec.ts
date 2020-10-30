@@ -21,14 +21,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { EditableCollectionBackendApiService } from
   'domain/collection/editable-collection-backend-api.service';
-import { Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
+import { Collection } from 'domain/collection/collection.model';
 
 describe('Editable collection backend API service', () => {
   let editableCollectionBackendApiService:
     EditableCollectionBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let collectionObjectFactory: CollectionObjectFactory;
   // Sample collection object returnable from the backend.
   let sampleDataResults = {
     collection: {
@@ -81,7 +79,6 @@ describe('Editable collection backend API service', () => {
 
     editableCollectionBackendApiService = TestBed.get(
       EditableCollectionBackendApiService);
-    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -103,7 +100,7 @@ describe('Editable collection backend API service', () => {
 
       flushMicrotasks();
 
-      var collectionObject = collectionObjectFactory.create(
+      var collectionObject = Collection.create(
         sampleDataResults.collection);
 
       expect(successHandler).toHaveBeenCalledWith(collectionObject);
@@ -154,7 +151,7 @@ describe('Editable collection backend API service', () => {
 
       collectionDict.collection.title = 'New Title';
       collectionDict.collection.version = 2;
-      collection = collectionObjectFactory.create(collectionDict.collection);
+      collection = Collection.create(collectionDict.collection);
 
       // Send a request to update collection.
       editableCollectionBackendApiService.updateCollection(

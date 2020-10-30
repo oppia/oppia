@@ -19,8 +19,7 @@
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import $ from 'jquery';
 import { Subscription } from 'rxjs';
-
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Router Service', () => {
   var RouterService = null;
@@ -41,12 +40,8 @@ describe('Router Service', () => {
   var refreshVersionHistorySpy = null;
   var refreshStateEditorSpy = null;
 
-  beforeEach(angular.mock.module('oppia', $provide => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
+
   beforeEach(angular.mock.inject($injector => {
     RouterService = $injector.get('RouterService');
     ExplorationStatesService = $injector.get('ExplorationStatesService');

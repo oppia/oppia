@@ -728,7 +728,7 @@ class InteractionInstance(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'Expected customization arg value to be a '
                         'InteractionCustomizationArg domain object, '
-                        'recieved %s' % self.customization_args[ca_name])
+                        'received %s' % self.customization_args[ca_name])
 
         interaction = interaction_registry.Registry.get_interaction_by_id(
             self.id)
