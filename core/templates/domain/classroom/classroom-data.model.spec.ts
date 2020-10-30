@@ -22,10 +22,10 @@ import { TopicSummary } from
   'domain/topic/topic-summary.model';
 
 describe('Classroom data model', () => {
-  let topicSummaryDicts;
+  let privateTopicSummaryDicts, publicTopicSummaryDicts;
 
   beforeEach(() => {
-    topicSummaryDicts = [{
+    publicTopicSummaryDicts = [{
       id: 'topic1',
       name: 'Topic name',
       description: 'Topic description',
@@ -35,7 +35,8 @@ describe('Classroom data model', () => {
       uncategorized_skill_count: 5,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
-    }, {
+    }];
+    privateTopicSummaryDicts = [{
       id: 'topic2',
       name: 'Topic name 2',
       description: 'Topic description 2',
@@ -51,13 +52,14 @@ describe('Classroom data model', () => {
   it('should create a new classroom object from a backend dictionary', () => {
     let classroomData = (
       ClassroomData.createFromBackendData(
-        'Math', topicSummaryDicts, 'Course Details', 'Topics Covered'));
+        'Math', publicTopicSummaryDicts, privateTopicSummaryDicts,
+        'Course Details', 'Topics Covered'));
     expect(classroomData.getName()).toEqual('Math');
     expect(classroomData.getCourseDetails()).toEqual('Course Details');
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
-    expect(classroomData.getTopicSummaries()[0]).toEqual(
-      TopicSummary.createFromBackendDict(topicSummaryDicts[0]));
-    expect(classroomData.getTopicSummaries()[1]).toEqual(
-      TopicSummary.createFromBackendDict(topicSummaryDicts[1]));
+    expect(classroomData.getPublicTopicSummaries()[0]).toEqual(
+      TopicSummary.createFromBackendDict(publicTopicSummaryDicts[0]));
+    expect(classroomData.getPrivateTopicSummaries()[0]).toEqual(
+      TopicSummary.createFromBackendDict(privateTopicSummaryDicts[0]));
   });
 });

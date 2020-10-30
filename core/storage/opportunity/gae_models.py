@@ -51,7 +51,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration opporturnity summary is deleted only if the corresponding
+        """Exploration opportunity summary is deleted only if the corresponding
         exploration is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
