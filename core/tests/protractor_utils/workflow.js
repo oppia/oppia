@@ -296,7 +296,11 @@ var getImageSource = async function(customImageElement) {
 
 var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
+  await waitFor.visibilityOf(
+    imageClickableElement,
+    'Image element is taking too long to appear.');
   await action.click('imageClickableElement', imageClickableElement);
+  
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
     await action.click('thumbnailResetButton', thumbnailResetButton);
