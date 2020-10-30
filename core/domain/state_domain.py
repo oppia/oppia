@@ -2512,26 +2512,6 @@ class State(python_utils.OBJECT):
             return True
         return False
 
-    def is_structurally_compatible_with(self, other_state):
-        """Returns whether two states are compatible with each other.
-
-        Compatibility refers to the ability of a state to have metrics shared
-        across different versions. For example, whether the stats of a
-        particular state can be carried over to a new state version.
-
-        Currently, two states are compatible if they share the same interaction
-        ID.
-
-        Args:
-            other_state: State. The state to compare.
-
-        Returns:
-            bool. Whether the two states are compatible with each other.
-        """
-        return (
-            isinstance(other_state, State) and
-            self.interaction.id == other_state.interaction.id)
-
     @classmethod
     def convert_state_dict_to_yaml(cls, state_dict, width):
         """Converts the given state dict to yaml format.

@@ -582,9 +582,11 @@ class StateVersionSpan(python_utils.OBJECT):
             for name, _ in self._get_multi_versions(version_start, version_end)
         ]
 
-    def extend_or_split(self, exp_version, state_name, state, exp_version_diff):
-        """Extends span to include the given state's version if it is compatible
-        with previous versions, otherwise split it into its own distinct span.
+    def extend_or_split(
+            self, exp_version, state_name, state, exp_version_diff,
+            split_predicate=None):
+        """Extends span to include the given state, unless it fails to pass the
+        given split predicate, in which case a new span is created and returned.
 
         Args:
             exp_version: int. The state's corresponding exploration version.
@@ -592,6 +594,10 @@ class StateVersionSpan(python_utils.OBJECT):
             state: state_domain.State. State's representation at given version.
             exp_version_diff: ExplorationVersionsDiff. The changes since the
                 last exploration version.
+            split_predicate:
+                callable(state_domain.State, state_domain.State) -> bool | None.
+                Should return True when the two states should be split up. If
+                None, then the states will never be split up.
 
         Returns:
             StateVersionSpan. The span chosen to hold the state.
@@ -622,12 +628,12 @@ class StateVersionSpan(python_utils.OBJECT):
                     exp_version, prev_exp_version,
                     prev_state_name, prev_snapshot_state_name))
 
-        if prev_snapshot_state.is_structurally_compatible_with(state):
-            self._version_snapshots[exp_version] = (state_name, state)
-            self._version_end += 1
-            return self
-        else:
+        if split_predicate and split_predicate(prev_snapshot_state, state):
             return StateVersionSpan(exp_version, state_name, state)
+
+        self._version_snapshots[exp_version] = (state_name, state)
+        self._version_end += 1
+        return self
 
     def _get_multi_versions(self, version_start, version_end):
         """Returns state details for a half-open range of exploration versions.
@@ -649,7 +655,7 @@ class StateVersionSpan(python_utils.OBJECT):
 class ExplorationStatesHistory(python_utils.OBJECT):
     """Organizes the history of changes made to each state of an exploration."""
 
-    def __init__(self, exps, exp_version_diffs):
+    def __init__(self, exps, exp_version_diffs, split_predicate=None):
         """Constructs the exploration's state history.
 
         Args:
@@ -657,6 +663,10 @@ class ExplorationStatesHistory(python_utils.OBJECT):
                 by version. Items should begin at version 1 and contain no gaps.
             exp_version_diffs: list(ExplorationVersionsDiff). The specific
                 changes made to the exploration at each corresponding version.
+            split_predicate:
+                callable(state_domain.State, state_domain.State) -> bool | None.
+                Should return True when the two states should be split up. If
+                None, then the states will never be split up.
         """
         if not exps or not exp_version_diffs:
             raise ValueError('Inputs must be non-empty')
@@ -685,7 +695,8 @@ class ExplorationStatesHistory(python_utils.OBJECT):
                         diff.new_to_old_state_names.get(state_name, state_name))
                     new_state_spans[state_name] = (
                         prev_state_spans[prev_name].extend_or_split(
-                            exp.version, state_name, state, diff))
+                            exp.version, state_name, state, diff,
+                            split_predicate=split_predicate))
             self._state_spans_history.append(new_state_spans)
 
     def get_state_span(self, exp_version, state_name):

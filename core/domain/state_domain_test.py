@@ -955,28 +955,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             state_without_training_data.can_undergo_classification())
 
-    def test_is_structurally_compatible_with(self):
-        text_input, mult_choice = (
-            state_domain.State.create_default_state('End'),
-            state_domain.State.create_default_state('End'))
-        text_input.update_interaction_id('TextInput')
-        mult_choice.update_interaction_id('MultipleChoiceInput')
-
-        self.assertTrue(
-            text_input.is_structurally_compatible_with(text_input))
-        self.assertTrue(
-            mult_choice.is_structurally_compatible_with(mult_choice))
-
-        self.assertFalse(
-            text_input.is_structurally_compatible_with(mult_choice))
-        self.assertFalse(
-            mult_choice.is_structurally_compatible_with(text_input))
-
-        self.assertFalse(
-            text_input.is_structurally_compatible_with(text_input.to_dict()))
-        self.assertFalse(
-            mult_choice.is_structurally_compatible_with(mult_choice.to_dict()))
-
     def test_get_training_data(self):
         """Test retrieval of training data."""
         exploration_id = 'eid'
