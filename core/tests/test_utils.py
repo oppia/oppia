@@ -2496,7 +2496,7 @@ class AppEngineTestBase(TestBase):
             # Since the old stack is empty and the new stack is not held by the
             # current `with` context, we can exit the old stack's context while
             # accomplishing our goal: do _NOT_ unwind the stack immediately.
-            pass
+            pass # pylint: disable=unnecesary-pass. Documents the context's end.
 
         empty_environ()
         self.memory_cache_services_stub.flush_cache()
@@ -2537,7 +2537,7 @@ class AppEngineTestBase(TestBase):
         # an ExitStack invokes all of the callbacks/exits it has gathered in
         # reverse order.
         with self._stack:
-            pass # pylint: disable=unnecessary-pass
+            pass
         self._stack = None
 
     def _get_all_queue_names(self):
