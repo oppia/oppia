@@ -615,10 +615,12 @@ class StateVersionSpan(python_utils.OBJECT):
 
         if prev_state_name != prev_snapshot_state_name:
             raise Exception(
-                'State does not map to previous version (previous name of '
+                'State has no mapping from v%d to v%d (previous name of the '
                 'state is different; input exploration diff thinks that the '
                 'previous name was %r, but this span thinks that the previous '
-                'name was %r)' % (prev_state_name, prev_snapshot_state_name))
+                'name was %r)' % (
+                    exp_version, prev_exp_version,
+                    prev_state_name, prev_snapshot_state_name))
 
         if prev_snapshot_state.is_structurally_compatible_with(state):
             self._version_snapshots[exp_version] = (state_name, state)

@@ -1021,7 +1021,6 @@ class VersionedModel(BaseModel):
         reconstituted_models = []
         for snapshot_model, version in (
                 python_utils.ZIP(snapshot_models, versions)):
-            """Reconstitutes given snapshot or raises exception when invalid."""
             if snapshot_model is None:
                 raise ValueError('version number %r is invalid.' % version)
             reconstituted_model = (

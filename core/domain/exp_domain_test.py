@@ -619,7 +619,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             }),
         ])
 
-        with self.assertRaisesRegexp(Exception, 'does not map to previous'):
+        with self.assertRaisesRegexp(Exception, 'no mapping from v2 to v1'):
             span.extend_or_split(2, 'Z', self.new_state_domain_obj(), diff)
 
 
