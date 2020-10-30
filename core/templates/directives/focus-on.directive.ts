@@ -17,6 +17,8 @@
  * components.)
  * NB: Reusable component directives should go in the components/ folder.
  *
+ * NOTE: PLEASE MAKE SURE THAT ANY CHANGES MADE TO THE CODE IS DONE TO BOTH THE
+ * DIRECTIVES IN THIS FILE.
  * There are two attribute directives in this file. One for AngularJS code and
  * the other for Angular code.
  * Attribute directives can't be shared at between AngularJS and Angular
