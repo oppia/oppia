@@ -55,7 +55,6 @@ import { AnswerStatsObjectFactory } from
 import { AppService } from 'services/app.service';
 import { AssetsBackendApiService } from
   'services/assets-backend-api.service';
-import { AttributionService } from 'services/attribution.service';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioPreloaderService } from
   'pages/exploration-player-page/services/audio-preloader.service';
@@ -699,8 +698,6 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['AlertsService'] = new AlertsService(
       upgradedServices['LoggerService']);
-    upgradedServices['AttributionService'] = new AttributionService(
-      upgradedServices['ContextService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
     upgradedServices['CodeReplValidationService'] =
