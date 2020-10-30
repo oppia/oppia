@@ -29,7 +29,6 @@ angular.module('oppia').controller('DeleteAccountModalController', [
       $uibModalInstance: $uibModalInstance
     });
 
-
     let expectedUsername = null;
     UserService.getUserInfoAsync().then(function(userInfo) {
       expectedUsername = userInfo.getUsername();
