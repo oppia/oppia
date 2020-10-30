@@ -128,17 +128,12 @@ def get_filepath_from_filename(filename, rootdir):
     # So, we need to swap the name here to obtain the correct filepath.
     if filename.startswith('error-page'):
         filename = 'error-page.mainpage.html'
-
-    filepath = None
-    for root, _, filenames in os.walk(rootdir):
-        for name in filenames:
-            if name == filename:
-                if filepath is None:
-                    filepath = os.path.join(root, filename)
-                else:
-                    raise Exception(
-                        'Multiple files found with name: %s' % filename)
-    return filepath
+    matches = list(itertools.chain.from_iterable(
+        (os.path.join(subrootdir, f) for f in filenames if f == filename)
+        for subrootdir, _, filenames in os.walk(rootdir)))
+    if len(matches) > 1:
+        raise Exception('Multiple files found with name: %s' % filename)
+    return None if not matches else matches[0]
 
 
 def mock_load_template(filename):
@@ -159,8 +154,7 @@ def mock_load_template(filename):
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
     with python_utils.open_file(filepath, 'r') as f:
-        file_content = f.read()
-    return file_content
+        return f.read()
 
 
 def check_image_png_or_webp(image_string):
@@ -170,12 +164,9 @@ def check_image_png_or_webp(image_string):
         image_string: str. Image url in base64 format.
 
     Returns:
-        boolean. Returns true if image is in WebP format.
+        bool. Returns true if image is in WebP format.
     """
-    if (image_string.startswith('data:image/png') or
-            image_string.startswith('data:image/webp')):
-        return True
-    return False
+    return image_string.startswith(('data:image/png', 'data:image/webp'))
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -190,8 +181,8 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         Args:
             test_base: AppEngineTestBase. The current test base.
         """
-        self.test_base = test_base
-        self.client = cloud_tasks_emulator.Emulator(
+        self._test_base = test_base
+        self._client = cloud_tasks_emulator.Emulator(
             task_handler=self._task_handler, automatic_task_handling=False)
 
     def _task_handler(self, url, payload, queue_name, task_name=None):
@@ -206,14 +197,11 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         """
         headers = {
             'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
-            'X-Appengine-TaskName': (
-                task_name
-                if task_name else python_utils.convert_to_bytes('None')),
-            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes('1')
+            'X-Appengine-TaskName': python_utils.convert_to_bytes(task_name),
+            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes(1),
         }
-        csrf_token = self.test_base.get_new_csrf_token()
-        self.test_base.post_task(
-            url=url, payload=payload, csrf_token=csrf_token, headers=headers)
+        csrf_token = self._test_base.get_new_csrf_token()
+        self._test_base.post_task(url, payload, headers, csrf_token=csrf_token)
 
     def create_http_task(
             self, queue_name, url, payload=None, scheduled_for=None,
@@ -227,14 +215,14 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             payload: dict(str : *). Payload to pass to the request. Defaults
                 to None if no payload is required.
             scheduled_for: datetime|None. The naive datetime object for the
-                time to execute the task. Pass in None for immediate execution.
+                time to execute the task. Ignored by this stub.
             task_name: str|None. Optional. The name of the task.
         """
         # Causes the task to execute immediately by setting the scheduled_for
         # time to 0. If we allow scheduled_for to be non-zero, then tests that
         # rely on the actions made by the task will become unreliable.
         scheduled_for = 0
-        self.client.create_task(
+        self._client.create_task(
             queue_name, url, payload, scheduled_for=scheduled_for,
             task_name=task_name)
 
@@ -250,7 +238,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             int. The total number of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self.client.get_number_of_tasks(queue_name=queue_name)
+        return self._client.get_number_of_tasks(queue_name=queue_name)
 
     def process_and_flush_tasks(self, queue_name=None):
         """Executes all of the tasks in a single queue if a queue name is
@@ -261,7 +249,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             queue_name: str|None. Name of the queue. Pass in None if no specific
                 queue is designated.
         """
-        self.client.process_and_flush_tasks(queue_name=queue_name)
+        self._client.process_and_flush_tasks(queue_name=queue_name)
 
     def get_pending_tasks(self, queue_name=None):
         """Returns a list of the tasks in a single queue if a queue name is
@@ -276,7 +264,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             list(Task). List of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self.client.get_tasks(queue_name=queue_name)
+        return self._client.get_tasks(queue_name=queue_name)
 
 
 class MemoryCacheServicesStub(python_utils.OBJECT):
@@ -284,7 +272,8 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
     layer, namely the platform.cache cache services API.
     """
 
-    cache_dict = collections.defaultdict()
+    def __init__(self):
+        self._cache_dict = {}
 
     def get_memory_cache_stats(self):
         """Returns a mock profile of the cache dictionary. This mock does not
@@ -295,16 +284,11 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
             MemoryCacheStats. MemoryCacheStats object containing the total
             number of keys in the cache dictionary.
         """
-        memory_stats = caching_domain.MemoryCacheStats(
-            0,
-            0,
-            len(self.cache_dict))
-
-        return memory_stats
+        return caching_domain.MemoryCacheStats(0, 0, len(self._cache_dict))
 
     def flush_cache(self):
         """Wipes the cache dictionary clean."""
-        self.cache_dict = collections.defaultdict()
+        self._cache_dict.clear()
 
     def get_multi(self, keys):
         """Looks up a list of keys in cache dictionary.
@@ -317,10 +301,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
             the keys that are passed in.
         """
         assert isinstance(keys, list)
-        cache_list = [
-            (self.cache_dict[key] if key in self.cache_dict else None)
-            for key in keys]
-        return cache_list
+        return [self._cache_dict.get(key, None) for key in keys]
 
     def set_multi(self, key_value_mapping):
         """Sets multiple keys' values at once in the cache dictionary.
@@ -334,26 +315,23 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
             bool. Whether the set action succeeded.
         """
         assert isinstance(key_value_mapping, dict)
-        for key, value in key_value_mapping.items():
-            self.cache_dict[key] = value
+        self._cache_dict.update(key_value_mapping)
         return True
 
     def delete_multi(self, keys):
         """Deletes multiple keys in the cache dictionary.
 
         Args:
-            keys: list(str). The keys (strings) to delete.
+            keys: list(str). The keys to delete.
 
         Returns:
             int. Number of successfully deleted keys.
         """
-        number_of_deleted_keys = 0
-        for key in keys:
-            assert isinstance(key, python_utils.BASESTRING)
-            if key in self.cache_dict:
-                del self.cache_dict[key]
-                number_of_deleted_keys += 1
-        return number_of_deleted_keys
+        assert all(isinstance(key, python_utils.BASESTRING) for key in keys)
+        keys_to_delete = [key for key in keys if key in self._cache_dict]
+        for key in keys_to_delete:
+            del self._cache_dict[key]
+        return len(keys_to_delete)
 
 
 class TestBase(unittest.TestCase):
@@ -2465,8 +2443,19 @@ class AppEngineTestBase(TestBase):
         self.taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def run(self, result=None):
+        """Run the test, collecting the result into the specified TestResult.
+
+        https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
+
+        AppEngineTestBase's override of run() wraps super().run() in swap
+        contexts to mock out the cache and taskqueue services.
+
+        Args:
+            result: TestResult | None. Holds onto the results of each test. If
+                None, a temporary result object is created (by calling the
+                defaultTestResult() method) and used instead.
+        """
         memory_cache_services_stub = MemoryCacheServicesStub()
-        memory_cache_services_stub.flush_cache()
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
@@ -2496,14 +2485,13 @@ class AppEngineTestBase(TestBase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
 
-        # Configure datastore policy to emulate instantaneously and globally
-        # consistent HRD.
-        policy = datastore_services.make_pseudo_random_hr_consistency_policy()
 
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
         self.testbed.init_app_identity_stub()
         self.testbed.init_memcache_stub()
+        # Policy that emulates an instantaneously and globally consistent HRD.
+        policy = datastore_services.make_pseudo_random_hr_consistency_policy()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_blobstore_stub()
         self.testbed.init_urlfetch_stub()
@@ -2512,8 +2500,8 @@ class AppEngineTestBase(TestBase):
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self.mapreduce_taskqueue_stub = self.testbed.get_stub(
-            testbed.TASKQUEUE_SERVICE_NAME)
+        self.mapreduce_taskqueue_stub = (
+            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
@@ -2582,15 +2570,11 @@ class AppEngineTestBase(TestBase):
         return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
 
     def get_pending_mapreduce_tasks(self, queue_name=None):
-        """Returns the jobs in the given mapreduce taskqueue.
-        If queue_name is None, defaults to returning the jobs in all available
-        queues.
+        """Returns the jobs in the given mapreduce taskqueue. If queue_name is
+        None, defaults to returning the jobs in all available queues.
         """
-        if queue_name is not None:
-            return self.mapreduce_taskqueue_stub.get_filtered_tasks(
-                queue_names=[queue_name])
-        else:
-            return self.mapreduce_taskqueue_stub.get_filtered_tasks()
+        return self.mapreduce_taskqueue_stub.get_filtered_tasks(
+            queue_names=queue_name and [queue_name])
 
     def _execute_mapreduce_tasks(self, tasks):
         """Execute mapreduce queued tasks.
@@ -2605,24 +2589,23 @@ class AppEngineTestBase(TestBase):
             else:
                 # All other tasks are expected to be mapreduce ones, or
                 # Oppia-taskqueue-related ones.
+                payload = task.payload or ''
                 headers = {
-                    key: python_utils.convert_to_bytes(
-                        val) for key, val in task.headers.items()
+                    'Content-Length': (
+                        python_utils.convert_to_bytes(len(payload))),
                 }
-                headers['Content-Length'] = python_utils.convert_to_bytes(
-                    len(task.payload or ''))
+                headers.update(
+                    (key, python_utils.convert_to_bytes(val))
+                    for key, val in task.headers.items())
 
                 app = (
                     webtest.TestApp(main_taskqueue.app)
-                    if task.url.startswith('/task')
-                    else self.testapp)
+                    if task.url.startswith('/task') else self.testapp)
                 response = app.post(
-                    url=python_utils.UNICODE(
-                        task.url), params=(task.payload or ''),
+                    url=python_utils.UNICODE(task.url), params=payload,
                     headers=headers, expect_errors=True)
                 if response.status_code != 200:
-                    raise RuntimeError(
-                        'MapReduce task to URL %s failed' % task.url)
+                    raise RuntimeError('MapReduce task failed: %r' % task)
 
     def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
         """Runs and flushes pending mapreduce tasks. If queue_name is None, does
@@ -2634,29 +2617,25 @@ class AppEngineTestBase(TestBase):
             https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
         """
         queue_names = (
-            [queue_name] if queue_name else self._get_all_queue_names())
+            self._get_all_queue_names() if queue_name is None else [queue_name])
 
-        tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
-            queue_names=queue_names)
-        for queue in queue_names:
-            self.mapreduce_taskqueue_stub.FlushQueue(queue)
+        get_remaining_tasks = lambda: list(
+            self.mapreduce_taskqueue_stub.get_filtered_tasks(
+                queue_names=queue_names))
 
-        while tasks:
+        # Loop until get_remaining_tasks() returns an empty list.
+        for tasks in iter(get_remaining_tasks, []):
             self._execute_mapreduce_tasks(tasks)
-            tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
-                queue_names=queue_names)
             for queue in queue_names:
                 self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
     def run_but_do_not_flush_pending_mapreduce_tasks(self):
         """"Runs but not flushes mapreduce pending tasks."""
         queue_names = self._get_all_queue_names()
-
         tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
             queue_names=queue_names)
         for queue in queue_names:
             self.mapreduce_taskqueue_stub.FlushQueue(queue)
-
         self._execute_mapreduce_tasks(tasks)
 
     def _create_valid_question_data(self, default_dest_state_name):
