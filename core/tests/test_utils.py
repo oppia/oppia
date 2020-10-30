@@ -31,7 +31,6 @@ import os
 import unittest
 
 from constants import constants
-import contextlib2
 from core.controllers import base
 from core.domain import caching_domain
 from core.domain import collection_domain
@@ -66,6 +65,7 @@ import requests_mock
 import schema_utils
 import utils
 
+import contextlib2
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
@@ -2496,7 +2496,6 @@ class AppEngineTestBase(TestBase):
             # Since the old stack is empty and the new stack is not held by the
             # current `with` context, we can exit the old stack's context while
             # accomplishing our goal: do _NOT_ invoke the callbacks/exits yet.
-            pass # Documents end of context, so pylint: disable=unnecessary-pass
 
         empty_environ()
         self.memory_cache_services_stub.flush_cache()
