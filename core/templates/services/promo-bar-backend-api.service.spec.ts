@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests that the resource service is working as expected.
+ * @fileoverview Unit tests for PromoBarBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
@@ -27,7 +27,7 @@ describe('Promo bar backend api service', () => {
   let promoBarBackendApiService:
     PromoBarBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let promoBarData = {
+  let promoBar = {
     promoBarEnabled: true,
     promoBarMessage: 'test message'
   };
@@ -51,12 +51,12 @@ describe('Promo bar backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      promoBarBackendApiService.getPromoBarData()
+      promoBarBackendApiService.getPromoBarDataAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne('/promo_bar_handler');
       expect(req.request.method).toEqual('GET');
-      req.flush(promoBarData);
+      req.flush(promoBar);
 
       flushMicrotasks();
 

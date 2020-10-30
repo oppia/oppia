@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service Promo bar.
+ * @fileoverview The backend API service to fetch promo bar data.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
 import { ServicesConstants } from 'services/services.constants';
 
-export interface PromoBarData {
+export interface PromoBar {
   promoBarEnabled: boolean;
   promoBarMessage: string;
 }
@@ -30,28 +31,27 @@ export interface PromoBarData {
   providedIn: 'root'
 })
 export class PromoBarBackendApiService {
-  constructor(
-    private http: HttpClient) { }
-  getPromoBarData(): Promise<PromoBarData> {
+  constructor(private http: HttpClient) { }
+
+  async getPromoBarDataAsync(): Promise<PromoBar> {
     var promoBarData = {
       promoBarEnabled: false,
       promoBarMessage: ''
     };
-    if (ServicesConstants.ENABLE_PROMO_BAR) {
-      return new Promise((resolve, reject) => {
-        this.http.get<PromoBarData>(
-          ServicesConstants.PROMO_BAR_URL, {}
-        ).toPromise().then(response => {
-          resolve(response);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
-      });
-    } else {
+    if (!ServicesConstants.ENABLE_PROMO_BAR) {
       return new Promise((resolve, reject) => {
         resolve(promoBarData);
       });
     }
+    return new Promise((resolve, reject) => {
+      this.http.get<PromoBar>(
+        ServicesConstants.PROMO_BAR_URL, {}
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
   }
 }
 
