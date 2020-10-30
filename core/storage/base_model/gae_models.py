@@ -46,8 +46,9 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'DELETE_AT_END',
     # Models that should be pseudonymized in their local context.
     'LOCALLY_PSEUDONYMIZE',
-    # Models that should only be kept if published.
-    'KEEP_IF_PUBLIC',
+    # Models that should be pseudonymized if they are published and otherwise
+    # (when private) deleted.
+    'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE',
     # Models that are not directly or indirectly related to users.
     'NOT_APPLICABLE'
 )
@@ -418,6 +419,13 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = datastore_services.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = datastore_services.IntegerProperty()
+
+    @staticmethod
+    def get_deletion_policy():
+        """BaseCommitLogEntryModel contains data corresponding to a user that
+        requires pseudonymization: user_id field.
+        """
+        return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def get_export_policy(cls):
@@ -1257,25 +1265,6 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = datastore_services.JsonProperty(indexed=False)
-
-    @staticmethod
-    def get_deletion_policy():
-        """The content models do not contain any user ID fields directly,
-        the user ID fields might be hidden inside the content field (because
-        content field contains all the fields from the parent model), e.g. the
-        owner_ids or viewer_ids in the ExplorationRightsModel that are then in
-        the content field of ExplorationRightsSnapshotContentModel.
-
-        The pseudonymization of these models is handled in the wipeout service
-        (in the relevant pseudonymization function, e.g. in
-        _pseudonymize_activity_models_with_associated_rights_models() for
-        CollectionRightsModel or ExplorationRightsModel), based on
-        the content_user_ids field of the relevant metadata model.
-        E.g. the content_user_ids in ExplorationRightsSnapshotMetadataModel are
-        used to pseudonymize the relevant fields in the corresponding
-        ExplorationRightsSnapshotContentModel.
-        """
-        return DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
