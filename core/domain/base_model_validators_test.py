@@ -182,8 +182,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         validator.validate_deleted(model)
         self.assertEqual(
             validator.errors.items(),
-            [(
-                'entity stale check',
-                ['Entity id 123: model marked as deleted is older than 8 weeks']
-            )]
+            {
+                'entity stale check': [
+                    'Entity id 123: model marked as '
+                    'deleted is older than 8 weeks'
+                ]
+            }
         )

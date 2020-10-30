@@ -71,7 +71,9 @@ def delete_models_marked_as_deleted():
     date_before_which_to_hard_delete = (
         date_now - PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
     for model_class in models.Registry.get_all_storage_model_classes():
-        deleted_models = model_class.query(model_class.deleted == True).fetch()
+        deleted_models = model_class.query(
+            model_class.deleted == True  # pylint: disable=singleton-comparison
+        ).fetch()
         models_to_hard_delete = [
             deleted_model for deleted_model in deleted_models
             if deleted_model.last_updated < date_before_which_to_hard_delete

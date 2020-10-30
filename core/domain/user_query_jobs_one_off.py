@@ -46,7 +46,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [user_models.UserSettingsModel]
 
     @staticmethod
-    def map(user_settings_model):
+    def map(user_settings_model):  # pylint: disable=too-many-return-statements
         user_id = user_settings_model.id
 
         email_preferences = user_services.get_email_preferences(user_id)
