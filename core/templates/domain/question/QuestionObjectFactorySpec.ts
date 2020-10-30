@@ -43,12 +43,15 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state/StateObjectFactory.ts');
 
 describe('Question object factory', function() {
+  importAllAngularServices();
+  
   var QuestionObjectFactory = null;
   var StateObjectFactory = null;
   var sampleQuestion = null;

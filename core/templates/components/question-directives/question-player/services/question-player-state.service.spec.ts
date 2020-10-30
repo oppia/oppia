@@ -45,12 +45,18 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 require(
   'components/question-directives/question-player/services/' +
   'question-player-state.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 
 describe('Question player state service', function() {
+  importAllAngularServices();
+  
   var qpservice;
   var QuestionObjectFactory;
   var questionId = 'question_1';

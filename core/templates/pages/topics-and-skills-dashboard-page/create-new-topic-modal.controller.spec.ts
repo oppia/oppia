@@ -24,7 +24,12 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { NewlyCreatedTopic } from
   'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Create new topic modal', function() {
+  importAllAngularServices();
+  
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {

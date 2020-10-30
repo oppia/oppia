@@ -20,8 +20,13 @@
 import { EventEmitter } from '@angular/core';
 
 import { UpgradedServices } from 'services/UpgradedServices';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Subtopic editor tab', function() {
+  importAllAngularServices();
+  
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {

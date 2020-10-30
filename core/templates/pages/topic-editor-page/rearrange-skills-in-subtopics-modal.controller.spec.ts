@@ -20,7 +20,13 @@ import { EventEmitter } from '@angular/core';
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Rearrange Skills In Subtopic Modal Controller', function() {
+  importAllAngularServices();
+  
   var $scope = null;
   var ctrl = null;
   var topic = null;
