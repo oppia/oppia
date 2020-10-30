@@ -1,18 +1,29 @@
 steps:
-  - id: lint-check
-    name: python:2.7-jessie
-    entrypoint: bash
-    dir: mv 
+  - id: build-oppia-base
+    name: gcr.io/kaniko-project/executor:latest
+    wait_for: ["-"]
     args: 
-      - '-c'
-      - | 
-          apt-get update
-          apt-get install lsb-release
-          curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
-          dpkg -i google-chrome.deb && apt-get install -f -y
-          dpkg -i google-chrome.deb
-          google-chrome --version
-          python -m scripts.install_third_party_libs
-          python -m scripts.third_party_size_check
-          python -m scripts.pre_commit_linter --path=. --verbose
+    - --destination=gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
+    - --cache=true
+    - --cache-ttl=24h
 
+  - id: install-dependencies
+    wait_for: build-oppia-base
+    name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
+    entrypoint: bash
+    args: 
+      - "-c"
+      - |
+          mkdir oppia
+          shopt -s extglob
+          mv !(oppia) oppia
+          shopt -u extglob
+          cd oppia
+          python -m scripts.install_third_party_libs
+
+  - id: third-party-size-check
+    wait_for: install-dependencies
+    name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
+    dir: oppia
+    entrypoint: python
+    args: ["-m", "scripts.third_party_size_check"]

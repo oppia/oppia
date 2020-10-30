@@ -19,3 +19,5 @@ RUN bash /home/oppia/scripts/install_prerequisites.sh
 # Install chrome.
 COPY ./scripts/install_chrome.sh /home/oppia/scripts/
 RUN bash /home/oppia/scripts/install_chrome.sh
+
+RUN pip install enum34==1.1.10 protobuf==3.13.0
