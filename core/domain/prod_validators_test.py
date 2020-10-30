@@ -2995,7 +2995,8 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for current time check of '
                 'ExplorationModel\', '
                 '[u\'Entity id %s: The last_updated field has a '
-                'value %s which is greater than the time when the job was run\']]'
+                'value %s which is greater than the time when '
+                'the job was run\']]'
             ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(

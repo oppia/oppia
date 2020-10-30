@@ -333,7 +333,8 @@ class CronJobTests(test_utils.GenericTestBase):
             id=admin_user_id,
             exploration_ids=[],
             collection_ids=[],
-            last_updated=datetime.datetime.now() - self.NINE_WEEKS
+            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
+            deleted=True
         )
         completed_activities_model.update_timestamps(
             update_last_updated_time=False)
@@ -344,7 +345,7 @@ class CronJobTests(test_utils.GenericTestBase):
             user_ids=[],
             submitter_id=admin_user_id,
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
-            last_updated=datetime.datetime.now() - self.FIVE_WEEKS
+            last_updated=datetime.datetime.utcnow() - self.FIVE_WEEKS
         )
         user_query_model.update_timestamps(update_last_updated_time=False)
         user_query_model.put()
@@ -352,8 +353,8 @@ class CronJobTests(test_utils.GenericTestBase):
         with self.testapp_swap:
             self.get_html_response('/cron/models/cleanup')
 
-        self.assertIsNone(completed_activities_model.get(admin_user_id))
-        self.assertTrue(user_query_model.get('query_id').deleted)
+        self.assertIsNone(completed_activities_model.get_by_id(admin_user_id))
+        self.assertTrue(user_query_model.get_by_id('query_id').deleted)
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(

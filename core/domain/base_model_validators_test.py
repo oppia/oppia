@@ -181,7 +181,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         validator = MockBaseUserModelValidator()
         validator.validate_deleted(model)
         self.assertEqual(
-            validator.errors.items(),
+            validator.errors,
             {
                 'entity stale check': [
                     'Entity id 123: model marked as '

@@ -164,7 +164,8 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 u'[u\'failed validation check for current time check of '
                 'SkillModel\', '
                 '[u\'Entity id %s: The last_updated field has a '
-                'value %s which is greater than the time when the job was run\']]'
+                'value %s which is greater than the time when '
+                'the job was run\']]'
             ) % (self.model_instance_2.id, self.model_instance_2.last_updated)
         ]
 
