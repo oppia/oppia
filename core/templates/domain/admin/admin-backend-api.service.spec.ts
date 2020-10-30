@@ -163,7 +163,7 @@ describe('Admin backend api service', () => {
   });
 
   it('should fetch the data.', fakeAsync(() => {
-    abas.getData().then((adminData) => {
+    abas.getDataAsync().then((adminData) => {
       expect(adminData).toEqual(adminDataObject);
     });
 
@@ -180,7 +180,7 @@ describe('Admin backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      abas.getData().then(successHandler, failHandler);
+      abas.getDataAsync().then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
         '/adminhandler');

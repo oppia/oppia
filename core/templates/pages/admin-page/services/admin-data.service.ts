@@ -40,7 +40,7 @@ export class AdminDataService {
       return this.dataPromise;
     }
 
-    this.dataPromise = this.adminBackendApiService.getData();
+    this.dataPromise = this.adminBackendApiService.getDataAsync();
 
     return this.dataPromise;
   }
