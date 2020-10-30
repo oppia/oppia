@@ -1720,16 +1720,14 @@ def send_account_deleted_email(user_id, user_email):
 
     email_body_template = (
         'Hi %s,<br><br>'
-        'Your account was successfully deleted.'
-        '- The Oppia Team<br>'
-        '<br>%s')
+        'Your account was successfully deleted.<br><br>'
+        '- The Oppia Team')
 
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
 
-    email_body = email_body_template % (
-        user_email, EMAIL_FOOTER.value)
+    email_body = email_body_template % user_email
     _send_email(
         user_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_ACCOUNT_DELETED, email_subject, email_body,
