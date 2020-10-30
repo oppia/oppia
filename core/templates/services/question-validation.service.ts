@@ -16,8 +16,9 @@
  * @fileoverview Service to validate a question.
  *
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';

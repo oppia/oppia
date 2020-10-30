@@ -16,18 +16,18 @@
  * @fileoverview Service to change the rights of topic in the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
 import { TopicDomainConstants } from
   'domain/topic/topic-domain.constants';
 import { TopicRightsBackendDict, TopicRights }
   from 'domain/topic/topic-rights.model.ts';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +42,7 @@ export class TopicRightsBackendApiService {
 
     private _fetchTopicRights(
         topicId: string,
-        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        successCallback: (value?: Object | Promise<TopicRights>) => void,
         errorCallback: (reason?: string) => void): void {
       var topicRightsUrl = this.urlInterpolation.interpolateUrl(
         TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
@@ -65,7 +65,7 @@ export class TopicRightsBackendApiService {
     private _setTopicStatus(
         topicId: string,
         publishStatus: boolean,
-        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        successCallback: (value?: Object | Promise<TopicRights>) => void,
         errorCallback: (reason?: string) => void): void {
       var changeTopicStatusUrl = this.urlInterpolation.interpolateUrl(
         '/rightshandler/change_topic_status/<topic_id>', {

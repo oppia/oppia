@@ -16,16 +16,17 @@
  * @fileoverview Unit tests for QuestionValidationService.
  */
 
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory';
 import { QuestionObjectFactory } from
   'domain/question/QuestionObjectFactory.ts';
 import { QuestionValidationService } from
   'services/question-validation.service.ts';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 describe('Question Validation Service', () => {
   let questionValidationService: QuestionValidationService = null;

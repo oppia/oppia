@@ -53,12 +53,12 @@ describe('Topic rights backend API service', () => {
   });
 
   it('should fetch a topic rights', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     topicRightsBackendApiService.fetchTopicRights(topicId).then(
       successHandler, failHandler);
-    var req = httpTestingController.expectOne(
+    const req = httpTestingController.expectOne(
       '/rightshandler/get_topic_rights/' + topicId);
     expect(req.request.method).toEqual('GET');
     req.flush(200);
@@ -70,12 +70,12 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should not fetch a topic rights', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     topicRightsBackendApiService.fetchTopicRights(topicId).then(
       successHandler, failHandler);
-    var req = httpTestingController.expectOne(
+    const req = httpTestingController.expectOne(
       '/rightshandler/get_topic_rights/' + topicId);
     expect(req.request.method).toEqual('GET');
     req.flush(404, {
@@ -89,8 +89,8 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should successfully publish and unpublish a topic', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     topicRightsBackendApiService.publishTopic(topicId).then(
       successHandler, failHandler);
@@ -118,12 +118,12 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should call the provided fail handler on HTTP failure', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     topicRightsBackendApiService.publishTopic(topicId).then(
       successHandler, failHandler);
-    var req = httpTestingController.expectOne(
+    const req = httpTestingController.expectOne(
       '/rightshandler/change_topic_status/0');
     expect(req.request.method).toEqual('PUT');
     req.flush('Topic does not exist.', {
@@ -138,8 +138,8 @@ describe('Topic rights backend API service', () => {
 
   it('should report an uncached topic rights after caching it',
     fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       // The topic should not currently be cached.
       expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
@@ -148,7 +148,7 @@ describe('Topic rights backend API service', () => {
       // the returned topic should match the expected topic object.
       topicRightsBackendApiService.loadTopicRights(topicId).then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      const req = httpTestingController.expectOne(
         '/rightshandler/get_topic_rights/0');
       expect(req.request.method).toEqual('GET');
       req.flush(topicRightsDict);
@@ -162,8 +162,8 @@ describe('Topic rights backend API service', () => {
     }));
 
   it('should report a cached topic rights after caching it', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     // The topic should not currently be cached.
     expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
@@ -188,12 +188,12 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should send a topic rights mail', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     topicRightsBackendApiService.sendMail(topicId, topicName).then(
       successHandler, failHandler);
-    var req = httpTestingController.expectOne(
+    const req = httpTestingController.expectOne(
       '/rightshandler/send_topic_publish_mail/' + topicId);
     expect(req.request.method).toEqual('PUT');
     req.flush(200);
@@ -205,12 +205,12 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should handler error on sending topic rights mail', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     topicRightsBackendApiService.sendMail(topicId, topicName).then(
       successHandler, failHandler);
-    var req = httpTestingController.expectOne(
+    const req = httpTestingController.expectOne(
       '/rightshandler/send_topic_publish_mail/' + topicId);
     expect(req.request.method).toEqual('PUT');
     req.flush(404, {

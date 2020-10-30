@@ -19,11 +19,11 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+
+const constants = require('constants.ts');
 import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
-
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
-const constants = require('constants.ts');
 
 export interface QuestionBackendDict {
   'id': string;
@@ -36,27 +36,14 @@ export interface QuestionBackendDict {
 }
 
 export class Question {
-  _id: string;
-  _stateData: State;
-  _stateDataSchemaVersion: number;
-  _languageCode: string;
-  _version: number;
-  _linkedSkillIds: string[];
-  _inapplicableSkillMisconceptionIds: string[];
-
   constructor(
-      id: string, stateData: State, stateDataSchemaVersion: number,
-      languageCode: string, version: number, linkedSkillIds: string[],
-      inapplicableSkillMisconceptionIds: string[]) {
-    this._id = id;
-    this._stateData = stateData;
-    this._stateDataSchemaVersion = stateDataSchemaVersion;
-    this._languageCode = languageCode;
-    this._version = version;
-    this._linkedSkillIds = linkedSkillIds;
-    this._inapplicableSkillMisconceptionIds = (
-      inapplicableSkillMisconceptionIds);
-  }
+    private _id: string,
+    private _stateData: State,
+    private _stateDataSchemaVersion: number,
+    private _languageCode: string,
+    private _version: number,
+    private _linkedSkillIds: string[],
+    private _inapplicableSkillMisconceptionIds: string[]) {}
 
   getId(): string {
     return this._id;
@@ -105,7 +92,7 @@ export class Question {
   }
 
   getValidationErrorMessage(): string {
-    var interaction = this._stateData.interaction;
+    const interaction = this._stateData.interaction;
     if (interaction.id === null) {
       return 'An interaction must be specified';
     }
@@ -117,7 +104,7 @@ export class Question {
       INTERACTION_SPECS[interaction.id].can_have_solution) {
       return 'A solution must be specified';
     }
-    var answerGroups = this._stateData.interaction.answerGroups;
+    const answerGroups = this._stateData.interaction.answerGroups;
     var atLeastOneAnswerCorrect = false;
     for (var i = 0; i < answerGroups.length; i++) {
       if (answerGroups[i].outcome.labelledAsCorrect) {
@@ -132,7 +119,7 @@ export class Question {
   }
 
   getUnaddressedMisconceptionNames(misconceptionsBySkill: {}): string[] {
-    var answerGroups = this._stateData.interaction.answerGroups;
+    const answerGroups = this._stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds = {};
     for (var i = 0; i < answerGroups.length; i++) {
       if (!answerGroups[i].outcome.labelledAsCorrect &&
