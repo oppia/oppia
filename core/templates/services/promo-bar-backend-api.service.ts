@@ -34,7 +34,7 @@ export class PromoBarBackendApiService {
   constructor(private http: HttpClient) { }
 
   async getPromoBarDataAsync(): Promise<PromoBar> {
-    var promoBarData = {
+    const promoBarData = {
       promoBarEnabled: false,
       promoBarMessage: ''
     };

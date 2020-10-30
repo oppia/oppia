@@ -48,13 +48,13 @@ describe('Promo bar backend api service', () => {
 
   it('should successfully fetch data from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       promoBarBackendApiService.getPromoBarDataAsync()
         .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/promo_bar_handler');
+      let req = httpTestingController.expectOne('/promo_bar_handler');
       expect(req.request.method).toEqual('GET');
       req.flush(promoBar);
 
