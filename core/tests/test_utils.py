@@ -133,7 +133,7 @@ def get_filepath_from_filename(filename, rootdir):
         for subrootdir, _, filenames in os.walk(rootdir)))
     if len(matches) > 1:
         raise Exception('Multiple files found with name: %s' % filename)
-    return None if not matches else matches[0]
+    return matches[0] if matches else None
 
 
 def mock_load_template(filename):
