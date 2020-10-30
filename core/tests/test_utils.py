@@ -2461,6 +2461,14 @@ class AppEngineTestBase(TestBase):
         self.memory_cache_services_stub = MemoryCacheServicesStub()
         self.taskqueue_services_stub = TaskqueueServicesStub(self)
 
+        # Set up a new ExitStack. When exiting an ExitStack's context (via early
+        # return or an exception), it "unwinds" and invokes all of the callbacks
+        # and exits gathered up until that point in reverse order.
+        #
+        # NOTE: We do _NOT_ want the callbacks/exits to be invoked immediately;
+        # our goal is to do that in self.tearDown(). Regardless, we build up the
+        # stack from within its own context just in case an early exit occurs
+        # anyway (e.g. when a developer presses CTRL-C).
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
@@ -2481,7 +2489,14 @@ class AppEngineTestBase(TestBase):
                 memory_cache_services, 'delete_multi',
                 self.memory_cache_services_stub.delete_multi))
 
+            # The method stack.pop_all() clears out the contexts pushed onto the
+            # stack and returns a brand new stack that owns them instead.
             self._stack = stack.pop_all()
+
+            # Since the old stack is empty and the new stack is not held by the
+            # current `with` context, we can exit the old stack's context while
+            # accomplishing our goal: do _NOT_ unwind the stack immediately.
+            pass
 
         empty_environ()
         self.memory_cache_services_stub.flush_cache()
@@ -2518,9 +2533,11 @@ class AppEngineTestBase(TestBase):
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
-        with self._stack.pop_all() as unused_stack:
-            self._stack = None
-            # Allow callbacks and exit methods in the stack to unwind.
+        # Enter the stack's context and exit immediately. Exiting the context of
+        # an ExitStack invokes all of the callbacks/exits it has gathered.
+        with self._stack:
+            pass
+        self._stack = None
 
     def _get_all_queue_names(self):
         """Returns all the queue names.
