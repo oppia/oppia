@@ -13,12 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of Ratio
- * domain objects.
+ * @fileoverview Frontend Model for ratio.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
@@ -31,35 +27,7 @@ export class Ratio {
     this.components = numbersList;
   }
 
-  toAnswerString(): string {
-    return this.components.join(':');
-  }
-
-  getNumberOfTerms(): number {
-    return this.components.length;
-  }
-
-  getComponents(): number[] {
-    return this.components;
-  }
-
-  /**
-   * Returns this Ratio in its most simplified form.
-   */
-  convertToSimplestForm(): number[] {
-    var gcd = (x: number, y: number) => {
-      return y === 0 ? x : gcd(y, x % y);
-    };
-    var gcdResult = this.components.reduce(gcd);
-    return this.components.map(currentValue => currentValue / gcdResult);
-  }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class RatioObjectFactory {
-  fromRawInputString(rawInput: string): Ratio {
+  static fromRawInputString(rawInput: string): Ratio {
     if (rawInput.length === 0) {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.EMPTY_STRING);
@@ -97,17 +65,37 @@ export class RatioObjectFactory {
   }
 
   // Checks the equality of arrays value by value.
-  arrayEquals(a: number[], b: number[]): boolean {
+  static arrayEquals(a: number[], b: number[]): boolean {
     return Array.isArray(a) &&
       Array.isArray(b) &&
       a.length === b.length &&
       a.every((val, index) => val === b[index]);
   }
 
-  fromList(ratioList: RatioInputAnswer): Ratio {
+  static fromList(ratioList: RatioInputAnswer): Ratio {
     return new Ratio(ratioList);
   }
-}
 
-angular.module('oppia').factory(
-  'RatioObjectFactory', downgradeInjectable(RatioObjectFactory));
+  toAnswerString(): string {
+    return this.components.join(':');
+  }
+
+  getNumberOfTerms(): number {
+    return this.components.length;
+  }
+
+  getComponents(): number[] {
+    return this.components;
+  }
+
+  /**
+   * Returns this Ratio in its most simplified form.
+   */
+  convertToSimplestForm(): number[] {
+    var gcd = (x: number, y: number) => {
+      return y === 0 ? x : gcd(y, x % y);
+    };
+    var gcdResult = this.components.reduce(gcd);
+    return this.components.map(currentValue => currentValue / gcdResult);
+  }
+}

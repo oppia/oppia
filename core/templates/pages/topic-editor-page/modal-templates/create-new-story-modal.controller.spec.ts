@@ -17,9 +17,6 @@
  */
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-import { NewlyCreatedStoryObjectFactory } from
-  'domain/topic/NewlyCreatedStoryObjectFactory';
-
 const CONSTANTS = require('constants.ts');
 
 describe('Create New Story Modal Controller', function() {
@@ -31,10 +28,6 @@ describe('Create New Story Modal Controller', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'NewlyCreatedStoryObjectFactory', new NewlyCreatedStoryObjectFactory());
-  }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');

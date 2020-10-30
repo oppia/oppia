@@ -13,23 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for FeedbackMessageSummaryObjectFactory.
+ * @fileoverview Tests for FeedbackMessageSummaryModel.
  */
 
-import { FeedbackMessageSummaryObjectFactory } from
-  'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
+import { FeedbackMessageSummary } from
+  'domain/feedback_message/feedback-message-summary.model';
 
-describe('Feedback message object factory', () => {
-  let feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
-
-  beforeEach(() => {
-    feedbackMessageSummaryObjectFactory =
-      new FeedbackMessageSummaryObjectFactory();
-  });
-
+describe('Feedback message model', () => {
   it('should create a new message', () => {
     var feedbackMessageSummary = (
-      feedbackMessageSummaryObjectFactory.createNewMessage(
+      FeedbackMessageSummary.createNewMessage(
         0, 'Sample message', 'Test user', 'profile_picture_url'));
 
     expect(feedbackMessageSummary.messageId).toEqual(0);
@@ -54,7 +47,7 @@ describe('Feedback message object factory', () => {
     };
 
     var feedbackMessageSummary = (
-      feedbackMessageSummaryObjectFactory.createFromBackendDict(
+      FeedbackMessageSummary.createFromBackendDict(
         messageSummary));
 
     expect(feedbackMessageSummary.text).toEqual('Sample text');
