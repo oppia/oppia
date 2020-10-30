@@ -2532,12 +2532,7 @@ class AppEngineTestBase(TestBase):
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
-        # Enter the stack's context and exit immediately. Exiting the context of
-        # an ExitStack invokes all of the callbacks/exits it has gathered in
-        # reverse order.
-        with self._stack:
-            pass
-        self._stack = None
+        self._stack.close()
 
     def _get_all_queue_names(self):
         """Returns all the queue names.
