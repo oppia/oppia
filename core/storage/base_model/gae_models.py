@@ -1015,7 +1015,12 @@ class VersionedModel(BaseModel):
                 'Requested version number %s cannot be higher than the current '
                 'version number %s.' % (max_requested_version, entity.version))
 
-        def reconstitute(snapshot_model, version):
+        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(
+            [cls.get_snapshot_id(entity_id, v) for v in versions])
+
+        reconstituted_models = []
+        for snapshot_model, version in (
+                python_utils.ZIP(snapshot_models, versions)):
             """Reconstitutes given snapshot or raises exception when invalid."""
             if snapshot_model is None:
                 raise ValueError('version number %r is invalid.' % version)
@@ -1023,14 +1028,9 @@ class VersionedModel(BaseModel):
                 cls(id=entity_id)._reconstitute(snapshot_model.content)) # pylint: disable=protected-access
             reconstituted_model.created_on = snapshot_model.created_on
             reconstituted_model.last_updated = snapshot_model.last_updated
-            return reconstituted_model
+            reconstituted_models.append(reconstituted_model)
+        return reconstituted_models
 
-        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(
-            [cls.get_snapshot_id(entity_id, v) for v in versions])
-        return [
-            reconstitute(snapshot_model, v)
-            for snapshot_model, v in python_utils.ZIP(snapshot_models, versions)
-        ]
 
     @classmethod
     def get(cls, entity_id, strict=True, version=None):

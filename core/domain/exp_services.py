@@ -97,7 +97,7 @@ def get_exploration_state_history(exp_id):
         exp_id: str. The ID of the exploration.
 
     Returns:
-        exp_domain.ExplorationStateHistory. The history of state changes.
+        exp_domain.ExplorationStatesHistory. The history of state changes.
     """
     latest_exp = exp_fetchers.get_exploration_by_id(exp_id)
 
@@ -112,7 +112,7 @@ def get_exploration_state_history(exp_id):
             exp_id, python_utils.RANGE(1, latest_exp.version + 1))
     ]
 
-    return exp_domain.ExplorationStateHistory(exps, exp_version_diffs)
+    return exp_domain.ExplorationStatesHistory(exps, exp_version_diffs)
 
 
 # Query methods.
