@@ -112,10 +112,10 @@
 <div class="oppia-same-row-container">
   <div class="float-left oppia-navbar-button-container">
     <div ng-if="$ctrl.classroomPageIsActive"
-             class="oppia-search-button protractor-test-search-button"
-             ng-click="$ctrl.onSearchQueryChangeExec()"
-             title="Click here to search">
-          Go!
+         class="oppia-search-button protractor-test-search-button"
+         ng-click="$ctrl.onSearchQueryChangeExec()"
+         title="Click here to search">
+         Go!
     </div>
   </div>
 </div>
@@ -124,7 +124,9 @@
   search-bar .oppia-search-bar-input,
   search-bar .oppia-search-button {
     background: #257D76;
-    border: 1px solid #257D76;
+    border-width: 1px 1px 1px 0;
+    border-style: solid;
+    border-color: #257D76;
     border-radius: 0;
     color: white;
     font-size: 15px;
@@ -155,7 +157,9 @@
   }
   search-bar .oppia-search-bar-icon {
     background: #257D76;
-    border: 1px solid #257D76;
+    border-width: 1px 0 1px 1px;
+    border-style: solid;
+    border-color: #257D76;
     color: rgba(255,255,255,0.95);
   }
   search-bar .oppia-search-bar-input.btn:hover,
