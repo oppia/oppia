@@ -1030,7 +1030,6 @@ class VersionedModel(BaseModel):
             reconstituted_models.append(reconstituted_model)
         return reconstituted_models
 
-
     @classmethod
     def get(cls, entity_id, strict=True, version=None):
         """Gets model instance.
