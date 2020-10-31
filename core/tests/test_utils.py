@@ -106,18 +106,18 @@ def get_default_version_hostname():
 
 
 def get_filepath_from_filename(filename, rootdir):
-    """Returns filepath using the filename. Different files are present
-    in different subdirectories in the rootdir. So, we walk through the
-    rootdir and match the all the filenames with the given filename.
-    When a match is found the function returns the complete path of the
-    filename by using os.path.join(root, filename).
+    """Returns filepath using the filename. Different files are present in
+    different subdirectories in the rootdir. So, we walk through the rootdir and
+    match the all the filenames with the given filename.  When a match is found
+    the function returns the complete path of the filename by using
+    os.path.join(root, filename).
 
     For example signup-page.mainpage.html is present in
-    core/templates/pages/signup-page and error-page.mainpage.html is
-    present in core/templates/pages/error-pages. So we walk through
-    core/templates/pages and a match for signup-page.component.html
-    is found in signup-page subdirectory and a match for
-    error-page.directive.html is found in error-pages subdirectory.
+    core/templates/pages/signup-page and error-page.mainpage.html is present in
+    core/templates/pages/error-pages. So we walk through core/templates/pages
+    and a match for signup-page.component.html is found in signup-page
+    subdirectory and a match for error-page.directive.html is found in
+    error-pages subdirectory.
 
     Args:
         filename: str. The name of the file.
@@ -128,9 +128,9 @@ def get_filepath_from_filename(filename, rootdir):
         None.
     """
     # This is required since error files are served according to error status
-    # code. The file served is error-page.mainpage.html but it is compiled
-    # and stored as error-page-{status_code}.mainpage.html.
-    # So, we need to swap the name here to obtain the correct filepath.
+    # code. The file served is error-page.mainpage.html but it is compiled and
+    # stored as error-page-{status_code}.mainpage.html.  So, we need to swap the
+    # name here to obtain the correct filepath.
     if filename.startswith('error-page'):
         filename = 'error-page.mainpage.html'
     matches = list(itertools.chain.from_iterable(
@@ -143,15 +143,15 @@ def get_filepath_from_filename(filename, rootdir):
 
 def mock_load_template(filename):
     """Mock for load_template function. This mock is required for backend tests
-    since we do not have webpack compilation before backend tests. The folder
-    to search templates is webpack_bundles which is generated after webpack
+    since we do not have webpack compilation before backend tests. The folder to
+    search templates is webpack_bundles which is generated after webpack
     compilation. Since this folder will be missing, load_template function will
     return an error. So, we use a mock for load_template which returns the html
     file from the source directory instead.
 
     Args:
-        filename: str. The name of the file for which template is
-            to be returned.
+        filename: str. The name of the file for which template is to be
+            returned.
 
     Returns:
         str. The contents of the given file.
@@ -218,10 +218,10 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         Args:
             queue_name: str. The name of the queue to add the task to.
             url: str. URL of the handler function.
-            payload: dict(str : *). Payload to pass to the request. Defaults
-                to None if no payload is required.
-            scheduled_for: datetime|None. The naive datetime object for the
-                time to execute the task. Ignored by this stub.
+            payload: dict(str : *). Payload to pass to the request. Defaults to
+                None if no payload is required.
+            scheduled_for: datetime|None. The naive datetime object for the time
+                to execute the task. Ignored by this stub.
             task_name: str|None. Optional. The name of the task.
         """
         # Causes the task to execute immediately by setting the scheduled_for
@@ -349,8 +349,8 @@ class TestBase(unittest.TestCase):
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
-        given suffix. This is used to test that functions behave correctly
-        when handling strings with unicode characters.
+        given suffix. This is used to test that functions behave correctly when
+        handling strings with unicode characters.
 
         Args:
             suffix: str. The suffix to append to the UNICODE_TEST_STRING.
@@ -367,8 +367,8 @@ class TestBase(unittest.TestCase):
             item.validate()
 
     def log_line(self, line):
-        """Print the line with a prefix that can be identified by the
-        script that calls the test.
+        """Print the line with a prefix that can be identified by the script
+        that calls the test.
         """
         # We are using the b' prefix as all the stdouts are in bytes.
         python_utils.PRINT(
@@ -383,9 +383,9 @@ class TestBase(unittest.TestCase):
             self, param_dict, param_changes, exp_param_specs):
         """Updates a param dict using the given list of param_changes.
 
-        Note that the list of parameter changes is ordered. Parameter
-        changes later in the list may depend on parameter changes that have
-        been set earlier in the same list.
+        Note that the list of parameter changes is ordered. Parameter changes
+        later in the list may depend on parameter changes that have been set
+        earlier in the same list.
         """
         new_param_dict = copy.deepcopy(param_dict)
         for pc in param_changes:
@@ -403,8 +403,7 @@ class TestBase(unittest.TestCase):
 
     def get_static_asset_url(self, asset_suffix):
         """Returns the relative path for the asset, appending it to the
-        corresponding cache slug. asset_suffix should have a leading
-        slash.
+        corresponding cache slug. asset_suffix should have a leading slash.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
@@ -414,11 +413,11 @@ class TestBase(unittest.TestCase):
 
         Example usage:
             import datetime
-            mocked_datetime_utcnow = datetime.datetime.utcnow() -
-                datetime.timedelta(days=1)
+            mocked_datetime_utcnow = (
+                datetime.datetime.utcnow() - datetime.timedelta(days=1))
             with self.mock_datetime_utcnow(mocked_datetime_utcnow):
                 print datetime.datetime.utcnow() # prints time reduced by 1 day
-            print datetime.datetime.utcnow()  # prints current time.
+            print datetime.datetime.utcnow() # prints current time.
 
         Args:
             mocked_datetime: datetime.datetime. The datetime which will be used
@@ -438,9 +437,7 @@ class TestBase(unittest.TestCase):
             """Validates the datetime instances."""
 
             def __instancecheck__(cls, other):
-                """Validates whether the given instance is datetime
-                instance.
-                """
+                """Validates whether the given instance is datetime instance."""
                 return isinstance(other, original_datetime_type)
 
         mock_datetime_type = (
@@ -462,16 +459,16 @@ class TestBase(unittest.TestCase):
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
-        """Swap an object's attribute value within the context of a
-        'with' statement. The object can be anything that supports
-        getattr and setattr, such as class instances, modules, ...
+        """Swap an object's attribute value within the context of a 'with'
+        statement. The object can be anything that supports getattr and setattr,
+        such as class instances, modules, etc.
 
         Example usage:
 
             import math
             with self.swap(math, 'sqrt', lambda x: 42):
-                print math.sqrt(16.0)  # prints 42
-            print math.sqrt(16.0)  # prints 4 as expected.
+                print math.sqrt(16.0) # prints 42
+            print math.sqrt(16.0) # prints 4 as expected.
 
         Note that this does not work directly for classmethods. In this case,
         you will need to import the 'types' module, as follows:
@@ -498,23 +495,24 @@ class TestBase(unittest.TestCase):
     def swap_with_checks(
             self, obj, attr, new_value, expected_args=None,
             expected_kwargs=None, called=True):
-        """Swap an object's function value within the context of a
-        'with' statement. The object can be anything that supports
-        getattr and setattr, such as class instances, modules, ...
+        """Swap an object's function value within the context of a 'with'
+        statement. The object can be anything that supports getattr and setattr,
+        such as class instances, modules, etc.
 
         Examples:
-            If you want to check subprocess.Popen is invoked twice
-            like `subprocess.Popen(['python'], shell=True)` and
-            `subprocess.Popen(['python2], shell=False), you can first
-            define the mock function, then the swap, and just run the
-            target function in context, as follows:
+            If you want to check subprocess.Popen is invoked twice like
+            `subprocess.Popen(['python'], shell=True)` and
+            `subprocess.Popen(['python2], shell=False), you can first define the
+            mock function, then the swap, and just run the target function in
+            context, as follows:
+
                 def mock_popen(command, shell):
                     return
 
                 popen_swap = self.swap_with_checks(
-                    subprocess, 'Popen', mock_popen, expected_args=[
-                        (['python'],), (['python2'],)], expected_kwargs=[
-                            {'shell': True,}, {'shell': False}])
+                    subprocess, 'Popen', mock_popen,
+                    expected_args=[(['python'],), (['python2'],)],
+                    expected_kwargs=[{'shell': True}, {'shell': False}])
                 with popen_swap:
                     function_that_invokes_popen()
 
@@ -522,15 +520,13 @@ class TestBase(unittest.TestCase):
             obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
             new_value: function. The new function you want to use.
-            expected_args: None|list(tuple). The expected args that you
-                want this function to be invoked with. When its value is None,
-                args will not be checked. If the value type is list, the
-                function will check whether the called args is the first element
-                in the list. If matched, this tuple will be removed from the
-                list.
-            expected_kwargs: None|list(dict). The expected keyword args
-                you want this function to be invoked with. Similar to
-                expected_args.
+            expected_args: None|list(tuple). The expected args that you want
+                this function to be invoked with. When its value is None, args
+                will not be checked. If the value type is list, the function
+                will check whether the called args is the first element in the
+                list. If matched, this tuple will be removed from the list.
+            expected_kwargs: None|list(dict). The expected keyword args you want
+                this function to be invoked with. Similar to expected_args.
             called: bool. Whether the function is expected to be invoked. This
                 will always be checked.
 
@@ -1025,8 +1021,8 @@ class AppEngineTestBase(TestBase):
     def __init__(self, *args, **kwargs):
         super(AppEngineTestBase, self).__init__(*args, **kwargs)
         # Defined outside of setUp() because we want to swap it in during tests,
-        # while minimizing the swap's scope.
-        # We accomplish this by using a context manager over run().
+        # while minimizing the swap's scope. We accomplish this by using a
+        # context manager over run().
         self._taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def run(self, result=None):
@@ -1170,9 +1166,7 @@ class AppEngineTestBase(TestBase):
             self.assertEqual(response.status_int, 200)
 
     def signup_superadmin_user(self):
-        """Signs up a superadmin user. Should be called at the end of
-        setUp().
-        """
+        """Signs up a superadmin user. Must be called at the end of setUp()."""
         self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
 
     def set_config_property(self, config_obj, new_config_value):
@@ -1287,8 +1281,8 @@ class AppEngineTestBase(TestBase):
             url: str. The URL to fetch the response.
             expected_content_type: str. The content type to expect.
             params: dict. A dictionary that will be encoded into a query string.
-            expected_status_int: int. The integer status code to expect. Will
-                be 200 if not specified.
+            expected_status_int: int. The integer status code to expect. Will be
+                200 if not specified.
 
         Returns:
             webtest.TestResponse. The test response.
@@ -1299,9 +1293,9 @@ class AppEngineTestBase(TestBase):
         expect_errors = expected_status_int >= 400
 
         # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles
-        # is only produced after webpack compilation which is not performed
-        # during backend tests.
+        # source directory instead of webpack_bundles since webpack_bundles is
+        # only produced after webpack compilation which is not performed during
+        # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url, params=params, expect_errors=expect_errors,
@@ -1344,15 +1338,14 @@ class AppEngineTestBase(TestBase):
     def get_custom_response(
             self, url, expected_content_type, params=None,
             expected_status_int=200):
-        """Get a response other than HTML or JSON, transformed to a Python
-        object.
+        """Get a response other than HTML or JSON as a Python object.
 
         Args:
             url: str. The URL to fetch the response.
             expected_content_type: str. The content type to expect.
             params: dict. A dictionary that will be encoded into a query string.
-            expected_status_int: int. The integer status code to expect. Will
-                be 200 if not specified.
+            expected_status_int: int. The integer status code to expect. Will be
+                200 if not specified.
 
         Returns:
             webtest.TestResponse. The test response.
@@ -1366,13 +1359,13 @@ class AppEngineTestBase(TestBase):
 
     def get_response_without_checking_for_errors(
             self, url, expected_status_int_list, params=None):
-        """Get a response, transformed to a Python object and
-        checks for a list of status codes.
+        """Get a response, transformed to a Python object and checks for a list
+        of status codes.
 
         Args:
             url: str. The URL to fetch the response.
-            expected_status_int_list: list(int). A list of integer status
-                code to expect.
+            expected_status_int_list: list(int). A list of integer status code
+                to expect.
             params: dict. A dictionary that will be encoded into a query string.
 
         Returns:
@@ -1384,9 +1377,9 @@ class AppEngineTestBase(TestBase):
                 msg='Expected params to be a dict, received %s' % params)
 
         # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles
-        # is only produced after webpack compilation which is not performed
-        # during backend tests.
+        # source directory instead of webpack_bundles since webpack_bundles is
+        # only produced after webpack compilation which is not performed during
+        # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(url, params=params, expect_errors=True)
 
@@ -1482,19 +1475,20 @@ class AppEngineTestBase(TestBase):
         """Sends a post request with the data provided to the url specified.
 
         Args:
-            app: TestApp. The WSGI application which receives the
-                request and produces response.
+            app: TestApp. The WSGI application which receives the request and
+                produces response.
             url: str. The URL to send the POST request to.
             data: *. To be put in the body of the request. If params is an
-                iterator, it will be urlencoded. If it is a string, it will
-                not be encoded, but placed in the body directly. Can be a
+                iterator, it will be urlencoded. If it is a string, it will not
+                be encoded, but placed in the body directly. Can be a
                 collections.OrderedDict with webtest.forms.Upload fields
                 included.
             expect_errors: bool. Whether errors are expected.
             expected_status_int: int. The expected status code.
-            upload_files: list(tuple). A list of (fieldname, filename,
-                file_content). You can also use just (fieldname, filename) and
-                the file contents will be read from disk.
+            upload_files: list(tuple). List of
+                (fieldname, filename, file_content) tuples. Can also provide
+                just (fieldname, filename) to have the file contents will be
+                read from disk.
             headers: dict(str, *). Extra headers to send.
 
         Returns:
@@ -1601,9 +1595,8 @@ class AppEngineTestBase(TestBase):
         return exploration
 
     def set_interaction_for_state(self, state, interaction_id):
-        """Sets the interaction_id, sets the fully populated default
-        interaction customization arguments, and increments
-        next_content_id_index as needed.
+        """Sets the interaction_id, sets the fully populated default interaction
+        customization arguments, and increments next_content_id_index as needed.
 
         Args:
             state: State. The state domain object to set the interaction for.
@@ -1762,8 +1755,7 @@ class AppEngineTestBase(TestBase):
         return exploration
 
     def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 0 states
-        dictionary.
+        """Saves a new default exploration with a default version 0 states dict.
 
         This function should only be used for creating explorations in tests
         involving migration of datastore explorations that use an old states
@@ -1812,8 +1804,7 @@ class AppEngineTestBase(TestBase):
 
     def save_new_exp_with_custom_states_schema_version(
             self, exp_id, user_id, states_dict, version):
-        """Saves a new default exploration with the given version of states
-        dictionary.
+        """Saves a new default exploration with the given version of state dict.
 
         This function should only be used for creating explorations in tests
         involving migration of datastore explorations that use an old states
@@ -1942,8 +1933,8 @@ class AppEngineTestBase(TestBase):
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
-        """Creates an Oppia collection and adds a node saving the
-        exploration details.
+        """Creates an Oppia collection and adds a node saving the exploration
+        details.
 
         Args:
             collection_id: str. ID for the collection to be created.
@@ -2005,8 +1996,8 @@ class AppEngineTestBase(TestBase):
                 main storyline, and setting.
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
-            language_code: str. The ISO 639-1 code for the language this
-                story is written in.
+            language_code: str. The ISO 639-1 code for the language this story
+                is written in.
             url_fragment: str. The url fragment of the story.
             meta_tag_content: str. The meta tag content of the story.
 
@@ -2030,17 +2021,16 @@ class AppEngineTestBase(TestBase):
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='story-frag',
             meta_tag_content='story meta tag content'):
-        """Saves a new story with a default version 1 story contents
-        data dictionary.
+        """Saves a new story with a default version 1 story contents data dict.
 
         This function should only be used for creating stories in tests
-        involving migration of datastore stories that use an old story
-        contents schema version.
+        involving migration of datastore stories that use an old story contents
+        schema version.
 
         Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating stories. This is
-        because the latter approach would result in a story with the
-        *current* story contents schema version.
+        the usual functions for updating and creating stories. This is because
+        the latter approach would result in a story with the *current* story
+        contents schema version.
 
         Args:
             story_id: str. ID for the story to be created.
@@ -2050,12 +2040,12 @@ class AppEngineTestBase(TestBase):
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
-            notes: str. A set of notes, that describe the characters,
-                main storyline, and setting.
+            notes: str. A set of notes, that describe the characters, main
+                storyline, and setting.
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
-            language_code: str. The ISO 639-1 code for the language this
-                story is written in.
+            language_code: str. The ISO 639-1 code for the language this story
+                is written in.
             url_fragment: str. The URL fragment for the story.
             meta_tag_content: str. The meta tag content of the story.
         """
@@ -2130,8 +2120,8 @@ class AppEngineTestBase(TestBase):
             subtopics: list(Subtopic). The different subtopics that are part of
                 this topic.
             next_subtopic_id: int. The id for the next subtopic.
-            language_code: str. The ISO 639-1 code for the language this
-                topic is written in.
+            language_code: str. The ISO 639-1 code for the language this topic
+                is written in.
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
@@ -2167,17 +2157,15 @@ class AppEngineTestBase(TestBase):
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
             practice_tab_is_displayed=False):
-        """Saves a new topic with a default version 1 subtopic
-        data dictionary.
+        """Saves a new topic with a default version 1 subtopic data dict.
 
-        This function should only be used for creating topics in tests
-        involving migration of datastore topics that use an old subtopic
-        schema version.
+        This function should only be used for creating topics in tests involving
+        migration of datastore topics that use an old subtopic schema version.
 
         Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating topics. This is
-        because the latter approach would result in a topic with the
-        *current* subtopic schema version.
+        the usual functions for updating and creating topics. This is because
+        the latter approach would result in a topic with the *current* subtopic
+        schema version.
 
         Args:
             topic_id: str. ID for the topic to be created.
@@ -2199,8 +2187,8 @@ class AppEngineTestBase(TestBase):
             uncategorized_skill_ids: list(str). The list of ids of skills that
                 are not part of any subtopic.
             next_subtopic_id: int. The id for the next subtopic.
-            language_code: str. The ISO 639-1 code for the language this
-                topic is written in.
+            language_code: str. The ISO 639-1 code for the language this topic
+                is written in.
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
@@ -2244,9 +2232,8 @@ class AppEngineTestBase(TestBase):
             question_state_data: State. The state data for the question.
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
-            inapplicable_skill_misconception_ids: list(str). List of
-                skill misconceptions ids that are not applicable to the
-                question.
+            inapplicable_skill_misconception_ids: list(str). List of skill
+                misconceptions ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -2266,25 +2253,24 @@ class AppEngineTestBase(TestBase):
             self, question_id, owner_id, linked_skill_ids,
             inapplicable_skill_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default question with a default version 27 state
-        data dictionary.
+        """Saves a new default question with a default version 27 state data
+        dict.
 
         This function should only be used for creating questions in tests
-        involving migration of datastore questions that use an old state
-        data schema version.
+        involving migration of datastore questions that use an old state data
+        schema version.
 
         Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating questions. This is
-        because the latter approach would result in an question with the
-        *current* state data schema version.
+        the usual functions for updating and creating questions. This is because
+        the latter approach would result in an question with the *current* state
+        data schema version.
 
         Args:
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             linked_skill_ids: list(str). The skill IDs linked to the question.
-            inapplicable_skill_misconception_ids: list(str). List of
-                skill misconceptions ids that are not applicable to the
-                question.
+            inapplicable_skill_misconception_ids: list(str). List of skill
+                misconceptions ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
@@ -2318,8 +2304,8 @@ class AppEngineTestBase(TestBase):
                 the rubric for each difficulty of the skill.
             skill_contents: SkillContents|None. A SkillContents object
                 containing the explanation and examples of the skill.
-            language_code: str. The ISO 639-1 code for the language this
-                skill is written in.
+            language_code: str. The ISO 639-1 code for the language this skill
+                is written in.
             prerequisite_skill_ids: list(str)|None. The prerequisite skill IDs
                 for the skill.
 
@@ -2360,35 +2346,34 @@ class AppEngineTestBase(TestBase):
         """Saves a new default skill with the given versions for misconceptions
         and skill contents.
 
-        This function should only be used for creating skills in tests
-        involving migration of datastore skills that use an old
-        schema version.
+        This function should only be used for creating skills in tests involving
+        migration of datastore skills that use an old schema version.
 
         Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating skills. This is
-        because the latter approach would result in a skill with the
-        *current* schema version.
+        the usual functions for updating and creating skills. This is because
+        the latter approach would result in a skill with the *current* schema
+        version.
 
         Args:
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
             description: str. The description of the skill.
-            next_misconception_id: int. The misconception id to be used by
-                the next misconception added.
-            misconceptions: list(Misconception.to_dict()). The list
-                of misconception dicts associated with the skill.
+            next_misconception_id: int. The misconception id to be used by the
+                next misconception added.
+            misconceptions: list(Misconception.to_dict()). The list of
+                misconception dicts associated with the skill.
             rubrics: list(Rubric.to_dict()). The list of rubric dicts associated
                 with the skill.
             skill_contents: SkillContents.to_dict(). A SkillContents dict
                 containing the explanation and examples of the skill.
             misconceptions_schema_version: int. The schema version for the
                 misconceptions object.
-            rubric_schema_version: int. The schema version for the
-                rubric object.
+            rubric_schema_version: int. The schema version for the rubric
+                object.
             skill_contents_schema_version: int. The schema version for the
                 skill_contents object.
-            language_code: str. The ISO 639-1 code for the language this
-                skill is written in.
+            language_code: str. The ISO 639-1 code for the language this skill
+                is written in.
         """
         skill_model = skill_models.SkillModel(
             id=skill_id, description=description, language_code=language_code,
@@ -2404,11 +2389,7 @@ class AppEngineTestBase(TestBase):
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
     def _get_all_queue_names(self):
-        """Returns all the queue names.
-
-        Returns:
-            list(str). All the queue names.
-        """
+        """Returns a list of all queue names."""
         return [q['name'] for q in self._taskqueue_stub.GetQueues()]
 
     def count_jobs_in_taskqueue(self, queue_name):
@@ -2476,8 +2457,7 @@ class AppEngineTestBase(TestBase):
             if task.url == '/_ah/queue/deferred':
                 deferred.run(task.payload)
             else:
-                # All other tasks are expected to be mapreduce ones, or
-                # Oppia-taskqueue-related ones.
+                # All other tasks are expected to be for mapreduce or taskqueue.
                 params = task.payload or ''
                 headers = {
                     'Content-Length': python_utils.convert_to_bytes(len(params))
@@ -2595,14 +2575,13 @@ class LinterTestBase(GenericTestBase):
         stdout outputs.
 
         Args:
-            phrases: list(str). A list of phrases we are trying to find in
-                one of the stdout outputs. For example, python linting
-                outputs a success string that includes data we don't have easy
-                access to, like how long the test took, so we may want to search
-                for a substring of that success string in stdout.
-
-            stdout: list(str). A list of the output results from the
-                method's execution.
+            phrases: list(str). A list of phrases we are trying to find in one
+                of the stdout outputs. For example, python linting outputs a
+                success string that includes data we don't have easy access to,
+                like how long the test took, so we may want to search for a
+                substring of that success string in stdout.
+            stdout: list(str). A list of the output results from the method's
+                execution.
         """
         self.assertTrue(
             any(all(p in output for p in phrases) for output in stdout))
@@ -2613,7 +2592,6 @@ class LinterTestBase(GenericTestBase):
 
         Args:
             stdout: list(str). A list of linter output messages.
-
             expected_failed_count: int. Expected number of failed messages.
         """
         failed_count = sum(msg.startswith('FAILED') for msg in stdout)
@@ -2685,26 +2663,27 @@ class EmailMessageMock(python_utils.OBJECT):
             sender_email: str. The email address of the sender. This should be
                 in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
                 'SENDER_EMAIL_ADDRESS'. Must be utf-8.
-            recipient_email: str. The email address of the recipient.
-                Must be utf-8.
+            recipient_email: str. The email address of the recipient. Must be
+                utf-8.
             subject: str. The subject line of the email, Must be utf-8.
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|None. Optional argument. List of bcc emails.
-                Emails must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails. Emails
+                must be utf-8.
             reply_to: str|None. Optional argument. Reply address formatted like
-                “reply+<reply_id>@<incoming_email_domain_name>
-                reply_id is the unique id of the sender.
+                “reply+<reply_id>@<incoming_email_domain_name> reply_id is the
+                unique id of the sender.
             recipient_variables: dict|None. Optional argument. If batch sending
                 requires differentiating each email based on the recipient, we
                 assign a unique id to each recipient, including info relevant to
                 that recipient so that we can reference it when composing the
                 email like so:
-                    recipient_variables =
-                        {"bob@example.com": {"first":"Bob", "id":1},
-                        "alice@example.com": {"first":"Alice", "id":2}}
-                    subject = 'Hey, %recipient.first%’
+                    recipient_variables = {
+                        'bob@example.com': {'first': 'Bob', 'id': 1},
+                        'alice@example.com': {'first': 'Alice', 'id': 2},
+                    }
+                    subject = 'Hey, %recipient.first%'
                 For more information about this format, see:
                 https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
         """
@@ -2725,8 +2704,8 @@ class GenericEmailTestBase(GenericTestBase):
 
     def run(self, result=None):
         """Adds a context swap on top of the test_utils.run() method so that
-        test classes extending GenericEmailTestBase will automatically have
-        a mailgun api key, mailgun domain name and mocked version of
+        test classes extending GenericEmailTestBase will automatically have a
+        mailgun api key, mailgun domain name and mocked version of
         send_email_to_recipients().
         """
         with self.swap(
@@ -2757,20 +2736,21 @@ class GenericEmailTestBase(GenericTestBase):
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|None. Optional argument. List of bcc emails.
-                Must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails. Must be
+                utf-8.
             reply_to: str|None. Optional Argument. Reply address formatted like
-                “reply+<reply_id>@<incoming_email_domain_name>
-                reply_id is the unique id of the sender.
-            recipient_variables: dict|None. Optional Argument.
-                If batch sending requires differentiating each email based on
-                the recipient, we assign a unique id to each recipient,
-                including info relevant to that recipient so that we can
-                reference it when composing the email like so:
-                    recipient_variables =
-                        {"bob@example.com": {"first":"Bob", "id":1},
-                        "alice@example.com": {"first":"Alice", "id":2}}
-                    subject = 'Hey, %recipient.first%’
+                “reply+<reply_id>@<incoming_email_domain_name> reply_id is the
+                unique id of the sender.
+            recipient_variables: dict|None. Optional Argument. If batch sending
+                requires differentiating each email based on the recipient, we
+                assign a unique id to each recipient, including info relevant to
+                that recipient so that we can reference it when composing the
+                email like so:
+                    recipient_variables = {
+                        'bob@example.com': {'first': 'Bob', 'id': 1},
+                        'alice@example.com': {'first': 'Alice', 'id': 2},
+                    }
+                    subject = 'Hey, %recipient.first%'
                 For more information about this format, see:
                 https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
 
@@ -2806,7 +2786,7 @@ class GenericEmailTestBase(GenericTestBase):
         """Gets the entire messages dictionary.
 
         Returns:
-            dict(str, (list(EmailMessageMock))). The dict keyed by recipient
+            dict(str, list(EmailMessageMock)). The dict keyed by recipient
             email. Each value contains a list of EmailMessageMock objects
             corresponding to that recipient email; in other words, all
             individual emails sent to that specific recipient email.
@@ -2827,7 +2807,7 @@ class FunctionWrapper(python_utils.OBJECT):
         """Creates a new FunctionWrapper instance.
 
         Args:
-            func: a callable, or data descriptor. If it's a descriptor, its
+            func: a callable, or data descriptor. If it's a descriptor, then
                 __get__ should return a bound method. For example, func can be
                 a function, a method, a static or class method, but not a
                 @property.
@@ -2854,15 +2834,15 @@ class FunctionWrapper(python_utils.OBJECT):
         return result
 
     def __get__(self, instance, owner):
-        # We have to implement __get__ because otherwise, we don't have a
-        # chance to bind to the instance self._func was bound to. See the
-        # following SO answer: https://stackoverflow.com/a/22555978/675311
+        # We have to implement __get__ because otherwise, we don't have a chance
+        # to bind to the instance self._func was bound to. See the following SO
+        # answer: https://stackoverflow.com/a/22555978/675311
         self._instance = instance
         return self
 
     def pre_call_hook(self, args):
-        """Override this to do tasks that should be executed before the
-        actual function call.
+        """Override this to do tasks that should be executed before the actual
+        function call.
 
         Args:
             args: list(*). Set of arguments that the function accepts.
@@ -2870,8 +2850,8 @@ class FunctionWrapper(python_utils.OBJECT):
         pass
 
     def post_call_hook(self, args, result):
-        """Override this to do tasks that should be executed after the
-        actual function call.
+        """Override this to do tasks that should be executed after the actual
+        function call.
 
         Args:
             args: list(*). Set of arguments that the function accepts.
@@ -2887,8 +2867,8 @@ class CallCounter(FunctionWrapper):
     """
 
     def __init__(self, f):
-        """Counts the number of times the given function has been called.
-        See FunctionWrapper for arguments.
+        """Counts the number of times the given function has been called. See
+        FunctionWrapper for arguments.
         """
         super(CallCounter, self).__init__(f)
         self._times_called = 0
@@ -2905,8 +2885,8 @@ class CallCounter(FunctionWrapper):
 
     def pre_call_hook(self, args):
         """Method that is called before each function call to increment the
-        counter tracking the number of times a function is called. This
-        will also be called even when the function raises an exception.
+        counter tracking the number of times a function is called. This will
+        also be called even when the function raises an exception.
 
         Args:
             args: list(*). Set of arguments that the function accepts.
@@ -2915,8 +2895,8 @@ class CallCounter(FunctionWrapper):
 
 
 class FailingFunction(FunctionWrapper):
-    """A function wrapper that makes a function fail, raising a given
-    exception. It can be set to succeed after a given number of calls.
+    """A function wrapper that makes a function fail, raising a given exception.
+    It can be set to succeed after a given number of calls.
     """
 
     INFINITY = 'infinity'
@@ -2946,9 +2926,9 @@ class FailingFunction(FunctionWrapper):
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
-        """Method that is called each time before the actual function call
-        to check if the exception is to be raised based on the number of
-        tries before success.
+        """Method that is called each time before the actual function call to
+        check if the exception is to be raised based on the number of tries
+        before success.
 
         Args:
             args: list(*). Set of arguments this function accepts.
