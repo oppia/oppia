@@ -1153,7 +1153,7 @@ class AppEngineTestBase(TestBase):
             response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
                 'csrf_token': self.get_new_csrf_token(),
                 'payload': json.dumps(
-                    {'username': username, 'agreed_to_terms': True})
+                    {'username': username, 'agreed_to_terms': True}),
             })
             self.assertEqual(response.status_int, 200)
 
@@ -1172,7 +1172,7 @@ class AppEngineTestBase(TestBase):
                 'action': 'save_config_properties',
                 'new_config_property_values': {
                     config_obj.name: new_config_value,
-                }
+                },
             }, csrf_token=self.get_new_csrf_token())
 
     def set_user_role(self, username, user_role):
@@ -1185,7 +1185,7 @@ class AppEngineTestBase(TestBase):
         with self.superadmin_context():
             self.post_json('/adminrolehandler', {
                 'username': username,
-                'role': user_role
+                'role': user_role,
             }, csrf_token=self.get_new_csrf_token())
 
     def set_admins(self, admin_usernames):
@@ -2049,7 +2049,7 @@ class AppEngineTestBase(TestBase):
         commit_message = 'New story created with title \'%s\'.' % title
         story_model.commit(owner_id, commit_message, [{
             'cmd': story_domain.CMD_CREATE_NEW,
-            'title': title
+            'title': title,
         }])
 
     def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
@@ -2070,7 +2070,7 @@ class AppEngineTestBase(TestBase):
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_CREATE_NEW,
                 'topic_id': topic_id,
-                'subtopic_id': subtopic_id
+                'subtopic_id': subtopic_id,
             })
         ]
         subtopic_page_services.save_subtopic_page(
@@ -2210,7 +2210,7 @@ class AppEngineTestBase(TestBase):
             commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}])
         topic_model.commit(owner_id, commit_message, [{
             'cmd': topic_domain.CMD_CREATE_NEW,
-            'name': name
+            'name': name,
         }])
 
     def save_new_question(
