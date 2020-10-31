@@ -369,8 +369,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_kwargs=[
-                {'key': '123', 'default': '456'},
-                {'key': '678', 'default': '900'},
+                {'default': '456'}, {'default': '900'},
             ])
 
         with getenv_swap:
