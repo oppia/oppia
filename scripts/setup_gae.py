@@ -88,6 +88,15 @@ def main(args=None):
 
         os.remove('gcloud-sdk.tar.gz')
 
+    python_utils.PRINT(
+        'Creating symlinks to the Google Cloud SDK platform libraries...')
+    for lib in os.listdir(common.GOOGLE_CLOUD_SDK_PLATFORM_DIR):
+        lib_path, symlink_path = (
+            os.path.join(common.GOOGLE_CLOUD_SDK_PLATFORM_DIR, lib),
+            os.path.join(common.THIRD_PARTY_DIR, lib))
+        if not os.path.exists(symlink_path):
+            os.symlink(lib_path, symlink_path)
+
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when setup_gae.py is used as a script.

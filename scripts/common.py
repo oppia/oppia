@@ -92,8 +92,9 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
+GOOGLE_CLOUD_SDK_PLATFORM_DIR = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'platform')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
-    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
+    GOOGLE_CLOUD_SDK_PLATFORM_DIR, 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
