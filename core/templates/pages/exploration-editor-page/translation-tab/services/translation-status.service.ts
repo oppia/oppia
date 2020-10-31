@@ -40,10 +40,11 @@ require(
 angular.module('oppia').factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
-  'TranslationTabActiveModeService', 'INTERACTION_SPECS', function(
+  'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT', 'INTERACTION_SPECS',
+  function(
       ExplorationStatesService, StateRecordedVoiceoversService,
       StateWrittenTranslationsService, TranslationLanguageService,
-      TranslationTabActiveModeService, INTERACTION_SPECS) {
+      TranslationTabActiveModeService, COMPONENT_NAME_HINT, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
     var ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
@@ -135,7 +136,15 @@ angular.module('oppia').factory('TranslationStatusService', [
           if (!interactionId ||
             INTERACTION_SPECS[interactionId].is_linear ||
             INTERACTION_SPECS[interactionId].is_terminal) {
-            allContentId = ['content'];
+            var contentIdToRemove = _getContentIdListRelatedToComponent(
+              COMPONENT_NAME_HINT);
+            // Excluding default_outcome content status as default outcome's
+            // content is left empty so the translation or voiceover is not
+            // required.
+            contentIdToRemove.push('default_outcome');
+            allContentId = allContentId.filter(function(contentId) {
+              return contentIdToRemove.indexOf(contentId) < 0;
+            });
           }
           explorationContentRequiredCount += allContentId.length;
           allContentId.forEach(function(contentId) {
