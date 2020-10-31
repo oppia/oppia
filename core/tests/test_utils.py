@@ -1034,6 +1034,7 @@ class AppEngineTestBase(TestBase):
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
 
+        Reference URL:
         https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
 
         AppEngineTestBase's override of run() wraps super().run() in swap
@@ -1317,7 +1318,9 @@ class AppEngineTestBase(TestBase):
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119. pylint: disable=line-too-long
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(response.status_int, expected_status_int)
 
         self.assertEqual(response.content_type, expected_content_type)
@@ -1420,7 +1423,9 @@ class AppEngineTestBase(TestBase):
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119. pylint: disable=line-too-long
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(json_response, expect_errors)
@@ -1443,7 +1448,9 @@ class AppEngineTestBase(TestBase):
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 # pylint: disable=line-too-long
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(json_response, expect_errors)
@@ -1464,7 +1471,9 @@ class AppEngineTestBase(TestBase):
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 # pylint: disable=line-too-long
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(json_response, expect_errors)
@@ -1565,7 +1574,9 @@ class AppEngineTestBase(TestBase):
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
-        # Reference URL: https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 # pylint: disable=line-too-long
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
@@ -2491,7 +2502,7 @@ class AppEngineTestBase(TestBase):
         so for all queues; otherwise, this only runs and flushes tasks for the
         specified queue.
 
-        For more information on taskqueue_stub see:
+        For more information on taskqueue_stub, see:
         https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
         """
         queue_names = (
@@ -2696,9 +2707,8 @@ class EmailMessageMock(python_utils.OBJECT):
                         {"bob@example.com": {"first":"Bob", "id":1},
                         "alice@example.com": {"first":"Alice", "id":2}}
                     subject = 'Hey, %recipient.first%’
-                More info about this format at:
-                https://documentation.mailgun.com/en/
-                    latest/user_manual.html#batch-sending.
+                For more information about this format, see:
+                https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
         """
         self.sender = sender_email
         self.to = recipient_email
@@ -2763,9 +2773,8 @@ class GenericEmailTestBase(GenericTestBase):
                         {"bob@example.com": {"first":"Bob", "id":1},
                         "alice@example.com": {"first":"Alice", "id":2}}
                     subject = 'Hey, %recipient.first%’
-                More info about this format at:
-                https://documentation.mailgun.com/en/
-                    latest/user_manual.html#batch-sending
+                For more information about this format, see:
+                https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
 
         Returns:
             bool. Whether the emails are sent successfully.
