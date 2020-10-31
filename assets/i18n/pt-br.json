@@ -129,7 +129,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Visão geral",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "Resumo dos dados que serão anonimizados:",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_3": "Resumo dos dados que serão transferidos para a comunidade:",
-	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4": "Se você tiver alguma dúvida ou preocupação sobre o processo de remoção da conta, envie um e-mail para <strong>privacy@oppia.org</strong>.",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Arraste uma imagem para esta área",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Selecione um arquivo de imagem",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploração desabilitada",

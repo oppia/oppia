@@ -122,7 +122,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
             AlertsService.addWarning();
             _skillIsBeingLoaded = false;
           });
-        SkillRightsBackendApiService.fetchSkillRights(
+        SkillRightsBackendApiService.fetchSkillRightsAsync(
           skillId).then(function(newSkillRightsObject) {
           _updateSkillRights(newSkillRightsObject);
           _skillIsBeingLoaded = false;

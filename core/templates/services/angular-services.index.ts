@@ -121,6 +121,8 @@ import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOn
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionObjectFactory } from 'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
 import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageContentsObjectFactory';
@@ -135,6 +137,7 @@ import { BrowserCheckerService } from 'domain/utilities/browser-checker.service'
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExpressionEvaluatorService } from 'expressions/expression-evaluator.service';
+import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from 'expressions/expression-syntax-tree.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -360,11 +363,13 @@ export const angularServices: [string, unknown][] = [
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
+  ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationDiffService', ExplorationDiffService],
   ['ExplorationFeaturesBackendApiService',
     ExplorationFeaturesBackendApiService],
   ['ExplorationFeaturesService', ExplorationFeaturesService],
   ['ExplorationHtmlFormatterService', ExplorationHtmlFormatterService],
+  ['ExplorationIdValidationService', ExplorationIdValidationService],
   ['ExplorationImprovementsBackendApiService',
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsTaskRegistryService',
@@ -378,6 +383,7 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
+  ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],
   ['ExpressionSyntaxTreeService', ExpressionSyntaxTreeService],
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],

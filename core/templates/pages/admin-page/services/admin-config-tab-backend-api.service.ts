@@ -16,28 +16,47 @@
  * @fileoverview Service to revert/change admin-config-tab properties
  */
 
-require('pages/admin-page/admin-page.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 
-angular.module('oppia').factory('AdminConfigTabBackendApiService', [
-  '$http', 'ADMIN_HANDLER_URL',
-  function($http, ADMIN_HANDLER_URL) {
-    var _revertConfigProperty = function(configPropertyId) {
-      return $http.post(ADMIN_HANDLER_URL, {
+ @Injectable({
+   providedIn: 'root'
+ })
+export class AdminConfigTabBackendApiService {
+  constructor(private http: HttpClient) {}
+
+  private _revertConfigProperty(configPropertyId: string):Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      {
         action: 'revert_config_property',
         config_property_id: configPropertyId
-      });
-    };
+      }
+    ).toPromise();
+  }
 
-    var _saveConfigProperties = function(newConfigPropertyValues) {
-      return $http.post(ADMIN_HANDLER_URL, {
+  private _saveConfigProperties(
+      newConfigPropertyValues: object): Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      {
         action: 'save_config_properties',
         new_config_property_values: newConfigPropertyValues
-      });
-    };
-
-    return {
-      revertConfigProperty: _revertConfigProperty,
-      saveConfigProperties: _saveConfigProperties,
-    };
+      }
+    ).toPromise();
   }
-]);
+
+  revertConfigProperty(configPropertyId: string): Promise<void> {
+    return this._revertConfigProperty(configPropertyId);
+  }
+
+  saveConfigProperties(newConfigPropertyValues: object): Promise<void> {
+    return this._saveConfigProperties(newConfigPropertyValues);
+  }
+}
+
+angular.module('oppia').factory(
+  'AdminConfigTabBackendApiService', downgradeInjectable(
+    AdminConfigTabBackendApiService));
