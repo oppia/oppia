@@ -2494,7 +2494,8 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_files_stub()
         self.testbed.init_search_stub()
 
-        policy = datastore_services.instantaneous_global_consistency_policy()
+        policy = (
+            datastore_services.make_instantaneous_global_consistency_policy())
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
 
         # The root path tells the testbed where to find the queue.yaml file.
@@ -2572,7 +2573,7 @@ class AppEngineTestBase(TestBase):
         """Returns the jobs in the given mapreduce taskqueue. If queue_name is
         None, defaults to returning the jobs in all available queues.
         """
-        queue_names = queue_name and [queue_name]
+        queue_names = [queue_name] if queue_name is not None else None
         return self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
 
     def _execute_mapreduce_tasks(self, tasks):
