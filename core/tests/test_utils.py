@@ -572,7 +572,7 @@ class TestBase(unittest.TestCase):
                 self.assertFalse(expected_kwargs, msg=msg)
             self.longMessage = False
 
-    def assertRaises(self, exc, fun, *args, **kwds):
+    def assertRaises(self, *args, **kwds):
         raise NotImplementedError(
             'self.assertRaises should not be used in these tests. Please use '
             'self.assertRaisesRegexp instead.')
