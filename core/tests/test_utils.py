@@ -1102,10 +1102,9 @@ class AppEngineTestBase(TestBase):
             is_super_admin: bool. Whether the user is a super admin.
         """
         self.testbed.setup_env(
-            overwrite=True,
-            user_email=email,
+            overwrite=True, user_email=email,
             user_id=self.get_gae_id_from_email(email),
-            user_is_admin='1' if is_super_admin else '0')
+            user_is_admin=('1' if is_super_admin else '0'))
 
     def logout(self):
         """Simulates a logout by resetting the environment variables."""
