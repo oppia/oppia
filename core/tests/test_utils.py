@@ -592,10 +592,10 @@ class TestBase(unittest.TestCase):
             'self.assertRaises should not be used in these tests. Please use '
             'self.assertRaisesRegexp instead.')
 
-    def assertRaisesRegexp(
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
             self, expected_exception, expected_regexp, callable_obj=None,
             *args, **kwargs):
-        if expected_regexp == '':
+        if not expected_regexp:
             raise Exception(
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
