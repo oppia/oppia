@@ -874,148 +874,146 @@ class AppEngineTestBase(TestBase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT = textwrap.dedent("""\
-        author_notes: ''
-        auto_tts_enabled: true
-        blurb: ''
-        category: Category
-        correctness_feedback_enabled: false
-        init_state_name: %s
-        language_code: en
-        objective: ''
-        param_changes: []
-        param_specs: {}
-        schema_version: %d
-        states:
-          %s:
-            classifier_model_id: null
-            content:
-              content_id: content
-              html: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args: {}
-              default_outcome:
-                dest: %s
-                feedback:
-                  content_id: default_outcome
-                  html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              hints: []
-              id: null
-              solution: null
-            next_content_id_index: 0
-            param_changes: []
-            recorded_voiceovers:
-              voiceovers_mapping:
-                content: {}
-                default_outcome: {}
-            solicit_answer_details: false
-            written_translations:
-              translations_mapping:
-                content: {}
-                default_outcome: {}
-          New state:
-            classifier_model_id: null
-            content:
-              content_id: content
-              html: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args: {}
-              default_outcome:
-                dest: New state
-                feedback:
-                  content_id: default_outcome
-                  html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              hints: []
-              id: null
-              solution: null
-            next_content_id_index: 0
-            param_changes: []
-            recorded_voiceovers:
-              voiceovers_mapping:
-                content: {}
-                default_outcome: {}
-            solicit_answer_details: false
-            written_translations:
-              translations_mapping:
-                content: {}
-                default_outcome: {}
-        states_schema_version: %d
-        tags: []
-        title: Title
-        """) % (
-            feconf.DEFAULT_INIT_STATE_NAME,
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+    SAMPLE_YAML_CONTENT = '\n'.join([
+        'author_notes: ""',
+        'auto_tts_enabled: true',
+        'blurb: ""',
+        'category: Category',
+        'correctness_feedback_enabled: false',
+        'init_state_name: %s',
+        'language_code: en',
+        'objective: ""',
+        'param_changes: []',
+        'param_specs: {}',
+        'schema_version: %d',
+        'states:',
+        '  %s:',
+        '    classifier_model_id: null',
+        '    content:',
+        '      content_id: content',
+        '      html: ""',
+        '    interaction:',
+        '      answer_groups: []',
+        '      confirmed_unclassified_answers: []',
+        '      customization_args: {}',
+        '      default_outcome:',
+        '        dest: %s',
+        '        feedback:',
+        '          content_id: default_outcome',
+        '          html: ""',
+        '        labelled_as_correct: false',
+        '        missing_prerequisite_skill_id: null',
+        '        param_changes: []',
+        '        refresher_exploration_id: null',
+        '      hints: []',
+        '      id: null',
+        '      solution: null',
+        '    next_content_id_index: 0',
+        '    param_changes: []',
+        '    recorded_voiceovers:',
+        '      voiceovers_mapping:',
+        '        content: {}',
+        '        default_outcome: {}',
+        '    solicit_answer_details: false',
+        '    written_translations:',
+        '      translations_mapping:',
+        '        content: {}',
+        '        default_outcome: {}',
+        '  New state:',
+        '    classifier_model_id: null',
+        '    content:',
+        '      content_id: content',
+        '      html: ""',
+        '    interaction:',
+        '      answer_groups: []',
+        '      confirmed_unclassified_answers: []',
+        '      customization_args: {}',
+        '      default_outcome:',
+        '        dest: New state',
+        '        feedback:',
+        '          content_id: default_outcome',
+        '          html: ""',
+        '        labelled_as_correct: false',
+        '        missing_prerequisite_skill_id: null',
+        '        param_changes: []',
+        '        refresher_exploration_id: null',
+        '      hints: []',
+        '      id: null',
+        '      solution: null',
+        '    next_content_id_index: 0',
+        '    param_changes: []',
+        '    recorded_voiceovers:',
+        '      voiceovers_mapping:',
+        '        content: {}',
+        '        default_outcome: {}',
+        '    solicit_answer_details: false',
+        '    written_translations:',
+        '      translations_mapping:',
+        '        content: {}',
+        '        default_outcome: {}',
+        'states_schema_version: %d',
+        'tags: []',
+        'title: Title',
+    ]) % (
+        feconf.DEFAULT_INIT_STATE_NAME,
+        exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+        feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+        feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = textwrap.dedent("""\
-        author_notes: ''
-        blurb: ''
-        default_skin: conversation_v1
-        init_state_name: %s
-        language_code: en
-        objective: ''
-        param_changes: []
-        param_specs: {}
-        schema_version: %d
-        states:
-          %s:
-            content:
-            - type: text
-              value: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args: {}
-              default_outcome:
-                dest: %s
-                feedback: []
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              fallbacks: []
-              id: null
-            param_changes: []
-          New state:
-            content:
-            - type: text
-              value: ''
-            interaction:
-              answer_groups: []
-              confirmed_unclassified_answers: []
-              customization_args: {}
-              default_outcome:
-                dest: New state
-                feedback: []
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-              fallbacks: []
-              id: null
-            param_changes: []
-        states_schema_version: %d
-        tags: []
-        """) % (
-            feconf.DEFAULT_INIT_STATE_NAME,
-            exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+    SAMPLE_UNTITLED_YAML_CONTENT = '\n'.join([
+        'author_notes: ""',
+        'blurb: ""',
+        'default_skin: conversation_v1',
+        'init_state_name: %s',
+        'language_code: en',
+        'objective: ""',
+        'param_changes: []',
+        'param_specs: {}',
+        'schema_version: %d',
+        'states:',
+        '  %s:',
+        '    content:',
+        '    - type: text',
+        '      value: ""',
+        '    interaction:',
+        '      answer_groups: []',
+        '      confirmed_unclassified_answers: []',
+        '      customization_args: {}',
+        '      default_outcome:',
+        '        dest: %s',
+        '        feedback: []',
+        '        labelled_as_correct: false',
+        '        missing_prerequisite_skill_id: null',
+        '        param_changes: []',
+        '        refresher_exploration_id: null',
+        '      fallbacks: []',
+        '      id: null',
+        '    param_changes: []',
+        '  New state:',
+        '    content:',
+        '    - type: text',
+        '      value: ""',
+        '    interaction:',
+        '      answer_groups: []',
+        '      confirmed_unclassified_answers: []',
+        '      customization_args: {}',
+        '      default_outcome:',
+        '        dest: New state',
+        '        feedback: []',
+        '        labelled_as_correct: false',
+        '        missing_prerequisite_skill_id: null',
+        '        param_changes: []',
+        '        refresher_exploration_id: null',
+        '      fallbacks: []',
+        '      id: null',
+        '    param_changes: []',
+        'states_schema_version: %d',
+        'tags: []',
+    ]) % (
+        feconf.DEFAULT_INIT_STATE_NAME,
+        exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
+        feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+        feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def __init__(self, *args, **kwargs):
         super(AppEngineTestBase, self).__init__(*args, **kwargs)
@@ -1297,7 +1295,7 @@ class AppEngineTestBase(TestBase):
         # during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
-                url, params, expect_errors=expect_errors,
+                url, params=params, expect_errors=expect_errors,
                 status=expected_status_int)
 
         if expect_errors:
@@ -1379,7 +1377,7 @@ class AppEngineTestBase(TestBase):
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(base, 'load_template', mock_load_template):
-            response = self.testapp.get(url, params, expect_errors=True)
+            response = self.testapp.get(url, params=params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
@@ -1405,7 +1403,7 @@ class AppEngineTestBase(TestBase):
         expect_errors = expected_status_int >= 400
 
         json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors,
+            url, params=params, expect_errors=expect_errors,
             status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
@@ -1449,7 +1447,7 @@ class AppEngineTestBase(TestBase):
 
         expect_errors = expected_status_int >= 400
         json_response = self.testapp.delete(
-            url, params, expect_errors=expect_errors,
+            url, params=params, expect_errors=expect_errors,
             status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
@@ -1544,13 +1542,14 @@ class AppEngineTestBase(TestBase):
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
         """Put an object to the server by JSON; return the received object."""
-        expect_errors = expected_status_int >= 400
-
+        data = json.dumps(payload)
         if csrf_token:
             data['csrf_token'] = csrf_token
 
+        expect_errors = expected_status_int >= 400
+
         json_response = self.testapp.put(
-            url, params=json.dumps(payload), content_type='application/json',
+            url, params=data, content_type='application/json',
             expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
