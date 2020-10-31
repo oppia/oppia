@@ -24,6 +24,8 @@ var DeleteAccountPage = function() {
   var DELETE_ACCOUNT_PAGE_URL = '/delete-account';
   var deleteMyAccountButton = element(
     by.css('.protractor-test-delete-my-account-button'));
+  var confirmDeletionUsernameField = element(
+    by.css('.protractor-test-confirm-username-field'));
   var confirmDeletionButton = element(
     by.css('.protractor-test-confirm-deletion-button'));
 
@@ -32,9 +34,11 @@ var DeleteAccountPage = function() {
     await waitFor.elementToBeClickable(deleteMyAccountButton);
   };
 
-  this.requestAccountDeletion = async function() {
+  this.requestAccountDeletion = async function(username) {
     await action.click('Delete Account button', deleteMyAccountButton);
     await waitFor.modalPopupToAppear();
+    await action.sendKeys(
+      'Fill username', confirmDeletionUsernameField, username);
     await action.click('Confirm deletion button', confirmDeletionButton);
   };
 };

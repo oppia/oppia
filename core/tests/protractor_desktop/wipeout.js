@@ -43,7 +43,7 @@ describe('When account is deleted it', function() {
   it('should request account deletion', async function() {
     await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
-    await deleteAccountPage.requestAccountDeletion();
+    await deleteAccountPage.requestAccountDeletion('userToDelete1');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
   });
@@ -57,7 +57,7 @@ describe('When account is deleted it', function() {
     await explorationEditorSettingsTab.setTitle('voice artists');
     await workflow.addExplorationVoiceArtist('voiceArtist');
     await deleteAccountPage.get();
-    await deleteAccountPage.requestAccountDeletion();
+    await deleteAccountPage.requestAccountDeletion('userToDelete2');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
@@ -78,7 +78,7 @@ describe('When account is deleted it', function() {
     );
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
-    await deleteAccountPage.requestAccountDeletion();
+    await deleteAccountPage.requestAccountDeletion('userToDelete3');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
@@ -96,7 +96,7 @@ describe('When account is deleted it', function() {
     await explorationEditorSettingsTab.setTitle('second owner');
     await workflow.addExplorationManager('secondOwner');
     await deleteAccountPage.get();
-    await deleteAccountPage.requestAccountDeletion();
+    await deleteAccountPage.requestAccountDeletion('userToDelete4');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
