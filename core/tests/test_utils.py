@@ -66,7 +66,6 @@ import schema_utils
 import utils
 
 import contextlib2
-from google.appengine.api import app_identity
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
