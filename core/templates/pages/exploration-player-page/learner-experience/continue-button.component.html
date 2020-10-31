@@ -1,5 +1,5 @@
 <button mat-raised-button class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
-        focus-on="{{::focusLabel}}"
+        [oppiaFocusOn] = "'::' + focusLabel"
         (click)="clickContinueButton.emit()"
         aria-label="Continue">
   <div *ngIf="!isLearnAgainButton">
