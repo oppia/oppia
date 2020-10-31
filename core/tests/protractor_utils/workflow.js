@@ -269,8 +269,8 @@ var createSkillAndAssignTopic = async function(
   await topicsAndSkillsDashboardPage.navigateToSkillsTab();
   await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
   await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
-  await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-    0, topicName);
+  await topicsAndSkillsDashboardPage.assignSkillToTopic(
+    skillDescription, topicName);
 };
 
 var getImageSource = async function(customImageElement) {

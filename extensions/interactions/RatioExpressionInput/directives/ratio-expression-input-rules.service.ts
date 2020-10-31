@@ -55,5 +55,5 @@ export class RatioExpressionInputRulesService {
 }
 
 angular.module('oppia').factory(
-  'RatioInputRulesService',
+  'RatioExpressionInputRulesService',
   downgradeInjectable(RatioExpressionInputRulesService));

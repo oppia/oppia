@@ -20,7 +20,7 @@
 import { EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { BackendChangeObject, Change } from './ChangeObjectFactory';
+import { BackendChangeObject, Change } from './change.model';
 
 /**
  * Stores a stack of changes to a domain object. Please note that only one

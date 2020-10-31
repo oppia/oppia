@@ -34,17 +34,17 @@ import feconf
 import utils
 
 (
-    base_models, collection_models, config_models,
-    email_models, exploration_models, feedback_models,
-    improvements_models, question_models, skill_models,
-    story_models, suggestion_models, topic_models,
-    user_models,
+    collection_models, config_models, email_models,
+    exploration_models, feedback_models, improvements_models,
+    question_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user
 ])
 
 
@@ -652,7 +652,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
-        topic_models.SubtopicPageSnapshotMetadataModel(
+        subtopic_models.SubtopicPageSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS

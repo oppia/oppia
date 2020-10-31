@@ -24,7 +24,7 @@ import { group } from 'd3-array';
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { States } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import {
   ExplorationTask,
   ExplorationTaskObjectFactory,
@@ -49,7 +49,7 @@ import {
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+import { StateStats } from 'domain/statistics/state-stats-model';
 
 type HbrTask = HighBounceRateTask;
 type IflTask = IneffectiveFeedbackLoopTask;

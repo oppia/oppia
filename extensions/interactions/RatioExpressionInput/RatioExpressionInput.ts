@@ -18,7 +18,16 @@
 
 require(
   'interactions/RatioExpressionInput/directives/' +
-    'ratio-expression-input-rules.service.ts');
+  'ratio-expression-input-rules.service.ts');
 require(
   'interactions/RatioExpressionInput/directives/' +
-    'ratio-expression-input-validation.service.ts');
+  'ratio-expression-input-validation.service.ts');
+require(
+  'interactions/RatioExpressionInput/directives/' +
+  'oppia-interactive-ratio-expression-input.component.ts');
+require(
+  'interactions/RatioExpressionInput/directives/' +
+  'oppia-response-ratio-expression-input.component.ts');
+require(
+  'interactions/RatioExpressionInput/directives/' +
+  'oppia-short-response-ratio-expression-input.component.ts');

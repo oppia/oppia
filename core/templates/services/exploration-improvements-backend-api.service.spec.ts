@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {
   ExplorationImprovementsConfig,
   ExplorationImprovementsConfigBackendDict,
-} from 'domain/improvements/exploration-improvements-config-object.factory';
+} from 'domain/improvements/exploration-improvements-config.model';
 import {
   ExplorationTaskBackendDict,
   ExplorationTaskObjectFactory,

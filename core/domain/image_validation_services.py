@@ -60,6 +60,10 @@ def validate_image_and_filename(raw_image, filename):
             raise utils.ValidationError(
                 'Unsupported tags/attributes found in the SVG:\n%s\n%s' % (
                     invalid_tags_message, invalid_attrs_message))
+        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(
+                raw_image):
+            raise utils.ValidationError(
+                'The svg tag does not contains the \'xmlns\' attribute.')
     else:
         # Verify that the data is recognized as an image.
         file_format = imghdr.what(None, h=raw_image)

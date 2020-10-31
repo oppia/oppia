@@ -28,7 +28,7 @@ import {
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
 import { StateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
+  'domain/statistics/state-stats-model';
 
 describe('Exploration stats backend api service', () => {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;

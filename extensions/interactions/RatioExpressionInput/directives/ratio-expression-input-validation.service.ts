@@ -44,21 +44,23 @@ export class RatioExpressionInputValidationService {
 
   getCustomizationArgsWarnings(
       customizationArgs: RatioExpressionInputCustomizationArgs): Warning[] {
-    var isPositiveInt = function(n) {
-      return angular.isNumber(n) && n % 1 === 0 && n > 0;
+    var isNonNegativeInt = function(number) {
+      return angular.isNumber(number) && number % 1 === 0 && number >= 0;
     };
-    var minimumNumberOfTerms = customizationArgs.numberOfTerms.value;
-    if (minimumNumberOfTerms === undefined ||
-        !isPositiveInt(minimumNumberOfTerms)
+    var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
+    // 0 is allowed as an input, as that corresponds to having no limit.
+    if (expectedNumberOfTerms === undefined ||
+        !isNonNegativeInt(expectedNumberOfTerms)
     ) {
       return [
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'The number of terms should be a positive integer.')
+            'The number of terms should be a non-negative integer other than 1.'
+          )
         }
       ];
-    } else if (minimumNumberOfTerms === 1) {
+    } else if (expectedNumberOfTerms === 1) {
       return [
         {
           type: AppConstants.WARNING_TYPES.ERROR,
@@ -79,7 +81,7 @@ export class RatioExpressionInputValidationService {
     let warningsList = [];
     let ratioRulesService = (
       new RatioExpressionInputRulesService(this.rof));
-    var minimumNumberOfTerms = customizationArgs.numberOfTerms.value;
+    var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
@@ -136,30 +138,33 @@ export class RatioExpressionInputValidationService {
           currentInput = <number[]> rules[j].inputs.x;
         }
 
-        if (minimumNumberOfTerms > 2) {
+        if (expectedNumberOfTerms >= 2) {
           if (currentRuleType === 'HasNumberOfTermsEqualTo') {
-            if (currentInput < minimumNumberOfTerms) {
+            if (currentInput !== expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                  ' matched because it has fewer number of terms than required.'
+                  ' matched because it has differing number of terms than ' +
+                  'required.'
                 )
               });
             }
           } else {
             ratio = rulesService.rof.fromList(<number[]> currentInput);
-            if (ratio.getNumberOfTerms() < minimumNumberOfTerms) {
+            if (ratio.getNumberOfTerms() !== expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                  ' matched because it has fewer number of terms than required.'
+                  ' matched because it has differing number of terms than ' +
+                  'required.'
                 )
               });
             }
           }
         }
+        ratio = rulesService.rof.fromList(<number[]> currentInput);
         if (isInSimplestForm(currentRuleType, ratio, currentInput)) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
@@ -171,9 +176,12 @@ export class RatioExpressionInputValidationService {
         for (let seenRule of seenRules) {
           let seenInput = seenRule.inputs.x || seenRule.inputs.y;
           let seenRuleType = <string> seenRule.type;
-          if (seenRuleType === 'Equals' && (
-            ratioRulesService.Equals(
-              seenInput, {x: currentInput}))) {
+
+          if (
+            seenRuleType === 'Equals' &&
+            currentRuleType !== 'HasNumberOfTermsEqualTo' && (
+              ratioRulesService.Equals(
+                seenInput, {x: currentInput}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -183,9 +191,11 @@ export class RatioExpressionInputValidationService {
                 ' be matched because it is preceded by a \'Equals\' rule with' +
                 ' a matching input.')
             });
-          } else if (seenRuleType === 'IsEquivalent' && (
-            ratioRulesService.IsEquivalent(
-              seenInput, {x: currentInput}))) {
+          } else if (
+            seenRuleType === 'IsEquivalent' &&
+            currentRuleType !== 'HasNumberOfTermsEqualTo' && (
+              ratioRulesService.IsEquivalent(
+                seenInput, {x: currentInput}))) {
             // This rule will make the following inputs with
             // IsEquivalent rule obsolete.
             warningsList.push({
@@ -207,8 +217,19 @@ export class RatioExpressionInputValidationService {
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
                 `Rule ${j + 1} from answer group ${i + 1} will never` +
-                ' be matched because it is preceded by a' +
-                ' \'HasNumberOfTermsEqualTo\' rule with a matching input.')
+                ' be matched because the \'HasNumberOfTermsEqualTo\' ' +
+                'rule is preceded by a rule with a matching input.')
+            });
+          } else if (
+            currentRuleType === 'HasNumberOfTermsEqualTo' &&
+            seenRuleType === 'HasNumberOfTermsEqualTo' && (
+              currentInput === seenRule.inputs.y)) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                `Rule ${j + 1} from answer group ${i + 1} will never` +
+                ' be matched because it is preceded by a ' +
+                '\'HasNumberOfTermsEqualTo\' rule with a matching input.')
             });
           }
         }

@@ -24,21 +24,18 @@ import { TranslationLanguageSelectorComponent } from
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
-import { FeaturedTranslationLanguageObjectFactory } from
-  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 
 describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectorComponent>;
 
-  let featuredTranslationLanguageObjectFactory = (
-    new FeaturedTranslationLanguageObjectFactory());
   let featuredLanguages = [
-    featuredTranslationLanguageObjectFactory.createFromBackendDict({
+    FeaturedTranslationLanguage.createFromBackendDict({
       language_code: 'fr',
       explanation: 'Partnership with ABC'
     }),
-    featuredTranslationLanguageObjectFactory.createFromBackendDict({
+    FeaturedTranslationLanguage.createFromBackendDict({
       language_code: 'de',
       explanation: 'Partnership with CBA'
     })

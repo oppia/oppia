@@ -29,7 +29,7 @@ import {
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { StateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
+  'domain/statistics/state-stats-model';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from
@@ -37,7 +37,7 @@ import { NeedsGuidingResponsesTask } from
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
   'domain/statistics/ExplorationStatsObjectFactory';

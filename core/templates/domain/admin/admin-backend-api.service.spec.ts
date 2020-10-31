@@ -20,22 +20,19 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AdminPageData, AdminBackendApiService } from
-  'domain/admin/admin-backend-api.service';
-import { ComputationDataObjectFactory } from
-  'domain/admin/computation-data-object.factory';
-import { JobDataObjectFactory } from
-  'domain/admin/job-data-object.factory';
-import { JobStatusSummaryObjectFactory } from
-  'domain/admin/job-status-summary-object.factory';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { ComputationData } from 'domain/admin/computation-data.model';
+import { Job } from 'domain/admin/job.model';
+import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
+import { PlatformParameterFilterType } from
+  'domain/platform_feature/platform-parameter-filter-object.factory';
+import { FeatureStage, PlatformParameterObjectFactory } from
+  'domain/platform_feature/platform-parameter-object.factory';
+import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
-  let cdof: ComputationDataObjectFactory;
-  let jdof: JobDataObjectFactory;
-  let jsof: JobStatusSummaryObjectFactory;
+  let ppof: PlatformParameterObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   let adminBackendResponse = {
@@ -107,7 +104,23 @@ describe('Admin backend api service', () => {
     ],
     viewable_roles: {
       TOPIC_MANAGER: 'topic manager'
-    }
+    },
+    feature_flags: [{
+      name: 'dummy_feature',
+      description: 'this is a dummy feature',
+      data_type: 'bool',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [<[string, string]>['=', 'dev']]
+        }],
+        value_when_matched: true
+      }],
+      rule_schema_version: 1,
+      default_value: false,
+      is_feature: true,
+      feature_stage: FeatureStage.DEV
+    }]
   };
   let adminDataObject: AdminPageData;
 
@@ -117,9 +130,7 @@ describe('Admin backend api service', () => {
     });
 
     abas = TestBed.get(AdminBackendApiService);
-    cdof = TestBed.get(ComputationDataObjectFactory);
-    jdof = TestBed.get(JobDataObjectFactory);
-    jsof = TestBed.get(JobStatusSummaryObjectFactory);
+    ppof = TestBed.get(PlatformParameterObjectFactory);
     tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataObject = {
@@ -128,25 +139,28 @@ describe('Admin backend api service', () => {
       demoExplorationIds: adminBackendResponse.demo_exploration_ids,
       oneOffJobStatusSummaries:
         adminBackendResponse.one_off_job_status_summaries.map(
-          jsof.createFromBackendDict),
+          JobStatusSummary.createFromBackendDict),
       humanReadableCurrentTime:
         adminBackendResponse.human_readable_current_time,
       auditJobStatusSummaries:
         adminBackendResponse.audit_job_status_summaries.map(
-          jsof.createFromBackendDict),
+          JobStatusSummary.createFromBackendDict),
       updatableRoles: adminBackendResponse.updatable_roles,
       roleGraphData: adminBackendResponse.role_graph_data,
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
       unfinishedJobData: adminBackendResponse.unfinished_job_data.map(
-        jdof.createFromBackendDict),
+        Job.createFromBackendDict),
       recentJobData: adminBackendResponse.recent_job_data.map(
-        jdof.createFromBackendDict),
+        Job.createFromBackendDict),
       continuousComputationsData:
         adminBackendResponse.continuous_computations_data.map(
-          cdof.createFromBackendDict),
+          ComputationData.createFromBackendDict),
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        tsof.createFromBackendDict)
+        tsof.createFromBackendDict),
+      featureFlags: adminBackendResponse.feature_flags.map(
+        dict => ppof.createFromBackendDict(dict)
+      )
     };
   });
 

@@ -769,6 +769,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     recommendations_services.delete_explorations_from_recommendations(
         exploration_ids)
     opportunity_services.delete_exploration_opportunities(exploration_ids)
+    feedback_services.delete_exploration_feedback_analytics(exploration_ids)
 
     # Remove the explorations from the featured activity references, if
     # necessary.

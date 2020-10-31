@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 
 from core import jobs_registry
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import recommendations_jobs_one_off
 from core.domain import recommendations_services
@@ -30,6 +31,7 @@ from core.domain import rights_manager
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (exp_models, recommendations_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
@@ -202,3 +204,124 @@ class DeleteAllExplorationRecommendationsOneOffJobTests(
         self.assertIsNone(
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
                 self.RECOMMENDATION_3_ID))
+
+
+class CleanUpExplorationRecommendationsOneOffJob(test_utils.GenericTestBase):
+    """Test clean up exploration recommendations one-off job."""
+
+    def setUp(self):
+        super(CleanUpExplorationRecommendationsOneOffJob, self).setUp()
+
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(4)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.user_id, exp)
+
+        recommendations_services.set_exploration_recommendations(
+            '0', ['1', '2'])
+
+    def test_standard_operation(self):
+        job_id = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.create_new())
+        (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+        recommendation_model = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '0'))
+        self.assertEqual(
+            recommendation_model.recommended_exploration_ids, ['1', '2'])
+
+    def test_migration_job_skips_deleted_model(self):
+        recommendation_model = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '0'))
+        recommendation_model.deleted = True
+        recommendation_model.put()
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.create_new())
+        (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_job_deletes_model_if_exp_model_is_deleted(self):
+        recommendation_model = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '0'))
+        self.assertEqual(
+            recommendation_model.recommended_exploration_ids, ['1', '2'])
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.create_new())
+        (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output, ['[u\'Removed recommendation model\', [u\'0\']]'])
+
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '0'))
+
+    def test_job_removes_deleted_exp_ids_from_recommendation_list(self):
+        recommendation_model = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '0'))
+        self.assertEqual(
+            recommendation_model.recommended_exploration_ids, ['1', '2'])
+
+        exp_models.ExplorationModel.get_by_id('1').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.create_new())
+        (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            recommendations_jobs_one_off
+            .CleanUpExplorationRecommendationsOneOffJob.get_output(job_id))
+        self.assertEqual(
+            output,
+            ['[u\'Removed deleted exp ids from recommendations\', [u\'0\']]'])
+
+        recommendation_model = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '0'))
+        self.assertEqual(
+            recommendation_model.recommended_exploration_ids, ['2'])

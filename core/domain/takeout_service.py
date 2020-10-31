@@ -39,7 +39,7 @@ def get_models_which_should_be_exported():
     """Returns list of models to export.
 
     Returns:
-        list(ndb.Model). List of models whose data should be
+        list(datastore_services.Model). List of models whose data should be
         exported.
     """
     return [model_class for model_class in

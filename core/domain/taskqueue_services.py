@@ -88,6 +88,9 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
             fn_identifier)
+    # This is a workaround for a known python bug.
+    # See https://bugs.python.org/issue7980
+    datetime.datetime.strptime('', '')
     platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,
         payload=payload)

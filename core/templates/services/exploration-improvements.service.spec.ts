@@ -19,9 +19,9 @@ import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { StateObjectsBackendDict } from
   'domain/exploration/StatesObjectFactory';
 import { ExplorationPermissions } from
-  'domain/exploration/exploration-permissions-object.factory';
+  'domain/exploration/exploration-permissions.model';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
@@ -29,7 +29,7 @@ import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+import { StateStats } from 'domain/statistics/state-stats-model';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { ContextService } from 'services/context.service';

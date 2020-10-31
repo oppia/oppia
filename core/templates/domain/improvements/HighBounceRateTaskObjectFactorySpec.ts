@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { ExplorationStatsObjectFactory, ExplorationStats } from

@@ -5437,17 +5437,32 @@ export = {
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
 
+  "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
+
   // Used to disable account removal until it is fully implemented.
   "ENABLE_ACCOUNT_DELETION": false,
 
   // Used to disable account data export until it is fully implemented.
-  "ENABLE_ACCOUNT_EXPORT": false,
+  "ENABLE_ACCOUNT_EXPORT": true,
 
   // Link to open when the Oppia avatar is clicked on any page.
   "OPPIA_AVATAR_LINK_URL": null,
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
+
+  "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
+    "Chrome", "Edge", "Safari", "Firefox", "Others"],
+  "PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES": ["Web", "Android"],
+  // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
+  // of corresponding flavors, which is used in app_version_flavor filter for
+  // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.
+  "PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS": [
+    "test", "alpha", "beta", "release"],
+  "PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP":
+    "^(\\d+(?:\\.\\d+){2})$",
+  "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
+    "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
   "DEV_MODE": true
 } as const;

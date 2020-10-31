@@ -19,14 +19,14 @@
  * undo/redo service.
  */
 
+import { Change } from 'domain/editor/undo_redo/change.model';
+
 require('domain/collection/collection-node-object.factory.ts');
-require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 
 require('domain/collection/collection-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('CollectionUpdateService', [
-  'ChangeObjectFactory',
   'CollectionNodeObjectFactory', 'UndoRedoService',
   'CMD_ADD_COLLECTION_NODE',
   'CMD_DELETE_COLLECTION_NODE',
@@ -34,7 +34,6 @@ angular.module('oppia').factory('CollectionUpdateService', [
   'COLLECTION_PROPERTY_CATEGORY', 'COLLECTION_PROPERTY_LANGUAGE_CODE',
   'COLLECTION_PROPERTY_OBJECTIVE',
   'COLLECTION_PROPERTY_TAGS', 'COLLECTION_PROPERTY_TITLE', function(
-      ChangeObjectFactory,
       CollectionNodeObjectFactory, UndoRedoService,
       CMD_ADD_COLLECTION_NODE,
       CMD_DELETE_COLLECTION_NODE,
@@ -48,7 +47,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
     var _applyChange = function(collection, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       UndoRedoService.applyChange(changeObj, collection);
     };
 

@@ -23,8 +23,6 @@ import ast
 
 from constants import constants
 from core.domain import caching_services
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
 from core.domain import skill_services
@@ -65,14 +63,15 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         story_id_1 = 'story1'
         story_id_2 = 'story2'
 
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(2)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
             self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(

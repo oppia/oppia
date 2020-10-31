@@ -114,7 +114,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
             QuestionsListService.getQuestionSummariesAsync(
-              [skillId], true, false
+              skillId, true, false
             );
             _skillIsBeingLoaded = false;
             $rootScope.$apply();

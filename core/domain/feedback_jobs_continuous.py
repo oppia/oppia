@@ -25,11 +25,11 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (base_models, feedback_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.feedback, models.NAMES.exploration
 ])
+
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -40,8 +40,8 @@ class FeedbackAnalyticsRealtimeModel(
     in the realtime layer.
     """
 
-    num_open_threads = ndb.IntegerProperty(default=0)
-    num_total_threads = ndb.IntegerProperty(default=0)
+    num_open_threads = datastore_services.IntegerProperty(default=0)
+    num_total_threads = datastore_services.IntegerProperty(default=0)
 
 
 class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
@@ -64,8 +64,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         """Get the realtime datastore class used by the realtime layer.
 
         Returns:
-            ndb.model.MetaModel. Datastore class used by the
-            realtime layer, which should be a subclass of
+            datastore_services.MetaModel. Datastore class used by the realtime
+            layer, which should be a subclass of
             BaseRealtimeDatastoreClassForContinuousComputations.
         """
         return FeedbackAnalyticsRealtimeModel

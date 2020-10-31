@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import copy
 
 from core import jobs
 from core.domain import exp_fetchers
@@ -470,3 +471,158 @@ class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
+
+class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that cleans up UserSubscribersModel by removing user id if it is
+    present in subscriber ids.
+
+    NOTE TO DEVELOPERS: This job can be deleted after it is run in October
+    2020 release.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSubscribersModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        if item.id in item.subscriber_ids:
+            item.subscriber_ids.remove(item.id)
+            item.put()
+            yield ('Removed user from their own subscribers list', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        values.sort()
+        yield (key, values)
+
+
+class CleanUpCollectionProgressModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that cleans up CollectionProgressModel.
+
+    This is done by:
+        1. Removing exploration ids which are not a part of the collection.
+        2. Creating CompletedActivitiesModel for completed explorations if
+        it is missing.
+        3. Adding missing exploration ids for completed explorations.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.CollectionProgressModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(item.user_id))
+
+        if completed_activities_model is None:
+            completed_activities_model = (
+                user_models.CompletedActivitiesModel(id=item.user_id))
+            completed_activities_model.exploration_ids = (
+                item.completed_explorations)
+            completed_activities_model.put()
+            yield ('Regenerated Missing CompletedActivitiesModel', item.id)
+        else:
+            missing_exp_ids = [
+                exp_id
+                for exp_id in item.completed_explorations if exp_id not in (
+                    completed_activities_model.exploration_ids)]
+            if missing_exp_ids:
+                completed_activities_model.exploration_ids.extend(
+                    missing_exp_ids)
+                completed_activities_model.put()
+                yield (
+                    'Added missing exp ids in CompletedActivitiesModel',
+                    item.id)
+
+        col_model = collection_models.CollectionModel.get_by_id(
+            item.collection_id)
+
+        collection_node_ids = [
+            node['exploration_id'] for node in (
+                col_model.collection_contents['nodes'])]
+        exp_ids_to_remove = [
+            exp_id
+            for exp_id in item.completed_explorations if exp_id not in (
+                collection_node_ids)]
+
+        if exp_ids_to_remove:
+            item.completed_explorations = [
+                exp_id for exp_id in item.completed_explorations
+                if exp_id not in exp_ids_to_remove]
+            item.put()
+            yield (
+                'Invalid Exploration IDs cleaned from '
+                'CollectionProgressModel',
+                'Model id: %s, Collection id: %s, Removed exploration '
+                'ids: %s' % (
+                    item.id, item.collection_id, exp_ids_to_remove))
+
+    @staticmethod
+    def reduce(key, values):
+        values.sort()
+        yield (key, values)
+
+
+class CleanUpUserContributionsModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that cleans up UserContributionsModel by removing deleted
+    explorations from user contribution.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserContributionsModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        fetched_created_exploration_model_instances = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [('ExplorationModel', item.created_exploration_ids)]))[0]
+
+        exp_ids_removed = []
+        for exp_id, exp_instance in list(python_utils.ZIP(
+                copy.deepcopy(item.created_exploration_ids),
+                fetched_created_exploration_model_instances)):
+            if exp_instance is None or exp_instance.deleted:
+                exp_ids_removed.append(exp_id)
+                item.created_exploration_ids.remove(exp_id)
+
+        fetched_edited_exploration_model_instances = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [('ExplorationModel', item.edited_exploration_ids)]))[0]
+
+        for exp_id, exp_instance in list(python_utils.ZIP(
+                copy.deepcopy(item.edited_exploration_ids),
+                fetched_edited_exploration_model_instances)):
+            if exp_instance is None or exp_instance.deleted:
+                exp_ids_removed.append(exp_id)
+                item.edited_exploration_ids.remove(exp_id)
+
+        if exp_ids_removed:
+            item.put()
+            yield (
+                'Removed deleted exp ids from UserContributionsModel',
+                'Model id: %s, Removed exploration ids: %s' % (
+                    item.id, exp_ids_removed))
+
+    @staticmethod
+    def reduce(key, values):
+        values.sort()
+        yield (key, values)

@@ -24,7 +24,7 @@
 <div ng-cloak class="float-right navbar-header" ng-if="$ctrl.userMenuIsShown">
   <ul class="nav oppia-navbar-nav" ng-if="$ctrl.standardNavIsShown">
     <li>
-      <ul ng-if="$ctrl.windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
+      <ul ng-if="$ctrl.windowIsNarrow && !$ctrl.inClassroomPage" class="nav oppia-navbar-tabs-narrow">
         <li><create-activity-button></create-activity-button></li>
       </ul>
     </li>
@@ -139,7 +139,7 @@
             </a>
           </div>
         </li>
-        <li>
+        <li ng-if="!$ctrl.inClassroomPage">
           <create-activity-button ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
         </li>
       </ul>

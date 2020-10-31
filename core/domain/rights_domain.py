@@ -45,6 +45,11 @@ ROLE_VOICE_ARTIST = feconf.ROLE_VOICE_ARTIST
 ROLE_VIEWER = feconf.ROLE_VIEWER
 ROLE_NONE = feconf.ROLE_NONE
 
+ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Changed role of %s from %s to %s'
+ASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Changed role of (.*) from (.*) to (.*)$'
+DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Remove %s from role %s'
+DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
+
 
 class ActivityRights(python_utils.OBJECT):
     """Domain object for the rights/publication status of an activity (an

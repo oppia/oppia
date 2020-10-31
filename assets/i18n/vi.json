@@ -277,7 +277,6 @@
 	"I18N_SIGNUP_UPDATE_WARNING": "Xin thông báo, chúng tôi vừa mới thay đổi điều khoản sử dụng.",
 	"I18N_SIGNUP_USERNAME": "Tên Tài Khoản",
 	"I18N_SIGNUP_USERNAME_EXPLANATION": "Tên Tài Khoản Của Bạn Sẽ Xuất Hiện Kế Bên Những Đóng Góp Của Bạn.",
-	"I18N_SIGNUP_WAIVER_OBJECTIVE": "Giấy ủy quyền (BY) có điều kiện, nếu người khác dùng tài liệu của bạn, họ không phải nêu tên bạn. Mọi tài liệu của bạn sẽ được đang trên Oppia và bất cư ai dùng sẽ có đề nghị từ Oppia nên để đường link tới trang tài liệu của bạn trên trang của họ.",
 	"I18N_SIGNUP_WHY_LICENSE": "Tại sao lại sử dụng giấy phép CC-BY-SA?",
 	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Những bài học của Oppia, với cái tên gọi khác là nhửng cuộc hành trình, sẽ mang đến cho các bạn một trải nghiệm mới mẻ và thú vị hơn cách xem video hoặc đọc sách thông thường.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia là một chưng trình phầm mềm tự do và miễn phí. Oppia cho phép bạn tạo ra những bài giảng có tính tương tác cao, gọi là 'cuộc hành trình'. Để chưng trình có thể hoạt đông, Oppia cần phải có Javascript trong trình duyệt web của bạn. Nếu bạn không biết cách cho phép Javascript hoạt động,  <a href=\"<[hrefUrl]>\">bấm vào đây.</a>",

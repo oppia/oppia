@@ -26,7 +26,7 @@ require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.component.ts');
 
 require('domain/classroom/classroom-backend-api.service');
-require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
+require('domain/learner_dashboard/learner-dashboard-activity-ids.model.ts');
 require(
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
 require('domain/learner_dashboard/learner-playlist.service.ts');

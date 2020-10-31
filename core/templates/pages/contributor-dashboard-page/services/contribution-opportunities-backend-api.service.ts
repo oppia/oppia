@@ -24,7 +24,7 @@ import { Injectable } from '@angular/core';
 import {
   ExplorationOpportunitySummary,
   ExplorationOpportunitySummaryBackendDict
-} from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+} from 'domain/opportunity/exploration-opportunity-summary.model';
 import { SkillOpportunity, SkillOpportunityBackendDict } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from
@@ -32,8 +32,7 @@ import { UrlInterpolationService } from
 import {
   FeaturedTranslationLanguage,
   FeaturedTranslationLanguageBackendDict,
-  FeaturedTranslationLanguageObjectFactory
-} from 'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+} from 'domain/opportunity/featured-translation-language.model';
 
 const constants = require('constants.ts');
 
@@ -85,8 +84,6 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private featuredTranslationLanguageObjectFactory:
-      FeaturedTranslationLanguageObjectFactory
   ) {}
 
   private _getExplorationOpportunityFromDict(
@@ -190,7 +187,7 @@ export class ContributionOpportunitiesBackendApiService {
           '/retrivefeaturedtranslationlanguages').toPromise();
 
       return response.featured_translation_languages.map(
-        backendDict => this.featuredTranslationLanguageObjectFactory
+        backendDict => FeaturedTranslationLanguage
           .createFromBackendDict(backendDict));
     } catch {
       return [];

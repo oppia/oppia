@@ -118,9 +118,10 @@ def get_exploration_stats(exp_id, exp_version):
     return exploration_stats
 
 
-def update_stats(exp_id, exp_version, aggregated_stats):
-    """Updates ExplorationStatsModel according to the dict containing aggregated
-    stats.
+def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
+    """Updates ExplorationStatsModel according to the dict containing
+    aggregated stats. The model GET and PUT must be done in a transaction to
+    avoid loss of updates that come in rapid succession.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -146,7 +147,21 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         exp_stats.state_stats_mapping[state_name].aggregate_from(
             stats_domain.SessionStateStats.from_dict(stats))
 
-    save_stats_model_transactional(exp_stats)
+    save_stats_model(exp_stats)
+
+
+def update_stats(exp_id, exp_version, aggregated_stats):
+    """Updates ExplorationStatsModel according to the dict containing
+    aggregated stats.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+        aggregated_stats: dict. Dict representing an ExplorationStatsModel
+            instance with stats aggregated in the frontend.
+    """
+    transaction_services.run_in_transaction(
+        _update_stats_transactional, exp_id, exp_version, aggregated_stats)
 
 
 def get_stats_for_new_exploration(exp_id, exp_version, state_names):
@@ -632,7 +647,7 @@ def create_stats_model(exploration_stats):
     return instance_id
 
 
-def _save_stats_model(exploration_stats):
+def save_stats_model(exploration_stats):
     """Updates the ExplorationStatsModel datastore instance with the passed
     ExplorationStats domain object.
 
@@ -661,18 +676,6 @@ def _save_stats_model(exploration_stats):
     exploration_stats_model.state_stats_mapping = new_state_stats_mapping
 
     exploration_stats_model.put()
-
-
-def save_stats_model_transactional(exploration_stats):
-    """Updates the ExplorationStatsModel datastore instance with the passed
-    ExplorationStats domain object in a transaction.
-
-    Args:
-        exploration_stats: ExplorationStats. The exploration statistics domain
-            object.
-    """
-    transaction_services.run_in_transaction(
-        _save_stats_model, exploration_stats)
 
 
 def create_exp_issues_model(exp_issues):

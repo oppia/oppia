@@ -23,7 +23,7 @@ import {
   ExplorationStatsObjectFactory,
   ExplorationStatsBackendDict
 } from 'domain/statistics/ExplorationStatsObjectFactory';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+import { StateStats } from 'domain/statistics/state-stats-model';
 
 describe('Exploration stats', function() {
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
