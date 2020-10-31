@@ -105,7 +105,7 @@ export class AdminBackendApiService {
   constructor(
     private http: HttpClient) {}
 
-  getData(): Promise<AdminPageData> {
+  async getDataAsync(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
       this.http.get<AdminPageDataBackendDict>(
         AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
