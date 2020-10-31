@@ -52,7 +52,7 @@ export class CodeNormalizerService {
     var FOUR_SPACES = '    ';
     // Maps the number of spaces at the beginning of a line to an int
     // specifying the desired indentation level.
-    var numSpacesToDesiredIndentLevel: { [key: number]: number; } = {
+    var numSpacesToDesiredIndentLevel: { [key: number]: number } = {
       0: 0
     };
 
@@ -69,8 +69,9 @@ export class CodeNormalizerService {
 
       var numSpaces = line.length - this.removeLeadingWhitespace(line).length;
 
-      // eslint-disable-next-line max-len
-      var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel).map(Number);
+      var existingNumSpaces = Object.keys(
+        numSpacesToDesiredIndentLevel
+      ).map(Number);
       var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
       if (numSpaces > maxNumSpaces) {
         // Add a new indentation level.
@@ -95,8 +96,9 @@ export class CodeNormalizerService {
       }
 
       if (isShortfallLine) {
-        // eslint-disable-next-line max-len
-        existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel).map(Number);
+        existingNumSpaces = Object.keys(
+          numSpacesToDesiredIndentLevel
+        ).map(Number);
         numSpaces = Math.max.apply(null, existingNumSpaces);
       }
 
