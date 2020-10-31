@@ -179,8 +179,7 @@ describe('Learner Dashboard Backend API Service', () => {
     }],
     subscription_list: [{
       creator_username: 'user',
-      creator_impact: 0,
-      creator_picture_data_url: 'path/to/img'
+      creator_impact: 0
     }],
     user_email: 'user@example.com',
     completed_to_incomplete_collections: []

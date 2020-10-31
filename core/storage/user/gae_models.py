@@ -68,9 +68,6 @@ class UserSettingsModel(base_models.BaseModel):
     display_alias = datastore_services.StringProperty(default=None)
     # User specified biography (to be shown on their profile page).
     user_bio = datastore_services.TextProperty(indexed=False)
-    # User uploaded profile picture as a dataURI string. May be None.
-    profile_picture_data_url = (
-        datastore_services.TextProperty(default=None, indexed=False))
     # Subject interests specified by the user.
     subject_interests = (
         datastore_services.StringProperty(repeated=True, indexed=True))
@@ -125,6 +122,10 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
+    # DEPRECATED in v3.0.5 Do not use.
+    profile_picture_data_url = (
+        datastore_services.TextProperty(default=None, indexed=False))
+
     @staticmethod
     def get_lowest_supported_role():
         """The lowest supported role here should be Learner."""
@@ -149,7 +150,7 @@ class UserSettingsModel(base_models.BaseModel):
             'display_alias': base_models.EXPORT_POLICY.EXPORTED,
             'user_bio': base_models.EXPORT_POLICY.EXPORTED,
             'profile_picture_data_url':
-                base_models.EXPORT_POLICY.EXPORTED,
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
             'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
             'preferred_language_codes':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -239,7 +240,6 @@ class UserSettingsModel(base_models.BaseModel):
                 if user.last_edited_an_exploration
                 else None
             ),
-            'profile_picture_data_url': user.profile_picture_data_url,
             'default_dashboard': user.default_dashboard,
             'creator_dashboard_display_pref': (
                 user.creator_dashboard_display_pref),

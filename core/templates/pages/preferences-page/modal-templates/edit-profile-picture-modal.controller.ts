@@ -42,8 +42,7 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
 
     $scope.initialiseCropper = function() {
       let profilePicture = (
-        <HTMLImageElement>document.getElementById(
-          'croppable-image'));
+        <HTMLImageElement>document.getElementById('croppable-image'));
       cropper = new Cropper(profilePicture, {
         minContainerWidth: 500,
         minContainerHeight: 350,
@@ -72,7 +71,7 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
 
     $scope.reset = function() {
       $scope.uploadedImage = null;
-      $scope.croppedImageDataUrl = '';
+      $scope.croppedImageBlob = '';
     };
 
     $scope.onInvalidImageLoaded = function() {
@@ -81,12 +80,12 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
     };
 
     $scope.confirm = function() {
-      $scope.croppedImageDataUrl = (
+      $scope.croppedImageBlob = (
         cropper.getCroppedCanvas({
           height: 150,
           width: 150
         }).toBlob);
-      $uibModalInstance.close($scope.croppedImageDataUrl);
+      $uibModalInstance.close($scope.croppedImageBlob);
     };
   }
 ]);

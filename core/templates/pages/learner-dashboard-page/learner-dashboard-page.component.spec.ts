@@ -136,11 +136,9 @@ describe('Learner dashboard page', function() {
         incomplete_collections_list: [],
         subscription_list: [{
           creator_impact: null,
-          creator_picture_data_url: 'creator1-url',
           creator_username: 'username1',
         }, {
           creator_impact: null,
-          creator_picture_data_url: 'creator1-url',
           creator_username: 'username1',
         }],
         number_of_nonexistent_activities: {

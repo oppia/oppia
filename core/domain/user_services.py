@@ -1573,7 +1573,7 @@ def record_agreement_to_terms(user_id):
 
 
 def update_profile_picture(user_id, profile_picture_binary):
-    """Updates profile_picture_data_url of user with given user_id.
+    """Updates the profile picture of the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.

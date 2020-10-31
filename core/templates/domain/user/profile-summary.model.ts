@@ -22,21 +22,18 @@ export interface SubscriberSummaryBackendDict {
 }
 
 export interface CreatorSummaryBackendDict {
-  'creator_picture_data_url': string;
   'creator_username': string;
   'creator_impact': number;
 }
 
 export class ProfileSummary {
   constructor(
-    public pictureDataUrl: string,
     public username: string,
     public impact: number) { }
 
   static createFromSubscriberBackendDict(
       summaryBackendDict: SubscriberSummaryBackendDict): ProfileSummary {
     return new ProfileSummary(
-      summaryBackendDict.subscriber_picture_data_url,
       summaryBackendDict.subscriber_username,
       summaryBackendDict.subscriber_impact);
   }
@@ -44,7 +41,6 @@ export class ProfileSummary {
   static createFromCreatorBackendDict(
       summaryBackendDict: CreatorSummaryBackendDict): ProfileSummary {
     return new ProfileSummary(
-      summaryBackendDict.creator_picture_data_url,
       summaryBackendDict.creator_username,
       summaryBackendDict.creator_impact);
   }

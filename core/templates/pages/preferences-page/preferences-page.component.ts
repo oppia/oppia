@@ -156,13 +156,13 @@ angular.module('oppia').component('preferencesPage', {
           backdrop: 'static',
           controller: 'EditProfilePictureModalController'
         }).result.then(function(newProfilePictureUrl) {
-          UserService.setProfileImageDataUrlAsync(
-            newProfilePictureUrl)
-            .then(function() {
+          UserService.setProfileImageBlobAsync(newProfilePictureUrl).then(
+            function() {
               // The reload is needed in order to update the profile picture
               // in the top-right corner.
               $window.location.reload();
-            });
+            }
+          );
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -214,6 +214,11 @@ angular.module('oppia').component('preferencesPage', {
           ctrl.preferredAudioLanguageCode =
             data.preferred_audio_language_code;
           ctrl.subscriptionList = data.subscription_list;
+          for (let subscription of ctrl.subscriptionList) {
+            subscription.profilePictureUrl = (
+              UrlInterpolationService.getProfilePictureUrl(
+                subscription.creator_username));
+          }
           ctrl.hasPageLoaded = true;
           _forceSelect2Refresh();
         });

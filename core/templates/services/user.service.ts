@@ -51,10 +51,10 @@ angular.module('oppia').factory('UserService', [
     };
 
     return {
-      setProfileImageDataUrlAsync: function(newProfileImageDataUrl) {
+      setProfileImageBlobAsync: function(newProfileImageBlob) {
         return $http.put(PREFERENCES_DATA_URL, {
-          update_type: 'profile_picture_data_url',
-          data: newProfileImageDataUrl
+          update_type: 'profile_picture_blob',
+          data: newProfileImageBlob
         });
       },
       getLoginUrlAsync: function() {

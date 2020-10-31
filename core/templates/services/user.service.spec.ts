@@ -183,11 +183,11 @@ describe('User Service', function() {
   it('should set a profile image data url', function() {
     var newProfileImageDataurl = '/avatar/x.png';
     $httpBackend.expect('PUT', '/preferenceshandler/data')
-      .respond({profile_picture_data_url: newProfileImageDataurl});
+      .respond({profile_picture_blob: newProfileImageDataurl});
 
     UserService.setProfileImageDataUrlAsync(newProfileImageDataurl).then(
       function(response) {
-        expect(response.data.profile_picture_data_url).toBe(
+        expect(response.data.profile_picture_blob).toBe(
           newProfileImageDataurl);
       }
     );
