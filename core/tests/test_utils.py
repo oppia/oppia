@@ -1090,7 +1090,6 @@ class AppEngineTestBase(TestBase):
         self.signup_superadmin_user()
 
     def tearDown(self):
-        self.logout()
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
