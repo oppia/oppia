@@ -1067,7 +1067,7 @@ class AppEngineTestBase(TestBase):
 
     def setUp(self):
         self.testbed = testbed.Testbed()
-        self.testbed.activate()
+        self.testbed.activate(use_datastore_emulator=True)
 
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
