@@ -66,7 +66,9 @@ VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
 VALIDATION_MODE_NON_STRICT = 'non-strict'
 
-PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+WEEKS_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = 8
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(
+    weeks=WEEKS_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
 
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
@@ -398,7 +400,8 @@ class BaseModelValidator(python_utils.OBJECT):
             cls._add_error(
                 'entity %s' % ERROR_CATEGORY_STALE_CHECK,
                 'Entity id %s: '
-                'model marked as deleted is older than 8 weeks' % item.id
+                'model marked as deleted is older than %s weeks' % (
+                    item.id, WEEKS_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
             )
 
 

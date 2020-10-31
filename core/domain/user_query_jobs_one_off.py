@@ -46,7 +46,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [user_models.UserSettingsModel]
 
     @staticmethod
-    def map(user_settings_model):  # pylint: disable=too-many-return-statements
+    def map(user_settings_model):
         user_id = user_settings_model.id
 
         email_preferences = user_services.get_email_preferences(user_id)
@@ -62,31 +62,31 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 user_services.is_at_least_moderator(user_id)):
             return
 
+        query_criteria_satisfied = True
         if query_model.has_not_logged_in_for_n_days is not None:
             if user_settings_model.last_logged_in:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_logged_in).days
-                if difference < query_model.has_not_logged_in_for_n_days:
-                    return
+                query_criteria_satisfied &= (
+                    difference >= query_model.has_not_logged_in_for_n_days)
 
         if query_model.inactive_in_last_n_days is not None:
             if user_settings_model.last_created_an_exploration:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_created_an_exploration).days
-                if difference < query_model.inactive_in_last_n_days:
-                    return
+                query_criteria_satisfied &= (
+                    difference >= query_model.inactive_in_last_n_days)
             elif user_settings_model.last_edited_an_exploration:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_edited_an_exploration).days
-                if difference < query_model.inactive_in_last_n_days:
-                    return
+                query_criteria_satisfied &= (
+                    difference >= query_model.inactive_in_last_n_days)
             else:
-                return
+                query_criteria_satisfied &= False
 
-        query_criteria_satisfied = True
         if query_model.created_at_least_n_exps is not None:
             query_criteria_satisfied &= (
                 len(user_contributions.created_exploration_ids) >=

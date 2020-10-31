@@ -4724,7 +4724,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
     @classmethod
     def _validate_old_models_are_deleted(cls, item):
         """Validate that there are no models that were last updated more than
-        twelve weeks ago, these models should be deleted.
+        four weeks ago, these models should be deleted.
 
         Args:
             item: UserQueryModel. UserQueryModel to validate.

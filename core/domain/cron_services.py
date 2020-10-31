@@ -30,6 +30,7 @@ from mapreduce import model as mapreduce_model
 
 (base_models, job_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
 PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
@@ -85,20 +86,23 @@ def delete_models_marked_as_deleted():
             model_class.delete_multi(models_to_hard_delete)
 
 
-def mark_models_as_deleted():
+def mark_outdated_models_as_deleted():
     """Mark some types of models (that we shouldn't keep for long time)
     as deleted if they were last updated more than four weeks ago.
     """
     date_before_which_to_mark_as_deleted = (
         datetime.datetime.utcnow() - PERIOD_TO_MARK_MODELS_AS_DELETED)
+    models_to_mark_as_deleted = []
     for model_class in MODEL_CLASSES_TO_MARK_AS_DELETED:
-        models_to_mark_as_deleted = model_class.query(
-            model_class.last_updated < date_before_which_to_mark_as_deleted
-        ).fetch()
-        for model_to_mark_as_deleted in models_to_mark_as_deleted:
-            model_to_mark_as_deleted.deleted = True
-        model_class.update_timestamps_multi(models_to_mark_as_deleted)
-        model_class.put_multi(models_to_mark_as_deleted)
+        models_to_mark_as_deleted.extend(
+            model_class.query(
+                model_class.last_updated < date_before_which_to_mark_as_deleted
+            ).fetch()
+        )
+    for model_to_mark_as_deleted in models_to_mark_as_deleted:
+        model_to_mark_as_deleted.deleted = True
+    datastore_services.update_timestamps_multi(models_to_mark_as_deleted)
+    datastore_services.put_multi(models_to_mark_as_deleted)
 
 
 class MapReduceStateModelsCleanupManager(jobs.BaseMapReduceOneOffJobManager):

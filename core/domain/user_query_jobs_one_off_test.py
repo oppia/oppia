@@ -177,9 +177,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         query = user_models.UserQueryModel.get(query_id)
 
         # List of users who has not logged_in in last 6 days.
-        qualifying_user_ids = [self.user_e_id]
-        self.assertEqual(len(query.user_ids), 1)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        self.assertItemsEqual(query.user_ids, [self.user_e_id])
 
         query_id = user_query_services.save_new_query_model(
             self.submitter_id, has_not_logged_in_for_n_days=2)
