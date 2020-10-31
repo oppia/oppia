@@ -23,6 +23,7 @@ import collections
 import datetime
 import re
 
+from core.domain import cron_services
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -65,10 +66,6 @@ ERROR_CATEGORY_STALE_CHECK = 'stale check'
 VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
 VALIDATION_MODE_NON_STRICT = 'non-strict'
-
-WEEKS_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = 8
-PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(
-    weeks=WEEKS_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
 
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
@@ -395,13 +392,14 @@ class BaseModelValidator(python_utils.OBJECT):
         cls.errors.clear()
         date_now = datetime.datetime.utcnow()
         date_before_which_models_should_be_deleted = (
-            date_now - PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+            date_now -
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
+        )
         if item.last_updated < date_before_which_models_should_be_deleted:
             cls._add_error(
                 'entity %s' % ERROR_CATEGORY_STALE_CHECK,
                 'Entity id %s: '
-                'model marked as deleted is older than %s weeks' % (
-                    item.id, WEEKS_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+                'model marked as deleted is older than 8 weeks' % item.id
             )
 
 

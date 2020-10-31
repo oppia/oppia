@@ -30,6 +30,7 @@ from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
+from core.domain import cron_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -4722,7 +4723,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
                             item.id, recipient_user_ids[index]))
 
     @classmethod
-    def _validate_old_models_are_deleted(cls, item):
+    def _validate_old_models_marked_deleted(cls, item):
         """Validate that there are no models that were last updated more than
         four weeks ago, these models should be deleted.
 
@@ -4730,7 +4731,9 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
             item: UserQueryModel. UserQueryModel to validate.
         """
         date_four_weeks_ago = (
-            datetime.datetime.utcnow() - UserQueryModelValidator.FOUR_WEEKS)
+            datetime.datetime.utcnow() -
+            cron_services.PERIOD_TO_MARK_MODELS_AS_DELETED
+        )
         if item.last_updated < date_four_weeks_ago:
             cls._add_error(
                 'entity %s' % base_model_validators.ERROR_CATEGORY_STALE_CHECK,
@@ -4743,7 +4746,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_old_models_are_deleted]
+        return [cls._validate_old_models_marked_deleted]
 
 
 class UserBulkEmailsModelValidator(
