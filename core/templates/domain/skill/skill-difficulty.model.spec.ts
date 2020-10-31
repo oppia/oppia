@@ -13,23 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SkillDifficultyObjectFactory.
+ * @fileoverview Unit tests for SkillDifficultyModel.
  */
 
-import { SkillDifficultyObjectFactory } from
-  'domain/skill/SkillDifficultyObjectFactory';
+import { SkillDifficulty } from
+  'domain/skill/skill-difficulty.model';
 
-describe('Skill Difficulty object factory', () => {
-  describe('SkillDifficultyObjectFactory', () => {
-    let skillDifficultyObjectFactory: SkillDifficultyObjectFactory;
-
-    beforeEach(() => {
-      skillDifficultyObjectFactory = new SkillDifficultyObjectFactory();
-    });
-
+describe('Skill Difficulty model', () => {
+  describe('SkillDifficultyModel', () => {
     it('should create a new skill difficulty instance', () => {
       var skillDifficulty =
-        skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
+        SkillDifficulty.create('1', 'test skill', 0.3);
       expect(skillDifficulty.getId()).toEqual('1');
       expect(skillDifficulty.getDescription()).toEqual('test skill');
       expect(skillDifficulty.getDifficulty()).toEqual(0.3);
@@ -37,7 +31,7 @@ describe('Skill Difficulty object factory', () => {
 
     it('should convert to a backend dictionary', () => {
       var skillDifficulty =
-        skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
+        SkillDifficulty.create('1', 'test skill', 0.3);
       var skillDifficultyDict = {
         id: '1',
         description: 'test skill',
@@ -47,7 +41,7 @@ describe('Skill Difficulty object factory', () => {
     });
 
     it('should set the description of the skill difficulty instance', () => {
-      var skillDifficulty = skillDifficultyObjectFactory.create(
+      var skillDifficulty = SkillDifficulty.create(
         '1', 'test skill', 0.3);
 
       expect(skillDifficulty.getId()).toEqual('1');
@@ -60,7 +54,7 @@ describe('Skill Difficulty object factory', () => {
     });
 
     it('should set the difficulty of the skill difficulty instance', () => {
-      var skillDifficulty = skillDifficultyObjectFactory.create(
+      var skillDifficulty = SkillDifficulty.create(
         '1', 'test skill', 0.3);
 
       expect(skillDifficulty.getId()).toEqual('1');

@@ -21,6 +21,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
 describe(
   'Questions Opportunities Select Skill And Difficulty Modal Controller',
@@ -30,7 +31,6 @@ describe(
     var $uibModalInstance = null;
     var alertsService = null;
     var SkillBackendApiService = null;
-    var skillDifficultyObjectFactory = null;
     var skillObjectFactory = null;
 
     var skillId = 'skill_1';
@@ -46,8 +46,6 @@ describe(
         var $rootScope = $injector.get('$rootScope');
         SkillBackendApiService = $injector.get('SkillBackendApiService');
         alertsService = $injector.get('AlertsService');
-        skillDifficultyObjectFactory = $injector.get(
-          'SkillDifficultyObjectFactory');
         skillObjectFactory = $injector.get('SkillObjectFactory');
         var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
@@ -97,7 +95,6 @@ describe(
           'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', {
             $scope: $scope,
             AlertsService: alertsService,
-            SkillDifficultyObjectFactory: skillDifficultyObjectFactory,
             SkillObjectFactory: skillObjectFactory,
             $uibModalInstance: $uibModalInstance,
             skillId: skillId,
@@ -110,7 +107,7 @@ describe(
         expect($scope.skill).toEqual(skillObjectFactory.createFromBackendDict(
           skill));
         expect($scope.linkedSkillsWithDifficulty).toEqual(
-          [skillDifficultyObjectFactory.create(
+          [SkillDifficulty.create(
             skillId, 'Skill 1 description', 0.3)]);
         expect($scope.skillIdToRubricsObject[skillId].length).toBe(1);
       });
@@ -144,7 +141,6 @@ describe(
           'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', {
             $scope: $scope,
             AlertsService: alertsService,
-            SkillDifficultyObjectFactory: skillDifficultyObjectFactory,
             SkillObjectFactory: skillObjectFactory,
             $uibModalInstance: $uibModalInstance,
             skillId: skillId,

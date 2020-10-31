@@ -13,12 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of feedback
-   message domain objects.
+ * @fileoverview Frontend Model for feedback message summary.
  */
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface FeedbackMessageSummaryBackendDict {
   'message_id': number;
@@ -58,13 +54,8 @@ export class FeedbackMessageSummary {
     this.authorPictureDataUrl = authorPictureDataUrl;
     this.createdOnMsecs = createdOnMsecs;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class FeedbackMessageSummaryObjectFactory {
-  createNewMessage(
+  static createNewMessage(
       newMessageId: number, newMessageText: string, authorUsername: string,
       authorPictureDataUrl: string): FeedbackMessageSummary {
     // Date.now() returns number of milliseconds since 1970-01-01 UTC.
@@ -74,7 +65,7 @@ export class FeedbackMessageSummaryObjectFactory {
       authorPictureDataUrl, createdOnMsecs);
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict):
       FeedbackMessageSummary {
     return new FeedbackMessageSummary(
@@ -89,7 +80,3 @@ export class FeedbackMessageSummaryObjectFactory {
       feedbackMessageSummaryBackendDict.created_on_msecs);
   }
 }
-
-angular.module('oppia').factory(
-  'FeedbackMessageSummaryObjectFactory',
-  downgradeInjectable(FeedbackMessageSummaryObjectFactory));

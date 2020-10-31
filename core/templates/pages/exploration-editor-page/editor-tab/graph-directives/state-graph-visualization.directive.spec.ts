@@ -50,6 +50,7 @@ import * as d3 from 'd3';
 import { of } from 'rxjs';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
@@ -100,6 +101,9 @@ describe('State Graph Visualization directive', function() {
   };
 
   beforeEach(angular.mock.module('directiveTemplates'));
+
+  importAllAngularServices();
+
   beforeEach(function() {
     stateGraphLayoutService = TestBed.get(StateGraphLayoutService);
   });

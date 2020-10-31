@@ -15,17 +15,13 @@
 /**
  * @fileoverview Unit tests for the ratio expression component.
  */
-
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
-
+import { Ratio } from 'domain/objects/ratio.model';
 
 describe('RatioExpression', function() {
   var RationExpressionCtrl = null;
-  var ratioObjectFactory = null;
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    ratioObjectFactory = new RatioObjectFactory();
-    $provide.value('RatioObjectFactory', ratioObjectFactory);
+    $provide.value('Ratio', Ratio);
   }));
   beforeEach(angular.mock.inject(function($componentController) {
     RationExpressionCtrl = $componentController('ratioExpressionEditor');

@@ -20,25 +20,25 @@
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/question-backend-api.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/SkillRightsObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
 import { EventEmitter } from '@angular/core';
+import { SkillRights } from 'domain/skill/skill-rights.model';
 
 angular.module('oppia').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'QuestionsListService',
   'SkillBackendApiService', 'SkillObjectFactory',
-  'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
+  'SkillRightsBackendApiService', 'UndoRedoService',
   function(
       $rootScope, AlertsService, QuestionsListService,
       SkillBackendApiService, SkillObjectFactory,
-      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService) {
+      SkillRightsBackendApiService, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = (
-      SkillRightsObjectFactory.createInterstitialSkillRights());
+      SkillRights.createInterstitialSkillRights());
     var _skillIsInitialized = false;
     var assignedSkillTopicData = null;
     var _skillIsBeingLoaded = false;
@@ -122,7 +122,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
             AlertsService.addWarning();
             _skillIsBeingLoaded = false;
           });
-        SkillRightsBackendApiService.fetchSkillRights(
+        SkillRightsBackendApiService.fetchSkillRightsAsync(
           skillId).then(function(newSkillRightsObject) {
           _updateSkillRights(newSkillRightsObject);
           _skillIsBeingLoaded = false;

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to ensure for unused dependency.
+ * @fileoverview Lint check to ensure there are no unused dependency and all
+ * dependencies are sorted.
  */
 
 'use strict';

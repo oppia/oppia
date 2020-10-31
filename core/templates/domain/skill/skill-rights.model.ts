@@ -13,12 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
- * skill rights domain objects.
+ * @fileoverview Frontend Model for skill rights.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export interface SkillRightsBackendDict {
   'can_edit_skill_description': boolean,
@@ -35,6 +31,17 @@ export class SkillRights {
     this._canEditSkillDescription = canEditSkillDescription;
   }
 
+  static createFromBackendDict(
+      skillRightsBackendDict: SkillRightsBackendDict): SkillRights {
+    return new SkillRights(
+      skillRightsBackendDict.skill_id,
+      skillRightsBackendDict.can_edit_skill_description);
+  }
+
+  static createInterstitialSkillRights(): SkillRights {
+    return new SkillRights(null, false);
+  }
+
   getSkillId(): string {
     return this._skillId;
   }
@@ -49,22 +56,3 @@ export class SkillRights {
       otherSkillRights.canEditSkillDescription();
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SkillRightsObjectFactory {
-  createFromBackendDict(
-      skillRightsBackendDict: SkillRightsBackendDict): SkillRights {
-    return new SkillRights(
-      skillRightsBackendDict.skill_id,
-      skillRightsBackendDict.can_edit_skill_description);
-  }
-  createInterstitialSkillRights(): SkillRights {
-    return new SkillRights(null, false);
-  }
-}
-
-angular.module('oppia').factory(
-  'SkillRightsObjectFactory',
-  downgradeInjectable(SkillRightsObjectFactory));
