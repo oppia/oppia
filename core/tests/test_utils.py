@@ -66,6 +66,7 @@ import schema_utils
 import utils
 
 import contextlib2
+from google.appengine.api import app_identity
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
@@ -85,6 +86,25 @@ platform_taskqueue_services = models.Registry.import_taskqueue_services()
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
+
+
+def get_default_version_hostname():
+    """Returns the DEFAULT_VERSION_HOSTNAME value for GAE taskqueue services.
+
+    This value is not always set by testbed, see:
+    https://github.com/GoogleCloudPlatform/python-compat-runtime/issues/118#issuecomment-311952878
+
+    Returns:
+        str. The value of DEFAULT_VERSION_HOSTNAME.
+    """
+    hostname = app_identity.get_default_version_hostname()
+    if hostname:
+        return hostname
+    # Try to read from environment.
+    if 'GAE_APPENGINE_HOSTNAME' in os.environ:
+        return os.environ['GAE_APPENGINE_HOSTNAME']
+    # Otherwise, there's no choice but to return a fake value.
+    return 'localhost:8080'
 
 
 def get_filepath_from_filename(filename, rootdir):
@@ -380,14 +400,8 @@ class TestBase(unittest.TestCase):
         return new_param_dict
 
     def get_static_asset_filepath(self):
-        """Returns filepath for referencing static files on disk.
-        examples: '' or 'build/'.
-        """
-        filepath = ''
-        if not constants.DEV_MODE:
-            filepath = os.path.join('build')
-
-        return filepath
+        """Returns filepath to the static files on disk ('' or 'build/')."""
+        return '' if constants.DEV_MODE else os.path.join('build')
 
     def get_static_asset_url(self, asset_suffix):
         """Returns the relative path for the asset, appending it to the
@@ -422,7 +436,7 @@ class TestBase(unittest.TestCase):
 
         original_datetime_type = datetime.datetime
 
-        class PatchedDatetimeType(type):
+        class MockDatetimeType(type):
             """Validates the datetime instances."""
 
             def __instancecheck__(cls, other):
@@ -431,9 +445,10 @@ class TestBase(unittest.TestCase):
                 """
                 return isinstance(other, original_datetime_type)
 
-        class MockDatetime( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
+        mock_datetime_type = (
+            python_utils.with_metaclass(MockDatetimeType, datetime.datetime))
+
+        class MockDatetime(mock_datetime_type): # pylint: disable=inherit-non-class
             @classmethod
             def utcnow(cls):
                 """Returns the mocked datetime."""
@@ -861,7 +876,9 @@ class AppEngineTestBase(TestBase):
     }
 
     # Dictionary-like data structures within sample YAML must be formatted
-    # alphabetically to match string equivalence with YAML generation tests.
+    # alphabetically to match string equivalence with YAML generation tests. The
+    # indentations are also important, since it is used to define nesting (just
+    # like Python).
     #
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
@@ -1055,7 +1072,10 @@ class AppEngineTestBase(TestBase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
-        self.testbed.setup_env(overwrite=True)
+        self.testbed.setup_env(
+            overwrite=True,
+            # https://github.com/GoogleCloudPlatform/python-compat-runtime/issues/118#issuecomment-311952878
+            default_version_hostname=get_default_version_hostname())
 
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
@@ -1531,16 +1551,15 @@ class AppEngineTestBase(TestBase):
             status=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
-        """Put an object to the server by JSON; return the received object."""
-        data = json.dumps(payload)
+        """PUT an object to the server with JSON and return the response."""
+        params = {'payload': json.dumps(payload)}
         if csrf_token:
-            data['csrf_token'] = csrf_token
+            params['csrf_token'] = csrf_token
 
         expect_errors = expected_status_int >= 400
 
         json_response = self.testapp.put(
-            url, params=data, content_type='application/json',
-            expect_errors=expect_errors)
+            url, params=params, expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -2450,21 +2469,20 @@ class AppEngineTestBase(TestBase):
             else:
                 # All other tasks are expected to be mapreduce ones, or
                 # Oppia-taskqueue-related ones.
-                payload = task.payload or ''
+                params = task.payload or ''
                 headers = {
-                    'Content-Length': (
-                        python_utils.convert_to_bytes(len(payload))),
+                    'Content-Length': python_utils.convert_to_bytes(len(params))
                 }
                 headers.update(
                     (key, python_utils.convert_to_bytes(val))
                     for key, val in task.headers.items())
 
                 app = (
-                    self.taskqueue_testapp
-                    if task.url.startswith('/task') else self.testapp)
+                    self.taskqueue_testapp if task.url.startswith('/task') else
+                    self.testapp)
                 response = app.post(
-                    url=python_utils.UNICODE(task.url), params=payload,
-                    headers=headers, expect_errors=True)
+                    url=task.url, params=params, headers=headers,
+                    expect_errors=True)
                 if response.status_code != 200:
                     raise RuntimeError('MapReduce task failed: %r' % task)
 
