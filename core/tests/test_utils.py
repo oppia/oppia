@@ -97,14 +97,12 @@ def get_default_version_hostname():
     Returns:
         str. The value of DEFAULT_VERSION_HOSTNAME.
     """
-    hostname = app_identity.get_default_version_hostname()
-    if hostname:
-        return hostname
-    # Try to read from environment.
-    if 'GAE_APPENGINE_HOSTNAME' in os.environ:
-        return os.environ['GAE_APPENGINE_HOSTNAME']
-    # Otherwise, there's no choice but to return a fake value.
-    return 'localhost:8080'
+    return (
+        app_identity.get_default_version_hostname() or
+        # Try to read from environment.
+        os.environ.get('GAE_APPENGINE_HOSTNAME', None) or
+        # Otherwise, there's no choice but to return a fake value.
+        'localhost:8080')
 
 
 def get_filepath_from_filename(filename, rootdir):
