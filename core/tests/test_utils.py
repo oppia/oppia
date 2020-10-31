@@ -1071,10 +1071,6 @@ class AppEngineTestBase(TestBase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
-        self.testbed.setup_env(
-            overwrite=True,
-            # https://github.com/GoogleCloudPlatform/python-compat-runtime/issues/118#issuecomment-311952878
-            default_version_hostname=get_default_version_hostname())
 
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
@@ -1098,6 +1094,11 @@ class AppEngineTestBase(TestBase):
         self.testapp = webtest.TestApp(main.app)
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
         self.mail_testapp = webtest.TestApp(main_mail.app)
+
+        self.testbed.setup_env(
+            overwrite=True,
+            # https://github.com/GoogleCloudPlatform/python-compat-runtime/issues/118#issuecomment-311952878
+            default_version_hostname=get_default_version_hostname())
 
         self.signup_superadmin_user()
 
