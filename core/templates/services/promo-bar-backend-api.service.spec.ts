@@ -64,4 +64,27 @@ describe('Promo bar backend api service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should use rejection handler if data backend request failed',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      promoBarBackendApiService.getPromoBarDataAsync()
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne('/promo_bar_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Error loading data.',
+      }, {
+        status: 500, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });

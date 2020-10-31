@@ -31,16 +31,16 @@ export interface PromoBar {
   providedIn: 'root'
 })
 export class PromoBarBackendApiService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   async getPromoBarDataAsync(): Promise<PromoBar> {
-    const promoBarData = {
+    const promoBar = {
       promoBarEnabled: false,
       promoBarMessage: ''
     };
     if (!ServicesConstants.ENABLE_PROMO_BAR) {
       return new Promise((resolve, reject) => {
-        resolve(promoBarData);
+        resolve(promoBar);
       });
     }
     return new Promise((resolve, reject) => {
