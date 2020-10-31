@@ -590,7 +590,7 @@ class AppEngineTestBase(TestBase):
     # app_identity.get_application_id() is called during tests.
     EXPECTED_TEST_APP_ID = 'dummy-cloudsdk-project-id'
 
-    # Values our tests assume to have.
+    # Environment values our tests assume to have.
     AUTH_DOMAIN = 'example.com'
     HTTP_HOST = 'localhost'
     SERVER_NAME = 'localhost'
