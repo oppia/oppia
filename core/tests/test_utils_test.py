@@ -368,9 +368,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getenv(key, default): # pylint: disable=unused-argument
             return
         getenv_swap = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_kwargs=[
-                {'default': '456'}, {'default': '900'},
-            ])
+            os, 'getenv', mock_getenv,
+            expected_args=[('123',), ('678',)],
+            expected_kwargs=[{'default': '456'}, {'default': '900'}])
 
         with getenv_swap:
             SwapWithCheckTestClass.functions_with_kwargs()
