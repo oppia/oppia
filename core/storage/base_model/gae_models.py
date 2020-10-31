@@ -46,8 +46,9 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'DELETE_AT_END',
     # Models that should be pseudonymized in their local context.
     'LOCALLY_PSEUDONYMIZE',
-    # Models that should only be kept if published.
-    'KEEP_IF_PUBLIC',
+    # Models that should be pseudonymized if they are published and otherwise
+    # (when private) deleted.
+    'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE',
     # Models that are not directly or indirectly related to users.
     'NOT_APPLICABLE'
 )
@@ -69,16 +70,41 @@ ID_LENGTH = 12
 class BaseModel(datastore_services.Model):
     """Base model for all persistent object storage classes."""
 
-    # When this entity was first created. This value should only be modified
-    # with the _update_timestamps method.
+    # When this entity was first created. This value should only be modified by
+    # the update_timestamps method.
     created_on = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
-    # When this entity was last updated. This value should only be modified
-    # with the _update_timestamps method.
+    # When this entity was last updated. This value should only be modified by
+    # the update_timestamps method.
     last_updated = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
+
+    def __init__(self, *args, **kwargs):
+        super(BaseModel, self).__init__(*args, **kwargs)
+        self._last_updated_timestamp_is_fresh = False
+
+    def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage.
+
+        Raises:
+            Exception. The model has not refreshed the value of last_updated.
+        """
+        super(BaseModel, self)._pre_put_hook()
+
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
+        if self.last_updated is None:
+            self.last_updated = datetime.datetime.utcnow()
+            self._last_updated_timestamp_is_fresh = True
+
+        if not self._last_updated_timestamp_is_fresh:
+            raise Exception(
+                '%s did not call update_timestamps() yet' % type(self).__name__)
+
+        self._last_updated_timestamp_is_fresh = False
 
     @property
     def id(self):
@@ -210,78 +236,57 @@ class BaseModel(datastore_services.Model):
                     entities[i] = None
         return entities
 
-    def _update_timestamps(self, update_last_updated_time):
+    def update_timestamps(self, update_last_updated_time=True):
         """Update the created_on and last_updated fields.
 
         Args:
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the model.
         """
+        self._last_updated_timestamp_is_fresh = True
+
         if self.created_on is None:
             self.created_on = datetime.datetime.utcnow()
 
         if update_last_updated_time or self.last_updated is None:
             self.last_updated = datetime.datetime.utcnow()
 
-    def put(self, update_last_updated_time=True):
-        """Stores the given datastore_services.Model instance to the datastore.
-
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the model.
-
-        Returns:
-            Model. The entity that was stored.
-        """
-        self._update_timestamps(update_last_updated_time)
-        return super(BaseModel, self).put()
-
-    def put_async(self, update_last_updated_time=True):
-        """Stores the given datastore_services.Model instance to the datastore
-        asynchronously.
-
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the model.
-
-        Returns:
-            Model. The entity that was stored.
-        """
-        self._update_timestamps(update_last_updated_time)
-        return super(BaseModel, self).put_async()
-
     @classmethod
-    def put_multi(cls, entities, update_last_updated_time=True):
-        """Stores the given datastore_services.Model instances.
+    def update_timestamps_multi(cls, entities, update_last_updated_time=True):
+        """Update the created_on and last_updated fields of all given entities.
 
         Args:
             entities: list(datastore_services.Model). List of model instances to
                 be stored.
             update_last_updated_time: bool. Whether to update the
-                last_updated field of the entities.
+                last_updated field of the model.
         """
-        # Internally put_multi calls put so we don't need to call
-        # _update_timestamps here.
-        datastore_services.put_multi(
-            entities, update_last_updated_time=update_last_updated_time)
+        for entity in entities:
+            entity.update_timestamps(
+                update_last_updated_time=update_last_updated_time)
 
     @classmethod
-    def put_multi_async(cls, entities, update_last_updated_time=True):
+    def put_multi(cls, entities):
+        """Stores the given datastore_services.Model instances.
+
+        Args:
+            entities: list(datastore_services.Model). List of model instances to
+                be stored.
+        """
+        datastore_services.put_multi(entities)
+
+    @classmethod
+    def put_multi_async(cls, entities):
         """Stores the given datastore_services.Model instances asynchronously.
 
         Args:
             entities: list(datastore_services.Model). The list of model
                 instances to be stored.
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the entities.
 
         Returns:
             list(future). A list of futures.
         """
-        # Internally put_multi_async calls put_async so we don't need to call
-        # _update_timestamps here.
-        return datastore_services.put_multi_async(
-            entities, update_last_updated_time=update_last_updated_time)
+        return datastore_services.put_multi_async(entities)
 
     @classmethod
     def delete_multi(cls, entities):
@@ -291,8 +296,7 @@ class BaseModel(datastore_services.Model):
             entities: list(datastore_services.Model). The list of model
                 instances to be deleted.
         """
-        keys = [entity.key for entity in entities]
-        datastore_services.delete_multi(keys)
+        datastore_services.delete_multi([entity.key for entity in entities])
 
     @classmethod
     def delete_by_id(cls, instance_id):
@@ -305,7 +309,7 @@ class BaseModel(datastore_services.Model):
 
     def delete(self):
         """Deletes this instance."""
-        super(BaseModel, self).key.delete()
+        self.key.delete()
 
     @classmethod
     def get_all(cls, include_deleted=False):
@@ -318,10 +322,9 @@ class BaseModel(datastore_services.Model):
         Returns:
             iterable. Filterable iterable of all entities of this class.
         """
-        query = cls.query()
-        if not include_deleted:
-            query = query.filter(cls.deleted == False)  # pylint: disable=singleton-comparison
-        return query
+        return (
+            cls.query() if include_deleted else
+            cls.query().filter(cls.deleted == False)) # pylint: disable=singleton-comparison
 
     @classmethod
     def get_new_id(cls, entity_name):
@@ -416,6 +419,13 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = datastore_services.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = datastore_services.IntegerProperty()
+
+    @staticmethod
+    def get_deletion_policy():
+        """BaseCommitLogEntryModel contains data corresponding to a user that
+        requires pseudonymization: user_id field.
+        """
+        return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def get_export_policy(cls):
@@ -711,9 +721,9 @@ class VersionedModel(BaseModel):
         snapshot_content_instance = (
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
-        transaction_services.run_in_transaction(
-            BaseModel.put_multi,
-            [snapshot_metadata_instance, snapshot_content_instance, self])
+        entities = [snapshot_metadata_instance, snapshot_content_instance, self]
+        self.update_timestamps_multi(entities)
+        transaction_services.run_in_transaction(BaseModel.put_multi, entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
@@ -805,10 +815,19 @@ class VersionedModel(BaseModel):
                         model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
             versioned_models_keys = [model.key for model in versioned_models]
-            transaction_services.run_in_transaction(
-                datastore_services.delete_multi,
-                all_models_metadata_keys + all_models_content_keys +
-                versioned_models_keys)
+            all_models_keys = (
+                all_models_metadata_keys +
+                all_models_content_keys +
+                versioned_models_keys
+            )
+            for i in python_utils.RANGE(
+                    0,
+                    len(all_models_keys),
+                    feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                transaction_services.run_in_transaction(
+                    datastore_services.delete_multi,
+                    all_models_keys[
+                        i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
         else:
             for model in versioned_models:
                 model._require_not_marked_deleted()  # pylint: disable=protected-access
@@ -831,10 +850,12 @@ class VersionedModel(BaseModel):
                 snapshot_content_models.append(
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
-            transaction_services.run_in_transaction(
-                BaseModel.put_multi,
+            entities = (
                 snapshot_metadata_models + snapshot_content_models +
                 versioned_models)
+            cls.update_timestamps_multi(entities)
+            transaction_services.run_in_transaction(
+                BaseModel.put_multi, entities)
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
@@ -1244,25 +1265,6 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = datastore_services.JsonProperty(indexed=False)
-
-    @staticmethod
-    def get_deletion_policy():
-        """The content models do not contain any user ID fields directly,
-        the user ID fields might be hidden inside the content field (because
-        content field contains all the fields from the parent model), e.g. the
-        owner_ids or viewer_ids in the ExplorationRightsModel that are then in
-        the content field of ExplorationRightsSnapshotContentModel.
-
-        The pseudonymization of these models is handled in the wipeout service
-        (in the relevant pseudonymization function, e.g. in
-        _pseudonymize_activity_models_with_associated_rights_models() for
-        CollectionRightsModel or ExplorationRightsModel), based on
-        the content_user_ids field of the relevant metadata model.
-        E.g. the content_user_ids in ExplorationRightsSnapshotMetadataModel are
-        used to pseudonymize the relevant fields in the corresponding
-        ExplorationRightsSnapshotContentModel.
-        """
-        return DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):

@@ -22,12 +22,11 @@ import { OppiaAngularRootComponent } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ReadOnlyStoryNode } from
+  'domain/story_viewer/read-only-story-node.model';
 import { StoryNode } from 'domain/story/story-node.model';
-import { StoryPlaythroughObjectFactory } from
-  'domain/story_viewer/StoryPlaythroughObjectFactory';
-import { ReadOnlyStoryNodeObjectFactory } from
-  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { PageTitleService } from 'services/page-title.service';
+import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
 
 describe('Story Viewer Page component', function() {
   var ctrl = null;
@@ -35,8 +34,6 @@ describe('Story Viewer Page component', function() {
   var $rootScope = null;
   var alertsService = null;
   var assetsBackendApiService = null;
-  var readOnlyStoryNodeObjectFactory = null;
-  var storyPlaythroughObjectFactory = null;
   var storyViewerBackendApiService = null;
   var urlService = null;
 
@@ -52,9 +49,6 @@ describe('Story Viewer Page component', function() {
     OppiaAngularRootComponent.pageTitleService = (
       TestBed.get(PageTitleService)
     );
-    readOnlyStoryNodeObjectFactory = TestBed.get(
-      ReadOnlyStoryNodeObjectFactory);
-    storyPlaythroughObjectFactory = TestBed.get(StoryPlaythroughObjectFactory);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
   });
 
@@ -92,7 +86,7 @@ describe('Story Viewer Page component', function() {
     spyOnProperty(ctrl, 'storyViewerBackendApiService').and.returnValue(
       storyViewerBackendApiService);
 
-    storyPlaythrough = storyPlaythroughObjectFactory.createFromBackendDict({
+    storyPlaythrough = StoryPlaythrough.createFromBackendDict({
       story_nodes: [{
         id: 'node_1',
         title: 'Title 1',
@@ -172,7 +166,7 @@ describe('Story Viewer Page component', function() {
       story_description: 'Story Description 1',
       topic_name: 'Topic 1',
       meta_tag_content: 'Story Meta Tag Content'
-    });
+    } as StoryPlaythroughBackendDict);
   }));
 
   it('should get path icon parameters after story data is loaded', function() {
@@ -254,12 +248,12 @@ describe('Story Viewer Page component', function() {
   it('should not show story\'s chapters when story has no chapters',
     function() {
       spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
-        $q.resolve(storyPlaythroughObjectFactory.createFromBackendDict({
+        $q.resolve(StoryPlaythrough.createFromBackendDict({
           story_nodes: [],
           story_title: 'Story Title 1',
           story_description: 'Story Description 1',
           topic_name: 'topic_1',
-        })));
+        } as StoryPlaythroughBackendDict)));
 
       ctrl.$onInit();
       $rootScope.$apply();
@@ -281,7 +275,7 @@ describe('Story Viewer Page component', function() {
     ctrl.$onInit();
     $rootScope.$apply();
 
-    var node = readOnlyStoryNodeObjectFactory.createFromBackendDict({
+    var node = ReadOnlyStoryNode.createFromBackendDict({
       id: 'node_2',
       title: 'Title 2',
       description: 'Description 2',
@@ -329,7 +323,7 @@ describe('Story Viewer Page component', function() {
     ctrl.$onInit();
     $rootScope.$apply();
 
-    var node = readOnlyStoryNodeObjectFactory.createFromBackendDict({
+    var node = ReadOnlyStoryNode.createFromBackendDict({
       id: 'node_3',
       title: 'Title 2',
       description: 'Description 2',
@@ -378,7 +372,7 @@ describe('Story Viewer Page component', function() {
     ctrl.$onInit();
     $rootScope.$apply();
 
-    var node = readOnlyStoryNodeObjectFactory.createFromBackendDict({
+    var node = ReadOnlyStoryNode.createFromBackendDict({
       id: 'node_3',
       title: 'Title 2',
       description: 'Description 2',

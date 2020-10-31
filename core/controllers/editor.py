@@ -618,7 +618,7 @@ class ResolveIssueHandler(EditorHandler):
         # instances.
         stats_services.delete_playthroughs_multi(
             issue_to_remove.playthrough_ids)
-        stats_services.save_exp_issues_model_transactional(exp_issues)
+        stats_services.save_exp_issues_model(exp_issues)
 
         self.render_json({})
 
