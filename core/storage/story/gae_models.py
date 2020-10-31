@@ -35,7 +35,12 @@ class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """StorySnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class StoryModel(base_models.VersionedModel):
@@ -81,21 +86,10 @@ class StoryModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Story should be kept if the corresponding topic is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether StoryModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """StoryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -173,13 +167,6 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the story being edited.
     story_id = datastore_services.StringProperty(indexed=True, required=True)
 
-    @staticmethod
-    def get_deletion_policy():
-        """Story commit log is deleted only if the corresponding collection
-        is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
     @classmethod
     def _get_instance_id(cls, story_id, version):
         """This function returns the generated id for the get_commit function
@@ -248,23 +235,10 @@ class StorySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Story summary should be kept if the corresponding topic is
-        published.
+        """StorySummaryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether StorySummaryModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):

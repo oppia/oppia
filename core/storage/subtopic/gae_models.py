@@ -35,7 +35,12 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """SubtopicPageSnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class SubtopicPageModel(base_models.VersionedModel):
@@ -62,21 +67,10 @@ class SubtopicPageModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Subtopic should be kept if associated topic is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether SubtopicPageModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """SubtopicPageModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -132,13 +126,6 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the subtopic page being edited.
     subtopic_page_id = (
         datastore_services.StringProperty(indexed=True, required=True))
-
-    @staticmethod
-    def get_deletion_policy():
-        """Subtopic page commit log is deleted only if the corresponding
-        topic is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def _get_instance_id(cls, subtopic_page_id, version):
