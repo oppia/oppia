@@ -48,7 +48,7 @@ export class EmailDashboardBackendApiService {
   constructor(
     private http: HttpClient) {}
 
-  fetchQueriesPage(
+  async fetchQueriesPageAsync(
       pageSize: number, cursor: string): Promise<EmailDashboardQueryResults> {
     // Here 'cursor' property is optional because it is present only if this
     // function is called with a non-null value to 'cursor' arg.
@@ -76,7 +76,7 @@ export class EmailDashboardBackendApiService {
     });
   }
 
-  fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
+  async fetchQueryAsync(queryId: string): Promise<EmailDashboardQuery> {
     return new Promise((resolve, reject) => {
       this.http.get<EmailDashboardQueryBackendDict>(
         this.QUERY_STATUS_CHECK_URL, {
@@ -92,7 +92,7 @@ export class EmailDashboardBackendApiService {
     });
   }
 
-  submitQuery(data: QueryData): Promise<EmailDashboardQuery> {
+  async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery> {
     const postData = {
       has_not_logged_in_for_n_days: data.hasNotLoggedInForNDays,
       inactive_in_last_n_days: data.inactiveInLastNDays,

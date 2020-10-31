@@ -70,7 +70,7 @@ angular.module('oppia').component('reviewTestPage', {
             classroom_url_fragment: classroomUrlFragment,
             story_url_fragment: storyUrlFragment
           });
-        ctrl.reviewTestBackendApiService.fetchReviewTestData(
+        ctrl.reviewTestBackendApiService.fetchReviewTestDataAsync(
           storyUrlFragment).then(
           function(result) {
             var skillIdList = [];

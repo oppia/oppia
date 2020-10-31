@@ -78,7 +78,8 @@ describe('Review test page component', function() {
 
     spyOnProperty(ctrl, 'reviewTestBackendApiService').and.returnValue(
       reviewTestBackendApiService);
-    spyOn(reviewTestBackendApiService, 'fetchReviewTestData').and.returnValue(
+    spyOn(
+      reviewTestBackendApiService, 'fetchReviewTestDataAsync').and.returnValue(
       $q.resolve({
         storyName: '',
         skillDescriptions: ['skill_1', 'skill_2']
