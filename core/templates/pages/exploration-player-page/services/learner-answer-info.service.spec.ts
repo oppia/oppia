@@ -31,7 +31,7 @@ import { AnswerClassificationService } from
 import { LearnerAnswerInfoService } from
   'pages/exploration-player-page/services/learner-answer-info.service.ts';
 import { ExplorationPlayerConstants } from
- 'pages/exploration-player-page/exploration-player-page.constants';
+  'pages/exploration-player-page/exploration-player-page.constants';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 interface MockInteractionRulesService {
