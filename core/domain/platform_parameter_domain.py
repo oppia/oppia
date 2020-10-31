@@ -128,13 +128,29 @@ class EvaluationContext(python_utils.OBJECT):
         """
         return self._server_mode
 
-    def validate(self):
-        """Validates the EvaluationContext domain object."""
-        if self._client_type not in ALLOWED_CLIENT_TYPES:
-            raise utils.ValidationError(
-                'Invalid client type \'%s\', must be one of %s.' % (
-                    self._client_type, ALLOWED_CLIENT_TYPES))
+    @property
+    def is_valid(self):
+        """Returns whether this context object is valid for evaluating
+        parameters. An invalid context object usually indicates that one of the
+        object's required fields is missing or an unexpected value. Note that
+        objects which are not valid will still pass validation. This method
+        should return true and validate() should not raise an exception before
+        using this object for platform evaluation.
 
+        Returns:
+            bool. Whether this context object can be used for evaluating
+            parameters.
+        """
+        return (
+            self._client_type is not None and
+            self._client_type in ALLOWED_CLIENT_TYPES and
+            self._user_locale is not None and
+            self._user_locale in ALLOWED_USER_LOCALES)
+
+    def validate(self):
+        """Validates the EvaluationContext domain object, raising an exception
+        if the object is in an irrecoverable error state.
+        """
         if (
                 self._browser_type is not None and
                 self._browser_type not in ALLOWED_BROWSER_TYPES):
@@ -155,11 +171,6 @@ class EvaluationContext(python_utils.OBJECT):
                     'Invalid version flavor \'%s\', must be one of %s if'
                     ' specified.' % (
                         match.group(2), ALLOWED_APP_VERSION_FLAVORS))
-
-        if self._user_locale not in ALLOWED_USER_LOCALES:
-            raise utils.ValidationError(
-                'Invalid user locale \'%s\', must be one of %s.' % (
-                    self._user_locale, ALLOWED_USER_LOCALES))
 
         if self._server_mode not in ALLOWED_SERVER_MODES:
             raise utils.ValidationError(
@@ -693,15 +704,21 @@ class PlatformParameter(python_utils.OBJECT):
         """Evaluates the value of the platform parameter in the given context.
         The value of first matched rule is returned as the result.
 
+        Note that if the provided context is in an invalid state (e.g. its
+        is_valid property returns false) then this parameter will defer to its
+        default value since it may not be safe to partially evaluate the
+        parameter for an unrecognized or partially recognized context.
+
         Args:
             context: EvaluationContext. The context for evaluation.
 
         Returns:
             *. The evaluate result of the platform parameter.
         """
-        for rule in self._rules:
-            if rule.evaluate(context):
-                return rule.value_when_matched
+        if context.is_valid:
+            for rule in self._rules:
+                if rule.evaluate(context):
+                    return rule.value_when_matched
         return self._default_value
 
     def to_dict(self):
