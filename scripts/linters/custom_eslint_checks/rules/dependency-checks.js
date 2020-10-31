@@ -95,38 +95,41 @@ module.exports = {
       ArrayExpression: function checkDirective(node) {
         var paramsList = [];
         var tokensList = [];
-        if (node.parent.key) {
-          if (node.parent.key.name === 'controller' &&
-              node.parent.parent.type === 'ObjectExpression') {
-            if (node.elements[node.elements.length - 1].type ===
-                'FunctionExpression') {
-              var params = node.elements[node.elements.length - 1].params;
-              for (var index in params) {
-                var param = params[index];
-                paramsList.push(param.name);
-              }
-              var tokens = sourceCode.getTokens(node);
-              tokens.forEach((token) => {
-                if (token.type !== 'Punctuator') {
-                  tokensList.push(token.value);
-                }
-              });
-              checkSortedDependency(node, paramsList);
-              paramsList.forEach((param) => {
-                if (isUnused(param, tokensList)) {
-                  context.report({
-                    node,
-                    loc: node.loc,
-                    messageId: 'unusedDirective',
-                    data: {
-                      dependencyName: param
-                    }
-                  });
-                }
-              });
-            }
-          }
+        if (!node.parent.key) {
+          return true;
         }
+        if (!(node.parent.key.name === 'controller' &&
+            node.parent.parent.type === 'ObjectExpression')) {
+          return true;
+        }
+        if (!(node.elements[node.elements.length - 1].type ===
+            'FunctionExpression')) {
+          return true;
+        }
+        var params = node.elements[node.elements.length - 1].params;
+        for (var index in params) {
+          var param = params[index];
+          paramsList.push(param.name);
+        }
+        var tokens = sourceCode.getTokens(node);
+        tokens.forEach((token) => {
+          if (token.type !== 'Punctuator') {
+            tokensList.push(token.value);
+          }
+        });
+        checkSortedDependency(node, paramsList);
+        paramsList.forEach((param) => {
+          if (isUnused(param, tokensList)) {
+            context.report({
+              node,
+              loc: node.loc,
+              messageId: 'unusedDirective',
+              data: {
+                dependencyName: param
+              }
+            });
+          }
+        });
       }
     };
   }

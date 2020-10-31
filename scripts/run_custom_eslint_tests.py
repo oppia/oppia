@@ -57,12 +57,12 @@ def main():
         python_utils.PRINT('---------------------------')
 
     coverage_result = re.search = re.search(
-        r'All files\s*\|\s*(?P<total1>\S+)\s*\|\s*(?P<total2>\S+)\s*\|\s*'
-        r'(?P<total3>\S+)\s*\|\s*(?P<total4>\S+)\s*\|\s*', tests_stdout)
-    if (coverage_result.group('total1') != 100 or
-            coverage_result.group('total2') != 100 or
-            coverage_result.group('total3') != 100 or
-            coverage_result.group('total2') != 100):
+        r'All files\s*\|\s*(?P<stmts>\S+)\s*\|\s*(?P<branch>\S+)\s*\|\s*'
+        r'(?P<funcs>\S+)\s*\|\s*(?P<lines>\S+)\s*\|\s*', tests_stdout)
+    if (coverage_result.group('stmts') != '100' or
+            coverage_result.group('branch') != '100' or
+            coverage_result.group('funcs') != '100' or
+            coverage_result.group('lines') != '100'):
         raise Exception('Eslint test coverage is not 100%')
 
 
