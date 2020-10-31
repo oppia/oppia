@@ -198,11 +198,12 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             payload: dict(str : *). Payload to pass to the request. Defaults
                 to None if no payload is required.
             queue_name: str. The name of the queue to add the task to.
-            task_name: str|None. Optional. The name of the task.
+            task_name: str | None. Optional. The name of the task.
         """
         headers = {
             'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
             'X-Appengine-TaskName': (
+                # Maps empty strings to None so the output can become 'None'.
                 python_utils.convert_to_bytes(task_name or None)),
             'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes(1),
         }
@@ -220,9 +221,9 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             url: str. URL of the handler function.
             payload: dict(str : *). Payload to pass to the request. Defaults to
                 None if no payload is required.
-            scheduled_for: datetime|None. The naive datetime object for the time
-                to execute the task. Ignored by this stub.
-            task_name: str|None. Optional. The name of the task.
+            scheduled_for: datetime | None. The naive datetime object for the
+                time to execute the task. Ignored by this stub.
+            task_name: str | None. Optional. The name of the task.
         """
         # Causes the task to execute immediately by setting the scheduled_for
         # time to 0. If we allow scheduled_for to be non-zero, then tests that
@@ -237,8 +238,8 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         is specified or the entire taskqueue if no queue name is specified.
 
         Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
+            queue_name: str | None. Name of the queue. Pass in None if no
+                specific queue is designated.
 
         Returns:
             int. The total number of tasks in a single queue or in the entire
@@ -252,8 +253,8 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         specified.
 
         Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
+            queue_name: str | None. Name of the queue. Pass in None if no
+                specific queue is designated.
         """
         self._client.process_and_flush_tasks(queue_name=queue_name)
 
@@ -263,8 +264,8 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         name is specified.
 
         Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
+            queue_name: str | None. Name of the queue. Pass in None if no
+                specific queue is designated.
 
         Returns:
             list(Task). List of tasks in a single queue or in the entire
@@ -520,13 +521,13 @@ class TestBase(unittest.TestCase):
             obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
             new_value: function. The new function you want to use.
-            expected_args: None|list(tuple). The expected args that you want
+            expected_args: None | list(tuple). The expected args that you want
                 this function to be invoked with. When its value is None, args
                 will not be checked. If the value type is list, the function
                 will check whether the called args is the first element in the
                 list. If matched, this tuple will be removed from the list.
-            expected_kwargs: None|list(dict). The expected keyword args you want
-                this function to be invoked with. Similar to expected_args.
+            expected_kwargs: None | list(dict). The expected keyword args you
+                want this function to be invoked with. Similar to expected_args.
             called: bool. Whether the function is expected to be invoked. This
                 will always be checked.
 
@@ -2034,8 +2035,8 @@ class AppEngineTestBase(TestBase):
 
         Args:
             story_id: str. ID for the story to be created.
-            thumbnail_filename: str|None. Thumbnail filename for the story.
-            thumbnail_bg_color: str|None. Thumbnail background color for the
+            thumbnail_filename: str | None. Thumbnail filename for the story.
+            thumbnail_bg_color: str | None. Thumbnail background color for the
                 story.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
@@ -2107,9 +2108,9 @@ class AppEngineTestBase(TestBase):
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
             url_fragment: str. The url fragment of the topic.
-            thumbnail_filename: str|None. The thumbnail filename of the topic.
-            thumbnail_bg_color: str|None. The thumbnail background color of the
-                topic.
+            thumbnail_filename: str | None. The thumbnail filename of the topic.
+            thumbnail_bg_color: str | None. The thumbnail background color of
+                the topic.
             description: str. The description of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -2298,15 +2299,15 @@ class AppEngineTestBase(TestBase):
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
             description: str. The description of the skill.
-            misconceptions: list(Misconception)|None. A list of Misconception
+            misconceptions: list(Misconception) | None. A list of Misconception
                 objects that contains the various misconceptions of the skill.
-            rubrics: list(Rubric)|None. A list of Rubric objects that contain
+            rubrics: list(Rubric) | None. A list of Rubric objects that contain
                 the rubric for each difficulty of the skill.
-            skill_contents: SkillContents|None. A SkillContents object
+            skill_contents: SkillContents | None. A SkillContents object
                 containing the explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this skill
                 is written in.
-            prerequisite_skill_ids: list(str)|None. The prerequisite skill IDs
+            prerequisite_skill_ids: list(str) | None. The prerequisite skill IDs
                 for the skill.
 
         Returns:
@@ -2397,8 +2398,8 @@ class AppEngineTestBase(TestBase):
         is specified or the entire taskqueue if no queue name is specified.
 
         Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
+            queue_name: str | None. Name of the queue. Pass in None if no
+                specific queue is designated.
 
         Returns:
             int. The total number of tasks in a single queue or in the entire
@@ -2413,8 +2414,8 @@ class AppEngineTestBase(TestBase):
         specified.
 
         Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
+            queue_name: str | None. Name of the queue. Pass in None if no
+                specific queue is designated.
         """
         self._taskqueue_services_stub.process_and_flush_tasks(
             queue_name=queue_name)
@@ -2425,8 +2426,8 @@ class AppEngineTestBase(TestBase):
         name is specified.
 
         Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
+            queue_name: str | None. Name of the queue. Pass in None if no
+                specific queue is designated.
 
         Returns:
             list(Task). List of tasks in a single queue or in the entire
@@ -2669,16 +2670,16 @@ class EmailMessageMock(python_utils.OBJECT):
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|None. Optional argument. List of bcc emails. Emails
+            bcc: list(str) | None. Optional argument. List of bcc emails. Emails
                 must be utf-8.
-            reply_to: str|None. Optional argument. Reply address formatted like
-                “reply+<reply_id>@<incoming_email_domain_name> reply_id is the
-                unique id of the sender.
-            recipient_variables: dict|None. Optional argument. If batch sending
-                requires differentiating each email based on the recipient, we
-                assign a unique id to each recipient, including info relevant to
-                that recipient so that we can reference it when composing the
-                email like so:
+            reply_to: str | None. Optional argument. Reply address formatted
+                like "reply+<reply_id>@<incoming_email_domain_name>". The value
+                of reply_id is the unique id of the sender.
+            recipient_variables: dict | None. Optional argument. If batch
+                sending requires differentiating each email based on the
+                recipient, we assign a unique id to each recipient, including
+                info relevant to that recipient so that we can reference it when
+                composing the email like so:
                     recipient_variables = {
                         'bob@example.com': {'first': 'Bob', 'id': 1},
                         'alice@example.com': {'first': 'Alice', 'id': 2},
@@ -2736,16 +2737,16 @@ class GenericEmailTestBase(GenericTestBase):
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|None. Optional argument. List of bcc emails. Must be
-                utf-8.
-            reply_to: str|None. Optional Argument. Reply address formatted like
-                “reply+<reply_id>@<incoming_email_domain_name> reply_id is the
-                unique id of the sender.
-            recipient_variables: dict|None. Optional Argument. If batch sending
-                requires differentiating each email based on the recipient, we
-                assign a unique id to each recipient, including info relevant to
-                that recipient so that we can reference it when composing the
-                email like so:
+            bcc: list(str) | None. Optional argument. List of bcc emails. Must
+                be utf-8.
+            reply_to: str | None. Optional Argument. Reply address formatted
+                like "reply+<reply_id>@<incoming_email_domain_name>". The value
+                of reply_id is the unique id of the sender.
+            recipient_variables: dict | None. Optional Argument. If batch
+                sending requires differentiating each email based on the
+                recipient, we assign a unique id to each recipient, including
+                info relevant to that recipient so that we can reference it when
+                composing the email like so:
                     recipient_variables = {
                         'bob@example.com': {'first': 'Bob', 'id': 1},
                         'alice@example.com': {'first': 'Alice', 'id': 2},
