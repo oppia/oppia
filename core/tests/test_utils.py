@@ -1097,7 +1097,6 @@ class AppEngineTestBase(TestBase):
 
         self.testbed.setup_env(
             overwrite=True,
-            # https://github.com/GoogleCloudPlatform/python-compat-runtime/issues/118#issuecomment-311952878
             default_version_hostname=get_default_version_hostname())
 
         self.signup_superadmin_user()
