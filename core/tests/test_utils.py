@@ -704,9 +704,7 @@ class AppEngineTestBase(TestBase):
                 'content_id': 'content',
                 'html': 'Congratulations, you have finished!',
             },
-            'content_ids_to_audio_translations': {
-                'content': {},
-            },
+            'content_ids_to_audio_translations': {'content': {}},
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
@@ -722,10 +720,7 @@ class AppEngineTestBase(TestBase):
         },
         'Introduction': {
             'classifier_model_id': None,
-            'content': {
-                'content_id': 'content',
-                'html': '',
-            },
+            'content': {'content_id': 'content', 'html': ''},
             'content_ids_to_audio_translations': {
                 'content': {},
                 'default_outcome': {},
@@ -758,10 +753,7 @@ class AppEngineTestBase(TestBase):
                 },
                 'default_outcome': {
                     'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': '',
-                    },
+                    'feedback': {'content_id': 'default_outcome', 'html': ''},
                     'labelled_as_correct': False,
                     'missing_prerequisite_skill_id': None,
                     'param_changes': [],
@@ -2047,10 +2039,9 @@ class AppEngineTestBase(TestBase):
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
             url_fragment=url_fragment, meta_tag_content=meta_tag_content)
         commit_message = 'New story created with title \'%s\'.' % title
-        story_model.commit(owner_id, commit_message, [{
-            'cmd': story_domain.CMD_CREATE_NEW,
-            'title': title,
-        }])
+        story_model.commit(
+            owner_id, commit_message,
+            [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
 
     def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
         """Creates an Oppia subtopic and saves it.
@@ -2208,10 +2199,9 @@ class AppEngineTestBase(TestBase):
             committer_id=owner_id,
             commit_message='Created new topic rights',
             commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}])
-        topic_model.commit(owner_id, commit_message, [{
-            'cmd': topic_domain.CMD_CREATE_NEW,
-            'name': name,
-        }])
+        topic_model.commit(
+            owner_id, commit_message,
+            [{'cmd': topic_domain.CMD_CREATE_NEW, 'name': name}])
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
