@@ -16,13 +16,13 @@
  * @fileoverview Service for learner answer info.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service.ts';
-import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service.ts';
-import { State } from 'domain/state/StateObjectFactory.ts';
 import { AppConstants } from 'app.constants';
+import { State } from 'domain/state/StateObjectFactory.ts';
+import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service.ts';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -58,8 +58,8 @@ export class LearnerAnswerInfoService {
   };
 
   getRandomProbabilityIndex(): number {
-    var min = 0;
-    var max = 100;
+    const min = 0;
+    const max = 100;
     return (Math.floor(Math.random() * (max - min + 1)) + min) / 100;
   }
 
@@ -72,7 +72,7 @@ export class LearnerAnswerInfoService {
     this.currentInteractionRulesService = interactionRulesService;
     this.stateName = state.name;
     this.interactionId = state.interaction.id;
-    var defaultOutcome = state.interaction.defaultOutcome;
+    const defaultOutcome = state.interaction.defaultOutcome;
 
     if (this.submittedAnswerInfoCount === 2) {
       return;
@@ -96,13 +96,13 @@ export class LearnerAnswerInfoService {
       return;
     }
 
-    var classificationResult = (
+    const classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
         this.stateName, state.interaction, answer,
         interactionRulesService));
-    var outcome = classificationResult.outcome;
-    var thresholdProbabilityIndex = null;
-    var randomProbabilityIndex = this.getRandomProbabilityIndex();
+    const outcome = classificationResult.outcome;
+    let thresholdProbabilityIndex = null;
+    const randomProbabilityIndex = this.getRandomProbabilityIndex();
 
     if (outcome === defaultOutcome) {
       thresholdProbabilityIndex = this.probabilityIndexes.typeA;

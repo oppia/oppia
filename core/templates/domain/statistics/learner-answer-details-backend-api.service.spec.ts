@@ -63,8 +63,8 @@ describe('Learner answer info backend Api service', () => {
 
   it('should use rejection handler if learner answer backend request failed',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
         'exp123', 'Introduction', 'TextInput', 'sample answer',

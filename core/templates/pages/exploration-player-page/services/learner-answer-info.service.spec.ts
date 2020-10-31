@@ -15,22 +15,24 @@
 /**
  * @fileoverview Unit tests for the learner answer info service.
  */
-import { importAllAngularServices } from 'tests/unit-test-utils';
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerClassificationResult } from
   'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
-import { LearnerAnswerInfoService } from
-  'pages/exploration-player-page/services/learner-answer-info.service.ts';
 import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
-import { AnswerClassificationService } from './answer-classification.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
+import { LearnerAnswerInfoService } from
+  'pages/exploration-player-page/services/learner-answer-info.service.ts';
+import { ExplorationPlayerConstants } from
+ 'pages/exploration-player-page/exploration-player-page.constants';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 interface MockInteractionRulesService {
   [ruleName: string]: (
