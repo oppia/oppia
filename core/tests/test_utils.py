@@ -1130,10 +1130,16 @@ tags: []
             self.logout()
 
     @contextlib.contextmanager
-    def superadmin_context(self):
-        """Log in as a global admin under the context of a 'with' statement."""
-        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
-            yield
+    def super_admin_context(self):
+        """Log in as a global admin under the context of a 'with' statement.
+
+        Yields:
+            str. The id of the user associated to the given email, who is now
+            'logged in'.
+        """
+        email = self.SUPER_ADMIN_EMAIL
+        with self.login_context(email, is_super_admin=True) as user_id:
+            yield user_id
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
@@ -1167,7 +1173,7 @@ tags: []
         """Sets a given configuration object's value to the new value specified
         using a POST request.
         """
-        with self.superadmin_context():
+        with self.super_admin_context():
             self.post_json('/adminhandler', {
                 'action': 'save_config_properties',
                 'new_config_property_values': {
@@ -1182,7 +1188,7 @@ tags: []
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
-        with self.superadmin_context():
+        with self.super_admin_context():
             self.post_json('/adminrolehandler', {
                 'username': username,
                 'role': user_role,
