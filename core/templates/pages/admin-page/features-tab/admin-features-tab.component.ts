@@ -22,27 +22,26 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
-import {
-  PlatformParameterFilterType,
-  PlatformParameterFilterObjectFactory,
-  PlatformParameterFilter,
-} from 'domain/platform_feature/platform-parameter-filter-object.factory';
-import { PlatformParameter, FeatureStage } from
-  'domain/platform_feature/platform-parameter-object.factory';
-import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
-  'domain/platform_feature/platform-parameter-rule-object.factory';
 import { AdminFeaturesTabConstants } from
   'pages/admin-page/features-tab/admin-features-tab.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import {
+  PlatformParameterFilterType,
+  PlatformParameterFilter,
+} from 'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameter, FeatureStage } from
+  'domain/platform_feature/platform-parameter.model';
+import { PlatformParameterRule } from
+  'domain/platform_feature/platform-parameter-rule.model';
 
 @Component({
   selector: 'admin-features-tab',
@@ -111,13 +110,13 @@ export class AdminFeaturesTabComponent implements OnInit {
   };
 
   private readonly defaultNewFilter: PlatformParameterFilter =
-    this.filterFactory.createFromBackendDict({
+    PlatformParameterFilter.createFromBackendDict({
       type: PlatformParameterFilterType.ServerMode,
       conditions: []
     });
 
   private readonly defaultNewRule: PlatformParameterRule =
-    this.ruleFactory.createFromBackendDict({
+    PlatformParameterRule.createFromBackendDict({
       filters: [this.defaultNewFilter.toBackendDict()],
       value_when_matched: false
     });
@@ -132,8 +131,6 @@ export class AdminFeaturesTabComponent implements OnInit {
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
     private apiService: PlatformFeatureAdminBackendApiService,
-    private ruleFactory: PlatformParameterRuleObjectFactory,
-    private filterFactory: PlatformParameterFilterObjectFactory,
     private featureService: PlatformFeatureService,
     private dummyApiService: PlatformFeatureDummyBackendApiService,
   ) {}
@@ -243,16 +240,6 @@ export class AdminFeaturesTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  get isDummyFeatureEnabled(): boolean {
-    return this.featureService.status.DummyFeature.isEnabled;
-  }
-
-  async reloadDummyHandlerStatusAsync(): Promise<void> {
-    if (this.isDummyFeatureEnabled) {
-      this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
-    }
-  }
-
   isFeatureFlagRulesChanged(feature: PlatformParameter): boolean {
     const original = this.featureFlagNameToBackupMap.get(feature.name);
     return !isEqual(original.rules, feature.rules);
@@ -311,6 +298,16 @@ export class AdminFeaturesTabComponent implements OnInit {
       }
     }
     return issues;
+  }
+
+  get isDummyFeatureEnabled(): boolean {
+    return this.featureService.status.DummyFeature.isEnabled;
+  }
+
+  async reloadDummyHandlerStatusAsync(): Promise<void> {
+    if (this.isDummyFeatureEnabled) {
+      this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
+    }
   }
 
   ngOnInit(): void {

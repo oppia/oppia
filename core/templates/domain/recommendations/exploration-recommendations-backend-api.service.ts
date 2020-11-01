@@ -22,9 +22,8 @@ import { Injectable } from '@angular/core';
 
 import {
   LearnerExplorationSummary,
-  LearnerExplorationSummaryBackendDict,
-  LearnerExplorationSummaryObjectFactory
-} from 'domain/summary/learner-exploration-summary-object.factory';
+  LearnerExplorationSummaryBackendDict
+} from 'domain/summary/learner-exploration-summary.model';
 
 // This is the type used for params that are sent to the backend.
 // This type has optional properties because they may not be present in the URL.
@@ -48,9 +47,7 @@ export interface RecommendedExplorationSummariesBackendDict {
 })
 export class ExplorationRecommendationsBackendApiService {
   constructor(
-    private http: HttpClient,
-    private learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory) { }
+    private http: HttpClient) { }
 
   getRecommendedSummaryDicts(
       authorRecommendedExpIds: string[],
@@ -77,8 +74,8 @@ export class ExplorationRecommendationsBackendApiService {
       '/explorehandler/recommendations/' + explorationId, {
         params: recommendationsUrlParams
       }).toPromise().then(backendDict => backendDict.summaries.map(
-      summaryDict => this.learnerExplorationSummaryObjectFactory
-        .createFromBackendDict(summaryDict)));
+      summaryDict => LearnerExplorationSummary.createFromBackendDict(
+        summaryDict)));
   }
 }
 

@@ -13,29 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for CollectionObjectFactory.
+ * @fileoverview Tests for collection-model.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { CollectionNode } from
+  'domain/collection/collection-node.model';
+import { Collection } from
+  'domain/collection/collection.model';
 
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
-import { Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-
-describe('Collection object factory', () => {
-  let collectionObjectFactory: CollectionObjectFactory = null;
-  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
+describe('Collection model', () => {
   let _sampleCollection: Collection = null;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [CollectionObjectFactory]
-    });
-
-    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
-    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
-
     var sampleCollectionBackendObject = {
       id: 'sample_collection_id',
       title: 'a title',
@@ -51,7 +40,7 @@ describe('Collection object factory', () => {
         completed_exploration_ids: ['expId2']
       }
     };
-    _sampleCollection = collectionObjectFactory.create(
+    _sampleCollection = Collection.create(
       sampleCollectionBackendObject);
   });
 
@@ -84,7 +73,7 @@ describe('Collection object factory', () => {
       }
     };
     return _sampleCollection.addCollectionNode(
-      collectionNodeObjectFactory.create(collectionNodeBackendObject));
+      CollectionNode.create(collectionNodeBackendObject));
   };
 
   var _getCollectionNode = function(explorationId) {
@@ -92,7 +81,7 @@ describe('Collection object factory', () => {
   };
 
   it('should be able to create an empty collection object', () => {
-    var collection = collectionObjectFactory.createEmptyCollection();
+    var collection = Collection.createEmptyCollection();
     expect(collection.getId()).toBeNull();
     expect(collection.getTitle()).toBeNull();
     expect(collection.getCategory()).toBeNull();
@@ -136,7 +125,7 @@ describe('Collection object factory', () => {
           title: 'Test Title'
         }
       };
-      var collection = collectionObjectFactory.create({
+      var collection = Collection.create({
         id: 'collection_id',
         nodes: [collectionNodeBackendObject],
         title: null,
@@ -153,7 +142,7 @@ describe('Collection object factory', () => {
       });
       expect(collection.containsCollectionNode('exp_id0')).toBe(true);
       expect(collection.getCollectionNodes()).toEqual([
-        collectionNodeObjectFactory.create(collectionNodeBackendObject)
+        CollectionNode.create(collectionNodeBackendObject)
       ]);
     }
   );
@@ -190,13 +179,13 @@ describe('Collection object factory', () => {
           title: 'Test Title'
         }
       };
-      var collectionNode = collectionNodeObjectFactory.create(
+      var collectionNode = CollectionNode.create(
         collectionNodeBackendObject);
 
       expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
       expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(true);
       expect(_sampleCollection.getCollectionNodes()).toEqual([
-        collectionNodeObjectFactory.create(collectionNodeBackendObject)
+        CollectionNode.create(collectionNodeBackendObject)
       ]);
       expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
 
@@ -234,7 +223,7 @@ describe('Collection object factory', () => {
         title: 'Test Title'
       }
     };
-    var collectionNode = collectionNodeObjectFactory.create(
+    var collectionNode = CollectionNode.create(
       collectionNodeBackendObject);
 
     expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
@@ -302,9 +291,9 @@ describe('Collection object factory', () => {
         title: 'Test Title'
       }
     };
-    var collectionNode1 = collectionNodeObjectFactory.create(
+    var collectionNode1 = CollectionNode.create(
       collectionNodeBackendObject1);
-    var collectionNode2 = collectionNodeObjectFactory.create(
+    var collectionNode2 = CollectionNode.create(
       collectionNodeBackendObject2);
 
     _sampleCollection.addCollectionNode(collectionNode1);
@@ -352,10 +341,10 @@ describe('Collection object factory', () => {
         }
       };
       _sampleCollection.addCollectionNode(
-        collectionNodeObjectFactory.create(collectionNodeBackendObject));
+        CollectionNode.create(collectionNodeBackendObject));
 
       var collectionNodeBefore = _getCollectionNode('exp_id0');
-      expect(collectionNodeBefore).toEqual(collectionNodeObjectFactory.create(
+      expect(collectionNodeBefore).toEqual(CollectionNode.create(
         collectionNodeBackendObject));
     }
   );
@@ -438,7 +427,7 @@ describe('Collection object factory', () => {
   });
 
   it('should be able to copy from another collection', () => {
-    var secondCollection = collectionObjectFactory.create({
+    var secondCollection = Collection.create({
       id: 'col_id0',
       title: 'Another title',
       objective: 'Another objective',
@@ -453,7 +442,7 @@ describe('Collection object factory', () => {
         completed_exploration_ids: ['expId2']
       }
     });
-    secondCollection.addCollectionNode(collectionNodeObjectFactory.create({
+    secondCollection.addCollectionNode(CollectionNode.create({
       exploration_id: 'exp_id5',
       exploration_summary: {
         last_updated_msec: 1591296737470.528,

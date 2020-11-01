@@ -18,12 +18,10 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-update.service.ts is upgraded to Angular 8.
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from
-  'domain/collection/CollectionPlaythroughObjectFactory';
+import { Change } from
+  'domain/editor/undo_redo/change.model';
+import { Collection, CollectionBackendDict } from
+  'domain/collection/collection.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -32,7 +30,6 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 
 describe('Collection update service', function() {
   var CollectionUpdateService = null;
-  var collectionObjectFactory = null;
   var UndoRedoService = null;
   var _sampleCollection = null;
   var _sampleExplorationSummaryBackendObject = {
@@ -42,12 +39,7 @@ describe('Collection update service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
-    $provide.value(
-      'CollectionObjectFactory', new CollectionObjectFactory(
-        new CollectionNodeObjectFactory(),
-        new CollectionPlaythroughObjectFactory()));
+    $provide.value('ChangeObjectFactory', Change);
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -58,10 +50,9 @@ describe('Collection update service', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
-    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
-    var sampleCollectionBackendObject = {
+    const sampleCollectionBackendObject = {
       id: 'collection_id',
       title: 'a title',
       objective: 'an objective',
@@ -78,8 +69,9 @@ describe('Collection update service', function() {
         completed_exploration_ids: ['expId2']
       }
     };
-    _sampleCollection = collectionObjectFactory.create(
-      sampleCollectionBackendObject);
+    _sampleCollection = Collection.create(
+      // TODO(#10875): Fix type mismatch.
+      sampleCollectionBackendObject as unknown as CollectionBackendDict);
   }));
 
   it('should add/remove a new collection node to/from a collection',
