@@ -97,7 +97,7 @@ angular.module('oppia').component('stateTranslation', {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       $scope.isVoiceoverModeActive = function() {
-        return TranslationTabActiveModeService.isVoiceoverModeActive();
+        return (TranslationTabActiveModeService.isVoiceoverModeActive());
       };
       var isTranslatedTextRequired = function() {
         return (

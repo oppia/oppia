@@ -479,6 +479,7 @@ describe('State translation component', function() {
       refreshStateTranslationEmitter.emit();
 
       expect($scope.isActive('content')).toBe(true);
+      expect($scope.isVoiceoverModeActive()).toBe(true);
       expect($scope.isDisabled('content')).toBe(false);
       expect(translationTabActiveContentIdService.setActiveContent)
         .toHaveBeenCalledWith('content_1', 'html');
@@ -782,6 +783,7 @@ describe('State translation component', function() {
       $scope.onTabClick('content');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect($scope.isVoiceoverModeActive()).toBe(false);
       expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
