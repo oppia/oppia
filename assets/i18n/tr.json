@@ -128,7 +128,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_1": "Geri bildirim konuları ve önerileri",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "Diğer sahipleri olan halka açık keşiflere ve koleksiyonlara yapılan taahhütler",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_3": "Konular, hikayeler, beceriler ve sorulara verilen taahhütler",
-	"I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT": "Hesabınızı gerçekten silmek istiyor musunuz? <strong>Bu işlem geri alınamaz.</strong>",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "Bu işlem, bu kullanıcı hesabını ve bu hesapla ilişkili tüm özel verileri siler. Zaten herkese açık olan veriler anonimleştirilir, böylece bu hesapla ilişkilendirilemez. Aşağıda belirtilen kategorilerden bazıları hesabınız için geçerli olmayabilir.",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Genel bakış",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "Silinecek veri türleri şunlardır:",

@@ -125,7 +125,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_1": "Tópicos e sugestões",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "Estatísticas dos usuários",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_3": "Explorações públicas e coleções que têm outros proprietários",
-	"I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT": "Deseja mesmo excluir sua conta? <strong>Esta ação não pode ser revertida.</strong>",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "Esta ação excluirá esta conta de usuário e também todos os dados privados associados a esta conta. Os dados que já são públicos serão anonimizados, para que não possam ser associados a esta conta. A propriedade de alguns desses dados pode ser transferida para a comunidade. Aqui está um resumo dos dados que serão excluídos:",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Visão geral",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "Resumo dos dados que serão anonimizados:",

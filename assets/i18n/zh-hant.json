@@ -128,7 +128,6 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_1": "意見回饋與建議",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "被其他擁有者擁有的公開探索與收藏的提交",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_3": "對於主題、故事、技能、與問題的提交",
-	"I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT": "您確定要刪除您的帳號嗎？<strong>此操作將無法還原。</strong>",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "此操作將會刪除該用戶帳號，與所有關聯該帳號的私有資料。已公開的資料因為無法與帳號關聯，因此會匿名處理。以下提及的一些分類可能不適用於您的帳號。",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "概要",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "此為將會被刪除掉的資料類型：",
