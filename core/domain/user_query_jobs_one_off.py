@@ -85,7 +85,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 query_criteria_satisfied &= (
                     difference >= query_model.inactive_in_last_n_days)
             else:
-                query_criteria_satisfied &= False
+                query_criteria_satisfied = False
 
         if query_model.created_at_least_n_exps is not None:
             query_criteria_satisfied &= (

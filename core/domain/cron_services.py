@@ -34,7 +34,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
 PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
-MODEL_CLASSES_TO_MARK_AS_DELETED = [user_models.UserQueryModel]
+MODEL_CLASSES_TO_MARK_AS_DELETED = (user_models.UserQueryModel,)
 
 
 def get_stuck_jobs(recency_msecs):

@@ -243,7 +243,7 @@ class CronModelsCleanupHandler(base.BaseHandler):
         models (that we shouldn't keep for long time) mark them as deleted if
         they were last updated more than some period of time ago.
 
-        The time periods are specified in the cron_services as a constants.
+        The time periods are specified in the cron_services as a constant.
         """
         cron_services.delete_models_marked_as_deleted()
         cron_services.mark_outdated_models_as_deleted()
