@@ -29,7 +29,7 @@ export class WindowRef {
     return window;
   }
   /**
-  * @returns the global native browser window object
+  * @returns The global native browser window object.
   */
   get nativeWindow(): Window {
     return this._window();
