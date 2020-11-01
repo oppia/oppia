@@ -586,6 +586,7 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
             classifier_training_job.next_scheduled_check_time = (
                 datetime.datetime.utcnow())
             classifier_training_job.status = feconf.TRAINING_JOB_STATUS_NEW
+            classifier_training_job.update_timestamps()
             classifier_training_job.put()
 
     if algorithm_ids_to_remove:
@@ -602,6 +603,7 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
     state_training_jobs_mapping.validate()
     state_training_jobs_mapping_model.algorithm_ids_to_job_ids = (
         state_training_jobs_mapping.algorithm_ids_to_job_ids)
+    state_training_jobs_mapping_model.update_timestamps()
     state_training_jobs_mapping_model.put()
 
 
