@@ -29,7 +29,6 @@ from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -752,74 +751,6 @@ class CollectionSummaryModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_node_count]
-
-
-class ConfigPropertyModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating ConfigPropertyModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return r'^[A-Za-z0-9_]{1,100}$'
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        snapshot_model_ids = [
-            '%s-%d' % (item.id, version)
-            for version in python_utils.RANGE(1, item.version + 1)]
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'snapshot_metadata_ids',
-                config_models.ConfigPropertySnapshotMetadataModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'snapshot_content_ids',
-                config_models.ConfigPropertySnapshotContentModel,
-                snapshot_model_ids)]
-
-
-class ConfigPropertySnapshotMetadataModelValidator(
-        base_model_validators.BaseSnapshotMetadataModelValidator):
-    """Class for validating ConfigPropertySnapshotMetadataModel."""
-
-    EXTERNAL_MODEL_NAME = 'config property'
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return r'^[A-Za-z0-9_]{1,100}-\d+$'
-
-    @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return config_domain.ConfigPropertyChange
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'config_property_ids',
-                config_models.ConfigPropertyModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel, [item.committer_id])]
-
-
-class ConfigPropertySnapshotContentModelValidator(
-        base_model_validators.BaseSnapshotContentModelValidator):
-    """Class for validating ConfigPropertySnapshotContentModel."""
-
-    EXTERNAL_MODEL_NAME = 'config property'
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return r'^[A-Za-z0-9_]{1,100}-\d+$'
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'config_property_ids',
-                config_models.ConfigPropertyModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class ExplorationModelValidator(base_model_validators.BaseModelValidator):
