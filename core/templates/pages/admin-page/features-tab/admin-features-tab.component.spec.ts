@@ -24,19 +24,19 @@ import { FormsModule } from '@angular/forms';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
-import { PlatformParameterFilterType, ServerMode } from
-  'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { AdminFeaturesTabComponent } from
   'pages/admin-page/features-tab/admin-features-tab.component';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { PlatformParameterFilterType, ServerMode } from
+  'domain/platform_feature/platform-parameter-filter.model';
+import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
