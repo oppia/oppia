@@ -1129,9 +1129,11 @@ tags: []
         finally:
             self.logout()
 
+    @contextlib.contextmanager
     def superadmin_context(self):
         """Log in as a global admin under the context of a 'with' statement."""
-        return self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
+            yield
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
