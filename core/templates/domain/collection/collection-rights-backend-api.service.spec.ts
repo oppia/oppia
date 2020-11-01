@@ -63,7 +63,7 @@ describe('Collection rights backend API service', function() {
     httpTestingController.verify();
   });
 
-  describe('when .fetchCollectionRights is called', () => {
+  describe('when .fetchCollectionRightsAsync is called', () => {
     it('should fetch collection rights', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -112,7 +112,7 @@ describe('Collection rights backend API service', function() {
       }));
   });
 
-  describe('when .setCollectionPublic is called', () => {
+  describe('when .setCollectionPublicAsync is called', () => {
     it('should successfully set a collection to be public', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -161,7 +161,7 @@ describe('Collection rights backend API service', function() {
       }));
   });
 
-  describe('when .setCollectionPrivate is called', () => {
+  describe('when .setCollectionPrivateAsync is called', () => {
     it('should successfully set a collection to be public', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -210,7 +210,7 @@ describe('Collection rights backend API service', function() {
       }));
   });
 
-  describe('when .loadCollectionRights is called', () => {
+  describe('when .loadCollectionRightsAsync is called', () => {
     it('should report a cached collection rights after caching it',
       fakeAsync(() => {
         let successHandler = jasmine.createSpy('success');
