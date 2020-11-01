@@ -36,7 +36,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class AutoplayedVideosService {
-  autoplayedVideosDict: {[key:string]:boolean} = {};
+  autoplayedVideosDict: { [key: string]: boolean } = {};
 
   /**
    * Adds video to the autoplayed videos dictionary.
