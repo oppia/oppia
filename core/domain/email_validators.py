@@ -26,12 +26,9 @@ from core.platform import models
 
 (
     base_models, email_models, feedback_models,
-    suggestion_models, user_models
-) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.email, models.NAMES.feedback,
-    models.NAMES.suggestion, models.NAMES.user
-
-])
+    suggestion_models, user_models,) = models.Registry.import_models([
+        models.NAMES.base_model, models.NAMES.email, models.NAMES.feedback,
+        models.NAMES.suggestion, models.NAMES.user])
 
 USER_ID_REGEX = 'uid_[a-z]{32}'
 
