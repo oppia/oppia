@@ -37,12 +37,12 @@ interface FetchStoryBackendResponse {
 }
 
 interface FetchStoryResponse {
-  'story': StoryBackendDict;
-  'topicName': string;
-  'storyIsPublished': boolean;
-  'skillSummaries': SkillSummaryBackendDict[];
-  'topicUrlFragment': string;
-  'classroomUrlFragment': string;
+  story: StoryBackendDict;
+  topicName: string;
+  storyIsPublished: boolean;
+  skillSummaries: SkillSummaryBackendDict[];
+  topicUrlFragment: string;
+  classroomUrlFragment: string;
 }
 
 interface UpdateStoryBackendResponse {
