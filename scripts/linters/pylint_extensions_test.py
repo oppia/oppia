@@ -2921,3 +2921,4 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
+        
