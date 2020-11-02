@@ -113,7 +113,7 @@ describe('Solution Verification Service', function() {
             },
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: 'abc'}
+              inputs: {x: ['abc']}
             }],
           }],
           customization_args: {

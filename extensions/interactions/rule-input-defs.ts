@@ -227,7 +227,7 @@ export interface SetInputRuleInputs {
 }
 
 export interface TextInputRuleInputs {
-  x: string;
+  x: string[];
 }
 
 export type InteractionRuleInputs = (

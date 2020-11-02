@@ -32,20 +32,39 @@ describe('Text Input rules service', () => {
     tirs = TestBed.get(TextInputRulesService);
   });
 
-  var RULE_INPUT = {
-    x: 'abc def'
+  const RULE_INPUT = {
+    x: ['abc def']
+  };
+
+  const RULE_INPUT_PLURAL = {
+    x: ['testing', 'abc def']
+  };
+
+  const RULE_INPUT_EMPTY = {
+    x: []
   };
 
   it('should have a correct \'equals\' rule', () => {
+    expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
+
     expect(tirs.Equals('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('ABC def', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('abc DeF', RULE_INPUT)).toBe(true);
     expect(tirs.Equals(' abc   DeF ', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('', RULE_INPUT)).toBe(false);
     expect(tirs.Equals('abc', RULE_INPUT)).toBe(false);
+
+    expect(tirs.Equals('abc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Equals('ABC def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Equals('abc DeF', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Equals(' abc   DeF ', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Equals('', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.Equals('abc', RULE_INPUT_PLURAL)).toBe(false);
   });
 
   it('should have a correct \'fuzzy equals\' rule', () => {
+    expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
+
     expect(tirs.FuzzyEquals('ABC DEF', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('acc def', RULE_INPUT)).toBe(true);
@@ -59,18 +78,43 @@ describe('Text Input rules service', () => {
     expect(tirs.FuzzyEquals('abc', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('dbc deg', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT)).toBe(false);
+
+    expect(tirs.FuzzyEquals('ABC DEF', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('abc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('acc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('ab def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('cbc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('abcd def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('abc defg', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('aBC DEfg', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('aabc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals(' aBC  DEfg  ', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.FuzzyEquals('abc', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.FuzzyEquals('dbc deg', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT_PLURAL)).toBe(false);
   });
 
   it('should have a correct \'starts with\' rule', () => {
+    expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
+
     expect(tirs.StartsWith('  ABC  DEFGHI', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('abc defghi', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('ABC DEFGHI', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('fabc defghi', RULE_INPUT)).toBe(false);
     expect(tirs.StartsWith('cde', RULE_INPUT)).toBe(false);
+
+    expect(tirs.StartsWith('  ABC  DEFGHI', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.StartsWith('abc defghi', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.StartsWith('ABC DEFGHI', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.StartsWith('abc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.StartsWith('fabc defghi', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.StartsWith('cde', RULE_INPUT_PLURAL)).toBe(false);
   });
 
   it('should have a correct \'contains\' rule', () => {
+    expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
+
     expect(tirs.Contains(' abc  def', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('ghabc defjk', RULE_INPUT)).toBe(true);
@@ -78,5 +122,13 @@ describe('Text Input rules service', () => {
     expect(tirs.Contains('abcdef', RULE_INPUT)).toBe(false);
     expect(tirs.Contains('fabcd', RULE_INPUT)).toBe(false);
     expect(tirs.Contains('ab', RULE_INPUT)).toBe(false);
+
+    expect(tirs.Contains(' abc  def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Contains('abc def', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Contains('ghabc defjk', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Contains('GHABC DEFJK', RULE_INPUT_PLURAL)).toBe(true);
+    expect(tirs.Contains('abcdef', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.Contains('fabcd', RULE_INPUT_PLURAL)).toBe(false);
+    expect(tirs.Contains('ab', RULE_INPUT_PLURAL)).toBe(false);
   });
 });

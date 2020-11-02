@@ -689,7 +689,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': 'Test'
+                        'x': ['Test']
                     },
                     'rule_type': 'Contains'
                 }],
@@ -710,7 +710,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': 'Test'
+                        'x': ['Test']
                     },
                     'rule_type': 'Contains'
                 }],
@@ -731,7 +731,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': 'Test'
+                        'x': ['Test']
                     },
                     'rule_type': 'Contains'
                 }],
@@ -828,7 +828,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': 'Test'
+                        'x': ['Test']
                     },
                     'rule_type': 'Contains'
                 }],
@@ -849,7 +849,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': 'Test'
+                        'x': ['Test']
                     },
                     'rule_type': 'Contains'
                 }],
@@ -870,7 +870,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': 'Test'
+                        'x': ['Test']
                     },
                     'rule_type': 'Contains'
                 }],
@@ -2276,7 +2276,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             migrated_rule_spec,
             {
-                'inputs': {'x': 'test'},
+                'inputs': {'x': ['test']},
                 'rule_type': 'Equals'
             })
 

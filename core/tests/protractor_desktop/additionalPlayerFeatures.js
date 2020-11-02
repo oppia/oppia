@@ -433,7 +433,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'),
-      'End', true, 'Equals', 'Finnish');
+      'End', true, 'Equals', ['Finnish']);
     await (
       await explorationEditorMainTab.getResponseEditor('default')
     ).setFeedback(await forms.toRichText('Try again'));

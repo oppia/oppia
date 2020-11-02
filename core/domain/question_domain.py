@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import copy
 import datetime
 import re
@@ -761,6 +762,36 @@ class Question(python_utils.OBJECT):
                 'ca_placeholder_0'] = {}
             question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
                 'ca_placeholder_0'] = {}
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v39_dict_to_v40_dict(cls, question_state_dict):
+        """Converts from version 39 to 40. Version 40 converts TextInput rule
+        inputs from NormalizedString to SetOfNormalizedString.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] != 'TextInput':
+            return question_state_dict
+
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            rule_type_to_inputs = collections.defaultdict(set)
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                rule_type = rule_spec_dict['rule_type']
+                rule_inputs = rule_spec_dict['inputs']['x']
+                rule_type_to_inputs[rule_type].add(rule_inputs)
+            answer_group_dict['rule_specs'] = [{
+                'rule_type': rule_type,
+                'inputs': {'x': list(rule_type_to_inputs[rule_type])}
+            } for rule_type in rule_type_to_inputs]
 
         return question_state_dict
 

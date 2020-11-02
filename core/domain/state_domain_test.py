@@ -398,7 +398,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Equals'
             }],
@@ -1081,7 +1081,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -1244,7 +1244,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -3157,7 +3157,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -3617,7 +3617,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': []
+                    'x': [[]]
                 },
                 'rule_type': 'Contains'
             }],
@@ -3628,7 +3628,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '[] has the wrong type. It should be a NormalizedString.')):
+                '[[]] has the wrong type. It should be a SetOfNormalizedString.'
+            )
+        ):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
 
@@ -3656,7 +3658,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
