@@ -124,7 +124,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'fraction-input-validation.service.ts',
     'generatedParser.ts',
     'google-analytics.initializer.ts',
-    'graph-detail.service.ts',
     'graph-editor.directive.ts',
     'graph-input-rules.service.ts',
     'graph-input-validation.service.ts',
