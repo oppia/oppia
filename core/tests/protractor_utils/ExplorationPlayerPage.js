@@ -178,11 +178,13 @@ var ExplorationPlayerPage = function() {
   };
 
   this.viewHint = async function() {
+    browser.waitForAngularEnabled(false);
     // We need to wait some time for the solution to activate.
     await waitFor.elementToBeClickable(
       viewHintButton, '"View Hint" button takes too long to be clickable');
     await viewHintButton.click();
     await clickGotItButton();
+    browser.waitForAngularEnabled(true);
   };
 
   this.viewSolution = async function() {
