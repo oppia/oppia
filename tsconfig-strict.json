@@ -62,6 +62,8 @@
     "core/templates/services/csrf-token.service.spec.ts",
     "core/templates/services/date-time-format.service.ts",
     "core/templates/services/date-time-format.service.spec.ts",
+    "core/templates/services/i18n-language-code.service.ts",
+    "core/templates/services/i18n-language-code.service.spec.ts",
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
