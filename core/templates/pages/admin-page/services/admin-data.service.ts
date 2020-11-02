@@ -35,7 +35,7 @@ export class AdminDataService {
     this.dataPromise = null;
   }
 
-  _getDataAsync(): Promise<AdminPageData> {
+  async _getDataAsync(): Promise<AdminPageData> {
     if (this.dataPromise) {
       return this.dataPromise;
     }
@@ -45,7 +45,7 @@ export class AdminDataService {
     return this.dataPromise;
   }
 
-  getDataAsync(): Promise<AdminPageData> {
+  async getDataAsync(): Promise<AdminPageData> {
     return this._getDataAsync();
   }
 }
