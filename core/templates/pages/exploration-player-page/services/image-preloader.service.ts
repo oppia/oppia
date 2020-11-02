@@ -209,7 +209,7 @@ export class ImagePreloaderService {
     return new Promise((resolve, reject) => {
       if (this.assetsBackendApiService.isCached(filename) ||
           this.isInFailedDownload(filename)) {
-        this.assetsBackendApiService.loadImage(
+        this.assetsBackendApiService.loadImageAsync(
           this.contextService.getEntityType(),
           this.contextService.getEntityId(), filename
         ).then(
@@ -288,7 +288,7 @@ export class ImagePreloaderService {
    * @param {string} imageFilename - The filename of the image to be loaded.
    */
   private loadImage(imageFilename: string): void {
-    this.assetsBackendApiService.loadImage(
+    this.assetsBackendApiService.loadImageAsync(
       AppConstants.ENTITY_TYPE.EXPLORATION,
       this.contextService.getExplorationId(), imageFilename
     ).then(

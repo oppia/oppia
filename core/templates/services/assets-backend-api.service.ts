@@ -66,7 +66,7 @@ export class AssetsBackendApiService {
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
   }
 
-  async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
+  async loadAudioAsync(explorationId: string, filename: string): Promise<AudioFile> {
     if (this.isCached(filename)) {
       return new AudioFile(filename, this.assetsCache.get(filename));
     }
@@ -75,7 +75,7 @@ export class AssetsBackendApiService {
       AppConstants.ASSET_TYPE_AUDIO);
   }
 
-  async loadImage(
+  async loadImageAsync(
       entityType: string, entityId: string,
       filename: string): Promise<ImageFile> {
     if (this.isCached(filename)) {
@@ -85,7 +85,7 @@ export class AssetsBackendApiService {
       entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
   }
 
-  async saveAudio(
+  async saveAudioAsync(
       explorationId: string, filename: string,
       rawAssetData: Blob): Promise<SaveAudioResponse> {
     const form = new FormData();
@@ -100,7 +100,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  async saveMathExpresionImage(
+  async saveMathExpresionImageAsync(
       resampledFile: Blob, filename: string, entityType: string,
       entityId: string): Promise<SaveImageResponse> {
     const form = new FormData();
