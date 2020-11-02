@@ -93,6 +93,7 @@ export class HintsAndSolutionManagerService {
   }
   releaseSolution(): void {
     this.solutionReleased = true;
+    this._timeoutElapsedEventEmitter.next();
   }
   accelerateHintRelease(): void {
     this.enqueueTimeout(this.releaseHint, this.ACCELERATED_HINT_WAIT_TIME_MSEC);
