@@ -56,6 +56,8 @@
     "core/templates/services/app.service.spec.ts",
     "core/templates/services/audio-bar-status.service.ts",
     "core/templates/services/audio-bar-status.service.spec.ts",
+    "core/templates/services/autoplayed-videos.service.ts",
+    "core/templates/services/autoplayed-videos.service.spec.ts",
     "core/templates/services/editability.service.ts",
     "core/templates/services/editability.service.spec.ts",
     "core/templates/services/csrf-token.service.ts",
