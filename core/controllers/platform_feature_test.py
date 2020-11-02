@@ -89,18 +89,71 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                 result,
                 {self.dev_feature.name: False, self.prod_feature.name: True})
 
-    def test_get_with_invalid_client_type_context_raises_400(self):
-        resp_dict = self.get_json(
-            '/platform_features_evaluation_handler',
-            params={
-                'client_type': 'Invalid',
-                'app_version': '1.0.0',
-                'user_locale': 'en',
-            },
-            expected_status_int=400
-        )
-        self.assertEqual(
-            resp_dict['error'],
-            'Invalid client type \'Invalid\', must be one of [u\'Web\', '
-            'u\'Android\'].'
-        )
+    def test_get_features_invalid_client_type_returns_features_disabled(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'client_type': 'invalid',
+                    'user_locale': 'en',
+                },
+                expected_status_int=200
+            )
+            self.assertEqual(
+                result,
+                {self.dev_feature.name: False, self.prod_feature.name: False})
+
+    def test_get_features_missing_client_type_returns_features_disabled(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'user_locale': 'en',
+                }
+            )
+            self.assertEqual(
+                result,
+                {self.dev_feature.name: False, self.prod_feature.name: False})
+
+    def test_get_features_invalid_user_locale_returns_features_disabled(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'client_type': 'Android',
+                    'user_locale': 'invalid',
+                },
+                expected_status_int=200
+            )
+            self.assertEqual(
+                result,
+                {self.dev_feature.name: False, self.prod_feature.name: False})
+
+    def test_get_features_missing_user_locale_returns_features_disabled(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'client_type': 'Android',
+                }
+            )
+            self.assertEqual(
+                result,
+                {self.dev_feature.name: False, self.prod_feature.name: False})
+
+    def test_get_features_invalid_version_flavor_raises_400(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            resp_dict = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
+                    'client_type': 'Android',
+                    'app_version': '1.0.0-abcdefg-invalid',
+                    'user_locale': 'en',
+                },
+                expected_status_int=400
+            )
+            self.assertEqual(
+                resp_dict['error'],
+                'Invalid version flavor \'invalid\', must be one of '
+                '[u\'test\', u\'alpha\', u\'beta\', u\'release\'] if specified.'
+            )
