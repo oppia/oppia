@@ -192,11 +192,26 @@ class BaseHandler(webapp2.RequestHandler):
                     user_settings = user_services.create_new_user(
                         self.gae_id, email)
                 else:
-                    logging.error(
-                        'Cannot find user %s with email %s on page %s'
-                        % (self.gae_id, email, self.request.uri))
-                    _clear_login_cookies(self.response.headers)
-                    return
+                    for _ in range(5):
+                        logging.error(
+                            'Cannot find user %s with email %s on page %s'
+                            % (self.gae_id, email, self.request.uri))
+                        time.sleep(2)
+                        user_settings = (
+                            user_services.get_user_settings_by_gae_id(
+                                self.gae_id, strict=False))
+                        if user_settings is not None:
+                            logging.error(
+                                'Found user %s with email %s on page %s'
+                                % (self.gae_id, email, self.request.uri))
+                            break
+                    else:
+                        _clear_login_cookies(self.response.headers)
+                        return
+            else:
+                logging.error(
+                    'Found user %s on page %s'
+                    % (self.gae_id, self.request.uri))
 
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
