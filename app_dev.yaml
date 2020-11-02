@@ -298,6 +298,7 @@ skip_files:
 - third_party/static/bower-angular-translate-loader-static-files-2.18.1/
 - third_party/static/bower-angular-translate-storage-cookie-2.18.1/
 - third_party/static/bower-material-1.1.19/
+- third_party/python_libs/certifi
 - third_party/python_libs/google/appengine/
 - third_party/python_libs/google/net/
 - third_party/python_libs/google_auth_oauthlib/
