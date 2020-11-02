@@ -6,13 +6,15 @@
               cy="25"
               r="20"
               stroke-dasharray="<[$ctrl.getStrokeDashArrayValues()]>"
-              stroke-dashoffset="-2.5"/>
+              stroke-dashoffset="-2.5"
+              stroke-linecap="round"/>
       <circle class="story-progress-circle completed-circle"
               cx="25"
               cy="25"
               r="20"
               stroke-dasharray="<[$ctrl.getCompletedStrokeDashArrayValues()]>"
-              stroke-dashoffset="-2.5"/>
+              stroke-dashoffset="-2.5"
+              stroke-linecap="<[$ctrl.completedStoriesCount ? 'round' : 'butt']>"/>
       <text x="25"
             y="-20"
             text-anchor="middle"
