@@ -148,8 +148,8 @@ describe('Assets Backend API Service', () => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
 
-      assetsBackendApiService.saveAudioAsync('0', 'a.mp3', new File([], 'a.mp3'))
-        .then(onSuccess, onFailure);
+      assetsBackendApiService.saveAudioAsync(
+        '0', 'a.mp3', new File([], 'a.mp3')).then(onSuccess, onFailure);
       flushMicrotasks();
 
       httpTestingController.expectOne('/createhandler/audioupload/0')

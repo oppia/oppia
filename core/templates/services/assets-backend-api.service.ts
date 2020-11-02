@@ -66,7 +66,8 @@ export class AssetsBackendApiService {
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
   }
 
-  async loadAudioAsync(explorationId: string, filename: string): Promise<AudioFile> {
+  async loadAudioAsync(
+    explorationId: string, filename: string): Promise<AudioFile> {
     if (this.isCached(filename)) {
       return new AudioFile(filename, this.assetsCache.get(filename));
     }
