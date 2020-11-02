@@ -103,7 +103,8 @@ describe('Add Audio Translation Modal Controller', function() {
     $scope.updateUploadedFile(file);
 
     spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(AssetsBackendApiService, 'saveAudioAsync').and.returnValue($q.reject({}));
+    spyOn(AssetsBackendApiService, 'saveAudioAsync')
+    .and.returnValue($q.reject({}));
     $scope.confirm();
 
     expect($scope.saveButtonText).toBe('Saving...');
