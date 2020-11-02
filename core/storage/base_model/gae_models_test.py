@@ -371,6 +371,11 @@ class TestVersionedModel(base_models.VersionedModel):
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
+    def test_get_deletion_policy_is_locally_pseudonymize(self):
+        self.assertEqual(
+            base_models.BaseCommitLogEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
     def test_base_class_get_instance_id_raises_not_implemented_error(self):
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
