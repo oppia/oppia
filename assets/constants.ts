@@ -4877,6 +4877,9 @@ export = {
     "id": "fr",
     "text": "français (French)"
   }, {
+    "id": "kab",
+    "text": "Taqbaylit (Kabyle)"
+  }, {
     "id": "pt-br",
     "text": "Português (Brasil)"
   }, {
@@ -4888,6 +4891,9 @@ export = {
   }, {
     "id": "vi",
     "text": "Tiếng Việt"
+  }, {
+    "id": "tr",
+    "text": "Türkçe (Turkish)"
   }, {
     "id": "hi",
     "text": "हिन्दी"
