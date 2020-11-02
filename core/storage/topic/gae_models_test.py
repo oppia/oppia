@@ -30,6 +30,14 @@ import feconf
     [models.NAMES.base_model, models.NAMES.topic, models.NAMES.user])
 
 
+class TopicSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            topic_models.TopicSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class TopicModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicModel class."""
 
@@ -40,11 +48,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            topic_models.TopicModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
@@ -118,11 +122,6 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the TopicCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            topic_models.TopicCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
     def test_has_reference_to_user_id(self):
         commit = topic_models.TopicCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
@@ -164,11 +163,41 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
+class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    TOPIC_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
+
+    def test_get_deletion_policy_is_locally_pseudonymize(self):
+        self.assertEqual(
+            topic_models.TopicRightsSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_ID_1,
+            manager_ids=[self.USER_ID_1, self.USER_ID_2],
+        ).commit(
+            self.USER_ID_COMMITTER, 'Created new topic right',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
+        self.assertTrue(
+            topic_models.TopicRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            topic_models.TopicRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_2))
         self.assertFalse(
-            topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
+            topic_models.TopicRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
+        self.assertFalse(
+            topic_models.TopicRightsSnapshotContentModel
+            .has_reference_to_user_id('x_id'))
 
 
 class TopicRightsModelUnitTests(test_utils.GenericTestBase):
@@ -210,7 +239,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
