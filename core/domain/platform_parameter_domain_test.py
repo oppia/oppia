@@ -105,6 +105,74 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         self.assertEqual(context.user_locale, 'en')
         self.assertEqual(context.server_mode, 'dev')
 
+    def test_is_valid_with_invalid_client_type_returns_false(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'invalid',
+                'browser_type': None,
+                'app_version': '1.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertFalse(context.is_valid)
+
+    def test_is_valid_with_invalid_user_locale_returns_false(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Android',
+                'browser_type': None,
+                'app_version': '1.0.0',
+                'user_locale': 'invalid',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertFalse(context.is_valid)
+
+    def test_is_valid_with_valid_android_context_returns_true(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Android',
+                'browser_type': None,
+                'app_version': '1.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertTrue(context.is_valid)
+
+    def test_is_valid_with_valid_web_context_returns_true(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Web',
+                'browser_type': 'Chrome',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertTrue(context.is_valid)
+
+    def test_is_valid_with_valid_backend_context_returns_true(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Backend',
+                'app_version': '3.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertTrue(context.is_valid)
+
     def test_validate_with_valid_context_passes_without_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
@@ -119,7 +187,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         )
         context.validate()
 
-    def test_validate_with_invalid_client_type_raises_exception(self):
+    def test_validate_with_invalid_client_type_does_not_raise_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_type': 'invalid',
@@ -131,9 +199,8 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'server_mode': 'dev',
             },
         )
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid client type \'invalid\''):
-            context.validate()
+        # No exception should be raised since invalid client types are ignored.
+        context.validate()
 
     def test_validate_with_invalid_browser_type_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
@@ -200,7 +267,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid version flavor \'invalid\''):
             context.validate()
 
-    def test_validate_with_invalid_user_locale_raises_exception(self):
+    def test_validate_with_invalid_user_locale_does_not_raise_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_type': 'Android',
@@ -212,9 +279,8 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'server_mode': 'dev',
             },
         )
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid user locale \'invalid\''):
-            context.validate()
+        # No exception should be raised since invalid user locales are ignored.
+        context.validate()
 
     def test_validate_with_invalid_server_mode_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
@@ -334,6 +400,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         zh_context = self._create_example_context(user_locale='zh-hans')
         self.assertFalse(filter_domain.evaluate(zh_context))
+
+    def test_eval_backend_client_filter_with_backend_client_returns_true(self):
+        filter_dict = {'type': 'client_type', 'conditions': [('=', 'Backend')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+
+        web_context = self._create_example_context(client_type='Backend')
+        self.assertTrue(filter_domain.evaluate(web_context))
 
     def test_evaluate_web_client_filter_with_web_client_returns_true(self):
         filter_dict = {'type': 'client_type', 'conditions': [('=', 'Web')]}
@@ -1631,6 +1706,148 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
+
+    def test_evaluate_matching_feature_invalid_client_type_returns_def(self):
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', 'dev')]
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111',
+            'is_feature': False,
+            'feature_stage': None,
+        })
+
+        dev_context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'invalid',
+                'browser_type': None,
+                'app_version': '1.2.3',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertEqual(parameter.evaluate(dev_context), '111')
+
+    def test_evaluate_matching_feature_missing_client_type_returns_def(self):
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', 'dev')]
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111',
+            'is_feature': False,
+            'feature_stage': None,
+        })
+
+        dev_context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'browser_type': None,
+                'app_version': '1.2.3',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertEqual(parameter.evaluate(dev_context), '111')
+
+    def test_evaluate_matching_feature_invalid_user_locale_returns_def(self):
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', 'dev')]
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111',
+            'is_feature': False,
+            'feature_stage': None,
+        })
+
+        dev_context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Android',
+                'browser_type': None,
+                'app_version': '1.2.3',
+                'user_locale': 'invalid',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertEqual(parameter.evaluate(dev_context), '111')
+
+    def test_evaluate_matching_feature_missing_user_locale_returns_def(self):
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', 'dev')]
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111',
+            'is_feature': False,
+            'feature_stage': None,
+        })
+
+        dev_context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Android',
+                'browser_type': None,
+                'app_version': '1.2.3',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        self.assertEqual(parameter.evaluate(dev_context), '111')
 
     def test_validate_feature_passes_without_exception(self):
         parameter = parameter_domain.PlatformParameter.from_dict({
