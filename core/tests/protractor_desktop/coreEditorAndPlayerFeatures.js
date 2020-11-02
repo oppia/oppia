@@ -448,7 +448,7 @@ describe('Core exploration functionality', function() {
       'I am happy', true, 'FuzzyEquals', ['happy']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.expectRuleToBe(
-      'TextInput', 'FuzzyEquals', ['"happy"']);
+      'TextInput', 'FuzzyEquals', ['[happy]']);
     responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.expectFeedbackInstructionToBe('You must be happy!');
     // Verify newly created state.
@@ -460,7 +460,7 @@ describe('Core exploration functionality', function() {
       'TextInput', await forms.toRichText('You cannot be sad!'),
       '(try again)', false, 'FuzzyEquals', ['sad']);
     responseEditor = await explorationEditorMainTab.getResponseEditor(1);
-    await responseEditor.expectRuleToBe('TextInput', 'FuzzyEquals', ['"sad"']);
+    await responseEditor.expectRuleToBe('TextInput', 'FuzzyEquals', ['[sad]']);
     await explorationEditorPage.saveChanges();
   });
 
