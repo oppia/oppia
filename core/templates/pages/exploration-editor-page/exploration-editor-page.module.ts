@@ -41,14 +41,15 @@ import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-
-import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
+import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 
 @NgModule({
   imports: [
@@ -58,11 +59,14 @@ import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-ed
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    ParamChangesEditorDirective,
+    StateParamChangesEditorComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    StateParamChangesEditorComponent
   ],
   providers: [
     {
