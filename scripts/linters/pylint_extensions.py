@@ -1857,6 +1857,33 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                         args=(token),
                         line=line_num)
 
+class InequalityWithNoneChecker(checkers.BaseChecker):
+    """Custom pylint checker prohibiting use of "if x != None" and
+    enforcing use of "if x is not None" instead.
+    """
+    __implements__ = interfaces.ITokenChecker
+    
+    name = 'inequality-with-none'
+    priority = -1
+    msgs = {
+        'C0030': (
+            'Please refrain from using "x != None" and use "x is not None" instead.',
+            'inequality-with-none',
+            'Use "is" to assert equality or inequality against None.'
+        )
+    }
+
+    def process_tokens(self, tokens):
+        """
+        Custom pylint checker prohibiting use of "if x != None" and
+        enforcing use of "if x is not None" instead.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            if token == '!=' and re.search("!= None", line):
+                self.add_message('inequality-with-none', line=line_num)
 
 def register(linter):
     """Registers the checker with pylint.
@@ -1877,3 +1904,4 @@ def register(linter):
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
+    linter.register_checker(InequalityWithNoneChecker(linter))

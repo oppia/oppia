@@ -2862,3 +2862,62 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
+
+class InequalityWithNoneCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(InequalityWithNoneCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.InequalityWithNoneChecker)
+        self.checker_test_object.setup_method()
+
+    def test_inequality_op_on_none(self):
+        node_inequality_op_on_none = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                if x != None:
+                    pass
+                """
+            )
+        node_inequality_op_on_none.file = filename
+        node_inequality_op_on_none.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inequality_op_on_none))
+
+        not_equal_none_message = testutils.Message(
+            msg_id='inequality-with-none', line=2)
+        with self.checker_test_object.assertAddsMessages(not_equal_none_message): 
+            temp_file.close()
+
+    def test_usage_of_is_not_on_none(self):
+        node_inequality_op_on_none = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                if x is not None:
+                    pass
+                """
+            )
+        node_inequality_op_on_none.file = filename
+        node_inequality_op_on_none.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_inequality_op_on_none))
+        
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
