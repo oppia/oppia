@@ -37,4 +37,18 @@ describe('Preferences', function() {
     }
   });
 
+    it('should create and login as users 50-75', async function() {
+    while (i<75) {
+      await users.createUser(`dummy${i}@creator.com`, `dummy${i}`);
+      i++;
+    }
+  });
+
+  it('should create and login as users 75-100', async function() {
+    while (i<100) {
+      await users.createUser(`dummy${i}@creator.com`, `dummy${i}`);
+      i++;
+    }
+  });
+
 });
