@@ -509,7 +509,7 @@ describe('Audio translation bar directive', function() {
     spyOn(siteAnalyticsService, 'registerSaveRecordedAudioEvent');
     spyOn(alertsService, 'addSuccessMessage');
     spyOn(stateRecordedVoiceoversService.displayed, 'addVoiceover');
-    spyOn(assetsBackendApiService, 'saveAudio').and.returnValue($q.resolve({
+    spyOn(assetsBackendApiService, 'saveAudioAsync').and.returnValue($q.resolve({
       duration_secs: 90
     }));
     $scope.saveRecordedAudio();
@@ -531,7 +531,7 @@ describe('Audio translation bar directive', function() {
     function() {
       spyOn(siteAnalyticsService, 'registerSaveRecordedAudioEvent');
       spyOn(alertsService, 'addWarning');
-      spyOn(assetsBackendApiService, 'saveAudio').and.returnValue($q.reject({
+      spyOn(assetsBackendApiService, 'saveAudioAsync').and.returnValue($q.reject({
         error: 'It was not possible to save the recorded audio'
       }));
       $scope.saveRecordedAudio();
