@@ -283,6 +283,9 @@ def url_retrieve(source_url, filename=None):
     Returns:
         urlretrieve. The 'urlretrieve' object.
     """
+    import certifi
+    import ssl
+    context = ssl.create_default_context(capath=certifi.where())
     try:
         import urllib
         # Change the User-Agent to prevent servers from blocking requests.
@@ -290,10 +293,12 @@ def url_retrieve(source_url, filename=None):
         urllib.URLopener.version = (
             'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
             'Gecko/20100101 Firefox/47.0')
-        return urllib.urlretrieve(source_url, filename=filename)
+        return urllib.urlretrieve(
+            source_url, filename=filename, context=context)
     except ImportError:
         import urllib.request
-        return urllib.request.urlretrieve(source_url, filename=filename)
+        return urllib.request.urlretrieve(
+            source_url, filename=filename, context=context)
 
 
 def url_open(source_url):
@@ -307,12 +312,15 @@ def url_open(source_url):
     Returns:
         urlopen. The 'urlopen' object.
     """
+    import certifi
+    import ssl
+    context = ssl.create_default_context(capath=certifi.where())
     try:
         import urllib2
-        return urllib2.urlopen(source_url)
+        return urllib2.urlopen(source_url, context=context)
     except ImportError:
         import urllib.request
-        return urllib.request.urlopen(source_url)
+        return urllib.request.urlopen(source_url, context=context)
 
 
 def url_request(source_url, data, headers):
