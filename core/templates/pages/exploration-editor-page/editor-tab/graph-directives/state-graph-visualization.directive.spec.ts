@@ -46,11 +46,16 @@ import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
 import * as d3 from 'd3';
 import { of } from 'rxjs';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+
 
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
@@ -99,10 +104,11 @@ describe('State Graph Visualization directive', function() {
       reachableFromEnd: false
     }
   };
-
-  beforeEach(angular.mock.module('directiveTemplates'));
+  beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
+
+  beforeEach(angular.mock.module('directiveTemplates'));
 
   beforeEach(function() {
     stateGraphLayoutService = TestBed.get(StateGraphLayoutService);

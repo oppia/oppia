@@ -56,6 +56,11 @@ import { ExternalSaveService } from 'services/external-save.service';
 
 import $ from 'jquery';
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
 describe('Translation tab component', function() {
   var ctrl = null;
   var $q = null;
@@ -74,6 +79,9 @@ describe('Translation tab component', function() {
   var openTranslationTutorialEmitter = new EventEmitter();
   var refreshTranslationTabEmitter = new EventEmitter();
   var enterTranslationForTheFirstTimeEmitter = new EventEmitter();
+
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
