@@ -53,7 +53,7 @@ interface StoryUrlFragmentExistsBackendResponse {
   'story_url_fragment_exists': boolean;
 }
 
-interface ValidationErrorMessages {
+interface ValidationExplorationBackendResponse {
   'validation_error_messages': string[];
 }
 
@@ -137,7 +137,7 @@ export class EditableStoryBackendApiService {
   private _validateExplorations(
       storyId: string,
       expIds: string[],
-      successCallback: (value: ValidationErrorMessages) => void,
+      successCallback: (value: string[]) => void,
       errorCallback: (reason: string) => void): void {
     const validateExplorationsUrl =
       this.urlInterpolationService.interpolateUrl(
@@ -145,14 +145,14 @@ export class EditableStoryBackendApiService {
           story_id: storyId
         });
 
-    this.http.get<ValidationErrorMessages>(
+    this.http.get<ValidationExplorationBackendResponse>(
       validateExplorationsUrl, {
         params: {
           comma_separated_exp_ids: expIds.join(',')
         }
       }
     ).toPromise().then(
-      response => successCallback(response),
+      response => successCallback(response.validation_error_messages),
       errorResponse => errorCallback(errorResponse.error.error));
   }
 
@@ -180,7 +180,7 @@ export class EditableStoryBackendApiService {
 
   private _doesStoryWithUrlFragmentExist(
       storyUrlFragment: string,
-      successCallback: (value: StoryUrlFragmentExistsBackendResponse) => void,
+      successCallback: (value: boolean) => void,
       errorCallback: (reason: string) => void): void {
     const storyUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
@@ -190,7 +190,7 @@ export class EditableStoryBackendApiService {
       storyUrlFragmentUrl).toPromise().then(
       (response) => {
         if (successCallback) {
-          successCallback(response);
+          successCallback(response.story_url_fragment_exists);
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -238,7 +238,8 @@ export class EditableStoryBackendApiService {
   }
 
   validateExplorations(
-      storyId: string, expIds: string[]): Promise<ValidationErrorMessages> {
+      storyId: string,
+      expIds: string[]): Promise<string[]> {
     return new Promise((resolve, reject) => {
       this._validateExplorations(
         storyId, expIds, resolve, reject);
@@ -252,7 +253,7 @@ export class EditableStoryBackendApiService {
   }
 
   async doesStoryWithUrlFragmentExistAsync(storyUrlFragment: string):
-  Promise<StoryUrlFragmentExistsBackendResponse> {
+  Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesStoryWithUrlFragmentExist(
         storyUrlFragment, resolve, reject);
