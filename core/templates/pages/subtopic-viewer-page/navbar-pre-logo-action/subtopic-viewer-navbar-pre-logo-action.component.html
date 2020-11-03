@@ -1,5 +1,12 @@
-<a ng-href="<[$ctrl.topicUrl]>">
+<a ng-href="<[$ctrl.topicUrl]>" class="oppia-subtopic-viewer-back-button">
   <span class="material-icons oppia-navbar-back-button">
     arrow_back
   </span>
 </a>
+<style>
+  @media (max-width: 570px) {
+    .oppia-subtopic-viewer-back-button {
+      margin-left: -10px;
+    }
+  }
+</style>

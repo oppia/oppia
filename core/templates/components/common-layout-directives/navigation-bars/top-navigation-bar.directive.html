@@ -30,6 +30,35 @@
     </li>
     <li>
       <ul ng-if="!$ctrl.windowIsNarrow" class="nav oppia-navbar-tabs">
+        <li ng-if="$ctrl.CLASSROOM_PROMOS_ARE_ENABLED"
+            ng-class="{'open' : $ctrl.activeMenuName === 'classroomMenu'}"
+            uib-dropdown
+            ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
+            aria-hidden="false"
+            class="nav-item  oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
+          <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})"
+             class="nav-link oppia-navbar-tab dropdown-toggle"
+             role="menuitem"
+             aria-haspopup="true"
+             aria-expanded="false"
+             aria-hidden="false"
+             tabindex="0"
+             ng-mouseover="$ctrl.openSubmenu($event, 'classroomMenu')"
+             ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
+            <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_CLASSROOM"></span>
+          </a>
+          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
+              ng-mouseover="$ctrl.openSubmenu($event, 'classroomMenu')"
+              ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"
+              role="menu">
+            <li class="nav-item">
+              <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE})"
+                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link"
+                 href="/learn/math" translate="I18N_TOPNAV_CLASSROOM_BASIC_MATHS">
+              </a>
+            </li>
+          </ul>
+        </li>
         <li ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="nav-item oppia-clickable-navbar-element">
           <a ng-mouseover="$ctrl.blurNavigationLinks($event)"
              class="nav-link oppia-navbar-tab oppia-navbar-tab-content"
@@ -98,35 +127,6 @@
                  target="_blank"
                  rel="noopener"
                  translate="I18N_TOPNAV_GET_INVOLVED">
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li ng-if="$ctrl.CLASSROOM_PROMOS_ARE_ENABLED"
-            ng-class="{'open' : $ctrl.activeMenuName === 'classroomMenu'}"
-            uib-dropdown
-            ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
-            aria-hidden="false"
-            class="nav-item  oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
-          <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})"
-             class="nav-link oppia-navbar-tab dropdown-toggle"
-             role="menuitem"
-             aria-haspopup="true"
-             aria-expanded="false"
-             aria-hidden="false"
-             tabindex="0"
-             ng-mouseover="$ctrl.openSubmenu($event, 'classroomMenu')"
-             ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
-            <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_CLASSROOM"></span>
-          </a>
-          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
-              ng-mouseover="$ctrl.openSubmenu($event, 'classroomMenu')"
-              ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"
-              role="menu">
-            <li class="nav-item">
-              <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE})"
-                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link"
-                 href="/learn/math" translate="I18N_TOPNAV_CLASSROOM_BASIC_MATHS">
               </a>
             </li>
           </ul>
