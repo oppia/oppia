@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0030.
+presubmit checks. Next message id would be C0031.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1880,11 +1880,11 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
         """Called for comparisons (a != b).
 
         Args:
-            node: astroid.node.compare. Node comparing two values.
+            node: astroid.node.Compare. A node indicating comparison.
         """
 
         ops = node.ops
-        for (operator, operand) in ops:
+        for operator, operand in ops:
             if operator == '!=' and operand.as_string() == 'None':
                 self.add_message('inequality-with-none', node=node)
 

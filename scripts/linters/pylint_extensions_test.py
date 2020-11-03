@@ -2873,23 +2873,33 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
             pylint_extensions.InequalityWithNoneChecker)
         self.checker_test_object.setup_method()
 
-    def test_inequality_op_on_none(self):
-        (if_node) = astroid.extract_node(
+    def test_inequality_op_on_none_adds_message(self):
+        (if_node_one, if_node_two) = astroid.extract_node(
             """
             if x != None: #@
                 pass
+            if x != ( #@
+                None
+            ):
+                pass
             """
         )
-        compare_node = if_node.test
-        not_equal_none_message = testutils.Message(
-            msg_id='inequality-with-none', node=compare_node)
+        compare_node_one = if_node_one.test
+        compare_node_two = if_node_two.test
+
+        not_equal_none_message_one = testutils.Message(
+            msg_id='inequality-with-none', node=compare_node_one)
+        not_equal_none_message_two = testutils.Message(
+            msg_id='inequality-with-none', node=compare_node_two)
 
         with self.checker_test_object.assertAddsMessages(
-            not_equal_none_message
+            not_equal_none_message_one,
+            not_equal_none_message_two
         ):
-            self.checker_test_object.checker.visit_compare(compare_node)
+            self.checker_test_object.checker.visit_compare(compare_node_one)
+            self.checker_test_object.checker.visit_compare(compare_node_two)
 
-    def test_usage_of_is_not_on_none(self):
+    def test_usage_of_is_not_on_none_does_not_add_message(self):
         (if_node) = astroid.extract_node(
             """
             if x is not None: #@
