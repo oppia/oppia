@@ -312,6 +312,12 @@ indexes:
   - name: commit_message
   - name: commit_type
 
+- kind: UserAuthDetailsModel
+  properties:
+  - name: gae_id
+  - name: created_on
+    direction: desc
+
 - kind: UserContributionProficiencyModel
   properties:
   - name: deleted

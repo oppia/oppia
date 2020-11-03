@@ -180,6 +180,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
 
+        email = current_user_services.get_current_user_email()
         if self.gae_id:
             user_settings = user_services.get_user_settings_by_gae_id(
                 self.gae_id, strict=False)
@@ -187,31 +188,19 @@ class BaseHandler(webapp2.RequestHandler):
                 # If the user settings are not yet created and the request leads
                 # to signup page create a new user settings. Otherwise logout
                 # the not-fully registered user.
-                email = current_user_services.get_current_user_email()
                 if 'signup?' in self.request.uri:
                     user_settings = user_services.create_new_user(
                         self.gae_id, email)
                 else:
-                    for _ in range(5):
-                        logging.error(
-                            'Cannot find user %s with email %s on page %s'
-                            % (self.gae_id, email, self.request.uri))
-                        time.sleep(2)
-                        user_settings = (
-                            user_services.get_user_settings_by_gae_id(
-                                self.gae_id, strict=False))
-                        if user_settings is not None:
-                            logging.error(
-                                'Found user %s with email %s on page %s'
-                                % (self.gae_id, email, self.request.uri))
-                            break
-                    else:
-                        _clear_login_cookies(self.response.headers)
-                        return
+                    logging.error(
+                        'Cannot find user %s with email %s on page %s'
+                        % (self.gae_id, email, self.request.uri))
+                    _clear_login_cookies(self.response.headers)
+                    return
             else:
                 logging.error(
-                    'Found user %s on page %s'
-                    % (self.gae_id, self.request.uri))
+                    'Found user %s with email %s on page %s' % (self.gae_id, email, self.request.uri)
+                )
 
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
@@ -284,7 +273,7 @@ class BaseHandler(webapp2.RequestHandler):
             # consistency that does not guarantee that the UserAuthDetailsModel
             # will be returned by a query even when we are sure that the model
             # was added to the datastore. More info in #10951.
-            if 'csrf' in self.request.uri and self.gae_id and not self.user_id:
+            if 'signuphandler' in self.request.uri and not self.user_id:
                 raise self.UnauthorizedUserException('User details not found.')
 
             if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:

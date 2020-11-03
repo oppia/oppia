@@ -2537,7 +2537,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """
 
         if auth_service == feconf.AUTH_METHOD_GAE:
-            return cls.query(cls.gae_id == auth_id).get()
+            return cls.query(cls.gae_id == auth_id).order(-cls.created_on).get()
         return None
 
     @classmethod

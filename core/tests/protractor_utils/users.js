@@ -66,22 +66,39 @@ var _completeSignup = async function(username) {
   await browser.waitForAngularEnabled(false);
   await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
   await browser.waitForAngularEnabled(true);
-  await waitFor.pageToFullyLoad();
-  if (await element(by.css('.protractor-test-toast-warning-message')).isPresent()) {
-     await browser.waitForAngularEnabled(false);
-     await browser.refresh()
-     await browser.waitForAngularEnabled(true);
+  var loadingMessage = element(by.css('.protractor-test-loading-fullpage'));
+  var warningToast = element(by.css('.protractor-test-toast-warning-message'))
+  await browser.driver.wait(
+    protractor.ExpectedConditions.or(
+      protractor.ExpectedConditions.invisibilityOf(loadingMessage),
+      protractor.ExpectedConditions.visibilityOf(warningToast)
+    ), 15000, 'Page takes more than 15 secs to load');
+  var waitForToast = browser.driver.wait(
+    protractor.ExpectedConditions.visibilityOf(warningToast), 1000)
+  return waitForToast.then(() => {
+    return false;
+  }).catch(async () => {
+    var usernameInput = element(by.css('.protractor-test-username-input'));
+    var agreeToTermsCheckbox = element(
+      by.css('.protractor-test-agree-to-terms-checkbox'));
+    var registerUser = element(by.css('.protractor-test-register-user'));
+    await waitFor.visibilityOf(
+      usernameInput, 'No username input field was displayed');
+    await usernameInput.sendKeys(username);
+    await agreeToTermsCheckbox.click();
+    await registerUser.click();
+    await waitFor.pageToFullyLoad();
+    return true;
+  });
+};
+
+var createAndLoginUser = async function(email, username, isSuperAdmin = false) {
+  await login(email, isSuperAdmin);
+  if (!(await _completeSignup(username))) {
+    await logout();
+    await login(email, isSuperAdmin);
+    await _completeSignup(username)
   }
-  var usernameInput = element(by.css('.protractor-test-username-input'));
-  var agreeToTermsCheckbox = element(
-    by.css('.protractor-test-agree-to-terms-checkbox'));
-  var registerUser = element(by.css('.protractor-test-register-user'));
-  await waitFor.visibilityOf(
-    usernameInput, 'No username input field was displayed');
-  await usernameInput.sendKeys(username);
-  await agreeToTermsCheckbox.click();
-  await registerUser.click();
-  await waitFor.pageToFullyLoad();
 };
 
 var createUser = async function(email, username) {
@@ -89,39 +106,24 @@ var createUser = async function(email, username) {
   await logout();
 };
 
-var createAndLoginUser = async function(email, username) {
-  await login(email);
-  await _completeSignup(username);
+createAndLoginUserWithRole = async function(email, username, role) {
+  await createAndLoginUser(email, username, true)
+  await adminPage.get();
+  await adminPage.updateRole(username, role);
 };
 
 var createModerator = async function(email, username) {
-  await login(email, true);
-  await _completeSignup(username);
-  await adminPage.get();
-  await adminPage.updateRole(username, 'moderator');
+  await createAndLoginUserWithRole(email, username, 'moderator');
   await logout();
+};
+
+var createAndLoginAdminUser = async function(email, username) {
+  await createAndLoginUserWithRole(email, username, 'admin');
 };
 
 var createAdmin = async function(email, username) {
   await createAndLoginAdminUser(email, username);
   await logout();
-};
-
-var createAndLoginAdminUser = async function(email, username) {
-  await login(email, true);
-  await _completeSignup(username);
-  await adminPage.get();
-  await adminPage.updateRole(username, 'admin');
-};
-
-var createAdminMobile = async function(email, username) {
-  await createAndLoginAdminUserMobile(email, username);
-  await logout();
-};
-
-var createAndLoginAdminUserMobile = async function(email, username) {
-  await login(email, true);
-  await _completeSignup(username);
 };
 
 var isAdmin = async function() {
@@ -136,5 +138,3 @@ exports.createAndLoginUser = createAndLoginUser;
 exports.createModerator = createModerator;
 exports.createAdmin = createAdmin;
 exports.createAndLoginAdminUser = createAndLoginAdminUser;
-exports.createAdminMobile = createAdminMobile;
-exports.createAndLoginAdminUserMobile = createAndLoginAdminUserMobile;
