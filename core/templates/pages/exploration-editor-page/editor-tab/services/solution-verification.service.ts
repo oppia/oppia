@@ -19,14 +19,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AnswerClassificationService } from 
+import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service.ts';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionRulesRegistryService } from 
+import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { StateEditorService } from
- 'components/state-editor/state-editor-properties-services/state-editor.service.ts';
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-editor.service.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -38,8 +39,9 @@ export class SolutionVerificationService {
       private stateEditorService: StateEditorService) {}
 
   verifySolution(stateName: string, interaction: Interaction, correctAnswer: InteractionAnswer): boolean {
-    let rulesService = this.interactionRulesRegistryService.getRulesServiceByInteractionId(interaction.id);
-    let result = 
+    let rulesService = this.interactionRulesRegistryService.
+      getRulesServiceByInteractionId(interaction.id);
+    let result =
       this.answerClassificationService.getMatchingClassificationResult(
         stateName, interaction, correctAnswer, rulesService
       );

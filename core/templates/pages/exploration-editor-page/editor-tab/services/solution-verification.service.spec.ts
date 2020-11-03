@@ -27,12 +27,16 @@ import { AngularNameService } from
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 import { SolutionVerificationService } from
+  // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
-import { StateCustomizationArgsService } from 
+import { StateCustomizationArgsService } from
+  // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service.ts';
 import { StateEditorService} from
+  // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service.ts';
-import { StateInteractionIdService } from 
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service.ts';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
@@ -41,7 +45,6 @@ describe('Solution Verification Service', () => {
   let mockExplorationData, mockInteractionState;
 
   beforeEach(() => {
-
     mockExplorationData = {
       explorationId: 0,
       autosaveChangeList: () => {}
@@ -60,7 +63,7 @@ describe('Solution Verification Service', () => {
 
     TestBed.configureTestingModule({
       providers: [
-       { provide: INTERACTION_SPECS, useValue: mockInteractionState }
+        { provide: INTERACTION_SPECS, useValue: mockInteractionState }
       ]
     });
 
