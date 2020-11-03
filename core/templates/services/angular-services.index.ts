@@ -293,8 +293,7 @@ import { TranslateService } from 'services/translate.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
-import { SuggestionModalForCreatorDashboardBackendApiService } from 'pages/creator-dashboard-page/suggestion-modal-for-creator-view/suggestion-modal-for-creator-dashboard-backend-api.service.ts';
-import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import { SuggestionModalForCreatorDashboardBackendApiService } from 'pages/creator-dashboard-page/suggestion-modal-for-creator-view/suggestion-modal-for-creator-dashboard-backend-api.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -564,6 +563,7 @@ export const angularServices: [string, unknown][] = [
   ['SubtopicPageContentsObjectFactory', SubtopicPageContentsObjectFactory],
   ['SubtopicPageObjectFactory', SubtopicPageObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
+  ['SuggestionModalForCreatorDashboardBackendApiService', SuggestionModalForCreatorDashboardBackendApiService],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionObjectFactory', SuggestionObjectFactory],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
@@ -599,6 +599,4 @@ export const angularServices: [string, unknown][] = [
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['baseInteractionValidationService', baseInteractionValidationService],
-  ['SuggestionModalForCreatorDashboardBackendApiService', SuggestionModalForCreatorDashboardBackendApiService],
-  ['PromoBarBackendApiService', PromoBarBackendApiService],
 ];

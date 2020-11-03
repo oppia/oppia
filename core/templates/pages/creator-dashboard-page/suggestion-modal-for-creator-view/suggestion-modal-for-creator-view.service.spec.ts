@@ -25,13 +25,14 @@ describe('Suggestion Modal for Creator View Service', function() {
   var SuggestionModalForCreatorDashboardService = null;
   var CsrfService = null;
   var $rootScope = null;
-  var $httpBackend = null;
   var $uibModal = null;
   var $q = null;
   var $log = null;
   var cleanActiveThreadSpy = null;
   var activeThread = null;
   var extraParams = null;
+  var suggestionBackendDict = null;
+  var SuggestionModalForCreatorDashboardBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -44,11 +45,12 @@ describe('Suggestion Modal for Creator View Service', function() {
     SuggestionModalForCreatorDashboardService = $injector.get(
       'SuggestionModalForCreatorDashboardService');
     $rootScope = $injector.get('$rootScope');
-    $httpBackend = $injector.get('$httpBackend');
     $uibModal = $injector.get('$uibModal');
     $log = $injector.get('$log');
     $q = $injector.get('$q');
     CsrfService = $injector.get('CsrfTokenService');
+    SuggestionModalForCreatorDashboardBackendApiService =
+      $injector.get('SuggestionModalForCreatorDashboardBackendApiService');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       var deferred = $q.defer();
@@ -77,6 +79,27 @@ describe('Suggestion Modal for Creator View Service', function() {
       clearActiveThread: cleanActiveThreadSpy,
       canReviewActiveThread: true
     };
+    suggestionBackendDict = {
+      suggestion_id: 'exploration.exp1.thread1',
+      suggestion_type: 'edit_exploration_state_content',
+      target_type: 'exploration',
+      target_id: 'exp1',
+      target_version_at_submission: 1,
+      status: 'accepted',
+      author_name: 'author',
+      change: {
+        cmd: 'edit_state_property',
+        property_name: 'content',
+        state_name: 'state_1',
+        new_value: {
+          html: 'new suggestion content'
+        },
+        old_value: {
+          html: 'old suggestion content'
+        }
+      },
+      last_updated_msecs: 1000
+    };
   }));
 
   it('should call $uibModal open when opening suggestion modal', function() {
@@ -88,7 +111,8 @@ describe('Suggestion Modal for Creator View Service', function() {
     expect(uibModalSpy).toHaveBeenCalled();
   });
 
-  it('should open suggestion modal when suggestion has resubmit action',
+  it(
+    'should open suggestion modal when suggestion has resubmit action',
     function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
@@ -96,41 +120,51 @@ describe('Suggestion Modal for Creator View Service', function() {
           suggestionType: 'edit_exploration_state_content'
         })
       });
+      var suggBackendSpy = spyOn(
+        SuggestionModalForCreatorDashboardBackendApiService, 'updateSuggestion')
+        .and.callFake(function() {
+          var deferred = $q.defer();
+          deferred.resolve(suggestionBackendDict);
+          return deferred.promise;
+        });
 
-      $httpBackend.expectPUT('/suggestionactionhandler/resubmit/0')
-        .respond(200);
       SuggestionModalForCreatorDashboardService.showSuggestionModal(
         'edit_exploration_state_content', extraParams);
       $rootScope.$apply();
-      $httpBackend.flush();
 
+      expect(suggBackendSpy).toHaveBeenCalled();
       expect(cleanActiveThreadSpy).toHaveBeenCalled();
       expect(extraParams.suggestionsToReviewList.length).toBe(0);
     });
 
-  it('should handle rejects when resolving suggestion with resubmit' +
+  it(
+    'should handle rejects when resolving suggestion with resubmit' +
     ' action fails', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        action: 'resubmit',
-        suggestionType: 'edit_exploration_state_content'
-      })
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({
+          action: 'resubmit',
+          suggestionType: 'edit_exploration_state_content'
+        })
+      });
+      var logSpy = spyOn($log, 'error').and.callThrough();
+      var suggBackendSpy = spyOn(
+        SuggestionModalForCreatorDashboardBackendApiService, 'updateSuggestion')
+        .and.callFake(function() {
+          return $q.reject('error calling backend');
+        });
+
+      SuggestionModalForCreatorDashboardService.showSuggestionModal(
+        'edit_exploration_state_content', extraParams);
+      $rootScope.$apply();
+
+      expect(suggBackendSpy).toHaveBeenCalled();
+      expect(cleanActiveThreadSpy).not.toHaveBeenCalled();
+      expect(extraParams.suggestionsToReviewList.length).toBe(1);
+      expect(logSpy).toHaveBeenCalledWith('Error resolving suggestion');
     });
-    var logSpy = spyOn($log, 'error').and.callThrough();
 
-    $httpBackend.expectPUT('/suggestionactionhandler/resubmit/0')
-      .respond(500);
-    SuggestionModalForCreatorDashboardService.showSuggestionModal(
-      'edit_exploration_state_content', extraParams);
-    $rootScope.$apply();
-    $httpBackend.flush();
-
-    expect(cleanActiveThreadSpy).not.toHaveBeenCalled();
-    expect(extraParams.suggestionsToReviewList.length).toBe(1);
-    expect(logSpy).toHaveBeenCalledWith('Error resolving suggestion');
-  });
-
-  it('should open suggestion modal when suggestion has no resubmit action',
+  it(
+    'should open suggestion modal when suggestion has no resubmit action',
     function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
@@ -138,39 +172,49 @@ describe('Suggestion Modal for Creator View Service', function() {
           suggestionType: 'edit_exploration_state_content'
         })
       });
+      var suggBackendSpy = spyOn(
+        SuggestionModalForCreatorDashboardBackendApiService, 'updateSuggestion')
+        .and.callFake(function() {
+          var deferred = $q.defer();
+          deferred.resolve(suggestionBackendDict);
+          return deferred.promise;
+        });
 
-      $httpBackend.expectPUT('/suggestionactionhandler/exploration/0/0')
-        .respond(200);
       SuggestionModalForCreatorDashboardService.showSuggestionModal(
         'edit_exploration_state_content', extraParams);
       $rootScope.$apply();
-      $httpBackend.flush();
 
+      expect(suggBackendSpy).toHaveBeenCalled();
+      expect(suggBackendSpy).toHaveBeenCalled();
       expect(cleanActiveThreadSpy).toHaveBeenCalled();
       expect(extraParams.suggestionsToReviewList.length).toBe(0);
     });
 
-  it('should handle rejects when resolving suggestion with no resubmit' +
+  it(
+    'should handle rejects when resolving suggestion with no resubmit' +
     ' action fails', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        action: 'accept',
-        suggestionType: 'edit_exploration_state_content'
-      })
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({
+          action: 'accept',
+          suggestionType: 'edit_exploration_state_content'
+        })
+      });
+      var logSpy = spyOn($log, 'error').and.callThrough();
+      var suggBackendSpy = spyOn(
+        SuggestionModalForCreatorDashboardBackendApiService, 'updateSuggestion')
+        .and.callFake(function() {
+          return $q.reject('error calling backend');
+        });
+
+      SuggestionModalForCreatorDashboardService.showSuggestionModal(
+        'edit_exploration_state_content', extraParams);
+      $rootScope.$apply();
+
+      expect(suggBackendSpy).toHaveBeenCalled();
+      expect(cleanActiveThreadSpy).not.toHaveBeenCalled();
+      expect(extraParams.suggestionsToReviewList.length).toBe(1);
+      expect(logSpy).toHaveBeenCalledWith('Error resolving suggestion');
     });
-    var logSpy = spyOn($log, 'error').and.callThrough();
-
-    $httpBackend.expectPUT('/suggestionactionhandler/exploration/0/0')
-      .respond(500);
-    SuggestionModalForCreatorDashboardService.showSuggestionModal(
-      'edit_exploration_state_content', extraParams);
-    $rootScope.$apply();
-    $httpBackend.flush();
-
-    expect(cleanActiveThreadSpy).not.toHaveBeenCalled();
-    expect(extraParams.suggestionsToReviewList.length).toBe(1);
-    expect(logSpy).toHaveBeenCalledWith('Error resolving suggestion');
-  });
 
   it('should not open suggestion modal', function() {
     var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
