@@ -34,6 +34,8 @@ datastore_services = models.Registry.import_datastore_services()
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
 PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
+# Only non-versioned models should be included in this list. Activities that
+# use versioned models should have their own delete functions.
 MODEL_CLASSES_TO_MARK_AS_DELETED = (user_models.UserQueryModel,)
 
 
@@ -85,8 +87,8 @@ def delete_models_marked_as_deleted():
 
 
 def mark_outdated_models_as_deleted():
-    """Mark some types of models (that we shouldn't keep for long time)
-    as deleted if they were last updated more than four weeks ago.
+    """Mark models in MODEL_CLASSES_TO_MARK_AS_DELETED, as deleted if they were
+    last updated more than four weeks ago.
     """
     date_before_which_to_mark_as_deleted = (
         datetime.datetime.utcnow() - PERIOD_TO_MARK_MODELS_AS_DELETED)

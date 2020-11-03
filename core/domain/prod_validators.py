@@ -4628,8 +4628,6 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
 class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
     """Class for validating UserQueryModels."""
 
-    FOUR_WEEKS = datetime.timedelta(weeks=4)
-
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH

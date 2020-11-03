@@ -395,11 +395,14 @@ class BaseModelValidator(python_utils.OBJECT):
             date_now -
             cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
         )
+        period_to_hard_delete_models_in_days = (
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
         if item.last_updated < date_before_which_models_should_be_deleted:
             cls._add_error(
                 'entity %s' % ERROR_CATEGORY_STALE_CHECK,
-                'Entity id %s: '
-                'model marked as deleted is older than 8 weeks' % item.id
+                'Entity id %s: model marked as deleted is older than %s weeks'
+                % (item.id, python_utils.divide(
+                    period_to_hard_delete_models_in_days, 7))
             )
 
 
