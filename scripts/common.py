@@ -63,8 +63,11 @@ YARN_VERSION = '1.22.4'
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
 
-# Prototool version.
-PROTOTOOL_VERSION = '1.10.0'
+# Buf version.
+BUF_VERSION = '0.29.0'
+# Protoc is the compiler for protobuf files and the version must be same as
+# the version of protobuf library being used.
+PROTOC_VERSION = PROTOBUF_VERSION
 
 # We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
 # there is a `make test` bug in redis 6.0.6 where the solution has not been

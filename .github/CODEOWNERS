@@ -80,7 +80,8 @@
 /core/storage/classifier/ @prasanna08
 /core/templates/domain/classifier/ @prasanna08
 /extensions/classifiers/ @prasanna08
-/prototool.yaml @prasanna08
+/buf.yaml @prasanna08
+/buf.gen.yaml @prasanna08
 
 
 # Audio and Translation team.
