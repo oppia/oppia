@@ -61,8 +61,8 @@ var ExplorationEditorFeedbackTab = function() {
       suggestionDescription));
     expect(await matchingRow.isDisplayed()).toBe(true);
     await matchingRow.click();
-    await waitFor.elementToBeClickable(viewSuggestionButton,
-       'View suggestion button not clickable.');
+    await waitFor.elementToBeClickable(
+      viewSuggestionButton, '\'View suggestion\' button not clickable.');
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await viewSuggestionButton.click();
     expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
@@ -122,8 +122,8 @@ var ExplorationEditorFeedbackTab = function() {
       suggestionDescription));
     expect(await matchingRow.isDisplayed()).toBe(true);
     await matchingRow.click();
-    await waitFor.elementToBeClickable(viewSuggestionButton,
-      'View suggestion button not clickable.');
+    await waitFor.elementToBeClickable(
+      viewSuggestionButton, '\'View suggestion\' button not clickable.');
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await viewSuggestionButton.click();
     expect(await rejectSuggestionButton.isDisplayed()).toBe(true);
