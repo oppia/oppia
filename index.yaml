@@ -93,7 +93,7 @@ indexes:
 
 - kind: ExplorationOpportunitySummaryModel
   properties:
-  - name: need_voice_artist_in_language_codes
+  - name: language_codes_needing_voice_artists
   - name: created_on
 
 - kind: ExplorationRecommendationsRealtimeModel

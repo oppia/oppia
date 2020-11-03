@@ -32,8 +32,8 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_language_codes,
-            translation_counts, need_voice_artist_in_language_codes,
-            assigned_voice_artist_in_language_codes):
+            translation_counts, language_codes_needing_voice_artists,
+            language_codes_with_assigned_voice_artists):
         """Constructs a ExplorationOpportunitySummary domain object.
 
         Args:
@@ -49,9 +49,9 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 code in which the exploration translation is incomplete.
             translation_counts: dict. A dict with language code as a key and
                 number of translation available in that language as the value.
-            need_voice_artist_in_language_codes: list(str). A list of language
+            language_codes_needing_voice_artists: list(str). A list of language
                 code in which the exploration needs voice artist.
-            assigned_voice_artist_in_language_codes: list(str). A list of
+            language_codes_with_assigned_voice_artists: list(str). A list of
                 language code for which a voice-artist is already assigned to
                 the exploration.
         """
@@ -65,10 +65,10 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
         self.incomplete_translation_language_codes = (
             incomplete_translation_language_codes)
         self.translation_counts = translation_counts
-        self.need_voice_artist_in_language_codes = (
-            need_voice_artist_in_language_codes)
-        self.assigned_voice_artist_in_language_codes = (
-            assigned_voice_artist_in_language_codes)
+        self.language_codes_needing_voice_artists = (
+            language_codes_needing_voice_artists)
+        self.language_codes_with_assigned_voice_artists = (
+            language_codes_with_assigned_voice_artists)
         self.validate()
 
     @classmethod
@@ -95,9 +95,9 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'incomplete_translation_language_codes'],
             exploration_opportunity_summary_dict['translation_counts'],
             exploration_opportunity_summary_dict[
-                'need_voice_artist_in_language_codes'],
+                'language_codes_needing_voice_artists'],
             exploration_opportunity_summary_dict[
-                'assigned_voice_artist_in_language_codes'])
+                'language_codes_with_assigned_voice_artists'])
 
     def to_dict(self):
         """Return a copy of the object as a dictionary. It includes all
@@ -157,13 +157,13 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
         allowed_language_codes = [language['id'] for language in (
             constants.SUPPORTED_AUDIO_LANGUAGES)]
 
-        if not set(self.assigned_voice_artist_in_language_codes).isdisjoint(
-                self.need_voice_artist_in_language_codes):
+        if not set(self.language_codes_with_assigned_voice_artists).isdisjoint(
+                self.language_codes_needing_voice_artists):
             raise utils.ValidationError(
                 'Expected voice_artist "needed" and "assigned" list of '
                 'languages to be disjoint, received: %s, %s' % (
-                    self.need_voice_artist_in_language_codes,
-                    self.assigned_voice_artist_in_language_codes))
+                    self.language_codes_needing_voice_artists,
+                    self.language_codes_with_assigned_voice_artists))
         for language_code, count in (
                 self.translation_counts.items()):
             if not utils.is_supported_audio_language_code(language_code):
@@ -186,8 +186,8 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
 
         expected_set_of_all_languages = set(
             self.incomplete_translation_language_codes +
-            self.need_voice_artist_in_language_codes +
-            self.assigned_voice_artist_in_language_codes)
+            self.language_codes_needing_voice_artists +
+            self.language_codes_with_assigned_voice_artists)
 
         for language_code in expected_set_of_all_languages:
             if language_code not in allowed_language_codes:
