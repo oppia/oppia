@@ -20,28 +20,26 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LearnerDashboardSuggestionModalComponent } from 
-  'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component.ts';
+import { LearnerDashboardSuggestionModalComponent } from 'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component.ts';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SuggestionModalForLearnerDashboardService {
   constructor(
-    private nbgModal: NgbModal,
-    private urlInterpolationService: UrlInterpolationService
+    private nbgModal: NgbModal
   ){}
 
-  _showEditStateContentSuggestionModal(newContent:string, oldContent:string, description:string): void {
-    const modelRef = this.nbgModal.open(
-      LearnerDashboardSuggestionModalComponent,{backdrop: true});
+  _showEditStateContentSuggestionModal(
+    newContent:string, oldContent:string, description:string): void {
+      const modelRef = this.nbgModal.open(
+        LearnerDashboardSuggestionModalComponent,{backdrop: true});
 
-    modelRef.componentInstance.newContent = newContent;
-    modelRef.componentInstance.oldContent = oldContent;
-    modelRef.componentInstance.description = description;
+      modelRef.componentInstance.newContent = newContent;
+      modelRef.componentInstance.oldContent = oldContent;
+      modelRef.componentInstance.description = description;
   }
-  showSuggestionModal(suggestionType, extraParams): void {
+  showSuggestionModal(suggestionType:string, extraParams): void {
     if (suggestionType === 'edit_exploration_state_content') {
       this._showEditStateContentSuggestionModal(
         extraParams.newContent,
@@ -51,4 +49,6 @@ export class SuggestionModalForLearnerDashboardService {
     }
   }
 }
-angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', downgradeInjectable(SuggestionModalForLearnerDashboardService));
+angular.module('oppia').factory(
+  'SuggestionModalForLearnerDashboardService', downgradeInjectable(
+    SuggestionModalForLearnerDashboardService));

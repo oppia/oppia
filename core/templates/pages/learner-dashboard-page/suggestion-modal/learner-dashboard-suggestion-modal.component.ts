@@ -30,7 +30,7 @@ export class LearnerDashboardSuggestionModalComponent {
 
   constructor(
     private activeModal: NgbActiveModal
-  ){}
+  ) {}
 
   cancel(): void {
     this.activeModal.dismiss();
