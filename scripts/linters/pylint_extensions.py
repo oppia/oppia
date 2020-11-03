@@ -1857,35 +1857,38 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                         args=(token),
                         line=line_num)
 
+
 class InequalityWithNoneChecker(checkers.BaseChecker):
     """Custom pylint checker prohibiting use of "if x != None" and
     enforcing use of "if x is not None" instead.
     """
 
     __implements__ = interfaces.IAstroidChecker
-    
+
     name = 'inequality-with-none'
     priority = -1
     msgs = {
         'C0030': (
-            'Please refrain from using "x != None" and use "x is not None" instead.',
+            'Please refrain from using "x != None" '
+            'and use "x is not None" instead.',
             'inequality-with-none',
             'Use "is" to assert equality or inequality against None.'
         )
     }
 
     def visit_compare(self, node):
-        """Called for comparisons (a != b)
+        """Called for comparisons (a != b).
 
         Args:
-            node: astroid.node.compare. Node for a comparison between two values.
+            node: astroid.node.compare. Node comparing two values.
         """
-        
+
         ops = node.ops
         for (operator, operand) in ops:
-            if operator == '!=' and operand.as_string() == "None":
+            if operator == '!=' and operand.as_string() == 'None':
                 self.add_message('inequality-with-none', node=node)
-    
+
+
 def register(linter):
     """Registers the checker with pylint.
 

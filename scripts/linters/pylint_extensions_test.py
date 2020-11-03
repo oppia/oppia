@@ -2863,6 +2863,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+
 class InequalityWithNoneCheckerTests(unittest.TestCase):
 
     def setUp(self):
@@ -2882,8 +2883,10 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         compare_node = if_node.test
         not_equal_none_message = testutils.Message(
             msg_id='inequality-with-none', node=compare_node)
-        
-        with self.checker_test_object.assertAddsMessages(not_equal_none_message):
+
+        with self.checker_test_object.assertAddsMessages(
+            not_equal_none_message
+        ):
             self.checker_test_object.checker.visit_compare(compare_node)
 
     def test_usage_of_is_not_on_none(self):
