@@ -4884,10 +4884,13 @@ export = {
     "text": "العربية"
   }, {
     "id": "kab",
-    "text": "Taqbaylit"
+    "text": "Taqbaylit (Kabyle)"
   }, {
     "id": "vi",
     "text": "Tiếng Việt"
+  }, {
+    "id": "tr",
+    "text": "Türkçe (Turkish)"
   }, {
     "id": "hi",
     "text": "हिन्दी"
