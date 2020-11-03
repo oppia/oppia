@@ -31,5 +31,5 @@ require(
   'collection-local-nav.directive.ts');
 require(
   'pages/collection-player-page/collection-navbar/' +
-  'collection-navbar.directive.ts');
+  'collection-navbar.component.ts');
 require('pages/collection-player-page/collection-player-page.directive.ts');
