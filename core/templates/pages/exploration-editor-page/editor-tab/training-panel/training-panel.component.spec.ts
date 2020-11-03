@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for trainingPanel.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { TestBed } from '@angular/core/testing';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
@@ -40,6 +41,8 @@ import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('Training Panel Component', function() {
+  importAllAngularServices();
+  
   var ctrl = null;
   var $scope = null;
   var explorationStatesService = null;

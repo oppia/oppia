@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TeachOppiaModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
@@ -41,6 +42,8 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Teach Oppia Modal Controller', function() {
+  importAllAngularServices();
+  
   var $httpBackend = null;
   var $log = null;
   var $scope = null;
