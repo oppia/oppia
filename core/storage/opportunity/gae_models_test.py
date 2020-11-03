@@ -43,8 +43,8 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             content_count=20,
             incomplete_translation_language_codes=['hi', 'ar'],
             translation_counts={},
-            need_voice_artist_in_language_codes=['en'],
-            assigned_voice_artist_in_language_codes=[]
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
         ).put()
         opportunity_models.ExplorationOpportunitySummaryModel(
             id='opportunity_id2',
@@ -56,8 +56,8 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             content_count=120,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
-            need_voice_artist_in_language_codes=['en'],
-            assigned_voice_artist_in_language_codes=[]
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
         ).put()
 
     def test_get_deletion_policy(self):
