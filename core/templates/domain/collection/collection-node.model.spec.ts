@@ -57,8 +57,10 @@ describe('Collection node model', () => {
 
     var summaryObject = collectionNode.getExplorationSummaryObject();
     expect(summaryObject).toEqual(explorationSummaryBackendObject);
-
-    summaryObject.category = 'abc';
+    summaryObject = {
+      ...summaryObject,
+      category: 'abc'
+    };
     expect(summaryObject).not.toEqual(
       collectionNode.getExplorationSummaryObject());
   });
