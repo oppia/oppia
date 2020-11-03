@@ -2873,51 +2873,26 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_inequality_op_on_none(self):
-        node_inequality_op_on_none = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
+        (if_node) = astroid.extract_node(
+            """
+            if x != None: #@
+                pass
+            """
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                if x != None:
-                    pass
-                """
-            )
-        node_inequality_op_on_none.file = filename
-        node_inequality_op_on_none.path = filename
-
-        self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_inequality_op_on_none))
-
+        compare_node = if_node.test
         not_equal_none_message = testutils.Message(
-            msg_id='inequality-with-none', line=2)
-        with self.checker_test_object.assertAddsMessages(not_equal_none_message): 
-            temp_file.close()
+            msg_id='inequality-with-none', node=compare_node)
+        
+        with self.checker_test_object.assertAddsMessages(not_equal_none_message):
+            self.checker_test_object.checker.visit_compare(compare_node)
 
     def test_usage_of_is_not_on_none(self):
-        node_inequality_op_on_none = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
+        (if_node) = astroid.extract_node(
+            """
+            if x is not None: #@
+                pass
+            """
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                if x is not None:
-                    pass
-                """
-            )
-        node_inequality_op_on_none.file = filename
-        node_inequality_op_on_none.path = filename
-
-        self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_inequality_op_on_none))
-        
+        compare_node = if_node.test
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_compare(compare_node)

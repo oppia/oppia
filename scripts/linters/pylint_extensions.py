@@ -1861,7 +1861,8 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
     """Custom pylint checker prohibiting use of "if x != None" and
     enforcing use of "if x is not None" instead.
     """
-    __implements__ = interfaces.ITokenChecker
+
+    __implements__ = interfaces.IAstroidChecker
     
     name = 'inequality-with-none'
     priority = -1
@@ -1873,18 +1874,18 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
         )
     }
 
-    def process_tokens(self, tokens):
-        """
-        Custom pylint checker prohibiting use of "if x != None" and
-        enforcing use of "if x is not None" instead.
+    def visit_compare(self, node):
+        """Called for comparisons (a != b)
 
         Args:
-            tokens: Token. Object to access all tokens of a module.
+            node: astroid.node.compare. Node for a comparison between two values.
         """
-        for (token_type, token, (line_num, _), _, line) in tokens:
-            if token == '!=' and re.search("!= None", line):
-                self.add_message('inequality-with-none', line=line_num)
-
+        
+        ops = node.ops
+        for (operator, operand) in ops:
+            if operator == '!=' and operand.as_string() == "None":
+                self.add_message('inequality-with-none', node=node)
+    
 def register(linter):
     """Registers the checker with pylint.
 
