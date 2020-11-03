@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 import { TestBed } from '@angular/core/testing';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
@@ -68,6 +73,12 @@ describe('Solution Verification Service', () => {
 
   // TODO: Migrate following lines to Angular 8 once ExplorationStatesService and
   // ExplorationDataService are migrated.
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(function() {
     mockExplorationData = {
       explorationId: 0,
