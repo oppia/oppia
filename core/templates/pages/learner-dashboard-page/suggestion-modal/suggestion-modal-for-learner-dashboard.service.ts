@@ -16,47 +16,39 @@
  * @fileoverview Service to display suggestion modal in learner view.
  */
 
-require(
-  'pages/learner-dashboard-page/suggestion-modal/' +
-  'learner-dashboard-suggestion-modal.controller.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-require('domain/utilities/url-interpolation.service.ts');
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LearnerDashboardSuggestionModalComponent } from 
+  'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component.ts';
 
-angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
-  '$uibModal', 'UrlInterpolationService',
-  function($uibModal, UrlInterpolationService) {
-    var _showEditStateContentSuggestionModal = function(
-        newContent, oldContent, description) {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner-dashboard-page/suggestion-modal/' +
-          'learner-dashboard-suggestion-modal.directive.html'),
-        backdrop: true,
-        resolve: {
-          newContent: function() {
-            return newContent;
-          },
-          oldContent: function() {
-            return oldContent;
-          },
-          description: function() {
-            return description;
-          }
-        },
-        controller: 'LearnerDashboardSuggestionModalController'
-      });
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class SuggestionModalForLearnerDashboardService {
+  constructor(
+    private nbgModal: NgbModal,
+    private urlInterpolationService: UrlInterpolationService
+  ){}
 
-    return {
-      showSuggestionModal: function(suggestionType, extraParams) {
-        if (suggestionType === 'edit_exploration_state_content') {
-          _showEditStateContentSuggestionModal(
-            extraParams.newContent,
-            extraParams.oldContent,
-            extraParams.description
-          );
-        }
-      }
-    };
+  _showEditStateContentSuggestionModal(newContent:string, oldContent:string, description:string): void {
+    const modelRef = this.nbgModal.open(
+      LearnerDashboardSuggestionModalComponent,{backdrop: true});
+
+    modelRef.componentInstance.newContent = newContent;
+    modelRef.componentInstance.oldContent = oldContent;
+    modelRef.componentInstance.description = description;
   }
-]);
+  showSuggestionModal(suggestionType, extraParams): void {
+    if (suggestionType === 'edit_exploration_state_content') {
+      this._showEditStateContentSuggestionModal(
+        extraParams.newContent,
+        extraParams.oldContent,
+        extraParams.description
+      );
+    }
+  }
+}
+angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', downgradeInjectable(SuggestionModalForLearnerDashboardService));

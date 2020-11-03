@@ -8,10 +8,10 @@
       <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER"></strong>
       <div class="oppia-suggestion-review-panel">
         <div>
-          <angular-html-bind ng-if="oldContent" html-data="oldContent">
+          <angular-html-bind *ngIf="oldContent" html-data="oldContent">
           </angular-html-bind>
         </div>
-        <div ng-if="!oldContent" class="oppia-no-current-state" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
+        <div *ngIf="!oldContent" class="oppia-no-current-state" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
@@ -32,7 +32,7 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
+  <button class="btn btn-secondary" (click)="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
 </div>
 <style>
   .oppia-learner-dashboard-suggestion-body .oppia-no-current-state {
