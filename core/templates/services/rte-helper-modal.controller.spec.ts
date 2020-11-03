@@ -163,7 +163,7 @@ describe('Rte Helper Modal Controller', function() {
         filename: 'mathImage.svg'
       };
       var imageFile = new Blob();
-      spyOn(AssetsBackendApiService, 'saveMathExpresionImage').and.returnValue(
+      spyOn(AssetsBackendApiService, 'saveMathExpresionImageAsync').and.returnValue(
         $q.resolve(response));
       spyOn(
         ImageUploadHelperService,
@@ -190,7 +190,7 @@ describe('Rte Helper Modal Controller', function() {
         }
       }];
       var imageFile = new Blob();
-      spyOn(AssetsBackendApiService, 'saveMathExpresionImage').and.returnValue(
+      spyOn(AssetsBackendApiService, 'saveMathExpresionImageAsync').and.returnValue(
         $q.reject({}));
       spyOn(
         ImageUploadHelperService,
