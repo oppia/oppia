@@ -70,20 +70,15 @@ export class EditableQuestionBackendApiService {
         body.append(filenames[idx], imageBlobs[idx]);
       }
       this.http.post<EditableQuestionBackendResponse>(
-        QuestionDomainConstants.QUESTION_CREATION_URL, body)
-        .toPromise()
+        QuestionDomainConstants.QUESTION_CREATION_URL, body).toPromise()
         .then(response => {
-          if (successCallback) {
-            successCallback(
-              {
-                questionId: response.questionId
-              });
-          }
+          successCallback(
+            {
+              questionId: response.questionId
+            });
         },
         errorResponse => {
-          if (errorCallback) {
-            errorCallback(errorResponse.error.error);
-          }
+          errorCallback(errorResponse.error.error);
         });
     });
   }
@@ -100,17 +95,13 @@ export class EditableQuestionBackendApiService {
       this.http.get<UpdateEditableQuestionBackendResponse>(questionDataUrl)
         .toPromise().then(
           response => {
-            if (successCallback) {
-              successCallback(
-                this.questionObjectFactory
-                  .createFromBackendDict(response.questionDict),
-              );
-            }
+            successCallback(
+              this.questionObjectFactory
+                .createFromBackendDict(response.questionDict),
+            );
           },
           errorResponse => {
-            if (errorCallback) {
-              errorCallback(errorResponse.error.error);
-            }
+            errorCallback(errorResponse.error.error);
           });
     });
   }
@@ -134,20 +125,15 @@ export class EditableQuestionBackendApiService {
         change_list: changeList
       };
       this.http.put<UpdateEditableQuestionBackendResponse>(
-        editableQuestionDataUrl, putData)
-        .toPromise()
+        editableQuestionDataUrl, putData).toPromise()
         .then(response => {
           let questionDict = angular.copy(response.questionDict);
-          if (successCallback) {
-            successCallback(
-              // The returned data is an updated question dict.
-              questionDict);
-          }
+          successCallback(
+            // The returned data is an updated question dict.
+            questionDict);
         },
         errorResponse => {
-          if (errorCallback) {
-            errorCallback(errorResponse.error.error);
-          }
+          errorCallback(errorResponse.error.error);
         });
     });
   }
@@ -169,18 +155,13 @@ export class EditableQuestionBackendApiService {
         action: 'edit_links',
         difficulty: difficulty,
         skill_ids_task_list: skillIdsTaskArray
-      })
-        .toPromise()
+      }).toPromise()
         .then(
           response => {
-            if (successCallback) {
-              successCallback();
-            }
+            successCallback();
           },
           errorResponse => {
-            if (errorCallback) {
-              errorCallback(errorResponse.error.error);
-            }
+            errorCallback(errorResponse.error.error);
           });
     });
   }
@@ -202,18 +183,13 @@ export class EditableQuestionBackendApiService {
         action: 'update_difficulty',
         skill_id: skillId
       };
-      this.http.put(changeDifficultyUrl, putData).
-        toPromise()
+      this.http.put(changeDifficultyUrl, putData).toPromise()
         .then(
           response => {
-            if (successCallback) {
-              successCallback();
-            }
+            successCallback();
           },
           errorResponse => {
-            if (errorCallback) {
-              errorCallback(errorResponse.error.error);
-            }
+            errorCallback(errorResponse.error.error);
           });
     });
   }
