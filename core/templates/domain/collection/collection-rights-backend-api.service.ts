@@ -119,7 +119,7 @@ export class CollectionRightsBackendApiService {
   }
 
   /**
-   * Behaves exactly as fetchCollectionRights (including callback
+   * Behaves exactly as fetchCollectionRightsAsync (including callback
    * behavior and returning a promise object), except this function will
    * attempt to see whether the given collection rights has been
    * cached. If it has not yet been cached, it will fetch the collection

@@ -69,7 +69,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        */
       loadCollection: function(collectionId) {
         _collectionIsLoading = true;
-        EditableCollectionBackendApiService.fetchCollection(
+        EditableCollectionBackendApiService.fetchCollectionAsync(
           collectionId).then(
           function(newCollectionObject) {
             _updateCollection(newCollectionObject);
@@ -180,7 +180,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
           return false;
         }
         _collectionIsBeingSaved = true;
-        EditableCollectionBackendApiService.updateCollection(
+        EditableCollectionBackendApiService.updateCollectionAsync(
           _collection.getId(), _collection.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(collectionObject) {
