@@ -28,16 +28,16 @@ import { LearnerDashboardSuggestionModalComponent } from 'pages/learner-dashboar
 export class SuggestionModalForLearnerDashboardService {
   constructor(
     private nbgModal: NgbModal
-  ){}
+  ) {}
 
   _showEditStateContentSuggestionModal(
-    newContent:string, oldContent:string, description:string): void {
-      const modelRef = this.nbgModal.open(
-        LearnerDashboardSuggestionModalComponent,{backdrop: true});
+      newContent:string, oldContent:string, description:string): void {
+    const modelRef = this.nbgModal.open(
+      LearnerDashboardSuggestionModalComponent, {backdrop: true});
 
-      modelRef.componentInstance.newContent = newContent;
-      modelRef.componentInstance.oldContent = oldContent;
-      modelRef.componentInstance.description = description;
+    modelRef.componentInstance.newContent = newContent;
+    modelRef.componentInstance.oldContent = oldContent;
+    modelRef.componentInstance.description = description;
   }
   showSuggestionModal(suggestionType:string, extraParams): void {
     if (suggestionType === 'edit_exploration_state_content') {
