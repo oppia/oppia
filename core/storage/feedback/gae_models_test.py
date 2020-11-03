@@ -60,12 +60,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
-            gae_id='gae_1_id',
             email='some@email.com'
         ).put()
         user_models.UserSettingsModel(
             id=self.NEW_USER_2_ID,
-            gae_id='gae_2_id',
             email='some_other@email.com'
         ).put()
 
@@ -480,12 +478,7 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            feedback_models.FeedbackAnalyticsModel
-            .has_reference_to_user_id('id_x'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):

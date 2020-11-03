@@ -39,20 +39,16 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
-    USER_1_GAE_ID = 'gae_id'
     USER_1_EMAIL = 'user@example.com'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     USER_2_ID = 'user2_id'
-    USER_2_GAE_ID = 'gae2_id'
     USER_2_EMAIL = 'user2@example.com'
     USER_2_ROLE = feconf.ROLE_ID_BANNED_USER
     USER_3_ID = 'user3_id'
-    USER_3_GAE_ID = 'gae3_id'
     USER_3_EMAIL = 'user3@example.com'
     USER_3_ROLE = feconf.ROLE_ID_ADMIN
     GENERIC_PIN = '12345'
     PROFILE_1_ID = 'profile_id'
-    PROFILE_1_GAE_ID = 'gae_id'
     PROFILE_1_EMAIL = 'user@example.com'
     PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     GENERIC_USERNAME = 'user'
@@ -68,26 +64,22 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         super(UserSettingsModelTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
-            gae_id=self.USER_1_GAE_ID,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_1_ID,
-            gae_id=self.PROFILE_1_GAE_ID,
             email=self.PROFILE_1_EMAIL,
             role=self.PROFILE_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
-            gae_id=self.USER_2_GAE_ID,
             email=self.USER_2_EMAIL,
             role=self.USER_2_ROLE,
             deleted=True
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
-            gae_id=self.USER_3_GAE_ID,
             email=self.USER_3_EMAIL,
             role=self.USER_3_ROLE,
             username=self.GENERIC_USERNAME,
@@ -251,7 +243,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             new_id = user_models.UserSettingsModel.get_new_id('')
             self.assertNotIn(new_id, ids)
             user_models.UserSettingsModel(
-                id=new_id, gae_id='gae_id', email='some@email.com').put()
+                id=new_id, email='some@email.com').put()
             ids.add(new_id)
 
     def test_get_new_id_with_deleted_user_model(self):
@@ -827,12 +819,10 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         super(UserSubscriptionsModelTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id='gae_1_id',
             email='some@email.com'
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
-            gae_id='gae_2_id',
             email='some_other@email.com'
         ).put()
 
@@ -841,7 +831,6 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         for creator_id in self.CREATOR_IDS:
             user_models.UserSettingsModel(
                 id=creator_id,
-                gae_id='gae_' + creator_id,
                 username='username' + creator_id,
                 email=creator_id + '@example.com'
             ).put()
@@ -951,12 +940,10 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id='gae_1_id',
             email='some@email.com'
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
-            gae_id='gae_2_id',
             email='some_other@email.com'
         ).put()
 
@@ -2324,8 +2311,6 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE,
-            exploration_ids=[],
-            collection_ids=[],
         ).put()
 
     def test_get_deletion_policy(self):
