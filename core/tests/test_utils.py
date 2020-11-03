@@ -371,13 +371,13 @@ class TestBase(unittest.TestCase):
         earlier in the same list.
         """
         new_param_dict = copy.deepcopy(param_dict)
-        for pc in param_changes:
+        for param_change in param_changes:
             try:
-                obj_type = exp_param_specs[pc.name].obj_type
+                obj_type = exp_param_specs[param_change.name].obj_type
             except:
-                raise Exception('Parameter %s not found' % pc.name)
-            new_param_dict[pc.name] = pc.get_normalized_value(
-                obj_type, new_param_dict)
+                raise Exception('Parameter %s not found' % param_change.name)
+            new_param_dict[param_change.name] = (
+                param_change.get_normalized_value(obj_type, new_param_dict))
         return new_param_dict
 
     def get_static_asset_filepath(self):
@@ -1059,9 +1059,9 @@ tags: []
         self.testbed.activate()
 
         self.testbed.setup_env(
-            overwrite=True, auth_domain=self.AUTH_DOMAIN,
-            http_host=self.HTTP_HOST, server_name=self.SERVER_NAME,
-            server_port=self.SERVER_PORT,
+            overwrite=True,
+            auth_domain=self.AUTH_DOMAIN, http_host=self.HTTP_HOST,
+            server_name=self.SERVER_NAME, server_port=self.SERVER_PORT,
             default_version_hostname=self.DEFAULT_VERSION_HOSTNAME)
 
         # Declare any relevant App Engine service stubs here.
@@ -1102,8 +1102,8 @@ tags: []
             is_super_admin: bool. Whether the user is a super admin.
         """
         self.testbed.setup_env(
-            overwrite=True, user_email=email,
-            user_id=self.get_gae_id_from_email(email),
+            overwrite=True,
+            user_email=email, user_id=self.get_gae_id_from_email(email),
             user_is_admin=('1' if is_super_admin else '0'))
 
     def logout(self):
@@ -1501,8 +1501,8 @@ tags: []
                 for upload_file in upload_files)
 
         return app.post(
-            url, data, expect_errors=expect_errors, upload_files=upload_files,
-            headers=headers, status=expected_status_int)
+            url, params=data, headers=headers, status=expected_status_int,
+            upload_files=upload_files, expect_errors=expect_errors)
 
     def post_email(
             self, recipient_email, sender_email, subject, body, html_body=None,
@@ -1547,9 +1547,9 @@ tags: []
         if csrf_token:
             payload['csrf_token'] = csrf_token
         return self.taskqueue_testapp.post(
-            url, params=json.dumps(payload), content_type='application/json',
-            expect_errors=expect_errors, headers=headers,
-            status=expected_status_int)
+            url, params=json.dumps(payload), headers=headers,
+            status=expected_status_int, expect_errors=expect_errors,
+            content_type='application/json')
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
         """PUT an object to the server with JSON and return the response."""
@@ -1570,6 +1570,7 @@ tags: []
         # Reference URL:
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
+
         return self._parse_json_response(json_response, expect_errors)
 
     def get_new_csrf_token(self):
@@ -2470,7 +2471,7 @@ tags: []
                     self.taskqueue_testapp if task.url.startswith('/task') else
                     self.testapp)
                 response = app.post(
-                    url=task.url, params=params, headers=headers,
+                    task.url, params=params, headers=headers,
                     expect_errors=True)
                 if response.status_code != 200:
                     raise RuntimeError('MapReduce task failed: %r' % task)
