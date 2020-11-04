@@ -67,75 +67,79 @@ describe('SuggestionModalForCreatorDashboardBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  it('should make a request to update the suggestion in the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let suggestion = suggestionObjectFactory.createFromBackendDict(
-      suggestionBackendDict);
-    let backendResponse = {
-      suggestion: suggestionBackendDict
-    };
+  it(
+    'should make a request to update the suggestion in the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let suggestion = suggestionObjectFactory.createFromBackendDict(
+        suggestionBackendDict);
+      let backendResponse = {
+        suggestion: suggestionBackendDict
+      };
 
-    let urlDetails = {
-      targetType: 'exploration',
-      targetId: 0,
-      suggestionId: 0
-    };
+      let urlDetails = {
+        targetType: 'exploration',
+        targetId: 0,
+        suggestionId: 0
+      };
 
-    let updateData = {
-      action: 'accept',
-      commitMessage: 'commit message',
-      reviewMessage: 'review message'
-    };
+      let updateData = {
+        action: 'accept',
+        commitMessage: 'commit message',
+        reviewMessage: 'review message'
+      };
 
-    sugBackendApiService.updateSuggestion(
-      urlDetails, updateData).then(successHandler, failHandler);
-    
-    let req = httpTestingController
-      .expectOne('/suggestionactionhandler/exploration/0/0');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(backendResponse);
+      sugBackendApiService.updateSuggestion(
+        urlDetails, updateData).then(successHandler, failHandler);
 
-    flushMicrotasks();
+      let req = httpTestingController
+        .expectOne('/suggestionactionhandler/exploration/0/0');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(backendResponse);
 
-    expect(successHandler).toHaveBeenCalledWith(suggestion);
-    expect(failHandler).not.toHaveBeenCalled();
-  })
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(suggestion);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
   );
 
-  it('should use rejection handler if suggestion update in the backend failed', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should use rejection handler if suggestion update in the backend failed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    let urlDetails = {
-      targetType: 'exploration',
-      targetId: 0,
-      suggestionId: 0
-    };
+      let urlDetails = {
+        targetType: 'exploration',
+        targetId: 0,
+        suggestionId: 0
+      };
 
-    let updateData = {
-      action: 'accept',
-      commitMessage: 'commit message',
-      reviewMessage: 'review message'
-    };
+      let updateData = {
+        action: 'accept',
+        commitMessage: 'commit message',
+        reviewMessage: 'review message'
+      };
 
-    sugBackendApiService.updateSuggestion(
-      urlDetails, updateData).then(successHandler, failHandler);
+      sugBackendApiService.updateSuggestion(
+        urlDetails, updateData).then(successHandler, failHandler);
 
-    let req = httpTestingController
-      .expectOne('/suggestionactionhandler/exploration/0/0');
-    expect(req.request.method).toEqual('PUT');
+      let req = httpTestingController
+        .expectOne('/suggestionactionhandler/exploration/0/0');
+      expect(req.request.method).toEqual('PUT');
 
-    req.flush({
-      error: 'Error updating suggestion.'
-    }, {
-      status: 500, statusText: 'Error updating suggestion.'
-    });
+      req.flush({
+        error: 'Error updating suggestion.'
+      }, {
+        status: 500, statusText: 'Error updating suggestion.'
+      });
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error updating suggestion.');
-  })
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error updating suggestion.');
+    })
   );
 });
