@@ -969,10 +969,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     else:
                         exported_property_names.append(property_name)
                 elif (export_policy[property_name] ==
-                        base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID):
-                        model_takeout_ids.append(property_name)
+                      base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID):
+                    model_takeout_ids.append(property_name)
 
-            if export_method == base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER:
+            if (export_method ==
+                base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
                 self.assertEqual(len(exported_property_names), 0)
                 self.assertEqual(len(model_takeout_ids), 0)
             elif (export_method ==
@@ -986,7 +987,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted(exported_property_names)
                 )
             elif (export_method ==
-                  base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS):
+                  base_models.\
+                      MODEL_ASSOCIATION_TO_USER.\
+                          ONE_INSTANCE_SHARED_ACROSS_USERS):
                 self.assertIsNotNone(
                     model.get_field_name_mapping_to_takeout_keys)
                 exported_data = model.export_data(self.USER_ID_1)

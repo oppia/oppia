@@ -892,16 +892,19 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     @staticmethod
     def export_data(user_id):
         """Exports the UserEmailPreferencesModel for this user."""
-        user_email_preferences = UserEmailPreferencesModel.get(user_id)
-        return {
-            'site_updates': user_email_preferences.site_updates,
-            'editor_role_notifications':
-                user_email_preferences.editor_role_notifications,
-            'feedback_message_notifications':
-                user_email_preferences.feedback_message_notifications,
-            'subscription_notifications':
-                user_email_preferences.subscription_notifications
-        }
+        user_email_preferences = UserEmailPreferencesModel.get_by_id(user_id)
+        if user_email_preferences:
+            return {
+                'site_updates': user_email_preferences.site_updates,
+                'editor_role_notifications':
+                    user_email_preferences.editor_role_notifications,
+                'feedback_message_notifications':
+                    user_email_preferences.feedback_message_notifications,
+                'subscription_notifications':
+                    user_email_preferences.subscription_notifications
+            }
+        else:
+            return {}
 
 
 class UserSubscriptionsModel(base_models.BaseModel):
@@ -2706,8 +2709,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
     @staticmethod
     def export_data(user_id):
         """Exports the username of the parent."""
-        user_auth_model = UserAuthDetailsModel.get(user_id)
-        if user_auth_model.parent_user_id:
+        user_auth_model = UserAuthDetailsModel.get_by_id(user_id)
+        if user_auth_model and user_auth_model.parent_user_id:
             parent_data = UserSettingsModel.get(user_auth_model.parent_user_id)
             parent_username = parent_data.username
             return {
