@@ -226,6 +226,7 @@ import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-pag
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service.ts';
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
@@ -562,6 +563,7 @@ export const angularServices: [string, unknown][] = [
   ['SubtopicPageContentsObjectFactory', SubtopicPageContentsObjectFactory],
   ['SubtopicPageObjectFactory', SubtopicPageObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
+  ['SuggestionModalForLearnerDashboardService', SuggestionModalForLearnerDashboardService],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionObjectFactory', SuggestionObjectFactory],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
