@@ -3205,9 +3205,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 'field check of ExplorationSnapshotMetadataModel\', '
                 '[u"Entity id 0-1: based on field exploration_ids '
                 'having value 0, expected model ExplorationModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_ids having value 0, expected model '
-                'ExplorationModel with id 0 but it doesn\'t exist"]]'
+                'id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotMetadataModel\', 2]')]
