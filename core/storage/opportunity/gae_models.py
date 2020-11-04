@@ -44,9 +44,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         repeated=True, indexed=True)
     translation_counts = (
         datastore_services.JsonProperty(default={}, indexed=False))
-    assigned_voice_artist_in_language_codes = datastore_services.StringProperty(
-        repeated=True, indexed=True)
-    need_voice_artist_in_language_codes = datastore_services.StringProperty(
+    language_codes_with_assigned_voice_artists = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    language_codes_needing_voice_artists = datastore_services.StringProperty(
         repeated=True, indexed=True)
 
     @staticmethod
@@ -69,9 +69,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             'incomplete_translation_language_codes':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'assigned_voice_artist_in_language_codes':
+            'language_codes_with_assigned_voice_artists':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'need_voice_artist_in_language_codes':
+            'language_codes_needing_voice_artists':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -150,7 +150,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             start_cursor = None
 
         results, cursor, more = cls.query(
-            cls.need_voice_artist_in_language_codes == language_code).order(
+            cls.language_codes_needing_voice_artists == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
 
