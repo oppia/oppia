@@ -238,7 +238,8 @@ angular.module('oppia').factory('ThreadDataService', [
           text: newMessage
         }).then((response) => {
           if (updatedStatus) {
-            openThreadsCount += (newStatus === STATUS_OPEN) ? 1 : -1;
+            openThreadsCount += (newStatus === STATUS_OPEN) ? 1 :
+              ((openThreadsCount === 0) ? 0 : -1);
           }
           thread.status = newStatus;
           let threadMessageBackendDicts = response.data.messages;
