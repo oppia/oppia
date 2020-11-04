@@ -91,9 +91,9 @@ class QuestionModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -232,9 +232,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -655,11 +655,11 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     question_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -729,12 +729,12 @@ class QuestionSummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model data has already been exported as a part of the QuestionModel
         export_data function, and thus a new export_data function does not
         need to be defined here.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

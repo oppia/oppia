@@ -94,11 +94,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as multiple unshared instances since there
         are multiple feedback threads relevant to a particular user.
         """
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -120,11 +120,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_export_policy_exceptions(cls):
+    def get_takeout_keys_to_rename(cls):
         """Indicates that the last_updated variable is exported under the
         name "last_updated_msec" in Takeout.
         """
-        return dict(super(cls, cls).get_export_policy_exceptions(), ** {
+        return dict(super(cls, cls).get_takeout_keys_to_rename(), ** {
             'last_updated': 'last_updated_msec'
         })
 
@@ -168,7 +168,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 'has_suggestion': feedback_model.has_suggestion,
                 'summary': feedback_model.summary,
                 'message_count': feedback_model.message_count,
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated': utils.get_time_in_millisecs(
                     feedback_model.last_updated)
             }
 
@@ -274,11 +274,11 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as multiple unshared instances since there are
         multiple feedback messages relevant to a user.
         """
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -564,18 +564,18 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as unshared instances since there are multiple
         feedback threads relevant to a user.
         """
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thread_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thread_id': base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID,
             'message_ids_read_by_user':
                 base_models.EXPORT_POLICY.EXPORTED
         })
@@ -734,9 +734,9 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -793,9 +793,9 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

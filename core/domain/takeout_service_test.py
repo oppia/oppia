@@ -954,10 +954,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # Iterate over models and test export policies.
         for model in all_models:
-            export_method = model.get_export_method()
+            export_method = model.get_model_association_to_user()
             export_policy = model.get_export_policy()
-            renamed_export_keys = model.get_export_policy_exceptions()
+            renamed_export_keys = model.get_takeout_keys_to_rename()
             exported_property_names = []
+            model_takeout_ids = []
             for property_name in model._properties: # pylint: disable=protected-access
                 if (export_policy[property_name] ==
                         base_models.EXPORT_POLICY.EXPORTED):
@@ -967,12 +968,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         )
                     else:
                         exported_property_names.append(property_name)
+                elif (export_policy[property_name] ==
+                        base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID):
+                        model_takeout_ids.append(property_name)
 
-            if export_method == base_models.EXPORT_METHOD.NOT_EXPORTED:
+            if export_method == base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER:
                 self.assertEqual(len(exported_property_names), 0)
+                self.assertEqual(len(model_takeout_ids), 0)
             elif (export_method ==
-                  base_models.EXPORT_METHOD.SINGLE_UNSHARED_INSTANCE):
+                  base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
+                self.assertEqual(len(model_takeout_ids), 0)
                 self.assertEqual(
                     sorted([
                         python_utils.UNICODE(key)
@@ -980,11 +986,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted(exported_property_names)
                 )
             elif (export_method ==
-                  base_models.EXPORT_METHOD.SHARED_INSTANCE):
+                  base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS):
                 self.assertIsNotNone(
                     model.get_field_name_mapping_to_takeout_keys)
                 exported_data = model.export_data(self.USER_ID_1)
                 field_mapping = model.get_field_name_mapping_to_takeout_keys()
+                self.assertEqual(len(model_takeout_ids), 0)
                 self.assertEqual(
                     sorted(exported_property_names),
                     sorted(field_mapping.keys())
@@ -994,10 +1001,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted(field_mapping.values())
                 )
             elif (export_method ==
-                  base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES):
+                  base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
-
                 for model_id in exported_data.keys():
+                    if len(model_takeout_ids) > 0:
+                        self.assertEqual(model_id,
+                            getattr(model, model_takeout_ids[0]))
                     self.assertEqual(
                         sorted([
                             python_utils.UNICODE(key)

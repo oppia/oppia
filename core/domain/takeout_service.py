@@ -53,8 +53,8 @@ def get_models_which_should_be_exported():
 
     return [model_class for model_class in
             models.Registry.get_all_storage_model_classes()
-            if model_class.get_export_method() !=
-            base_models.EXPORT_METHOD.NOT_EXPORTED and
+            if model_class.get_model_association_to_user() !=
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER and
             not model_class.__name__ in exempt_base_classes]
 
 

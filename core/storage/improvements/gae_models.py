@@ -133,11 +133,11 @@ class TaskEntryModel(base_models.BaseModel):
         cls.delete_multi(cls.query(cls.resolver_id == user_id))
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as a shared instance since multiple users
         resolve tasks.
         """
-        return base_models.EXPORT_METHOD.SHARED_INSTANCE
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_export_policy(cls):
@@ -150,10 +150,10 @@ class TaskEntryModel(base_models.BaseModel):
             'task_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'target_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'target_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'issue_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_description': base_models.EXPORT_POLICY.EXPORTED,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
             'resolver_id': base_models.EXPORT_POLICY.EXPORTED,
-            'resolved_on': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'resolved_on': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -181,7 +181,13 @@ class TaskEntryModel(base_models.BaseModel):
             TaskEntryModel.resolver_id == user_id)
         return {
             'task_ids_resolved_by_user': (
-                [t.id for t in task_ids_resolved_by_user])
+                [t.id for t in task_ids_resolved_by_user]),
+            'issue_description': (
+                [t.issue_description for t in task_ids_resolved_by_user]),
+            'status': (
+                [t.status for t in task_ids_resolved_by_user]),
+            'resolved_on': (
+                [t.resolved_on for t in task_ids_resolved_by_user]),
         }
 
     @classmethod

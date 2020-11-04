@@ -93,11 +93,11 @@ class SentEmailModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Users already have access to this data since emails were sent
         to them.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -329,11 +329,11 @@ class BulkEmailModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Users already have access to this data since the emails were sent
         to them.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -414,16 +414,16 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as multiple unshared instance."""
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thread_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thread_id': base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID,
             'reply_to_id': base_models.EXPORT_POLICY.EXPORTED
         })
 

@@ -121,9 +121,9 @@ class ExplorationModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -247,9 +247,9 @@ class ExplorationContextModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -359,11 +359,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
         )
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as a shared instance since multiple users
         contribute to an exploration and have varying rights.
         """
-        return base_models.EXPORT_METHOD.SHARED_INSTANCE
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_export_policy(cls):
@@ -378,6 +378,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            # DEPRECATED in v2.8.3., so translator_ids are not exported.
             'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -621,11 +622,11 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         )
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -919,11 +920,11 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(limit)
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model data has already been exported as a part of the
         ExplorationModel and thus does not need a separate export.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

@@ -184,9 +184,9 @@ class TopicModel(base_models.VersionedModel):
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -243,9 +243,9 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return 'topic-%s-%s' % (topic_id, version)
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -325,9 +325,9 @@ class TopicSummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -507,11 +507,11 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.put()
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as a shared instance since multiple users
         contribute to topics and their rights.
         """
-        return base_models.EXPORT_METHOD.SHARED_INSTANCE
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_export_policy(cls):

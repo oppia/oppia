@@ -56,19 +56,21 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     # Indicates that a model's field is to be exported.
     'EXPORTED',
+    # Indicates that the field is exported as the Takeout id.
+    'EXPORTED_AS_MODEL_TAKEOUT_ID',
     # Indicates that a model's field should not be exported.
     'NOT_APPLICABLE'
 )
 
-EXPORT_METHOD = utils.create_enum(  # pylint: disable=invalid-name
+MODEL_ASSOCIATION_TO_USER = utils.create_enum(  # pylint: disable=invalid-name
     # Indicates that a model has a single instance per user.
-    'SINGLE_UNSHARED_INSTANCE',
+    'ONE_INSTANCE_PER_USER',
     # Indicates that a model can be shared by multiple users.
-    'SHARED_INSTANCE',
+    'ONE_INSTANCE_SHARED_ACROSS_USERS',
     # Indicates that a model has multiple instances, specific to a user.
-    'MULTIPLE_UNSHARED_INSTANCES',
+    'MULTIPLE_INSTANCES_PER_USER',
     # Indicates that a model should not be exported.
-    'NOT_EXPORTED'
+    'NOT_CORRESPONDING_TO_USER'
 )
 
 # Constant used when retrieving big number of models.
@@ -179,7 +181,7 @@ class BaseModel(datastore_services.Model):
             'derived class. It should be implemented in the derived class.')
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """This method should be implemented by subclasses.
 
         Raises:
@@ -187,7 +189,7 @@ class BaseModel(datastore_services.Model):
                 class.
         """
         raise NotImplementedError(
-            'The get_export_method() method is missing from the '
+            'The get_model_association_to_user() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
     @classmethod
@@ -200,7 +202,7 @@ class BaseModel(datastore_services.Model):
         }
 
     @classmethod
-    def get_export_policy_exceptions(cls):
+    def get_takeout_keys_to_rename(cls):
         """Returns a dictionary containing a mapping from field names to
         export dictionary keys for fields whose export dictionary key does
         not match their field name.
@@ -454,11 +456,11 @@ class BaseCommitLogEntryModel(BaseModel):
     version = datastore_services.IntegerProperty()
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
         Takeout.
         """
-        return EXPORT_METHOD.NOT_EXPORTED
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
     
     def get_deletion_policy():
         """BaseCommitLogEntryModel contains data corresponding to a user that
@@ -1165,11 +1167,11 @@ class VersionedModel(BaseModel):
         } for (ind, model) in enumerate(returned_models)]
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
         Takeout.
         """
-        return EXPORT_METHOD.NOT_EXPORTED
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1214,9 +1216,9 @@ class BaseSnapshotMetadataModel(BaseModel):
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """This model is exported as multiple unshared instances."""
-        return EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+        return MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1318,11 +1320,11 @@ class BaseSnapshotContentModel(BaseModel):
     content = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """The contents of snapshots are not relevant to the user for
         Takeout.
         """
-        return EXPORT_METHOD.NOT_EXPORTED
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

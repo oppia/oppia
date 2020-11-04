@@ -190,9 +190,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as multiple unshared instance."""
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -627,11 +627,11 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             cls.language_code == language_code)).fetch()
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model is exported as multiple unshared instances since there are
         multiple voiceover applications relevant to a user.
         """
-        return base_models.EXPORT_METHOD.MULTIPLE_UNSHARED_INSTANCES
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -744,11 +744,11 @@ class CommunityContributionStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """This model does not directly contain user
         information because the data is aggregated.
         """
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

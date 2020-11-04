@@ -121,9 +121,9 @@ class StateCounterModel(base_models.BaseModel):
         return counter
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -194,9 +194,9 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -265,9 +265,9 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -335,9 +335,9 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -460,9 +460,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -601,9 +601,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         leave_event_entity.put()
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -736,9 +736,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -829,9 +829,9 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         ).put()
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -948,9 +948,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1021,9 +1021,9 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1096,9 +1096,9 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1301,9 +1301,9 @@ class ExplorationStatsModel(base_models.BaseModel):
         cls.put_multi(exploration_stats_models)
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1397,9 +1397,14 @@ class ExplorationIssuesModel(base_models.BaseModel):
         return instance_id
 
     @staticmethod
-    def get_export_method():
-        """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+    def get_model_association_to_user():
+        """Suggested new Takeout docstring for ExplorationIssuesModel: All
+        playthrough issue data is anonymized and contains no data directly
+        corresponding to users. For specifics on the data included in this
+        model, see:
+        https://github.com/oppia/oppia/tree/develop/extensions/issues.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1441,9 +1446,13 @@ class PlaythroughModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_export_method():
-        """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+    def get_model_association_to_user():
+        """All playthrough data is anonymized and contains no data directly
+        corresponding to users. For specifics on the data included in this
+        model, see:
+        https://github.com/oppia/oppia/tree/develop/extensions/actions.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1673,9 +1682,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return None
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1778,9 +1787,9 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -2147,9 +2156,9 @@ class StateAnswersModel(base_models.BaseModel):
         return sys.getsizeof(json.dumps(answer_dict))
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -2287,9 +2296,9 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             state_name, calculation_id])
 
     @staticmethod
-    def get_export_method():
+    def get_model_association_to_user():
         """Model does not contain user data."""
-        return base_models.EXPORT_METHOD.NOT_EXPORTED
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
