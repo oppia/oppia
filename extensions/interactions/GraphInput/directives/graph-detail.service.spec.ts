@@ -15,11 +15,11 @@
 /**
  * @fileoverview Unit tests for graph detail service.
  */
+
 import { TestBed } from '@angular/core/testing';
 
 import { GraphDetailService } from
   'interactions/GraphInput/directives/graph-detail.service.ts';
-
 
 describe('GraphDetailService', () => {
   let gds: GraphDetailService;
@@ -32,58 +32,65 @@ describe('GraphDetailService', () => {
     gds = TestBed.get(GraphDetailService);
   });
 
-  it('should be able to return directed adge arrow points', () => {
-    var graph1 = {
-      isWeighted: true,
-      edges: [
-        {src: 0, dst: 1, weight: 1, $$hashKey: 'object:319'},
-        {src: 1, dst: 2, weight: 1, $$hashKey: 'object:320'}
-      ],
-      isDirected: true,
-      vertices: [
-        {x: 150, y: 50, label: '', $$hashKey: 'object:323'},
-        {x: 200, y: 50, label: '', $$hashKey: 'object:324'},
-        {x: 150, y: 100, label: '', $$hashKey: 'object:325'}
-      ],
-      isLabeled: false
-    };
+  describe('on calling getDirectedEdgeArrowPoints', () => {
+    it('should return empty string for zero length between points', () => {
+      var graph = {
+        isWeighted: true,
+        edges: [
+          {src: 0, dst: 0, weight: 1, $$hashKey: 'object:319'},
+        ],
+        isDirected: true,
+        vertices: [
+          {x: 283.5625, y: 72.95833587646484, label: '', $$hashKey: 'object:352'},
+          {x: 281.5625, y: 182.9583282470703, label: '', $$hashKey: 'object:368'}
+        ],
+        isLabeled: false
+      };
 
-    var graph2 = {
-      isWeighted: true,
-      edges: [
-        {src: 0, dst: 0, weight: 1, $$hashKey: 'object:319'},
-      ],
-      isDirected: true,
-      vertices: [
-        {x: 283.5625, y: 72.95833587646484, label: '', $$hashKey: 'object:352'},
-        {x: 281.5625, y: 182.9583282470703, label: '', $$hashKey: 'object:368'}
-      ],
-      isLabeled: false
-    };
+      expect(gds.getDirectedEdgeArrowPoints(graph, 0)).toBe('');
+    });
 
-    expect(gds.getDirectedEdgeArrowPoints(graph1, 0)).toBe(
-      '196,50 186,45 186,55');
-    expect(gds.getDirectedEdgeArrowPoints(graph2, 0)).toBe('');
+    it('should return correct arrow points for a non-zero length between points', () => {
+      var graph = {
+        isWeighted: true,
+        edges: [
+          {src: 0, dst: 1, weight: 1, $$hashKey: 'object:319'},
+          {src: 1, dst: 2, weight: 1, $$hashKey: 'object:320'}
+        ],
+        isDirected: true,
+        vertices: [
+          {x: 150, y: 50, label: '', $$hashKey: 'object:323'},
+          {x: 200, y: 50, label: '', $$hashKey: 'object:324'},
+          {x: 150, y: 100, label: '', $$hashKey: 'object:325'}
+        ],
+        isLabeled: false
+      };
+
+      expect(gds.getDirectedEdgeArrowPoints(graph, 0)).toBe(
+        '196,50 186,45 186,55');
+    });
   });
 
-  it('should be able to return edgecentre', () => {
-    var graph = {
-      isWeighted: true,
-      edges: [
-        {src: 0, dst: 1, weight: 1, $$hashKey: 'object:319'},
-      ],
-      isDirected: true,
-      vertices: [
-        {x: 150, y: 50, label: '', $$hashKey: 'object:327'},
-        {x: 200, y: 50, label: '', $$hashKey: 'object:328'}
-      ],
-      isLabeled: false
-    };
+  describe('on calling getDirectedEdgeArrowPoints', () => {
+    it('should return correct edge center for the given index', () => {
+      var graph = {
+        isWeighted: true,
+        edges: [
+          {src: 0, dst: 1, weight: 1, $$hashKey: 'object:319'},
+        ],
+        isDirected: true,
+        vertices: [
+          {x: 150, y: 50, label: '', $$hashKey: 'object:327'},
+          {x: 200, y: 50, label: '', $$hashKey: 'object:328'}
+        ],
+        isLabeled: false
+      };
 
-    var index = 0;
+      var index = 0;
 
-    var result = {x: 175, y: 50};
+      var result = {x: 175, y: 50};
 
-    expect(gds.getEdgeCentre(graph, index)).toEqual(result);
+      expect(gds.getEdgeCentre(graph, index)).toEqual(result);
+    });
   });
 });
