@@ -25,6 +25,7 @@ import { ObjectsDomainConstants } from
 import { FractionAnswer } from
   'interactions/answer-defs';
 
+
 export class Fraction {
   isNegative: boolean;
   wholeNumber: number;
@@ -76,7 +77,7 @@ export class Fraction {
   }
 
   convertToSimplestForm(): Fraction {
-    var gcd = (x: number, y: number) => {
+    const gcd = (x: number, y: number): number => {
       return y === 0 ? x : gcd(y, x % y);
     };
     var g = gcd(this.numerator, this.denominator);
