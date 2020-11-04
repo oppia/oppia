@@ -42,112 +42,116 @@ describe('Pencil Code Editor Validation Service', () => {
     agof = TestBed.get(AnswerGroupObjectFactory);
   });
 
-  it('should return empty list when feeback is given', () => {
-    var customizationArgs = {
-      initialCode: {
-        value: ' Add the initial code snippet here.↵code is here'
-      }
-    };
-    expect(pcevs.getCustomizationArgsWarnings(customizationArgs)).toEqual([]);
+  describe('on calling getCustomizationArgsWarnings', () => {
+    it('should return empty list when feeback is given', () => {
+      var customizationArgs = {
+        initialCode: {
+          value: ' Add the initial code snippet here.↵code is here'
+        }
+      };
+      expect(pcevs.getCustomizationArgsWarnings(customizationArgs)).toEqual([]);
+    });
   });
 
-  it('should return error when no feedback is given', () => {
-    var statename = 'Introduction';
+  describe('on calling getAllWarnings', () => {
+    it('should return error when no feedback is given', () => {
+      var statename = 'Introduction';
 
-    var customizationArgs = {
-      initialCode: {
-        value: ' Add the initial code snippet here.↵code is here'
-      }
-    };
+      var customizationArgs = {
+        initialCode: {
+          value: ' Add the initial code snippet here.↵code is here'
+        }
+      };
 
-    const testOutcome1 = oof.createNew(
-      'Introduction', 'default_outcome', '', []);
+      const testOutcome1 = oof.createNew(
+        'Introduction', 'default_outcome', '', []);
 
-    var answergroup1 = [];
-    var partialWarningsList = [];
+      var answergroup1 = [];
+      var partialWarningsList = [];
 
-    partialWarningsList.push({
-      type: AppConstants.WARNING_TYPES.ERROR,
-      message: (
-        'Please add feedback for the user in the [All other answers] ' +
-        'rule.')
+      partialWarningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'Please add feedback for the user in the [All other answers] ' +
+          'rule.')
+      });
+
+      // It returns the error when feedback is not provided.
+      expect(pcevs.getAllWarnings(
+        statename, customizationArgs, answergroup1, testOutcome1)
+      ).toEqual(partialWarningsList);
+
+      inputBackend = {
+        x: [['<p>one</p>']]
+      };
+
+      const testOutcome2 = oof.createNew(
+        'Introduction', 'feedback_0', '<p>YES</p>', []);
+
+      let rulesDict = rof.createNew('CodeString', inputBackend);
+
+      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
+
+      // It also returns the error when feedback is not provided.
+      expect(pcevs.getAllWarnings(
+        statename, customizationArgs,
+        [answergroup2], testOutcome1)
+      ).toEqual(partialWarningsList);
     });
 
-    // It returns the error when feedback is not provided.
-    expect(pcevs.getAllWarnings(
-      statename, customizationArgs, answergroup1, testOutcome1)
-    ).toEqual(partialWarningsList);
+    it('should not return error when feedback is given', () => {
+      var statename = 'Introduction';
 
-    inputBackend = {
-      x: [['<p>one</p>']]
-    };
+      var customizationArgs = {
+        initialCode: {
+          value: ' Add the initial code snippet here.↵code is here'
+        }
+      };
 
-    const testOutcome2 = oof.createNew(
-      'Introduction', 'feedback_0', '<p>YES</p>', []);
+      inputBackend = {
+        x: [['<p>one</p>']]
+      };
 
-    let rulesDict = rof.createNew('CodeString', inputBackend);
+      const testOutcome = oof.createNew(
+        'Introduction', 'feedback_0', '<p>YES</p>', []);
 
-    let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
+      let rulesDict = rof.createNew('CodeString', inputBackend);
 
-    // It also returns the error when feedback is not provided.
-    expect(pcevs.getAllWarnings(
-      statename, customizationArgs,
-      [answergroup2], testOutcome1)
-    ).toEqual(partialWarningsList);
-  });
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
 
-  it('should not return error when feedback is given', () => {
-    var statename = 'Introduction';
+      const testOutcome2 = oof.createNew(
+        'Introduction', 'default_outcome',
+        '<p>no</p>', []);
 
-    var customizationArgs = {
-      initialCode: {
-        value: ' Add the initial code snippet here.↵code is here'
-      }
-    };
+      // It returns the list when feedback is provided.
+      expect(pcevs.getAllWarnings(
+        statename, customizationArgs, [answergroup2], testOutcome2)
+      ).toEqual([]);
+    });
 
-    inputBackend = {
-      x: [['<p>one</p>']]
-    };
+    it('should call getCustomizationArgsWarnings', () => {
+      var statename = 'Introduction';
 
-    const testOutcome = oof.createNew(
-      'Introduction', 'feedback_0', '<p>YES</p>', []);
+      var customizationArgs = {
+        initialCode: {
+          value: ' Add the initial code snippet here.↵code is here'
+        }
+      };
 
-    let rulesDict = rof.createNew('CodeString', inputBackend);
+      const testOutcome1 = oof.createNew(
+        'Introduction', 'default_outcome', '', []);
 
-    let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
+      var answergroup1 = [];
 
-    const testOutcome2 = oof.createNew(
-      'Introduction', 'default_outcome',
-      '<p>no</p>', []);
+      spyOn(pcevs, 'getCustomizationArgsWarnings')
+        .withArgs(customizationArgs).and.returnValue([]);
 
-    // It returns the list when feedback is provided.
-    expect(pcevs.getAllWarnings(
-      statename, customizationArgs, [answergroup2], testOutcome2)
-    ).toEqual([]);
-  });
+      // It returns the error when feedback is not provided.
+      pcevs.getAllWarnings(
+        statename, customizationArgs, answergroup1, testOutcome1);
 
-  it('should call getCustomizationArgsWarnings', () => {
-    var statename = 'Introduction';
-
-    var customizationArgs = {
-      initialCode: {
-        value: ' Add the initial code snippet here.↵code is here'
-      }
-    };
-
-    const testOutcome1 = oof.createNew(
-      'Introduction', 'default_outcome', '', []);
-
-    var answergroup1 = [];
-
-    spyOn(pcevs, 'getCustomizationArgsWarnings')
-      .withArgs(customizationArgs).and.returnValue([]);
-
-    // It returns the error when feedback is not provided.
-    pcevs.getAllWarnings(
-      statename, customizationArgs, answergroup1, testOutcome1);
-
-    // It checks the getCustomizationArgsWarnings has been called or not.
-    expect(pcevs.getCustomizationArgsWarnings).toHaveBeenCalled();
+      // It checks the getCustomizationArgsWarnings has been called or not.
+      expect(pcevs.getCustomizationArgsWarnings).toHaveBeenCalled();
+    });
   });
 });
