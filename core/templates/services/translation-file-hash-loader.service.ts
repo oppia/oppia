@@ -17,11 +17,10 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('./translations-backend-api.service.ts')
 
 angular.module('oppia').factory('TranslationFileHashLoaderService', [
-  '$q', 'TranslationsBackendApiService', 'UrlInterpolationService',
-  function($q, TranslationsBackendApiService, UrlInterpolationService) {
+  '$http', '$q', 'UrlInterpolationService',
+  function($http, $q, UrlInterpolationService) {
     /* Options object contains:
      *  prefix: added before key, defined by developer
      *  key: language key, determined internally by i18n library
@@ -33,10 +32,10 @@ angular.module('oppia').factory('TranslationFileHashLoaderService', [
         options.key,
         options.suffix
       ].join('');
-      return TranslationsBackendApiService.loadTranslationFileHash(
+      return $http.get(
         UrlInterpolationService.getStaticAssetUrl(fileUrl)
       ).then(function(result) {
-        return result;
+        return result.data;
       }, function() {
         return $q.reject(options.key);
       });

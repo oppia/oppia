@@ -37,9 +37,6 @@ export class TranslationsBackendApiService {
     return this.http.get<TranslationsDict>(
       `${this.prefix}${languageCode}${this.suffix}`).toPromise();
   }
-  loadTranslationFileHash(url: string): Promise<String> {
-    return this.http.get<String>(url).toPromise();
-  }
 }
 
 angular.module('oppia').factory(
