@@ -41,9 +41,9 @@ describe('GraphDetailService', () => {
         ],
         isDirected: true,
         vertices: [
-          {x: 283.5625, y: 72.95833587646484, 
+          {x: 283.5625, y: 72.95833587646484,
             label: '', $$hashKey: 'object:352'},
-          {x: 281.5625, y: 182.9583282470703, 
+          {x: 281.5625, y: 182.9583282470703,
             label: '', $$hashKey: 'object:368'}
         ],
         isLabeled: false
@@ -52,7 +52,7 @@ describe('GraphDetailService', () => {
       expect(gds.getDirectedEdgeArrowPoints(graph, 0)).toBe('');
     });
 
-    it('should return correct arrow points for non-zero length between points', () => {
+    it('should return arrow points for non-zero length between points', () => {
       var graph = {
         isWeighted: true,
         edges: [
