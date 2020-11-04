@@ -139,7 +139,7 @@ angular.module('oppia').config([
       'PredictionAlgorithmRegistryService', 'PretestQuestionBackendApiService',
       'ProfilePageBackendApiService', 'QuestionBackendApiService',
       'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',
-      'RatingComputationService', 'ReadOnlyCollectionBackendApiService',
+      'RatingComputationService',
       'ReadOnlySubtopicPageObjectFactory', 'ReviewTestBackendApiService',
       'RubricObjectFactory', 'SchemaDefaultValueService',
       'SchemaUndefinedLastElementService', 'SidebarStatusService',
