@@ -330,6 +330,16 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationSnapshotMetadataModel]
 
+    @staticmethod
+    def reduce(key, values):
+        """Yields number of fully validated models or the failure messages."""
+        if 'fully-validated' in key:
+            yield (key, len(values))
+        else:
+            # Just yield one error of each error type since the list of errors
+            # for this model is quite large.
+            yield (key, [values[0]])
+
 
 class ExplorationSnapshotContentModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
