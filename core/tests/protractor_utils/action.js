@@ -32,6 +32,18 @@ var click = async function(elementName, clickableElement) {
   await clickableElement.click();
 };
 
+var count = async function(elementsName, elements) {
+  await waitFor.visibilityOf(elements, `${elementsName} is not visible.`);
+
+  return await textElement.count();
+};
+
+var getText = async function(elementName, textElement) {
+  await waitFor.visibilityOf(textElement, `${elementName} is not visible.`);
+
+  return await textElement.getText();
+};
+
 var select = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var optionElement = selectorElement.element(
@@ -56,6 +68,8 @@ var sendKeys = async function(inputName, inputElement, keys) {
 
 exports.clear = clear;
 exports.click = click;
+exports.count = count;
+exports.getText = getText;
 exports.select = select;
 exports.select2 = select2;
 exports.sendKeys = sendKeys;
