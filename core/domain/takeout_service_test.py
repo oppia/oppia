@@ -987,9 +987,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted(exported_property_names)
                 )
             elif (export_method ==
-                  base_models.\
-                      MODEL_ASSOCIATION_TO_USER.\
-                          ONE_INSTANCE_SHARED_ACROSS_USERS):
+                  base_models
+                      .MODEL_ASSOCIATION_TO_USER
+                          .ONE_INSTANCE_SHARED_ACROSS_USERS):
                 self.assertIsNotNone(
                     model.get_field_name_mapping_to_takeout_keys)
                 exported_data = model.export_data(self.USER_ID_1)
