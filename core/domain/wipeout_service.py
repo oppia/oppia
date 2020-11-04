@@ -153,9 +153,6 @@ def pre_delete_user(user_id):
             )
         )
     if user_settings.role != feconf.ROLE_ID_LEARNER:
-        _remove_user_from_activities_with_associated_rights_models(
-            user_id, True)
-
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
         user_services.update_email_preferences(
@@ -169,6 +166,10 @@ def pre_delete_user(user_id):
     )
 
     save_pending_deletion_requests(pending_deletion_requests)
+
+    if user_settings.role != feconf.ROLE_ID_LEARNER:
+        _remove_user_from_activities_with_associated_rights_models(
+            user_id, True)
 
 
 def run_user_deletion(pending_deletion_request):
