@@ -859,10 +859,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
             if line == b'':
                 blank_line_counter += 1
             if line in docstring_sections:
-                blank_line_counter = 0
                 if blank_line_counter == 0 or blank_line_counter > 1:
                     self.add_message(docstring_sections[line], node=node)
-
+                blank_line_counter = 0
 
     def check_docstring_structure(self, node):
         """Checks whether the docstring has the correct structure i.e.

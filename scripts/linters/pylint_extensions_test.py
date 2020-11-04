@@ -816,8 +816,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='no-newline-used-at-end', node=node_no_newline_at_end)
+        message_below_args = testutils.Message(
+            msg_id='single-space-below-args', node=node_no_newline_at_end)
 
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertAddsMessages(
+            message, message_below_args):
             self.checker_test_object.checker.visit_functiondef(
                 node_no_newline_at_end)
 
@@ -876,8 +879,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_with_no_space_above_return)
 
-    def test_varying_combination_of_newline_above_args(self):
-        node_newline_above_args_raises = astroid.extract_node(
+    def test_varying_combination_of_newline_around_docstring_sections(self):
+        node_newline_above_raises_below_args = astroid.extract_node(
             u"""def func(arg): #@
                 \"\"\"Raises exception.
 
@@ -889,16 +892,22 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 raise exception
         """)
 
-        message = testutils.Message(
+        message_above_raises = testutils.Message(
             msg_id='single-space-above-raises',
-            node=node_newline_above_args_raises
+            node=node_newline_above_raises_below_args
         )
 
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_functiondef(
-                node_newline_above_args_raises)
+        message_below_args = testutils.Message(
+            msg_id='single-space-below-args',
+            node=node_newline_above_raises_below_args
+        )
 
-        node_newline_above_args_returns = astroid.extract_node(
+        with self.checker_test_object.assertAddsMessages(
+            message_above_raises, message_below_args):
+            self.checker_test_object.checker.visit_functiondef(
+                node_newline_above_raises_below_args)
+
+        node_newline_above_returns_below_args = astroid.extract_node(
             u"""def func(arg): #@
                 \"\"\"Returns Something.
 
@@ -910,14 +919,20 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 return something
         """)
 
-        message = testutils.Message(
+        message_above_returns = testutils.Message(
             msg_id='single-space-above-returns',
-            node=node_newline_above_args_returns
+            node=node_newline_above_returns_below_args
         )
 
-        with self.checker_test_object.assertAddsMessages(message):
+        message_below_args = testutils.Message(
+            msg_id='single-space-below-args',
+            node=node_newline_above_returns_below_args
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_above_returns, message_below_args):
             self.checker_test_object.checker.visit_functiondef(
-                node_newline_above_args_returns)
+                node_newline_above_returns_below_args)
 
         node_newline_above_returns_raises = astroid.extract_node(
             u"""def func(): #@
@@ -929,23 +944,34 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     raises_exception. Description.
 
                 Returns:
-                    returns_something. Description.
-                \"\"\"
+                    returns_something. Description.\"\"\"
                 raise something
                 return something
         """)
 
-        message = testutils.Message(
+        message_no_newline_at_end = testutils.Message(
+            msg_id='no-newline-used-at-end',
+            node=node_newline_above_returns_raises
+        )
+
+        message_above_raises = testutils.Message(
             msg_id='single-space-above-raises',
             node=node_newline_above_returns_raises
         )
 
-        with self.checker_test_object.assertAddsMessages(message):
+        message_below_returns = testutils.Message(
+            msg_id='single-space-below-returns',
+            node=node_newline_above_returns_raises
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_no_newline_at_end, message_above_raises,
+            message_below_returns):
             self.checker_test_object.checker.visit_functiondef(
                 node_newline_above_returns_raises)
 
-    def test_excessive_newline_above_args(self):
-        node_with_two_newline = astroid.extract_node(
+    def test_excessive_newline_around_docstring_sections(self):
+        node_with_multiple_newlines = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"Returns something.
 
@@ -965,191 +991,36 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     yield something
         """)
 
-        single_space_above_args_message = testutils.Message(
+        message_above_args = testutils.Message(
             msg_id='single-space-above-args',
-            node=node_with_two_newline
+            node=node_with_multiple_newlines
         )
 
-        single_space_above_returns_message = testutils.Message(
+        message_above_returns = testutils.Message(
             msg_id='single-space-above-returns',
-            node=node_with_two_newline
+            node=node_with_multiple_newlines
         )
 
-        single_space_above_yields_message = testutils.Message(
+        message_above_yields = testutils.Message(
             msg_id='single-space-above-yield',
-            node=node_with_two_newline
+            node=node_with_multiple_newlines
+        )
+
+        message_below_args = testutils.Message(
+            msg_id='single-space-below-args',
+            node=node_with_multiple_newlines
+        )
+
+        message_below_returns = testutils.Message(
+            msg_id='single-space-below-returns',
+            node=node_with_multiple_newlines
         )
 
         with self.checker_test_object.assertAddsMessages(
-            single_space_above_args_message, single_space_above_returns_message,
-            single_space_above_yields_message):
+            message_above_args, message_above_returns, message_above_yields,
+            message_below_returns, message_below_args):
             self.checker_test_object.checker.visit_functiondef(
-                node_with_two_newline)
-
-    def test_no_newline_below_args(self):
-        node_single_newline_below_args = astroid.extract_node(
-            u"""def func(arg): #@
-                \"\"\"Do something.
-
-                Args:
-                    arg: argument. Description.\"\"\"
-        """)
-
-        message = testutils.Message(
-            msg_id='single-space-below-args',
-            node=node_single_newline_below_args)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_functiondef(
-                node_single_newline_below_args)
-
-    def test_no_newline_below_raises(self):
-        node_single_newline_below_raises = astroid.extract_node(
-            u"""def func(): #@
-                    \"\"\"Raises exception.
-
-                    Raises:
-                        raises_exception. Description.\"\"\"
-                    raise exception
-        """)
-
-        message = testutils.Message(
-            msg_id='single-space-below-raises',
-            node=node_single_newline_below_raises
-        )
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_functiondef(
-                node_single_newline_below_raises)
-
-    def test_no_newline_below_return(self):
-        node_with_no_space_below_return = astroid.extract_node(
-            u"""def func(): #@
-                \"\"\"Returns something.
-
-                Returns:
-                    returns_something. Description.\"\"\"
-                return something
-        """)
-
-        message = testutils.Message(
-            msg_id='single-space-below-returns',
-            node=node_with_no_space_below_return
-        )
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_functiondef(
-                node_with_no_space_below_return)
-
-    def test_varying_combination_of_newline_below_docstring_sections(self):
-        node_newline_below_args = astroid.extract_node(
-            u"""def func(arg): #@
-                \"\"\"Raises exception.
-
-                Args:
-                    arg: argument. Description.
-                Raises:
-                    raises_something. Description.
-                \"\"\"
-                raise exception
-        """)
-
-        message = testutils.Message(
-            msg_id='single-space-below-args',
-            node=node_newline_below_args
-        )
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_functiondef(
-                node_newline_below_args)
-
-        node_newline_below_args_returns = astroid.extract_node(
-            u"""def func(arg): #@
-                \"\"\"Returns Something.
-
-                Args:
-                    arg: argument. Description.
-                Returns:
-                    returns_something. Description.\"\"\"
-                return something
-        """)
-
-        message_args = testutils.Message(
-            msg_id='single-space-below-args',
-            node=node_newline_below_args_returns
-        )
-        message_returns = testutils.Message(
-            msg_id='single-space-below-returns',
-            node=node_newline_below_args_returns
-        )
-
-        with self.checker_test_object.assertAddsMessages(message_args, message_returns):
-            self.checker_test_object.checker.visit_functiondef(
-                node_newline_below_args_returns)
-
-        node_newline_below_returns = astroid.extract_node(
-            u"""def func(): #@
-                \"\"\"Do something.
-
-                Raises:
-                    raises_exception. Description.
-                Returns:
-                    returns_something. Description.
-                \"\"\"
-                raise something
-                return something
-        """)
-
-        message_raises = testutils.Message(
-            msg_id='single-space-below-raises',
-            node=node_newline_below_returns
-        )
-
-        with self.checker_test_object.assertAddsMessages(message_raises):
-            self.checker_test_object.checker.visit_functiondef(
-                node_newline_below_returns)
-
-    def test_excessive_newline_below_docstring_sections(self):
-        node_multiple_newlines_below_sections = astroid.extract_node(
-            u"""def func(arg): #@
-                    \"\"\"Returns something.
-
-                    Args:
-                        arg: argument. This is  description.
-
-
-                    Returns:
-                        int. Returns something.
-
-
-                    Yields:
-                        yield_something. Description.
-
-                    \"\"\"
-                    return True
-                    yield something
-        """)
-
-        message_args = testutils.Message(
-            msg_id='single-space-below-args',
-            node=node_multiple_newlines_below_sections
-        )
-
-        message_returns = testutils.Message(
-            msg_id='single-space-below-returns',
-            node=node_multiple_newlines_below_sections
-        )
-
-        message_yields = testutils.Message(
-            msg_id='single-space-below-yield',
-            node=node_multiple_newlines_below_sections
-        )
-
-        with self.checker_test_object.assertAddsMessages(
-            message_args, message_returns,
-            message_yields):
-            self.checker_test_object.checker.visit_functiondef(
-                node_multiple_newlines_below_sections)
+                node_with_multiple_newlines)
 
         node_multiple_newlines_below_returns = astroid.extract_node(
             u"""def func(arg): #@
@@ -1169,14 +1040,94 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     yield something
         """)
 
-        message_returns = testutils.Message(
+        message_above_yields = testutils.Message(
+            msg_id='single-space-above-yield',
+            node=node_multiple_newlines_below_returns
+        )
+
+        message_below_returns = testutils.Message(
             msg_id='single-space-below-returns',
             node=node_multiple_newlines_below_returns
         )
 
-        with self.checker_test_object.assertAddsMessages(message_returns):
+        with self.checker_test_object.assertAddsMessages(
+            message_above_yields, message_below_returns):
             self.checker_test_object.checker.visit_functiondef(
                 node_multiple_newlines_below_returns)
+
+    def test_no_newline_below_args(self):
+        node_no_newline_below_args_end = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"Do something.
+
+                Args:
+                    arg: argument. Description.\"\"\"
+        """)
+
+        message_no_newline_at_end = testutils.Message(
+            msg_id='no-newline-used-at-end',
+            node=node_no_newline_below_args_end
+        )
+
+        message_below_args = testutils.Message(
+            msg_id='single-space-below-args',
+            node=node_no_newline_below_args_end
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_no_newline_at_end, message_below_args):
+            self.checker_test_object.checker.visit_functiondef(
+                node_no_newline_below_args_end)
+
+    def test_no_newline_below_raises(self):
+        node_no_newline_below_raises_end = astroid.extract_node(
+            u"""def func(): #@
+                    \"\"\"Raises exception.
+
+                    Raises:
+                        raises_exception. Description.\"\"\"
+                    raise exception
+        """)
+
+        message_no_newline_at_end = testutils.Message(
+            msg_id='no-newline-used-at-end',
+            node=node_no_newline_below_raises_end
+        )
+
+        message_below_raises = testutils.Message(
+            msg_id='single-space-below-raises',
+            node=node_no_newline_below_raises_end
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_no_newline_at_end, message_below_raises):
+            self.checker_test_object.checker.visit_functiondef(
+                node_no_newline_below_raises_end)
+
+    def test_no_newline_below_return(self):
+        node_no_newline_below_raises_end = astroid.extract_node(
+            u"""def func(): #@
+                \"\"\"Returns something.
+
+                Returns:
+                    returns_something. Description.\"\"\"
+                return something
+        """)
+
+        message_no_newline_at_end = testutils.Message(
+            msg_id='no-newline-used-at-end',
+            node=node_no_newline_below_raises_end
+        )
+
+        message_below_returns = testutils.Message(
+            msg_id='single-space-below-returns',
+            node=node_no_newline_below_raises_end
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_no_newline_at_end, message_below_returns):
+            self.checker_test_object.checker.visit_functiondef(
+                node_no_newline_below_raises_end)
 
     def test_return_in_comment(self):
         node_with_return_in_comment = astroid.extract_node(
