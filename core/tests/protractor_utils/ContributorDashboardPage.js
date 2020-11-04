@@ -136,7 +136,8 @@ var ContributorDashboardPage = function() {
       element(opportunityHeadingCss),
       'Opportunity Heading takes too long to appear.');
 
-    var opportunityCount = await opportunityListItems.count();
+    var opportunityCount = await action.count(
+      'Opportunity items', opportunityListItems);
     var opportunityElements = [];
     for (var i = 0; i < opportunityCount; i++) {
       var opportunityElement = await opportunityListItems.get(i);
@@ -155,16 +156,11 @@ var ContributorDashboardPage = function() {
       var opportunity = opportunityElements[i];
 
       var headingElement = opportunity.element(opportunityHeadingCss);
-      await waitFor.visibilityOf(
-        headingElement,
-        'Opportunity heading is taking too much time to appear');
-      var heading = await headingElement.getText();
+      var heading = await action.getText('Opportunity heading', headingElement);
 
       var subheadingElement = opportunity.element(opportunitySubheadingCss);
-      await waitFor.visibilityOf(
-        subheadingElement,
-        'Opportunity subheading is taking too much time to appear');
-      var subheading = await subheadingElement.getText();
+      var subheading = await action.getText(
+        'Opportunity subheading', subheadingElement);
 
       if (expectedHeading === heading && expectedSubheading === subheading) {
         return opportunity;
@@ -183,19 +179,15 @@ var ContributorDashboardPage = function() {
 
     if (expectedLabel !== null) {
       var labelElement = opportunity.element(opportunityLabelCss);
-      await waitFor.visibilityOf(
-        labelElement, 'Opportunity label is taking too much time to appear');
-      var label = await labelElement.getText();
+      var label = await action.getText('Opportunity label', labelElement);
       expect(expectedLabel).toBe(label);
     }
 
     if (expectedPercentage !== null) {
       var percentageElement = opportunity.element(
         opportunityProgressPercentageCss);
-      await waitFor.visibilityOf(
-        percentageElement,
-        'Opportunity percentage is taking too much time to appear');
-      percentage = await percentageElement.getText();
+      var percentage = await action.getText(
+        'Opportunity percentage', percentageElement);
       expect(expectedPercentage).toBe(percentage);
     }
   };
