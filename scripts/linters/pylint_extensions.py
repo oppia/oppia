@@ -543,7 +543,27 @@ class DocstringParameterChecker(checkers.BaseChecker):
             ' form: *args: list(*). Description.',
             'malformed-args-argument',
             'The parameter is incorrectly formatted.'
-        )
+        ),
+        'W9039': (
+            'Files must have a single newline below args in doc string.',
+            'single-space-below-args',
+            'Please enter a single newline below args in doc string.'
+        ),
+        'W9040': (
+            'Files must have a single newline below returns in doc string.',
+            'single-space-below-returns',
+            'Please enter a single newline below returns in doc string.'
+        ),
+        'W9041': (
+            'Files must have a single newline below raises in doc string.',
+            'single-space-below-raises',
+            'Please enter a single newline below raises in doc string.'
+        ),
+        'W9042': (
+            'Files must have a single newline below yield in doc string.',
+            'single-space-below-yield',
+            'Please enter a single newline below yield in doc string.'
+        ),
     }
 
     options = (
@@ -818,6 +838,32 @@ class DocstringParameterChecker(checkers.BaseChecker):
             if line != b'':
                 blank_line_counter = 0
 
+    def check_newline_below_docstring_sections(self, node, docstring):
+        """Checks to ensure that there is a single space below the
+        "Args", "Returns", "Raises", and "Yields" sections in a docstring.
+
+        Args:
+            node: astroid.node.Function. Node for a function or method
+                definition in the AST.
+            docstring: list(str). Function docstring in splitted by newlines.
+        """
+        docstring_sections = {
+            b'Args:': 'single-space-below-args',
+            b'Returns:': 'single-space-below-returns',
+            b'Raises:': 'single-space-below-raises',
+            b'Yields:': 'single-space-below-yields'
+        }
+        blank_line_counter = 0
+        for line in docstring[::-1]:
+            line = line.strip()
+            if line == b'':
+                blank_line_counter += 1
+            if line in docstring_sections:
+                blank_line_counter = 0
+                if blank_line_counter == 0 or blank_line_counter > 1:
+                    self.add_message(docstring_sections[line], node=node)
+
+
     def check_docstring_structure(self, node):
         """Checks whether the docstring has the correct structure i.e.
         do not have space at the beginning and have a period at the end of
@@ -879,6 +925,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
             args_indentation_in_spaces = 0
             docstring = node.doc.splitlines()
             self.check_newline_above_args(node, docstring)
+            self.check_newline_below_docstring_sections(node, docstring)
             for line in docstring:
                 stripped_line = line.lstrip()
                 current_line_indentation = (
