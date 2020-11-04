@@ -77,6 +77,7 @@
   }
 
   .oppia-classroom-search-container .initial-help-text {
+    font-weight: 500;
     padding-top: 2.5vh;
   }
 
@@ -98,14 +99,15 @@
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
     display: grid;
     grid-gap: 2vw;
-    grid-template-columns: 210px 210px 210px 210px;
+    grid-template-columns: 210px 210px 210px;
     justify-content: space-between;
     margin-top: 40px;
     overflow-y: auto;
+    padding-bottom: 18vh;
   }
 
   .oppia-classroom-viewer-container .oppia-topic-summary-tile {
-    padding-bottom: 200px;
+    padding-bottom: 40px;
   }
 
   .oppia-classroom-viewer-container .classroom-name {
@@ -116,7 +118,7 @@
   }
   .oppia-classroom-viewer-container .oppia-classroom-banner {
     margin-left: 25vw;
-    margin-top: -10vw;
+    margin-top: -120px;
     width: 25vw;
   }
   classroom-page .oppia-classroom-page-subheading-text {
@@ -127,9 +129,18 @@
     .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
       grid-template-columns: 180px 180px 180px;
     }
+
+    .oppia-classroom-viewer-container,
+    .oppia-classroom-search-section {
+      width: 60vw;
+    }
+
+    .oppia-classroom-search-container {
+      margin-left: -20vw;
+    }
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 850px) {
     .oppia-classroom-viewer-container .oppia-topic-summary-tile {
       padding-bottom: 80px;
     }
@@ -141,13 +152,16 @@
       padding-top: 0.5vh;
     }
 
-    .oppia-classroom-viewer-container,
+    .oppia-classroom-viewer-container {
+      width: 80vw;
+    }
+
     .oppia-classroom-search-section {
-      width: 70vw;
+      width: 90vw;
     }
 
     .oppia-classroom-search-container {
-      margin-left: -15vw;
+      margin-left: -10vw;
     }
 
     .classroom-page-help-text {
@@ -167,9 +181,16 @@
   }
 
   @media(max-width: 500px) {
-    .oppia-classroom-viewer-container,
+    .oppia-classroom-viewer-container {
+      width: 85vw;
+    }
+
+    .oppia-classroom-search-container {
+      margin-left: -7vw;
+    }
+
     .oppia-classroom-search-section {
-      width: 70vw;
+      width: 90vw;
     }
 
     .oppia-classroom-details {
