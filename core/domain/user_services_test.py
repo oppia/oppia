@@ -29,6 +29,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import suggestion_services
 from core.domain import user_domain
 from core.domain import user_jobs_continuous
 from core.domain import user_services
@@ -106,6 +107,24 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(user_services.is_user_id_valid('uid_%s' % ('a' * 31)))
         self.assertFalse(user_services.is_user_id_valid('a' * 36))
 
+    def test_is_user_or_pseudonymous_id(self):
+        self.assertTrue(
+            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 32)))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id(
+                'uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
+        self.assertTrue(
+            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 32)))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id(
+                'pid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(
+            user_services.is_user_or_pseudonymous_id('pid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_or_pseudonymous_id('a' * 36))
+
     def test_set_and_get_username(self):
         gae_id = 'someUser'
         username = 'username'
@@ -129,17 +148,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_username_for_pseudonymous_id(self):
         self.assertEqual(
-            'UserAaaaaaaa',
+            'User_Aaaaaaaa',
             user_services.get_username('pid_' + 'a' * 32))
         self.assertEqual(
-            'UserBbbbbbbb',
+            'User_Bbbbbbbb',
             user_services.get_username('pid_' + 'b' * 32))
 
     def test_get_usernames_for_pseudonymous_ids(self):
 
         # Handle usernames that exists.
         self.assertEqual(
-            ['UserAaaaaaaa', 'UserBbbbbbbb'],
+            ['User_Aaaaaaaa', 'User_Bbbbbbbb'],
             user_services.get_usernames(['pid_' + 'a' * 32, 'pid_' + 'b' * 32]))
 
     def test_get_usernames_empty_list(self):
@@ -334,7 +353,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_models.UserSettingsModel(
             id=user_id,
-            gae_id=gae_id,
             email=email,
             username=username,
         ).put()
@@ -345,7 +363,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
-        self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
@@ -363,7 +380,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_models.UserSettingsModel(
             id=user_id,
-            gae_id=gae_id,
             email=email,
             username=username,
         ).put()
@@ -374,7 +390,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
-        self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
@@ -709,7 +724,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             new_gae_id)
         user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
             user_settings.user_id)
-        self.assertEqual(user_auth_details.gae_id, user_settings.gae_id)
+        self.assertEqual(user_auth_details.gae_id, new_gae_id)
 
     def test_get_auth_details_by_user_id_for_existing_user_works_fine(self):
         gae_id = 'new_gae_id'
@@ -1842,13 +1857,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_gae_id_raises_exception(self):
-        self.user_settings.gae_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected gae_id to be a string'
-        ):
-            self.user_settings.validate()
-
     def test_validate_non_str_pin_id(self):
         self.user_settings.pin = 0
         with self.assertRaisesRegexp(
@@ -1951,7 +1959,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_create_new_user_with_existing_gae_id_raises_error(self):
         user_id = self.user_settings.user_id
-        user_gae_id = self.user_settings.gae_id
+        user_gae_id = (
+            user_services.get_auth_details_by_user_id(user_id).gae_id)
         with self.assertRaisesRegexp(
             Exception, 'User %s already exists for gae_id %s.'
             % (user_id, user_gae_id)
@@ -1998,7 +2007,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         # Create an unregistered user who has no username.
         user_models.UserSettingsModel(
             id='unregistered_user_id',
-            gae_id='gae_unregistered_user_id',
             email='user@example.com',
             username='').put()
 
@@ -2166,6 +2174,11 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'to be a string'):
             self.user_contributions.validate()
 
+    def test_cannot_create_user_contributions_with_migration_bot(self):
+        self.assertIsNone(
+            user_services.create_user_contributions(
+                feconf.MIGRATION_BOT_USER_ID, [], []))
+
     def test_cannot_create_user_contributions_with_existing_user_id(self):
         with self.assertRaisesRegexp(
             Exception,
@@ -2183,6 +2196,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self):
         model = user_models.UserStatsModel.get_or_create(self.owner_id)
         model.schema_version = 0
+        model.update_timestamps()
         model.put()
 
         self.assertIsNone(user_services.get_user_impact_score(self.owner_id))
@@ -2192,29 +2206,369 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
             user_services.update_dashboard_stats_log(self.owner_id)
 
-    def test_flush_migration_bot_contributions_model(self):
-        created_exploration_ids = ['exp_1', 'exp_2']
-        edited_exploration_ids = ['exp_3', 'exp_4']
-        user_services.create_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, created_exploration_ids,
-            edited_exploration_ids)
 
-        migration_bot_contributions_model = (
-            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
-        self.assertEqual(
-            migration_bot_contributions_model.created_exploration_ids,
-            created_exploration_ids)
-        self.assertEqual(
-            migration_bot_contributions_model.edited_exploration_ids,
-            edited_exploration_ids)
+class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
+    """Test the functionality related to updating the community contribution
+    stats.
+    """
 
-        user_services.flush_migration_bot_contributions_model()
-        migration_bot_contributions_model = (
-            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+    REVIEWER_1_EMAIL = 'reviewer1@community.org'
+    REVIEWER_2_EMAIL = 'reviewer2@community.org'
+
+    def _assert_community_contribution_stats_is_in_default_state(self):
+        """Checks if the community contribution stats is in its default
+        state.
+        """
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+
         self.assertEqual(
-            migration_bot_contributions_model.created_exploration_ids, [])
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code
+            ), {})
         self.assertEqual(
-            migration_bot_contributions_model.edited_exploration_ids, [])
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            community_contribution_stats.question_reviewer_count, 0)
+        self.assertEqual(
+            community_contribution_stats.question_suggestion_count, 0)
+
+    def setUp(self):
+        super(
+            CommunityContributionStatsUnitTests, self).setUp()
+
+        self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
+        self.reviewer_1_id = self.get_user_id_from_email(
+            self.REVIEWER_1_EMAIL)
+
+        self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
+        self.reviewer_2_id = self.get_user_id_from_email(
+            self.REVIEWER_2_EMAIL)
+
+    def test_grant_reviewer_translation_reviewing_rights_increases_count(self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_grant_reviewer_translation_multi_reviewing_rights_increases_count(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code,
+            {'hi': 1, 'en': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_grant_reviewer_existing_translation_reviewing_rights_no_count_diff(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        # Assert that the translation reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+
+        # Assert that the translation reviewer count did not change because the
+        # reviewer already had the permissions.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_remove_all_reviewer_translation_reviewing_rights_decreases_count(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        # Assert that the translation reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.remove_translation_review_rights_in_language(
+            self.reviewer_1_id, 'hi')
+
+        # Assert that the translation reviewer count decreased by one after the
+        # rights were removed.
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_remove_some_reviewer_translation_reviewing_rights_decreases_count(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        # Assert that the translation reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.remove_translation_review_rights_in_language(
+            self.reviewer_1_id, 'hi')
+
+        # Assert that the translation reviewer count decreased by one after the
+        # rights were removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'en': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_remove_translation_contribution_reviewer_decreases_count(self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        # Assert that the translation reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.remove_contribution_reviewer(self.reviewer_1_id)
+
+        # Assert that the translation reviewer counts decreased by one after the
+        # contribution reviewer was removed.
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_grant_reviewer_question_reviewing_rights_increases_count(self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_grant_reviewer_existing_question_reviewing_rights_no_count_diff(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the question reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+
+        # Assert that the question reviewer count did not change because the
+        # reviewer already had the permissions.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_remove_reviewer_question_reviewing_rights_decreases_count(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the question reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.remove_question_review_rights(self.reviewer_1_id)
+
+        # Assert that the question reviewer count decreased by one after the
+        # rights were removed.
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_remove_question_contribution_reviewer_decreases_count(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the question reviewer count increased by one.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.remove_contribution_reviewer(self.reviewer_1_id)
+
+        # Assert that the question reviewer count decreased by one after the
+        # contribution reviewer was removed.
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_grant_reviewer_multiple_reviewing_rights_increases_counts(self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_grant_multiple_reviewers_multi_reviewing_rights_increases_counts(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'fr')
+        user_services.allow_user_to_review_question(self.reviewer_2_id)
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 2)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code,
+            {'hi': 2, 'en': 1, 'fr': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_remove_question_rights_from_multi_rights_reviewer_updates_count(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the counts were updated before the question rights are
+        # removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.remove_question_review_rights(self.reviewer_1_id)
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 0)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_remove_translation_rights_from_multi_rights_reviewer_updates_count(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the counts were updated before the translation rights are
+        # removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.remove_translation_review_rights_in_language(
+            self.reviewer_1_id, 'hi')
+
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+    def test_remove_multi_rights_contribution_reviewer_decreases_counts(self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'en')
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        # Assert that the counts were updated before the contribution reviewer
+        # is removed.
+        stats = suggestion_services.get_community_contribution_stats()
+        self.assertEqual(stats.question_reviewer_count, 1)
+        self.assertEqual(stats.question_suggestion_count, 0)
+        self.assertDictEqual(
+            stats.translation_reviewer_counts_by_lang_code, {'hi': 1, 'en': 1})
+        self.assertDictEqual(
+            stats.translation_suggestion_counts_by_lang_code, {})
+
+        user_services.remove_contribution_reviewer(self.reviewer_1_id)
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_grant_reviewer_voiceover_reviewing_permissions_does_nothing(self):
+        # Granting reviewers voiceover reviewing permissions does not change the
+        # counts because voiceover suggestions are currently not offered on the
+        # Contributor Dashboard.
+        user_services.allow_user_to_review_voiceover_in_language(
+            self.reviewer_1_id, 'hi')
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_remove_reviewer_voiceover_reviewing_permissions_does_nothing(self):
+        # Removing reviewers voiceover reviewing permissions does not change the
+        # counts because voiceover suggestions are currently not offered on the
+        # Contributor Dashboard.
+        user_services.allow_user_to_review_voiceover_in_language(
+            self.reviewer_1_id, 'hi')
+        self._assert_community_contribution_stats_is_in_default_state()
+
+        user_services.remove_voiceover_review_rights_in_language(
+            self.reviewer_1_id, 'hi')
+
+        self._assert_community_contribution_stats_is_in_default_state()
 
 
 class UserContributionReviewRightsTests(test_utils.GenericTestBase):
@@ -2502,7 +2856,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.can_review_question_suggestions(
                 self.translator_id))
 
-    def test_removal_of_all_review_rights_delets_model(self):
+    def test_removal_of_all_review_rights_deletes_model(self):
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
         user_services.allow_user_to_review_question(self.translator_id)

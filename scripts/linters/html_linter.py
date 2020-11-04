@@ -38,19 +38,17 @@ class TagMismatchException(Exception):
 class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
-    def __init__(self, filepath, file_lines, debug, failed=False):
+    def __init__(self, filepath, file_lines, failed=False):
         """Define various variables to parse HTML.
 
         Args:
             filepath: str. Path of the file.
             file_lines: list(str). List of the lines in the file.
-            debug: bool. If true prints tag_stack for the file.
             failed: bool. True if the HTML indentation check fails.
         """
         html.parser.HTMLParser.__init__(self)
         self.error_messages = []
         self.tag_stack = []
-        self.debug = debug
         self.failed = failed
         self.filepath = filepath
         self.file_lines = file_lines
@@ -106,12 +104,6 @@ class CustomHTMLParser(html.parser.HTMLParser):
         if tag not in self.void_elements:
             self.tag_stack.append((tag, line_number, column_number))
             self.indentation_level += 1
-
-        # TODO(#10482): Check if the DEBUG mode is useful if it is not useful
-        # then remove it.
-        if self.debug:
-            concurrent_task_utils.log('DEBUG MODE: Start tag_stack')
-            concurrent_task_utils.log(self.tag_stack)
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
@@ -200,10 +192,6 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         self.indentation_level -= 1
 
-        if self.debug:
-            concurrent_task_utils.log('DEBUG MODE: End tag_stack')
-            concurrent_task_utils.log(self.tag_stack)
-
     def handle_data(self, data):
         """Handle indentation level.
 
@@ -225,18 +213,16 @@ class CustomHTMLParser(html.parser.HTMLParser):
 class HTMLLintChecksManager(python_utils.OBJECT):
     """Manages all the HTML linting functions."""
 
-    def __init__(self, files_to_lint, file_cache, debug=False):
+    def __init__(self, files_to_lint, file_cache):
         """Constructs a HTMLLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
             file_cache: object(FileCache). Provides thread-safe access to cached
                 file content.
-            debug: bool. Print tag_stack if set to True.
         """
         self.files_to_lint = files_to_lint
         self.file_cache = file_cache
-        self.debug = debug
 
     @property
     def html_filepaths(self):
@@ -263,7 +249,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         for filepath in html_files_to_lint:
             file_content = self.file_cache.read(filepath)
             file_lines = self.file_cache.readlines(filepath)
-            parser = CustomHTMLParser(filepath, file_lines, self.debug)
+            parser = CustomHTMLParser(filepath, file_lines)
             parser.feed(file_content)
 
             if len(parser.tag_stack) != 0:
@@ -290,8 +276,6 @@ class HTMLLintChecksManager(python_utils.OBJECT):
                     'HTML lint', False, [],
                     ['There are no HTML files to lint.'])]
 
-        # The html tags and attributes check has an additional
-        # debug mode which when enabled prints the tag_stack for each file.
         return [self.check_html_tags_and_attributes()]
 
 

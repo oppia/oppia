@@ -71,6 +71,7 @@ def update_featured_activity_references(featured_activity_references):
             feconf.ACTIVITY_REFERENCE_LIST_FEATURED))
     featured_model_instance.activity_references = [
         reference.to_dict() for reference in featured_activity_references]
+    featured_model_instance.update_timestamps()
     featured_model_instance.put()
 
 

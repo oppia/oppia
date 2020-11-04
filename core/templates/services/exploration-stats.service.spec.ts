@@ -21,13 +21,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
-import { ExplorationStatsObjectFactory } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStats } from
+  'domain/statistics/exploration-stats.model';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 
 describe('Exploration stats service', function() {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
-  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   let explorationStatsService: ExplorationStatsService;
 
   beforeEach(() => {
@@ -35,13 +34,12 @@ describe('Exploration stats service', function() {
 
     explorationStatsBackendApiService = (
       TestBed.get(ExplorationStatsBackendApiService));
-    explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
     explorationStatsService = TestBed.get(ExplorationStatsService);
   });
 
   beforeEach(() => {
     this.explorationStats = (
-      explorationStatsObjectFactory.createFromBackendDict({
+      ExplorationStats.createFromBackendDict({
         exp_id: 'eid',
         exp_version: 1,
         num_starts: 2,

@@ -184,6 +184,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             time_spent_in_state_secs=time_spent_in_state_secs,
             is_feedback_useful=is_feedback_useful,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        answer_submitted_event_entity.update_timestamps()
         answer_submitted_event_entity.put()
         return entity_id
 
@@ -249,6 +250,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
             state_name=state_name,
             session_id=session_id,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        actual_start_event_entity.update_timestamps()
         actual_start_event_entity.put()
         return entity_id
 
@@ -313,6 +315,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        solution_hit_event_entity.update_timestamps()
         solution_hit_event_entity.put()
         return entity_id
 
@@ -432,6 +435,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        start_event_entity.update_timestamps()
         start_event_entity.put()
         return entity_id
 
@@ -568,6 +572,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        leave_event_entity.update_timestamps()
         leave_event_entity.put()
 
     @classmethod
@@ -696,6 +701,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        complete_event_entity.update_timestamps()
         complete_event_entity.put()
         return entity_id
 
@@ -897,6 +903,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        state_event_entity.update_timestamps()
         state_event_entity.put()
         return entity_id
 
@@ -964,6 +971,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        state_finish_event_entity.update_timestamps()
         state_finish_event_entity.put()
         return entity_id
 
@@ -1033,6 +1041,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        leave_for_refresher_exp_entity.update_timestamps()
         leave_for_refresher_exp_entity.put()
         return entity_id
 
@@ -1162,6 +1171,7 @@ class ExplorationStatsModel(base_models.BaseModel):
             num_completions_v1=num_completions_v1,
             num_completions_v2=num_completions_v2,
             state_stats_mapping=state_stats_mapping)
+        stats_instance.update_timestamps()
         stats_instance.put()
         return instance_id
 
@@ -1232,6 +1242,7 @@ class ExplorationStatsModel(base_models.BaseModel):
                 state_stats_mapping=exploration_stats_dict[
                     'state_stats_mapping'])
             exploration_stats_models.append(stats_instance)
+        cls.update_timestamps_multi(exploration_stats_models)
         cls.put_multi(exploration_stats_models)
 
     @classmethod
@@ -1321,6 +1332,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             unresolved_issues=unresolved_issues)
+        exp_issues_instance.update_timestamps()
         exp_issues_instance.put()
         return instance_id
 
@@ -1415,33 +1427,22 @@ class PlaythroughModel(base_models.BaseModel):
             str. ID of the new PlaythroughModel instance.
         """
         instance_id = cls._generate_id(exp_id)
-        playthrough_instance = cls(
+        cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             issue_type=issue_type,
             issue_customization_args=issue_customization_args,
-            actions=actions)
-        playthrough_instance.put()
+            actions=actions).put()
         return instance_id
-
-    @classmethod
-    def delete_playthroughs_multi(cls, playthrough_ids):
-        """Deltes multiple playthrough instances.
-
-        Args:
-            playthrough_ids: list(str). List of playthrough IDs to be deleted.
-        """
-        instances = cls.get_multi(playthrough_ids)
-        cls.delete_multi(instances)
 
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return dict(super(PlaythroughModel, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'issue_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'issue_customization_args':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_customization_args': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'actions': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -1572,6 +1573,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 learner_answer_info_schema_version),
             accumulated_answer_info_json_size_bytes=(
                 accumulated_answer_info_json_size_bytes))
+        answer_details_instance.update_timestamps()
         answer_details_instance.put()
 
     @classmethod
@@ -1626,7 +1628,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     # ID of exploration.
     exploration_id = datastore_services.StringProperty(indexed=True)
     # Version of exploration.
-    version = datastore_services.StringProperty(indexed=False)
+    version = datastore_services.StringProperty(indexed=True)
     # Number of students who started the exploration.
     num_starts = datastore_services.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration.
@@ -1952,6 +1954,7 @@ class StateAnswersModel(base_models.BaseModel):
             if last_shard_updated:
                 entities_to_put.append(last_shard)
 
+        cls.update_timestamps_multi(entities_to_put)
         cls.put_multi(entities_to_put)
 
     @classmethod
@@ -2148,6 +2151,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
 
         try:
             # This may fail if calculation_output is too large.
+            instance.update_timestamps()
             instance.put()
         except Exception:
             logging.exception(

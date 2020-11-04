@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Service for creating a new question.
  */
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -40,7 +42,6 @@ require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
-require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
@@ -65,17 +66,15 @@ angular.module('oppia').factory('QuestionCreationService', [
   'EditableQuestionBackendApiService', 'ImageLocalStorageService',
   'QuestionObjectFactory',
   'QuestionUndoRedoService', 'SkillBackendApiService',
-  'SkillDifficultyObjectFactory', 'SkillEditorStateService',
-  'UrlInterpolationService', 'DEFAULT_SKILL_DIFFICULTY',
-  'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
+  'SkillEditorStateService', 'UrlInterpolationService',
+  'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
   function(
       $location, $rootScope, $uibModal, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
       QuestionObjectFactory,
       QuestionUndoRedoService, SkillBackendApiService,
-      SkillDifficultyObjectFactory, SkillEditorStateService,
-      UrlInterpolationService, DEFAULT_SKILL_DIFFICULTY,
-      MODE_SELECT_DIFFICULTY, SKILL_DIFFICULTIES) {
+      SkillEditorStateService, UrlInterpolationService,
+      DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY, SKILL_DIFFICULTIES) {
     var newQuestionSkillDifficulties = [];
     var question = null;
     var skill = null;
@@ -113,7 +112,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       var linkedSkillsWithDifficulty = [];
       newQuestionSkillIds.forEach(function(skillId) {
         linkedSkillsWithDifficulty.push(
-          SkillDifficultyObjectFactory.create(
+          SkillDifficulty.create(
             skillId, '', DEFAULT_SKILL_DIFFICULTY));
       });
       groupedSkillSummaries = (
