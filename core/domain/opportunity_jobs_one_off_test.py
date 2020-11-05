@@ -41,6 +41,8 @@ import python_utils
 (opportunity_models, story_models, exp_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])
 
+datastore_services = models.Registry.import_datastore_services()
+
 
 class ExplorationOpportunitySummaryModelRegenerationJobTest(
         test_utils.GenericTestBase):
@@ -512,3 +514,117 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])
+
+
+class MockExplorationOpportunitySummaryModel(
+        opportunity_models.ExplorationOpportunitySummaryModel):
+    need_voice_artist_in_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    assigned_voice_artist_in_language_codes = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+
+
+class RenameExplorationOpportunitySummaryModelPropertiesJobTest(
+        test_utils.GenericTestBase):
+    """Tests for the exploration opportunity summary model rename attributes
+    job.
+    """
+
+    def test_job_replaces_value_correctly_to_renamed_properties(self):
+        with self.swap(
+            opportunity_models, 'ExplorationOpportunitySummaryModel',
+            MockExplorationOpportunitySummaryModel):
+            old_model = opportunity_models.ExplorationOpportunitySummaryModel(
+                id='opportunity_id',
+                topic_id='topic1',
+                topic_name='The Topic!',
+                story_id='story1',
+                story_title='The story!',
+                chapter_title='The content!',
+                content_count=5,
+                incomplete_translation_language_codes=['hi'],
+                translation_counts={'en': 5},
+                need_voice_artist_in_language_codes=['hi'],
+                assigned_voice_artist_in_language_codes=['en'])
+            old_model.put()
+
+            self.assertEqual(
+                old_model.language_codes_with_assigned_voice_artists, [])
+            self.assertEqual(
+                old_model.language_codes_needing_voice_artists, [])
+
+            job_class = (
+                opportunity_jobs_one_off.
+                RenameExplorationOpportunitySummaryModelPropertiesJob)
+
+            job_id = job_class.create_new()
+            job_class.enqueue(job_id)
+
+            self.assertEqual(
+                self.count_jobs_in_mapreduce_taskqueue(
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+            output = job_class.get_output(job_id)
+            self.assertEqual(
+                output, [
+                    u'[u\'SUCCESS_RENAMED['
+                    'assigned_voice_artist_in_language_codes]\', 1]', u'['
+                    'u\'SUCCESS_RENAMED[need_voice_artist_in_language_codes]\','
+                    ' 1]'])
+
+            new_model = (
+                opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                    'opportunity_id'))
+
+            self.assertEqual(
+                old_model.assigned_voice_artist_in_language_codes,
+                new_model.language_codes_with_assigned_voice_artists)
+            self.assertEqual(
+                old_model.need_voice_artist_in_language_codes,
+                new_model.language_codes_needing_voice_artists)
+
+            self.assertFalse(
+                'assigned_voice_artist_in_language_codes'
+                in new_model._properties) # pylint: disable=protected-access
+            self.assertFalse(
+                'need_voice_artist_in_language_codes' in new_model._properties) # pylint: disable=protected-access
+
+    def test_job_for_new_models_with_updated_properties_works_correctly(self):
+        old_model = opportunity_models.ExplorationOpportunitySummaryModel(
+            id='opportunity_id',
+            topic_id='topic1',
+            topic_name='The Topic!',
+            story_id='story1',
+            story_title='The story!',
+            chapter_title='The content!',
+            content_count=5,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'en': 5},
+            language_codes_with_assigned_voice_artists=['hi'],
+            language_codes_needing_voice_artists=['en'])
+        old_model.put()
+
+        job_class = (
+            opportunity_jobs_one_off.
+            RenameExplorationOpportunitySummaryModelPropertiesJob)
+
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = job_class.get_output(job_id)
+        self.assertEqual(output, [])
+
+        new_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                'opportunity_id'))
+
+        self.assertEqual(
+            new_model.language_codes_with_assigned_voice_artists, ['hi'])
+        self.assertEqual(
+            new_model.language_codes_needing_voice_artists, ['en'])
