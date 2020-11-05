@@ -20,23 +20,16 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import {LearnerExplorationSummary} from 
+'domain/summary/learner-exploration-summary.model';
 import { StoryPlaythrough } from
   'domain/story_viewer/story-playthrough.model';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 
-describe('Story viewer backend API service', () => {
+fdescribe('Story viewer backend API service', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService = null;
   let httpTestingController: HttpTestingController;
-
-  let sampleDataResults = {
-    story_id: 'qwerty',
-    story_title: 'Story title',
-    story_description: 'Story description',
-    story_nodes: [],
-    topic_name: 'Topic name',
-    meta_tag_content: 'Story meta tag content'
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -53,6 +46,15 @@ describe('Story viewer backend API service', () => {
 
   it('should successfully fetch an existing story from the backend',
     fakeAsync(() => {
+      let sampleDataResults = {
+        story_id: 'qwerty',
+        story_title: 'Story title',
+        story_description: 'Story description',
+        story_nodes: [],
+        topic_name: 'Topic name',
+        meta_tag_content: 'Story meta tag content'
+      };
+    
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
@@ -72,4 +74,59 @@ describe('Story viewer backend API service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should successfully record a chapter as completed from the backend',
+    fakeAsync(() => {
+      let sampleDataResults = {
+        summaries: [{
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        }],
+        next_node_id: 'node_2',
+        ready_for_review_test: true,
+      };
+    
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      storyViewerBackendApiService.recordChapterCompletion(
+        'abbrev', 'staging', '0', 'node_1').then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/story_progress_handler/staging/abbrev/0/node_1');
+      expect(req.request.method).toEqual('POST');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        summaries: sampleDataResults.summaries.map(
+          expSummary => LearnerExplorationSummary.createFromBackendDict(
+            expSummary)),
+        nextNodeId: sampleDataResults.next_node_id,
+        readyForReviewTest: sampleDataResults.ready_for_review_test});
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
 });
