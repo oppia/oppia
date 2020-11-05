@@ -1885,7 +1885,10 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
 
         ops = node.ops
         for operator, operand in ops:
-            if operator == '!=' and operand.value is None:
+            if operator != '!=': continue
+            # Check if value field is in operand node, since
+            # not all righthand side nodes will have this field,
+            if 'value' in vars(operand) and operand.value is None:
                 self.add_message('inequality-with-none', node=node)
 
 
