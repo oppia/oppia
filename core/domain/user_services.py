@@ -408,8 +408,7 @@ class UserAuthDetails(python_utils.OBJECT):
             user associated with that profile. None for full users.
     """
 
-    def __init__(
-            self, user_id, gae_id, parent_user_id=None, deleted=False):
+    def __init__(self, user_id, gae_id, parent_user_id=None, deleted=False):
         """Constructs a UserAuthDetails domain object.
 
         Args:
@@ -463,6 +462,56 @@ class UserAuthDetails(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The parent user ID and gae_id cannot be None together '
                 'for a user.')
+
+
+class GaeIdToUserId(python_utils.OBJECT):
+    """Value object representing a user's authentication details information.
+
+    Attributes:
+        user_id: str. The unique ID of the user.
+        gae_id: str. The ID of the user retrieved from GAE.
+        parent_user_id: str or None. For profile users, the user ID of the full
+            user associated with that profile. None for full users.
+    """
+
+    def __init__(self, gae_id, user_id,  deleted=False):
+        """Constructs a UserAuthDetails domain object.
+
+        Args:
+            user_id: str. The unique ID of the user.
+            gae_id: str. The ID of the user retrieved from GAE.
+            parent_user_id: str or None. For profile users, the user ID of the
+                full user associated with that profile. None for full users.
+            deleted: bool. Whether the user has requested removal of their
+                account.
+        """
+        self.gae_id = gae_id
+        self.user_id = user_id
+        self.deleted = deleted
+
+    def validate(self):
+        """Checks that user_id, gae_id, and parent_user_id fields of this
+        UserAuthDetails domain object are valid.
+
+        Raises:
+            ValidationError. The user_id is not str.
+            ValidationError. The gae_id is not str.
+            ValidationError. The parent_user_id is not str.
+        """
+        if not isinstance(self.user_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+        if not is_user_id_valid(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
+
+        if (self.gae_id is not None and
+                not isinstance(self.gae_id, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected gae_id to be a string, received %s' %
+                self.gae_id
+            )
 
 
 def is_user_id_valid(user_id):
@@ -723,11 +772,23 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_auth_id(
-        feconf.AUTH_METHOD_GAE, gae_id)
-    if user_auth_details_model is not None:
+    user_id = None
+    gae_id_to_user_id_model = (
+        user_models.GaeIdToUserIdModel.get(gae_id, strict=False))
+    # If the GaeIdToUserIdModels are not yet generated use UserAuthDetailsModel
+    # as the backup for retrieving the user_id.
+    if gae_id_to_user_id_model is None:
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id))
+        if user_auth_details_model is not None:
+            user_id = user_auth_details_model.id
+    else:
+        user_id = gae_id_to_user_id_model.user_id
+
+    if user_id is not None:
         user_settings = _get_user_settings_from_model(
-            user_models.UserSettingsModel.get_by_id(user_auth_details_model.id))
+            user_models.UserSettingsModel.get_by_id(user_id))
         return user_settings
     elif strict:
         logging.error('Could not find user with id %s' % gae_id)
@@ -1208,7 +1269,8 @@ def create_new_user(gae_id, email):
     Raises:
         Exception. A user with the given gae_id already exists.
     """
-    def _create_new_user_transactional(user_settings, user_auth_details):
+    def _create_new_user_transactional(
+            user_settings, user_auth_details, gae_id_to_user_id):
         """Save user models for new users as a transaction.
 
         Args:
@@ -1218,6 +1280,7 @@ def create_new_user(gae_id, email):
                 object corresponding to the newly created user.
         """
         _save_user_auth_details(user_auth_details)
+        _save_gae_id_to_user_id(gae_id_to_user_id)
         _save_user_settings(user_settings)
         create_user_contributions(user_settings.user_id, [], [])
 
@@ -1230,9 +1293,12 @@ def create_new_user(gae_id, email):
     user_settings = UserSettings(
         user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
-    user_auth_details = UserAuthDetails(user_id, gae_id)
     transaction_services.run_in_transaction(
-        _create_new_user_transactional, user_settings, user_auth_details)
+        _create_new_user_transactional,
+        user_settings,
+        UserAuthDetails(user_id, gae_id),
+        GaeIdToUserId(gae_id, user_id)
+    )
     return user_settings
 
 
@@ -1411,6 +1477,35 @@ def _save_user_auth_details(user_auth_details):
         model.put()
 
 
+def _save_gae_id_to_user_id(gae_id_to_user_id):
+    """Puts the GAE ID to user ID object to the datastore.
+
+    Args:
+        gae_id_to_user_id: GaeIdToUserId. The GAE ID to user ID domain object to
+            be saved.
+    """
+    gae_id_to_user_id.validate()
+
+    user_auth_details_dict = {
+        'user_id': gae_id_to_user_id.user_id,
+        'deleted': gae_id_to_user_id.deleted
+    }
+
+    # If user auth details entry with the given user_id does not exist, create
+    # a new one.
+    user_auth_details_model = user_models.GaeIdToUserIdModel.get_by_id(
+        gae_id_to_user_id.gae_id)
+    if user_auth_details_model is not None:
+        user_auth_details_model.populate(**user_auth_details_dict)
+    else:
+        user_auth_details_dict['id'] = gae_id_to_user_id.gae_id
+        user_auth_details_model = (
+            user_models.GaeIdToUserIdModel(**user_auth_details_dict))
+
+    user_auth_details_model.update_timestamps()
+    user_auth_details_model.put()
+
+
 def get_multiple_user_auth_details(user_ids):
     """Gets domain objects representing the auth details
     for the given user_ids.
@@ -1474,6 +1569,22 @@ def _get_user_auth_details_from_model(user_auth_details_model):
         gae_id=user_auth_details_model.gae_id,
         parent_user_id=user_auth_details_model.parent_user_id,
         deleted=user_auth_details_model.deleted
+    )
+
+
+def _get_gae_id_to_user_id_from_model(gae_id_to_user_id_model):
+    """Transform user auth details storage model to domain object.
+
+    Args:
+        gae_id_to_user_id_model: GaeIdToUserIdModel. The model to be converted.
+
+    Returns:
+        UserAuthDetails. Domain object for user auth details.
+    """
+    return GaeIdToUserId(
+        gae_id=gae_id_to_user_id_model.id,
+        user_id=gae_id_to_user_id_model.user_id,
+        deleted=gae_id_to_user_id_model.deleted
     )
 
 
@@ -1758,6 +1869,11 @@ def mark_user_for_deletion(user_id):
     )
     user_auth_details.deleted = True
     _save_user_auth_details(user_auth_details)
+    gae_id_to_user_id = _get_gae_id_to_user_id_from_model(
+        user_models.GaeIdToUserIdModel.get_by_user_id(user_id)
+    )
+    gae_id_to_user_id.deleted = True
+    _save_gae_id_to_user_id(gae_id_to_user_id)
 
 
 def get_human_readable_user_ids(user_ids):
