@@ -8,7 +8,7 @@ steps:
     - --cache-ttl=24h
 
   - id: install-dependencies
-    wait_for: build-oppia-base
+    wait_for: ["build-oppia-base"]
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
     entrypoint: bash
     args: 
@@ -22,7 +22,7 @@ steps:
           python -m scripts.install_third_party_libs
 
   - id: third-party-size-check
-    wait_for: install-dependencies
+    wait_for: ["install-dependencies"]
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
     dir: oppia
     entrypoint: python
