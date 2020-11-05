@@ -43,6 +43,8 @@ import python_utils
     models.NAMES.topic, models.NAMES.user
 ])
 
+FULLY_VALIDATED_CONSTANT = 'fully-validated'
+
 
 class ProdValidationAuditOneOffJobMetaClass(type):
     """Type class for audit one off jobs. Registers classes inheriting from
@@ -125,12 +127,12 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
                         python_utils.convert_to_bytes(error_message))
             else:
                 yield (
-                    'fully-validated %s' % model_name, 1)
+                    '%s %s' % (FULLY_VALIDATED_CONSTANT, model_name), 1)
 
     @staticmethod
     def reduce(key, values):
         """Yields number of fully validated models or the failure messages."""
-        if 'fully-validated' in key:
+        if FULLY_VALIDATED_CONSTANT in key:
             yield (key, len(values))
         else:
             yield (key, values)
@@ -333,7 +335,7 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
     @staticmethod
     def reduce(key, values):
         """Yields number of fully validated models or the failure messages."""
-        if 'fully-validated' in key:
+        if FULLY_VALIDATED_CONSTANT in key:
             yield (key, len(values))
         else:
             # Just yield one error of each error type since the list of errors
