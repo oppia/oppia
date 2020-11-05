@@ -3774,6 +3774,82 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
         })
 
 
+class SubtitledSetOfUnicodeStringUnitTests(test_utils.GenericTestBase):
+    """Test SubtitledSetOfUnicodeString domain object methods."""
+
+    def test_from_and_to_dict(self):
+        subtitled_set_of_unicode_str_dict = {
+            'content_id': 'id',
+            'unicode_str_set': []
+        }
+        subtitled_set_of_unicode_str = (
+            state_domain.SubtitledSetOfUnicodeString.from_dict(
+                subtitled_set_of_unicode_str_dict)
+        )
+        self.assertEqual(
+            subtitled_set_of_unicode_str.to_dict(),
+            subtitled_set_of_unicode_str_dict)
+
+    def test_validation(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected content id to be a string'
+            ):
+            state_domain.SubtitledSetOfUnicodeString(3, '')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid unicode string set'
+            ):
+            state_domain.SubtitledSetOfUnicodeString('id', '')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content unicode'
+            ):
+            state_domain.SubtitledSetOfUnicodeString('id', ['', 2])
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Duplicate unicode found in set'
+            ):
+            state_domain.SubtitledSetOfUnicodeString('id', ['test', 'test'])
+
+
+class SubtitledSetOfNormalizedStringUnitTests(test_utils.GenericTestBase):
+    """Test SubtitledSetOfNormalizedString domain object methods."""
+
+    def test_from_and_to_dict(self):
+        subtitled_set_of_normalized_str_dict = {
+            'content_id': 'id',
+            'normalized_str_set': []
+        }
+        subtitled_set_of_normalized_str = (
+            state_domain.SubtitledSetOfNormalizedString.from_dict(
+                subtitled_set_of_normalized_str_dict)
+        )
+        self.assertEqual(
+            subtitled_set_of_normalized_str.to_dict(),
+            subtitled_set_of_normalized_str_dict)
+
+    def test_validation(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected content id to be a string'
+            ):
+            state_domain.SubtitledSetOfNormalizedString(3, '')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid unicode string set'
+            ):
+            state_domain.SubtitledSetOfNormalizedString('id', '')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content unicode'
+            ):
+            state_domain.SubtitledSetOfNormalizedString('id', ['', 2])
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Duplicate unicode found in set'
+            ):
+            state_domain.SubtitledSetOfNormalizedString('id', ['test', 'test'])
+
+
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 

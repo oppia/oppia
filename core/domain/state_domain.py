@@ -2281,6 +2281,150 @@ class SubtitledUnicode(python_utils.OBJECT):
         return cls(content_id, '')
 
 
+class SubtitledSetOfUnicodeString(python_utils.OBJECT):
+    """Value object representing subtitled set of unicode string."""
+
+    def __init__(self, content_id, unicode_str_set):
+        """Initializes a SubtitledSetOfUnicodeString domain object.
+
+        Args:
+            content_id: str. A unique id referring to the other assets for this
+                content.
+            unicode_str_set: list(str). A piece of user-submitted list of
+                unicode.
+        """
+        self.content_id = content_id
+        self.unicode_str_set = unicode_str_set
+        self.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this SubtitledSetOfUnicodeString domain
+            object.
+
+        Returns:
+            dict. A dict, mapping all fields of SubtitledSetOfUnicodeString
+            instance.
+        """
+        return {
+            'content_id': self.content_id,
+            'unicode_str_set': self.unicode_str_set
+        }
+
+    @classmethod
+    def from_dict(cls, subtitled_set_of_unicode_str_dict):
+        """Return a SubtitledSetOfUnicodeString domain object from a dict.
+
+        Args:
+            subtitled_set_of_unicode_str_dict: dict. The dict representation of
+                SubtitledSetOfUnicodeString object.
+
+        Returns:
+            SubtitledSetOfUnicodeString. The corresponding
+            SubtitledSetOfUnicodeString domain object.
+        """
+        return cls(
+            subtitled_set_of_unicode_str_dict['content_id'],
+            subtitled_set_of_unicode_str_dict['unicode_str_set']
+        )
+
+    def validate(self):
+        """Validates properties of the SubtitledSetOfUnicodeString.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                SubtitledSetOfUnicodeString are invalid.
+        """
+        if not isinstance(self.content_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected content id to be a string, received %s' %
+                self.content_id)
+
+        if not isinstance(self.unicode_str_set, list):
+            raise utils.ValidationError(
+                'Invalid unicode string set: %s' % self.unicode_str_set)
+
+        for unicode_str in self.unicode_str_set:
+            if not isinstance(unicode_str, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Invalid content unicode: %s' % unicode_str)
+
+        if len(set(self.unicode_str_set)) != len(self.unicode_str_set):
+            raise utils.ValidationError(
+                'Duplicate unicode found in set: %s' % self.unicode_str_set)
+
+
+class SubtitledSetOfNormalizedString(python_utils.OBJECT):
+    """Value object representing subtitled set of normalized string."""
+
+    def __init__(self, content_id, normalized_str_set):
+        """Initializes a SubtitledSetOfNormalizedString domain object.
+
+        Args:
+            content_id: str. A unique id referring to the other assets for this
+                content.
+            normalized_str_set: list(str). A piece of user-submitted list of
+                normalized unicode.
+        """
+        self.content_id = content_id
+        self.normalized_str_set = normalized_str_set
+        self.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this SubtitledSetOfNormalizedString domain
+            object.
+
+        Returns:
+            dict. A dict, mapping all fields of SubtitledSetOfNormalizedString
+            instance.
+        """
+        return {
+            'content_id': self.content_id,
+            'normalized_str_set': self.normalized_str_set
+        }
+
+    @classmethod
+    def from_dict(cls, subtitled_set_of_normalized_str_dict):
+        """Return a SubtitledSetOfNormalizedString domain object from a dict.
+
+        Args:
+            subtitled_set_of_normalized_str_dict: dict. The dict
+                representation of SubtitledSetOfNormalizedString object.
+
+        Returns:
+            SubtitledSetOfNormalizedString. The corresponding
+            SubtitledSetOfNormalizedString domain object.
+        """
+        return cls(
+            subtitled_set_of_normalized_str_dict['content_id'],
+            subtitled_set_of_normalized_str_dict['normalized_str_set']
+        )
+
+    def validate(self):
+        """Validates properties of the SubtitledSetOfNormalizedString.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                SubtitledSetOfNormalizedString are invalid.
+        """
+        if not isinstance(self.content_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected content id to be a string, received %s' %
+                self.content_id)
+
+        if not isinstance(self.normalized_str_set, list):
+            raise utils.ValidationError(
+                'Invalid unicode string set: %s' % self.normalized_str_set)
+
+        for normalized_str in self.normalized_str_set:
+            if not isinstance(normalized_str, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Invalid content unicode: %s' % normalized_str)
+
+        if len(set(self.normalized_str_set)) != len(self.normalized_str_set):
+            raise utils.ValidationError(
+                'Duplicate unicode found in set: %s' % self.normalized_str_set)
+
+
 class State(python_utils.OBJECT):
     """Domain object for a state."""
 
