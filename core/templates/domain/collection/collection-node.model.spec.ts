@@ -57,10 +57,8 @@ describe('Collection node model', () => {
 
     var summaryObject = collectionNode.getExplorationSummaryObject();
     expect(summaryObject).toEqual(explorationSummaryBackendObject);
-    summaryObject = {
-      ...summaryObject,
-      category: 'abc'
-    };
+
+    delete summaryObject.category;
     expect(summaryObject).not.toEqual(
       collectionNode.getExplorationSummaryObject());
   });
