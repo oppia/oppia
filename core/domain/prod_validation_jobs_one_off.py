@@ -956,6 +956,14 @@ class UserAuthDetailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.UserAuthDetailsModel]
 
 
+class GaeIdToUserIdModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates GaeIdToUserIdModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.GaeIdToUserIdModel]
+
+
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates PlatformParameterModel."""
 
