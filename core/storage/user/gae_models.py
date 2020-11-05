@@ -2605,4 +2605,13 @@ class GaeIdToUserIdModel(base_models.BaseModel):
 
     @classmethod
     def get_by_user_id(cls, user_id):
+        """Fetch a entry by user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            GaeIdToUserIdModel. The mdoel with user_id field equal to user_id
+            argument.
+        """
         return cls.query(cls.user_id == user_id).get()

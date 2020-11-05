@@ -474,14 +474,12 @@ class GaeIdToUserId(python_utils.OBJECT):
             user associated with that profile. None for full users.
     """
 
-    def __init__(self, gae_id, user_id,  deleted=False):
-        """Constructs a UserAuthDetails domain object.
+    def __init__(self, gae_id, user_id, deleted=False):
+        """Constructs a GaeIdToUserId domain object.
 
         Args:
-            user_id: str. The unique ID of the user.
             gae_id: str. The ID of the user retrieved from GAE.
-            parent_user_id: str or None. For profile users, the user ID of the
-                full user associated with that profile. None for full users.
+            user_id: str. The unique ID of the user.
             deleted: bool. Whether the user has requested removal of their
                 account.
         """
@@ -490,13 +488,12 @@ class GaeIdToUserId(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that user_id, gae_id, and parent_user_id fields of this
-        UserAuthDetails domain object are valid.
+        """Checks that user_id, and gae_id fields of this GaeIdToUserId domain
+        object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
             ValidationError. The gae_id is not str.
-            ValidationError. The parent_user_id is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -1278,6 +1275,8 @@ def create_new_user(gae_id, email):
                 corresponding to the newly created user.
             user_auth_details: UserAuthDetails. The user auth details domain
                 object corresponding to the newly created user.
+            gae_id_to_user_id: GaeIdToUserId. The user GAE ID to user ID domain
+                object corresponding to the newly created user.
         """
         _save_user_auth_details(user_auth_details)
         _save_gae_id_to_user_id(gae_id_to_user_id)
@@ -1573,13 +1572,13 @@ def _get_user_auth_details_from_model(user_auth_details_model):
 
 
 def _get_gae_id_to_user_id_from_model(gae_id_to_user_id_model):
-    """Transform user auth details storage model to domain object.
+    """Transform GaeIdToUserIdModel to domain object.
 
     Args:
         gae_id_to_user_id_model: GaeIdToUserIdModel. The model to be converted.
 
     Returns:
-        UserAuthDetails. Domain object for user auth details.
+        GaeIdToUserId. Domain object for GAE ID to user ID details.
     """
     return GaeIdToUserId(
         gae_id=gae_id_to_user_id_model.id,

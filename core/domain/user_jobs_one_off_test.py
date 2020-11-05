@@ -2176,7 +2176,7 @@ class UserAuthDetailsModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_multiple_user_auth_details_with_different_gae_ids_success(self):
         # Generate 3 completely different models.
-        for i in range(3):
+        for i in python_utils.RANGE(3):
             user_models.UserAuthDetailsModel(
                 id='user_id_%s' % i,
                 gae_id='gae_id_%s' % i
@@ -2186,7 +2186,7 @@ class UserAuthDetailsModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_multiple_user_auth_details_with_same_gae_ids_failure(self):
         # Generate two pairs of models with the same gae_id.
-        for i in range(4):
+        for i in python_utils.RANGE(4):
             user_models.UserAuthDetailsModel(
                 id='user_id_%s' % i,
                 gae_id='gae_id_%s' % (i % 2)
@@ -2200,13 +2200,13 @@ class UserAuthDetailsModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_multiple_user_auth_details_with_various_gae_ids_mixed_resutls(
             self):
         # Generate pair of models with the same gae_id.
-        for i in range(2):
+        for i in python_utils.RANGE(2):
             user_models.UserAuthDetailsModel(
                 id='user_id_%s' % i,
                 gae_id='gae_id_1'
             ).put()
         # Generate 3 completely different models.
-        for i in range(2, 5):
+        for i in python_utils.RANGE(2, 5):
             user_models.UserAuthDetailsModel(
                 id='user_id_%s' % i,
                 gae_id='gae_id_%s' % i
@@ -2247,14 +2247,14 @@ class GenerateGaeIdToUserIdModelOneOffJobTests(test_utils.GenericTestBase):
 
     def test_from_user_auth_details_generate_gae_id_to_user_id_models(self):
         # Generate 3 completely different models.
-        for i in range(3):
+        for i in python_utils.RANGE(3):
             user_models.UserAuthDetailsModel(
                 id='user_id_%s' % i,
                 gae_id='gae_id_%s' % i
             ).put()
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS', 3]])
-        for i in range(3):
+        for i in python_utils.RANGE(3):
             user_auth_details_model = (
                 user_models.UserAuthDetailsModel.get_by_id('user_id_%s' % i))
             gae_id_to_user_id_model = (
