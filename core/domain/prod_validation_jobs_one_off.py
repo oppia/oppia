@@ -43,7 +43,7 @@ import python_utils
     models.NAMES.topic, models.NAMES.user
 ])
 
-FULLY_VALIDATED_CONSTANT = 'fully-validated'
+VALIDATION_STATUS_SUCCESS = 'fully-validated'
 
 
 class ProdValidationAuditOneOffJobMetaClass(type):
@@ -127,12 +127,12 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
                         python_utils.convert_to_bytes(error_message))
             else:
                 yield (
-                    '%s %s' % (FULLY_VALIDATED_CONSTANT, model_name), 1)
+                    '%s %s' % (VALIDATION_STATUS_SUCCESS, model_name), 1)
 
     @staticmethod
     def reduce(key, values):
         """Yields number of fully validated models or the failure messages."""
-        if FULLY_VALIDATED_CONSTANT in key:
+        if VALIDATION_STATUS_SUCCESS in key:
             yield (key, len(values))
         else:
             yield (key, values)
@@ -342,7 +342,7 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
         to be yielded. To do so, just change the yield statement to yield all
         values instead of the first 10.
         """
-        if FULLY_VALIDATED_CONSTANT in key:
+        if VALIDATION_STATUS_SUCCESS in key:
             yield (key, len(values))
         else:
             # Just yield ten errors of each error type since the list of errors
