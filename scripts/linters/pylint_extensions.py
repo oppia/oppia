@@ -1885,7 +1885,7 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
 
         ops = node.ops
         for operator, operand in ops:
-            if operator != '!=': 
+            if operator != '!=':
                 continue
             # Check if value field is in operand node, since
             # not all righthand side nodes will have this field.
