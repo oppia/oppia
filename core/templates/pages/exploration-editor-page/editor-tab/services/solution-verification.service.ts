@@ -38,7 +38,9 @@ export class SolutionVerificationService {
       private answerClassificationService: AnswerClassificationService,
       private stateEditorService: StateEditorService) {}
 
-  verifySolution(stateName: string, interaction: Interaction, correctAnswer: InteractionAnswer): boolean {
+  verifySolution(stateName: string,
+                interaction: Interaction,
+                correctAnswer: InteractionAnswer): boolean {
     let rulesService = this.interactionRulesRegistryService.
       getRulesServiceByInteractionId(interaction.id);
     let result =

@@ -22,8 +22,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TestBed } from '@angular/core/testing';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 import { SolutionVerificationService } from
