@@ -51,3 +51,6 @@ class Constants(dict):
 
 with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
     constants = Constants(parse_json_from_js(f))  # pylint:disable=invalid-name
+
+with python_utils.open_file('release_constants.json', 'r') as f:
+    release_constants = Constants(json.loads(f.read()))  # pylint:disable=invalid-name

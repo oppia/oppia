@@ -142,6 +142,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
                 'application_id'))
         voiceover_application_model.target_type = 'invalid_type'
+        voiceover_application_model.update_timestamps()
         voiceover_application_model.put()
         with self.assertRaisesRegexp(
             Exception,

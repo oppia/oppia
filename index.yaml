@@ -93,7 +93,7 @@ indexes:
 
 - kind: ExplorationOpportunitySummaryModel
   properties:
-  - name: need_voice_artist_in_language_codes
+  - name: language_codes_needing_voice_artists
   - name: created_on
 
 - kind: ExplorationRecommendationsRealtimeModel
@@ -207,6 +207,12 @@ indexes:
   - name: status_code
   - name: time_queued_msec
     direction: desc
+
+- kind: PlatformParameterSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: QuestionSkillLinkModel
   properties:

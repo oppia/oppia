@@ -38,14 +38,15 @@
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /core/templates/components/ @srijanreddy98
 /core/templates/domain/ @kevintab95
-/core/templates/pages/ @seanlip
+/core/templates/pages/ @srijanreddy98
 /core/templates/services/ @nithusha21
 /extensions/ @vojtechjelinek
 /scripts/ @DubeySandeep
 
 
 # Android team
-/core/domain/android_validation_constants*.py @BenHenning
+# TODO(#11083): Revert owner to @BenHenning after 2020-11-15.
+/core/domain/android_validation_constants*.py @rt4914
 
 
 # Angular Migration team
@@ -103,13 +104,12 @@
 
 
 # Contributor Dashboard project.
-# TODO(#10779): Revert ownership to @sagangwee after 2020-10-05.
-/core/controllers/contributor_dashboard*.py @DubeySandeep
-/core/domain/opportunity*.py @DubeySandeep
-/core/domain/voiceover_services*.py @DubeySandeep
-/core/storage/opportunity/ @DubeySandeep
-/core/templates/domain/opportunity/ @DubeySandeep
-/core/templates/pages/contributor-dashboard-page/ @DubeySandeep
+/core/controllers/contributor_dashboard*.py @sagangwee
+/core/domain/opportunity*.py @sagangwee
+/core/domain/voiceover_services*.py @sagangwee
+/core/storage/opportunity/ @sagangwee
+/core/templates/domain/opportunity/ @sagangwee
+/core/templates/pages/contributor-dashboard-page/ @sagangwee
 
 
 # Core documentation
@@ -146,7 +146,8 @@
 
 
 # Dev workflow team.
-/.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
+# TODO(#11083): Re-add owner @BenHenning after 2020-11-15.
+/.circleci/ @U8NWXD @kevintab95 @vinitamurthi
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /.eslintignore @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
@@ -163,7 +164,8 @@
 /.pylintrc @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /.stylelintrc @DubeySandeep @Hudda
-/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
+# TODO(#11083): Re-add owner @BenHenning after 2020-11-15.
+/.travis.yml @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
@@ -171,8 +173,8 @@
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /tox.ini @DubeySandeep @Hudda
 /scripts/*.py @DubeySandeep
-/scripts/check_e2e_tests_are_captured_in_ci*.py @Showtim3 @DubeySandeep
-/scripts/check_frontend_coverage*.py @nithusha21 @DubeySandeep
+/scripts/check_e2e_tests_are_captured_in_ci*.py @kevintab95 @DubeySandeep
+/scripts/check_frontend_coverage*.py @DubeySandeep @nithusha21
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
@@ -209,8 +211,8 @@
 /core/templates/domain/summary/ @kevintab95
 /core/templates/domain/state_card/ @kevintab95
 /core/templates/pages/exploration-editor-page/ @kevintab95
-/core/templates/pages/exploration-editor-page/history-tab/ @Showtim3
-/core/templates/pages/exploration-editor-page/settings-tab/ @Showtim3
+/core/templates/pages/exploration-editor-page/history-tab/ @kevintab95
+/core/templates/pages/exploration-editor-page/settings-tab/ @kevintab95
 /core/templates/pages/exploration-player-page/ @kevintab95
 /core/templates/components/state-editor/ @kevintab95
 /core/templates/services/compute-graph.service.ts @kevintab95
@@ -396,22 +398,22 @@
 /core/controllers/skill*.py @aks681
 /core/domain/skill*.py @aks681
 /core/storage/skill/ @aks681
-/core/templates/components/entity-creation-services/skill-creation.service.ts @Showtim3
+/core/templates/components/entity-creation-services/skill-creation.service.ts @kevintab95
 /core/templates/components/question-difficulty-selector/ @aks681
-/core/templates/components/review-material-editor/ @Showtim3
-/core/templates/components/rubrics-editor/ @Showtim3
-/core/templates/components/skill-selector/ @Showtim3
-/core/templates/domain/skill/ @Showtim3
-/core/templates/pages/skill-editor-page/ @Showtim3
+/core/templates/components/review-material-editor/ @kevintab95
+/core/templates/components/rubrics-editor/ @kevintab95
+/core/templates/components/skill-selector/ @kevintab95
+/core/templates/domain/skill/ @kevintab95
+/core/templates/pages/skill-editor-page/ @kevintab95
 
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
 /core/storage/story/ @aks681
-/core/templates/components/entity-creation-services/story-creation.service.ts @Showtim3
-/core/templates/domain/story/ @Showtim3
+/core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
+/core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
-/core/templates/pages/story-editor-page/ @Showtim3
+/core/templates/pages/story-editor-page/ @kevintab95
 /core/templates/pages/story-viewer-page/ @kevintab95
 
 # Topic project.
@@ -422,21 +424,21 @@
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
-/core/templates/components/entity-creation-services/topic-creation.service.ts @Showtim3
+/core/templates/components/entity-creation-services/topic-creation.service.ts @kevintab95
 /core/templates/domain/classroom/ @kevintab95
 /core/templates/domain/subtopic_viewer/ @kevintab95
-/core/templates/domain/topic/ @Showtim3
+/core/templates/domain/topic/ @kevintab95
 /core/templates/domain/topic_viewer @kevintab95
 /core/templates/pages/classroom-page/ @kevintab95
 /core/templates/pages/subtopic-viewer-page/ @kevintab95
-/core/templates/pages/topic-editor-page/ @Showtim3
+/core/templates/pages/topic-editor-page/ @kevintab95
 /core/templates/pages/topic-viewer-page/ @kevintab95
 
 # Topics and skills dashboard project.
 /core/controllers/subtopic_viewer*.py @aks681
 /core/controllers/topics_and_skills_dashboard*.py @aks681
-/core/templates/domain/topics_and_skills_dashboard/ @Showtim3
-/core/templates/pages/topics-and-skills-dashboard-page/ @Showtim3
+/core/templates/domain/topics_and_skills_dashboard/ @kevintab95
+/core/templates/pages/topics-and-skills-dashboard-page/ @kevintab95
 
 
 # Infrastructure.
@@ -444,8 +446,8 @@
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
 /main_mail.py @aks681
-/main.py @nithusha21 @DubeySandeep
-/feconf.py @nithusha21 @seanlip
+/main.py @DubeySandeep @nithusha21
+/feconf.py @seanlip @nithusha21
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/incoming_emails*.py @aks681
@@ -478,11 +480,11 @@
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
 /redis.conf @seanlip
-/release_constants.py @nithusha21 @DubeySandeep
-/release_constants.json @nithusha21 @DubeySandeep
+/release_constants.json @DubeySandeep @nithusha21
 
 
 # Miscellaneous.
+/auth.json.enc @nithusha21
 /__init__.py @nithusha21
 /core/__init__.py @nithusha21
 /core/controllers/__init__.py @nithusha21
@@ -510,7 +512,7 @@
 
 
 # Release team.
-/scripts/release_scripts/ @DubeySandeep @nithusha21
+/scripts/release_scripts/ @DubeySandeep
 
 
 # Rich text editor team.
@@ -547,7 +549,7 @@
 /core/domain/feedback*.py @nithusha21
 /core/storage/feedback/ @nithusha21
 /core/templates/components/ratings/rating-display/rating-display.directive.html @nithusha21
-/core/templates/components/ratings/  @nithusha21
+/core/templates/components/ratings/ @nithusha21
 /core/templates/domain/feedback_message/ @nithusha21
 /core/templates/domain/feedback_thread/ @nithusha21
 /core/templates/pages/exploration-editor-page/feedback-tab/ @nithusha21
@@ -614,13 +616,15 @@
 
 
 # Dynamic Feature Gating project
-/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
-/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
-/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
-/core/platform_feature*.py @BenHenning @vinitamurthi
-/core/storage/config/ @BenHenning @vinitamurthi
-/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
-/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
+# TODO(#11083): Re-add owner @BenHenning after 2020-11-15 (to all patterns in this section).
+/core/controllers/platform_feature*.py @vinitamurthi
+/core/domain/platform_feature_services*.py @vinitamurthi
+/core/domain/platform_parameter*.py @vinitamurthi
+/core/platform_feature*.py @vinitamurthi
+/core/storage/config/ @vinitamurthi
+/core/templates/domain/platform_feature/ @vinitamurthi
+/core/templates/pages/admin-page/features-tab/ @vinitamurthi
+/core/templates/services/platform-feature*.ts @vinitamurthi
 
 
 # Frontend unit tests
@@ -675,4 +679,5 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-/.github/workflows/ @BenHenning @vinitamurthi
+# TODO(#11083): Re-add owner @BenHenning after 2020-11-15.
+/.github/workflows/ @vinitamurthi

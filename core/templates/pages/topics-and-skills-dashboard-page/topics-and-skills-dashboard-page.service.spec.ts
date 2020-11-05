@@ -25,20 +25,18 @@ import { TopicsAndSkillsDashboardFilter } from
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+import { TopicSummary } from
+  'domain/topic/topic-summary.model';
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService = null;
-  let tsof: TopicSummaryObjectFactory = null;
 
   beforeEach(() => {
     tsds = new TopicsAndSkillsDashboardPageService();
-    tsof = new TopicSummaryObjectFactory();
   });
 
   it('should filter the topics', () => {
-    const topic1 = tsof.createFromBackendDict({
+    const topic1 = TopicSummary.createFromBackendDict({
       topic_model_created_on: 1581839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -58,7 +56,7 @@ describe('Topic and Skill dashboard page service', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     });
-    const topic2 = tsof.createFromBackendDict({
+    const topic2 = TopicSummary.createFromBackendDict({
       topic_model_created_on: 1681839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -78,7 +76,7 @@ describe('Topic and Skill dashboard page service', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     });
-    const topic3 = tsof.createFromBackendDict({
+    const topic3 = TopicSummary.createFromBackendDict({
       topic_model_created_on: 1781839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,

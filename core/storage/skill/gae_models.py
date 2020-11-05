@@ -35,7 +35,12 @@ class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """SkillSnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class SkillModel(base_models.VersionedModel):
@@ -73,7 +78,7 @@ class SkillModel(base_models.VersionedModel):
     skill_contents = datastore_services.JsonProperty(indexed=False)
     # The prerequisite skills for the skill.
     prerequisite_skill_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=False))
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # The id to be used by the next misconception added.
     next_misconception_id = (
         datastore_services.IntegerProperty(required=True, indexed=False))
@@ -89,21 +94,10 @@ class SkillModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Skill should be kept if it is published."""
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether SkillModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """SkillModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_merged_skills(cls):
@@ -143,6 +137,7 @@ class SkillModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
+        skill_commit_log_entry.update_timestamps()
         skill_commit_log_entry.put()
 
     @classmethod
@@ -177,13 +172,6 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     # The id of the skill being edited.
     skill_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """Skill commit log is deleted only if the corresponding collection
-        is not public.
-        """
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def _get_instance_id(cls, skill_id, version):
@@ -247,21 +235,10 @@ class SkillSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Skill summary should be kept if associated skill is published."""
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether SkillSummaryModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """SkillSummaryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):

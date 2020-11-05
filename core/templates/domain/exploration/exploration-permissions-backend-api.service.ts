@@ -26,8 +26,7 @@ import { UrlInterpolationService } from
 import {
   ExplorationPermissionsBackendDict,
   ExplorationPermissions,
-  ExplorationPermissionsObjectFactory
-} from 'domain/exploration/exploration-permissions-object.factory';
+} from 'domain/exploration/exploration-permissions.model';
 
 @Injectable({
   providedIn: 'root'
@@ -36,9 +35,7 @@ export class ExplorationPermissionsBackendApiService {
   constructor(
     private contextService: ContextService,
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService,
-    private explorationPermissionsObjectFactory:
-    ExplorationPermissionsObjectFactory) {}
+    private urlInterpolationService: UrlInterpolationService) {}
 
   getPermissions(): Promise<ExplorationPermissions> {
     let explorationPermissionsUrl = this.urlInterpolationService
@@ -50,7 +47,7 @@ export class ExplorationPermissionsBackendApiService {
       this.http.get<ExplorationPermissionsBackendDict>(
         explorationPermissionsUrl).toPromise().then(response => {
         let permissionsObject = (
-          this.explorationPermissionsObjectFactory.createFromBackendDict(
+          ExplorationPermissions.createFromBackendDict(
             response));
         resolve(permissionsObject);
       }, errorResponse => {

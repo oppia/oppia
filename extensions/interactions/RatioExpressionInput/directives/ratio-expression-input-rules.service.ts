@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
+import { Ratio } from 'domain/objects/ratio.model';
 import { RatioInputAnswer } from 'interactions/answer-defs';
 import {
   RatioInputEqualRuleInputs,
@@ -30,10 +30,9 @@ import {
   providedIn: 'root'
 })
 export class RatioExpressionInputRulesService {
-  constructor(private ratioObjectFactory: RatioObjectFactory) {}
   Equals(
       answer: RatioInputAnswer, inputs: RatioInputEqualRuleInputs): boolean {
-    return this.ratioObjectFactory.arrayEquals(answer, inputs.x);
+    return Ratio.arrayEquals(answer, inputs.x);
   }
 
   HasNumberOfTermsEqualTo(
@@ -45,15 +44,15 @@ export class RatioExpressionInputRulesService {
   IsEquivalent(
       answer: RatioInputAnswer,
       inputs: RatioInputEqualRuleInputs): boolean {
-    var simplifiedInput = this.ratioObjectFactory.fromList(
+    var simplifiedInput = Ratio.fromList(
       inputs.x).convertToSimplestForm();
-    var simplifiedAnswer = this.ratioObjectFactory.fromList(
+    var simplifiedAnswer = Ratio.fromList(
       answer).convertToSimplestForm();
-    return this.ratioObjectFactory.arrayEquals(
+    return Ratio.arrayEquals(
       simplifiedAnswer, simplifiedInput);
   }
 }
 
 angular.module('oppia').factory(
-  'RatioInputRulesService',
+  'RatioExpressionInputRulesService',
   downgradeInjectable(RatioExpressionInputRulesService));

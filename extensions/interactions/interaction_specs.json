@@ -74,7 +74,18 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "NumericExpressionInput",
-    "customization_arg_specs": [],
+    "customization_arg_specs": [{
+      "description": "Placeholder text",
+      "name": "placeholder",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SubtitledUnicode"
+      },
+      "default_value": {
+        "content_id": null,
+        "unicode_str": "Type an expression here, using only numbers."
+      }
+    }],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
@@ -768,10 +779,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "StartsWith": "starts with {{x|NormalizedString}}",
-      "Contains": "contains {{x|NormalizedString}}",
-      "Equals": "is equal to {{x|NormalizedString}}, without taking case into account",
-      "FuzzyEquals": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
+      "StartsWith": "starts with at least one of {{x|SetOfNormalizedString}}",
+      "Contains": "contains at least one of {{x|SetOfNormalizedString}}",
+      "Equals": "is equal to at least one of {{x|SetOfNormalizedString}}, without taking case into account",
+      "FuzzyEquals": "is equal to at least one of {{x|SetOfNormalizedString}}, misspelled by at most one character"
     }
   },
   "InteractiveMap": {

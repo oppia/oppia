@@ -99,82 +99,48 @@ def try_upgrading_draft_to_exp_version(
     return draft_change_list
 
 
-def extract_html_from_draft_change_list(draft_change_list):
-    """Extracts all the HTML strings from a draft change list.
-
-    Args:
-        draft_change_list: list(ExplorationChange). The list of
-            ExplorationChange domain objects from which to extract the HTML.
-
-    Returns:
-        list(str). The list of html content strings.
-    """
-    html_list = []
-    for change in draft_change_list:
-        new_value = None
-        if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-            continue
-        # The change object has the key 'new_value' only if the
-        # cmd is 'CMD_EDIT_STATE_PROPERTY' or
-        # 'CMD_EDIT_EXPLORATION_PROPERTY'.
-        new_value = change.new_value
-        if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-            # new_value['html'] = conversion_fn(new_value['html'])
-            html_list += [new_value['html']]
-        elif (change.property_name ==
-              exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-            # Only customization args with the key 'choices' have HTML
-            # content in them.
-            if 'choices' in new_value.keys():
-                html_list += new_value['choices']['value']
-        elif (change.property_name ==
-              exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-            written_translations = (
-                state_domain.WrittenTranslations.from_dict(new_value))
-            html_in_written_translations = (
-                written_translations.get_all_html_content_strings())
-            html_list += html_in_written_translations
-
-        elif (change.property_name ==
-              exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
-            html_list = html_list + [new_value['feedback']['html']]
-        elif (change.property_name ==
-              exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-            for hint in new_value:
-                hint_html = hint['hint_content']['html']
-                html_list += [hint_html]
-
-        elif (change.property_name ==
-              exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-            html_list = html_list + [new_value['explanation']['html']]
-            # TODO(#9413): Find a way to include a reference to the
-            # interaction type in the Draft change lists.
-            # See issue: https://github.com/oppia/oppia/issues/9413.
-            # currently, only DragAndDropSortInput interaction allows
-            # solution correct answers having HTML in them.
-            # This code below should be updated if any new interaction
-            # is allowed to have HTML in the solution correct answer
-            # The typecheckings below can be avoided once #9413 is fixed.
-            if new_value['correct_answer']:
-                if isinstance(new_value['correct_answer'], list):
-                    for html_answer_list in new_value['correct_answer']:
-                        if isinstance(html_answer_list, list):
-                            for answer_html in html_answer_list:
-                                if isinstance(
-                                        answer_html, python_utils.UNICODE):
-                                    html_list += [answer_html]
-
-        elif (change.property_name ==
-              exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-            for answer_group_dict in new_value:
-                answer_group = (
-                    state_domain.AnswerGroup.from_dict(answer_group_dict))
-                html_list += answer_group.get_all_html_content_strings()
-    return html_list
-
-
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
+
+    @classmethod
+    def _convert_states_v39_dict_to_v40_dict(cls, draft_change_list):
+        """Converts draft change list from state version 39 to 40.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                # Converting the answer groups depends on getting an
+                # exploration state of v38, because we need an interaction's id
+                # to properly convert ExplorationChanges that set answer groups.
+                # Since we do not yet support passing an exploration state of a
+                # given version into draft conversion functions, we throw an
+                # Exception to indicate that the conversion cannot be completed.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v38_dict_to_v39_dict(cls, draft_change_list):
+        """Converts draft change list from state version 38 to 39. State
+        version 39 adds a customization arg for the Numeric Expression Input
+        interactions that allows creators to modify the placeholder text,
+        for which there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
 
     @classmethod
     def _convert_states_v37_dict_to_v38_dict(cls, draft_change_list):
