@@ -3197,17 +3197,27 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
+        for i in python_utils.RANGE(20):
+            exp_services.update_exploration(
+                self.owner_id, '0', [exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title %s' % i
+                })], 'Changes.')
         exp_models.ExplorationModel.get_by_id('0').delete(
             self.user_id, '', [])
+
+        error_list = []
+        for i in python_utils.RANGE(10):
+            error_list.append(
+                'u"Entity id 0-%s: based on field exploration_ids having '
+                'value 0, expected model ExplorationModel with id 0 but '
+                'it doesn\'t exist"' % (i + 1))
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field exploration_ids '
-                'having value 0, expected model ExplorationModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'exploration_ids having value 0, expected model '
-                'ExplorationModel with id 0 but it doesn\'t exist"]]'
+                '%s]' % (', ').join(error_list)
             ), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotMetadataModel\', 2]')]
@@ -3280,6 +3290,24 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             ), u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
+
+    def test_maximum_of_ten_errors_are_emitted(self):
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_ids '
+                'field check of ExplorationSnapshotMetadataModel\', '
+                '[u"Entity id 0-1: based on field exploration_ids '
+                'having value 0, expected model ExplorationModel with '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'exploration_ids having value 0, expected model '
+                'ExplorationModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'ExplorationSnapshotMetadataModel\', 2]')]
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
 
 class ExplorationSnapshotContentModelValidatorTests(
