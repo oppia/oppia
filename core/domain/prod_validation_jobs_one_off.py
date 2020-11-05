@@ -338,9 +338,9 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
         By default, this method only yields a maximum of 10 errors if there are
         multiple errors of the same type.
 
-        Note: This behaviour can be overriden in any subclass if more errors need
-        to be yielded. To do so, just change the yield statement to yield all
-        values instead of the first 10.
+        Note: This behaviour can be overriden in any subclass if more errors
+        need to be yielded. To do so, just change the yield statement to
+        yield all values instead of the first 10.
         """
         if VALIDATION_STATUS_SUCCESS in key:
             yield (key, len(values))
