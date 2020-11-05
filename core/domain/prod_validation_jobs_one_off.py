@@ -334,13 +334,19 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        """Yields number of fully validated models or the failure messages."""
+        """Yields number of fully validated models or the failure messages.
+        
+        This method can be overriden in any subclasses if required when all
+        the errors should be generated instead of just 10 errors of each type.
+        The override will simply change the yield statement to yield all values
+        instead of first 10.
+        """
         if FULLY_VALIDATED_CONSTANT in key:
             yield (key, len(values))
         else:
-            # Just yield one error of each error type since the list of errors
+            # Just yield ten errors of each error type since the list of errors
             # for this model is quite large.
-            yield (key, [values[0]])
+            yield (key, [values[0:10]])
 
 
 class ExplorationSnapshotContentModelAuditOneOffJob(
