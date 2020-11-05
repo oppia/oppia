@@ -202,7 +202,7 @@ class BaseModel(datastore_services.Model):
         }
 
     @classmethod
-    def get_takeout_keys_to_rename(cls):
+    def get_field_names_for_takeout(cls):
         """Returns a dictionary containing a mapping from field names to
         export dictionary keys for fields whose export dictionary key does
         not match their field name.

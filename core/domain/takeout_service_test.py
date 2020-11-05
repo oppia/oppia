@@ -740,6 +740,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
+        user_models.UserEmailPreferencesModel(
+            id=self.USER_ID_1,
+            site_updates=False,
+            editor_role_notifications=False,
+            feedback_message_notifications=False,
+            subscription_notifications=False
+        ).put()
+        user_models.UserAuthDetailsModel(
+            id=self.USER_ID_1,
+            parent_user_id=self.PROFILE_ID_1
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceFullUserUnitTests, self).setUp()
@@ -827,7 +839,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'last_checked_msec': None
         }
         task_entry_data = {
-            'task_ids_resolved_by_user': []
+            'task_ids_resolved_by_user': [],
+            'issue_descriptions': [],
+            'resolution_msecs': [],
+            'statuses': []
         }
         topic_rights_data = {
             'managed_topic_ids': []
@@ -848,6 +863,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_exploration_rights_sm = {}
         expected_exploration_sm = {}
         expected_platform_parameter_sm = {}
+        expected_user_auth_details = {}
+        expected_user_email_preferences = {}
 
         expected_user_data = {
             'user_stats': stats_data,
@@ -896,6 +913,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
+            'user_auth_details': expected_user_auth_details,
+            'user_email_preferences': expected_user_email_preferences
         }
 
         # Perform export and compare.
@@ -956,7 +975,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         for model in all_models:
             export_method = model.get_model_association_to_user()
             export_policy = model.get_export_policy()
-            renamed_export_keys = model.get_takeout_keys_to_rename()
+            renamed_export_keys = model.get_field_names_for_takeout()
             exported_property_names = []
             model_takeout_ids = []
             for property_name in model._properties: # pylint: disable=protected-access
@@ -1349,6 +1368,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        expected_user_email_preferences = {
+            
+        }
+
+        expected_user_auth_details = {
+
+        }
+
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
@@ -1399,6 +1426,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
+            'user_email_preferences': expected_user_email_preferences,
+            'user_auth_details': expected_user_auth_details
         }
 
         user_takeout_object = takeout_service.export_data_for_user(

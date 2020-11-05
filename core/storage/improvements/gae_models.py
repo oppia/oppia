@@ -162,7 +162,10 @@ class TaskEntryModel(base_models.BaseModel):
         is exported as a shared instance.
         """
         return {
-            'resolver_id': 'task_ids_resolved_by_user'
+            'resolver_id': 'task_ids_resolved_by_user',
+            'issue_description': 'issue_descriptions',
+            'status': 'statuses',
+            'resolved_on': 'resolution_msecs'
         }
 
     @staticmethod
@@ -182,11 +185,11 @@ class TaskEntryModel(base_models.BaseModel):
         return {
             'task_ids_resolved_by_user': (
                 [t.id for t in task_ids_resolved_by_user]),
-            'issue_description': (
+            'issue_descriptions': (
                 [t.issue_description for t in task_ids_resolved_by_user]),
-            'status': (
+            'statuses': (
                 [t.status for t in task_ids_resolved_by_user]),
-            'resolved_on': (
+            'resolution_msecs': (
                 [t.resolved_on for t in task_ids_resolved_by_user]),
         }
 

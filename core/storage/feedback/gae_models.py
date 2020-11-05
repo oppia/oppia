@@ -120,11 +120,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_takeout_keys_to_rename(cls):
+    def get_field_names_for_takeout(cls):
         """Indicates that the last_updated variable is exported under the
         name "last_updated_msec" in Takeout.
         """
-        return dict(super(cls, cls).get_takeout_keys_to_rename(), ** {
+        return dict(super(cls, cls).get_field_names_for_takeout(), ** {
             'last_updated': 'last_updated_msec'
         })
 
@@ -168,7 +168,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 'has_suggestion': feedback_model.has_suggestion,
                 'summary': feedback_model.summary,
                 'message_count': feedback_model.message_count,
-                'last_updated': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_time_in_millisecs(
                     feedback_model.last_updated)
             }
 

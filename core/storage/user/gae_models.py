@@ -138,7 +138,7 @@ class UserSettingsModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @staticmethod
-    def get_takeout_keys_to_rename():
+    def get_field_names_for_takeout():
         """Export renames some time related fields to clearly indicate that
         they represent time in milliseconds since the epoch.
         """
@@ -227,34 +227,34 @@ class UserSettingsModel(base_models.BaseModel):
             'role': user.role,
             'username': user.username,
             'normalized_username': user.normalized_username,
-            'last_agreed_to_terms': (
+            'last_agreed_to_terms_msec': (
                 utils.get_time_in_millisecs(user.last_agreed_to_terms)
                 if user.last_agreed_to_terms
                 else None
             ),
-            'last_started_state_editor_tutorial': (
+            'last_started_state_editor_tutorial_msec': (
                 utils.get_time_in_millisecs(
                     user.last_started_state_editor_tutorial)
                 if user.last_started_state_editor_tutorial
                 else None
             ),
-            'last_started_state_translation_tutorial': (
+            'last_started_state_translation_tutorial_msec': (
                 utils.get_time_in_millisecs(
                     user.last_started_state_translation_tutorial)
                 if user.last_started_state_translation_tutorial
                 else None
             ),
-            'last_logged_in': (
+            'last_logged_in_msec': (
                 utils.get_time_in_millisecs(user.last_logged_in)
                 if user.last_logged_in
                 else None
             ),
-            'last_edited_an_exploration': (
+            'last_edited_an_exploration_msec': (
                 utils.get_time_in_millisecs(user.last_edited_an_exploration)
                 if user.last_edited_an_exploration
                 else None
             ),
-            'last_created_an_exploration': (
+            'last_created_an_exploration_msec': (
                 utils.get_time_in_millisecs(user.last_created_an_exploration)
                 if user.last_created_an_exploration
                 else None
@@ -265,7 +265,7 @@ class UserSettingsModel(base_models.BaseModel):
                 user.creator_dashboard_display_pref),
             'user_bio': user.user_bio,
             'subject_interests': user.subject_interests,
-            'first_contribution': user.first_contribution_msec,
+            'first_contribution_msec': user.first_contribution_msec,
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
@@ -958,12 +958,12 @@ class UserSubscriptionsModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_takeout_keys_to_rename(cls):
+    def get_field_names_for_takeout(cls):
         """Indicates that creator_ids are an exception in the export policy
         for Takeout. Also renames timestamp fields to clearly indicate that
         they represent milliseconds since the epoch.
         """
-        return dict(super(cls, cls).get_takeout_keys_to_rename(), ** {
+        return dict(super(cls, cls).get_field_names_for_takeout(), ** {
             # We do not want to expose creator_ids, so we instead return
             # creator_usernames.
             'creator_ids': 'creator_usernames',
@@ -1024,8 +1024,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
                 user_model.general_feedback_thread_ids),
             'feedback_thread_ids': (
                 user_model.feedback_thread_ids),
-            'creator_ids': creator_usernames,
-            'last_checked':
+            'creator_usernames': creator_usernames,
+            'last_checked_msec':
                 None if user_model.last_checked is None else
                 utils.get_time_in_millisecs(user_model.last_checked)
         }
@@ -1363,7 +1363,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @staticmethod
-    def get_takeout_keys_to_rename():
+    def get_field_names_for_takeout():
         """Fields are renamed to clarify that they represent the time in
         milliseconds since the epoch.
         """
@@ -1492,13 +1492,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
         for user_model in found_models:
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
-                'rated_on': (
+                'rated_on_msec': (
                     utils.get_time_in_millisecs(user_model.rated_on)
                     if user_model.rated_on
                     else None
                 ),
                 'draft_change_list': user_model.draft_change_list,
-                'draft_change_list_last_updated': (
+                'draft_change_list_last_updated_msec': (
                     utils.get_time_in_millisecs(
                         user_model.draft_change_list_last_updated)
                     if user_model.draft_change_list_last_updated
@@ -2705,7 +2705,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
             'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'parent_user_id': base_models.EXPORT_POLICY.EXPORTED
         })
-    
+
     @staticmethod
     def export_data(user_id):
         """Exports the username of the parent."""
