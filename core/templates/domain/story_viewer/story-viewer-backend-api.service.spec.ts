@@ -18,16 +18,17 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import {LearnerExplorationSummary} from 
-'domain/summary/learner-exploration-summary.model';
+import {LearnerExplorationSummary} from
+  'domain/summary/learner-exploration-summary.model';
 import { StoryPlaythrough } from
   'domain/story_viewer/story-playthrough.model';
-import { StoryViewerBackendApiService } from
+import { StoryDataDict, StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 
-fdescribe('Story viewer backend API service', () => {
+describe('Story viewer backend API service', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService = null;
   let httpTestingController: HttpTestingController;
 
@@ -54,7 +55,7 @@ fdescribe('Story viewer backend API service', () => {
         topic_name: 'Topic name',
         meta_tag_content: 'Story meta tag content'
       };
-    
+
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
@@ -72,6 +73,29 @@ fdescribe('Story viewer backend API service', () => {
         StoryPlaythrough.createFromBackendDict(
           sampleDataResults));
       expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should handle errorCallback for fetching an existing story',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      storyViewerBackendApiService.fetchStoryData(
+        'abbrev', 'staging', '0').then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/story_data_handler/staging/abbrev/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
     })
   );
 
@@ -105,7 +129,7 @@ fdescribe('Story viewer backend API service', () => {
         next_node_id: 'node_2',
         ready_for_review_test: true,
       };
-    
+
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
@@ -129,4 +153,33 @@ fdescribe('Story viewer backend API service', () => {
     })
   );
 
+  it('should handle errorCallback for recording a chapter as completed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      storyViewerBackendApiService.recordChapterCompletion(
+        'abbrev', 'staging', '0', 'node_1').then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/story_progress_handler/staging/abbrev/0/node_1');
+      expect(req.request.method).toEqual('POST');
+
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
+
+  it('should emit the story data event correctly', function() {
+    let storyDataEventEmitter = new EventEmitter<StoryDataDict>();
+    expect(storyViewerBackendApiService.onSendStoryData).toEqual(
+      storyDataEventEmitter);
+  });
 });
