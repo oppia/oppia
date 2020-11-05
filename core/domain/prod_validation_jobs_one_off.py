@@ -347,7 +347,7 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
         else:
             # Just yield ten errors of each error type since the list of errors
             # for this model is quite large.
-            yield (key, [values[:10]])
+            yield (key, values[:10])
 
 
 class ExplorationSnapshotContentModelAuditOneOffJob(
