@@ -18,6 +18,7 @@
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { EventEmitter } from '@angular/core';
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Responses Service', function() {
   var ResponsesService = null;
@@ -33,6 +34,12 @@ describe('Responses Service', function() {
   var LoggerService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StateSolutionService', {
