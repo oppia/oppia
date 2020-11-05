@@ -3292,9 +3292,9 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         exp_models.ExplorationModel.get_by_id('0').delete(
             self.user_id, '', [])
 
-        error_list = []
+        expected_error_list = []
         for i in python_utils.RANGE(10):
-            error_list.append(
+            expected_error_list.append(
                 'u"Entity id 0-%s: based on field exploration_ids having '
                 'value 0, expected model ExplorationModel with id 0 but '
                 'it doesn\'t exist"' % (i + 1))
@@ -3302,7 +3302,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationSnapshotMetadataModel\', '
-                '%s]' % (', ').join(error_list)
+                '%s]' % (', ').join(expected_error_list)
             ), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotMetadataModel\', 2]')]
