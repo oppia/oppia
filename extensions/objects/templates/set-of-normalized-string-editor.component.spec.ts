@@ -13,24 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the set of algebraic identifier component.
+ * @fileoverview Unit tests for the list of normalized string editor.
  */
-
-import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
-describe('SetOfAlgebraicIdentifier', function() {
+describe('SetOfNormalizedStringEditor', function() {
   var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'GuppyInitializationService', new GuppyInitializationService());
-  }));
   beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('setOfAlgebraicIdentifierEditor');
+    ctrl = $componentController('setOfNormalizedStringEditor');
   }));
 
   it('should initialize the value with an empty array', function() {
