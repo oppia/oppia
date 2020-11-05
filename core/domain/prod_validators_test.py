@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
 import math
 import random
@@ -48,6 +49,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -3292,22 +3294,35 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         exp_models.ExplorationModel.get_by_id('0').delete(
             self.user_id, '', [])
 
-        expected_error_list = []
-        for i in python_utils.RANGE(10):
-            expected_error_list.append(
-                'u"Entity id 0-%s: based on field exploration_ids having '
+        self.process_and_flush_pending_tasks()
+        job_id = self.job_class.create_new()
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        self.job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.process_and_flush_pending_tasks()
+        actual_output = self.job_class.get_output(job_id)
+
+        self.assertEqual(len(actual_output), 2)
+
+        self.assertEqual(
+            actual_output[1],
+            '[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]')
+
+        full_error_list = []
+        for i in python_utils.RANGE(21):
+            full_error_list.append(
+                'Entity id 0-%s: based on field exploration_ids having '
                 'value 0, expected model ExplorationModel with id 0 but '
-                'it doesn\'t exist"' % (i + 1))
-        expected_output = [
-            (
-                u'[u\'failed validation check for exploration_ids '
-                'field check of ExplorationSnapshotMetadataModel\', '
-                '%s]' % (', ').join(expected_error_list)
-            ), (
-                u'[u\'fully-validated '
-                'ExplorationSnapshotMetadataModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, literal_eval=True)
+                'it doesn\'t exist' % (i + 1))
+        actual_error_list = ast.literal_eval(actual_output[0])[1]
+        self.assertEqual(len(actual_error_list), 10)
+        for error in actual_error_list:
+            assert (error in full_error_list), ('Extra error: %s' % error)
 
 
 class ExplorationSnapshotContentModelValidatorTests(
