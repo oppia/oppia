@@ -19,7 +19,6 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -27,12 +26,9 @@ var Constants = require('../protractor_utils/ProtractorConstants.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicAndStoryViewerPage = require(
-  '../protractor_utils/TopicAndStoryViewerPage.js')
+  '../protractor_utils/TopicAndStoryViewerPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
-var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
@@ -42,9 +38,6 @@ describe('Story viewer functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
-  var skillEditorPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
   var dummyExplorationIds = [];
 
@@ -57,9 +50,6 @@ describe('Story viewer functionality', function() {
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
-    skillEditorPage = new SkillEditorPage.SkillEditorPage();
-    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorMainTab = explorationEditorPage.getMainTab();
   });
 
   var createDummyExplorations = async function() {
@@ -83,12 +73,12 @@ describe('Story viewer functionality', function() {
 
   it('should save story progress on login.', async function() {
     await users.createAndLoginAdminUser(
-        'creator@storyPlayer.com', 'creatorStoryPlayer');
+      'creator@storyPlayer.com', 'creatorStoryPlayer');
     await adminPage.editConfigProperty(
-    'Make classroom page accessible.',
-    'Boolean', async function(elem) {
+      'Make classroom page accessible.',
+      'Boolean', async function(elem) {
         await elem.setValue(true);
-    });
+      });
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();

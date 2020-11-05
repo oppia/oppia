@@ -48,7 +48,7 @@ require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
-require('domain/story_viewer/story-viewer-domain.contants.ajs.ts');
+require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(

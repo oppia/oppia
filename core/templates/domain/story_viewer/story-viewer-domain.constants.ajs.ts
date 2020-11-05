@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the topic viewer domain.
+ * @fileoverview Constants for the story viewer domain.
  */
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS

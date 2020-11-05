@@ -18,9 +18,7 @@
  */
 
 var action = require('../protractor_utils/action.js');
-var general = require('../protractor_utils/general.js');
 var waitFor = require('./waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
 
 var TopicAndStoryViewerPage = function() {
   var chapterTitleList = element.all(by.css('.protractor-chapter-title'));
@@ -29,8 +27,8 @@ var TopicAndStoryViewerPage = function() {
   this.get = async function(
       classroomUrlFragment, topicUrlFragment, storyUrlFragment) {
     await browser.get(
-        `/learn/${classroomUrlFragment}/${topicUrlFragment}` +
-        `/story/${storyUrlFragment}`);
+      `/learn/${classroomUrlFragment}/${topicUrlFragment}` +
+      `/story/${storyUrlFragment}`);
     await waitFor.pageToFullyLoad();
   };
 
@@ -43,7 +41,6 @@ var TopicAndStoryViewerPage = function() {
   this.expectLockedChaptersToBe = async function(value) {
     expect(await lockedChapterList.count()).toEqual(value);
   };
-
 };
 
 exports.TopicAndStoryViewerPage = TopicAndStoryViewerPage;
