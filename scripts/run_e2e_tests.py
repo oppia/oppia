@@ -33,6 +33,22 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
+from google.oauth2 import service_account
+
+_SIMPLE_CRYPT_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools',
+    'simple-crypt-' + common.SIMPLE_CRYPT_VERSION)
+sys.path.insert(0, _SIMPLE_CRYPT_PATH)
+
+import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+_PYTHON_LIBS_PATH = os.path.join(
+    os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _PYTHON_LIBS_PATH)
+
+import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+MAX_RETRY_COUNT = 3
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
@@ -518,7 +534,65 @@ def cleanup_portserver(portserver_process):
         portserver_process.kill()
 
 
-def main(args=None):
+def get_flaky_tests_data_from_sheets(sheet):
+    """Gets all flaky tests from the google sheet.
+
+    Args:
+        sheet: googleapiclient.discovery.Resource. The spreedsheet object.
+
+    Returns:
+        list(tuple(str, str, str, int)). A list of rows from the sheet.
+        The tuple has 4 entries. The entries represent
+        (suite_name, test_name, test_error_log, flake_count).
+    """
+    sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
+    flaky_tests_list = []
+    if sheet_id is not None:
+        result = sheet.values().get(
+            spreadsheetId=sheet_id,
+            range='Log!A5:T1000').execute()
+        values = result.get('values', [])
+
+        for row in values:
+            if len(row) < 3:
+                continue
+            if len(row) >= 6 and row[5] != '':
+                flaky_tests_list.append((row[0], row[1], row[2], int(row[5])))
+            else:
+                flaky_tests_list.append((row[0], row[1], row[2], 0))
+
+    return flaky_tests_list
+
+
+def update_flaky_tests_count(sheet, row_index, current_count):
+    """Updates the flaky tests count in the google sheet.
+
+    Args:
+        sheet: googleapiclient.discovery.Resource. The spreedsheet object.
+        row_index: int. The index of the row to update in the sheet.
+        current_count: int. The current count of this flake in the sheet.
+    """
+    sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
+    if sheet_id is not None:
+        values = [
+            [
+                current_count + 1
+            ]
+        ]
+
+        body = {
+            'values': values
+        }
+
+        sheet.values().update(
+            spreadsheetId=sheet_id,
+            range='Log!F' + python_utils.convert_to_bytes(row_index + 5),
+            valueInputOption='USER_ENTERED',
+            body=body).execute()
+        python_utils.PRINT('** NOTE: Updated sheet for first failing test **')
+
+
+def run_tests(args=None):
     """Run the scripts to start end-to-end tests."""
 
     parsed_args = _PARSER.parse_args(args=args)
@@ -559,9 +633,79 @@ def main(args=None):
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 
-    p = subprocess.Popen(commands)
-    p.communicate()
+    p = subprocess.Popen(commands, stdout=subprocess.PIPE)
+    output_lines = []
+    while True:
+        nextline = p.stdout.readline()
+        if len(nextline) == 0 and p.poll() is not None:
+            break
+        sys.stdout.write(nextline)
+        sys.stdout.flush()
+        output_lines.append(nextline.strip())
+
+    flaky_tests_list = []
+    google_auth_decode_password = os.getenv('GOOGLE_AUTH_DECODE_PASSWORD')
+    if google_auth_decode_password is not None:
+        with python_utils.open_file(
+            'auth.json.enc', 'rb', encoding=None) as enc_file:
+            with python_utils.open_file('auth.json', 'w') as dec_file:
+                ciphertext = enc_file.read()
+                plaintext = simplecrypt.decrypt(
+                    google_auth_decode_password, ciphertext).decode('utf-8')
+                dec_file.write(plaintext)
+
+        sheets_scopes = ['https://www.googleapis.com/auth/spreadsheets']
+        creds = service_account.Credentials.from_service_account_file(
+            'auth.json', scopes=sheets_scopes)
+        sheet = googleapiclient.discovery.build(
+            'sheets', 'v4', credentials=creds).spreadsheets()
+        flaky_tests_list = get_flaky_tests_data_from_sheets(sheet)
+
+    suite_name = parsed_args.suite.lower()
+    if len(flaky_tests_list) > 0 and p.returncode != 0:
+        for i, line in enumerate(output_lines):
+            if line == '*                    Failures                    *':
+                test_name = output_lines[i + 3][3:].strip().lower()
+
+                # Remove coloring characters.
+                ansi_escape = re.compile(
+                    r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+                failure_log = ansi_escape.sub('', output_lines[i + 4])
+                failure_log = failure_log.strip().lower()
+                for index, row in enumerate(flaky_tests_list):
+                    flaky_suite_name = row[0].strip().lower()
+                    flaky_test_message = row[1].strip().lower()
+                    flaky_error_message = row[2].strip().lower()
+                    if (
+                            suite_name == flaky_suite_name or
+                            flaky_suite_name == '[general]'):
+                        if (
+                                test_name == flaky_test_message or
+                                flaky_test_message == 'many'):
+                            if flaky_error_message in failure_log:
+                                update_flaky_tests_count(sheet, index, row[3])
+                                try:
+                                    cleanup_portserver(portserver_process)
+                                    cleanup()
+                                except Exception: # pragma: no cover
+                                    # This is marked as no cover because the
+                                    # exception happens due to some processes
+                                    # running on the local system, which might
+                                    # interfere with the cleanup stuff. This is
+                                    # added as a failsafe to make sure that
+                                    # even when it throws an exception, the
+                                    # test is retried.
+                                    pass # pragma: no cover
+                                return 'flake'
     sys.exit(p.returncode)
+
+
+def main(args=None):
+    """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
+    for _ in python_utils.RANGE(MAX_RETRY_COUNT):
+        flake_state = run_tests(args=args)
+        if flake_state != 'flake':
+            break
 
 
 if __name__ == '__main__':  # pragma: no cover

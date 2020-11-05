@@ -17,7 +17,6 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -34,6 +33,11 @@ import { UtilsService } from 'services/utils.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { Subscription } from 'rxjs';
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 describe('State Translation Status Graph Component', function() {
   var $rootScope = null;
@@ -54,11 +58,9 @@ describe('State Translation Status Graph Component', function() {
     written_translations: {}
   };
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
+  beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AlertsService', TestBed.get(AlertsService));
