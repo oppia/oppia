@@ -832,6 +832,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             }
         )
 
+
 class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     """Tests for UserSubscriptionsModel."""
 
