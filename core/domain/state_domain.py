@@ -2370,8 +2370,8 @@ class SubtitledSetOfNormalizedString(python_utils.OBJECT):
         self.validate()
 
     def to_dict(self):
-        """Returns a dict representing this SubtitledSetOfNormalizedString domain
-            object.
+        """Returns a dict representing this SubtitledSetOfNormalizedString
+            domain object.
 
         Returns:
             dict. A dict, mapping all fields of SubtitledSetOfNormalizedString
