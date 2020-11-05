@@ -216,14 +216,14 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
     return all_models_grouped_by_model_type
 
 
-def make_pseudo_random_hr_consistency_policy():
+def make_instantaneous_global_consistency_policy():
     """Returns a policy that always gives the same sequence of consistency
     decisions.
 
     Returns:
         datastore_stub_util.PseudoRandomHRConsistencyPolicy. The policy.
     """
-    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1.0)
 
 
 @contextlib.contextmanager

@@ -23,7 +23,6 @@ import ast
 import collections
 import contextlib
 import copy
-import datetime
 import inspect
 import itertools
 import json
@@ -65,7 +64,10 @@ import requests_mock
 import schema_utils
 import utils
 
+import contextlib2
 from google.appengine.api import mail
+from google.appengine.ext import deferred
+from google.appengine.ext import testbed
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -84,32 +86,19 @@ platform_taskqueue_services = models.Registry.import_taskqueue_services()
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
 
-def empty_environ():
-    """Create an empty environment for the tests."""
-    os.environ['AUTH_DOMAIN'] = 'example.com'
-    os.environ['SERVER_NAME'] = 'localhost'
-    os.environ['HTTP_HOST'] = 'localhost'
-    os.environ['SERVER_PORT'] = '8080'
-    os.environ['USER_EMAIL'] = ''
-    os.environ['USER_ID'] = ''
-    os.environ['USER_IS_ADMIN'] = '0'
-    os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
-        os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
-
-
 def get_filepath_from_filename(filename, rootdir):
-    """Returns filepath using the filename. Different files are present
-    in different subdirectories in the rootdir. So, we walk through the
-    rootdir and match the all the filenames with the given filename.
-    When a match is found the function returns the complete path of the
-    filename by using os.path.join(root, filename).
+    """Returns filepath using the filename. Different files are present in
+    different subdirectories in the rootdir. So, we walk through the rootdir and
+    match the all the filenames with the given filename.  When a match is found
+    the function returns the complete path of the filename by using
+    os.path.join(root, filename).
 
     For example signup-page.mainpage.html is present in
-    core/templates/pages/signup-page and error-page.mainpage.html is
-    present in core/templates/pages/error-pages. So we walk through
-    core/templates/pages and a match for signup-page.component.html
-    is found in signup-page subdirectory and a match for
-    error-page.directive.html is found in error-pages subdirectory.
+    core/templates/pages/signup-page and error-page.mainpage.html is present in
+    core/templates/pages/error-pages. So we walk through core/templates/pages
+    and a match for signup-page.component.html is found in signup-page
+    subdirectory and a match for error-page.directive.html is found in
+    error-pages subdirectory.
 
     Args:
         filename: str. The name of the file.
@@ -120,35 +109,30 @@ def get_filepath_from_filename(filename, rootdir):
         None.
     """
     # This is required since error files are served according to error status
-    # code. The file served is error-page.mainpage.html but it is compiled
-    # and stored as error-page-{status_code}.mainpage.html.
-    # So, we need to swap the name here to obtain the correct filepath.
+    # code. The file served is error-page.mainpage.html but it is compiled and
+    # stored as error-page-{status_code}.mainpage.html.  So, we need to swap the
+    # name here to obtain the correct filepath.
     if filename.startswith('error-page'):
         filename = 'error-page.mainpage.html'
-
-    filepath = None
-    for root, _, filenames in os.walk(rootdir):
-        for name in filenames:
-            if name == filename:
-                if filepath is None:
-                    filepath = os.path.join(root, filename)
-                else:
-                    raise Exception(
-                        'Multiple files found with name: %s' % filename)
-    return filepath
+    matches = list(itertools.chain.from_iterable(
+        (os.path.join(subdir, f) for f in filenames if f == filename)
+        for subdir, _, filenames in os.walk(rootdir)))
+    if len(matches) > 1:
+        raise Exception('Multiple files found with name: %s' % filename)
+    return matches[0] if matches else None
 
 
 def mock_load_template(filename):
     """Mock for load_template function. This mock is required for backend tests
-    since we do not have webpack compilation before backend tests. The folder
-    to search templates is webpack_bundles which is generated after webpack
+    since we do not have webpack compilation before backend tests. The folder to
+    search templates is webpack_bundles which is generated after webpack
     compilation. Since this folder will be missing, load_template function will
     return an error. So, we use a mock for load_template which returns the html
     file from the source directory instead.
 
     Args:
-        filename: str. The name of the file for which template is
-            to be returned.
+        filename: str. The name of the file for which template is to be
+            returned.
 
     Returns:
         str. The contents of the given file.
@@ -156,8 +140,7 @@ def mock_load_template(filename):
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
     with python_utils.open_file(filepath, 'r') as f:
-        file_content = f.read()
-    return file_content
+        return f.read()
 
 
 def check_image_png_or_webp(image_string):
@@ -167,12 +150,9 @@ def check_image_png_or_webp(image_string):
         image_string: str. Image url in base64 format.
 
     Returns:
-        boolean. Returns true if image is in WebP format.
+        bool. Returns true if image is in WebP format.
     """
-    if (image_string.startswith('data:image/png') or
-            image_string.startswith('data:image/webp')):
-        return True
-    return False
+    return image_string.startswith(('data:image/png', 'data:image/webp'))
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -187,8 +167,8 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         Args:
             test_base: AppEngineTestBase. The current test base.
         """
-        self.test_base = test_base
-        self.client = cloud_tasks_emulator.Emulator(
+        self._test_base = test_base
+        self._client = cloud_tasks_emulator.Emulator(
             task_handler=self._task_handler, automatic_task_handling=False)
 
     def _task_handler(self, url, payload, queue_name, task_name=None):
@@ -204,13 +184,12 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         headers = {
             'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
             'X-Appengine-TaskName': (
-                task_name
-                if task_name else python_utils.convert_to_bytes('None')),
-            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes('1')
+                # Maps empty strings to None so the output can become 'None'.
+                python_utils.convert_to_bytes(task_name or None)),
+            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes(1),
         }
-        csrf_token = self.test_base.get_new_csrf_token()
-        self.test_base.post_task(
-            url=url, payload=payload, csrf_token=csrf_token, headers=headers)
+        csrf_token = self._test_base.get_new_csrf_token()
+        self._test_base.post_task(url, payload, headers, csrf_token=csrf_token)
 
     def create_http_task(
             self, queue_name, url, payload=None, scheduled_for=None,
@@ -221,17 +200,17 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         Args:
             queue_name: str. The name of the queue to add the task to.
             url: str. URL of the handler function.
-            payload: dict(str : *). Payload to pass to the request. Defaults
-                to None if no payload is required.
-            scheduled_for: datetime|None. The naive datetime object for the
-                time to execute the task. Pass in None for immediate execution.
+            payload: dict(str : *). Payload to pass to the request. Defaults to
+                None if no payload is required.
+            scheduled_for: datetime|None. The naive datetime object for the time
+                to execute the task. Ignored by this stub.
             task_name: str|None. Optional. The name of the task.
         """
         # Causes the task to execute immediately by setting the scheduled_for
         # time to 0. If we allow scheduled_for to be non-zero, then tests that
         # rely on the actions made by the task will become unreliable.
         scheduled_for = 0
-        self.client.create_task(
+        self._client.create_task(
             queue_name, url, payload, scheduled_for=scheduled_for,
             task_name=task_name)
 
@@ -247,7 +226,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             int. The total number of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self.client.get_number_of_tasks(queue_name=queue_name)
+        return self._client.get_number_of_tasks(queue_name=queue_name)
 
     def process_and_flush_tasks(self, queue_name=None):
         """Executes all of the tasks in a single queue if a queue name is
@@ -258,7 +237,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             queue_name: str|None. Name of the queue. Pass in None if no specific
                 queue is designated.
         """
-        self.client.process_and_flush_tasks(queue_name=queue_name)
+        self._client.process_and_flush_tasks(queue_name=queue_name)
 
     def get_pending_tasks(self, queue_name=None):
         """Returns a list of the tasks in a single queue if a queue name is
@@ -273,7 +252,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             list(Task). List of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self.client.get_tasks(queue_name=queue_name)
+        return self._client.get_tasks(queue_name=queue_name)
 
 
 class MemoryCacheServicesStub(python_utils.OBJECT):
@@ -281,7 +260,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
     layer, namely the platform.cache cache services API.
     """
 
-    cache_dict = collections.defaultdict()
+    _CACHE_DICT = {}
 
     def get_memory_cache_stats(self):
         """Returns a mock profile of the cache dictionary. This mock does not
@@ -292,16 +271,11 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
             MemoryCacheStats. MemoryCacheStats object containing the total
             number of keys in the cache dictionary.
         """
-        memory_stats = caching_domain.MemoryCacheStats(
-            0,
-            0,
-            len(self.cache_dict))
-
-        return memory_stats
+        return caching_domain.MemoryCacheStats(0, 0, len(self._CACHE_DICT))
 
     def flush_cache(self):
         """Wipes the cache dictionary clean."""
-        self.cache_dict = collections.defaultdict()
+        self._CACHE_DICT.clear()
 
     def get_multi(self, keys):
         """Looks up a list of keys in cache dictionary.
@@ -314,10 +288,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
             the keys that are passed in.
         """
         assert isinstance(keys, list)
-        cache_list = [
-            (self.cache_dict[key] if key in self.cache_dict else None)
-            for key in keys]
-        return cache_list
+        return [self._CACHE_DICT.get(key, None) for key in keys]
 
     def set_multi(self, key_value_mapping):
         """Sets multiple keys' values at once in the cache dictionary.
@@ -331,26 +302,23 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
             bool. Whether the set action succeeded.
         """
         assert isinstance(key_value_mapping, dict)
-        for key, value in key_value_mapping.items():
-            self.cache_dict[key] = value
+        self._CACHE_DICT.update(key_value_mapping)
         return True
 
     def delete_multi(self, keys):
         """Deletes multiple keys in the cache dictionary.
 
         Args:
-            keys: list(str). The keys (strings) to delete.
+            keys: list(str). The keys to delete.
 
         Returns:
             int. Number of successfully deleted keys.
         """
-        number_of_deleted_keys = 0
-        for key in keys:
-            assert isinstance(key, python_utils.BASESTRING)
-            if key in self.cache_dict:
-                del self.cache_dict[key]
-                number_of_deleted_keys += 1
-        return number_of_deleted_keys
+        assert all(isinstance(key, python_utils.BASESTRING) for key in keys)
+        keys_to_delete = [key for key in keys if key in self._CACHE_DICT]
+        for key in keys_to_delete:
+            del self._CACHE_DICT[key]
+        return len(keys_to_delete)
 
 
 class TestBase(unittest.TestCase):
@@ -358,14 +326,227 @@ class TestBase(unittest.TestCase):
 
     maxDiff = 2500
 
+    # A test unicode string.
+    UNICODE_TEST_STRING = 'unicode ¡马!'
+
+    def _get_unicode_test_string(self, suffix):
+        """Returns a string that contains unicode characters and ends with the
+        given suffix. This is used to test that functions behave correctly when
+        handling strings with unicode characters.
+
+        Args:
+            suffix: str. The suffix to append to the UNICODE_TEST_STRING.
+
+        Returns:
+            str. A string that contains unicode characters and ends with the
+            given suffix.
+        """
+        return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
+
+    def _assert_validation_error(self, item, error_substring):
+        """Checks that the given item passes default validation."""
+        with self.assertRaisesRegexp(utils.ValidationError, error_substring):
+            item.validate()
+
+    def log_line(self, line):
+        """Print the line with a prefix that can be identified by the script
+        that calls the test.
+        """
+        # We are using the b' prefix as all the stdouts are in bytes.
+        python_utils.PRINT(
+            b'%s%s' % (LOG_LINE_PREFIX, python_utils.convert_to_bytes(line)))
+
+    def shortDescription(self):
+        """Additional information logged during unit test invocation."""
+        # Suppress default logging of docstrings.
+        return None
+
+    def get_updated_param_dict(
+            self, param_dict, param_changes, exp_param_specs):
+        """Updates a param dict using the given list of param_changes.
+
+        Note that the list of parameter changes is ordered. Parameter changes
+        later in the list may depend on parameter changes that have been set
+        earlier in the same list.
+        """
+        new_param_dict = copy.deepcopy(param_dict)
+        for param_change in param_changes:
+            try:
+                obj_type = exp_param_specs[param_change.name].obj_type
+            except:
+                raise Exception('Parameter %s not found' % param_change.name)
+            new_param_dict[param_change.name] = (
+                param_change.get_normalized_value(obj_type, new_param_dict))
+        return new_param_dict
+
+    def get_static_asset_filepath(self):
+        """Returns filepath to the static files on disk ('' or 'build/')."""
+        return '' if constants.DEV_MODE else os.path.join('build')
+
+    def get_static_asset_url(self, asset_suffix):
+        """Returns the relative path for the asset, appending it to the
+        corresponding cache slug. asset_suffix should have a leading slash.
+        """
+        return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
+
+    @contextlib.contextmanager
+    def swap(self, obj, attr, newvalue):
+        """Swap an object's attribute value within the context of a 'with'
+        statement. The object can be anything that supports getattr and setattr,
+        such as class instances, modules, etc.
+
+        Example usage:
+
+            import math
+            with self.swap(math, 'sqrt', lambda x: 42):
+                print math.sqrt(16.0) # prints 42
+            print math.sqrt(16.0) # prints 4 as expected.
+
+        Note that this does not work directly for classmethods. In this case,
+        you will need to import the 'types' module, as follows:
+
+            import types
+            with self.swap(
+                SomePythonClass, 'some_classmethod',
+                types.MethodType(new_classmethod, SomePythonClass)):
+
+        NOTE: self.swap and other context managers that are created using
+        contextlib.contextmanager use generators that yield exactly once. This
+        means that you can only use them once after construction, otherwise,
+        the generator will immediately raise StopIteration, and contextlib will
+        raise a RuntimeError.
+        """
+        original = getattr(obj, attr)
+        setattr(obj, attr, newvalue)
+        try:
+            yield
+        finally:
+            setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def swap_with_checks(
+            self, obj, attr, new_value, expected_args=None,
+            expected_kwargs=None, called=True):
+        """Swap an object's function value within the context of a 'with'
+        statement. The object can be anything that supports getattr and setattr,
+        such as class instances, modules, etc.
+
+        Examples:
+            If you want to check subprocess.Popen is invoked twice like
+            `subprocess.Popen(['python'], shell=True)` and
+            `subprocess.Popen(['python2], shell=False), you can first define the
+            mock function, then the swap, and just run the target function in
+            context, as follows:
+
+                def mock_popen(command, shell):
+                    return
+
+                popen_swap = self.swap_with_checks(
+                    subprocess, 'Popen', mock_popen,
+                    expected_args=[(['python'],), (['python2'],)],
+                    expected_kwargs=[{'shell': True}, {'shell': False}])
+                with popen_swap:
+                    function_that_invokes_popen()
+
+        Args:
+            obj: *. The Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            new_value: function. The new function you want to use.
+            expected_args: None|list(tuple). The expected args that you want
+                this function to be invoked with. When its value is None, args
+                will not be checked. If the value type is list, the function
+                will check whether the called args is the first element in the
+                list. If matched, this tuple will be removed from the list.
+            expected_kwargs: None|list(dict). The expected keyword args you want
+                this function to be invoked with. Similar to expected_args.
+            called: bool. Whether the function is expected to be invoked. This
+                will always be checked.
+
+        Yields:
+            context. The context with function replaced.
+        """
+        original = getattr(obj, attr)
+        # The actual error message will also include detail assert error message
+        # via the `self.longMessage` below.
+        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+            obj.__name__, attr)
+
+        def wrapper(*args, **kwargs):
+            """Wrapper function for the new value. This function will do the
+            check before the wrapped function is invoked. After the function
+            finished, the wrapper will update how many times this function is
+            invoked.
+
+            Args:
+                *args: list(*). The args passed into `attr` function.
+                **kwargs: dict. The key word args passed into `attr` function.
+
+            Returns:
+                *. Result of `new_value`.
+            """
+            wrapper.called = True
+            if expected_args is not None:
+                self.assertEqual(args, expected_args[0], msg=msg)
+                expected_args.pop(0)
+            if expected_kwargs is not None:
+                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
+                expected_kwargs.pop(0)
+            result = new_value(*args, **kwargs)
+            return result
+
+        wrapper.called = False
+        setattr(obj, attr, wrapper)
+        error_occurred = False
+        try:
+            # This will show the detailed assert message.
+            self.longMessage = True
+            yield
+        except Exception:
+            error_occurred = True
+            # Raise issues thrown by the called function or assert error.
+            raise
+        finally:
+            setattr(obj, attr, original)
+            if not error_occurred:
+                self.assertEqual(wrapper.called, called, msg=msg)
+                self.assertFalse(expected_args, msg=msg)
+                self.assertFalse(expected_kwargs, msg=msg)
+            self.longMessage = False
+
+    def assertRaises(self, *args, **kwargs):
+        raise NotImplementedError(
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.')
+
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
+            self, expected_exception, expected_regexp, callable_obj=None,
+            *args, **kwargs):
+        if not expected_regexp:
+            raise Exception(
+                'Please provide a sufficiently strong regexp string to '
+                'validate that the correct error is being raised.')
+
+        return super(TestBase, self).assertRaisesRegexp(
+            expected_exception, expected_regexp,
+            callable_obj=callable_obj, *args, **kwargs)
+
+
+class AppEngineTestBase(TestBase):
+    """Base class for tests requiring App Engine services."""
+
     # This is the value that gets returned by default when
     # app_identity.get_application_id() is called during tests.
     EXPECTED_TEST_APP_ID = 'dummy-cloudsdk-project-id'
 
-    # A test unicode string.
-    UNICODE_TEST_STRING = u'unicode ¡马!'
+    # Environment values our tests assume to have.
+    AUTH_DOMAIN = 'example.com'
+    HTTP_HOST = 'localhost'
+    SERVER_NAME = 'localhost'
+    SERVER_PORT = '8080'
+    DEFAULT_VERSION_HOSTNAME = '%s:%s' % (HTTP_HOST, SERVER_PORT)
 
     SUPER_ADMIN_EMAIL = 'tmpsuperadmin@example.com'
+    SUPER_ADMIN_USERNAME = 'tmpsuperadm1n'
 
     # Dummy strings representing user attributes. Note that it is up to the
     # individual test to actually register these users as editors, admins, etc.
@@ -389,7 +570,7 @@ class TestBase(unittest.TestCase):
     NEW_USER_USERNAME = 'newuser'
     DEFAULT_END_STATE_NAME = 'End'
 
-    PSEUDONYMOUS_ID = 'pid_%s' % (32 * 'a')
+    PSEUDONYMOUS_ID = 'pid_%s' % ('a' * 32)
 
     VERSION_0_STATES_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: {
@@ -404,65 +585,65 @@ class TestBase(unittest.TestCase):
                         'dest': 'END',
                         'feedback': [],
                         'param_changes': [],
-                        'definition': {'rule_type': 'default'}
-                    }]
-                }]
+                        'definition': {'rule_type': 'default'},
+                    }],
+                }],
             },
-        }
+        },
     }
 
     VERSION_27_STATE_DICT = {
-        'content': {'content_id': u'content', 'html': u''},
+        'content': {'content_id': 'content', 'html': ''},
         'param_changes': [],
         'content_ids_to_audio_translations': {
-            u'content': {},
-            u'default_outcome': {},
-            u'hint_1': {},
-            u'solution': {}
+            'content': {},
+            'default_outcome': {},
+            'hint_1': {},
+            'solution': {},
         },
         'written_translations': {
             'translations_mapping': {
-                u'content': {},
-                u'default_outcome': {},
-                u'hint_1': {},
-                u'solution': {}
-            }
+                'content': {},
+                'default_outcome': {},
+                'hint_1': {},
+                'solution': {},
+            },
         },
         'interaction': {
             'solution': {
-                'correct_answer': u'Solution',
+                'correct_answer': 'Solution',
                 'explanation': {
-                    'content_id': u'solution',
-                    'html': u'<p>Solution explanation</p>'
+                    'content_id': 'solution',
+                    'html': '<p>Solution explanation</p>',
                 },
-                'answer_is_exclusive': False
+                'answer_is_exclusive': False,
             },
             'answer_groups': [],
             'default_outcome': {
                 'param_changes': [],
                 'feedback': {
-                    'content_id': u'default_outcome',
-                    'html': u''
+                    'content_id': 'default_outcome',
+                    'html': '',
                 },
                 'dest': None,
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
-                'labelled_as_correct': True
+                'labelled_as_correct': True,
             },
             'customization_args': {
-                u'rows': {u'value': 1},
-                u'placeholder': {u'value': u'Enter text here'}
+                'rows': {'value': 1},
+                'placeholder': {'value': 'Enter text here'},
             },
             'confirmed_unclassified_answers': [],
-            'id': u'TextInput',
+            'id': 'TextInput',
             'hints': [{
                 'hint_content': {
-                    'content_id': u'hint_1',
-                    'html': u'<p>Hint 1</p>'
-                }
-            }]
+                    'content_id': 'hint_1',
+                    'html': '<p>Hint 1</p>',
+                },
+            }],
         },
-        'classifier_model_id': None
+        'classifier_model_id': None,
     }
 
     VERSION_21_STATE_DICT = {
@@ -470,31 +651,29 @@ class TestBase(unittest.TestCase):
             'classifier_model_id': None,
             'content': {
                 'content_id': 'content',
-                'html': 'Congratulations, you have finished!'},
-            'content_ids_to_audio_translations': {
-                'content': {}},
+                'html': 'Congratulations, you have finished!',
+            },
+            'content_ids_to_audio_translations': {'content': {}},
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
-                    'recommendedExplorationIds': {'value': []}},
+                    'recommendedExplorationIds': {'value': []},
+                },
                 'default_outcome': None,
                 'hints': [],
                 'id': 'EndExploration',
-                'solution': None
+                'solution': None,
             },
-            'param_changes': []
+            'param_changes': [],
         },
         'Introduction': {
             'classifier_model_id': None,
-            'content': {
-                'content_id': 'content',
-                'html': ''
-            },
+            'content': {'content_id': 'content', 'html': ''},
             'content_ids_to_audio_translations': {
                 'content': {},
                 'default_outcome': {},
-                'feedback_1': {}
+                'feedback_1': {},
             },
             'interaction': {
                 'answer_groups': [{
@@ -502,60 +681,67 @@ class TestBase(unittest.TestCase):
                         'dest': 'END',
                         'feedback': {
                             'content_id': 'feedback_1',
-                            'html': '<p>Correct!</p>'},
+                            'html': '<p>Correct!</p>',
+                        },
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
                         'param_changes': [],
-                        'refresher_exploration_id': None},
+                        'refresher_exploration_id': None,
+                    },
                     'rule_specs': [{
                         'inputs': {'x': 'InputString'},
-                        'rule_type': 'Equals'}],
+                        'rule_type': 'Equals',
+                    }],
                     'tagged_misconception_id': None,
-                    'training_data': ['answer1', 'answer2', 'answer3']}],
+                    'training_data': ['answer1', 'answer2', 'answer3'],
+                }],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'placeholder': {'value': ''},
-                    'rows': {'value': 1}},
+                    'rows': {'value': 1},
+                },
                 'default_outcome': {
                     'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': ''},
+                    'feedback': {'content_id': 'default_outcome', 'html': ''},
                     'labelled_as_correct': False,
                     'missing_prerequisite_skill_id': None,
                     'param_changes': [],
-                    'refresher_exploration_id': None},
+                    'refresher_exploration_id': None,
+                },
                 'hints': [],
                 'id': 'TextInput',
-                'solution': None
+                'solution': None,
             },
-            'param_changes': []
-        }
+            'param_changes': [],
+        },
     }
 
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
             'outline': (
-                '<p>Value</p><oppia-noninteractive-math ' +
-                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-                ';"></oppia-noninteractive-math>'),
+                '<p>Value</p>'
+                '<oppia-noninteractive-math '
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">'
+                '</oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
             'acquired_skill_ids': [],
             'id': 'node_1',
             'title': 'Chapter 1',
-            'prerequisite_skill_ids': []}],
+            'prerequisite_skill_ids': [],
+        }],
         'initial_node_id': 'node_1',
-        'next_node_id': 'node_2'
+        'next_node_id': 'node_2',
     }
 
     VERSION_2_STORY_CONTENTS_DICT = {
         'nodes': [{
             'outline': (
-                '<p>Value</p><oppia-noninteractive-math ' +
-                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-                ';"></oppia-noninteractive-math>'),
+                '<p>Value</p>'
+                '<oppia-noninteractive-math '
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">'
+                '</oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -564,17 +750,19 @@ class TestBase(unittest.TestCase):
             'title': 'Chapter 1',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': None,
-            'thumbnail_bg_color': None}],
+            'thumbnail_bg_color': None,
+        }],
         'initial_node_id': 'node_1',
-        'next_node_id': 'node_2'
+        'next_node_id': 'node_2',
     }
 
     VERSION_3_STORY_CONTENTS_DICT = {
         'nodes': [{
             'outline': (
-                '<p>Value</p><oppia-noninteractive-math ' +
-                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-                ';"></oppia-noninteractive-math>'),
+                '<p>Value</p>'
+                '<oppia-noninteractive-math '
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">'
+                '</oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -584,17 +772,21 @@ class TestBase(unittest.TestCase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': None,
-            'thumbnail_bg_color': None}],
+            'thumbnail_bg_color': None,
+        }],
         'initial_node_id': 'node_1',
-        'next_node_id': 'node_2'
+        'next_node_id': 'node_2',
     }
+
     VERSION_4_STORY_CONTENTS_DICT = {
         'nodes': [{
             'outline': (
-                '<p>Value</p><oppia-noninteractive-'
-                'math math_content-with-value="{&amp;quot;raw_latex&amp;quot;'
-                ': &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;'
-                'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'),
+                '<p>Value</p>'
+                '<oppia-noninteractive-math math_content-with-value="{'
+                '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
+                '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                '}">'
+                '</oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -604,19 +796,22 @@ class TestBase(unittest.TestCase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': None,
-            'thumbnail_bg_color': None}],
+            'thumbnail_bg_color': None,
+        }],
         'initial_node_id': 'node_1',
-        'next_node_id': 'node_2'
+        'next_node_id': 'node_2',
     }
 
     VERSION_1_SUBTOPIC_DICT = {
         'skill_ids': ['skill_1'],
         'id': 1,
-        'title': 'A subtitle'
+        'title': 'A subtitle',
     }
 
     # Dictionary-like data structures within sample YAML must be formatted
-    # alphabetically to match string equivalence with YAML generation tests.
+    # alphabetically to match string equivalence with YAML generation tests. The
+    # indentations are also important, since it is used to define nesting (just
+    # like Python).
     #
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
@@ -704,8 +899,7 @@ title: Title
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     SAMPLE_UNTITLED_YAML_CONTENT = (
@@ -760,42 +954,94 @@ tags: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    def _get_unicode_test_string(self, suffix):
-        """Returns a string that contains unicode characters and ends with the
-        given suffix. This is used to test that functions behave correctly
-        when handling strings with unicode characters.
+    def __init__(self, *args, **kwargs):
+        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+        # Defined outside of setUp() because we want to swap it in during tests,
+        # while minimizing the swap's scope. We accomplish this by using a
+        # context manager over run().
+        self._taskqueue_services_stub = TaskqueueServicesStub(self)
+
+    def run(self, result=None):
+        """Run the test, collecting the result into the specified TestResult.
+
+        Reference URL:
+        https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
+
+        AppEngineTestBase's override of run() wraps super().run() in swap
+        contexts to mock out the cache and taskqueue services.
 
         Args:
-            suffix: str. The suffix to append to the UNICODE_TEST_STRING.
-
-        Returns:
-            str. A string that contains unicode characters and ends with the
-            given suffix.
+            result: TestResult | None. Holds onto the results of each test. If
+                None, a temporary result object is created (by calling the
+                defaultTestResult() method) and used instead.
         """
-        return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
+        memory_cache_services_stub = MemoryCacheServicesStub()
+        memory_cache_services_stub.flush_cache()
 
-    def _assert_validation_error(self, item, error_substring):
-        """Checks that the given item passes default validation."""
-        with self.assertRaisesRegexp(utils.ValidationError, error_substring):
-            item.validate()
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self.swap(
+                platform_taskqueue_services, 'create_http_task',
+                self._taskqueue_services_stub.create_http_task))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'flush_cache',
+                memory_cache_services_stub.flush_cache))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'get_multi',
+                memory_cache_services_stub.get_multi))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'set_multi',
+                memory_cache_services_stub.set_multi))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'get_memory_cache_stats',
+                memory_cache_services_stub.get_memory_cache_stats))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'delete_multi',
+                memory_cache_services_stub.delete_multi))
 
-    def signup_superadmin_user(self):
-        """Signs up a superadmin user. Should be called at the end of
-        setUp().
-        """
-        self.signup(self.SUPER_ADMIN_EMAIL, 'tmpsuperadm1n')
+            super(AppEngineTestBase, self).run(result=result)
 
-    def log_line(self, line):
-        """Print the line with a prefix that can be identified by the
-        script that calls the test.
-        """
-        # We are using the b' prefix as all the stdouts are in bytes.
-        python_utils.PRINT(
-            b'%s%s' % (LOG_LINE_PREFIX, python_utils.convert_to_bytes(line)))
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+
+        self.testbed.setup_env(
+            overwrite=True,
+            auth_domain=self.AUTH_DOMAIN, http_host=self.HTTP_HOST,
+            server_name=self.SERVER_NAME, server_port=self.SERVER_PORT,
+            default_version_hostname=self.DEFAULT_VERSION_HOSTNAME)
+
+        # Declare any relevant App Engine service stubs here.
+        self.testbed.init_app_identity_stub()
+        self.testbed.init_blobstore_stub()
+        self.testbed.init_files_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_search_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_user_stub()
+
+        policy = (
+            datastore_services.make_instantaneous_global_consistency_policy())
+        self.testbed.init_datastore_v3_stub(consistency_policy=policy)
+
+        # The root path tells the testbed where to find the queue.yaml file.
+        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
+        self._taskqueue_stub = (
+            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
+
+        # Set up the app to be tested.
+        self.testapp = webtest.TestApp(main.app)
+        self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
+        self.mail_testapp = webtest.TestApp(main_mail.app)
+
+        self.signup_superadmin_user()
+
+    def tearDown(self):
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
+        self.testbed.deactivate()
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -803,347 +1049,68 @@ tags: []
         Args:
             email: str. The email of the user who is to be logged in.
             is_super_admin: bool. Whether the user is a super admin.
-       """
-        os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_gae_id_from_email(email)
-        os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
+        """
+        self.testbed.setup_env(
+            overwrite=True,
+            user_email=email, user_id=self.get_gae_id_from_email(email),
+            user_is_admin=('1' if is_super_admin else '0'))
 
     def logout(self):
         """Simulates a logout by resetting the environment variables."""
-        os.environ['USER_EMAIL'] = ''
-        os.environ['USER_ID'] = ''
-        os.environ['USER_IS_ADMIN'] = '0'
+        self.testbed.setup_env(
+            overwrite=True, user_email='', user_id='', user_is_admin='0')
 
-    def shortDescription(self):
-        """Additional information logged during unit test invocation."""
-        # Suppress default logging of docstrings.
-        return None
+    @contextlib.contextmanager
+    def mock_datetime_utcnow(self, mocked_datetime):
+        """Mocks response from datetime.datetime.utcnow method.
 
-    def _get_response(
-            self, url, expected_content_type, params=None,
-            expected_status_int=200):
-        """Get a response, transformed to a Python object.
-
-        Args:
-            url: str. The URL to fetch the response.
-            expected_content_type: str. The content type to expect.
-            params: dict. A dictionary that will be encoded into a query string.
-            expected_status_int: int. The integer status code to expect. Will
-                be 200 if not specified.
-
-        Returns:
-            webtest.TestResponse. The test response.
-        """
-        if params is not None:
-            self.assertTrue(isinstance(params, dict))
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-
-        # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles
-        # is only produced after webpack compilation which is not performed
-        # during backend tests.
-        with self.swap(
-            base, 'load_template', mock_load_template):
-            response = self.testapp.get(
-                url, params, expect_errors=expect_errors,
-                status=expected_status_int)
-
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-        self.assertEqual(response.status_int, expected_status_int)
-        if not expect_errors:
-            self.assertTrue(
-                response.status_int >= 200 and response.status_int < 400)
-        else:
-            self.assertTrue(response.status_int >= 400)
-        self.assertEqual(
-            response.content_type, expected_content_type)
-
-        return response
-
-    def get_html_response(self, url, params=None, expected_status_int=200):
-        """Get a HTML response, transformed to a Python object.
+        Example usage:
+            import datetime
+            mocked_datetime_utcnow = (
+                datetime.datetime.utcnow() - datetime.timedelta(days=1))
+            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+                print datetime.datetime.utcnow() # prints time reduced by 1 day
+            print datetime.datetime.utcnow() # prints current time.
 
         Args:
-            url: str. The URL to fetch the response.
-            params: dict. A dictionary that will be encoded into a query string.
-            expected_status_int: int. The integer status code to expect. Will
-                be 200 if not specified.
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
 
-        Returns:
-            webtest.TestResponse. The test response.
+        Yields:
+            None. Empty yield statement.
         """
-        response = self._get_response(
-            url, 'text/html', params=params,
-            expected_status_int=expected_status_int)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            yield
 
-        return response
-
-    def get_custom_response(
-            self, url, expected_content_type, params=None,
-            expected_status_int=200):
-        """Get a response other than HTML or JSON, transformed to a Python
-        object.
+    @contextlib.contextmanager
+    def login_context(self, email, is_super_admin=False):
+        """Log in with the given email under the context of a 'with' statement.
 
         Args:
-            url: str. The URL to fetch the response.
-            expected_content_type: str. The content type to expect.
-            params: dict. A dictionary that will be encoded into a query string.
-            expected_status_int: int. The integer status code to expect. Will
-                be 200 if not specified.
+            email: str. An email associated to a user account.
+            is_super_admin: bool. Whether the user is a super admin.
 
-        Returns:
-            webtest.TestResponse. The test response.
+        Yields:
+            str. The id of the user associated to the given email, who is now
+            'logged in'.
         """
-        self.assertNotIn(
-            expected_content_type, ['text/html', 'application/json'])
+        self.login(email, is_super_admin=is_super_admin)
+        try:
+            yield self.get_user_id_from_email(email)
+        finally:
+            self.logout()
 
-        response = self._get_response(
-            url, expected_content_type, params=params,
-            expected_status_int=expected_status_int)
+    @contextlib.contextmanager
+    def super_admin_context(self):
+        """Log in as a global admin under the context of a 'with' statement.
 
-        return response
-
-    def get_response_without_checking_for_errors(
-            self, url, expected_status_int_list, params=None):
-        """Get a response, transformed to a Python object and
-        checks for a list of status codes.
-
-        Args:
-            url: str. The URL to fetch the response.
-            expected_status_int_list: list(int). A list of integer status
-                code to expect.
-            params: dict. A dictionary that will be encoded into a query string.
-
-        Returns:
-            webtest.TestResponse. The test response.
+        Yields:
+            str. The id of the user associated to the given email, who is now
+            'logged in'.
         """
-        if params is not None:
-            self.assertTrue(
-                isinstance(params, dict),
-                msg='Expected params to be a dict, received %s' % params)
-
-        # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles
-        # is only produced after webpack compilation which is not performed
-        # during backend tests.
-        with self.swap(
-            base, 'load_template', mock_load_template):
-            response = self.testapp.get(url, params, expect_errors=True)
-
-        self.assertIn(response.status_int, expected_status_int_list)
-
-        return response
-
-    def _parse_json_response(self, json_response, expect_errors):
-        """Convert a JSON server response to an object (such as a dict)."""
-        if not expect_errors:
-            self.assertTrue(
-                json_response.status_int >= 200 and
-                json_response.status_int < 400)
-        else:
-            self.assertTrue(json_response.status_int >= 400)
-        self.assertEqual(
-            json_response.content_type, 'application/json')
-        self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
-
-        return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
-
-    def get_json(self, url, params=None, expected_status_int=200):
-        """Get a JSON response, transformed to a Python object."""
-        if params is not None:
-            self.assertTrue(isinstance(params, dict))
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-
-        json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors,
-            status=expected_status_int)
-
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-        self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(json_response, expect_errors)
-
-    def post_json(
-            self, url, payload, csrf_token=None,
-            expected_status_int=200, upload_files=None):
-        """Post an object to the server by JSON; return the received object."""
-        data = {'payload': json.dumps(payload)}
-        if csrf_token:
-            data['csrf_token'] = csrf_token
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-        json_response = self._send_post_request(
-            self.testapp, url, data,
-            expect_errors,
-            expected_status_int=expected_status_int,
-            upload_files=upload_files)
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-
-        self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(json_response, expect_errors)
-
-    def delete_json(self, url, params='', expected_status_int=200):
-        """Delete object on the server using a JSON call."""
-        if params:
-            self.assertTrue(
-                isinstance(params, dict),
-                msg='Expected params to be a dict, received %s' % params)
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-        json_response = self.testapp.delete(
-            url, params, expect_errors=expect_errors,
-            status=expected_status_int)
-
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-        self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(json_response, expect_errors)
-
-    def _send_post_request(
-            self, app, url, data, expect_errors,
-            expected_status_int=200,
-            upload_files=None, headers=None):
-        """Sends a post request with the data provided to the url specified.
-
-        Args:
-            app: TestApp. The WSGI application which receives the
-                request and produces response.
-            url: str. The URL to send the POST request to.
-            data: *. To be put in the body of the request. If params is an
-                iterator, it will be urlencoded. If it is a string, it will
-                not be encoded, but placed in the body directly. Can be a
-                collections.OrderedDict with webtest.forms.Upload fields
-                included.
-            expect_errors: bool. Whether errors are expected.
-            expected_status_int: int. The expected status code.
-            upload_files: list(tuple). A list of (fieldname, filename,
-                file_content). You can also use just (fieldname, filename) and
-                the file contents will be read from disk.
-            headers: dict(str, *). Extra headers to send.
-
-        Returns:
-            webtest.TestResponse. The response of the POST request.
-        """
-        # Convert the files to bytes.
-        if upload_files is not None:
-            upload_files = tuple(
-                tuple(python_utils.convert_to_bytes(
-                    j) for j in i) for i in upload_files)
-
-        json_response = app.post(
-            url, data, expect_errors=expect_errors,
-            upload_files=upload_files, headers=headers,
-            status=expected_status_int)
-        return json_response
-
-    def post_email(
-            self, recipient_email, sender_email, subject, body, html_body=None,
-            expect_errors=False, expected_status_int=200):
-        """Post an email from the sender to the recipient.
-
-        Args:
-            recipient_email: str. The email of the recipient.
-            sender_email: str. The email of the sender.
-            subject: str. The subject of the email.
-            body: str. The body of the email.
-            html_body: str. The HTML body of the email.
-            expect_errors: bool. Whether errors are expected.
-            expected_status_int: int. The expected status code of
-                the JSON response.
-
-        Returns:
-            json. A JSON response generated by _send_post_request function.
-        """
-        email = mail.EmailMessage(
-            sender=sender_email, to=recipient_email, subject=subject,
-            body=body)
-        if html_body is not None:
-            email.html = html_body
-
-        mime_email = email.to_mime_message()
-        headers = {'content-type': mime_email.get_content_type()}
-        data = mime_email.as_string()
-        app = webtest.TestApp(main_mail.app)
-        incoming_email_url = '/_ah/mail/%s' % recipient_email
-
-        return self._send_post_request(
-            app, incoming_email_url, data,
-            expect_errors, headers=headers,
-            expected_status_int=expected_status_int)
-
-    def post_task(
-            self, url, payload, headers, csrf_token=None, expect_errors=False,
-            expected_status_int=200):
-        """Posts an object to the server by JSON with the specific headers
-        specified; return the received object.
-        """
-        if csrf_token:
-            payload['csrf_token'] = csrf_token
-        app = webtest.TestApp(main_taskqueue.app)
-        json_response = app.post(
-            url, params=json.dumps(payload), content_type='application/json',
-            expect_errors=expect_errors, headers=headers,
-            status=expected_status_int)
-        return json_response
-
-    def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
-        """Put an object to the server by JSON; return the received object."""
-        data = {'payload': json.dumps(payload)}
-        if csrf_token:
-            data['csrf_token'] = csrf_token
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-        json_response = self.testapp.put(
-            python_utils.UNICODE(url), data, expect_errors=expect_errors)
-
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-        self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(json_response, expect_errors)
-
-    def get_new_csrf_token(self):
-        """Generates CSRF token for test."""
-        response = self.get_json('/csrfhandler')
-        return response['token']
+        email = self.SUPER_ADMIN_EMAIL
+        with self.login_context(email, is_super_admin=True) as user_id:
+            yield user_id
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
@@ -1152,40 +1119,38 @@ tags: []
             email: str. Email of the given user.
             username: str. Username of the given user.
         """
-        self.login(email)
-        gae_id = self.get_gae_id_from_email(email)
-        user_services.create_new_user(gae_id, email)
-        # We mock out all HTTP requests while trying to signup to avoid calling
-        # out to real backend services.
-        with requests_mock.Mocker() as requests_mocker:
-            requests_mocker.request(requests_mock.ANY, requests_mock.ANY)
+        user_services.create_new_user(self.get_gae_id_from_email(email), email)
+
+        with self.login_context(email), requests_mock.Mocker() as m:
+            # We mock out all HTTP requests while trying to signup to avoid
+            # calling out to real backend services.
+            m.request(requests_mock.ANY, requests_mock.ANY)
+
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_new_csrf_token()
-            response = self.testapp.post(
-                feconf.SIGNUP_DATA_URL, params={
-                    'csrf_token': csrf_token,
-                    'payload': json.dumps({
-                        'username': username,
-                        'agreed_to_terms': True
-                    })
-                })
+
+            response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
+                'csrf_token': self.get_new_csrf_token(),
+                'payload': json.dumps(
+                    {'username': username, 'agreed_to_terms': True}),
+            })
             self.assertEqual(response.status_int, 200)
-        self.logout()
+
+    def signup_superadmin_user(self):
+        """Signs up a superadmin user. Must be called at the end of setUp()."""
+        self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
 
     def set_config_property(self, config_obj, new_config_value):
         """Sets a given configuration object's value to the new value specified
         using a POST request.
         """
-        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
-            csrf_token = self.get_new_csrf_token()
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'save_config_properties',
-                    'new_config_property_values': {
-                        config_obj.name: new_config_value,
-                    }
-                }, csrf_token=csrf_token)
+        with self.super_admin_context():
+            self.post_json('/adminhandler', {
+                'action': 'save_config_properties',
+                'new_config_property_values': {
+                    config_obj.name: new_config_value,
+                },
+            }, csrf_token=self.get_new_csrf_token())
 
     def set_user_role(self, username, user_role):
         """Sets the given role for this user.
@@ -1194,13 +1159,11 @@ tags: []
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
-        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
-            csrf_token = self.get_new_csrf_token()
-            self.post_json(
-                '/adminrolehandler', {
-                    'username': username,
-                    'role': user_role
-                }, csrf_token=csrf_token)
+        with self.super_admin_context():
+            self.post_json('/adminrolehandler', {
+                'username': username,
+                'role': user_role,
+            }, csrf_token=self.get_new_csrf_token())
 
     def set_admins(self, admin_usernames):
         """Sets role of given users as ADMIN.
@@ -1280,6 +1243,312 @@ tags: []
         # practice it is sufficient for our tests.
         return python_utils.convert_to_bytes(hash(email))
 
+    def _get_response(
+            self, url, expected_content_type, params=None,
+            expected_status_int=200):
+        """Get a response, transformed to a Python object.
+
+        Args:
+            url: str. The URL to fetch the response.
+            expected_content_type: str. The content type to expect.
+            params: dict. A dictionary that will be encoded into a query string.
+            expected_status_int: int. The integer status code to expect. Will be
+                200 if not specified.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        if params is not None:
+            self.assertIsInstance(params, dict)
+
+        expect_errors = expected_status_int >= 400
+
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles is
+        # only produced after webpack compilation which is not performed during
+        # backend tests.
+        with self.swap(base, 'load_template', mock_load_template):
+            response = self.testapp.get(
+                url, params=params, expect_errors=expect_errors,
+                status=expected_status_int)
+
+        if expect_errors:
+            self.assertTrue(response.status_int >= 400)
+        else:
+            self.assertTrue(200 <= response.status_int < 400)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        self.assertEqual(response.status_int, expected_status_int)
+
+        self.assertEqual(response.content_type, expected_content_type)
+
+        return response
+
+    def get_html_response(self, url, params=None, expected_status_int=200):
+        """Get a HTML response, transformed to a Python object.
+
+        Args:
+            url: str. The URL to fetch the response.
+            params: dict. A dictionary that will be encoded into a query string.
+            expected_status_int: int. The integer status code to expect. Will
+                be 200 if not specified.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        return self._get_response(
+            url, 'text/html', params=params,
+            expected_status_int=expected_status_int)
+
+    def get_custom_response(
+            self, url, expected_content_type, params=None,
+            expected_status_int=200):
+        """Get a response other than HTML or JSON as a Python object.
+
+        Args:
+            url: str. The URL to fetch the response.
+            expected_content_type: str. The content type to expect.
+            params: dict. A dictionary that will be encoded into a query string.
+            expected_status_int: int. The integer status code to expect. Will be
+                200 if not specified.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        self.assertNotIn(
+            expected_content_type, ['text/html', 'application/json'])
+
+        return self._get_response(
+            url, expected_content_type, params=params,
+            expected_status_int=expected_status_int)
+
+    def get_response_without_checking_for_errors(
+            self, url, expected_status_int_list, params=None):
+        """Get a response, transformed to a Python object and checks for a list
+        of status codes.
+
+        Args:
+            url: str. The URL to fetch the response.
+            expected_status_int_list: list(int). A list of integer status code
+                to expect.
+            params: dict. A dictionary that will be encoded into a query string.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        if params is not None:
+            self.assertIsInstance(
+                params, dict,
+                msg='Expected params to be a dict, received %s' % params)
+
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles is
+        # only produced after webpack compilation which is not performed during
+        # backend tests.
+        with self.swap(base, 'load_template', mock_load_template):
+            response = self.testapp.get(url, params=params, expect_errors=True)
+
+        self.assertIn(response.status_int, expected_status_int_list)
+
+        return response
+
+    def _parse_json_response(self, json_response, expect_errors):
+        """Convert a JSON server response to an object (such as a dict)."""
+        if expect_errors:
+            self.assertTrue(json_response.status_int >= 400)
+        else:
+            self.assertTrue(200 <= json_response.status_int < 400)
+
+        self.assertEqual(json_response.content_type, 'application/json')
+        self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
+
+        return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
+
+    def get_json(self, url, params=None, expected_status_int=200):
+        """Get a JSON response, transformed to a Python object."""
+        if params is not None:
+            self.assertIsInstance(params, dict)
+
+        expect_errors = expected_status_int >= 400
+
+        json_response = self.testapp.get(
+            url, params=params, expect_errors=expect_errors,
+            status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        self.assertEqual(json_response.status_int, expected_status_int)
+
+        return self._parse_json_response(json_response, expect_errors)
+
+    def post_json(
+            self, url, payload, csrf_token=None, expected_status_int=200,
+            upload_files=None):
+        """Post an object to the server by JSON; return the received object."""
+        data = {'payload': json.dumps(payload)}
+        if csrf_token:
+            data['csrf_token'] = csrf_token
+
+        expect_errors = expected_status_int >= 400
+
+        json_response = self._send_post_request(
+            self.testapp, url, data, expect_errors,
+            expected_status_int=expected_status_int, upload_files=upload_files)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        self.assertEqual(json_response.status_int, expected_status_int)
+
+        return self._parse_json_response(json_response, expect_errors)
+
+    def delete_json(self, url, params='', expected_status_int=200):
+        """Delete object on the server using a JSON call."""
+        if params:
+            self.assertIsInstance(
+                params, dict,
+                msg='Expected params to be a dict, received %s' % params)
+
+        expect_errors = expected_status_int >= 400
+        json_response = self.testapp.delete(
+            url, params=params, expect_errors=expect_errors,
+            status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        self.assertEqual(json_response.status_int, expected_status_int)
+
+        return self._parse_json_response(json_response, expect_errors)
+
+    def _send_post_request(
+            self, app, url, data, expect_errors, expected_status_int=200,
+            upload_files=None, headers=None):
+        """Sends a post request with the data provided to the url specified.
+
+        Args:
+            app: TestApp. The WSGI application which receives the request and
+                produces response.
+            url: str. The URL to send the POST request to.
+            data: *. To be put in the body of the request. If params is an
+                iterator, it will be urlencoded. If it is a string, it will not
+                be encoded, but placed in the body directly. Can be a
+                collections.OrderedDict with webtest.forms.Upload fields
+                included.
+            expect_errors: bool. Whether errors are expected.
+            expected_status_int: int. The expected status code.
+            upload_files: list(tuple). List of
+                (fieldname, filename, file_content) tuples. Can also provide
+                just (fieldname, filename) to have the file contents will be
+                read from disk.
+            headers: dict(str, *). Extra headers to send.
+
+        Returns:
+            webtest.TestResponse. The response of the POST request.
+        """
+        # Convert the files to bytes.
+        if upload_files is not None:
+            upload_files = tuple(
+                tuple(python_utils.convert_to_bytes(f) for f in upload_file)
+                for upload_file in upload_files)
+
+        return app.post(
+            url, params=data, headers=headers, status=expected_status_int,
+            upload_files=upload_files, expect_errors=expect_errors)
+
+    def post_email(
+            self, recipient_email, sender_email, subject, body, html_body=None,
+            expect_errors=False, expected_status_int=200):
+        """Post an email from the sender to the recipient.
+
+        Args:
+            recipient_email: str. The email of the recipient.
+            sender_email: str. The email of the sender.
+            subject: str. The subject of the email.
+            body: str. The body of the email.
+            html_body: str. The HTML body of the email.
+            expect_errors: bool. Whether errors are expected.
+            expected_status_int: int. The expected status code of the JSON
+                response.
+
+        Returns:
+            json. A JSON response generated by _send_post_request function.
+        """
+        email = mail.EmailMessage(
+            sender=sender_email, to=recipient_email, subject=subject, body=body)
+        if html_body is not None:
+            email.html = html_body
+
+        mime_email = email.to_mime_message()
+        headers = {
+            'Content-Type': mime_email.get_content_type(),
+        }
+        data = mime_email.as_string()
+        incoming_email_url = '/_ah/mail/%s' % recipient_email
+
+        return self._send_post_request(
+            self.mail_testapp, incoming_email_url, data, expect_errors,
+            headers=headers, expected_status_int=expected_status_int)
+
+    def post_task(
+            self, url, payload, headers, csrf_token=None, expect_errors=False,
+            expected_status_int=200):
+        """Posts an object to the server by JSON with the specific headers
+        specified; return the received object.
+        """
+        if csrf_token:
+            payload['csrf_token'] = csrf_token
+        return self.taskqueue_testapp.post(
+            url, params=json.dumps(payload), headers=headers,
+            status=expected_status_int, expect_errors=expect_errors,
+            content_type='application/json')
+
+    def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
+        """PUT an object to the server with JSON and return the response."""
+        params = {'payload': json.dumps(payload)}
+        if csrf_token:
+            params['csrf_token'] = csrf_token
+
+        expect_errors = expected_status_int >= 400
+
+        json_response = self.testapp.put(
+            url, params=params, expect_errors=expect_errors)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        self.assertEqual(json_response.status_int, expected_status_int)
+
+        return self._parse_json_response(json_response, expect_errors)
+
+    def get_new_csrf_token(self):
+        """Generates CSRF token for test."""
+        response = self.get_json('/csrfhandler')
+        return response['token']
+
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
         """Saves a new default exploration written by owner_id.
@@ -1298,9 +1567,8 @@ tags: []
         return exploration
 
     def set_interaction_for_state(self, state, interaction_id):
-        """Sets the interaction_id, sets the fully populated default
-        interaction customization arguments, and increments
-        next_content_id_index as needed.
+        """Sets the interaction_id, sets the fully populated default interaction
+        customization arguments, and increments next_content_id_index as needed.
 
         Args:
             state: State. The state domain object to set the interaction for.
@@ -1310,9 +1578,7 @@ tags: []
 
         # We wrap next_content_id_index in a dict so that modifying it in the
         # inner function modifies the value.
-        next_content_id_index_dict = {
-            'value': state.next_content_id_index
-        }
+        next_content_id_index_dict = {'value': state.next_content_id_index}
 
         def traverse_schema_and_assign_content_ids(value, schema, contentId):
             """Generates content_id from recursively traversing the schema, and
@@ -1346,11 +1612,10 @@ tags: []
                     traverse_schema_and_assign_content_ids(
                         x[schema_property.name],
                         schema_property['schema'],
-                        '%s_%s' % (contentId, schema_property.name)
-                    )
+                        '%s_%s' % (contentId, schema_property.name))
 
-        interaction = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id)
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(interaction_id))
         ca_specs = interaction.customization_arg_specs
         customization_args = {}
 
@@ -1358,10 +1623,7 @@ tags: []
             ca_name = ca_spec.name
             ca_value = ca_spec.default_value
             traverse_schema_and_assign_content_ids(
-                ca_value,
-                ca_spec.schema,
-                'ca_%s' % ca_name
-            )
+                ca_value, ca_spec.schema, 'ca_%s' % ca_name)
             customization_args[ca_name] = {'value': ca_value}
 
         state.update_interaction_id(interaction_id)
@@ -1371,9 +1633,8 @@ tags: []
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            end_state_name=None, interaction_id='TextInput',
-            correctness_feedback_enabled=False):
+            language_code=constants.DEFAULT_LANGUAGE_CODE, end_state_name=None,
+            interaction_id='TextInput', correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration.
 
         Args:
@@ -1466,8 +1727,7 @@ tags: []
         return exploration
 
     def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 0 states
-        dictionary.
+        """Saves a new default exploration with a default version 0 states dict.
 
         This function should only be used for creating explorations in tests
         involving migration of datastore explorations that use an old states
@@ -1484,45 +1744,29 @@ tags: []
             title: str. The title of the exploration.
         """
         exp_model = exp_models.ExplorationModel(
-            id=exp_id,
-            category='category',
-            title=title,
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            states_schema_version=0,
+            id=exp_id, category='category', title=title,
+            objective='Old objective', language_code='en', tags=[], blurb='',
+            author_notes='', states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT,
-            param_specs={},
-            param_changes=[]
-        )
+            states=self.VERSION_0_STATES_DICT, param_specs={}, param_changes=[])
         rights_manager.create_new_exploration_rights(exp_id, user_id)
 
         commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(
-            user_id, commit_message, [{
-                'cmd': 'create_new',
-                'title': 'title',
-                'category': 'category',
-            }])
+        exp_model.commit(user_id, commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
         exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
         exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id,
-            title=title,
-            category='category',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
+            id=exp_id, title=title, category='category',
+            objective='Old objective', language_code='en', tags=[],
             ratings=feconf.get_empty_ratings(),
             scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
             status=exp_rights.status,
             community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids,
-            contributor_ids=[],
-            contributors_summary={},
-        )
+            owner_ids=exp_rights.owner_ids, contributor_ids=[],
+            contributors_summary={})
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
@@ -1532,8 +1776,7 @@ tags: []
 
     def save_new_exp_with_custom_states_schema_version(
             self, exp_id, user_id, states_dict, version):
-        """Saves a new default exploration with the given version of states
-        dictionary.
+        """Saves a new default exploration with the given version of state dict.
 
         This function should only be used for creating explorations in tests
         involving migration of datastore explorations that use an old states
@@ -1551,45 +1794,29 @@ tags: []
             version: int. Custom states schema version.
         """
         exp_model = exp_models.ExplorationModel(
-            id=exp_id,
-            category='category',
-            title='title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            states_schema_version=version,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=states_dict,
-            param_specs={},
-            param_changes=[]
-        )
+            id=exp_id, category='category', title='title',
+            objective='Old objective', language_code='en', tags=[], blurb='',
+            author_notes='', states_schema_version=version,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME, states=states_dict,
+            param_specs={}, param_changes=[])
         rights_manager.create_new_exploration_rights(exp_id, user_id)
 
         commit_message = 'New exploration created with title \'title\'.'
-        exp_model.commit(
-            user_id, commit_message, [{
-                'cmd': 'create_new',
-                'title': 'title',
-                'category': 'category',
-            }])
+        exp_model.commit(user_id, commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
         exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
         exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id,
-            title='title',
-            category='category',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
+            id=exp_id, title='title', category='category',
+            objective='Old objective', language_code='en', tags=[],
             ratings=feconf.get_empty_ratings(),
             scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
             status=exp_rights.status,
             community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids,
-            contributor_ids=[],
-            contributors_summary={},
-        )
+            owner_ids=exp_rights.owner_ids, contributor_ids=[],
+            contributors_summary={})
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
@@ -1613,45 +1840,29 @@ tags: []
             title: str. The title of the exploration.
         """
         exp_model = exp_models.ExplorationModel(
-            id=exp_id,
-            category='category',
-            title=title,
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            states_schema_version=21,
+            id=exp_id, category='category', title=title,
+            objective='Old objective', language_code='en', tags=[], blurb='',
+            author_notes='', states_schema_version=21,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_21_STATE_DICT,
-            param_specs={},
-            param_changes=[]
-        )
+            states=self.VERSION_21_STATE_DICT, param_specs={}, param_changes=[])
         rights_manager.create_new_exploration_rights(exp_id, user_id)
 
         commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(
-            user_id, commit_message, [{
-                'cmd': 'create_new',
-                'title': 'title',
-                'category': 'category',
-            }])
+        exp_model.commit(user_id, commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
         exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
         exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id,
-            title=title,
-            category='category',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
+            id=exp_id, title=title, category='category',
+            objective='Old objective', language_code='en', tags=[],
             ratings=feconf.get_empty_ratings(),
             scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
             status=exp_rights.status,
             community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids,
-            contributor_ids=[],
-            contributors_summary={},
-        )
+            owner_ids=exp_rights.owner_ids, contributor_ids=[],
+            contributors_summary={})
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
@@ -1694,8 +1905,8 @@ tags: []
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
-        """Creates an Oppia collection and adds a node saving the
-        exploration details.
+        """Creates an Oppia collection and adds a node saving the exploration
+        details.
 
         Args:
             collection_id: str. ID for the collection to be created.
@@ -1712,22 +1923,16 @@ tags: []
             exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id,
-            title=title,
-            category=category,
-            objective=objective,
+            collection_id, title=title, category=category, objective=objective,
             language_code=language_code)
 
         # Check whether exploration with given exploration_id exists or not.
-        exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, strict=False)
+        exploration = (
+            exp_fetchers.get_exploration_by_id(exploration_id, strict=False))
         if exploration is None:
             exploration = self.save_new_valid_exploration(
-                exploration_id, owner_id,
-                title=title,
-                category=category,
-                objective=objective,
-                end_state_name=end_state_name)
+                exploration_id, owner_id, title=title, category=category,
+                objective=objective, end_state_name=end_state_name)
         collection.add_node(exploration.id)
 
         collection_services.save_new_collection(owner_id, collection)
@@ -1763,8 +1968,8 @@ tags: []
                 main storyline, and setting.
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
-            language_code: str. The ISO 639-1 code for the language this
-                story is written in.
+            language_code: str. The ISO 639-1 code for the language this story
+                is written in.
             url_fragment: str. The url fragment of the story.
             meta_tag_content: str. The meta tag content of the story.
 
@@ -1784,22 +1989,20 @@ tags: []
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, thumbnail_filename, thumbnail_bg_color,
-            owner_id, title, description,
-            notes, corresponding_topic_id,
+            owner_id, title, description, notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='story-frag',
             meta_tag_content='story meta tag content'):
-        """Saves a new story with a default version 1 story contents
-        data dictionary.
+        """Saves a new story with a default version 1 story contents data dict.
 
         This function should only be used for creating stories in tests
-        involving migration of datastore stories that use an old story
-        contents schema version.
+        involving migration of datastore stories that use an old story contents
+        schema version.
 
         Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating stories. This is
-        because the latter approach would result in a story with the
-        *current* story contents schema version.
+        the usual functions for updating and creating stories. This is because
+        the latter approach would result in a story with the *current* story
+        contents schema version.
 
         Args:
             story_id: str. ID for the story to be created.
@@ -1809,36 +2012,27 @@ tags: []
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
-            notes: str. A set of notes, that describe the characters,
-                main storyline, and setting.
+            notes: str. A set of notes, that describe the characters, main
+                storyline, and setting.
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
-            language_code: str. The ISO 639-1 code for the language this
-                story is written in.
+            language_code: str. The ISO 639-1 code for the language this story
+                is written in.
             url_fragment: str. The URL fragment for the story.
             meta_tag_content: str. The meta tag content of the story.
         """
         story_model = story_models.StoryModel(
-            id=story_id,
-            thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color,
-            description=description,
-            title=title,
-            language_code=language_code,
-            story_contents_schema_version=1,
-            notes=notes,
+            id=story_id, thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color, description=description,
+            title=title, language_code=language_code,
+            story_contents_schema_version=1, notes=notes,
             corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
-            url_fragment=url_fragment,
-            meta_tag_content=meta_tag_content
-        )
-        commit_message = (
-            'New story created with title \'%s\'.' % title)
+            url_fragment=url_fragment, meta_tag_content=meta_tag_content)
+        commit_message = 'New story created with title \'%s\'.' % title
         story_model.commit(
-            owner_id, commit_message, [{
-                'cmd': story_domain.CMD_CREATE_NEW,
-                'title': title
-            }])
+            owner_id, commit_message,
+            [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
 
     def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
         """Creates an Oppia subtopic and saves it.
@@ -1858,7 +2052,7 @@ tags: []
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_CREATE_NEW,
                 'topic_id': topic_id,
-                'subtopic_id': subtopic_id
+                'subtopic_id': subtopic_id,
             })
         ]
         subtopic_page_services.save_subtopic_page(
@@ -1898,8 +2092,8 @@ tags: []
             subtopics: list(Subtopic). The different subtopics that are part of
                 this topic.
             next_subtopic_id: int. The id for the next subtopic.
-            language_code: str. The ISO 639-1 code for the language this
-                topic is written in.
+            language_code: str. The ISO 639-1 code for the language this topic
+                is written in.
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
@@ -1915,40 +2109,35 @@ tags: []
             topic_domain.StoryReference.create_default_story_reference(story_id)
             for story_id in (additional_story_ids or [])
         ]
-        uncategorized_skill_ids = (uncategorized_skill_ids or [])
-        subtopics = (subtopics or [])
+        uncategorized_skill_ids = uncategorized_skill_ids or []
+        subtopics = subtopics or []
         topic = topic_domain.Topic(
-            topic_id, name, abbreviated_name, url_fragment,
-            thumbnail_filename, thumbnail_bg_color,
-            description, canonical_story_references,
+            topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
+            thumbnail_bg_color, description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content, practice_tab_is_displayed
-        )
+            meta_tag_content, practice_tab_is_displayed)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
             self, topic_id, owner_id, name, abbreviated_name, url_fragment,
-            canonical_name, description, thumbnail_filename,
-            thumbnail_bg_color, canonical_story_references,
-            additional_story_references,
+            canonical_name, description, thumbnail_filename, thumbnail_bg_color,
+            canonical_story_references, additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
             practice_tab_is_displayed=False):
-        """Saves a new topic with a default version 1 subtopic
-        data dictionary.
+        """Saves a new topic with a default version 1 subtopic data dict.
 
-        This function should only be used for creating topics in tests
-        involving migration of datastore topics that use an old subtopic
-        schema version.
+        This function should only be used for creating topics in tests involving
+        migration of datastore topics that use an old subtopic schema version.
 
         Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating topics. This is
-        because the latter approach would result in a topic with the
-        *current* subtopic schema version.
+        the usual functions for updating and creating topics. This is because
+        the latter approach would result in a topic with the *current* subtopic
+        schema version.
 
         Args:
             topic_id: str. ID for the topic to be created.
@@ -1970,26 +2159,19 @@ tags: []
             uncategorized_skill_ids: list(str). The list of ids of skills that
                 are not part of any subtopic.
             next_subtopic_id: int. The id for the next subtopic.
-            language_code: str. The ISO 639-1 code for the language this
-                topic is written in.
+            language_code: str. The ISO 639-1 code for the language this topic
+                is written in.
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
         """
         topic_rights_model = topic_models.TopicRightsModel(
-            id=topic_id,
-            manager_ids=[],
-            topic_is_published=True
-        )
+            id=topic_id, manager_ids=[], topic_is_published=True)
         topic_model = topic_models.TopicModel(
-            id=topic_id,
-            name=name,
-            abbreviated_name=abbreviated_name,
-            url_fragment=url_fragment,
-            thumbnail_filename=thumbnail_filename,
+            id=topic_id, name=name, abbreviated_name=abbreviated_name,
+            url_fragment=url_fragment, thumbnail_filename=thumbnail_filename,
             thumbnail_bg_color=thumbnail_bg_color,
-            canonical_name=canonical_name,
-            description=description,
+            canonical_name=canonical_name, description=description,
             language_code=language_code,
             canonical_story_references=canonical_story_references,
             additional_story_references=additional_story_references,
@@ -2000,20 +2182,15 @@ tags: []
             next_subtopic_id=next_subtopic_id,
             subtopics=[self.VERSION_1_SUBTOPIC_DICT],
             meta_tag_content=meta_tag_content,
-            practice_tab_is_displayed=practice_tab_is_displayed
-        )
-        commit_message = (
-            'New topic created with name \'%s\'.' % name)
+            practice_tab_is_displayed=practice_tab_is_displayed)
+        commit_message = 'New topic created with name \'%s\'.' % name
         topic_rights_model.commit(
             committer_id=owner_id,
             commit_message='Created new topic rights',
-            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}])
         topic_model.commit(
-            owner_id, commit_message, [{
-                'cmd': topic_domain.CMD_CREATE_NEW,
-                'name': name
-            }])
+            owner_id, commit_message,
+            [{'cmd': topic_domain.CMD_CREATE_NEW, 'name': name}])
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
@@ -2027,9 +2204,8 @@ tags: []
             question_state_data: State. The state data for the question.
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
-            inapplicable_skill_misconception_ids: list(str). List of
-                skill misconceptions ids that are not applicable to the
-                question.
+            inapplicable_skill_misconception_ids: list(str). List of skill
+                misconceptions ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -2038,64 +2214,55 @@ tags: []
         """
         # This needs to be done because default arguments can not be of list
         # type.
-        if inapplicable_skill_misconception_ids is None:
-            inapplicable_skill_misconception_ids = []
         question = question_domain.Question(
             question_id, question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
-            linked_skill_ids, inapplicable_skill_misconception_ids)
+            linked_skill_ids, inapplicable_skill_misconception_ids or [])
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
-            self, question_id, owner_id,
-            linked_skill_ids,
+            self, question_id, owner_id, linked_skill_ids,
             inapplicable_skill_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default question with a default version 27 state
-        data dictionary.
+        """Saves a new default question with a default version 27 state data
+        dict.
 
         This function should only be used for creating questions in tests
-        involving migration of datastore questions that use an old state
-        data schema version.
+        involving migration of datastore questions that use an old state data
+        schema version.
 
         Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating questions. This is
-        because the latter approach would result in an question with the
-        *current* state data schema version.
+        the usual functions for updating and creating questions. This is because
+        the latter approach would result in an question with the *current* state
+        data schema version.
 
         Args:
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             linked_skill_ids: list(str). The skill IDs linked to the question.
-            inapplicable_skill_misconception_ids: list(str). List of
-                skill misconceptions ids that are not applicable to the
-                question.
+            inapplicable_skill_misconception_ids: list(str). List of skill
+                misconceptions ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
         # This needs to be done because default arguments can not be of list
         # type.
-        if inapplicable_skill_misconception_ids is None:
-            inapplicable_skill_misconception_ids = []
         question_model = question_models.QuestionModel(
-            id=question_id,
-            question_state_data=self.VERSION_27_STATE_DICT,
-            language_code=language_code,
-            version=1,
+            id=question_id, question_state_data=self.VERSION_27_STATE_DICT,
+            language_code=language_code, version=1,
             question_state_data_schema_version=27,
             linked_skill_ids=linked_skill_ids,
             inapplicable_skill_misconception_ids=(
-                inapplicable_skill_misconception_ids)
-        )
+                inapplicable_skill_misconception_ids or []))
         question_model.commit(
             owner_id, 'New question created',
             [{'cmd': question_domain.CMD_CREATE_NEW}])
 
     def save_new_skill(
-            self, skill_id, owner_id,
-            description='description', misconceptions=None, rubrics=None,
-            skill_contents=None, language_code=constants.DEFAULT_LANGUAGE_CODE,
+            self, skill_id, owner_id, description='description',
+            misconceptions=None, rubrics=None, skill_contents=None,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
             prerequisite_skill_ids=None):
         """Creates an Oppia Skill and saves it.
 
@@ -2109,16 +2276,16 @@ tags: []
                 the rubric for each difficulty of the skill.
             skill_contents: SkillContents|None. A SkillContents object
                 containing the explanation and examples of the skill.
-            language_code: str. The ISO 639-1 code for the language this
-                skill is written in.
+            language_code: str. The ISO 639-1 code for the language this skill
+                is written in.
             prerequisite_skill_ids: list(str)|None. The prerequisite skill IDs
                 for the skill.
 
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill.create_default_skill(
-            skill_id, description, [])
+        skill = (
+            skill_domain.Skill.create_default_skill(skill_id, description, []))
         if misconceptions is not None:
             skill.misconceptions = misconceptions
             skill.next_misconception_id = len(misconceptions) + 1
@@ -2135,7 +2302,8 @@ tags: []
                 skill_domain.Rubric(
                     constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
+            ]
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
@@ -2150,405 +2318,51 @@ tags: []
         """Saves a new default skill with the given versions for misconceptions
         and skill contents.
 
-        This function should only be used for creating skills in tests
-        involving migration of datastore skills that use an old
-        schema version.
+        This function should only be used for creating skills in tests involving
+        migration of datastore skills that use an old schema version.
 
         Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating skills. This is
-        because the latter approach would result in a skill with the
-        *current* schema version.
+        the usual functions for updating and creating skills. This is because
+        the latter approach would result in a skill with the *current* schema
+        version.
 
         Args:
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
             description: str. The description of the skill.
-            next_misconception_id: int. The misconception id to be used by
-                the next misconception added.
-            misconceptions: list(Misconception.to_dict()). The list
-                of misconception dicts associated with the skill.
+            next_misconception_id: int. The misconception id to be used by the
+                next misconception added.
+            misconceptions: list(Misconception.to_dict()). The list of
+                misconception dicts associated with the skill.
             rubrics: list(Rubric.to_dict()). The list of rubric dicts associated
                 with the skill.
             skill_contents: SkillContents.to_dict(). A SkillContents dict
                 containing the explanation and examples of the skill.
             misconceptions_schema_version: int. The schema version for the
                 misconceptions object.
-            rubric_schema_version: int. The schema version for the
-                rubric object.
+            rubric_schema_version: int. The schema version for the rubric
+                object.
             skill_contents_schema_version: int. The schema version for the
                 skill_contents object.
-            language_code: str. The ISO 639-1 code for the language this
-                skill is written in.
+            language_code: str. The ISO 639-1 code for the language this skill
+                is written in.
         """
         skill_model = skill_models.SkillModel(
-            id=skill_id,
-            description=description,
-            language_code=language_code,
-            misconceptions=misconceptions,
-            rubrics=rubrics,
+            id=skill_id, description=description, language_code=language_code,
+            misconceptions=misconceptions, rubrics=rubrics,
             skill_contents=skill_contents,
             next_misconception_id=next_misconception_id,
             misconceptions_schema_version=misconceptions_schema_version,
             rubric_schema_version=rubric_schema_version,
             skill_contents_schema_version=skill_contents_schema_version,
-            superseding_skill_id=None,
-            all_questions_merged=False
-        )
+            superseding_skill_id=None, all_questions_merged=False)
         skill_model.commit(
             owner_id, 'New skill created.',
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
-    def get_updated_param_dict(
-            self, param_dict, param_changes, exp_param_specs):
-        """Updates a param dict using the given list of param_changes.
-
-        Note that the list of parameter changes is ordered. Parameter
-        changes later in the list may depend on parameter changes that have
-        been set earlier in the same list.
-        """
-        new_param_dict = copy.deepcopy(param_dict)
-        for pc in param_changes:
-            try:
-                obj_type = exp_param_specs[pc.name].obj_type
-            except:
-                raise Exception('Parameter %s not found' % pc.name)
-            new_param_dict[pc.name] = pc.get_normalized_value(
-                obj_type, new_param_dict)
-        return new_param_dict
-
-    def get_static_asset_filepath(self):
-        """Returns filepath for referencing static files on disk.
-        examples: '' or 'build/'.
-        """
-        filepath = ''
-        if not constants.DEV_MODE:
-            filepath = os.path.join('build')
-
-        return filepath
-
-    def get_static_asset_url(self, asset_suffix):
-        """Returns the relative path for the asset, appending it to the
-        corresponding cache slug. asset_suffix should have a leading
-        slash.
-        """
-        return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
-
-    @contextlib.contextmanager
-    def mock_datetime_utcnow(self, mocked_datetime):
-        """Mocks response from datetime.datetime.utcnow method.
-
-        Example usage:
-            import datetime
-            mocked_datetime_utcnow = datetime.datetime.utcnow() -
-                datetime.timedelta(days=1)
-            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-                print datetime.datetime.utcnow() # prints time reduced by 1 day
-            print datetime.datetime.utcnow()  # prints current time.
-
-        Args:
-            mocked_datetime: datetime.datetime. The datetime which will be used
-                instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
-        """
-        if not isinstance(mocked_datetime, datetime.datetime):
-            raise utils.ValidationError(
-                'Expected mocked_datetime to be datetime.datetime, got %s' % (
-                    type(mocked_datetime)))
-
-        original_datetime_type = datetime.datetime
-
-        class PatchedDatetimeType(type):
-            """Validates the datetime instances."""
-
-            def __instancecheck__(cls, other):
-                """Validates whether the given instance is datetime
-                instance.
-                """
-                return isinstance(other, original_datetime_type)
-
-        class MockDatetime( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the mocked datetime."""
-
-                return mocked_datetime
-
-        setattr(datetime, 'datetime', MockDatetime)
-
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', original_datetime_type)
-
-    @contextlib.contextmanager
-    def swap(self, obj, attr, newvalue):
-        """Swap an object's attribute value within the context of a
-        'with' statement. The object can be anything that supports
-        getattr and setattr, such as class instances, modules, ...
-
-        Example usage:
-
-            import math
-            with self.swap(math, 'sqrt', lambda x: 42):
-                print math.sqrt(16.0)  # prints 42
-            print math.sqrt(16.0)  # prints 4 as expected.
-
-        Note that this does not work directly for classmethods. In this case,
-        you will need to import the 'types' module, as follows:
-
-            import types
-            with self.swap(
-                SomePythonClass, 'some_classmethod',
-                types.MethodType(new_classmethod, SomePythonClass)):
-
-        NOTE: self.swap and other context managers that are created using
-        contextlib.contextmanager use generators that yield exactly once. This
-        means that you can only use them once after construction, otherwise,
-        the generator will immediately raise StopIteration, and contextlib will
-        raise a RuntimeError.
-        """
-        original = getattr(obj, attr)
-        setattr(obj, attr, newvalue)
-        try:
-            yield
-        finally:
-            setattr(obj, attr, original)
-
-    @contextlib.contextmanager
-    def swap_with_checks(
-            self, obj, attr, new_value, expected_args=None,
-            expected_kwargs=None, called=True):
-        """Swap an object's function value within the context of a
-        'with' statement. The object can be anything that supports
-        getattr and setattr, such as class instances, modules, ...
-
-        Examples:
-            If you want to check subprocess.Popen is invoked twice
-            like `subprocess.Popen(['python'], shell=True)` and
-            `subprocess.Popen(['python2], shell=False), you can first
-            define the mock function, then the swap, and just run the
-            target function in context, as follows:
-                def mock_popen(command, shell):
-                    return
-
-                popen_swap = self.swap_with_checks(
-                    subprocess, 'Popen', mock_popen, expected_args=[
-                        (['python'],), (['python2'],)], expected_kwargs=[
-                            {'shell': True,}, {'shell': False}])
-                with popen_swap:
-                    function_that_invokes_popen()
-
-        Args:
-            obj: *. The Python object whose attribute you want to swap.
-            attr: str. The name of the function to be swapped.
-            new_value: function. The new function you want to use.
-            expected_args: None|list(tuple). The expected args that you
-                want this function to be invoked with. When its value is None,
-                args will not be checked. If the value type is list, the
-                function will check whether the called args is the first element
-                in the list. If matched, this tuple will be removed from the
-                list.
-            expected_kwargs: None|list(dict). The expected keyword args
-                you want this function to be invoked with. Similar to
-                expected_args.
-            called: bool. Whether the function is expected to be invoked. This
-                will always be checked.
-
-        Yields:
-            context. The context with function replaced.
-        """
-        original = getattr(obj, attr)
-        # The actual error message will also include detail assert error message
-        # via the `self.longMessage` below.
-        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
-            obj.__name__, attr)
-
-        def wrapper(*args, **kwargs):
-            """Wrapper function for the new value. This function will do the
-            check before the wrapped function is invoked. After the function
-            finished, the wrapper will update how many times this function is
-            invoked.
-
-            Args:
-                *args: list(*). The args passed into `attr` function.
-                **kwargs: dict. The key word args passed into `attr` function.
-
-            Returns:
-                *. Result of `new_value`.
-            """
-            wrapper.called = True
-            if expected_args is not None:
-                self.assertEqual(args, expected_args[0], msg=msg)
-                expected_args.pop(0)
-            if expected_kwargs is not None:
-                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
-                expected_kwargs.pop(0)
-            result = new_value(*args, **kwargs)
-            return result
-
-        wrapper.called = False
-        setattr(obj, attr, wrapper)
-        error_occurred = False
-        try:
-            # This will show the detailed assert message.
-            self.longMessage = True
-            yield
-        except Exception:
-            error_occurred = True
-            # Raise issues thrown by the called function or assert error.
-            raise
-        finally:
-            setattr(obj, attr, original)
-            if not error_occurred:
-                self.assertEqual(wrapper.called, called, msg=msg)
-                self.assertFalse(expected_args, msg=msg)
-                self.assertFalse(expected_kwargs, msg=msg)
-            self.longMessage = False
-
-    @contextlib.contextmanager
-    def login_context(self, email, is_super_admin=False):
-        """Log in with the given email under the context of a 'with' statement.
-
-        Args:
-            email: str. An email associated to a user account.
-            is_super_admin: bool. Whether the user is a super admin.
-
-        Yields:
-            str. The id of the user associated to the given email, who is now
-            'logged in'.
-        """
-        initial_user_env = {
-            'USER_EMAIL': os.environ['USER_EMAIL'],
-            'USER_ID': os.environ['USER_ID'],
-            'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
-        }
-        self.login(email, is_super_admin=is_super_admin)
-        try:
-            yield self.get_user_id_from_email(email)
-        finally:
-            self.logout()
-            os.environ.update(initial_user_env)
-
-    def assertRaises(self, exc, fun, *args, **kwds):
-        raise NotImplementedError(
-            'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegexp instead.')
-
-    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
-            self, expected_exception, expected_regexp, callable_obj=None,
-            *args, **kwargs):
-        if expected_regexp == '':
-            raise Exception(
-                'Please provide a sufficiently strong regexp string to '
-                'validate that the correct error is being raised.')
-
-        return super(TestBase, self).assertRaisesRegexp(
-            expected_exception, expected_regexp,
-            callable_obj=callable_obj, *args, **kwargs)
-
-
-class AppEngineTestBase(TestBase):
-    """Base class for tests requiring App Engine services."""
-
-    # We can't instantiate the stub in setUp because the overrided
-    # method run() executes before setUp() and run() requires the memory
-    # cache stub.
-    def __init__(self, *args, **kwargs):
-        super(AppEngineTestBase, self).__init__(*args, **kwargs)
-        self.memory_cache_services_stub = MemoryCacheServicesStub()
-        self.taskqueue_services_stub = TaskqueueServicesStub(self)
-
-    def _delete_all_models(self):
-        """Deletes all models from the NDB datastore."""
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-
-    def setUp(self):
-        empty_environ()
-        self.memory_cache_services_stub.flush_cache()
-
-        from google.appengine.ext import testbed
-
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-
-        # Configure datastore policy to emulate instantaneously and globally
-        # consistent HRD.
-        policy = datastore_services.make_pseudo_random_hr_consistency_policy()
-
-        # Declare any relevant App Engine service stubs here.
-        self.testbed.init_user_stub()
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_memcache_stub()
-        self.testbed.init_datastore_v3_stub(consistency_policy=policy)
-        self.testbed.init_blobstore_stub()
-        self.testbed.init_urlfetch_stub()
-        self.testbed.init_files_stub()
-        self.testbed.init_search_stub()
-
-        # The root path tells the testbed where to find the queue.yaml file.
-        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self.mapreduce_taskqueue_stub = self.testbed.get_stub(
-            testbed.TASKQUEUE_SERVICE_NAME)
-
-        # Set up the app to be tested.
-        self.testapp = webtest.TestApp(main.app)
-
-        self.signup_superadmin_user()
-
-    def run(self, result=None):
-        """Adds a context switch to all test classes. This context switch occurs
-        to allow all test classes to automatically have access to a mock version
-        of the cache services functionality. All test classes that inherit
-        AppEngineTestBase will use a mocked version of the platform.cache cache
-        services API that can be found in the MemoryCacheServicesStub class.
-
-        Args:
-            result: TestResult|None. Optional result object that, if provided,
-                will collect the results of the test and returned to the caller
-                of run(). If None is provided, a default result object is
-                created and used. More details can be found here:
-                https://docs.python.org/3/library/unittest.html#unittest.
-                TestCase.run.
-        """
-        swap_create_task = self.swap(
-            platform_taskqueue_services, 'create_http_task',
-            self.taskqueue_services_stub.create_http_task)
-        swap_flush_cache = self.swap(
-            memory_cache_services, 'flush_cache',
-            self.memory_cache_services_stub.flush_cache)
-        swap_get_multi = self.swap(
-            memory_cache_services, 'get_multi',
-            self.memory_cache_services_stub.get_multi)
-        swap_set_multi = self.swap(
-            memory_cache_services, 'set_multi',
-            self.memory_cache_services_stub.set_multi)
-        swap_get_memory_cache_stats = self.swap(
-            memory_cache_services, 'get_memory_cache_stats',
-            self.memory_cache_services_stub.get_memory_cache_stats)
-        swap_delete_multi = self.swap(
-            memory_cache_services, 'delete_multi',
-            self.memory_cache_services_stub.delete_multi)
-        with swap_flush_cache, swap_get_multi, swap_set_multi, swap_create_task:
-            with swap_get_memory_cache_stats, swap_delete_multi:
-                super(AppEngineTestBase, self).run(result=result)
-
-    def tearDown(self):
-        self.logout()
-        self._delete_all_models()
-        self.testbed.deactivate()
-
     def _get_all_queue_names(self):
-        """Returns all the queue names.
-
-        Returns:
-            list(str). All the queue names.
-        """
-        return [q['name'] for q in self.mapreduce_taskqueue_stub.GetQueues()]
+        """Returns a list of all queue names."""
+        return [q['name'] for q in self._taskqueue_stub.GetQueues()]
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name
@@ -2562,7 +2376,7 @@ class AppEngineTestBase(TestBase):
             int. The total number of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self.taskqueue_services_stub.count_jobs_in_taskqueue(
+        return self._taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
     def process_and_flush_pending_tasks(self, queue_name=None):
@@ -2574,7 +2388,7 @@ class AppEngineTestBase(TestBase):
             queue_name: str|None. Name of the queue. Pass in None if no specific
                 queue is designated.
         """
-        self.taskqueue_services_stub.process_and_flush_tasks(
+        self._taskqueue_services_stub.process_and_flush_tasks(
             queue_name=queue_name)
 
     def get_pending_tasks(self, queue_name=None):
@@ -2590,7 +2404,7 @@ class AppEngineTestBase(TestBase):
             list(Task). List of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self.taskqueue_services_stub.get_pending_tasks(
+        return self._taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
 
     def count_jobs_in_mapreduce_taskqueue(self, queue_name):
@@ -2598,15 +2412,11 @@ class AppEngineTestBase(TestBase):
         return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
 
     def get_pending_mapreduce_tasks(self, queue_name=None):
-        """Returns the jobs in the given mapreduce taskqueue.
-        If queue_name is None, defaults to returning the jobs in all available
-        queues.
+        """Returns the jobs in the given mapreduce taskqueue. If queue_name is
+        None, defaults to returning the jobs in all available queues.
         """
-        if queue_name is not None:
-            return self.mapreduce_taskqueue_stub.get_filtered_tasks(
-                queue_names=[queue_name])
-        else:
-            return self.mapreduce_taskqueue_stub.get_filtered_tasks()
+        queue_names = None if queue_name is None else [queue_name]
+        return self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
 
     def _execute_mapreduce_tasks(self, tasks):
         """Execute mapreduce queued tasks.
@@ -2617,63 +2427,53 @@ class AppEngineTestBase(TestBase):
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
-                from google.appengine.ext import deferred
                 deferred.run(task.payload)
             else:
-                # All other tasks are expected to be mapreduce ones, or
-                # Oppia-taskqueue-related ones.
+                # All other tasks are expected to be for mapreduce or taskqueue.
+                params = task.payload or ''
                 headers = {
-                    key: python_utils.convert_to_bytes(
-                        val) for key, val in task.headers.items()
+                    'Content-Length': python_utils.convert_to_bytes(len(params))
                 }
-                headers['Content-Length'] = python_utils.convert_to_bytes(
-                    len(task.payload or ''))
+                headers.update(
+                    (key, python_utils.convert_to_bytes(val))
+                    for key, val in task.headers.items())
 
                 app = (
-                    webtest.TestApp(main_taskqueue.app)
-                    if task.url.startswith('/task')
-                    else self.testapp)
+                    self.taskqueue_testapp if task.url.startswith('/task') else
+                    self.testapp)
                 response = app.post(
-                    url=python_utils.UNICODE(
-                        task.url), params=(task.payload or ''),
-                    headers=headers, expect_errors=True)
+                    task.url, params=params, headers=headers,
+                    expect_errors=True)
                 if response.status_code != 200:
-                    raise RuntimeError(
-                        'MapReduce task to URL %s failed' % task.url)
+                    raise RuntimeError('MapReduce task failed: %r' % task)
 
     def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
         """Runs and flushes pending mapreduce tasks. If queue_name is None, does
         so for all queues; otherwise, this only runs and flushes tasks for the
         specified queue.
 
-        For more information on self.mapreduce_taskqueue_stub see
-
-            https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
+        For more information on taskqueue_stub, see:
+        https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
         """
         queue_names = (
-            [queue_name] if queue_name else self._get_all_queue_names())
+            self._get_all_queue_names() if queue_name is None else [queue_name])
 
-        tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
-            queue_names=queue_names)
-        for queue in queue_names:
-            self.mapreduce_taskqueue_stub.FlushQueue(queue)
+        get_enqueued_tasks = lambda: list(
+            self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names))
 
-        while tasks:
-            self._execute_mapreduce_tasks(tasks)
-            tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
-                queue_names=queue_names)
+        # Loop until get_enqueued_tasks() returns an empty list.
+        for tasks in iter(get_enqueued_tasks, []):
             for queue in queue_names:
-                self.mapreduce_taskqueue_stub.FlushQueue(queue)
+                self._taskqueue_stub.FlushQueue(queue)
+            self._execute_mapreduce_tasks(tasks)
 
     def run_but_do_not_flush_pending_mapreduce_tasks(self):
         """"Runs but not flushes mapreduce pending tasks."""
         queue_names = self._get_all_queue_names()
 
-        tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
-            queue_names=queue_names)
+        tasks = self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
         for queue in queue_names:
-            self.mapreduce_taskqueue_stub.FlushQueue(queue)
-
+            self._taskqueue_stub.FlushQueue(queue)
         self._execute_mapreduce_tasks(tasks)
 
     def _create_valid_question_data(self, default_dest_state_name):
@@ -2693,13 +2493,12 @@ class AppEngineTestBase(TestBase):
             'correct_answer': 'Solution',
             'explanation': {
                 'content_id': 'solution',
-                'html': '<p>This is a solution.</p>'
-            }
+                'html': '<p>This is a solution.</p>',
+            },
         }
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
-            )
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')),
         ]
         solution = state_domain.Solution.from_dict(
             state.interaction.id, solution_dict)
@@ -2709,10 +2508,10 @@ class AppEngineTestBase(TestBase):
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder',
-                    'unicode_str': 'Enter text here'
-                }
+                    'unicode_str': 'Enter text here',
+                },
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
         })
         state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
@@ -2748,19 +2547,16 @@ class LinterTestBase(GenericTestBase):
         stdout outputs.
 
         Args:
-            phrases: list(str). A list of phrases we are trying to find in
-                one of the stdout outputs. For example, python linting
-                outputs a success string that includes data we don't have easy
-                access to, like how long the test took, so we may want to search
-                for a substring of that success string in stdout.
-
-            stdout: list(str). A list of the output results from the
-                method's execution.
+            phrases: list(str). A list of phrases we are trying to find in one
+                of the stdout outputs. For example, python linting outputs a
+                success string that includes data we don't have easy access to,
+                like how long the test took, so we may want to search for a
+                substring of that success string in stdout.
+            stdout: list(str). A list of the output results from the method's
+                execution.
         """
         self.assertTrue(
-            any(
-                all(phrase in output for phrase in phrases) for
-                output in stdout))
+            any(all(p in output for p in phrases) for output in stdout))
 
     def assert_failed_messages_count(self, stdout, expected_failed_count):
         """Assert number of expected failed checks to actual number of failed
@@ -2768,7 +2564,6 @@ class LinterTestBase(GenericTestBase):
 
         Args:
             stdout: list(str). A list of linter output messages.
-
             expected_failed_count: int. Expected number of failed messages.
         """
         failed_count = sum(msg.startswith('FAILED') for msg in stdout)
@@ -2800,24 +2595,25 @@ class AuditJobsTestBase(GenericTestBase):
         self.process_and_flush_pending_mapreduce_tasks()
         self.process_and_flush_pending_tasks()
         actual_output = self.job_class.get_output(job_id)
+
         if literal_eval:
             actual_output_dict = {}
             expected_output_dict = {}
 
-            for item in [ast.literal_eval(value) for value in actual_output]:
+            for item in (ast.literal_eval(value) for value in actual_output):
                 value = item[1]
                 if isinstance(value, list):
                     value = sorted(value)
                 actual_output_dict[item[0]] = value
 
-            for item in [ast.literal_eval(value) for value in expected_output]:
+            for item in (ast.literal_eval(value) for value in expected_output):
                 value = item[1]
                 if isinstance(value, list):
                     value = sorted(value)
                 expected_output_dict[item[0]] = value
-            self.assertEqual(
-                sorted(actual_output_dict.keys()),
-                sorted(expected_output_dict.keys()))
+
+            self.assertItemsEqual(actual_output_dict, expected_output_dict)
+
             for key in actual_output_dict:
                 self.assertEqual(
                     actual_output_dict[key], expected_output_dict[key])
@@ -2839,29 +2635,29 @@ class EmailMessageMock(python_utils.OBJECT):
             sender_email: str. The email address of the sender. This should be
                 in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
                 'SENDER_EMAIL_ADDRESS'. Must be utf-8.
-            recipient_email: str. The email address of the recipient.
-                Must be utf-8.
+            recipient_email: str. The email address of the recipient. Must be
+                utf-8.
             subject: str. The subject line of the email, Must be utf-8.
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|None. Optional argument. List of bcc emails.
-                Emails must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails. Emails
+                must be utf-8.
             reply_to: str|None. Optional argument. Reply address formatted like
-                “reply+<reply_id>@<incoming_email_domain_name>
-                reply_id is the unique id of the sender.
+                “reply+<reply_id>@<incoming_email_domain_name> reply_id is the
+                unique id of the sender.
             recipient_variables: dict|None. Optional argument. If batch sending
                 requires differentiating each email based on the recipient, we
                 assign a unique id to each recipient, including info relevant to
                 that recipient so that we can reference it when composing the
                 email like so:
-                    recipient_variables =
-                        {"bob@example.com": {"first":"Bob", "id":1},
-                        "alice@example.com": {"first":"Alice", "id":2}}
-                    subject = 'Hey, %recipient.first%’
-                More info about this format at:
-                https://documentation.mailgun.com/en/
-                    latest/user_manual.html#batch-sending.
+                    recipient_variables = {
+                        'bob@example.com': {'first': 'Bob', 'id': 1},
+                        'alice@example.com': {'first': 'Alice', 'id': 2},
+                    }
+                    subject = 'Hey, %recipient.first%'
+                For more information about this format, see:
+                https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
         """
         self.sender = sender_email
         self.to = recipient_email
@@ -2880,8 +2676,8 @@ class GenericEmailTestBase(GenericTestBase):
 
     def run(self, result=None):
         """Adds a context swap on top of the test_utils.run() method so that
-        test classes extending GenericEmailTestBase will automatically have
-        a mailgun api key, mailgun domain name and mocked version of
+        test classes extending GenericEmailTestBase will automatically have a
+        mailgun api key, mailgun domain name and mocked version of
         send_email_to_recipients().
         """
         with self.swap(
@@ -2912,29 +2708,28 @@ class GenericEmailTestBase(GenericTestBase):
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
-            bcc: list(str)|None. Optional argument. List of bcc emails.
-                Must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails. Must be
+                utf-8.
             reply_to: str|None. Optional Argument. Reply address formatted like
-                “reply+<reply_id>@<incoming_email_domain_name>
-                reply_id is the unique id of the sender.
-            recipient_variables: dict|None. Optional Argument.
-                If batch sending requires differentiating each email based on
-                the recipient, we assign a unique id to each recipient,
-                including info relevant to that recipient so that we can
-                reference it when composing the email like so:
-                    recipient_variables =
-                        {"bob@example.com": {"first":"Bob", "id":1},
-                        "alice@example.com": {"first":"Alice", "id":2}}
-                    subject = 'Hey, %recipient.first%’
-                More info about this format at:
-                https://documentation.mailgun.com/en/
-                    latest/user_manual.html#batch-sending
+                “reply+<reply_id>@<incoming_email_domain_name> reply_id is the
+                unique id of the sender.
+            recipient_variables: dict|None. Optional Argument. If batch sending
+                requires differentiating each email based on the recipient, we
+                assign a unique id to each recipient, including info relevant to
+                that recipient so that we can reference it when composing the
+                email like so:
+                    recipient_variables = {
+                        'bob@example.com': {'first': 'Bob', 'id': 1},
+                        'alice@example.com': {'first': 'Alice', 'id': 2},
+                    }
+                    subject = 'Hey, %recipient.first%'
+                For more information about this format, see:
+                https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
 
         Returns:
             bool. Whether the emails are sent successfully.
         """
         bcc_emails = None
-
         if bcc:
             bcc_emails = bcc[0] if len(bcc) == 1 else bcc
 
@@ -2942,7 +2737,7 @@ class GenericEmailTestBase(GenericTestBase):
             sender_email, recipient_emails, subject, plaintext_body, html_body,
             bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
             recipient_variables=(
-                recipient_variables if (recipient_variables) else None))
+                recipient_variables if recipient_variables else None))
         for recipient_email in recipient_emails:
             self.emails_dict[recipient_email].append(new_email)
         return True
@@ -2963,7 +2758,7 @@ class GenericEmailTestBase(GenericTestBase):
         """Gets the entire messages dictionary.
 
         Returns:
-            dict(str, (list(EmailMessageMock))). The dict keyed by recipient
+            dict(str, list(EmailMessageMock)). The dict keyed by recipient
             email. Each value contains a list of EmailMessageMock objects
             corresponding to that recipient email; in other words, all
             individual emails sent to that specific recipient email.
@@ -2984,7 +2779,7 @@ class FunctionWrapper(python_utils.OBJECT):
         """Creates a new FunctionWrapper instance.
 
         Args:
-            func: a callable, or data descriptor. If it's a descriptor, its
+            func: a callable, or data descriptor. If it's a descriptor, then
                 __get__ should return a bound method. For example, func can be
                 a function, a method, a static or class method, but not a
                 @property.
@@ -3011,15 +2806,15 @@ class FunctionWrapper(python_utils.OBJECT):
         return result
 
     def __get__(self, instance, owner):
-        # We have to implement __get__ because otherwise, we don't have a
-        # chance to bind to the instance self._func was bound to. See the
-        # following SO answer: https://stackoverflow.com/a/22555978/675311
+        # We have to implement __get__ because otherwise, we don't have a chance
+        # to bind to the instance self._func was bound to. See the following SO
+        # answer: https://stackoverflow.com/a/22555978/675311
         self._instance = instance
         return self
 
     def pre_call_hook(self, args):
-        """Override this to do tasks that should be executed before the
-        actual function call.
+        """Override this to do tasks that should be executed before the actual
+        function call.
 
         Args:
             args: list(*). Set of arguments that the function accepts.
@@ -3027,8 +2822,8 @@ class FunctionWrapper(python_utils.OBJECT):
         pass
 
     def post_call_hook(self, args, result):
-        """Override this to do tasks that should be executed after the
-        actual function call.
+        """Override this to do tasks that should be executed after the actual
+        function call.
 
         Args:
             args: list(*). Set of arguments that the function accepts.
@@ -3044,8 +2839,8 @@ class CallCounter(FunctionWrapper):
     """
 
     def __init__(self, f):
-        """Counts the number of times the given function has been called.
-        See FunctionWrapper for arguments.
+        """Counts the number of times the given function has been called. See
+        FunctionWrapper for arguments.
         """
         super(CallCounter, self).__init__(f)
         self._times_called = 0
@@ -3062,8 +2857,8 @@ class CallCounter(FunctionWrapper):
 
     def pre_call_hook(self, args):
         """Method that is called before each function call to increment the
-        counter tracking the number of times a function is called. This
-        will also be called even when the function raises an exception.
+        counter tracking the number of times a function is called. This will
+        also be called even when the function raises an exception.
 
         Args:
             args: list(*). Set of arguments that the function accepts.
@@ -3072,8 +2867,8 @@ class CallCounter(FunctionWrapper):
 
 
 class FailingFunction(FunctionWrapper):
-    """A function wrapper that makes a function fail, raising a given
-    exception. It can be set to succeed after a given number of calls.
+    """A function wrapper that makes a function fail, raising a given exception.
+    It can be set to succeed after a given number of calls.
     """
 
     INFINITY = 'infinity'
@@ -3103,9 +2898,9 @@ class FailingFunction(FunctionWrapper):
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
-        """Method that is called each time before the actual function call
-        to check if the exception is to be raised based on the number of
-        tries before success.
+        """Method that is called each time before the actual function call to
+        check if the exception is to be raised based on the number of tries
+        before success.
 
         Args:
             args: list(*). Set of arguments this function accepts.

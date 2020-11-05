@@ -2027,7 +2027,8 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
             pass
 
         # We don't want to sign up the superadmin user.
-        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
             super(ProfilePictureAuditOneOffJobTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)

@@ -362,7 +362,7 @@ class ParamNameTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'MapReduce task to URL .+ failed')
+            Exception, 'MapReduce task failed: Task<.*>')
 
         with assert_raises_regexp_context_manager:
             self.process_and_flush_pending_mapreduce_tasks()
