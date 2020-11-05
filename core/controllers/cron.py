@@ -243,17 +243,22 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         suggestions that have been waiting the longest for review, based on
         their reviewing permissions.
         """
-        # Only execute this job if it's possible to send the emails.
-        if feconf.CAN_SEND_EMAILS and (
-                config_domain
+        # Only execute this job if it's possible to send the emails and there
+        # are reviewers to notify.
+        if not feconf.CAN_SEND_EMAILS:
+            return
+        if not (config_domain
                 .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
-            reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
-            reviewers_suggestion_email_infos = (
-                suggestion_services
-                .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                    reviewer_ids))
-            email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-                reviewer_ids, reviewers_suggestion_email_infos)
+            return
+        reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
+        if not reviewer_ids:
+            return
+        reviewers_suggestion_email_infos = (
+            suggestion_services
+            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
+                reviewer_ids))
+        email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
+            reviewer_ids, reviewers_suggestion_email_infos)
 
 
 class CronMailAdminContributorDashboardBottlenecksHandler(

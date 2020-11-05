@@ -475,6 +475,27 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.reviewers_suggestion_email_infos[0][0],
             self.expected_reviewable_suggestion_email_info)
 
+    def test_email_not_sent_if_reviewer_ids_is_empty(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id',
+            'contributor_dashboard_reviewer_emails_is_enabled', True)
+        user_services.remove_translation_review_rights_in_language(
+            self.reviewer_id, self.language_code)
+
+        with self.can_send_emails, self.testapp_swap:
+            with self.swap(
+                email_manager,
+                'send_mail_to_notify_contributor_dashboard_reviewers',
+                self._mock_send_contributor_dashboard_reviewers_emails):
+                self.get_html_response(
+                    '/cron/mail/reviewers/contributor_dashboard_suggestions')
+
+        self.assertEqual(len(self.reviewer_ids), 0)
+        self.assertEqual(len(self.reviewers_suggestion_email_infos), 0)
+
+        self.logout()
+
 
 class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         test_utils.GenericTestBase):
