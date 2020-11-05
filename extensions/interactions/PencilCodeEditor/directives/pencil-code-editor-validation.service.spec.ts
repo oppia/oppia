@@ -43,7 +43,7 @@ describe('Pencil Code Editor Validation Service', () => {
   });
 
   describe('on calling getCustomizationArgsWarnings', () => {
-    it('should return empty list when feeback is given', () => {
+    it('should return empty list when feedback is given', () => {
       var customizationArgs = {
         initialCode: {
           value: ' Add the initial code snippet here.↵code is here'
