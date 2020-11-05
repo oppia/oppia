@@ -992,8 +992,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     model_takeout_ids.append(property_name)
 
             if (export_method ==
-                base_models
-                .MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
+                    base_models
+                    .MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
                 self.assertEqual(len(exported_property_names), 0)
                 self.assertEqual(len(model_takeout_ids), 0)
             elif (export_method ==

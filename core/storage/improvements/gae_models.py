@@ -137,9 +137,9 @@ class TaskEntryModel(base_models.BaseModel):
         """Model is exported as a shared instance since multiple users
         resolve tasks.
         """
-        return base_models
+        return (base_models
                .MODEL_ASSOCIATION_TO_USER
-               .ONE_INSTANCE_SHARED_ACROSS_USERS
+               .ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     @classmethod
     def get_export_policy(cls):
