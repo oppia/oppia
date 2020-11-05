@@ -2874,33 +2874,39 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_inequality_op_on_none_adds_message(self):
-        (if_node_one, if_node_two) = astroid.extract_node(
+        if_node = astroid.extract_node(
             """
             if x != None: #@
                 pass
+            """
+        )
+        compare_node = if_node.test
+        not_equal_none_message = testutils.Message(
+            msg_id='inequality-with-none', node=compare_node)
+        with self.checker_test_object.assertAddsMessages(
+            not_equal_none_message
+        ):
+            self.checker_test_object.checker.visit_compare(compare_node)
+
+    def test_inequality_op_on_none_with_wrapped_none_adds_message(self):
+        if_node = astroid.extract_node(
+            """
             if x != ( #@
                 None
             ):
                 pass
             """
         )
-        compare_node_one = if_node_one.test
-        compare_node_two = if_node_two.test
-
-        not_equal_none_message_one = testutils.Message(
-            msg_id='inequality-with-none', node=compare_node_one)
-        not_equal_none_message_two = testutils.Message(
-            msg_id='inequality-with-none', node=compare_node_two)
-
+        compare_node = if_node.test
+        not_equal_none_message = testutils.Message(
+            msg_id='inequality-with-none', node=compare_node)
         with self.checker_test_object.assertAddsMessages(
-            not_equal_none_message_one,
-            not_equal_none_message_two
+            not_equal_none_message
         ):
-            self.checker_test_object.checker.visit_compare(compare_node_one)
-            self.checker_test_object.checker.visit_compare(compare_node_two)
+            self.checker_test_object.checker.visit_compare(compare_node)
 
     def test_usage_of_is_not_on_none_does_not_add_message(self):
-        (if_node) = astroid.extract_node(
+        if_node = astroid.extract_node(
             """
             if x is not None: #@
                 pass

@@ -1885,7 +1885,7 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
 
         ops = node.ops
         for operator, operand in ops:
-            if operator == '!=' and operand.as_string() == 'None':
+            if operator == '!=' and operand.value is None:
                 self.add_message('inequality-with-none', node=node)
 
 
