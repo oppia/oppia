@@ -977,7 +977,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             export_policy = model.get_export_policy()
             renamed_export_keys = model.get_field_names_for_takeout()
             exported_property_names = []
-            model_takeout_ids = []
+            props_used_as_takeout_ids = []
             for property_name in model._properties: # pylint: disable=protected-access
                 if (export_policy[property_name] ==
                         base_models.EXPORT_POLICY.EXPORTED):
@@ -989,17 +989,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         exported_property_names.append(property_name)
                 elif (export_policy[property_name] ==
                       base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID):
-                    model_takeout_ids.append(property_name)
+                    props_used_as_takeout_ids.append(property_name)
 
             if (export_method ==
                     base_models
                     .MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
                 self.assertEqual(len(exported_property_names), 0)
-                self.assertEqual(len(model_takeout_ids), 0)
+                self.assertEqual(len(props_used_as_takeout_ids), 0)
             elif (export_method ==
                   base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
-                self.assertEqual(len(model_takeout_ids), 0)
+                self.assertEqual(len(props_used_as_takeout_ids), 0)
                 self.assertEqual(
                     sorted([
                         python_utils.UNICODE(key)
@@ -1014,7 +1014,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     model.get_field_name_mapping_to_takeout_keys)
                 exported_data = model.export_data(self.USER_ID_1)
                 field_mapping = model.get_field_name_mapping_to_takeout_keys()
-                self.assertEqual(len(model_takeout_ids), 0)
+                self.assertEqual(len(props_used_as_takeout_ids), 0)
                 self.assertEqual(
                     sorted(exported_property_names),
                     sorted(field_mapping.keys())
@@ -1028,10 +1028,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   .MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
                 for model_id in exported_data.keys():
-                    if len(model_takeout_ids) > 0:
+                    # If we are using a property as a Takeout id.
+                    if props_used_as_takeout_ids:
+                        # Ensure that there is only one such property.
+                        self.assertEqual(len(props_used_as_takeout_ids), 1)
+                        # Ensure that we do use the property as a Takeout id.
                         self.assertEqual(
                             model_id,
-                            getattr(model, model_takeout_ids[0])
+                            getattr(model, props_used_as_takeout_ids[0])
                         )
                     self.assertEqual(
                         sorted([
