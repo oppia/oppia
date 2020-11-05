@@ -146,6 +146,18 @@
   <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
     <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
   </div>
+  <div ng-if="inStoryMode && !isLoggedIn" class="conversation-skin-login-container">
+    <div class="conversation-skin-congratulations-text">Congratulations on completing the chapter!</div>
+    <span class="conversation-skin-login-text text-secondary">Log in or sign up to save your progress and play through the next lesson.</span>
+    <div class="mt-2">
+      <md-button class="md-raised oppia-login-button text-light protractor-test-login-button" ng-click="signIn()">
+        LOGIN
+      </md-button>
+      <md-button class="md-raised oppia-sign-up-button text-light" ng-click="signIn()">
+        SIGN UP
+      </md-button>
+    </div>
+  </div>
 </div>
 
 <!-- These styles must be embedded within the directive script tags, since
@@ -172,6 +184,23 @@ otherwise they will interfere with the iframed conversation skin directive.
     position: fixed;
     width: 100%;
     z-index: 16;
+  }
+
+  .conversation-skin-login-container {
+    background-color: #FFF;
+    margin: -52px auto 92px;
+    padding: 1.5em 2em;
+    text-align: center;
+    width: 38%;
+  }
+
+  .conversation-skin-login-container .conversation-skin-login-text {
+    font-size: 0.8em;
+  }
+
+  .conversation-skin-login-container .conversation-skin-congratulations-text {
+    font-size: 1.2em;
+    font-weight: 500;
   }
 
   .conversation-skin-next-lesson-wrapper {
@@ -417,6 +446,20 @@ otherwise they will interfere with the iframed conversation skin directive.
     margin-left: 10px;
   }
 
+  conversation-skin .oppia-login-button.md-raised {
+    background-color: #00645C;
+    font-size: 1em;
+    min-width: max-content;
+    width: 30%;
+  }
+
+  conversation-skin .oppia-sign-up-button.md-raised {
+    background-color: #00609C;
+    font-size: 1em;
+    min-width: max-content;
+    width: 30%;
+  }
+
   @media screen and (max-width: 959px) {
     .conversation-skin-cards-container {
       display: block;
@@ -482,6 +525,10 @@ otherwise they will interfere with the iframed conversation skin directive.
     }
     .conversation-skin-final-ratings {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+      width: 100%;
+    }
+
+    .conversation-skin-login-container {
       width: 100%;
     }
   }

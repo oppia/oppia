@@ -79,6 +79,42 @@ var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
 };
 
+var completeLoginFlowFromStoryViewerPage = async function(email, username) {
+  var driver = browser.driver;
+  var loginButton = element(by.css('.protractor-test-login-button'));
+  await waitFor.elementToBeClickable(
+    loginButton,
+    'Login button takes too long to be clickable.');
+  await loginButton.click();
+
+  // The statement below uses a browser.wait() to determine if the user has
+  // logged in. Use of waitFor is not possible because the active page is
+  // non-angular.
+  await browser.wait(
+    async() => {
+      try {
+        await driver.findElement(protractor.By.name('email'));
+      } catch (error) {
+        return false;
+      }
+      return true;
+    }, waitFor.DEFAULT_WAIT_TIME_MSECS, 'Login takes too long.');
+  await (await driver.findElement(protractor.By.name('email'))).clear();
+  await (await driver.findElement(protractor.By.name('email'))).sendKeys(email);
+  await (await driver.findElement(protractor.By.id('submit-login'))).click();
+  await waitFor.pageToFullyLoad();
+  var usernameInput = element(by.css('.protractor-test-username-input'));
+  var agreeToTermsCheckbox = element(
+    by.css('.protractor-test-agree-to-terms-checkbox'));
+  var registerUser = element(by.css('.protractor-test-register-user'));
+  await waitFor.visibilityOf(
+    usernameInput, 'No username input field was displayed');
+  await usernameInput.sendKeys(username);
+  await agreeToTermsCheckbox.click();
+  await registerUser.click();
+  await waitFor.pageToFullyLoad();
+};
+
 var createUser = async function(email, username) {
   await createAndLoginUser(email, username);
   await logout();
@@ -126,6 +162,8 @@ var isAdmin = async function() {
 exports.isAdmin = isAdmin;
 exports.login = login;
 exports.logout = logout;
+exports.completeLoginFlowFromStoryViewerPage = (
+  completeLoginFlowFromStoryViewerPage);
 exports.createUser = createUser;
 exports.createAndLoginUser = createAndLoginUser;
 exports.createModerator = createModerator;

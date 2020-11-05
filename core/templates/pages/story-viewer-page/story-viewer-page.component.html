@@ -42,7 +42,7 @@
                 </div>
 
                 <div class="oppia-story-viewer-card">
-                  <span class="oppia-chapter-title" ng-class="{'locked-chapter': $ctrl.isChapterLocked(node)}" aria-live="assertive">
+                  <span class="oppia-chapter-title protractor-chapter-title" ng-class="{'locked-chapter protractor-locked-chapter': $ctrl.isChapterLocked(node)}" aria-live="assertive">
                     <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
                   </span>
 
@@ -126,6 +126,18 @@
       </div>
     </div>
     <attribution-guide></attribution-guide>
+    <div ng-if="!$ctrl.isLoggedIn" class="story-viewer-login-container">
+      <h2>Learn More about <[$ctrl.storyPlaythroughObject.topicName]></h2>
+      <div class="mt-2">
+        <md-button class="md-raised oppia-login-button text-light protractor-test-login-button" ng-click="$ctrl.signIn()">
+          LOG IN
+        </md-button>
+        <span class="m-2 oppia-login-or-signup-text">or</span>
+        <md-button class="md-raised oppia-sign-up-button text-light" ng-click="$ctrl.signIn()">
+          SIGN UP
+        </md-button>
+      </div>
+    </div>
   </div>
 </div>
 <style>
@@ -154,4 +166,39 @@
   story-viewer-page .oppia-story-description-text {
     font-size: 20px;
   }
+
+  .story-viewer-login-container {
+    background-color: rgba(255, 255, 255, 0.8);
+    bottom: 0;
+    padding: 2em;
+    position: sticky;
+    text-align: center;
+    width: 100%;
+  }
+
+  .story-viewer-login-container .md-raised {
+    font-size: 1.2em;
+    min-width: max-content;
+    padding: 1em;
+    width: 8em;
+  }
+
+  .story-viewer-login-container .oppia-login-button.md-raised {
+    background-color: #00645C;
+  }
+
+  .story-viewer-login-container .oppia-login-or-signup-text {
+    display: inline;
+  }
+
+  .story-viewer-login-container .oppia-sign-up-button.md-raised {
+    background-color: #00609C;
+  }
+
+  @media screen and (max-width: 450px) {
+    .story-viewer-login-container .oppia-login-or-signup-text {
+      display: block;
+    }
+  }
+
 </style>
