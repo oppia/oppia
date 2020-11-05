@@ -30,8 +30,6 @@ from core.platform import models
         models.NAMES.base_model, models.NAMES.email, models.NAMES.feedback,
         models.NAMES.suggestion, models.NAMES.user])
 
-USER_ID_REGEX = 'uid_[a-z]{32}'
-
 
 class SentEmailModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SentEmailModels."""
@@ -213,7 +211,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
         return (
             '^%s\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
             '[A-Za-z0-9=+/]{1,}') % (
-                USER_ID_REGEX,
+                base_model_validators.USER_ID_REGEX,
                 ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
                 base_models.ID_LENGTH)
 
