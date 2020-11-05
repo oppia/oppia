@@ -43,7 +43,7 @@ import { TextInputRulesService } from
 
 describe('Teach Oppia Modal Controller', function() {
   importAllAngularServices();
-  
+
   var $httpBackend = null;
   var $log = null;
   var $scope = null;

@@ -74,8 +74,6 @@ describe('Solution Verification Service', () => {
     svs = TestBed.get(SolutionVerificationService);
   });
 
-  // TODO: Migrate following lines to Angular 8 once ExplorationStatesService and
-  // ExplorationDataService are migrated.
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

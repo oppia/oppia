@@ -42,7 +42,7 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('Training Panel Component', function() {
   importAllAngularServices();
-  
+
   var ctrl = null;
   var $scope = null;
   var explorationStatesService = null;

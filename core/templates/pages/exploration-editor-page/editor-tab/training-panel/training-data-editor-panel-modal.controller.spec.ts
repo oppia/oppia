@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('TrainingDataEditorPanelServiceModalController', function() {
   importAllAngularServices();
-  
+
   var $scope = null;
   var $uibModalInstance = null;
   var ExplorationStatesService = null;
