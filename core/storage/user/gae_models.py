@@ -888,7 +888,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
             'subscription_notifications':
                 base_models.EXPORT_POLICY.EXPORTED
         })
-    
+
     @staticmethod
     def export_data(user_id):
         """Exports the UserEmailPreferencesModel for this user."""

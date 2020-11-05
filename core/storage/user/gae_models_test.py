@@ -805,7 +805,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             user_models.UserEmailPreferencesModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-    
+
     def test_export_data_trivial(self):
         user_data = user_models.UserEmailPreferencesModel.export_data(
             self.USER_ID_1)
@@ -818,7 +818,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             },
             user_data
         )
-    
+
     def test_export_data_nontrivial(self):
         user_data = user_models.UserEmailPreferencesModel.export_data(
             self.USER_ID_3)

@@ -511,7 +511,9 @@ class TopicRightsModel(base_models.VersionedModel):
         """Model is exported as a shared instance since multiple users
         contribute to topics and their rights.
         """
-        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
+        return base_models
+               .MODEL_ASSOCIATION_TO_USER
+               .ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_export_policy(cls):

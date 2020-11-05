@@ -461,7 +461,8 @@ class BaseCommitLogEntryModel(BaseModel):
         Takeout.
         """
         return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-    
+
+    @staticmethod
     def get_deletion_policy():
         """BaseCommitLogEntryModel contains data corresponding to a user that
         requires pseudonymization: user_id field.

@@ -992,7 +992,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     model_takeout_ids.append(property_name)
 
             if (export_method ==
-                base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
+                base_models
+                .MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
                 self.assertEqual(len(exported_property_names), 0)
                 self.assertEqual(len(model_takeout_ids), 0)
             elif (export_method ==
@@ -1007,8 +1008,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 )
             elif (export_method ==
                   base_models
-                      .MODEL_ASSOCIATION_TO_USER
-                          .ONE_INSTANCE_SHARED_ACROSS_USERS):
+                  .MODEL_ASSOCIATION_TO_USER
+                  .ONE_INSTANCE_SHARED_ACROSS_USERS):
                 self.assertIsNotNone(
                     model.get_field_name_mapping_to_takeout_keys)
                 exported_data = model.export_data(self.USER_ID_1)
@@ -1023,12 +1024,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted(field_mapping.values())
                 )
             elif (export_method ==
-                  base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
+                  base_models
+                  .MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
                 for model_id in exported_data.keys():
                     if len(model_takeout_ids) > 0:
-                        self.assertEqual(model_id,
-                            getattr(model, model_takeout_ids[0]))
+                        self.assertEqual(
+                            model_id,
+                            getattr(model, model_takeout_ids[0])
+                        )
                     self.assertEqual(
                         sorted([
                             python_utils.UNICODE(key)
@@ -1367,14 +1371,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
-
-        expected_user_email_preferences = {
-            
-        }
-
-        expected_user_auth_details = {
-
-        }
+        expected_user_email_preferences = {}
+        expected_user_auth_details = {}
 
         expected_user_data = {
             'user_stats': expected_stats_data,
