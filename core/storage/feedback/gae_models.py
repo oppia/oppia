@@ -55,6 +55,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         [entity_type].[entity_id].[generated_string]
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The type of entity the thread is linked to.
     entity_type = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the entity the thread is linked to.
@@ -247,6 +250,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     The id of instances of this class has the form [thread_id].[message_id]
     """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = datastore_services.StringProperty(required=True, indexed=True)

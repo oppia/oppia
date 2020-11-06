@@ -825,7 +825,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'display_alias': None,
-            'pin': None
         }
         skill_data = {}
         stats_data = {}
@@ -929,7 +928,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_images = []
         self.assertEqual(expected_images, observed_images)
 
-    def test_exports_have_single_takeout_dict(self):
+    def test_exports_have_single_takeout_dict_key(self):
         """Test to ensure that all export policies that specify a key for the
         Takeout dict are also models that specify this policy are type
         MULTIPLE_INSTANCES_PER_USER.
@@ -986,7 +985,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             if (export_method ==
                     base_models.MODEL_ASSOCIATION_TO_USER
                     .MULTIPLE_INSTANCES_PER_USER):
-                self.assertLessEqual(num_takeout_keys, 1)
+                # If the id is used as a Takeout key, then we should not
+                # have any fields exported as the key for the Takeout
+                if model.ID_IS_USED_AS_TAKEOUT_KEY:
+                    self.assertLessEqual(num_takeout_keys, 0)
+                else:
+                    self.assertLessEqual(num_takeout_keys, 1)
             else:
                 self.assertEqual(num_takeout_keys, 0)
 
@@ -1287,7 +1291,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
-            'pin': self.GENERIC_PIN
         }
 
         expected_reply_to_data = {

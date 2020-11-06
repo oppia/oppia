@@ -86,6 +86,10 @@ ID_LENGTH = 12
 class BaseModel(datastore_services.Model):
     """Base model for all persistent object storage classes."""
 
+    # Specifies whether the model's id is used as a key in Takeout. By default,
+    # the model's id is not used in Takeout.
+    ID_IS_USED_AS_TAKEOUT_KEY = False
+
     # When this entity was first created. This value should only be modified by
     # the update_timestamps method.
     created_on = (

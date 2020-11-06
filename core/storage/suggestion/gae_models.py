@@ -153,6 +153,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
     linked to the suggestion.
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The type of suggestion.
     suggestion_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=SUGGESTION_TYPE_CHOICES)
@@ -524,6 +527,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     The ID of the voiceover application will be a random hashed value.
     """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.

@@ -271,7 +271,6 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
             'display_alias': user.display_alias,
-            'pin': user.pin
         }
 
     @classmethod
