@@ -10,20 +10,25 @@ steps:
   - id: install-dependencies
     wait_for: ["build-oppia-base"]
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
+    volumes:
+      - name: 'test'
+        path: '/test'
     entrypoint: bash
     args: 
       - "-c"
       - |
-          mkdir oppia
-          shopt -s extglob
-          mv !(oppia) oppia
-          shopt -u extglob
-          cd oppia
+          mkdir /test/oppia
+          mv * /test/oppia
+          cd /test/oppia
+          git init
           python -m scripts.install_third_party_libs
 
   - id: third-party-size-check
     wait_for: ["install-dependencies"]
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    dir: oppia
+    volumes:
+      - name: 'test'
+        path: '/test'
+    dir: /test/oppia
     entrypoint: python
     args: ["-m", "scripts.third_party_size_check"]
