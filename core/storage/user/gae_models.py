@@ -1744,7 +1744,8 @@ class StoryProgressModel(base_models.BaseModel):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'story_id': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+            'story_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'completed_node_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -2101,7 +2102,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_id': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+            'skill_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'degree_of_mastery': base_models.EXPORT_POLICY.EXPORTED
         })
 

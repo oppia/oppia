@@ -928,7 +928,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(json.loads(expected_json), json.loads(observed_json))
         expected_images = []
         self.assertEqual(expected_images, observed_images)
-    
+
     def test_exports_have_single_takeout_dict(self):
         """Test to ensure that all export policies that specify a key for the
         Takeout dict are also models that specify this policy are type
@@ -978,14 +978,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             num_takeout_keys = 0
             for field_export_policy in export_policy.values():
                 if (field_export_policy ==
-                    base_models
-                    .EXPORT_POLICY
-                    .EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
+                        base_models
+                        .EXPORT_POLICY
+                        .EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
                     num_takeout_keys += 1
 
             if (export_method ==
-                base_models.MODEL_ASSOCIATION_TO_USER
-                .MULTIPLE_INSTANCES_PER_USER):
+                    base_models.MODEL_ASSOCIATION_TO_USER
+                    .MULTIPLE_INSTANCES_PER_USER):
                 self.assertLessEqual(num_takeout_keys, 1)
             else:
                 self.assertEqual(num_takeout_keys, 0)

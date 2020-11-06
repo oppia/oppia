@@ -423,7 +423,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thread_id': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+            'thread_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'reply_to_id': base_models.EXPORT_POLICY.EXPORTED
         })
 
