@@ -79,30 +79,35 @@ export class TopicEditorRoutingService {
   navigateToMainTab(): void {
     this.lastTabVisited = 'topic';
     this.pageTitleService.setPageTitleForMobileView('Topic Editor');
+    this.activeTabName = 'main';
     this.location.go('');
   }
 
   navigateToSubtopicPreviewTab(subtopicId: string | number): void {
     this.lastTabVisited = 'subtopic';
     this.pageTitleService.setPageTitleForMobileView('Subtopic Preview');
+    this.activeTabName = 'subtopic_preview';
     this.location.go('/subtopic_preview/' + subtopicId);
   }
 
   navigateToTopicPreviewTab(): void {
     this.lastTabVisited = 'topic';
     this.pageTitleService.setPageTitleForMobileView('Topic Preview');
+    this.activeTabName = 'topic_preview';
     this.location.go('/topic_preview/');
   }
 
   navigateToSubtopicEditorWithId(subtopicId: string | number): void {
     this.lastTabVisited = 'subtopic';
     this.pageTitleService.setPageTitleForMobileView('Subtopic Editor');
+    this.activeTabName = 'subtopic_editor';
     this.location.go('/subtopic_editor/' + subtopicId);
   }
 
   navigateToQuestionsTab(): void {
     this.lastSubtopicId = this.getSubtopicIdFromUrl();
     this.pageTitleService.setPageTitleForMobileView('Question Editor');
+    this.activeTabName = 'questions';
     this.location.go('/questions');
   }
 
