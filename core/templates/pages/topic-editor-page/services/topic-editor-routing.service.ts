@@ -43,7 +43,8 @@ export class TopicEditorRoutingService {
     private urlInterpolationService: UrlInterpolationService) {
     this.currentPath = this.location.path();
     this.location.onUrlChange((newPath: string, state: unknown) => {
-      newPath = newPath.split('#')[1];
+      console.log(newPath);
+      // newPath = newPath.split('#')[1];
       if (newPath === '') {
         this.location.go(this.currentPath);
         return;

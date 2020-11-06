@@ -29,27 +29,27 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 
 fdescribe('Topic editor routing service', () => {
-  beforeEach(angular.mock.module('oppia'));
+  // beforeEach(angular.mock.module('oppia'));
   
-  beforeEach(angular.mock.module('oppia', ($provide) => {
-    let ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  // beforeEach(angular.mock.module('oppia', ($provide) => {
+  //   let ugs = new UpgradedServices();
+  //   for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+  //     $provide.value(key, value);
+  //   }
+  // }));
 
   // let $rootScope = null;
   // let $location = null;
-  // let $window = null;
+  let $window = null;
   let TERS: TopicEditorRoutingService;
   let locat: SpyLocation;
   
 
-  // beforeEach(angular.mock.inject( ($injector) => {
+  beforeEach(angular.mock.inject( ($injector) => {
   //   $rootScope = $injector.get('$rootScope');
   //   $location = $injector.get('$location');
-  //   $window = $injector.get('$window');
-  // }));
+    $window = $injector.get('$window');
+  }));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -60,7 +60,7 @@ fdescribe('Topic editor routing service', () => {
       ]
     });
     TERS = TestBed.get(TopicEditorRoutingService);
-    locat =TestBed.get(Location);
+    // locat =TestBed.get(Location);
   });
 
   it('should return the default active tab name', () => {
@@ -71,7 +71,7 @@ fdescribe('Topic editor routing service', () => {
     expect(TERS.getActiveTabName()).toEqual('main');
     
     TERS.navigateToSubtopicPreviewTab(1);
-    locat.simulateHashChange('subtopic_preview');
+    // locat.simulateHashChange('subtopic_preview');
     expect(
       TERS.getActiveTabName()).toEqual('subtopic_preview');
 
@@ -94,47 +94,48 @@ fdescribe('Topic editor routing service', () => {
       'topic_preview');
   });
 
-  // it('should handle calls with unexpect paths', () => {
-  //   expect(TERS.getActiveTabName()).toEqual('main');
+  it('should handle calls with unexpect paths', () => {
+    expect(TERS.getActiveTabName()).toEqual('main');
 
-  //   $location.path();
-  //   $rootScope.$apply();
-  //   expect(TERS.getActiveTabName()).toEqual('main');
+    // locat.go();
+    // $rootScope.$apply();
+    expect(TERS.getActiveTabName()).toEqual('main');
 
-  //   $location.path('');
-  //   $rootScope.$apply();
-  //   expect(TERS.getActiveTabName()).toEqual('main');
-  // });
+    // locat.go('');
+    // $rootScope.$apply();
+    expect(TERS.getActiveTabName()).toEqual('main');
+  });
 
-  // it('should navigate to skill editor', () => {
-  //   spyOn($window, 'open').and.callFake(() => {
-  //     return true;
-  //   });
-  //   TERS.navigateToSkillEditorWithId('10');
-  //   expect($window.open).toHaveBeenCalled();
-  //   expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
-  // });
+  it('should navigate to skill editor', () => {
+    spyOn($window, 'open').and.callFake(() => {
+      return true;
+    });
+    TERS.navigateToSkillEditorWithId('10');
+    expect($window.open).toHaveBeenCalled();
+    expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
+  });
 
-  // it('should return last tab visited', () => {
-  //   TERS.navigateToSubtopicEditorWithId(1);
-  //   $rootScope.$apply();
-  //   expect(TERS.getLastTabVisited()).toEqual('subtopic');
-  //   TERS.navigateToMainTab();
-  //   $rootScope.$apply();
-  //   expect(TERS.getLastTabVisited()).toEqual('topic');
-  // });
+  it('should return last tab visited', () => {
+    TERS.navigateToSubtopicEditorWithId(1);
+    // locat.simulateHashChange('subtopic_editor');
+    // $rootScope.$apply();
+    expect(TERS.getLastTabVisited()).toEqual('subtopic');
+    TERS.navigateToMainTab();
+    // $rootScope.$apply();
+    expect(TERS.getLastTabVisited()).toEqual('topic');
+  });
 
-  // it('should return last visited subtopic id', () => {
-  //   TERS.navigateToSubtopicPreviewTab(1);
-  //   $rootScope.$apply();
-  //   TERS.navigateToQuestionsTab();
-  //   $rootScope.$apply();
-  //   expect(TERS.getLastSubtopicIdVisited()).toEqual(1);
+  it('should return last visited subtopic id', () => {
+    TERS.navigateToSubtopicPreviewTab(1);
+    // $rootScope.$apply();
+    TERS.navigateToQuestionsTab();
+    // $rootScope.$apply();
+    expect(TERS.getLastSubtopicIdVisited()).toEqual(1);
 
-  //   TERS.navigateToSubtopicPreviewTab(5);
-  //   $rootScope.$apply();
-  //   TERS.navigateToQuestionsTab();
-  //   $rootScope.$apply();
-  //   expect(TERS.getLastSubtopicIdVisited()).toEqual(5);
-  // });
+    TERS.navigateToSubtopicPreviewTab(5);
+    // $rootScope.$apply();
+    TERS.navigateToQuestionsTab();
+    // $rootScope.$apply();
+    expect(TERS.getLastSubtopicIdVisited()).toEqual(5);
+  });
 });
