@@ -87,9 +87,7 @@ describe('GraphDetailService', () => {
         ],
         isLabeled: false
       };
-
       var index = 0;
-
       var result = {x: 175, y: 50};
 
       expect(gds.getEdgeCentre(graph, index)).toEqual(result);
