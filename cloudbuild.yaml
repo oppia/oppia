@@ -1,3 +1,4 @@
+timeout: 10800s # 15 minutes
 steps:
   - id: build-oppia-base
     name: gcr.io/kaniko-project/executor:latest
