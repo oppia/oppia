@@ -3325,14 +3325,12 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             '[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]')
 
         full_error_list = []
-        for i in python_utils.RANGE(21):
+        for i in python_utils.RANGE(22):
             full_error_list.append(
                 'Entity id 0-%s: based on field exploration_ids having '
                 'value 0, expected model ExplorationModel with id 0 but '
                 'it doesn\'t exist' % (i + 1))
         actual_error_list = ast.literal_eval(actual_output[0])[1]
-        print(actual_error_list)
-        print(full_error_list)
         self.assertEqual(len(actual_error_list), 10)
         for error in actual_error_list:
             assert (error in full_error_list), ('Extra error: %s' % error)
