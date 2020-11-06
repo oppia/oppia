@@ -75,23 +75,23 @@ fdescribe('Topic editor routing service', () => {
     expect(
       TERS.getActiveTabName()).toEqual('subtopic_preview');
 
-    // TERS.navigateToSubtopicEditorWithId(1);
+    TERS.navigateToSubtopicEditorWithId(1);
     
-    // expect(
-    //   TERS.getActiveTabName()).toEqual('subtopic_editor');
+    expect(
+      TERS.getActiveTabName()).toEqual('subtopic_editor');
 
-    // TERS.navigateToQuestionsTab();
-    // // $rootScope.$apply();
-    // expect(TERS.getActiveTabName()).toEqual('questions');
+    TERS.navigateToQuestionsTab();
+    // $rootScope.$apply();
+    expect(TERS.getActiveTabName()).toEqual('questions');
 
-    // TERS.navigateToMainTab();
-    // // $rootScope.$apply();
-    // expect(TERS.getActiveTabName()).toEqual('main');
+    TERS.navigateToMainTab();
+    // $rootScope.$apply();
+    expect(TERS.getActiveTabName()).toEqual('main');
 
-    // TERS.navigateToTopicPreviewTab();
-    // // $rootScope.$apply();
-    // expect(TERS.getActiveTabName()).toEqual(
-    //   'topic_preview');
+    TERS.navigateToTopicPreviewTab();
+    // $rootScope.$apply();
+    expect(TERS.getActiveTabName()).toEqual(
+      'topic_preview');
   });
 
   // it('should handle calls with unexpect paths', () => {
