@@ -928,6 +928,67 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(json.loads(expected_json), json.loads(observed_json))
         expected_images = []
         self.assertEqual(expected_images, observed_images)
+    
+    def test_exports_have_single_takeout_dict(self):
+        """Test to ensure that all export policies that specify a key for the
+        Takeout dict are also models that specify this policy are type
+        MULTIPLE_INSTANCES_PER_USER.
+        """
+        self.set_up_non_trivial()
+
+        # We set up the feedback_thread_model here so that we can easily
+        # access it when computing the expected data later.
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=self.THREAD_ENTITY_TYPE,
+            entity_id=self.THREAD_ENTITY_ID,
+            original_author_id=self.USER_ID_1,
+            status=self.THREAD_STATUS,
+            subject=self.THREAD_SUBJECT,
+            has_suggestion=self.THREAD_HAS_SUGGESTION,
+            summary=self.THREAD_SUMMARY,
+            message_count=self.THREAD_MESSAGE_COUNT
+        )
+        feedback_thread_model.put()
+
+        thread_id = feedback_services.create_thread(
+            self.THREAD_ENTITY_TYPE,
+            self.THREAD_ENTITY_ID,
+            self.USER_ID_1,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+        feedback_services.create_message(
+            thread_id,
+            self.USER_ID_1,
+            self.THREAD_STATUS,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+
+        # Retrieve all models for export.
+        all_models = [
+            clazz
+            for clazz in self._get_model_classes()
+            if not clazz.__name__ in self.BASE_CLASSES
+        ]
+
+        for model in all_models:
+            export_method = model.get_model_association_to_user()
+            export_policy = model.get_export_policy()
+            num_takeout_keys = 0
+            for field_export_policy in export_policy.values():
+                if (field_export_policy ==
+                    base_models
+                    .EXPORT_POLICY
+                    .EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
+                    num_takeout_keys += 1
+
+            if (export_method ==
+                base_models.MODEL_ASSOCIATION_TO_USER
+                .MULTIPLE_INSTANCES_PER_USER):
+                self.assertLessEqual(num_takeout_keys, 1)
+            else:
+                self.assertEqual(num_takeout_keys, 0)
 
     def test_exports_follow_export_policies(self):
         """Test to ensure that all fields that should be exported
@@ -977,7 +1038,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             export_policy = model.get_export_policy()
             renamed_export_keys = model.get_field_names_for_takeout()
             exported_property_names = []
-            props_used_as_takeout_ids = []
+            key_for_takeout_dict = None
             for property_name in model._properties: # pylint: disable=protected-access
                 if (export_policy[property_name] ==
                         base_models.EXPORT_POLICY.EXPORTED):
@@ -988,18 +1049,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     else:
                         exported_property_names.append(property_name)
                 elif (export_policy[property_name] ==
-                      base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID):
-                    props_used_as_takeout_ids.append(property_name)
+                      base_models
+                      .EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
+                    key_for_takeout_dict = property_name
 
             if (export_method ==
                     base_models
                     .MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
                 self.assertEqual(len(exported_property_names), 0)
-                self.assertEqual(len(props_used_as_takeout_ids), 0)
             elif (export_method ==
                   base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
-                self.assertEqual(len(props_used_as_takeout_ids), 0)
                 self.assertEqual(
                     sorted([
                         python_utils.UNICODE(key)
@@ -1014,7 +1074,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     model.get_field_name_mapping_to_takeout_keys)
                 exported_data = model.export_data(self.USER_ID_1)
                 field_mapping = model.get_field_name_mapping_to_takeout_keys()
-                self.assertEqual(len(props_used_as_takeout_ids), 0)
                 self.assertEqual(
                     sorted(exported_property_names),
                     sorted(field_mapping.keys())
@@ -1028,14 +1087,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   .MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
                 for model_id in exported_data.keys():
-                    # If we are using a property as a Takeout id.
-                    if props_used_as_takeout_ids:
-                        # Ensure that there is only one such property.
-                        self.assertEqual(len(props_used_as_takeout_ids), 1)
-                        # Ensure that we do use the property as a Takeout id.
+                    # If we are using a property as a Takeout key.
+                    if key_for_takeout_dict:
+                        # Ensure that we export the property.
                         self.assertEqual(
                             model_id,
-                            getattr(model, props_used_as_takeout_ids[0])
+                            getattr(model, key_for_takeout_dict)
                         )
                     self.assertEqual(
                         sorted([

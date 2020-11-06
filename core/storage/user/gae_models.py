@@ -554,7 +554,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id':
-                base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID,
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'last_played_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_played_state_name': base_models.EXPORT_POLICY.EXPORTED
@@ -1379,7 +1379,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id':
-                base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID,
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'rating': base_models.EXPORT_POLICY.EXPORTED,
             'rated_on': base_models.EXPORT_POLICY.EXPORTED,
             'draft_change_list': base_models.EXPORT_POLICY.EXPORTED,
@@ -1562,7 +1562,7 @@ class CollectionProgressModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'collection_id':
-                base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID,
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'completed_explorations': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1744,7 +1744,7 @@ class StoryProgressModel(base_models.BaseModel):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'story_id': base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID,
+            'story_id': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'completed_node_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -2101,7 +2101,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_id': base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID,
+            'skill_id': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'degree_of_mastery': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -2203,7 +2203,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'score_category':
-                base_models.EXPORT_POLICY.EXPORTED_AS_MODEL_TAKEOUT_ID,
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'score': base_models.EXPORT_POLICY.EXPORTED,
             'onboarding_email_sent': base_models.EXPORT_POLICY.EXPORTED
         })
