@@ -24,7 +24,6 @@ import datetime
 import math
 import random
 import time
-import types
 
 from constants import constants
 from core.domain import collection_domain
