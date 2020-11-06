@@ -66,7 +66,7 @@ USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    audit_models, classifier_models, collection_models,
+    audit_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, job_models,
     opportunity_models, question_models, skill_models,
@@ -74,7 +74,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     topic_models, user_models
 
 ) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
+    models.NAMES.audit, models.NAMES.collection,
     models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
     models.NAMES.feedback, models.NAMES.job,
     models.NAMES.opportunity, models.NAMES.question,

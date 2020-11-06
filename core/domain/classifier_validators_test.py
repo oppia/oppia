@@ -14,11 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core.domain.prod_validators."""
+"""Unit tests for core.domain.classifier_validators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
+
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
