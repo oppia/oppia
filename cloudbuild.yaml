@@ -18,6 +18,7 @@ steps:
       - "-c"
       - |
           mkdir /test/oppia
+          shopt -s dotglob
           mv * /test/oppia
           cd /test/oppia
           git init
@@ -32,3 +33,19 @@ steps:
     dir: /test/oppia
     entrypoint: python
     args: ["-m", "scripts.third_party_size_check"]
+
+  - id: setup_and_typescript_tests
+    name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
+    wait_for: ["install-dependencies"]
+    volumes:
+      - name: 'test'
+        path: '/test'
+    dir: /test/oppia
+    entrypoint: bash
+    args: 
+      - "-c"
+      - |
+          set -e
+          python -m scripts.check_e2e_tests_are_captured_in_ci
+          python -m scripts.typescript_checks
+          python -m scripts.typescript_checks --strict_checks
