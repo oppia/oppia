@@ -628,7 +628,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as multiple unshared instances since there are
+        """Model is exported as multiple instances per user since there are
         multiple voiceover applications relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
@@ -643,6 +643,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             'status': base_models.EXPORT_POLICY.EXPORTED,
             'content': base_models.EXPORT_POLICY.EXPORTED,
             'filename': base_models.EXPORT_POLICY.EXPORTED,
+            # The author_id and final_reviewer_id are not exported in order to
+            # keep internal ids private.
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rejection_message': base_models.EXPORT_POLICY.EXPORTED
@@ -745,8 +747,9 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """This model does not directly contain user
-        information because the data is aggregated.
+        """TThis model only contains general statistical information about the
+        contributor dashboard and does not include any individual user
+        information.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

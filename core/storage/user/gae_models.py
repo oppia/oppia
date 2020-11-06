@@ -134,7 +134,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @staticmethod
@@ -187,7 +187,8 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'pin': base_models.EXPORT_POLICY.EXPORTED
+            # Pin is not exported since this is an auth mechanism.
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -371,7 +372,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -455,7 +456,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -543,7 +544,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as multiple unshared instances, since a user
+        """Model is exported as multiple instances per user, since a user
         has multiple playthroughs associated with their account.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
@@ -684,7 +685,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -765,7 +766,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -941,7 +942,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -1208,7 +1209,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -1357,7 +1358,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as multiple unshared instances since there are
+        """Model is exported as multiple instances per user since there are
         multiple explorations (and corresponding data) relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
@@ -1734,7 +1735,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as multiple unshared instances since a user
+        """Model is exported as multiple instances per user since a user
         can have multiple stories associated with their account.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
@@ -2092,7 +2093,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as multiple unshared instances since a user has
+        """Model is exported as multiple instances per user since a user has
         many relevant skill masteries.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
@@ -2194,7 +2195,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as multiple unshared instances since a user has
+        """Model is exported as multiple instances per user since a user has
         multiple relevant contribution proficiencies.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
@@ -2431,7 +2432,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a single unshared instance."""
+        """Model is exported as a one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod

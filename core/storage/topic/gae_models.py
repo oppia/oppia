@@ -508,7 +508,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a shared instance since multiple users
+        """Model is exported as one instance shared across users since multiple users
         contribute to topics and their rights.
         """
         return (
@@ -527,7 +527,7 @@ class TopicRightsModel(base_models.VersionedModel):
     @classmethod
     def get_field_name_mapping_to_takeout_keys(cls):
         """Defines the mapping of field names to takeout keys since this model
-        is exported as a shared instance.
+        is exported as one instance shared across users.
         """
         return {
             'manager_ids': 'managed_topic_ids'

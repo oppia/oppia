@@ -1038,7 +1038,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             export_policy = model.get_export_policy()
             renamed_export_keys = model.get_field_names_for_takeout()
             exported_property_names = []
-            key_for_takeout_dict = None
+            property_used_as_key_for_takeout_dict = None
             for property_name in model._properties: # pylint: disable=protected-access
                 if (export_policy[property_name] ==
                         base_models.EXPORT_POLICY.EXPORTED):
@@ -1051,7 +1051,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 elif (export_policy[property_name] ==
                       base_models
                       .EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
-                    key_for_takeout_dict = property_name
+                    property_used_as_key_for_takeout_dict = property_name
 
             if (export_method ==
                     base_models
@@ -1088,11 +1088,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 exported_data = model.export_data(self.USER_ID_1)
                 for model_id in exported_data.keys():
                     # If we are using a property as a Takeout key.
-                    if key_for_takeout_dict:
+                    if property_used_as_key_for_takeout_dict:
                         # Ensure that we export the property.
                         self.assertEqual(
                             model_id,
-                            getattr(model, key_for_takeout_dict)
+                            getattr(model, property_used_as_key_for_takeout_dict)
                         )
                     self.assertEqual(
                         sorted([

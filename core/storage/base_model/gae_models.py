@@ -1218,7 +1218,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """This model is exported as multiple unshared instances."""
+        """There are multiple SnapshotMetadataModels per user."""
         return MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
