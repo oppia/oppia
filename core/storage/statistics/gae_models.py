@@ -1398,10 +1398,9 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Suggested new Takeout docstring for ExplorationIssuesModel: All
-        playthrough issue data is anonymized and contains no data directly
-        corresponding to users. For specifics on the data included in this
-        model, see:
+        """All playthrough issue data is anonymized and contains no data
+        directly corresponding to users. For specifics on the data included in
+        this model, see:
         https://github.com/oppia/oppia/tree/develop/extensions/issues.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER

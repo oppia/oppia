@@ -134,13 +134,13 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a one instance per user."""
+        """Model is exported as one instance peruser."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @staticmethod
     def get_field_names_for_takeout():
-        """Export renames some time related fields to clearly indicate that
-        they represent time in milliseconds since the epoch.
+        """The export method renames some time-related fields to clearly
+        indicate that they represent time in milliseconds since the epoch.
         """
         return {
             'last_agreed_to_terms': 'last_agreed_to_terms_msec',
@@ -372,7 +372,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a one instance per user."""
+        """Model is exported as one instance peruser."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -456,7 +456,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a one instance per user."""
+        """Model is exported as one instance peruser."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -685,7 +685,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a one instance per user."""
+        """Model is exported as one instance peruser."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -766,7 +766,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a one instance per user."""
+        """Model is exported as one instance peruser."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -942,7 +942,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a one instance per user."""
+        """Model is exported as one instance peruser."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -1209,7 +1209,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a one instance per user."""
+        """Model is exported as one instance peruser."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -2434,7 +2434,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as a one instance per user."""
+        """Model is exported as one instance peruser."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
