@@ -49,6 +49,7 @@ describe('Pencil Code Editor Validation Service', () => {
           value: ' Add the initial code snippet here.↵code is here'
         }
       };
+
       expect(pcevs.getCustomizationArgsWarnings(customizationArgs)).toEqual([]);
     });
   });
@@ -56,19 +57,15 @@ describe('Pencil Code Editor Validation Service', () => {
   describe('on calling getAllWarnings', () => {
     it('should return error when no feedback is given', () => {
       var statename = 'Introduction';
-
       var customizationArgs = {
         initialCode: {
           value: ' Add the initial code snippet here.↵code is here'
         }
       };
-
       const testOutcome1 = oof.createNew(
         'Introduction', 'default_outcome', '', []);
-
       var answergroup1 = [];
       var partialWarningsList = [];
-
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
@@ -84,12 +81,9 @@ describe('Pencil Code Editor Validation Service', () => {
       inputBackend = {
         x: [['<p>one</p>']]
       };
-
       const testOutcome2 = oof.createNew(
         'Introduction', 'feedback_0', '<p>YES</p>', []);
-
       let rulesDict = rof.createNew('CodeString', inputBackend);
-
       let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
 
       // It also returns the error when feedback is not provided.
@@ -101,24 +95,18 @@ describe('Pencil Code Editor Validation Service', () => {
 
     it('should not return error when feedback is given', () => {
       var statename = 'Introduction';
-
       var customizationArgs = {
         initialCode: {
           value: ' Add the initial code snippet here.↵code is here'
         }
       };
-
       inputBackend = {
         x: [['<p>one</p>']]
       };
-
       const testOutcome = oof.createNew(
         'Introduction', 'feedback_0', '<p>YES</p>', []);
-
       let rulesDict = rof.createNew('CodeString', inputBackend);
-
       let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
-
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',
         '<p>no</p>', []);
@@ -131,16 +119,13 @@ describe('Pencil Code Editor Validation Service', () => {
 
     it('should call getCustomizationArgsWarnings', () => {
       var statename = 'Introduction';
-
       var customizationArgs = {
         initialCode: {
           value: ' Add the initial code snippet here.↵code is here'
         }
       };
-
       const testOutcome1 = oof.createNew(
         'Introduction', 'default_outcome', '', []);
-
       var answergroup1 = [];
 
       spyOn(pcevs, 'getCustomizationArgsWarnings')
