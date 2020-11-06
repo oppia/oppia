@@ -360,8 +360,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as one instance shared across users since multiple users
-        contribute to an exploration and have varying rights.
+        """Model is exported as one instance shared across users since multiple
+        users contribute to an exploration and have varying rights.
         """
         return (
             base_models

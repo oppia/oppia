@@ -1092,7 +1092,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         # Ensure that we export the property.
                         self.assertEqual(
                             model_id,
-                            getattr(model, property_used_as_key_for_takeout_dict)
+                            getattr(
+                                model,
+                                property_used_as_key_for_takeout_dict)
                         )
                     self.assertEqual(
                         sorted([
