@@ -242,8 +242,10 @@ def main():
 
     print("yarn path:" , common.YARN_PATH)
     print("current dir from common.py:" , common.CURR_DIR)
-    print("current dir from common.py:" , os.path.abspath(os.getcwd()))
+    print("current dir from os:" , os.path.abspath(os.getcwd()))
 
+    subprocess.check_call(["ls", '-a', common.OPPIA_TOOLS_DIR])
+    
     # Install third-party node modules needed for the build process.
     subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
 
