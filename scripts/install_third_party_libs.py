@@ -240,6 +240,10 @@ def main():
     if common.is_windows_os():
         tweak_yarn_executable()
 
+    print("yarn path:" , common.YARN_PATH)
+    print("current dir from common.py:" , common.CURR_DIR)
+    print("current dir from common.py:" , os.path.abspath(os.getcwd()))
+
     # Install third-party node modules needed for the build process.
     subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
 
