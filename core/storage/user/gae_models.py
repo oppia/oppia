@@ -1554,7 +1554,9 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as multiple unshared instance."""
+        """Model is exported as multiple instances per user since there can be
+        multiple collections associated with a user.
+        """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod

@@ -191,7 +191,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as multiple unshared instance."""
+        """Model is exported as multiple unshared instance since there
+        are multiple suggestions per user.
+        """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
@@ -747,9 +749,8 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """TThis model only contains general statistical information about the
-        contributor dashboard and does not include any individual user
-        information.
+        """This model does not directly contain user
+       information because the data is aggregated.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
