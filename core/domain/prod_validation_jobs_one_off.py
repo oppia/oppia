@@ -43,6 +43,8 @@ import python_utils
     models.NAMES.topic, models.NAMES.user
 ])
 
+VALIDATION_STATUS_SUCCESS = 'fully-validated'
+
 
 class ProdValidationAuditOneOffJobMetaClass(type):
     """Type class for audit one off jobs. Registers classes inheriting from
@@ -125,12 +127,12 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
                         python_utils.convert_to_bytes(error_message))
             else:
                 yield (
-                    'fully-validated %s' % model_name, 1)
+                    '%s %s' % (VALIDATION_STATUS_SUCCESS, model_name), 1)
 
     @staticmethod
     def reduce(key, values):
         """Yields number of fully validated models or the failure messages."""
-        if 'fully-validated' in key:
+        if VALIDATION_STATUS_SUCCESS in key:
             yield (key, len(values))
         else:
             yield (key, values)
@@ -329,6 +331,23 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationSnapshotMetadataModel]
+
+    @staticmethod
+    def reduce(key, values):
+        """Yields the number of fully validated models or the failure messages.
+        By default, this method only yields a maximum of 10 errors if there are
+        multiple errors of the same type.
+
+        Note: This behaviour can be overriden in any subclass if more errors
+        need to be yielded. To do so, just change the yield statement to
+        yield all values instead of the first 10.
+        """
+        if VALIDATION_STATUS_SUCCESS in key:
+            yield (key, len(values))
+        else:
+            # Just yield ten errors of each error type since the list of errors
+            # for this model is quite large.
+            yield (key, values[:10])
 
 
 class ExplorationSnapshotContentModelAuditOneOffJob(
