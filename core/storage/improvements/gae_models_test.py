@@ -76,7 +76,12 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
     def test_export_data_without_any_tasks(self):
         self.assertEqual(
             improvements_models.TaskEntryModel.export_data('uid'),
-            {'task_ids_resolved_by_user': []})
+            {
+                'issue_descriptions': [],
+                'resolution_msecs': [],
+                'statuses': [],
+                'task_ids_resolved_by_user': []
+            })
 
     def test_export_data_with_task(self):
         task_id = improvements_models.TaskEntryModel.create(
@@ -91,7 +96,12 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             resolver_id='uid')
         self.assertEqual(
             improvements_models.TaskEntryModel.export_data('uid'),
-            {'task_ids_resolved_by_user': [task_id]})
+            {
+                'issue_descriptions': ['issue_description'],
+                'resolution_msecs': [None],
+                'statuses': ['resolved'],
+                'task_ids_resolved_by_user': [task_id]
+            })
 
     def test_generate_new_task_id(self):
         self.assertEqual(
