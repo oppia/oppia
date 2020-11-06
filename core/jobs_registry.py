@@ -132,7 +132,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
     user_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
-    user_jobs_one_off.GenerateGaeIdToUserIdModelOneOffJob,
+    user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -191,7 +191,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.GaeIdToUserIdModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
         .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),

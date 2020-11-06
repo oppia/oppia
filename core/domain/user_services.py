@@ -463,19 +463,25 @@ class UserAuthDetails(python_utils.OBJECT):
                 'The parent user ID and gae_id cannot be None together '
                 'for a user.')
 
+    def is_full_user(self):
+        """Whether the user is a full user (not a profile user).
 
-class GaeIdToUserId(python_utils.OBJECT):
-    """Value object representing a user's authentication details information.
+        Returns:
+            bool. True if user is full user, False otherwise.
+        """
+        return self.gae_id is not None
+
+
+class UserIdentifiers(python_utils.OBJECT):
+    """Value object representing a user's identification details.
 
     Attributes:
         user_id: str. The unique ID of the user.
         gae_id: str. The ID of the user retrieved from GAE.
-        parent_user_id: str or None. For profile users, the user ID of the full
-            user associated with that profile. None for full users.
     """
 
     def __init__(self, gae_id, user_id, deleted=False):
-        """Constructs a GaeIdToUserId domain object.
+        """Constructs a UserIdentifiers domain object.
 
         Args:
             gae_id: str. The ID of the user retrieved from GAE.
@@ -488,7 +494,7 @@ class GaeIdToUserId(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that user_id, and gae_id fields of this GaeIdToUserId domain
+        """Checks that user_id and gae_id fields of this UserIdentifiers domain
         object are valid.
 
         Raises:
@@ -770,18 +776,19 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
         Exception. The value of strict is True and given gae_id does not exist.
     """
     user_id = None
-    gae_id_to_user_id_model = (
-        user_models.GaeIdToUserIdModel.get(gae_id, strict=False))
-    # If the GaeIdToUserIdModels are not yet generated use UserAuthDetailsModel
-    # as the backup for retrieving the user_id.
-    if gae_id_to_user_id_model is None:
+    user_identifiers_model = (
+        user_models.UserIdentifiersModel.get(gae_id, strict=False))
+    # If the UserIdentifiersModels are not yet generated use
+    # UserAuthDetailsModel as the backup for retrieving the user_id.
+    # TODO(#11140): Remove this after we run the migration job.
+    if user_identifiers_model is None:
         user_auth_details_model = (
             user_models.UserAuthDetailsModel.get_by_auth_id(
                 feconf.AUTH_METHOD_GAE, gae_id))
         if user_auth_details_model is not None:
             user_id = user_auth_details_model.id
     else:
-        user_id = gae_id_to_user_id_model.user_id
+        user_id = user_identifiers_model.user_id
 
     if user_id is not None:
         user_settings = _get_user_settings_from_model(
@@ -1267,7 +1274,7 @@ def create_new_user(gae_id, email):
         Exception. A user with the given gae_id already exists.
     """
     def _create_new_user_transactional(
-            user_settings, user_auth_details, gae_id_to_user_id):
+            user_settings, user_auth_details, user_identifiers):
         """Save user models for new users as a transaction.
 
         Args:
@@ -1275,11 +1282,11 @@ def create_new_user(gae_id, email):
                 corresponding to the newly created user.
             user_auth_details: UserAuthDetails. The user auth details domain
                 object corresponding to the newly created user.
-            gae_id_to_user_id: GaeIdToUserId. The user GAE ID to user ID domain
+            user_identifiers: UserIdentifiers. The user GAE ID to user ID domain
                 object corresponding to the newly created user.
         """
         _save_user_auth_details(user_auth_details)
-        _save_gae_id_to_user_id(gae_id_to_user_id)
+        _save_user_identifiers(user_identifiers)
         _save_user_settings(user_settings)
         create_user_contributions(user_settings.user_id, [], [])
 
@@ -1296,7 +1303,7 @@ def create_new_user(gae_id, email):
         _create_new_user_transactional,
         user_settings,
         UserAuthDetails(user_id, gae_id),
-        GaeIdToUserId(gae_id, user_id)
+        UserIdentifiers(gae_id, user_id)
     )
     return user_settings
 
@@ -1476,30 +1483,30 @@ def _save_user_auth_details(user_auth_details):
         model.put()
 
 
-def _save_gae_id_to_user_id(gae_id_to_user_id):
-    """Puts the GAE ID to user ID object to the datastore.
+def _save_user_identifiers(user_identifiers):
+    """Puts the user identifiers object to the datastore.
 
     Args:
-        gae_id_to_user_id: GaeIdToUserId. The GAE ID to user ID domain object to
+        user_identifiers: UserIdentifiers. The user identifiers domain object to
             be saved.
     """
-    gae_id_to_user_id.validate()
+    user_identifiers.validate()
 
     user_auth_details_dict = {
-        'user_id': gae_id_to_user_id.user_id,
-        'deleted': gae_id_to_user_id.deleted
+        'user_id': user_identifiers.user_id,
+        'deleted': user_identifiers.deleted
     }
 
     # If user auth details entry with the given user_id does not exist, create
     # a new one.
-    user_auth_details_model = user_models.GaeIdToUserIdModel.get_by_id(
-        gae_id_to_user_id.gae_id)
+    user_auth_details_model = user_models.UserIdentifiersModel.get_by_id(
+        user_identifiers.gae_id)
     if user_auth_details_model is not None:
         user_auth_details_model.populate(**user_auth_details_dict)
     else:
-        user_auth_details_dict['id'] = gae_id_to_user_id.gae_id
+        user_auth_details_dict['id'] = user_identifiers.gae_id
         user_auth_details_model = (
-            user_models.GaeIdToUserIdModel(**user_auth_details_dict))
+            user_models.UserIdentifiersModel(**user_auth_details_dict))
 
     user_auth_details_model.update_timestamps()
     user_auth_details_model.put()
@@ -1571,19 +1578,19 @@ def _get_user_auth_details_from_model(user_auth_details_model):
     )
 
 
-def _get_gae_id_to_user_id_from_model(gae_id_to_user_id_model):
-    """Transform GaeIdToUserIdModel to domain object.
+def _get_user_identifiers_from_model(user_identifiers_model):
+    """Transform UserIdentifiersModel to domain object.
 
     Args:
-        gae_id_to_user_id_model: GaeIdToUserIdModel. The model to be converted.
+        user_identifiers_model: UserIdentifiersModel. The model to be converted.
 
     Returns:
-        GaeIdToUserId. Domain object for GAE ID to user ID details.
+        UserIdentifiers. Domain object for the user identifiers.
     """
-    return GaeIdToUserId(
-        gae_id=gae_id_to_user_id_model.id,
-        user_id=gae_id_to_user_id_model.user_id,
-        deleted=gae_id_to_user_id_model.deleted
+    return UserIdentifiers(
+        gae_id=user_identifiers_model.id,
+        user_id=user_identifiers_model.user_id,
+        deleted=user_identifiers_model.deleted
     )
 
 
@@ -1868,11 +1875,12 @@ def mark_user_for_deletion(user_id):
     )
     user_auth_details.deleted = True
     _save_user_auth_details(user_auth_details)
-    gae_id_to_user_id = _get_gae_id_to_user_id_from_model(
-        user_models.GaeIdToUserIdModel.get_by_user_id(user_id)
-    )
-    gae_id_to_user_id.deleted = True
-    _save_gae_id_to_user_id(gae_id_to_user_id)
+    if user_auth_details.is_full_user():
+        user_identifiers = _get_user_identifiers_from_model(
+            user_models.UserIdentifiersModel.get_by_user_id(user_id)
+        )
+        user_identifiers.deleted = True
+        _save_user_identifiers(user_identifiers)
 
 
 def get_human_readable_user_ids(user_ids):

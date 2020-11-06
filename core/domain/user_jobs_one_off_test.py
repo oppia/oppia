@@ -2218,19 +2218,20 @@ class UserAuthDetailsModelAuditOneOffJobTests(test_utils.GenericTestBase):
         )
 
 
-class GenerateGaeIdToUserIdModelOneOffJobTests(test_utils.GenericTestBase):
+class GenerateUserIdentifiersModelOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            user_jobs_one_off.GenerateGaeIdToUserIdModelOneOffJob.create_new())
-        user_jobs_one_off.GenerateGaeIdToUserIdModelOneOffJob.enqueue(job_id)
+            user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob
+            .create_new())
+        user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            user_jobs_one_off.GenerateGaeIdToUserIdModelOneOffJob.get_output(
+            user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob.get_output(
                 job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
@@ -2243,9 +2244,9 @@ class GenerateGaeIdToUserIdModelOneOffJobTests(test_utils.GenericTestBase):
 
         # We don't want to sign up the superadmin user.
         with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
-            super(GenerateGaeIdToUserIdModelOneOffJobTests, self).setUp()
+            super(GenerateUserIdentifiersModelOneOffJobTests, self).setUp()
 
-    def test_from_user_auth_details_generate_gae_id_to_user_id_models(self):
+    def test_from_user_auth_details_generate_user_identifiers_models(self):
         # Generate 3 completely different models.
         for i in python_utils.RANGE(3):
             user_models.UserAuthDetailsModel(
@@ -2257,11 +2258,11 @@ class GenerateGaeIdToUserIdModelOneOffJobTests(test_utils.GenericTestBase):
         for i in python_utils.RANGE(3):
             user_auth_details_model = (
                 user_models.UserAuthDetailsModel.get_by_id('user_id_%s' % i))
-            gae_id_to_user_id_model = (
-                user_models.GaeIdToUserIdModel.get_by_id('gae_id_%s' % i))
+            user_identifiers_model = (
+                user_models.UserIdentifiersModel.get_by_id('gae_id_%s' % i))
             self.assertIsNotNone(user_auth_details_model)
-            self.assertIsNotNone(gae_id_to_user_id_model)
+            self.assertIsNotNone(user_identifiers_model)
             self.assertEqual(
-                user_auth_details_model.id, gae_id_to_user_id_model.user_id)
+                user_auth_details_model.id, user_identifiers_model.user_id)
             self.assertEqual(
-                user_auth_details_model.gae_id, gae_id_to_user_id_model.id)
+                user_auth_details_model.gae_id, user_identifiers_model.id)

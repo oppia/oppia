@@ -4808,8 +4808,8 @@ class UserAuthDetailsModelValidator(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
 
-class GaeIdToUserIdModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating GaeIdToUserIdModels."""
+class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
+    """Class for validating UserIdentifiersModels."""
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):

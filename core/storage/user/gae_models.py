@@ -2555,7 +2555,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         return cls.query(cls.parent_user_id == parent_user_id).fetch()
 
 
-class GaeIdToUserIdModel(base_models.BaseModel):
+class UserIdentifiersModel(base_models.BaseModel):
     """Stores the relation between GAE ID and user ID.
 
     Instances of this class are keyed by GAE ID.
@@ -2583,7 +2583,7 @@ class GaeIdToUserIdModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of GaeIdToUserIdModel for the user.
+        """Delete instances of UserIdentifiersModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -2593,13 +2593,13 @@ class GaeIdToUserIdModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether GaeIdToUserIdModel exists for the given user.
+        """Check whether UserIdentifiersModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether any GaeIdToUserIdModel refers to the given user ID.
+            bool. Whether any UserIdentifiersModel refers to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
@@ -2611,7 +2611,7 @@ class GaeIdToUserIdModel(base_models.BaseModel):
             user_id: str. The user ID.
 
         Returns:
-            GaeIdToUserIdModel. The mdoel with user_id field equal to user_id
+            UserIdentifiersModel. The model with user_id field equal to user_id
             argument.
         """
         return cls.query(cls.user_id == user_id).get()

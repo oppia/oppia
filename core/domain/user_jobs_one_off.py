@@ -735,15 +735,14 @@ class UserAuthDetailsModelAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class GenerateGaeIdToUserIdModelOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that creates GaeIdToUserIdModel for each UserAuthDetailsModel."""
+class GenerateUserIdentifiersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that creates UserIdentifiersModel for each UserAuthDetailsModel."""
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         # We can raise the number of shards for this job, since it goes only
         # over one type of entity class.
-        super(GenerateGaeIdToUserIdModelOneOffJob, cls).enqueue(
+        super(GenerateUserIdentifiersModelOneOffJob, cls).enqueue(
             job_id, shard_count=32)
 
     @classmethod
@@ -752,7 +751,7 @@ class GenerateGaeIdToUserIdModelOneOffJob(
 
     @staticmethod
     def map(model):
-        user_models.GaeIdToUserIdModel(
+        user_models.UserIdentifiersModel(
             id=model.gae_id,
             user_id=model.id,
             deleted=model.deleted

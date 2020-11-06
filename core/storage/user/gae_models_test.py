@@ -2493,8 +2493,8 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         self.assertItemsEqual(user_auth_details_models, fetched_output)
 
 
-class GaeIdToUserIdModelTests(test_utils.GenericTestBase):
-    """Tests for GaeIdToUserIdModel."""
+class UserIdentifiersModelTests(test_utils.GenericTestBase):
+    """Tests for UserIdentifiersModel."""
 
     NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
     NONEXISTENT_USER_ID = 'id_x'
@@ -2506,45 +2506,45 @@ class GaeIdToUserIdModelTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
-        super(GaeIdToUserIdModelTests, self).setUp()
+        super(UserIdentifiersModelTests, self).setUp()
 
-        user_models.GaeIdToUserIdModel(
+        user_models.UserIdentifiersModel(
             id=self.USER_GAE_ID,
             user_id=self.USER_ID,
         ).put()
 
     def test_get_deletion_policy_is_delete_at_end(self):
         self.assertEqual(
-            user_models.GaeIdToUserIdModel.get_deletion_policy(),
+            user_models.UserIdentifiersModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.
-        user_models.GaeIdToUserIdModel.apply_deletion_policy(self.USER_ID)
-        self.assertIsNone(user_models.GaeIdToUserIdModel.get_by_id(
+        user_models.UserIdentifiersModel.apply_deletion_policy(self.USER_ID)
+        self.assertIsNone(user_models.UserIdentifiersModel.get_by_id(
             self.USER_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
-        self.assertIsNone(user_models.GaeIdToUserIdModel.get_by_id(
+        self.assertIsNone(user_models.UserIdentifiersModel.get_by_id(
             self.NONEXISTENT_USER_ID))
-        user_models.GaeIdToUserIdModel.apply_deletion_policy(
+        user_models.UserIdentifiersModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_existing_user_id_is_true(self):
         # For a full user.
         self.assertTrue(
-            user_models.GaeIdToUserIdModel.has_reference_to_user_id(
+            user_models.UserIdentifiersModel.has_reference_to_user_id(
                 self.USER_ID)
         )
 
     def test_has_reference_to_non_existing_user_id_is_false(self):
         self.assertFalse(
-            user_models.GaeIdToUserIdModel.has_reference_to_user_id(
+            user_models.UserIdentifiersModel.has_reference_to_user_id(
                 self.NONEXISTENT_USER_ID)
         )
 
     def test_get_by_user_id_for_correct_user_id(self):
         self.assertEqual(
-            user_models.GaeIdToUserIdModel.get_by_id(self.USER_GAE_ID),
-            user_models.GaeIdToUserIdModel.get_by_user_id(self.USER_ID)
+            user_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID),
+            user_models.UserIdentifiersModel.get_by_user_id(self.USER_ID)
         )

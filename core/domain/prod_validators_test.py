@@ -11537,10 +11537,10 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class GaeIdToUserIdModelValidatorTests(test_utils.AuditJobsTestBase):
+class UserIdentifiersModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
-        super(GaeIdToUserIdModelValidatorTests, self).setUp()
+        super(UserIdentifiersModelValidatorTests, self).setUp()
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
@@ -11550,14 +11550,14 @@ class GaeIdToUserIdModelValidatorTests(test_utils.AuditJobsTestBase):
         # UserAuthDetailsModels too) even though only one user signs up in the
         # test since superadmin signup is also done in
         # test_utils.AuditJobsTestBase.
-        self.model_instance = user_models.GaeIdToUserIdModel.get_by_id(
+        self.model_instance = user_models.UserIdentifiersModel.get_by_id(
             self.gae_id)
         self.job_class = (
-            prod_validation_jobs_one_off.GaeIdToUserIdModelAuditOneOffJob)
+            prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob)
 
     def test_audit_standard_operation_passes(self):
         expected_output = [
-            u'[u\'fully-validated GaeIdToUserIdModel\', 2]']
+            u'[u\'fully-validated UserIdentifiersModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -11568,23 +11568,23 @@ class GaeIdToUserIdModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of GaeIdToUserIdModel\', '
+            'of UserIdentifiersModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.gae_id, self.model_instance.created_on,
                 self.model_instance.last_updated
-            ), u'[u\'fully-validated GaeIdToUserIdModel\', 1]']
+            ), u'[u\'fully-validated UserIdentifiersModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_audit_with_last_updated_greater_than_current_time_fails(self):
-        user_models.GaeIdToUserIdModel.get_by_id(
+        user_models.UserIdentifiersModel.get_by_id(
             self.get_gae_id_from_email('tmpsuperadmin@example.com')
         ).delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'GaeIdToUserIdModel\', '
+            'UserIdentifiersModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.gae_id, self.model_instance.last_updated)]
@@ -11600,13 +11600,13 @@ class GaeIdToUserIdModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
-                'field check of GaeIdToUserIdModel\', '
+                'field check of UserIdentifiersModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
                 '%s, expected model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.gae_id, self.user_id, self.user_id),
-            u'[u\'fully-validated GaeIdToUserIdModel\', 1]']
+            u'[u\'fully-validated UserIdentifiersModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
