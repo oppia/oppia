@@ -29,25 +29,12 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 
 fdescribe('Topic editor routing service', () => {
-  // beforeEach(angular.mock.module('oppia'));
-  
-  // beforeEach(angular.mock.module('oppia', ($provide) => {
-  //   let ugs = new UpgradedServices();
-  //   for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-  //     $provide.value(key, value);
-  //   }
-  // }));
 
-  // let $rootScope = null;
-  // let $location = null;
   let $window = null;
-  let TERS: TopicEditorRoutingService;
-  let locat: SpyLocation;
+  let ters: TopicEditorRoutingService;
   
 
   beforeEach(angular.mock.inject( ($injector) => {
-  //   $rootScope = $injector.get('$rootScope');
-  //   $location = $injector.get('$location');
     $window = $injector.get('$window');
   }));
 
@@ -56,86 +43,75 @@ fdescribe('Topic editor routing service', () => {
       providers: [
         TopicEditorRoutingService,
         {provide: Location, useClass: SpyLocation},
-        // {provide: Location, useClass: MockLocationStrategy}
       ]
     });
-    TERS = TestBed.get(TopicEditorRoutingService);
-    // locat =TestBed.get(Location);
+    ters = TestBed.get(TopicEditorRoutingService);
   });
 
   it('should return the default active tab name', () => {
-    expect(TERS.getActiveTabName()).toEqual('main');
+    expect(ters.getActiveTabName()).toEqual('main');
   });
 
   it('should navigate to different tabs', () => {
-    expect(TERS.getActiveTabName()).toEqual('main');
+    expect(ters.getActiveTabName()).toEqual('main');
     
-    TERS.navigateToSubtopicPreviewTab(1);
-    // locat.simulateHashChange('subtopic_preview');
+    ters.navigateToSubtopicPreviewTab(1);
     expect(
-      TERS.getActiveTabName()).toEqual('subtopic_preview');
+      ters.getActiveTabName()).toEqual('subtopic_preview');
 
-    TERS.navigateToSubtopicEditorWithId(1);
-    
+    ters.navigateToSubtopicEditorWithId(1);
     expect(
-      TERS.getActiveTabName()).toEqual('subtopic_editor');
+      ters.getActiveTabName()).toEqual('subtopic_editor');
 
-    TERS.navigateToQuestionsTab();
-    // $rootScope.$apply();
-    expect(TERS.getActiveTabName()).toEqual('questions');
+    ters.navigateToQuestionsTab();
+    expect(ters.getActiveTabName()).toEqual('questions');
 
-    TERS.navigateToMainTab();
-    // $rootScope.$apply();
-    expect(TERS.getActiveTabName()).toEqual('main');
+    ters.navigateToMainTab();
+    expect(ters.getActiveTabName()).toEqual('main');
 
-    TERS.navigateToTopicPreviewTab();
-    // $rootScope.$apply();
-    expect(TERS.getActiveTabName()).toEqual(
+    ters.navigateToTopicPreviewTab();
+    expect(ters.getActiveTabName()).toEqual(
       'topic_preview');
   });
 
   it('should handle calls with unexpect paths', () => {
-    expect(TERS.getActiveTabName()).toEqual('main');
+    expect(ters.getActiveTabName()).toEqual('main');
 
     // locat.go();
-    // $rootScope.$apply();
-    expect(TERS.getActiveTabName()).toEqual('main');
+    
+    expect(ters.getActiveTabName()).toEqual('main');
 
     // locat.go('');
-    // $rootScope.$apply();
-    expect(TERS.getActiveTabName()).toEqual('main');
+    
+    expect(ters.getActiveTabName()).toEqual('main');
   });
 
   it('should navigate to skill editor', () => {
     spyOn($window, 'open').and.callFake(() => {
       return true;
     });
-    TERS.navigateToSkillEditorWithId('10');
+    ters.navigateToSkillEditorWithId('10');
     expect($window.open).toHaveBeenCalled();
     expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
   });
 
   it('should return last tab visited', () => {
-    TERS.navigateToSubtopicEditorWithId(1);
-    // locat.simulateHashChange('subtopic_editor');
-    // $rootScope.$apply();
-    expect(TERS.getLastTabVisited()).toEqual('subtopic');
-    TERS.navigateToMainTab();
-    // $rootScope.$apply();
-    expect(TERS.getLastTabVisited()).toEqual('topic');
+    ters.navigateToSubtopicEditorWithId(1);    
+    expect(ters.getLastTabVisited()).toEqual('subtopic');
+
+    ters.navigateToMainTab();
+    expect(ters.getLastTabVisited()).toEqual('topic');
   });
 
   it('should return last visited subtopic id', () => {
-    TERS.navigateToSubtopicPreviewTab(1);
-    // $rootScope.$apply();
-    TERS.navigateToQuestionsTab();
-    // $rootScope.$apply();
-    expect(TERS.getLastSubtopicIdVisited()).toEqual(1);
+    ters.navigateToSubtopicPreviewTab(1);
+    
+    ters.navigateToQuestionsTab();
+    expect(ters.getLastSubtopicIdVisited()).toEqual(1);
 
-    TERS.navigateToSubtopicPreviewTab(5);
-    // $rootScope.$apply();
-    TERS.navigateToQuestionsTab();
-    // $rootScope.$apply();
-    expect(TERS.getLastSubtopicIdVisited()).toEqual(5);
+    ters.navigateToSubtopicPreviewTab(5);
+    
+    ters.navigateToQuestionsTab();
+    expect(ters.getLastSubtopicIdVisited()).toEqual(5);
   });
 });
