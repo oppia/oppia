@@ -2172,7 +2172,8 @@ class UserAuthDetailsModelAuditOneOffJobTests(test_utils.GenericTestBase):
             pass
 
         # We don't want to sign up the superadmin user.
-        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
             super(UserAuthDetailsModelAuditOneOffJobTests, self).setUp()
 
     def test_multiple_user_auth_details_with_different_gae_ids_success(self):
@@ -2244,7 +2245,8 @@ class GenerateUserIdentifiersModelOneOffJobTests(test_utils.GenericTestBase):
             pass
 
         # We don't want to sign up the superadmin user.
-        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
             super(GenerateUserIdentifiersModelOneOffJobTests, self).setUp()
 
     def test_from_user_auth_details_generate_user_identifiers_models(self):
