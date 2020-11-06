@@ -16,11 +16,11 @@
  * @fileoverview Service to handle the attribution experience.
  */
 
-import { Injectable } from '@angular/core';
+import { ApplicationRef, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { ContextService } from 'services/context.service';
 
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+import { ContextService } from 'services/context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,33 +30,36 @@ export class AttributionService {
   authors: string[] = [];
   explorationTitle: string = '';
   constructor(
+    private applicationRef: ApplicationRef,
     private contextService: ContextService,
     private explorationSummaryBackendApiService: (
       ExplorationSummaryBackendApiService)
   ) {}
 
-  private _init(successCallback, errorCallback): void {
+  private _init(): void {
     this.explorationSummaryBackendApiService
       .loadPublicAndPrivateExplorationSummaries(
         [this.contextService.getExplorationId()]).then(responseObject => {
-        var summaries = responseObject.summaries;
-        var contributorSummary = (
+        let summaries = responseObject.summaries;
+        let contributorSummary = (
           summaries.length ?
           summaries[0].human_readable_contributors_summary : {});
         this.authors = (
           Object.keys(contributorSummary).sort(
-            function(contributorUsername1, contributorUsername2) {
-              var commitsOfContributor1 = contributorSummary[
-                contributorUsername1].num_commits;
-              var commitsOfContributor2 = contributorSummary[
-                contributorUsername2].num_commits;
+            (contributorUsername1, contributorUsername2) => {
+              let { num_commits: commitsOfContributor1 } = contributorSummary[
+                contributorUsername1];
+              let { num_commits: commitsOfContributor2 } = contributorSummary[
+                contributorUsername2];
               return commitsOfContributor2 - commitsOfContributor1;
             })
         );
         this.explorationTitle = summaries.length ? summaries[0].title : '';
-        successCallback();
+        this.attributionModalIsShown = true;
+        this.applicationRef.tick();
       }, () => {
-        errorCallback();
+        this.attributionModalIsShown = false;
+        this.applicationRef.tick();
       });
   }
 
@@ -69,9 +72,7 @@ export class AttributionService {
       this.attributionModalIsShown = true;
       return;
     }
-    this._init(
-      () => this.attributionModalIsShown = true,
-      () => this.attributionModalIsShown = false);
+    this._init();
   }
 
   hideAttributionModal(): void {

@@ -17,20 +17,21 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <div class="container pt-4">
-          <div class="font-weight-bold">How to attribute this lesson for sharing or reusing?</div>
+          <div class="font-weight-bold">How to attribute this lesson for sharing or reusing</div>
+          <span class="oppia-attribution-guide-description">You can find more information about how to attribute our lessons in our</span>
           <a href="https://www.oppia.org/about#foundation" rel="noopener" target="_blank">
-            <span class="oppia-attribution-guide-link">Oppia Attribution Guide</span>
+            <span class="oppia-attribution-guide-link"> Oppia Attribution Guide</span>
             <span class="material-icons oppia-open-new-tab-icon">open_in_new</span>
           </a>
           <div class="attribution-html-section">
-            <div class="font-weight-bold">Attribute in HTML.</div>
+            <div class="font-weight-bold">Attribute in HTML</div>
             <ol class="attribute-instructions">
               <li>Copy and paste the HTML</li>
               <li>Make sure the link appears as "<u>Oppia</u> // <u>CC BY 4.0</u>"</li>
             </ol>
             <div data-trigger="manual"
                  data-toggle="tooltip"
-                 data-title="COPIED!"
+                 data-title="Copied!"
                  data-placement="bottom"
                  data-offset="0 20"
                  class="attribution-html-code text-monospace text-nowrap border border-secondary p-1 overflow-auto">
@@ -39,7 +40,7 @@
             <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-html-code')">COPY</button>
           </div>
           <div class="attribution-print-section">
-            <div class="font-weight-bold">Attribute in print.</div>
+            <div class="font-weight-bold">Attribute in print</div>
             <ol class="attribute-instructions">
               <li>Copy and paste the credit</li>
               <li>
@@ -52,7 +53,7 @@
             </ol>
             <div data-trigger="manual"
                  data-toggle="tooltip"
-                 data-title="COPIED!"
+                 data-title="Copied!"
                  data-placement="bottom"
                  data-offset="0 20"
                  class="attribution-print-text text-monospace text-nowrap border border-secondary p-1 overflow-auto">
@@ -61,7 +62,7 @@
             <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-print-text')">COPY</button>
           </div>
           <div class="sharing-section">
-            <div class="font-weight-bold">Share this lesson:</div>
+            <div class="font-weight-bold">Share this lesson</div>
             <sharing-links [layoutType]="'row center'"
                            [layoutAlignType]="'end'"
                            [shareType]="'exploration'"
@@ -131,6 +132,10 @@
     text-decoration: underline;
   }
 
+  .oppia-attribution-guide .oppia-attribution-guide-description {
+    font-size: 0.8rem;
+  }
+
   .oppia-attribution-guide .oppia-open-new-tab-icon {
     color: #000;
     font-size: 1rem;
@@ -155,11 +160,11 @@
   }
 
   .oppia-attribution-guide .attribution-html-section {
-    padding-top: 2rem;
+    padding-top: 1rem;
   }
 
   .oppia-attribution-guide .attribution-print-section {
-    padding-top: 3.5rem;
+    padding-top: 2.7rem;
   }
 
   .oppia-attribution-guide .attribute-instructions {
