@@ -565,8 +565,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as unshared instances since there are multiple
-        feedback threads relevant to a user.
+        """Model is exported as multiple instances per user since there are
+        multiple feedback threads relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
