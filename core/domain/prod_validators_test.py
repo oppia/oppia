@@ -12843,6 +12843,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.sent_mail_id = self.model_instance.sent_email_model_id
 
+        self.model_instance.query_status = feconf.USER_QUERY_STATUS_COMPLETED
         self.model_instance.deleted = False
         self.model_instance.update_timestamps()
         self.model_instance.put()
@@ -12954,7 +12955,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_model_not_marked_as_deleted(self):
+    def test_model_not_marked_as_deleted_when_older_than_4_weeks(self):
         self.model_instance.created_on = (
             self.model_instance.created_on - datetime.timedelta(weeks=5))
         self.model_instance.last_updated = (
@@ -12965,6 +12966,18 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             '[u\'failed validation check for entity stale check of '
             'UserQueryModel\', [u\'Entity id %s: '
             'Model older than 4 weeks\']]') % self.query_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_not_marked_as_deleted_when_query_status_set_as_archived(
+            self):
+        self.model_instance.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            '[u\'failed validation check for entity stale check of '
+            'UserQueryModel\', [u\'Entity id %s: '
+            'Archived model not marked as deleted\']]') % self.query_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

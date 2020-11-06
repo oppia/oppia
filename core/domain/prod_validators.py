@@ -4552,12 +4552,29 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
             )
 
     @classmethod
+    def _validate_archived_models_marked_deleted(cls, item):
+        """Validate that there are no models that were last updated more than
+        four weeks ago, these models should be deleted.
+
+        Args:
+            item: UserQueryModel. UserQueryModel to validate.
+        """
+        if item.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
+            cls._add_error(
+                'entity %s' % base_model_validators.ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: Archived model not marked as deleted' % item.id
+            )
+
+    @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_sender_and_recipient_ids]
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_old_models_marked_deleted]
+        return [
+            cls._validate_old_models_marked_deleted,
+            cls._validate_archived_models_marked_deleted
+        ]
 
 
 class UserBulkEmailsModelValidator(
