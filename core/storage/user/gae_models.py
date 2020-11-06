@@ -2700,6 +2700,15 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
+    @staticmethod
+    def get_field_names_for_takeout():
+        """We do not want to export the internal user id for the parent, so
+        we export the username instead.
+        """
+        return {
+            'parent_user_id': 'parent_username'
+        }
+
     @classmethod
     def get_export_policy(cls):
         """Currently, the model holds authentication details relevant only for
@@ -2719,7 +2728,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
             parent_data = UserSettingsModel.get(user_auth_model.parent_user_id)
             parent_username = parent_data.username
             return {
-                'parent_user_id': parent_username
+                'parent_username': parent_username
             }
         else:
             return {}

@@ -106,6 +106,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             'entity_id': base_models.EXPORT_POLICY.EXPORTED,
+            # We do not export the original_author_id because we should not
+            # export internal user ids.
             'original_author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.EXPORTED,
             'subject': base_models.EXPORT_POLICY.EXPORTED,
@@ -286,6 +288,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'message_id': base_models.EXPORT_POLICY.EXPORTED,
+            # We do not export the author_id because we should not export
+            # internal user ids.
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'updated_status': base_models.EXPORT_POLICY.EXPORTED,
             'updated_subject': base_models.EXPORT_POLICY.EXPORTED,

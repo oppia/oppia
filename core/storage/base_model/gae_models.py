@@ -56,7 +56,8 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     # Indicates that a model's field is to be exported.
     'EXPORTED',
-    # Indicates that the field is exported as the Takeout key.
+    # Indicates that the value of the field is exported as the key in the
+    # Takeout dict.
     'EXPORTED_AS_KEY_FOR_TAKEOUT_DICT',
     # Indicates that a model's field should not be exported.
     'NOT_APPLICABLE'

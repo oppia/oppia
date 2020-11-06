@@ -1037,26 +1037,26 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             export_method = model.get_model_association_to_user()
             export_policy = model.get_export_policy()
             renamed_export_keys = model.get_field_names_for_takeout()
-            exported_property_names = []
-            property_used_as_key_for_takeout_dict = None
-            for property_name in model._properties: # pylint: disable=protected-access
-                if (export_policy[property_name] ==
+            exported_field_names = []
+            field_used_as_key_for_takeout_dict = None
+            for field_name in model._properties: # pylint: disable=protected-access
+                if (export_policy[field_name] ==
                         base_models.EXPORT_POLICY.EXPORTED):
-                    if property_name in renamed_export_keys:
-                        exported_property_names.append(
-                            renamed_export_keys[property_name]
+                    if field_name in renamed_export_keys:
+                        exported_field_names.append(
+                            renamed_export_keys[field_name]
                         )
                     else:
-                        exported_property_names.append(property_name)
-                elif (export_policy[property_name] ==
+                        exported_field_names.append(field_name)
+                elif (export_policy[field_name] ==
                       base_models
                       .EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
-                    property_used_as_key_for_takeout_dict = property_name
+                    field_used_as_key_for_takeout_dict = field_name
 
             if (export_method ==
                     base_models
                     .MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
-                self.assertEqual(len(exported_property_names), 0)
+                self.assertEqual(len(exported_field_names), 0)
             elif (export_method ==
                   base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
@@ -1064,7 +1064,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted([
                         python_utils.UNICODE(key)
                         for key in exported_data.keys()]),
-                    sorted(exported_property_names)
+                    sorted(exported_field_names)
                 )
             elif (export_method ==
                   base_models
@@ -1075,7 +1075,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 exported_data = model.export_data(self.USER_ID_1)
                 field_mapping = model.get_field_name_mapping_to_takeout_keys()
                 self.assertEqual(
-                    sorted(exported_property_names),
+                    sorted(exported_field_names),
                     sorted(field_mapping.keys())
                 )
                 self.assertEqual(
@@ -1087,20 +1087,20 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   .MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
                 for model_id in exported_data.keys():
-                    # If we are using a property as a Takeout key.
-                    if property_used_as_key_for_takeout_dict:
-                        # Ensure that we export the property.
+                    # If we are using a field as a Takeout key.
+                    if field_used_as_key_for_takeout_dict:
+                        # Ensure that we export the field.
                         self.assertEqual(
                             model_id,
                             getattr(
                                 model,
-                                property_used_as_key_for_takeout_dict)
+                                field_used_as_key_for_takeout_dict)
                         )
                     self.assertEqual(
                         sorted([
                             python_utils.UNICODE(key)
                             for key in exported_data[model_id].keys()]),
-                        sorted(exported_property_names)
+                        sorted(exported_field_names)
                     )
 
     def test_export_data_for_full_user_nontrivial_is_correct(self):

@@ -84,23 +84,34 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             })
 
     def test_export_data_with_task(self):
-        task_id = improvements_models.TaskEntryModel.create(
+        task_id_1 = improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'eid',
+            'eid_1',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
             improvements_models.TASK_TARGET_TYPE_STATE,
             'state name',
-            'issue_description',
+            'issue_description_1',
+            status=improvements_models.TASK_STATUS_RESOLVED,
+            resolver_id='uid')
+        task_id_2 = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'eid_2',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'state name',
+            'issue_description_2',
             status=improvements_models.TASK_STATUS_RESOLVED,
             resolver_id='uid')
         self.assertEqual(
             improvements_models.TaskEntryModel.export_data('uid'),
             {
-                'issue_descriptions': ['issue_description'],
-                'resolution_msecs': [None],
-                'statuses': ['resolved'],
-                'task_ids_resolved_by_user': [task_id]
+                'issue_descriptions': [
+                    'issue_description_1', 'issue_description_2'],
+                'resolution_msecs': [None, None],
+                'statuses': ['resolved', 'resolved'],
+                'task_ids_resolved_by_user': [task_id_1, task_id_2]
             })
 
     def test_generate_new_task_id(self):

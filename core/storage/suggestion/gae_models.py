@@ -206,6 +206,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'target_version_at_submission':
                 base_models.EXPORT_POLICY.EXPORTED,
             'status': base_models.EXPORT_POLICY.EXPORTED,
+            # The author_id and final_reviewer_id are not exported since
+            # we do not want to reveal internal user ids.
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
@@ -749,8 +751,9 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """This model does not directly contain user
-       information because the data is aggregated.
+        """This model only contains general statistical information about the
+        contributor dashboard and does not include any individual user
+        information.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
