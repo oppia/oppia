@@ -20,7 +20,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'learner-dashboard-suggestion-modal',
-  templateUrl: './learner-dashboard-suggestion-modal.directive.html',
+  templateUrl: './learner-dashboard-suggestion-modal.component.html',
   styleUrls: []
 })
 export class LearnerDashboardSuggestionModalComponent {

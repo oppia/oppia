@@ -28,6 +28,7 @@ import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
@@ -59,6 +60,8 @@ describe('Learner dashboard page', function() {
       $provide.value(key, value);
     }
   }));
+
+  importAllAngularServices();
 
   describe('when succesfully fetching learner dashboard data', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
