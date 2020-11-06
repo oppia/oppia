@@ -89,11 +89,11 @@ describe('Attribution Guide Component', function() {
   });
 
   it('should initialize component properties correctly', () => {
-    expect(component.deviceUsedIsMobile).toBeFalse()
+    expect(component.deviceUsedIsMobile).toBeFalse();
     expect(component.iframed).toBeFalse();
     expect(component.generateAttibutionIsAllowed).toBeFalse();
     component.ngOnInit();
-    expect(component.deviceUsedIsMobile).toBeTrue()
+    expect(component.deviceUsedIsMobile).toBeTrue();
     expect(component.iframed).toBeTrue();
     expect(component.generateAttibutionIsAllowed).toBeTrue();
   });
@@ -133,7 +133,7 @@ describe('Attribution Guide Component', function() {
     dummyDivElement.className = 'class-name';
     dummyDivElement.appendChild(dummyTextNode);
     let dummyDocumentFragment = document.createDocumentFragment();
-    dummyDocumentFragment.appendChild(dummyDivElement)
+    dummyDocumentFragment.appendChild(dummyDivElement);
     spyOn(
       document, 'getElementsByClassName'
     ).withArgs('class-name').and.returnValue(dummyDocumentFragment.children);
@@ -142,5 +142,5 @@ describe('Attribution Guide Component', function() {
     component.copyAttribution('class-name');
     expect(document.execCommand).toHaveBeenCalled();
     expect($.fn.tooltip).toHaveBeenCalledWith('show');
-  })
+  });
 });
