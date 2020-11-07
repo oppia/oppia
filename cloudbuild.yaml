@@ -4,6 +4,7 @@ steps:
     name: gcr.io/kaniko-project/executor:latest
     wait_for: ["-"]
     args: 
+    - --dockerfile=Dockerfile.base
     - --destination=gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
     - --cache=true
     - --cache-ttl=24h
@@ -35,7 +36,7 @@ steps:
     entrypoint: python
     args: ["-m", "scripts.third_party_size_check"]
 
-  - id: setup_and_typescript_tests
+  - id: setup-and-typescript-tests
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
     wait_for: ["install-dependencies"]
     volumes:
@@ -50,3 +51,35 @@ steps:
           python -m scripts.check_e2e_tests_are_captured_in_ci
           python -m scripts.typescript_checks
           python -m scripts.typescript_checks --strict_checks
+ 
+  # - id: e2e-additional-editor-player-features
+  #   name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
+  #   wait_for: ["setup-and-typescript-tests"]
+  #   volumes:
+  #     - name: 'test'
+  #       path: '/test'
+  #   dir: /test/oppia
+  #   entrypoint: bash
+  #   args:
+  #     - "-c"
+  #     - |
+  #         set -e
+  #         python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env
+  #         python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
+
+          
+
+  # - id: e2e-core-editor-player-features
+  #   name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
+  #   wait_for: ["e2e-additional-editor-player-features"]
+  #   volumes:
+  #     - name: 'test'
+  #       path: '/test'
+  #   dir: /test/oppia
+  #   entrypoint: bash
+  #   args:
+  #     - "-c"
+  #     - |
+  #         set -e
+  #         python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env
+    
