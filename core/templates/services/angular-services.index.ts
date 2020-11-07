@@ -88,7 +88,9 @@ import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObje
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
+import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionSummaryObjectFactory } from 'domain/question/QuestionSummaryObjectFactory';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service.ts';
@@ -293,6 +295,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
+import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -493,6 +496,8 @@ export const angularServices: [string, unknown][] = [
   ['ProfileLinkImageBackendApiService', ProfileLinkImageBackendApiService],
   ['ProfilePageBackendApiService', ProfilePageBackendApiService],
   ['PythonProgramTokenizer', PythonProgramTokenizer],
+  ['EditableQuestionBackendApiService', EditableQuestionBackendApiService],
+  ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionSummaryForOneSkillObjectFactory',
@@ -587,6 +592,7 @@ export const angularServices: [string, unknown][] = [
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslateService', TranslateService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],
+  ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TruncatePipe', TruncatePipe],
   ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],
