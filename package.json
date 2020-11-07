@@ -139,7 +139,7 @@
     "gifshot": "^0.4.5",
     "hammerjs": "^2.0.8",
     "lodash": "^4.17.14",
-    "mathjs": "^7.0.0",
+    "mathjs": "^8.0.0",
     "mousetrap": "^1.6.5",
     "nerdamer": "^1.1.4",
     "ng-infinite-scroll": "^1.3.0",
