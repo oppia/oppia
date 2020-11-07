@@ -73,7 +73,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             r'The export_data\(\) method is missing from the '
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('')
-    
+
     def test_get_model_association_to_user_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
