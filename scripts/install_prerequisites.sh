@@ -26,9 +26,16 @@
 # Note that the root folder MUST be named 'oppia'.
 
 sudo apt-get -y update
+
+# Install Java 8
+apt-get -y install software-properties-common
+wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+sudo apt-get update && sudo apt-get -y install adoptopenjdk-8-hotspot-jre
+java -version
+
 sudo apt-get -y install curl
 sudo apt-get -y install git
-sudo apt-get -y install openjdk-8-jre
 sudo apt-get -y install python-setuptools
 sudo apt-get -y install python-dev
 sudo apt-get -y install python-pip
