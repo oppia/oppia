@@ -2201,6 +2201,68 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             self.user_auth_details.validate()
 
 
+class UserIdentifiersTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserIdentifiersTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_identifiers_model = (
+            user_models.UserIdentifiersModel.get_by_user_id(self.owner_id))
+        self.user_identifiers = user_services.UserIdentifiers(
+            self.user_identifiers_model.id,
+            self.user_identifiers_model.user_id
+        )
+        self.user_identifiers.validate()
+
+    def test_validate_non_str_user_id(self):
+        self.user_identifiers.user_id = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            self.user_identifiers.validate()
+
+    def test_validate_user_id(self):
+        self.user_identifiers.user_id = 'uid_%sA' % ('a' * 31)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_identifiers.validate()
+
+        self.user_identifiers.user_id = 'uid_%s' % ('a' * 31)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_identifiers.validate()
+
+        self.user_identifiers.user_id = 'a' * 36
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_identifiers.validate()
+
+    def test_validate_empty_gae_id(self):
+        self.user_identifiers.user_id = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'No user id specified.'
+        ):
+            self.user_identifiers.validate()
+
+    def test_validate_empty_user_id(self):
+        self.user_identifiers.gae_id = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'No GAE id specified.'
+        ):
+            self.user_identifiers.validate()
+
+    def test_validate_non_str_gae_id(self):
+        self.user_identifiers.gae_id = 123
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected gae_id to be a string'
+        ):
+            self.user_identifiers.validate()
+
+
 class UserContributionsTests(test_utils.GenericTestBase):
 
     def setUp(self):

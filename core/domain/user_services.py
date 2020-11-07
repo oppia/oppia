@@ -509,8 +509,9 @@ class UserIdentifiers(python_utils.OBJECT):
         if not is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
-        if (self.gae_id is not None and
-                not isinstance(self.gae_id, python_utils.BASESTRING)):
+        if not self.gae_id:
+            raise utils.ValidationError('No GAE id specified.')
+        if not isinstance(self.gae_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected gae_id to be a string, received %s' %
                 self.gae_id
