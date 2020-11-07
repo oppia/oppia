@@ -848,10 +848,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
             docstring: list(str). Function docstring in splitted by newlines.
         """
         docstring_sections = {
-            b'Args:': 'single-space-below-args',
-            b'Returns:': 'single-space-below-returns',
-            b'Raises:': 'single-space-below-raises',
-            b'Yields:': 'single-space-below-yields'
+            b'Args:': b'single-space-below-args',
+            b'Returns:': b'single-space-below-returns',
+            b'Raises:': b'single-space-below-raises',
+            b'Yields:': b'single-space-below-yields'
         }
         blank_line_counter = 0
         for line in docstring[::-1]:
