@@ -75,7 +75,7 @@ module.exports = {
           }
           if (paren.value === '(') {
             parensCount += 1;
-          } else if (paren.value === ')') {
+          } else {
             if (parensCount > 0) {
               parensCount -= 1;
             }
