@@ -22,6 +22,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
+import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
+import { SkillIdToDescriptionMap } from 'domain/topic/SubtopicObjectFactory';
+import { SubtopicPageBackendDict } from 'domain/topic/SubtopicPageObjectFactory';
 import { TopicBackendDict } from 'domain/topic/TopicObjectFactory';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service.ts';
@@ -29,22 +32,22 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 interface FetchTopicBackendResponse {
   'topic_dict': TopicBackendDict;
   'grouped_skill_summary_dicts': Object;
-  'skill_id_to_description_dict': Object;
+  'skill_id_to_description_dict': SkillIdToDescriptionMap;
   'skill_question_count_dict': Object;
   'skill_id_to_rubrics_dict': Object;
   'classroom_url_fragment': string;
 }
 
 interface FetchStoriesBackendResponse {
-  'canonical_story_summary_dicts': Object;
+  'canonical_story_summary_dicts': StorySummaryBackendDict[];
 }
 
 interface FetchSubtopicPageBackendResponse {
-  'subtopic_page': Object;
+  'subtopic_page': SubtopicPageBackendDict;
 }
 
 interface DeleteTopicBackendResponse {
-  status: Object;
+  status: number;
 }
 
 interface UpdateTopicBackendResponse {
@@ -54,11 +57,11 @@ interface UpdateTopicBackendResponse {
 }
 
 interface DoesTopicWithUrlFragmentExistBackendResponse {
-  'topic_url_fragment_exists': Object
+  'topic_url_fragment_exists': boolean;
 }
 
 interface DoesTopicWithNameExistBackendResponse {
-  'topic_name_exists': Object
+  'topic_name_exists': boolean;
 }
 
 @Injectable({
@@ -71,7 +74,7 @@ export class EditableTopicBackendApiService {
 
   private _fetchTopic(
       topicId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (value?: Object) => void,
       errorCallback: (reason?: string) => void): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
@@ -98,15 +101,13 @@ export class EditableTopicBackendApiService {
         });
       }
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
+      errorCallback(errorResponse.error);
     });
   }
 
   private _fetchStories(
       topicId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (value?: StorySummaryBackendDict[]) => void,
       errorCallback: (reason?: string) => void): void {
     let storiesDataUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
@@ -120,16 +121,14 @@ export class EditableTopicBackendApiService {
         successCallback(canonicalStorySummaries);
       }
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
+      errorCallback(errorResponse.error);
     });
   }
 
   private _fetchSubtopicPage(
       topicId: string,
       subtopicId: number,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (value?: SubtopicPageBackendDict) => void,
       errorCallback: (reason?: string) => void): void {
     let subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
@@ -144,15 +143,13 @@ export class EditableTopicBackendApiService {
         successCallback(topic);
       }
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
+      errorCallback(errorResponse.error);
     });
   }
 
   private _deleteTopic(
       topicId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (value?: number) => void,
       errorCallback: (reason?: string) => void): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
@@ -164,9 +161,7 @@ export class EditableTopicBackendApiService {
         successCallback(response.status);
       }
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
+      errorCallback(errorResponse.error);
     });
   }
 
@@ -199,15 +194,13 @@ export class EditableTopicBackendApiService {
         });
       }
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
+      errorCallback(errorResponse.error);
     });
   }
 
   private _doesTopicWithUrlFragmentExist(
       topicUrlFragment: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (value?: boolean) => void,
       errorCallback: (reason?: string) => void): void {
     let topicUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
@@ -219,15 +212,13 @@ export class EditableTopicBackendApiService {
         successCallback(response.topic_url_fragment_exists);
       }
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
+      errorCallback(errorResponse.error);
     });
   }
 
   private _doesTopicWithNameExist(
       topicName: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (value?: boolean) => void,
       errorCallback: (reason?: string) => void): void {
     let topicNameUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE, {
@@ -239,9 +230,7 @@ export class EditableTopicBackendApiService {
         successCallback(response.topic_name_exists);
       }
     }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
+      errorCallback(errorResponse.error);
     });
   }
 
@@ -251,7 +240,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  fetchStories(topicId: string): Promise<Object> {
+  fetchStories(topicId: string): Promise<StorySummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchStories(topicId, resolve, reject);
     });
@@ -259,7 +248,7 @@ export class EditableTopicBackendApiService {
 
   fetchSubtopicPage(
       topicId: string,
-      subtopicId: number): Promise<Object> {
+      subtopicId: number): Promise<SubtopicPageBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicPage(topicId, subtopicId, resolve, reject);
     });
