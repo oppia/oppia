@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for ResponsesService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
 import { EventEmitter } from '@angular/core';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Responses Service', function() {
   var ResponsesService = null;

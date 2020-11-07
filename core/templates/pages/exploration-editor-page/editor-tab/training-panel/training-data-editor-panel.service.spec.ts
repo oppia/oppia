@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for TrainingDataEditorPanelService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
 import { EventEmitter } from '@angular/core';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Training Data Editor Panel Service', function() {
   importAllAngularServices();

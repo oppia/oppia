@@ -16,18 +16,18 @@
  * @fileoverview Service for solution verification.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AnswerClassificationService } from
-  'pages/exploration-player-page/services/answer-classification.service.ts';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionRulesRegistryService } from
-  'services/interaction-rules-registry.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service.ts';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service.ts';
+import { InteractionRulesRegistryService } from
+  'services/interaction-rules-registry.service';
 
 @Injectable({
   providedIn: 'root'
