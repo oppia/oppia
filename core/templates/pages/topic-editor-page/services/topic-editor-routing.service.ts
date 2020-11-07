@@ -21,6 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -40,10 +41,11 @@ export class TopicEditorRoutingService {
   constructor(
     private location: Location,
     private pageTitleService: PageTitleService,
-    private urlInterpolationService: UrlInterpolationService) {
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef) {
     this.currentPath = this.location.path();
     this.location.onUrlChange((newPath: string, state: unknown) => {
-      console.log(newPath);
+      // console.log(newPath);
       // newPath = newPath.split('#')[1];
       if (newPath === '') {
         this.location.go(this.currentPath);
@@ -123,7 +125,7 @@ export class TopicEditorRoutingService {
       SKILL_EDITOR_URL_TEMPLATE, {
         skill_id: skillId
       });
-    window.open(skillEditorUrl);
+    this.windowRef.nativeWindow.open(skillEditorUrl);
   }
 }
 

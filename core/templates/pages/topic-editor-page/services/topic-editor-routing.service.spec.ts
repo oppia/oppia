@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for TopicEditorRoutingService.
  */
-import { MockLocationStrategy } from '@angular/common/testing';
 import { SpyLocation } from '@angular/common/testing';
 import { Location } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
@@ -27,25 +26,34 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-fdescribe('Topic editor routing service', () => {
-
-  let $window = null;
+describe('Topic editor routing service', () => {
   let ters: TopicEditorRoutingService;
-  
+  let locat: SpyLocation;
+  let openspy = jasmine.createSpy('open');
+  let window: WindowRef;
 
-  beforeEach(angular.mock.inject( ($injector) => {
-    $window = $injector.get('$window');
-  }));
+  class MockWindowRef{
+    _window = {
+      open: openspy
+    }
+    get nativeWindow() {
+      return this._window;
+    }
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         TopicEditorRoutingService,
         {provide: Location, useClass: SpyLocation},
+        {provide: WindowRef, useClass: MockWindowRef}
       ]
     });
     ters = TestBed.get(TopicEditorRoutingService);
+    locat = TestBed.get(Location);
+    window = TestBed.get(WindowRef);
   });
 
   it('should return the default active tab name', () => {
@@ -77,22 +85,14 @@ fdescribe('Topic editor routing service', () => {
   it('should handle calls with unexpect paths', () => {
     expect(ters.getActiveTabName()).toEqual('main');
 
-    // locat.go();
-    
-    expect(ters.getActiveTabName()).toEqual('main');
-
-    // locat.go('');
-    
+    locat.simulateHashChange('');    
     expect(ters.getActiveTabName()).toEqual('main');
   });
 
   it('should navigate to skill editor', () => {
-    spyOn($window, 'open').and.callFake(() => {
-      return true;
-    });
     ters.navigateToSkillEditorWithId('10');
-    expect($window.open).toHaveBeenCalled();
-    expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
+    expect(openspy).toHaveBeenCalled();
+    expect(openspy).toHaveBeenCalledWith('/skill_editor/10');
   });
 
   it('should return last tab visited', () => {
