@@ -33,13 +33,17 @@ require('services/contextual/window-dimensions.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
-
+require(
+  'pages/exploration-player-page/learner-experience/' +
+  'continue-button.component.ts');
+  
+  
 angular.module('oppia').directive('supplementalCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        onClickContinueButton: '&',
+        continueButtonClick: '&',
         isLearnAgainButton: '&',
         getDisplayedCard: '&displayedCard',
       },

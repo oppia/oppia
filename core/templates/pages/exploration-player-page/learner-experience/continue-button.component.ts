@@ -21,14 +21,14 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'continue-button',
+  selector: 'oppia-continue-button',
   templateUrl: './continue-button.component.html',
   styleUrls: []
 })
 export class ContinueButtonComponent {
   @Input() focusLabel: string;
   @Input() isLearnAgainButton: boolean = false;
-  @Output() clickContinueButton: EventEmitter<void> = new EventEmitter();
+  @Output() continueButtonClick: EventEmitter<void> = new EventEmitter();
 }
 
 angular.module('oppia').directive(

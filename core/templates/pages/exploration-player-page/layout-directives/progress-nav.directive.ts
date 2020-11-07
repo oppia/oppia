@@ -41,7 +41,7 @@ angular.module('oppia').directive('progressNav', [
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        onClickContinueButton: '&',
+        continueButtonClick: '&',
         isLearnAgainButton: '&',
         getDisplayedCard: '&displayedCard',
         isSubmitButtonShown: '&submitButtonIsShown',
