@@ -406,6 +406,8 @@ class UserAuthDetails(python_utils.OBJECT):
         gae_id: str. The ID of the user retrieved from GAE.
         parent_user_id: str or None. For profile users, the user ID of the full
             user associated with that profile. None for full users.
+        deleted: bool. Whether the user is marked as deleted and will be fully
+            deleted soon.
     """
 
     def __init__(self, user_id, gae_id, parent_user_id=None, deleted=False):
@@ -478,6 +480,8 @@ class UserIdentifiers(python_utils.OBJECT):
     Attributes:
         user_id: str. The unique ID of the user.
         gae_id: str. The ID of the user retrieved from GAE.
+        deleted: bool. Whether the user is marked as deleted and will be fully
+            deleted soon.
     """
 
     def __init__(self, gae_id, user_id, deleted=False):
