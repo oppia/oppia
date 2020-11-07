@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core import jobs
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -30,8 +31,13 @@ from core.domain import user_services
 from core.platform import models
 import python_utils
 
-(collection_models, exp_models, topic_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration, models.NAMES.topic])
+(
+    collection_models, exp_models, question_models,
+    skill_models, topic_models
+) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.topic
+])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -471,3 +477,111 @@ class AuditSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
+
+class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that adds the missing commit log entry model for the corresponding
+    snapshot models.
+    """
+
+    # This list consists of the snapshot models whose associated commit log
+    # models are missing. The commit logs were found missing in a validation
+    # job.
+    SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS = [
+        exp_models.ExplorationSnapshotMetadataModel,
+        exp_models.ExplorationRightsSnapshotMetadataModel,
+        question_models.QuestionSnapshotMetadataModel,
+        skill_models.SkillSnapshotMetadataModel
+    ]
+    MODEL_NAMES_TO_PROPERTIES = {
+        'ExplorationSnapshotMetadataModel': {
+            'parent_model_class': exp_models.ExplorationModel,
+            'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
+            'id_string_format': 'exploration-%s-%s'
+        },
+        'QuestionSnapshotMetadataModel': {
+            'commit_log_model_class': (
+                question_models.QuestionCommitLogEntryModel),
+            'id_string_format': 'question-%s-%s'
+        },
+        'SkillSnapshotMetadataModel': {
+            'commit_log_model_class': skill_models.SkillCommitLogEntryModel,
+            'id_string_format': 'skill-%s-%s'
+        },
+        'ExplorationRightsSnapshotMetadataModel': {
+            'parent_model_class': exp_models.ExplorationRightsModel,
+            'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
+            'id_string_format': 'rights-%s-%s'
+        }
+    }
+    # This list consists of the snapshot models whose parent model has the
+    # post commit status.
+    MODELS_WITH_COMMIT_STATUS = [
+        'ExplorationSnapshotMetadataModel',
+        'ExplorationRightsSnapshotMetadataModel'
+    ]
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        job_class = AddMissingCommitLogsJob
+        return job_class.SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS
+
+    @staticmethod
+    def map(snapshot_model):
+        job_class = AddMissingCommitLogsJob
+        class_name = snapshot_model.__class__.__name__
+        model_id, version = snapshot_model.id.rsplit('-', 1)
+        model_properties = job_class.MODEL_NAMES_TO_PROPERTIES[class_name]
+        commit_log_id = (
+            model_properties['id_string_format'] % (model_id, version))
+        commit_log_model_class = (
+            model_properties['commit_log_model_class'].get_by_id(
+                commit_log_id))
+        commit_logs_should_exist = True
+
+        if class_name in job_class.MODELS_WITH_COMMIT_STATUS:
+            parent_model = (
+                model_properties['parent_model_class'].get_by_id(model_id))
+        if class_name == 'ExplorationRightsSnapshotMetadataModel':
+            if snapshot_model.commit_type in ['create', 'delete']:
+                commit_logs_should_exist = False
+
+        if commit_log_model_class is None and commit_logs_should_exist:
+            # Public is the default value for post_commit_status for the
+            # question and skill models. For the exp model, it is assigned
+            # from the rights model.
+            commit_log_model = model_properties['commit_log_model_class'](
+                id=commit_log_id,
+                user_id=snapshot_model.committer_id,
+                commit_type=snapshot_model.commit_type,
+                commit_message=snapshot_model.commit_message,
+                commit_cmds=snapshot_model.commit_cmds,
+                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+                version=int(version)
+            )
+            if class_name == 'SkillSnapshotMetadataModel':
+                commit_log_model.skill_id = model_id
+            elif class_name == 'QuestionSnapshotMetadataModel':
+                commit_log_model.question_id = model_id
+            elif class_name == 'ExplorationRightsSnapshotMetadataModel':
+                commit_log_model.exploration_id = model_id
+                commit_log_model.post_commit_status = parent_model.status
+            elif class_name == 'ExplorationSnapshotMetadataModel':
+                commit_log_model.exploration_id = model_id
+                rights_model = exp_models.ExplorationRightsModel.get_by_id(
+                    model_id)
+                commit_log_model.post_commit_status = rights_model.status
+            commit_log_model.put()
+            yield (
+                'Added missing commit log model-%s' % class_name,
+                snapshot_model.id)
+        else:
+            yield ('Found commit log model-%s' % class_name, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key.startswith('Added missing commit log model'):
+            yield (key, values)
+        else:
+            yield (key, len(values))

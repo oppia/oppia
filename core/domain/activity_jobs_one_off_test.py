@@ -44,10 +44,12 @@ gae_search_services = models.Registry.import_search_services()
 
 (
     base_models, collection_models,
-    exp_models, topic_models
+    exp_models, question_models,
+    skill_models, topic_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection,
-    models.NAMES.exploration, models.NAMES.topic
+    models.NAMES.exploration, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.topic
 ])
 
 
@@ -1689,3 +1691,165 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                 ['topic-length-0', 1]
             ]
         )
+
+
+class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    EXP_ID = 'exp_id0'
+    QUESTION_ID = 'question_id0'
+    SKILL_ID = 'skill_id0'
+    DUMMY_COMMIT_CMDS = [
+        {
+            'cmd': 'some_command',
+            'other_field': 'test'
+        }, {
+            'cmd': 'some_other_command',
+            'other_field': 'test',
+            'different_field': 'test'
+        }
+    ]
+
+    def setUp(self):
+        super(AddMissingCommitLogsJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_class = activity_jobs_one_off.AddMissingCommitLogsJob
+        job_id = job_class.create_new()
+        activity_jobs_one_off.AddMissingCommitLogsJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            activity_jobs_one_off.AddMissingCommitLogsJob
+            .get_output(job_id))
+
+        eval_output = [
+            ast.literal_eval(stringified_item) for
+            stringified_item in stringified_output]
+        return eval_output
+
+    def test_add_missing_exp_commit_logs(self):
+        rights_manager.create_new_exploration_rights(
+            self.EXP_ID, self.albert_id)
+        exploration = exp_models.ExplorationModel(
+            id=self.EXP_ID,
+            title='title',
+            category='category',
+            states_schema_version=1,
+            init_state_name='init_state_name'
+        )
+        base_models.BaseModel.put_multi([exploration])
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-%s-%s' % (self.EXP_ID, 1)))
+
+        expected_output = [
+            [
+                'Added missing commit log model-' +
+                'ExplorationSnapshotMetadataModel',
+                ['exp_id0-1']
+            ],
+            [
+                'Found commit log model-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                1
+            ]
+        ]
+
+        self.assertIsNotNone(commit_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_exp_rights_commit_logs(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public'
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'rights-%s-%s' % (self.EXP_ID, 1)))
+
+        expected_output = [
+            [
+                'Added missing commit log model-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ]
+        ]
+
+        self.assertIsNotNone(commit_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_question_commit_logs(self):
+        question_models.QuestionSnapshotMetadataModel(
+            id='%s-1' % self.QUESTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-%s' % (self.QUESTION_ID, 1)))
+
+        expected_output = [
+            [
+                'Added missing commit log model-' +
+                'QuestionSnapshotMetadataModel',
+                ['question_id0-1']
+            ]
+        ]
+
+        self.assertIsNotNone(commit_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_skill_commit_logs(self):
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-%s-%s' % (self.SKILL_ID, 1)))
+
+        expected_output = [
+            [
+                'Added missing commit log model-' +
+                'SkillSnapshotMetadataModel',
+                ['skill_id0-1']
+            ]
+        ]
+
+        self.assertIsNotNone(commit_model)
+        self.assertItemsEqual(expected_output, actual_output)
