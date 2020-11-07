@@ -17,26 +17,18 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service.ts';
-import { StateEditorService} from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service.ts';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service.ts';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service.ts';
+import { StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service.ts';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service.ts';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { SolutionVerificationService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
+import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
 describe('Solution Verification Service', () => {
   let ess, siis, scas, sof, svs, see;
