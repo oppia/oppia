@@ -2000,7 +2000,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
 
             # Bot rejects suggestions when the suggestion's targeted entity gets
             # removed from the topic. The bot doesn't have a UserSettingsModel
-            # with their user_id. Exclude external model validation for bot.
+            # for their user_id. Exclude external model validation for bot.
             if item.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID:
                 field_name_to_external_model_references.append(
                     base_model_validators.ExternalModelFetcherDetails(
@@ -2150,6 +2150,11 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                         'doesn\'t exist' % (
                             item.id, item.target_type,
                             model_id, model_class.__name__, model_id))
+
+                # Do not validate the subtype of score_category with the
+                # exploration category. The exploration category can be changed
+                # anytime in the future and the suggestion model's
+                # score_category does not get updated with the updated category.
 
         if score_category_type == suggestion_models.SCORE_TYPE_QUESTION:
             score_category_regex = (

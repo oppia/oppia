@@ -6409,7 +6409,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_bot_as_final_reviewer_does_not_fails_reviewer_id_validation(self):
+    def test_bot_as_final_reviewer_does_not_fail_reviewer_id_validation(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_by_id(
                 feconf.SUGGESTION_BOT_USER_ID), None)
