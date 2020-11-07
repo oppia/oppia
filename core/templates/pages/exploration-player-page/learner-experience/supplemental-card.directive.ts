@@ -87,6 +87,12 @@ angular.module('oppia').directive('supplementalCard', [
           $scope.getHelpCardBottomPosition = function() {
             var helpCard = $('.conversation-skin-help-card');
             var container = $('.conversation-skin-supplemental-card-container');
+            // The image interaction's div is fixed which causes the height
+            // here to be 0, so in that case, the image container's height is to
+            // be fetched.
+            if (container.height() === 0) {
+              container = $('.image-click-container');
+            }
             return Math.max(container.height() - helpCard.height() / 2, 0);
           };
 
