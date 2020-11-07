@@ -80,6 +80,8 @@ describe('Solution Verification Service', () => {
     });
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
+  // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
+  // block when ExplorationStateService has been migrated to Angular 8.
   beforeEach(angular.mock.inject(function($injector) {
     ess = $injector.get('ExplorationStatesService');
     ess.init({
