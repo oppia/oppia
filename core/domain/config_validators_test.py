@@ -375,6 +375,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+
 class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):

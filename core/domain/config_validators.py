@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
 from core.domain import config_domain
+from core.domain import platform_parameter_domain
 from core.platform import models
 import python_utils
 
@@ -95,6 +96,7 @@ class ConfigPropertySnapshotContentModelValidator(
                 'config_property_ids',
                 config_models.ConfigPropertyModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
+
 
 class PlatformParameterModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating PlatformParameterModel."""
