@@ -24,9 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { TestBed } from '@angular/core/testing';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
-import { SolutionVerificationService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
+import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service.ts';
