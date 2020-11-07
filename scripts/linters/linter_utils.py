@@ -167,3 +167,23 @@ def temp_dir(suffix='', prefix='', parent=None):
         yield new_dir
     finally:
         shutil.rmtree(new_dir)
+
+
+def print_failure_message(failure_message):
+    """Prints the given failure message in red color.
+
+    Args:
+        failure_message: str. The failure message to print.
+    """
+    # \033[91m is the ANSI escape sequences for red color.
+    python_utils.PRINT('\033[91m' + failure_message + '\033[0m')
+
+
+def print_success_message(success_message):
+    """Prints the given success_message in red color.
+
+    Args:
+        success_message: str. The success message to print.
+    """
+    # \033[91m is the ANSI escape sequences for green color.
+    python_utils.PRINT('\033[92m' + success_message + '\033[0m')

@@ -22,17 +22,13 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { ClassroomDataObjectFactory } from
-  'domain/classroom/ClassroomDataObjectFactory';
-import { TopicSummaryBackendDict } from
-  'domain/topic/TopicSummaryObjectFactory';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
+import { TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
 
 describe('Classroom backend API service', function() {
   let classroomBackendApiService:
     ClassroomBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let classroomDataObjectFactory:
-    ClassroomDataObjectFactory = null;
   let firstTopicSummaryDict: TopicSummaryBackendDict = {
     id: 'topic1',
     name: 'Topic name',
@@ -70,7 +66,8 @@ describe('Classroom backend API service', function() {
 
   let responseDictionaries = {
     name: 'Math',
-    topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
+    public_topic_summary_dicts: [firstTopicSummaryDict],
+    private_topic_summary_dicts: [secondTopicSummaryDict],
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered'
   };
@@ -83,12 +80,13 @@ describe('Classroom backend API service', function() {
     });
     classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    classroomDataObjectFactory = TestBed.get(ClassroomDataObjectFactory);
 
     // Sample topic object returnable from the backend.
     sampleClassroomDataObject = (
-      classroomDataObjectFactory.createFromBackendData(
-        responseDictionaries.name, responseDictionaries.topic_summary_dicts,
+      ClassroomData.createFromBackendData(
+        responseDictionaries.name,
+        responseDictionaries.public_topic_summary_dicts,
+        responseDictionaries.private_topic_summary_dicts,
         responseDictionaries.course_details,
         responseDictionaries.topic_list_intro));
   });

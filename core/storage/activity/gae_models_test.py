@@ -56,6 +56,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
             'type': constants.ACTIVITY_TYPE_EXPLORATION,
             'id': '0',
         }]
+        featured_model_instance.update_timestamps()
         featured_model_instance.put()
 
         featured_model_instance = (

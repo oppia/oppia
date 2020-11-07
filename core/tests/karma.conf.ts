@@ -200,7 +200,12 @@ module.exports = function(config) {
           {
             test: /\.css$/,
             use: [
-              'style-loader',
+              {
+                loader: 'style-loader',
+                options: {
+                  esModule: false
+                }
+              },
               {
                 loader: 'css-loader',
                 options: {

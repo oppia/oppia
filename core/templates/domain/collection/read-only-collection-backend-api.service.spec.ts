@@ -24,14 +24,13 @@ import { Subscription } from 'rxjs';
 
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
+import { Collection } from
+  'domain/collection/collection.model';
 
 describe('Read only collection backend API service', () => {
   let readOnlyCollectionBackendApiService:
     ReadOnlyCollectionBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let collectionObjectFactory: CollectionObjectFactory = null;
   let sampleDataResults = {
     collection: {
       id: '0',
@@ -84,7 +83,6 @@ describe('Read only collection backend API service', () => {
 
     readOnlyCollectionBackendApiService = TestBed.get(
       ReadOnlyCollectionBackendApiService);
-    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     onCollectionLoadSpy = jasmine.createSpy('onCollectionLoadSpy');
     subscriptions = new Subscription();
@@ -113,7 +111,7 @@ describe('Read only collection backend API service', () => {
 
       flushMicrotasks();
 
-      var collectionObject = collectionObjectFactory.create(
+      var collectionObject = Collection.create(
         sampleDataResults.collection);
 
       expect(successHandler).toHaveBeenCalledWith(collectionObject);
@@ -134,7 +132,7 @@ describe('Read only collection backend API service', () => {
 
       flushMicrotasks();
 
-      var collectionObject = collectionObjectFactory.create(
+      var collectionObject = Collection.create(
         sampleDataResults.collection);
 
       expect(successHandler).toHaveBeenCalledWith(collectionObject);
@@ -189,7 +187,7 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    var collectionObject = collectionObjectFactory.create(
+    var collectionObject = Collection.create(
       sampleDataResults.collection);
 
     expect(successHandler).toHaveBeenCalledWith(collectionObject);
@@ -227,7 +225,7 @@ describe('Read only collection backend API service', () => {
     // The collection should not currently be cached.
     expect(readOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
 
-    var collection = collectionObjectFactory.create({
+    var collection = Collection.create({
       id: '0',
       nodes: [],
       title: null,
@@ -246,7 +244,7 @@ describe('Read only collection backend API service', () => {
     // Cache a collection.
     readOnlyCollectionBackendApiService.cacheCollection('0', collection);
 
-    // It should now be cached.CollectionPlaythroughObjectFactory.
+    // It should now be cached. collection-playthrough.model.
     expect(readOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
 
     // A new collection should not have been fetched from the backend. Also,

@@ -44,6 +44,7 @@ ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
 AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
+PACKAGE_JSON_PATH = os.path.join('', 'package.json')
 GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
     CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
     ABOUT_PAGE_CONSTANTS_FILEPATH)
@@ -474,6 +475,18 @@ def get_release_summary_lines():
     return release_summary_lines
 
 
+def update_package_json():
+    """Updates version param in package json file to match the current
+    release version.
+    """
+    release_version = common.get_current_release_version_number(
+        common.get_current_branch_name())
+
+    common.inplace_replace_file(
+        PACKAGE_JSON_PATH, '"version": ".*"',
+        '"version": "%s"' % release_version)
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
@@ -557,12 +570,13 @@ def main():
     update_authors(release_summary_lines)
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)
+    update_package_json()
 
     message = (
         'Please check the changes and make updates if required in the '
-        'following files:\n1. %s\n2. %s\n3. %s\n4. %s\n' % (
+        'following files:\n1. %s\n2. %s\n3. %s\n4. %s\n5. %s\n' % (
             CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-            ABOUT_PAGE_CONSTANTS_FILEPATH))
+            ABOUT_PAGE_CONSTANTS_FILEPATH, PACKAGE_JSON_PATH))
     common.ask_user_to_confirm(message)
 
     create_branch(

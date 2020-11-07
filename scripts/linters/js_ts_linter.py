@@ -1096,7 +1096,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             # string('') which is at the index 1 and message-id from the end.
             if re.search(r'^\d+:\d+', line.lstrip()):
                 # Replacing message-id with an empty string('').
-                line = re.sub(r'(\w+-*)+$', '', line)
+                if not 'Parsing error:' in line:
+                    line = re.sub(r'(\w+-*)+$', '', line)
                 error_string = re.search(r'error', line).group(0)
                 error_message = line.replace(error_string, '', 1)
             else:
@@ -1120,35 +1121,26 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
                 'and its dependencies.')
 
         files_to_lint = self.all_filepaths
-        num_files_with_errors = 0
         error_messages = []
         full_error_messages = []
         failed = False
         name = 'ESLint'
 
         eslint_cmd_args = [node_path, eslint_path, '--quiet']
-        result_list = []
-        for _, filepath in enumerate(files_to_lint):
-            proc_args = eslint_cmd_args + [filepath]
-            proc = subprocess.Popen(
-                proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc_args = eslint_cmd_args + files_to_lint
+        proc = subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-            encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-            linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-            linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
-            if linter_stderr:
-                raise Exception(linter_stderr)
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
+        if linter_stderr:
+            raise Exception(linter_stderr)
 
-            if linter_stdout:
-                num_files_with_errors += 1
-                result_list.append(linter_stdout)
-
-        if num_files_with_errors:
+        if linter_stdout:
             failed = True
-            for result in result_list:
-                full_error_messages.append(result)
-                error_messages.append(
-                    self._get_trimmed_error_output(result))
+            full_error_messages.append(linter_stdout)
+            error_messages.append(self._get_trimmed_error_output(linter_stdout))
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, full_error_messages)

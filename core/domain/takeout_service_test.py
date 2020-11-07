@@ -53,7 +53,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
     USER_ID_1 = 'user_1'
     PROFILE_ID_1 = 'profile_1'
-    USER_GAE_ID_1 = 'gae_1'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     USER_1_EMAIL = 'user1@example.com'
@@ -94,8 +93,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         10) Creates new exploration rights.
         11) Populates user settings.
         """
-        super(TakeoutServiceProfileUserUnitTests, self).setUp()
-
         # Setup for UserSkillModel.
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
@@ -156,7 +153,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE,
             username=self.GENERIC_USERNAME,
@@ -179,7 +175,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE,
             username=None,
@@ -203,16 +198,13 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
-        super(TakeoutServiceProfileUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE
         ).put()
@@ -239,7 +231,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     USER_ID_1 = 'user_1'
     PROFILE_ID_1 = 'profile_1'
-    USER_GAE_ID_1 = 'gae_1'
     THREAD_ID_1 = 'thread_id_1'
     THREAD_ID_2 = 'thread_id_2'
     TOPIC_ID_1 = 'topic_id_1'
@@ -340,7 +331,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         16) Creates two reply-to ids for feedback.
         17) Creates a task closed by the user.
         """
-        super(TakeoutServiceFullUserUnitTests, self).setUp()
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -375,7 +365,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         for creator_id in self.CREATOR_IDS:
             user_models.UserSettingsModel(
                 id=creator_id,
-                gae_id='gae_' + creator_id,
                 username='username' + creator_id,
                 email=creator_id + '@example.com'
             ).put()
@@ -527,7 +516,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE,
             username=self.GENERIC_USERNAME,
@@ -551,7 +539,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE,
             username=None,
@@ -579,16 +566,20 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_two_fake_hash_one = self.swap(
             utils, 'convert_to_hash', user_two_fake_hash_lambda_one)
         with user_two_fake_hash_one:
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_1, self.THREAD_ID_1).put()
+            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_1, self.THREAD_ID_1)
+            model.update_timestamps()
+            model.put()
 
         user_two_deterministic_hash_lambda_two = (
             lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_2)
         user_two_deterministic_hash_two = self.swap(
             utils, 'convert_to_hash', user_two_deterministic_hash_lambda_two)
         with user_two_deterministic_hash_two:
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_1, self.THREAD_ID_2).put()
+            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.USER_ID_1, self.THREAD_ID_2)
+            model.update_timestamps()
+            model.put()
 
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='application_1_id',
@@ -715,16 +706,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
-        super(TakeoutServiceFullUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
-            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE
         ).put()
@@ -898,6 +886,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             summary=self.THREAD_SUMMARY,
             message_count=self.THREAD_MESSAGE_COUNT
         )
+        feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
         expected_stats_data = {

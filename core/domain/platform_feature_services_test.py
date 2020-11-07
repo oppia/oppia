@@ -24,6 +24,7 @@ from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
+from core.domain import user_services
 from core.tests import test_utils
 import utils
 
@@ -153,8 +154,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 {
                     self.dev_feature.name: True,
                     self.prod_feature.name: True,
-                }
-            )
+                })
 
     def test_get_all_feature_flag_values_in_prod_returns_correct_values(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -170,8 +170,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 {
                     self.dev_feature.name: False,
                     self.prod_feature.name: True,
-                }
-            )
+                })
 
     def test_evaluate_dev_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):
@@ -192,6 +191,149 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
+                feature_services.is_feature_enabled(self.prod_feature.name))
+
+    def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
+            self):
+        registry.Registry.update_platform_parameter(
+            self.prod_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.prod
+                                ]
+                            ],
+                        },
+                        {
+                            'type': 'client_type',
+                            'conditions': [
+                                [
+                                    '=',
+                                    'Backend'
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertTrue(
+                feature_services.is_feature_enabled(self.prod_feature.name))
+
+    def test_evaluate_feature_for_prod_server_no_user_defaults_match_to_en_lang(
+            self):
+        registry.Registry.update_platform_parameter(
+            self.prod_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.prod
+                                ]
+                            ],
+                        },
+                        {
+                            'type': 'user_locale',
+                            'conditions': [
+                                [
+                                    '=',
+                                    'en'
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertTrue(
+                feature_services.is_feature_enabled(self.prod_feature.name))
+
+    def test_evaluate_feature_for_en_user_defaults_match_to_en_lang(
+            self):
+        user_services.update_preferred_site_language_code(self.user_id, 'en')
+        self.login(self.OWNER_EMAIL)
+        registry.Registry.update_platform_parameter(
+            self.prod_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.prod
+                                ]
+                            ],
+                        },
+                        {
+                            'type': 'user_locale',
+                            'conditions': [
+                                [
+                                    '=',
+                                    'en'
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertTrue(
+                feature_services.is_feature_enabled(self.prod_feature.name))
+
+    def test_evaluate_feature_for_fr_user_defaults_does_not_match_to_en_lang(
+            self):
+        user_services.update_preferred_site_language_code(self.user_id, 'fr')
+        self.login(self.OWNER_EMAIL)
+        registry.Registry.update_platform_parameter(
+            self.prod_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.prod
+                                ]
+                            ],
+                        },
+                        {
+                            'type': 'user_locale',
+                            'conditions': [
+                                [
+                                    '=',
+                                    'en'
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
+        # Since the feature is only enable for users who have French selected as
+        # their preferred site language code, the feature shouldn't be enabled
+        # for the current logged in user.
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertFalse(
                 feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_get_feature_flag_values_with_unknown_name_raises_error(self):
