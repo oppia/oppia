@@ -1112,8 +1112,8 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
     USER_1_USERNAME = 'username1'
     USER_2_EMAIL = 'some-other@email.com'
     USER_2_USERNAME = 'username2'
-    EXP_1_ID = 'col_1_id'
-    EXP_2_ID = 'col_2_id'
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
         super(WipeoutServiceDeleteExplorationModelsTests, self).setUp()
@@ -1332,6 +1332,30 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             commit_log_model.user_id, exploration_mappings[self.EXP_1_ID])
+
+    def test_one_exploration_user_is_removed_from_contributors(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        old_summary_model = exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID)
+
+        self.assertNotIn(self.user_1_id, old_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, old_summary_model.contributors_summary)
+
+        old_summary_model.contributor_ids = [self.user_1_id]
+        old_summary_model.contributors_summary = {self.user_1_id: 2}
+        old_summary_model.update_timestamps()
+        old_summary_model.put()
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        new_summary_model = exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID)
+
+        self.assertNotIn(self.user_1_id, new_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, new_summary_model.contributors_summary)
 
     def test_multiple_explorations_are_pseudonymized(self):
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
