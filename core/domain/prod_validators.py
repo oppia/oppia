@@ -33,7 +33,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_progress_services
-from core.domain import platform_parameter_domain
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
@@ -751,6 +750,7 @@ class CollectionSummaryModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_node_count]
+
 
 class ExplorationModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating ExplorationModel."""

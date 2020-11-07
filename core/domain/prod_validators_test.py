@@ -2163,6 +2163,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+
 class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
