@@ -986,7 +986,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     base_models.MODEL_ASSOCIATION_TO_USER
                     .MULTIPLE_INSTANCES_PER_USER):
                 # If the id is used as a Takeout key, then we should not
-                # have any fields exported as the key for the Takeout
+                # have any fields exported as the key for the Takeout.
                 if model.ID_IS_USED_AS_TAKEOUT_KEY:
                     self.assertLessEqual(num_takeout_keys, 0)
                 else:
