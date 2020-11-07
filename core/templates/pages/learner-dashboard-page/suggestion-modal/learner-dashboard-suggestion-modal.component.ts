@@ -16,6 +16,7 @@
  * @fileoverview Component for learner dashboard suggestion modal.
  */
 import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -36,3 +37,5 @@ export class LearnerDashboardSuggestionModalComponent {
     this.activeModal.dismiss();
   }
 }
+angular.module('oppia').directive(
+  'learnerDashboardSuggestionModal', downgradeComponent({component: LearnerDashboardSuggestionModalComponent}));

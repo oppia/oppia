@@ -39,6 +39,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 
 @NgModule({
   imports: [
@@ -47,9 +48,11 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
+    LearnerDashboardSuggestionModalComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    LearnerDashboardSuggestionModalComponent,
     OppiaAngularRootComponent
   ],
   providers: [
