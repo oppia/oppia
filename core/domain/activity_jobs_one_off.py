@@ -737,4 +737,3 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
         else:
             yield (key, len(values))
-
