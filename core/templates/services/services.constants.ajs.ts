@@ -44,6 +44,14 @@ angular.module('oppia').constant(
   'STORE_PLAYTHROUGH_URL',
   ServicesConstants.STORE_PLAYTHROUGH_URL);
 
+angular.module('oppia').constant(
+  'STARTED_EDITOR_TUTORIAL_EVENT_URL',
+  ServicesConstants.STARTED_EDITOR_TUTORIAL_EVENT_URL);
+
+angular.module('oppia').constant(
+  'STARTED_TRANSLATION_TUTORIAL_EVENT_URL',
+  ServicesConstants.STARTED_TRANSLATION_TUTORIAL_EVENT_URL);
+
 // Enables recording playthroughs from learner sessions.
 angular.module('oppia').constant(
   'EARLY_QUIT_THRESHOLD_IN_SECS',

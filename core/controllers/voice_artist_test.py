@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # Copyright 2018 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,293 +14,118 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the exploration voice artist work."""
+"""Controllers for the translation changes."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
-from core.domain import rights_domain
-from core.domain import rights_manager
+from core.controllers import acl_decorators
+from core.controllers import base
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import user_services
-from core.platform import models
-from core.tests import test_utils
 import feconf
+import python_utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
-
-
-class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
-        super(BaseVoiceArtistControllerTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(
-            self.VOICE_ARTIST_EMAIL)
-
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+import mutagen
+from mutagen import mp3
 
 
-class VoiceArtistTest(BaseVoiceArtistControllerTests):
-    """Test the handling of saving translation work."""
+class AudioUploadHandler(base.BaseHandler):
+    """Handles audio file uploads (to Google Cloud Storage in production, and
+    to the local datastore in dev).
+    """
 
-    EXP_ID = 'exp1'
+    # The string to prefix to the filename (before tacking the whole thing on
+    # to the end of 'assets/').
+    _FILENAME_PREFIX = 'audio'
 
-    RECORDED_VOICEOVERS = {
-        'voiceovers_mapping': {
-            'ca_placeholder_0': {},
-            'content': {
-                'en': {
-                    'filename': 'testFile.mp3',
-                    'file_size_bytes': 12200,
-                    'needs_update': False,
-                    'duration_secs': 4.5
-                }
-            },
-            'default_outcome': {}
-        }
-    }
+    @acl_decorators.can_voiceover_exploration
+    def post(self, exploration_id):
+        """Saves an audio file uploaded by a content creator."""
+        raw_audio_file = self.request.get('raw_audio_file')
+        filename = self.payload.get('filename')
+        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
-    def setUp(self):
-        super(VoiceArtistTest, self).setUp()
-        self.login(self.OWNER_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        rights_manager.assign_role_for_exploration(
-            self.owner,
-            self.EXP_ID,
-            self.voice_artist_id,
-            rights_domain.ROLE_VOICE_ARTIST
-        )
-        self.logout()
+        if not raw_audio_file:
+            raise self.InvalidInputException('No audio supplied')
+        dot_index = filename.rfind('.')
+        extension = filename[dot_index + 1:].lower()
 
-        self.login(self.VOICE_ARTIST_EMAIL)
-        # Generate CSRF token.
-        self.csrf_token = self.get_new_csrf_token()
+        if dot_index == -1 or dot_index == 0:
+            raise self.InvalidInputException(
+                'No filename extension: it should have '
+                'one of the following extensions: %s' % allowed_formats)
+        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
+            raise self.InvalidInputException(
+                'Invalid filename extension: it should have '
+                'one of the following extensions: %s' % allowed_formats)
 
-    def test_put_with_no_payload_version_raises_error(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid POST request: a version must be specified.'):
-            self.put_json(
-                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
-                    'change_list': [{
-                        'cmd': 'edit_state_property',
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'property_name': 'recorded_voiceovers',
-                        'new_value': self.RECORDED_VOICEOVERS
-                    }],
-                    'commit_message': 'Translated first state content'
-                }, csrf_token=self.csrf_token)
+        tempbuffer = python_utils.string_io()
+        tempbuffer.write(raw_audio_file)
+        tempbuffer.seek(0)
+        try:
+            # For every accepted extension, use the mutagen-specific
+            # constructor for that type. This will catch mismatched audio
+            # types e.g. uploading a flac file with an MP3 extension.
+            if extension == 'mp3':
+                audio = mp3.MP3(tempbuffer)
+            else:
+                audio = mutagen.File(tempbuffer)
+        except mutagen.MutagenError:
+            # The calls to mp3.MP3() versus mutagen.File() seem to behave
+            # differently upon not being able to interpret the audio.
+            # mp3.MP3() raises a MutagenError whereas mutagen.File()
+            # seems to return None. It's not clear if this is always
+            # the case. Occasionally, mutagen.File() also seems to
+            # raise a MutagenError.
+            raise self.InvalidInputException(
+                'Audio not recognized as a %s file' % extension)
+        tempbuffer.close()
 
-    def test_put_with_payload_version_different_from_exp_version_raises_error(
-            self):
-        with self.assertRaisesRegexp(
-            Exception, 'Trying to update version 1 of exploration from version'
-            ' 3, which is too old. Please reload the page and try again.'):
+        if audio is None:
+            raise self.InvalidInputException(
+                'Audio not recognized as a %s file' % extension)
+        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
+            raise self.InvalidInputException(
+                'Audio files must be under %s seconds in length. The uploaded '
+                'file is %.2f seconds long.' % (
+                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
+        if len(set(audio.mime).intersection(
+                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
+            raise self.InvalidInputException(
+                'Although the filename extension indicates the file '
+                'is a %s file, it was not recognized as one. '
+                'Found mime types: %s' % (extension, audio.mime))
 
-            self.put_json(
-                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
-                    'change_list': [{
-                        'cmd': 'edit_state_property',
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'property_name': 'recorded_voiceovers',
-                        'new_value': self.RECORDED_VOICEOVERS
-                    }],
-                    'commit_message': 'Translated first state content',
-                    'version': 3
-                }, csrf_token=self.csrf_token)
+        mimetype = audio.mime[0]
+        # Fetch the audio file duration from the Mutagen metadata.
+        duration_secs = audio.info.length
 
-    def test_voice_artist_can_save_valid_change_list(self):
-        response = self.put_json(
-            '/createhandler/data/%s' % self.EXP_ID, {
-                'change_list': [{
-                    'cmd': 'edit_state_property',
-                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                    'property_name': 'recorded_voiceovers',
-                    'new_value': self.RECORDED_VOICEOVERS
-                }],
-                'commit_message': 'Translated first state content',
-                'version': 1
-            }, csrf_token=self.csrf_token)
-        # Checking the response to have audio translations.
-        self.assertEqual(
-            response['states'][feconf.DEFAULT_INIT_STATE_NAME]
-            ['recorded_voiceovers'],
-            self.RECORDED_VOICEOVERS)
+        # For a strange, unknown reason, the audio variable must be
+        # deleted before opening cloud storage. If not, cloud storage
+        # throws a very mysterious error that entails a mutagen
+        # object being recursively passed around in app engine.
+        del audio
 
-    def test_voice_artist_cannot_save_invalid_change_list(self):
-        # Trying to change exploration objective.
-        response = self.put_json(
-            '/createhandler/data/%s' % self.EXP_ID, {
-                'change_list': [{
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'objective',
-                    'new_value': 'the objective',
-                }],
-                'commit_message': 'Changed exp objective',
-                'version': 1
-            }, csrf_token=self.csrf_token,
-            expected_status_int=400)
-        # Checking the response to have error.
-        self.assertEqual(
-            response, {'status_code': 400,
-                       'error': (
-                           'Voice artist does not have permission to make'
-                           ' some changes in the change list.')
-                      })
+        # Audio files are stored to the datastore in the dev env, and to GCS
+        # in production.
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
+        fs.commit(
+            '%s/%s' % (self._FILENAME_PREFIX, filename),
+            raw_audio_file, mimetype=mimetype)
+
+        self.render_json({'filename': filename, 'duration_secs': duration_secs})
 
 
-class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
-    """Test the handling of voice artist autosave actions."""
+class StartedTranslationTutorialEventHandler(base.BaseHandler):
+    """Records that this user has started the state translation tutorial."""
 
-    EXP_ID = 'expId'
-    # 30 days into the future.
-    NEWER_DATETIME = datetime.datetime.utcnow() + datetime.timedelta(30)
-    # A date in the past.
-    OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
-    RECORDED_VOICEOVERS = {
-        'voiceovers_mapping': {
-            'ca_placeholder_0': {},
-            'content': {
-                'en': {
-                    'filename': 'testFile.mp3',
-                    'file_size_bytes': 12200,
-                    'needs_update': False,
-                    'duration_secs': 4.5
-                }
-            },
-            'default_outcome': {}
-        }
-    }
-    VALID_DRAFT_CHANGELIST = [{
-        'cmd': 'edit_state_property',
-        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-        'property_name': 'recorded_voiceovers',
-        'old_value': None,
-        'new_value': RECORDED_VOICEOVERS}]
-    INVALID_DRAFT_CHANGELIST = [{
-        'cmd': 'edit_exploration_property',
-        'property_name': 'title',
-        'old_value': None,
-        'new_value': 'New title'}]
-
-    def setUp(self):
-        super(VoiceArtistAutosaveTest, self).setUp()
-        self.login(self.OWNER_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        rights_manager.assign_role_for_exploration(
-            self.owner,
-            self.EXP_ID,
-            self.voice_artist_id,
-            rights_domain.ROLE_VOICE_ARTIST
-        )
-        self.logout()
-
-        self.login(self.VOICE_ARTIST_EMAIL)
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.voice_artist_id, self.EXP_ID),
-            user_id=self.voice_artist_id, exploration_id=self.EXP_ID,
-            draft_change_list=self.VALID_DRAFT_CHANGELIST,
-            draft_change_list_last_updated=self.OLDER_DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=1).put()
-
-        # Generate CSRF token.
-        self.csrf_token = self.get_new_csrf_token()
-
-    def test_draft_updated_version_valid(self):
-        payload = {
-            'change_list': self.VALID_DRAFT_CHANGELIST,
-            'version': 1,
-        }
-        response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID,
-            payload, csrf_token=self.csrf_token)
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.voice_artist_id, self.EXP_ID))
-        self.assertEqual(
-            exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
-        self.assertTrue(response['is_version_of_draft_valid'])
-        self.assertEqual(response['draft_change_list_id'], 2)
-
-    def test_draft_not_updated_validation_error(self):
-        response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID, {
-                'change_list': self.INVALID_DRAFT_CHANGELIST,
-                'version': 1,
-            }, csrf_token=self.csrf_token, expected_status_int=400)
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.voice_artist_id, self.EXP_ID))
-        self.assertEqual(
-            exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_id, 1)
-        self.assertEqual(
-            response, {'status_code': 400,
-                       'error': (
-                           'Voice artist does not have permission to make'
-                           ' some changes in the change list.')
-                      })
-
-    def test_draft_updated_version_invalid(self):
-        payload = {
-            'change_list': self.VALID_DRAFT_CHANGELIST,
-            'version': 10,
-        }
-        response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID,
-            payload, csrf_token=self.csrf_token)
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.voice_artist_id, self.EXP_ID))
-        self.assertEqual(
-            exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
-        self.assertFalse(response['is_version_of_draft_valid'])
-        self.assertEqual(response['draft_change_list_id'], 2)
-
-    def test_discard_draft(self):
-        self.post_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID, {},
-            csrf_token=self.csrf_token)
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.voice_artist_id, self.EXP_ID))
-        self.assertIsNone(exp_user_data.draft_change_list)
-        self.assertIsNone(exp_user_data.draft_change_list_last_updated)
-        self.assertIsNone(exp_user_data.draft_change_list_exp_version)
-
-
-class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
-    """This controller tests the first time tutorial for translations."""
-
-    EXP_ID = 'exp1'
-
-    def setUp(self):
-        super(TranslationFirstTimeTutorialTest, self).setUp()
-        self.login(self.OWNER_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        rights_manager.assign_role_for_exploration(
-            self.owner,
-            self.EXP_ID,
-            self.voice_artist_id,
-            rights_domain.ROLE_VOICE_ARTIST
-        )
-        self.logout()
-
-        self.login(self.VOICE_ARTIST_EMAIL)
-        # Generate CSRF token.
-        self.csrf_token = self.get_new_csrf_token()
-
-    def test_firsttime_translation_tutorial(self):
-        """Testing of the firsttime translation tutorial http requests."""
-        # Check if method returns 200 http status.
-        self.post_json(
-            '/createhandler/started_translation_tutorial_event/%s'
-            % self.EXP_ID, {}, csrf_token=self.csrf_token,
-            expected_status_int=200)
+    @acl_decorators.can_play_exploration
+    def post(self, unused_exploration_id):
+        """Handles POST requests."""
+        user_services.record_user_started_state_translation_tutorial(
+            self.user_id)
+        self.render_json({})

@@ -20,18 +20,17 @@ import { EventEmitter } from '@angular/core';
 
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+require('pages/exploration-editor-page/services/' +
+  'state-tutorial-first-time-backend-api.service.ts');
 
 angular.module('oppia').factory('StateTutorialFirstTimeService', [
-  '$http', 'EditorFirstTimeEventsService',
-  function($http, EditorFirstTimeEventsService) {
+  'EditorFirstTimeEventsService', 'StateTutorialFirstTimeBackendApiService',
+  function(
+    EditorFirstTimeEventsService, StateTutorialFirstTimeBackendApiService) {
     // Whether this is the first time the tutorial has been seen by this user.
     var _currentlyInEditorFirstVisit = true;
-    var STARTED_EDITOR_TUTORIAL_EVENT_URL = '/createhandler/' +
-    'started_tutorial_event';
     var _currentlyInTranslationFirstVisit = true;
     var _translationTutorialNotSeenBefore = false;
-    var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
-    'started_translation_tutorial_event';
     /** @private */
     var enterEditorForTheFirstTimeEventEmitter = new EventEmitter();
     /** @private */
@@ -51,7 +50,8 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         if (_currentlyInEditorFirstVisit) {
           enterEditorForTheFirstTimeEventEmitter.emit();
           EditorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).then(
+          StateTutorialFirstTimeBackendApiService
+          .recordEditorTutorialStartEvent(expId).then(
             null, function() {
               console.error(
                 'Warning: could not record editor tutorial start event.');
@@ -79,8 +79,9 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         if (_currentlyInTranslationFirstVisit) {
           enterTranslationForTheFirstTimeEventEmitter.emit();
           EditorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
-            .then(null, function() {
+          StateTutorialFirstTimeBackendApiService
+          .recordTranslationsTutorialStartEvent(expId).then(
+            null, function() {
               console.error(
                 'Warning: could not record translation tutorial start event.'
               );

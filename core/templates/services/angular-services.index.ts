@@ -296,6 +296,9 @@ import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/t
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
+import { StateTutorialFirstTimeBackendApiService } from
+// eslint-disable-next-line max-len
+  'pages/exploration-editor-page/services/state-tutorial-first-time-backend-api.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -552,6 +555,8 @@ export const angularServices: [string, unknown][] = [
     StateTopAnswersStatsBackendApiService],
   ['StateTopAnswersStatsObjectFactory', StateTopAnswersStatsObjectFactory],
   ['StateTopAnswersStatsService', StateTopAnswersStatsService],
+  ['StateTutorialFirstTimeBackendApiService', 
+    StateTutorialFirstTimeBackendApiService],
   ['StateWrittenTranslationsService', StateWrittenTranslationsService],
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
