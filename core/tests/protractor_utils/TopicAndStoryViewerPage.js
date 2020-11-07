@@ -47,7 +47,7 @@ var TopicAndStoryViewerPage = function() {
   this.login = async function(email, username) {
     await action.click('Login button', loginButton);
     await users.completeLoginFlowFromStoryViewerPage(email, username);
-  }
+  };
 };
 
 exports.TopicAndStoryViewerPage = TopicAndStoryViewerPage;
