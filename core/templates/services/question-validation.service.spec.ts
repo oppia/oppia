@@ -24,6 +24,9 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 // ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('domain/question/QuestionObjectFactory.ts');
 require('services/question-validation.service.ts');
@@ -35,6 +38,7 @@ describe('Question Validation Service', function() {
   var QuestionObjectFactory = null;
   var qvs = null;
   var ses = null;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
