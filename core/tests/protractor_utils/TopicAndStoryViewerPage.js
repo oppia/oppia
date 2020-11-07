@@ -18,11 +18,13 @@
  */
 
 var action = require('../protractor_utils/action.js');
+var users = require('../protractor_utils/users.js');
 var waitFor = require('./waitFor.js');
 
 var TopicAndStoryViewerPage = function() {
   var chapterTitleList = element.all(by.css('.protractor-chapter-title'));
   var lockedChapterList = element.all(by.css('.protractor-locked-chapter'));
+  var loginButton = element(by.css('.protractor-test-login-button'));
 
   this.get = async function(
       classroomUrlFragment, topicUrlFragment, storyUrlFragment) {
@@ -41,6 +43,11 @@ var TopicAndStoryViewerPage = function() {
   this.expectLockedChaptersToBe = async function(value) {
     expect(await lockedChapterList.count()).toEqual(value);
   };
+
+  this.login = async function(email, username) {
+    await action.click('Login button', loginButton);
+    await users.completeLoginFlowFromStoryViewerPage(email, username);
+  }
 };
 
 exports.TopicAndStoryViewerPage = TopicAndStoryViewerPage;

@@ -66,8 +66,7 @@ describe('Story viewer functionality', function() {
         EXPLORATION.language,
         true
       );
-      var url = await browser.getCurrentUrl();
-      dummyExplorationIds.push(url.split('/')[4].replace('#', ''));
+      dummyExplorationIds.push(await general.getExplorationIdFromEditor());
     }
   };
 
@@ -145,7 +144,7 @@ describe('Story viewer functionality', function() {
     await topicAndStoryViewerPage.expectLockedChaptersToBe(2);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await users.completeLoginFlowFromStoryViewerPage(
+    await topicAndStoryViewerPage.login(
       'newStoryViewer@storyviewer.com', 'newStoryViewer');
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(

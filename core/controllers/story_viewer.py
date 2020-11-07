@@ -106,7 +106,7 @@ class StoryProgressHandler(base.BaseHandler):
 
         next_exp_ids = []
         next_node_id = None
-        if not node_id in completed_node_ids:
+        if node_id not in completed_node_ids:
             story_services.record_completed_node_in_story_context(
                 self.user_id, story_id, node_id)
 
@@ -131,9 +131,7 @@ class StoryProgressHandler(base.BaseHandler):
         story = story_fetchers.get_story_by_id(story_id)
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
             self.user_id, story_id)
-        ordered_nodes = [
-            node for node in story.story_contents.get_ordered_nodes()
-        ]
+        ordered_nodes = story.story_contents.get_ordered_nodes()
 
         # In case the user is a returning user and has completed nodes in the
         # past, redirect to the story page so that the user can continue from
@@ -176,10 +174,8 @@ class StoryProgressHandler(base.BaseHandler):
             self.user_id, story_id)
         completed_node_ids = [
             completed_node.id for completed_node in completed_nodes]
+        ordered_nodes = story.story_contents.get_ordered_nodes()
 
-        ordered_nodes = [
-            node for node in story.story_contents.get_ordered_nodes()
-        ]
         (next_exp_ids, next_node_id, completed_node_ids) = (
             self._record_node_completion(
                 story_id, node_id, completed_node_ids, ordered_nodes))
