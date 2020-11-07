@@ -34,17 +34,21 @@ import feconf
     [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
 
 
+class ExplorationSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            exp_models.ExplorationSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class ExplorationModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationModel class."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExplorationModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            exp_models.ExplorationModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -67,12 +71,49 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExplorationContextModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
+class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    EXP_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
+
+    def test_get_deletion_policy_is_locally_pseudonymize(self):
+        self.assertEqual(
+            exp_models.ExplorationRightsSnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
+        exp_models.ExplorationRightsModel(
+            id=self.EXP_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.1
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+        self.assertTrue(
+            exp_models.ExplorationRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            exp_models.ExplorationRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_2))
         self.assertFalse(
-            exp_models.ExplorationContextModel
-            .has_reference_to_user_id('any_id'))
+            exp_models.ExplorationRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
+        self.assertFalse(
+            exp_models.ExplorationRightsSnapshotContentModel
+            .has_reference_to_user_id('x_id'))
 
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
@@ -98,13 +139,11 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         super(ExplorationRightsModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id='gae_1_id',
             email='some@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
-            gae_id='gae_2_id',
             email='some_other@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
@@ -168,7 +207,8 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExplorationRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
@@ -353,6 +393,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
 
         with self.allow_revert_swap, self.allowed_commands_swap:
@@ -377,6 +418,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
 
         with self.allow_revert_swap, self.allowed_commands_swap:
@@ -402,6 +444,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
         with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
@@ -423,13 +466,15 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             exp_models.ExplorationCommitLogEntryModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         commit = exp_models.ExplorationCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.exploration_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             exp_models.ExplorationCommitLogEntryModel
@@ -449,7 +494,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
         public_commit.exploration_id = 'b'
+        private_commit.update_timestamps()
         private_commit.put()
+        public_commit.update_timestamps()
         public_commit.put()
         results, _, more = (
             exp_models.ExplorationCommitLogEntryModel
@@ -480,7 +527,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit1.exploration_id = 'a'
         commit2.exploration_id = 'a'
+        commit1.update_timestamps()
         commit1.put()
+        commit2.update_timestamps()
         commit2.put()
 
         actual_models = (
@@ -510,13 +559,11 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         super(ExpSummaryModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
-            gae_id='gae_1_id',
             email='some@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2_NEW,
-            gae_id='gae_2_id',
             email='some_other@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
@@ -524,7 +571,8 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExpSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         exp_models.ExpSummaryModel(
@@ -575,6 +623,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        public_exploration_summary_model.update_timestamps()
         public_exploration_summary_model.put()
 
         private_exploration_summary_model = (
@@ -596,6 +645,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        private_exploration_summary_model.update_timestamps()
         private_exploration_summary_model.put()
         exploration_summary_models = (
             exp_models.ExpSummaryModel.get_non_private())
@@ -624,6 +674,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_created_on=None,
             ))
         good_rating_exploration_summary_model.scaled_average_rating = 100
+        good_rating_exploration_summary_model.update_timestamps()
         good_rating_exploration_summary_model.put()
 
         bad_rating_exploration_summary_model = (
@@ -646,6 +697,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_created_on=None,
             ))
         bad_rating_exploration_summary_model.scaled_average_rating = 0
+        bad_rating_exploration_summary_model.update_timestamps()
         bad_rating_exploration_summary_model.put()
 
         self.assertEqual(
@@ -663,6 +715,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         # Test that private summaries should be ignored.
         good_rating_exploration_summary_model.status = (
             constants.ACTIVITY_STATUS_PRIVATE)
+        good_rating_exploration_summary_model.update_timestamps()
         good_rating_exploration_summary_model.put()
         self.assertEqual(
             exp_models.ExpSummaryModel.get_top_rated(2),
@@ -688,6 +741,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        viewable_exploration_summary_model.update_timestamps()
         viewable_exploration_summary_model.put()
 
         unviewable_exploration_summary_model = (
@@ -709,6 +763,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        unviewable_exploration_summary_model.update_timestamps()
         unviewable_exploration_summary_model.put()
         exploration_summary_models = (
             exp_models.ExpSummaryModel
@@ -736,6 +791,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        editable_collection_summary_model.update_timestamps()
         editable_collection_summary_model.put()
 
         uneditable_collection_summary_model = (
@@ -757,6 +813,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 exploration_model_last_updated=None,
                 exploration_model_created_on=None,
             ))
+        uneditable_collection_summary_model.update_timestamps()
         uneditable_collection_summary_model.put()
 
         exploration_summary_models = (

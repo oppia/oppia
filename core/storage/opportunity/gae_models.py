@@ -44,17 +44,17 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         repeated=True, indexed=True)
     translation_counts = (
         datastore_services.JsonProperty(default={}, indexed=False))
-    assigned_voice_artist_in_language_codes = datastore_services.StringProperty(
-        repeated=True, indexed=True)
-    need_voice_artist_in_language_codes = datastore_services.StringProperty(
+    language_codes_with_assigned_voice_artists = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    language_codes_needing_voice_artists = datastore_services.StringProperty(
         repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration opporturnity summary is deleted only if the corresponding
-        exploration is not public.
+        """ExplorationOpportunitySummaryModel doesn't contain any data directly
+        corresponding to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -69,25 +69,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             'incomplete_translation_language_codes':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'assigned_voice_artist_in_language_codes':
+            'language_codes_with_assigned_voice_artists':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'need_voice_artist_in_language_codes':
+            'language_codes_needing_voice_artists':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """ExplorationOpportunitySummaryModel doesn't reference any user_id
-        directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-                should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_all_translation_opportunities(
@@ -164,7 +150,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             start_cursor = None
 
         results, cursor, more = cls.query(
-            cls.need_voice_artist_in_language_codes == language_code).order(
+            cls.language_codes_needing_voice_artists == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
 
@@ -204,10 +190,10 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Skill opportunity is deleted only if the corresponding skill is not
-        public.
+        """SkillOpportunityModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):
@@ -216,19 +202,6 @@ class SkillOpportunityModel(base_models.BaseModel):
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """SkillOpportunityModel doesn't reference any user_id directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-                should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):

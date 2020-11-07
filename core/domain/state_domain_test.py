@@ -398,7 +398,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Equals'
             }],
@@ -1081,7 +1081,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -1181,6 +1181,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_supports_android(self, 'NumericInput')
         _verify_interaction_supports_android(self, 'TextInput')
         _verify_interaction_supports_android(self, 'NumericExpressionInput')
+        _verify_interaction_supports_android(self, 'RatioExpressionInput')
         _verify_interaction_supports_android(self, None)
 
         _verify_interaction_does_not_support_android(self, 'CodeRepl')
@@ -1189,8 +1190,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_does_not_support_android(self, 'LogicProof')
         _verify_interaction_does_not_support_android(self, 'MusicNotesInput')
         _verify_interaction_does_not_support_android(self, 'PencilCodeEditor')
-        _verify_interaction_does_not_support_android(
-            self, 'RatioExpressionInput')
         _verify_interaction_does_not_support_android(self, 'SetInput')
 
         _verify_all_interaction_ids_checked(self)
@@ -1244,7 +1243,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -3157,7 +3156,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -3617,7 +3616,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': []
+                    'x': [[]]
                 },
                 'rule_type': 'Contains'
             }],
@@ -3628,7 +3627,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '[] has the wrong type. It should be a NormalizedString.')):
+                '[[]] has the wrong type. It should be a SetOfNormalizedString.'
+            )
+        ):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
 
@@ -3656,7 +3657,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
