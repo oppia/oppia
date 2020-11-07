@@ -46,7 +46,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'answer-classification.service.ts',
     'answer-group-editor.directive.ts',
     'App.ts',
-    'attribution-guide.component.ts',
     'audio-bar.directive.ts',
     'audio-file-uploader.directive.ts',
     'audio-player.service.ts',
