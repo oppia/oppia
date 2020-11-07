@@ -1194,6 +1194,9 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     The id of this model is computed using VersionedModel.get_snapshot_id().
     """
+    
+    # The ids of SnapshotMetadataModels are used as Takeout keys.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The id of the user who committed this revision.
     committer_id = (
