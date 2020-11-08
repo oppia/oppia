@@ -22,6 +22,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
+import { RubricBackendDict } from 'domain/skill/RubricObjectFactory';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
 import { SkillIdToDescriptionMap } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageBackendDict } from 'domain/topic/SubtopicPageObjectFactory';
@@ -31,11 +33,32 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 
 interface FetchTopicBackendResponse {
   'topic_dict': TopicBackendDict;
-  'grouped_skill_summary_dicts': Object;
+  'grouped_skill_summary_dicts':  {
+    [topicName: string]: SkillSummaryBackendDict[];
+  };
   'skill_id_to_description_dict': SkillIdToDescriptionMap;
-  'skill_question_count_dict': Object;
-  'skill_id_to_rubrics_dict': Object;
+  'skill_question_count_dict': {
+    [skillId: string]: number;
+  };
+  'skill_id_to_rubrics_dict': {
+    [skillId: string]: RubricBackendDict[];
+  };
   'classroom_url_fragment': string;
+}
+
+interface FetchTopicResponse {
+  topicDict: TopicBackendDict;
+  groupedSkillSummaries: {
+    [topicName: string]: SkillSummaryBackendDict[];
+  };
+  skillIdToDescriptionDict: SkillIdToDescriptionMap;
+  skillQuestionCountDict: {
+    [skillId: string]: number;
+  };
+  skillIdToRubricsDict: {
+    [skillId: string]: RubricBackendDict[];
+  };;
+  classroomUrlFragment: string;
 }
 
 interface FetchStoriesBackendResponse {
@@ -51,9 +74,19 @@ interface DeleteTopicBackendResponse {
 }
 
 interface UpdateTopicBackendResponse {
-  'topic_dict': Object;
-  'skill_id_to_description_dict': Object;
-  'skill_id_to_rubrics_dict': Object
+  'topic_dict': TopicBackendDict;
+  'skill_id_to_description_dict': SkillIdToDescriptionMap;
+  'skill_id_to_rubrics_dict': {
+    [skillId: string]: RubricBackendDict[];
+  };
+}
+
+interface UpdateTopicResponse {
+  topicDict: TopicBackendDict;
+  skillIdToDescriptionDict: SkillIdToDescriptionMap;
+  skillIdToRubricsDict: {
+    [skillId: string]: RubricBackendDict[];
+  };
 }
 
 interface DoesTopicWithUrlFragmentExistBackendResponse {
@@ -74,7 +107,7 @@ export class EditableTopicBackendApiService {
 
   private _fetchTopic(
       topicId: string,
-      successCallback: (value?: Object) => void,
+      successCallback: (value?: FetchTopicResponse) => void,
       errorCallback: (reason?: string) => void): void {
     let topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
@@ -170,7 +203,7 @@ export class EditableTopicBackendApiService {
       topicVersion: string,
       commitMessage: string,
       changeList: BackendChangeObject[],
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (value?: UpdateTopicResponse) => void,
       errorCallback: (reason?: string) => void): void {
     let editableTopicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
@@ -234,7 +267,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  fetchTopic(topicId: string): Promise<Object> {
+  fetchTopic(topicId: string): Promise<FetchTopicResponse> {
     return new Promise((resolve, reject) => {
       this._fetchTopic(topicId, resolve, reject);
     });
@@ -268,7 +301,7 @@ export class EditableTopicBackendApiService {
       topicId: string,
       topicVersion: string,
       commitMessage: string,
-      changeList: BackendChangeObject[]): Promise<Object> {
+      changeList: BackendChangeObject[]): Promise<UpdateTopicResponse> {
     return new Promise((resolve, reject) => {
       this._updateTopic(
         topicId, topicVersion, commitMessage, changeList,
