@@ -29,7 +29,7 @@ var login = async function(
   // The full url is also necessary.
   var driver = browser.driver;
   // The manualNavigation argument is used to determine whether to navigate to
-  // the login URL using browser.get() or not. If false, the calling method
+  // the login URL using driver.get() or not. If false, the calling method
   // should handle navigation to the login page.
   if (manualNavigation) {
     await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
