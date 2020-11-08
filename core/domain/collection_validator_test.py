@@ -44,7 +44,7 @@ USER_NAME = 'username'
 (
     collection_models, exp_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration, 
+    models.NAMES.collection, models.NAMES.exploration,
     models.NAMES.user
 ])
 
@@ -59,7 +59,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
             title='title %d' % i,
             category='category%d' % i
         ) for i in python_utils.RANGE(6)]
-        
+
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
