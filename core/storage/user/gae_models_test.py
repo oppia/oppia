@@ -191,11 +191,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': None,
             'normalized_username': None,
-            'last_agreed_to_terms': None,
-            'last_started_state_editor_tutorial': None,
-            'last_started_state_translation_tutorial': None,
-            'last_logged_in': None,
-            'last_edited_an_exploration': None,
+            'last_agreed_to_terms_msec': None,
+            'last_started_state_editor_tutorial_msec': None,
+            'last_started_state_translation_tutorial_msec': None,
+            'last_logged_in_msec': None,
+            'last_edited_an_exploration_msec': None,
+            'last_created_an_exploration_msec': None,
             'profile_picture_data_url': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -205,8 +206,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'display_alias': None,
-            'pin': None
+            'display_alias': None
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -218,22 +218,22 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_EPOCH,
-            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
-            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
-            'last_logged_in': self.GENERIC_EPOCH,
-            'last_edited_an_exploration': self.GENERIC_EPOCH,
+            'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial_msec': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial_msec': self.GENERIC_EPOCH,
+            'last_logged_in_msec': self.GENERIC_EPOCH,
+            'last_edited_an_exploration_msec': self.GENERIC_EPOCH,
+            'last_created_an_exploration_msec': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': self.GENERIC_USER_BIO,
             'subject_interests': self.GENERIC_SUBJECT_INTERESTS,
-            'first_contribution_msec': 1,
+            'first_contribution_msec': 1.0,
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'display_alias': self.GENERIC_DISPLAY_ALIAS,
-            'pin': self.GENERIC_PIN
+            'display_alias': self.GENERIC_DISPLAY_ALIAS
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -342,8 +342,8 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.CompletedActivitiesModel.export_data(self.USER_1_ID))
         expected_data = {
-            'completed_exploration_ids': self.EXPLORATION_IDS_1,
-            'completed_collection_ids': self.COLLECTION_IDS_1
+            'exploration_ids': self.EXPLORATION_IDS_1,
+            'collection_ids': self.COLLECTION_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 
@@ -419,8 +419,8 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.IncompleteActivitiesModel.export_data(self.USER_1_ID))
         expected_data = {
-            'incomplete_exploration_ids': self.EXPLORATION_IDS_1,
-            'incomplete_collection_ids': self.COLLECTION_IDS_1
+            'exploration_ids': self.EXPLORATION_IDS_1,
+            'collection_ids': self.COLLECTION_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 
@@ -549,8 +549,8 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             self.USER_ID_1)
         expected_data = {
             self.EXP_ID_0: {
-                'exp_version': self.EXP_VERSION,
-                'state_name': self.STATE_NAME_1
+                'last_played_exp_version': self.EXP_VERSION,
+                'last_played_state_name': self.STATE_NAME_1
             }
         }
         self.assertEqual(expected_data, user_data)
@@ -561,12 +561,12 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             self.USER_ID_2)
         expected_data = {
             self.EXP_ID_0: {
-                'exp_version': self.EXP_VERSION,
-                'state_name': self.STATE_NAME_2
+                'last_played_exp_version': self.EXP_VERSION,
+                'last_played_state_name': self.STATE_NAME_2
             },
             self.EXP_ID_1: {
-                'exp_version': self.EXP_VERSION,
-                'state_name': self.STATE_NAME_2
+                'last_played_exp_version': self.EXP_VERSION,
+                'last_played_state_name': self.STATE_NAME_2
             }
         }
         self.assertEqual(expected_data, user_data)
@@ -641,8 +641,8 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         """Test if export_data works as intended on a user in datastore."""
         user_data = user_models.LearnerPlaylistModel.export_data(self.USER_ID_1)
         expected_data = {
-            'playlist_exploration_ids': self.EXPLORATION_IDS_1,
-            'playlist_collection_ids': self.COLLECTION_IDS_1
+            'exploration_ids': self.EXPLORATION_IDS_1,
+            'collection_ids': self.COLLECTION_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 
@@ -756,6 +756,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -765,6 +766,13 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
         user_models.UserEmailPreferencesModel(
             id=self.USER_ID_2,
             deleted=True
+        ).put()
+        user_models.UserEmailPreferencesModel(
+            id=self.USER_ID_3,
+            site_updates=False,
+            editor_role_notifications=False,
+            feedback_message_notifications=False,
+            subscription_notifications=False
         ).put()
 
     def test_get_deletion_policy(self):
@@ -794,6 +802,32 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
         self.assertFalse(
             user_models.UserEmailPreferencesModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_export_data_trivial(self):
+        user_data = user_models.UserEmailPreferencesModel.export_data(
+            self.USER_ID_1)
+        self.assertEqual(
+            {
+                'site_updates': None,
+                'editor_role_notifications': True,
+                'feedback_message_notifications': True,
+                'subscription_notifications': True
+            },
+            user_data
+        )
+
+    def test_export_data_nontrivial(self):
+        user_data = user_models.UserEmailPreferencesModel.export_data(
+            self.USER_ID_3)
+        self.assertEqual(
+            user_data,
+            {
+                'site_updates': False,
+                'editor_role_notifications': False,
+                'feedback_message_notifications': False,
+                'subscription_notifications': False
+            }
         )
 
 
@@ -840,6 +874,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             activity_ids=self.ACTIVITY_IDS,
+            feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATETIME
         ).put()
@@ -901,8 +936,9 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'creator_usernames': [],
             'collection_ids': [],
             'activity_ids': [],
+            'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
-            'last_checked': None
+            'last_checked_msec': None
         }
         self.assertEqual(user_data, test_data)
 
@@ -914,8 +950,10 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
+            'feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked': utils.get_time_in_millisecs(self.GENERIC_DATETIME)
+            'last_checked_msec':
+                utils.get_time_in_millisecs(self.GENERIC_DATETIME)
         }
         self.assertEqual(user_data, test_data)
 
@@ -1291,9 +1329,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_EPOCH,
+                'rated_on_msec': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1323,9 +1361,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_EPOCH,
+                'rated_on_msec': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1335,9 +1373,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             },
             self.EXP_ID_TWO: {
                 'rating': None,
-                'rated_on': None,
+                'rated_on_msec': None,
                 'draft_change_list': None,
-                'draft_change_list_last_updated': None,
+                'draft_change_list_last_updated_msec': None,
                 'draft_change_list_exp_version': None,
                 'draft_change_list_id': 0,
                 'mute_suggestion_notifications': (
@@ -1347,9 +1385,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             },
             self.EXP_ID_THREE: {
                 'rating': 5,
-                'rated_on': self.DATETIME_EPOCH,
+                'rated_on_msec': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {'content': 3}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 2,
                 'draft_change_list_id': 2,
                 'mute_suggestion_notifications': (
@@ -1457,7 +1495,9 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_2)
         expected_data = {
-            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATION_IDS_1
+            self.COLLECTION_ID_1: {
+                'completed_explorations': self.COMPLETED_EXPLORATION_IDS_1
+            }
         }
         self.assertEqual(expected_data, user_data)
 
@@ -1466,8 +1506,12 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_1)
         expected_data = {
-            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATION_IDS_1,
-            self.COLLECTION_ID_2: self.COMPLETED_EXPLORATION_IDS_2
+            self.COLLECTION_ID_1: {
+                'completed_explorations': self.COMPLETED_EXPLORATION_IDS_1
+            },
+            self.COLLECTION_ID_2: {
+                'completed_explorations': self.COMPLETED_EXPLORATION_IDS_2
+            }
         }
         self.assertEqual(expected_data, user_data)
 
@@ -1563,7 +1607,9 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.StoryProgressModel.export_data(
             self.USER_ID_1)
         expected_data = {
-            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
+            self.STORY_ID_1: {
+                'completed_node_ids': self.COMPLETED_NODE_IDS_1
+            }
         }
         self.assertEqual(expected_data, user_data)
 
@@ -1571,8 +1617,12 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.StoryProgressModel.export_data(
             self.USER_ID_2)
         expected_data = {
-            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1,
-            self.STORY_ID_2: self.COMPLETED_NODE_IDS_2
+            self.STORY_ID_1: {
+                'completed_node_ids': self.COMPLETED_NODE_IDS_1
+            },
+            self.STORY_ID_2: {
+                'completed_node_ids': self.COMPLETED_NODE_IDS_2
+            }
         }
         self.assertEqual(expected_data, user_data)
 
@@ -1924,8 +1974,12 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         user_data = user_models.UserSkillMasteryModel.export_data(
             self.USER_1_ID)
         test_data = {
-            self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
-            self.SKILL_ID_2: self.DEGREE_OF_MASTERY
+            self.SKILL_ID_1: {
+                'degree_of_mastery': self.DEGREE_OF_MASTERY
+            },
+            self.SKILL_ID_2: {
+                'degree_of_mastery': self.DEGREE_OF_MASTERY
+            }
         }
         self.assertEqual(user_data, test_data)
 
