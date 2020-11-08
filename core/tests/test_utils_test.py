@@ -228,9 +228,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(None), 1)
-        with self.assertRaisesRegexp(
-            RuntimeError, 'MapReduce task to URL .+ failed'):
-            self.process_and_flush_pending_mapreduce_tasks()
+        self.assertRaisesRegexp(
+            RuntimeError, 'MapReduce task failed: Task<.*>',
+            self.process_and_flush_pending_mapreduce_tasks)
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
@@ -368,10 +368,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getenv(key, default): # pylint: disable=unused-argument
             return
         getenv_swap = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_kwargs=[
-                {'key': '123', 'default': '456'},
-                {'key': '678', 'default': '900'},
-            ])
+            os, 'getenv', mock_getenv,
+            expected_args=[('123',), ('678',)],
+            expected_kwargs=[{'default': '456'}, {'default': '900'}])
 
         with getenv_swap:
             SwapWithCheckTestClass.functions_with_kwargs()

@@ -316,7 +316,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA = {
         '- The Oppia Contributor Dashboard Team'
     ),
     'email_subject': (
-        'Contributor Dashboard Suggestions Have Been Waiting Too Long for a'
+        'Contributor Dashboard Suggestions Have Been Waiting Too Long for '
         'Review')
 }
 
@@ -1537,7 +1537,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
 def send_mail_to_notify_contributor_dashboard_reviewers(
         reviewer_ids, reviewers_suggestion_email_infos):
     """Sends an email to each reviewer notifying them of the suggestions on the
-    Contributor Dashboard that have been waiting the longest for reivew, and
+    Contributor Dashboard that have been waiting the longest for review, and
     that the reviewer has permission to review.
 
     Args:
@@ -1720,16 +1720,14 @@ def send_account_deleted_email(user_id, user_email):
 
     email_body_template = (
         'Hi %s,<br><br>'
-        'Your account was successfully deleted.'
-        '- The Oppia Team<br>'
-        '<br>%s')
+        'Your account was successfully deleted.<br><br>'
+        '- The Oppia Team')
 
     if not feconf.CAN_SEND_EMAILS:
         log_new_error('This app cannot send emails to users.')
         return
 
-    email_body = email_body_template % (
-        user_email, EMAIL_FOOTER.value)
+    email_body = email_body_template % user_email
     _send_email(
         user_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_ACCOUNT_DELETED, email_subject, email_body,
