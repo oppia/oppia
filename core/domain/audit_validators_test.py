@@ -35,7 +35,7 @@ datastore_services = models.Registry.import_datastore_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-audit_models, user_models = models.Registry.import_models([
+(audit_models, user_models) = models.Registry.import_models([
     models.NAMES.audit, models.NAMES.user])
 
 
