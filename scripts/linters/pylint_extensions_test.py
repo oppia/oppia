@@ -879,6 +879,77 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_with_no_space_above_return)
 
+    def test_newline_below_multipart_docstring_section(self):
+        node_multipart_docstring_args = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"Return something in dict.
+
+                Args:
+                    arg: dict. Some sample
+                        dictionary.
+
+                Returns:
+                    dict. Sample dict.
+                    Example:
+
+                    {
+                        'entry1': {
+                            'number': 10,
+                        },
+                    }
+                \"\"\"
+                return something
+        """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_multipart_docstring_args)
+
+        node_multipart_varying_incorrect_spacing = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"Return something in dict.
+
+                Args:
+                    arg: dict. Some sample
+                        dictionary.
+
+
+                Returns:
+                    dict. Sample dict.
+                    Example:
+
+                    {
+                        'entry1': {
+                            'number': 10,
+                        },
+                    }
+
+                \"\"\"
+                return something
+        """)
+
+        empty_line_end_message = testutils.Message(
+            msg_id='empty-line-before-end',
+            node=node_multipart_varying_incorrect_spacing
+        )
+        message_above_returns = testutils.Message(
+            msg_id='single-space-above-returns',
+            node=node_multipart_varying_incorrect_spacing
+        )
+        message_below_returns = testutils.Message(
+            msg_id='single-space-below-returns',
+            node=node_multipart_varying_incorrect_spacing
+        )
+        message_below_args = testutils.Message(
+            msg_id='single-space-below-args',
+            node=node_multipart_varying_incorrect_spacing
+        )
+        with self.checker_test_object.assertAddsMessages(
+            empty_line_end_message, message_above_returns,
+            message_below_returns, message_below_args):
+            self.checker_test_object.checker.visit_functiondef(
+                node_multipart_varying_incorrect_spacing)
+
     def test_varying_combination_of_newline_around_docstring_sections(self):
         node_newline_above_raises_below_args = astroid.extract_node(
             u"""def func(arg): #@

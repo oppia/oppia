@@ -854,14 +854,18 @@ class DocstringParameterChecker(checkers.BaseChecker):
             b'Yields:': b'single-space-below-yields'
         }
         blank_line_counter = 0
+        found_words = False
         for line in docstring[::-1]:
             line = line.strip()
-            if line == b'':
+            if line != b'':
+                found_words = True
+            if line == b'' and not found_words:
                 blank_line_counter += 1
             if line in docstring_sections:
                 if blank_line_counter == 0 or blank_line_counter > 1:
                     self.add_message(docstring_sections[line], node=node)
                 blank_line_counter = 0
+                found_words = False
 
     def check_docstring_structure(self, node):
         """Checks whether the docstring has the correct structure i.e.
