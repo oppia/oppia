@@ -230,6 +230,25 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
             logging.warning('Deletion jobs for JobModels entities kicked off.')
 
 
+class CronModelsCleanupHandler(base.BaseHandler):
+    """Handler for cleaning up models that are marked as deleted and marking
+    specific types of models as deleted.
+    """
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Cron handler that hard-deletes all models that were marked as deleted
+        (have deleted field set to True) more than some period of time ago.
+        Also, for some types of models (that we shouldn't keep for long time)
+        mark them as deleted if they were last updated more than some period
+        of time ago.
+
+        The time periods are specified in the cron_services as a constant.
+        """
+        cron_services.delete_models_marked_as_deleted()
+        cron_services.mark_outdated_models_as_deleted()
+
+
 class CronMailReviewersContributorDashboardSuggestionsHandler(
         base.BaseHandler):
     """Handler for mailing reviewers suggestions on the Contributor

@@ -41,8 +41,8 @@ import utils
 from mapreduce import model as mapreduce_model
 import webtest
 
-(job_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.job, models.NAMES.suggestion])
+(job_models, suggestion_models, user_models) = models.Registry.import_models(
+    [models.NAMES.job, models.NAMES.suggestion, models.NAMES.user])
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
@@ -54,6 +54,9 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
 
 class CronJobTests(test_utils.GenericTestBase):
+
+    FIVE_WEEKS = datetime.timedelta(weeks=5)
+    NINE_WEEKS = datetime.timedelta(weeks=9)
 
     def setUp(self):
         super(CronJobTests, self).setUp()
@@ -321,6 +324,45 @@ class CronJobTests(test_utils.GenericTestBase):
                 'A previous JobModels cleanup job is still running.'
             ]
         )
+
+    def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        completed_activities_model = user_models.CompletedActivitiesModel(
+            id=admin_user_id,
+            exploration_ids=[],
+            collection_ids=[],
+            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
+            deleted=True
+        )
+        completed_activities_model.update_timestamps(
+            update_last_updated_time=False)
+        completed_activities_model.put()
+
+        with self.testapp_swap:
+            self.get_html_response('/cron/models/cleanup')
+
+        self.assertIsNone(completed_activities_model.get_by_id(admin_user_id))
+
+    def test_run_cron_to_mark_old_models_as_deleted(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        user_query_model = user_models.UserQueryModel(
+            id='query_id',
+            user_ids=[],
+            submitter_id=admin_user_id,
+            query_status=feconf.USER_QUERY_STATUS_PROCESSING,
+            last_updated=datetime.datetime.utcnow() - self.FIVE_WEEKS
+        )
+        user_query_model.update_timestamps(update_last_updated_time=False)
+        user_query_model.put()
+
+        with self.testapp_swap:
+            self.get_html_response('/cron/models/cleanup')
+
+        self.assertTrue(user_query_model.get_by_id('query_id').deleted)
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(

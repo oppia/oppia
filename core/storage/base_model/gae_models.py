@@ -301,9 +301,8 @@ class BaseModel(datastore_services.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the model.
         """
-        for entity in entities:
-            entity.update_timestamps(
-                update_last_updated_time=update_last_updated_time)
+        datastore_services.update_timestamps_multi(
+            entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     def put_multi(cls, entities):

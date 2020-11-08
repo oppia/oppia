@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core import jobs_registry
 from core.domain import base_model_validators
 from core.domain import prod_validation_jobs_one_off
@@ -166,3 +168,24 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         user.update_timestamps()
         user.put()
         MockBaseUserModelValidator().validate(user)
+
+    def test_validate_deleted_reports_error_for_old_deleted_model(self):
+        year_ago = datetime.datetime.utcnow() - datetime.timedelta(weeks=52)
+        model = MockModel(
+            id='123',
+            deleted=True,
+            last_updated=year_ago
+        )
+        model.update_timestamps(update_last_updated_time=False)
+        model.put()
+        validator = MockBaseUserModelValidator()
+        validator.validate_deleted(model)
+        self.assertEqual(
+            validator.errors,
+            {
+                'entity stale check': [
+                    'Entity id 123: model marked as '
+                    'deleted is older than 8 weeks'
+                ]
+            }
+        )

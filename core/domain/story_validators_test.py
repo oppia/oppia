@@ -153,12 +153,15 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'StoryModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated StoryModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'StoryModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)

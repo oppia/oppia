@@ -158,12 +158,16 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.superseding_skill_0.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.superseding_skill_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_2.id, self.model_instance_2.last_updated)]
+        expected_output = [
+            '[u\'fully-validated SkillModel\', 4]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'SkillModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_2.id, self.model_instance_2.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -210,7 +214,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id 0: based on field superseding_skill_ids '
                 'having value 3, expected model SkillModel with id 3 but it '
                 'doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillModel\', 3]']
+            u'[u\'fully-validated SkillModel\', 4]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 

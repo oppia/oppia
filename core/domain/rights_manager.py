@@ -820,7 +820,9 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
             'This user does not have any role in %s with ID %s'
             % (activity_type, activity_id))
 
-    assignee_username = user_services.get_username(removed_user_id)
+    assignee_username = user_services.get_usernames(removed_user_id)[0]
+    if assignee_username is None:
+        assignee_username = 'ANONYMOUS'
     commit_message = 'Remove %s from role %s for %s' % (
         assignee_username, old_role, activity_type)
     commit_cmds = [{

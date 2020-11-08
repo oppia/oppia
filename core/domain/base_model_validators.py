@@ -23,6 +23,7 @@ import collections
 import datetime
 import re
 
+from core.domain import cron_services
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -60,6 +61,7 @@ ERROR_CATEGORY_SUMMARY_CHECK = 'summary check'
 ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_TYPE_CHECK = 'type check'
 ERROR_CATEGORY_VERSION_CHECK = 'version check'
+ERROR_CATEGORY_STALE_CHECK = 'stale check'
 
 VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
@@ -378,6 +380,30 @@ class BaseModelValidator(python_utils.OBJECT):
 
         for func in cls._get_external_instance_custom_validation_functions():
             func(item, cls.field_name_to_external_model_references)
+
+    @classmethod
+    def validate_deleted(cls, item):
+        """Validate that the models marked as deleted are hard-deleted after
+        eight weeks.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+        """
+        cls.errors.clear()
+        date_now = datetime.datetime.utcnow()
+        date_before_which_models_should_be_deleted = (
+            date_now -
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
+        )
+        period_to_hard_delete_models_in_days = (
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+        if item.last_updated < date_before_which_models_should_be_deleted:
+            cls._add_error(
+                'entity %s' % ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: model marked as deleted is older than %s weeks'
+                % (item.id, python_utils.divide(
+                    period_to_hard_delete_models_in_days, 7))
+            )
 
 
 class BaseSummaryModelValidator(BaseModelValidator):

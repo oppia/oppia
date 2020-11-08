@@ -248,6 +248,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         email_preferences = user_services.get_email_preferences(self.user_1_id)
         self.assertFalse(email_preferences.can_receive_email_updates)
@@ -264,6 +265,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(user_auth_details.deleted)
 
         wipeout_service.pre_delete_user(self.profile_user_id)
+        self.process_and_flush_pending_tasks()
         user_settings = user_models.UserSettingsModel.get_by_id(
             self.profile_user_id)
         self.assertTrue(user_settings.deleted)
@@ -285,6 +287,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(profile_auth_details.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         user_settings = user_services.get_user_settings_by_gae_id(
             self.user_1_gae_id)
@@ -311,6 +314,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(user_auth_details.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         user_settings = user_services.get_user_settings_by_gae_id(
             self.user_1_gae_id)
@@ -340,6 +344,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             rights_domain.ROLE_OWNER)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
@@ -352,6 +357,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(collection_model.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNone(collection_models.CollectionModel.get_by_id('col_id'))
 
@@ -362,6 +368,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(exp_model.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
@@ -379,6 +386,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(collection_summary_model.community_owned)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         collection_summary_model = (
             collection_models.CollectionSummaryModel.get_by_id('col_id'))
@@ -397,6 +405,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(exp_summary_model.community_owned)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertTrue(exp_summary_model.community_owned)
@@ -414,6 +423,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertEqual(collection_summary_model.editor_ids, [self.user_2_id])
 
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
         collection_summary_model = (
             collection_models.CollectionSummaryModel.get_by_id('col_id'))
@@ -431,6 +441,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertEqual(exp_summary_model.editor_ids, [self.user_2_id])
 
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
         self.assertEqual(exp_summary_model.editor_ids, [])
@@ -447,6 +458,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertEqual(top_rights_model.manager_ids, [self.user_1_id])
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         top_rights_model = topic_models.TopicRightsModel.get_by_id('top_id')
         self.assertEqual(top_rights_model.manager_ids, [])
@@ -467,6 +479,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         self.pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -553,6 +566,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         ).commit(self.user_1_id, [{'cmd': 'command'}])
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_one_config_property_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -738,6 +752,7 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
             id=self.CONFIG_2_ID, value='a'
         ).commit(self.user_1_id, [{'cmd': 'command'}])
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
@@ -786,6 +801,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
     def test_one_collection_snapshot_metadata_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -827,6 +843,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
     def test_one_collection_snapshot_content_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -856,6 +873,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
     def test_one_collection_commit_log_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -901,6 +919,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
         with logging_swap:
             wipeout_service.pre_delete_user(self.user_1_id)
+            self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -954,6 +973,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
     def test_one_collection_when_the_deletion_is_repeated_is_pseudonymized(
             self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -999,6 +1019,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.publish_collection(self.user_1_id, self.COL_2_ID)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1057,6 +1078,7 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
         self.save_new_valid_collection(self.COL_2_ID, self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
@@ -1090,8 +1112,8 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
     USER_1_USERNAME = 'username1'
     USER_2_EMAIL = 'some-other@email.com'
     USER_2_USERNAME = 'username2'
-    EXP_1_ID = 'col_1_id'
-    EXP_2_ID = 'col_2_id'
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
         super(WipeoutServiceDeleteExplorationModelsTests, self).setUp()
@@ -1109,6 +1131,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
     def test_one_exploration_snapshot_metadata_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1150,6 +1173,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
     def test_one_exploration_snapshot_content_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1179,6 +1203,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
     def test_one_exploration_commit_log_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1223,6 +1248,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
         with logging_swap:
             wipeout_service.pre_delete_user(self.user_1_id)
+            self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1268,6 +1294,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
     def test_one_exploration_when_the_deletion_is_repeated_is_pseudonymized(
             self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1306,11 +1333,36 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id, exploration_mappings[self.EXP_1_ID])
 
+    def test_one_exploration_user_is_removed_from_contributors(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        old_summary_model = exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID)
+
+        self.assertNotIn(self.user_1_id, old_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, old_summary_model.contributors_summary)
+
+        old_summary_model.contributor_ids = [self.user_1_id]
+        old_summary_model.contributors_summary = {self.user_1_id: 2}
+        old_summary_model.update_timestamps()
+        old_summary_model.put()
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        new_summary_model = exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID)
+
+        self.assertNotIn(self.user_1_id, new_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, new_summary_model.contributors_summary)
+
     def test_multiple_explorations_are_pseudonymized(self):
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
         self.publish_exploration(self.user_1_id, self.EXP_2_ID)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1365,6 +1417,7 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
@@ -1417,6 +1470,7 @@ class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_one_email_is_deleted(self):
         wipeout_service.delete_user(
@@ -1490,6 +1544,7 @@ class WipeoutServiceVerifyDeleteEmailModelsTests(test_utils.GenericTestBase):
             reply_to_id=self.REPLY_1_ID
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
@@ -1568,6 +1623,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_one_feedback_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -1778,6 +1834,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             score_category=suggestion_models.SCORE_TYPE_CONTENT
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
@@ -1848,6 +1905,7 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
 
     def test_delete_user_is_successful(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNotNone(
             improvements_models.TaskEntryModel.get_by_id(
@@ -1907,6 +1965,7 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
             resolver_id=self.user_1_id
         )
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
@@ -1964,6 +2023,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_one_question_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -2319,6 +2379,7 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
@@ -2364,6 +2425,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_one_skill_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -2618,6 +2680,7 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.save_new_skill(self.SKILL_2_ID, self.user_2_id)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
@@ -2674,6 +2737,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.save_new_story(self.STORY_1_ID, self.user_1_id, self.TOPIC_1_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_one_story_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -2944,6 +3008,7 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.save_new_story(self.STORY_2_ID, self.user_2_id, self.TOPIC_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
@@ -2995,6 +3060,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             self.SUBTOP_1_ID, self.user_1_id, self.TOP_1_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_one_subtopic_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -3286,6 +3352,7 @@ class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
         self.save_new_subtopic(self.SUBTOP_1_ID, self.user_1_id, self.TOP_1_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
@@ -3353,6 +3420,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             final_reviewer_id=self.user_1_id,
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_voiceover_application_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -3424,6 +3492,7 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
             final_reviewer_id=self.user_1_id,
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
@@ -3490,6 +3559,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
 
     def test_one_topic_snapshot_metadata_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -3529,6 +3599,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
 
     def test_one_topic_snapshot_content_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -3557,6 +3628,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
 
     def test_one_topic_commit_log_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -3594,6 +3666,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
 
         with logging_swap:
             wipeout_service.pre_delete_user(self.user_1_id)
+            self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -3638,6 +3711,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
 
     def test_one_topic_when_the_deletion_is_repeated_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -3684,6 +3758,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             url_fragment='topic-two')
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -3737,6 +3812,7 @@ class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
@@ -3836,6 +3912,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
 
     def test_delete_user_for_profile_user_is_successful(self):
         wipeout_service.pre_delete_user(self.profile_user_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNotNone(
             user_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
@@ -3866,6 +3943,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
 
     def test_delete_user_for_full_user_and_its_profiles_is_successful(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNotNone(
             user_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
@@ -3912,6 +3990,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             exploration_id=self.EXPLORATION_1_ID)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNone(
             collection_models.CollectionModel.get_by_id(self.COLLECTION_1_ID))
@@ -3945,6 +4024,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             exploration_id=self.EXPLORATION_2_ID)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
@@ -3984,6 +4064,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             exploration_id=self.EXPLORATION_1_ID)
 
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
@@ -4021,6 +4102,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
 
     def test_delete_user_with_multiple_users_is_successful(self):
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
         self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_2_id))
@@ -4045,6 +4127,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
 
     def test_after_deletion_user_and_its_profiles_cannot_do_anything(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         wipeout_service.delete_user(
@@ -4110,9 +4193,11 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             [self.modifiable_new_user_data]
         )[0].user_id
         wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_profile_user_deleted_returns_true(self):
         wipeout_service.pre_delete_user(self.profile_user_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
         self.assertTrue(
@@ -4120,6 +4205,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
@@ -4152,6 +4238,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
 
     def test_verify_user_delete_when_profile_user_not_deleted_is_false(self):
         wipeout_service.pre_delete_user(self.profile_user_id)
+        self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
         self.assertTrue(

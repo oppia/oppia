@@ -35,6 +35,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -1724,6 +1725,26 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             {
                 'version': exploration.version,
                 'new_member_username': 'invalid_new_member_username'},
+            csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Sorry, we could not find the specified user.')
+
+    def test_put_with_deleted_user_raises_error(self):
+        wipeout_service.pre_delete_user(self.viewer_id)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'exp_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        csrf_token = self.get_new_csrf_token()
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'new_member_username': self.VIEWER_USERNAME},
             csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(

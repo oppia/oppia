@@ -619,12 +619,16 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'CollectionModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated CollectionModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'CollectionModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -1178,12 +1182,16 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'CollectionRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated CollectionRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'CollectionRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -2570,12 +2578,15 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated ExplorationModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'ExplorationModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -2901,7 +2912,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             '[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]')
 
         full_error_list = []
-        for i in python_utils.RANGE(21):
+        for i in python_utils.RANGE(22):
             full_error_list.append(
                 'Entity id 0-%s: based on field exploration_ids having '
                 'value 0, expected model ExplorationModel with id 0 but '
@@ -3101,12 +3112,16 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated ExplorationRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'ExplorationRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -5152,12 +5167,16 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'QuestionModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated QuestionModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'QuestionModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -7345,12 +7364,16 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated TopicModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'TopicModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -8053,12 +8076,16 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated TopicRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'TopicRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -9184,12 +9211,16 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SubtopicPageModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated SubtopicPageModel\', 2]',
+            (
+                '[u\'failed validation check for current time check of '
+                'SubtopicPageModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater '
+                'than the time when the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -12398,6 +12429,11 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.sent_mail_id = self.model_instance.sent_email_model_id
+
+        self.model_instance.query_status = feconf.USER_QUERY_STATUS_COMPLETED
+        self.model_instance.deleted = False
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         self.job_class = (
             prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob)
 
@@ -12503,6 +12539,32 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
             'is missing for recipient with id %s\']]') % (
                 self.query_id, self.owner_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_not_marked_as_deleted_when_older_than_4_weeks(self):
+        self.model_instance.created_on = (
+            self.model_instance.created_on - datetime.timedelta(weeks=5))
+        self.model_instance.last_updated = (
+            self.model_instance.last_updated - datetime.timedelta(weeks=5))
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+        expected_output = [(
+            '[u\'failed validation check for entity stale check of '
+            'UserQueryModel\', [u\'Entity id %s: '
+            'Model older than 4 weeks\']]') % self.query_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_not_marked_as_deleted_when_query_status_set_as_archived(
+            self):
+        self.model_instance.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            '[u\'failed validation check for entity stale check of '
+            'UserQueryModel\', [u\'Entity id %s: '
+            'Archived model not marked as deleted\']]') % self.query_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
