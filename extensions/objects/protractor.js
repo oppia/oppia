@@ -20,7 +20,7 @@
 // NOTE: all editors for objects that are used as parameters in a rule must
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
-
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
@@ -205,6 +205,20 @@ var SanitizedUrlEditor = function(elem) {
   };
 };
 
+var SetOfNormalizedStringEditor = function(elem) {
+  return {
+    setValue: async function(normalizedStrings) {
+      // Clear all entries.
+      await forms.ListEditor(elem).setLength(0);
+      for (let i = 0; i < normalizedStrings.length; i++) {
+        const normalizedStringEditor = await forms.ListEditor(elem).addItem(
+          'NormalizedString');
+        await normalizedStringEditor.setValue(normalizedStrings[i]);
+      }
+    }
+  };
+};
+
 var SkillSelector = function(elem) {
   return {
     setValue: async function(skillDescription) {
@@ -246,6 +260,7 @@ var OBJECT_EDITORS = {
   PositionOfTerms: ParameterNameEditor,
   RatioExpression: RatioExpressionEditor,
   SanitizedUrl: SanitizedUrlEditor,
+  SetOfNormalizedString: SetOfNormalizedStringEditor,
   SkillSelector: SkillSelector,
   UnicodeString: UnicodeStringEditor
 };

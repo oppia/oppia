@@ -93,8 +93,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         10) Creates new exploration rights.
         11) Populates user settings.
         """
-        super(TakeoutServiceProfileUserUnitTests, self).setUp()
-
         # Setup for UserSkillModel.
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
@@ -200,7 +198,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
-        super(TakeoutServiceProfileUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
@@ -334,7 +331,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         16) Creates two reply-to ids for feedback.
         17) Creates a task closed by the user.
         """
-        super(TakeoutServiceFullUserUnitTests, self).setUp()
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -710,7 +706,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
-        super(TakeoutServiceFullUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
