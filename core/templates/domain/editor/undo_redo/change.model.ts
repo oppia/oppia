@@ -396,7 +396,7 @@ interface StoryNodeOutlineStatusChange {
   'new_value': boolean;
 }
 
-type StoryChange = (
+export type StoryChange = (
   StoryPropertyChange |
   StoryContentsChange |
   StoryNodePropertyChange |

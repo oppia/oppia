@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { EventEmitter } from '@angular/core';
 
@@ -62,12 +62,7 @@ describe('Story editor page', function() {
     $provide.value('$window', mockedWindow);
   }));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
