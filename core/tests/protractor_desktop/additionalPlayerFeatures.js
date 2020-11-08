@@ -418,7 +418,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('should use hints and solutions in an exploration', async function() {
+  fit('should use hints and solutions in an exploration', async function() {
     var explorationPlayerPage = (
       new ExplorationPlayerPage.ExplorationPlayerPage());
     await users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');

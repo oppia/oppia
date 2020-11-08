@@ -18,7 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Rearrange Skills In Subtopic Modal Controller', function() {
@@ -36,12 +35,6 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');

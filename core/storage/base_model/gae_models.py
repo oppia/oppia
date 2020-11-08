@@ -54,8 +54,24 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 )
 
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    # Indicates that a model's field is to be exported.
     'EXPORTED',
+    # Indicates that the value of the field is exported as the key in the
+    # Takeout dict.
+    'EXPORTED_AS_KEY_FOR_TAKEOUT_DICT',
+    # Indicates that a model's field should not be exported.
     'NOT_APPLICABLE'
+)
+
+MODEL_ASSOCIATION_TO_USER = utils.create_enum(  # pylint: disable=invalid-name
+    # Indicates that a model has a single instance per user.
+    'ONE_INSTANCE_PER_USER',
+    # Indicates that a model can be shared by multiple users.
+    'ONE_INSTANCE_SHARED_ACROSS_USERS',
+    # Indicates that a model has multiple instances, specific to a user.
+    'MULTIPLE_INSTANCES_PER_USER',
+    # Indicates that a model should not be exported.
+    'NOT_CORRESPONDING_TO_USER'
 )
 
 # Constant used when retrieving big number of models.
@@ -69,6 +85,10 @@ ID_LENGTH = 12
 
 class BaseModel(datastore_services.Model):
     """Base model for all persistent object storage classes."""
+
+    # Specifies whether the model's id is used as a key in Takeout. By default,
+    # the model's id is not used as the key for the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = False
 
     # When this entity was first created. This value should only be modified by
     # the update_timestamps method.
@@ -165,6 +185,18 @@ class BaseModel(datastore_services.Model):
             'The export_data() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
+    @staticmethod
+    def get_model_association_to_user():
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_model_association_to_user() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
+
     @classmethod
     def get_export_policy(cls):
         """Model creation time is not relevant to user data."""
@@ -173,6 +205,14 @@ class BaseModel(datastore_services.Model):
             'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': EXPORT_POLICY.NOT_APPLICABLE
         }
+
+    @classmethod
+    def get_field_names_for_takeout(cls):
+        """Returns a dictionary containing a mapping from field names to
+        export dictionary keys for fields whose export dictionary key does
+        not match their field name.
+        """
+        return {}
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -419,6 +459,13 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = datastore_services.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = datastore_services.IntegerProperty()
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @staticmethod
     def get_deletion_policy():
@@ -1125,6 +1172,13 @@ class VersionedModel(BaseModel):
             'created_on_ms': utils.get_time_in_millisecs(model.created_on),
         } for (ind, model) in enumerate(returned_models)]
 
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """The history of commits is not relevant for the purposes of
@@ -1140,6 +1194,9 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     The id of this model is computed using VersionedModel.get_snapshot_id().
     """
+
+    # The ids of SnapshotMetadataModels are used as Takeout keys.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The id of the user who committed this revision.
     committer_id = (
@@ -1166,6 +1223,11 @@ class BaseSnapshotMetadataModel(BaseModel):
         their parent models.
         """
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """There are multiple SnapshotMetadataModels per user."""
+        return MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1265,6 +1327,13 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = datastore_services.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The contents of snapshots are not relevant to the user for
+        Takeout.
+        """
+        return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

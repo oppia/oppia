@@ -18,7 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -27,12 +26,7 @@ describe('Entity creation service', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   var $rootScope = null;
   var $uibModal = null;
