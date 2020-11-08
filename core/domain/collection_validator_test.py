@@ -17,26 +17,24 @@
 """Unit tests for core.domain.prod_validators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-module
 
 import datetime
 
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.platform import models
-from core.tests import test_utils
-from core.domain import exp_services
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import prod_validation_jobs_one_off
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
+from core.platform import models
+from core.tests import test_utils
 
 
 import feconf
 import python_utils
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
@@ -274,7 +272,7 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
 
      def test_missing_snapshot_content_model_failure(self):
         collection_models.CollectionSnapshotContentModel.get_by_id(
-            '0-1').delete()
+        '0-1').delete()
         expected_output = [
             (
                 u'[u\'failed validation check for snapshot_content_ids '
@@ -1646,5 +1644,3 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-
-

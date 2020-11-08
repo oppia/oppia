@@ -405,5 +405,3 @@ class CollectionSummaryModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_node_count]
-
-
