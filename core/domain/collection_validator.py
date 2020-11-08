@@ -30,7 +30,7 @@ import utils
 (
     base_models, collection_models, exp_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration, 
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
     models.NAMES.user
 ])
 
