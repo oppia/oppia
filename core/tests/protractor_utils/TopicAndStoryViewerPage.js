@@ -40,8 +40,8 @@ var TopicAndStoryViewerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectLockedChaptersToBe = async function(value) {
-    expect(await lockedChapterList.count()).toEqual(value);
+  this.expectLockedChaptersCountToBe = async function(count) {
+    expect(await lockedChapterList.count()).toEqual(count);
   };
 
   this.login = async function(email, username) {

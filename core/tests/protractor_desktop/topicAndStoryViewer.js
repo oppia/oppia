@@ -60,7 +60,7 @@ describe('Story viewer functionality', function() {
     };
     for (var i = 1; i <= 3; i++) {
       await workflow.createAndPublishTwoCardExploration(
-        `Exploration SPF1 - ${i}`,
+        `Exploration TASV1 - ${i}`,
         EXPLORATION.category,
         EXPLORATION.objective,
         EXPLORATION.language,
@@ -72,7 +72,7 @@ describe('Story viewer functionality', function() {
 
   it('should save story progress on login.', async function() {
     await users.createAndLoginAdminUser(
-      'creator@storyPlayer.com', 'creatorStoryPlayer');
+      'creator@storyViewer.com', 'creatorStoryViewer');
     await adminPage.editConfigProperty(
       'Make classroom page accessible.',
       'Boolean', async function(elem) {
@@ -82,7 +82,7 @@ describe('Story viewer functionality', function() {
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Topic SPF1', 'topic-spf-one', 'Description', false);
+      'Topic TASV1', 'topic-tasv-one', 'Description', false);
     await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.saveTopic('Added thumbnail.');
@@ -103,28 +103,28 @@ describe('Story viewer functionality', function() {
     (
       await
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill SPF1', 'Concept card explanation', false));
+        'Skill TASV1', 'Concept card explanation', false));
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill SPF1', 'Topic SPF1');
+      'Skill TASV1', 'Topic TASV1');
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.editTopic('Topic SPF1');
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
     await topicEditorPage.addSubtopic(
-      'Subtopic SPF1', 'subtopic-spf-one', Constants.TEST_SVG_PATH,
+      'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
 
-    await topicEditorPage.dragSkillToSubtopic('Skill SPF1', 0);
+    await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
     await topicEditorPage.publishTopic();
-    await topicsAndSkillsDashboardPage.editTopic('Topic SPF1');
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
     await topicEditorPage.createStory(
-      'Story SPF1', 'story-player-spf-one', 'Story description',
+      'Story TASV1', 'story-player-tasv-one', 'Story description',
       Constants.TEST_SVG_PATH);
     await storyEditorPage.updateMetaTagContent('story meta tag');
     for (var i = 0; i < 3; i++) {
@@ -140,16 +140,16 @@ describe('Story viewer functionality', function() {
     await storyEditorPage.publishStory();
     await users.logout();
     await topicAndStoryViewerPage.get(
-      'math', 'topic-spf-one', 'story-player-spf-one');
-    await topicAndStoryViewerPage.expectLockedChaptersToBe(2);
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectLockedChaptersCountToBe(2);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.login(
       'newStoryViewer@storyviewer.com', 'newStoryViewer');
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
-      'math', 'topic-spf-one', 'story-player-spf-one');
-    await topicAndStoryViewerPage.expectLockedChaptersToBe(0);
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectLockedChaptersCountToBe(0);
   });
 
   afterEach(async function() {

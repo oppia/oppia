@@ -3,6 +3,10 @@
     Search By Skill
     <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
   </md-card>
+  <div ng-hide="$ctrl.skills.length" class="oppia-align-center">
+    Loading
+    <loading-dots></loading-dots>
+  </div>
   <div class="skill-selector-item-container">
     <div class="oppia-list-group-item-text list-group-item protractor-test-rte-skill-selector-item"
          ng-repeat="skill in $ctrl.skills | filter:skillFilterText"

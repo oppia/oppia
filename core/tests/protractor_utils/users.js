@@ -28,6 +28,9 @@ var login = async function(
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
   var driver = browser.driver;
+  // The manualNavigation argument is used to determine whether to navigate to
+  // the login URL using browser.get() or not. If false, the calling method
+  // should handle navigation to the login page.
   if (manualNavigation) {
     await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
@@ -76,11 +79,14 @@ var logout = async function() {
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
 var _completeSignup = async function(username, manualNavigation = true) {
-  // This is required since there is a redirect which can be considered
-  // as a client side navigation and the tests fail since Angular is
-  // not found due to the navigation interfering with protractor's
-  // bootstrapping.
+  // The manualNavigation argument is used to determine whether to navigate to
+  // the sign-up URL using browser.get() or not. If false, the calling method
+  // should handle navigation to the sign-up page.
   if (manualNavigation) {
+    // This is required since there is a redirect which can be considered
+    // as a client side navigation and the tests fail since Angular is
+    // not found due to the navigation interfering with protractor's
+    // bootstrapping.
     await browser.waitForAngularEnabled(false);
     await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
     await browser.waitForAngularEnabled(true);
