@@ -1759,13 +1759,15 @@ def mark_user_for_deletion(user_id):
     _save_user_auth_details(user_auth_details)
 
 
-def get_human_readable_user_ids(user_ids):
+def get_human_readable_user_ids(user_ids, strict=True):
     """Converts the given ids to usernames, or truncated email addresses.
     Requires all users to be known.
 
     Args:
         user_ids: list(str). The list of user_ids to get UserSettings domain
             objects for.
+        strict: bool. Whether to fail noisily if no user with the given
+            id exists in the datastore. Defaults to True.
 
     Returns:
         list(str). List of usernames corresponding to given user_ids. If
@@ -1780,9 +1782,12 @@ def get_human_readable_user_ids(user_ids):
     usernames = []
     for ind, user_settings in enumerate(users_settings):
         if user_settings is None:
-            logging.error('User id %s not known in list of user_ids %s' % (
-                user_ids[ind], user_ids))
-            raise Exception('User not found.')
+            if strict:
+                logging.error('User id %s not known in list of user_ids %s' % (
+                    user_ids[ind], user_ids))
+                raise Exception('User not found.')
+            else:
+                usernames.append('[User being deleted]')
         elif user_settings.username:
             usernames.append(user_settings.username)
         else:

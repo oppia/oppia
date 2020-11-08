@@ -940,10 +940,10 @@ def _remove_user_id_from_contributors_in_summary_models(
         for summary_model in related_summary_models:
             summary_model.contributor_ids = [
                 contributor_id for contributor_id in
-                summary_model.contributor_ids
-                if contributor_id != user_id
+                summary_model.contributor_ids if contributor_id != user_id
             ]
-            del summary_model.contributors_summary[user_id]
+            if user_id in summary_model.contributors_summary:
+                del summary_model.contributors_summary[user_id]
 
         summary_model_class.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)

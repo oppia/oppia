@@ -2018,6 +2018,12 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
         self.assertEqual(user_ids, expected_user_ids)
 
+    def test_get_human_readable_user_ids_with_nonexistent_id_non_strict_passes(
+            self):
+        user_ids = user_services.get_human_readable_user_ids(
+            ['nonexistent_id'], strict=False)
+        self.assertEqual(user_ids, ['[User being deleted]'])
+
     def test_created_on_gets_updated_correctly(self):
         # created_on should not be updated upon updating other attributes of
         # the user settings model.
