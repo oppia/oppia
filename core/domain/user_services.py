@@ -1290,8 +1290,7 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
         )
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
-        user_auth_details = UserAuthDetails(
-            user_id, None, parent_user_id)
+        user_auth_details = UserAuthDetails(user_id, None, parent_user_id)
 
         # Each new profile user must be written to the datastore first and
         # because if we convert it into a batch write request, then calling
