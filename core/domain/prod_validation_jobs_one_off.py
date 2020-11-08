@@ -91,43 +91,45 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
     @staticmethod
     def map(model_instance):
         """Implements a map function which defers to a pre-defined validator."""
+        model_name = model_instance.__class__.__name__
+        validator_cls_name = '%sValidator' % model_name
+        # Module name for models is of the form:
+        # 'core.storage.<model-type>.gae_models'.
+        # Module name for validators is of the form:
+        # 'core.domain.<model-type>_validators'.
+        # So, we extract the module name for models to obtain the module name
+        # for validators. There is no extra test required to verify that models
+        # and validators have names defined based on model-type since if they
+        # don't the validators test will automatically fail based on the import
+        # we perform here for validators.
+        model_module_name = model_instance.__module__
+        model_type = model_module_name.split('.')[2]
+        validator_module_name = '%s_validators' % model_type
+        # TODO(#10415): This try catch is required until all the validators are
+        # refactored. Remove the try catch block once #10415 is fixed.
+        try:
+            validator_module = importlib.import_module(
+                'core.domain.%s' % validator_module_name)
+        except ImportError:
+            validator_module = importlib.import_module(
+                'core.domain.prod_validators')
+        validator = getattr(validator_module, validator_cls_name)
         if not model_instance.deleted:
-            model_name = model_instance.__class__.__name__
-            validator_cls_name = '%sValidator' % model_name
-            # Module name for models is of the form:
-            # 'core.storgae.<model-type>.gae_models'.
-            # Module name for validators is of the form:
-            # 'core.domain.<model-type>_validators'.
-            # So, we extract the module name for models to obtain the module
-            # name for validators. There is no extra test required to verify
-            # that models and validators have names defined based on model-type
-            # since if they don't the validators test will automatically fail
-            # based on the import we perform here for validators.
-            model_module_name = model_instance.__module__
-            model_type = model_module_name.split('.')[2]
-            validator_module_name = '%s_validators' % model_type
-            # TODO(#10415): This try catch is required until all
-            # the validators are refactored. Remove the try catch block
-            # once #10415 is fixed.
-            try:
-                validator_module = importlib.import_module(
-                    'core.domain.%s' % validator_module_name)
-            except ImportError:
-                validator_module = importlib.import_module(
-                    'core.domain.prod_validators')
-            validator = getattr(validator_module, validator_cls_name)
             validator.validate(model_instance)
-            if len(validator.errors) > 0:
-                for error_key, error_list in validator.errors.items():
-                    error_message = ((',').join(set(error_list))).encode(
-                        encoding='utf-8')
-                    yield (
-                        'failed validation check for %s of %s' % (
-                            error_key, model_name),
-                        python_utils.convert_to_bytes(error_message))
-            else:
+        else:
+            validator.validate_deleted(model_instance)
+
+        if len(validator.errors) > 0:
+            for error_key, error_list in validator.errors.items():
+                error_message = (
+                    ((',').join(set(error_list))).encode(encoding='utf-8'))
                 yield (
-                    '%s %s' % (VALIDATION_STATUS_SUCCESS, model_name), 1)
+                    'failed validation check for %s of %s' % (
+                        error_key, model_name),
+                    python_utils.convert_to_bytes(error_message)
+                )
+        else:
+            yield ('%s %s' % (VALIDATION_STATUS_SUCCESS, model_name), 1)
 
     @staticmethod
     def reduce(key, values):
