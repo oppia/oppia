@@ -93,6 +93,11 @@ class CollectionModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -283,6 +288,28 @@ class CollectionRightsModel(base_models.VersionedModel):
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance shared across users since multiple
+        users contribute to collections and have varying rights.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'owner_ids': 'owned_collection_ids',
+            'editor_ids': 'editable_collection_ids',
+            'voice_artist_ids': 'voiced_collection_ids',
+            'viewer_ids': 'viewable_collection_ids'
+        }
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
@@ -295,7 +322,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            # DEPRECATED in v2.8.3.
+            # DEPRECATED in v2.8.3, so translator_ids are not exported.
             'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -514,6 +541,13 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """The history of commits is not relevant for the purposes of
@@ -668,6 +702,14 @@ class CollectionSummaryModel(base_models.BaseModel):
         return (
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model data has already been exported as a part of the
+        CollectionRightsModel, and thus does not need an export_data
+        function.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

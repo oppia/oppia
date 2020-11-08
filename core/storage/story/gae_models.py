@@ -120,6 +120,11 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.update_timestamps()
         story_commit_log_entry.put()
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -181,6 +186,13 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'story-%s-%s' % (story_id, version)
 
+    @staticmethod
+    def get_model_association_to_user():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
@@ -239,6 +251,11 @@ class StorySummaryModel(base_models.BaseModel):
         to a user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

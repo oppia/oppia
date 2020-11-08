@@ -161,6 +161,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 set(export_policy.values()).issubset(
                     {
                         base_models.EXPORT_POLICY.EXPORTED,
+                        (
+                            base_models
+                            .EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT),
                         base_models.EXPORT_POLICY.NOT_APPLICABLE
                     })
             )
