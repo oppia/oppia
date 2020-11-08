@@ -18,6 +18,7 @@
  */
 
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
