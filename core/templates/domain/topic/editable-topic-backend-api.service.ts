@@ -33,7 +33,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 
 interface FetchTopicBackendResponse {
   'topic_dict': TopicBackendDict;
-  'grouped_skill_summary_dicts':  {
+  'grouped_skill_summary_dicts': {
     [topicName: string]: SkillSummaryBackendDict[];
   };
   'skill_id_to_description_dict': SkillIdToDescriptionMap;
