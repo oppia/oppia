@@ -19,8 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import copy
 import datetime
+import re
 
 from constants import constants
 from core.domain import change_domain
@@ -731,6 +733,69 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
+        """Converts from version 38 to 39. Version 39 adds a new
+        customization arg to NumericExpressionInput interaction which allows
+        creators to modify the placeholder text.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': (
+                            'Type an expression here, using only numbers.')
+                    }
+                }
+            })
+            question_state_dict['written_translations']['translations_mapping'][
+                'ca_placeholder_0'] = {}
+            question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
+                'ca_placeholder_0'] = {}
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v39_dict_to_v40_dict(cls, question_state_dict):
+        """Converts from version 39 to 40. Version 40 converts TextInput rule
+        inputs from NormalizedString to SetOfNormalizedString.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] != 'TextInput':
+            return question_state_dict
+
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            rule_type_to_inputs = collections.defaultdict(set)
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                rule_type = rule_spec_dict['rule_type']
+                rule_inputs = rule_spec_dict['inputs']['x']
+                rule_type_to_inputs[rule_type].add(rule_inputs)
+            answer_group_dict['rule_specs'] = [{
+                'rule_type': rule_type,
+                'inputs': {'x': list(rule_type_to_inputs[rule_type])}
+            } for rule_type in rule_type_to_inputs]
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
@@ -793,6 +858,15 @@ class Question(python_utils.OBJECT):
                 'Expected inapplicable_skill_misconception_ids to be a list '
                 'of strings, received %s'
                 % self.inapplicable_skill_misconception_ids)
+
+        if not (all(
+                re.match(
+                    constants.VALID_SKILL_MISCONCEPTION_ID_REGEX, elem
+                ) for elem in self.inapplicable_skill_misconception_ids)):
+            raise utils.ValidationError(
+                'Expected inapplicable_skill_misconception_ids to be a list '
+                'of strings of the format <skill_id>-<misconception_id>, '
+                'received %s' % self.inapplicable_skill_misconception_ids)
 
         if len(set(self.inapplicable_skill_misconception_ids)) != len(
                 self.inapplicable_skill_misconception_ids):
@@ -925,7 +999,8 @@ class Question(python_utils.OBJECT):
 
         Args:
             inapplicable_skill_misconception_ids: list(str). The optional
-                misconception ids marked as not applicable to the question.
+                skill misconception ids marked as not applicable to the
+                question.
         """
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))

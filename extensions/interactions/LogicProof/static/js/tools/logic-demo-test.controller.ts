@@ -261,7 +261,6 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
 
   $scope.REPLACEMENT_PAIRS = [{
     old: '\u2227',
-    // eslint-disable quote-props
     'new': '\\u2227'
   }, {
     old: '\u2228',

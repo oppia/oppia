@@ -30,7 +30,7 @@ interface ApplyValidationCustomScope extends ng.IScope {
   }
 }
 
-/* eslint-disable angular/directive-restrict */
+/* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('applyValidation', [
   '$filter', function($filter) {
     return {
@@ -78,4 +78,3 @@ angular.module('oppia').directive('applyValidation', [
       }
     };
   }]);
-/* eslint-enable angular/directive-restrict */

@@ -21,13 +21,13 @@ import { TestBed, fakeAsync, flushMicrotasks, tick } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformFeatureService } from
+import { PlatformFeatureService, platformFeatureInitFactory } from
   'services/platform-feature.service';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { FeatureNames, FeatureStatusSummaryObjectFactory } from
-  'domain/platform_feature/feature-status-summary-object.factory';
+import { FeatureNames, FeatureStatusSummary } from
+  'domain/platform_feature/feature-status-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 
 
@@ -35,7 +35,6 @@ describe('PlatformFeatureService', () => {
   let windowRef: WindowRef;
   let i18n: I18nLanguageCodeService;
   let apiService: PlatformFeatureBackendApiService;
-  let summaryFactory: FeatureStatusSummaryObjectFactory;
   let platformFeatureService: PlatformFeatureService;
   let urlService: UrlService;
 
@@ -45,10 +44,8 @@ describe('PlatformFeatureService', () => {
 
   let apiSpy: jasmine.Spy;
 
-  // TODO(#9154): Remove the following resetting code when migration is
-  // complete.
-  // Currently these properties are static, which are not automatically cleared
-  // after each test, so we need to manually clear the state of
+  // These properties are static, which are not automatically cleared after
+  // each test, so we need to manually clear the state of
   // PlatformFeatureService.
   const clearStaticProperties = () => {
     PlatformFeatureService.featureStatusSummary = null;
@@ -63,7 +60,6 @@ describe('PlatformFeatureService', () => {
 
     windowRef = TestBed.get(WindowRef);
     i18n = TestBed.get(I18nLanguageCodeService);
-    summaryFactory = TestBed.get(FeatureStatusSummaryObjectFactory);
     apiService = TestBed.get(PlatformFeatureBackendApiService);
     urlService = TestBed.get(UrlService);
 
@@ -100,7 +96,7 @@ describe('PlatformFeatureService', () => {
 
     spyOn(i18n, 'getCurrentI18nLanguageCode').and.returnValue('en');
     apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
-      summaryFactory.createFromBackendDict({
+      FeatureStatusSummary.createFromBackendDict({
         [FeatureNames.DummyFeature]: true,
       })
     );
@@ -344,5 +340,26 @@ describe('PlatformFeatureService', () => {
           'The platform feature service has not been initialized.');
       })
     );
+  });
+
+  describe('platformFeatureInitFactory', () => {
+    let factoryFn: (service: PlatformFeatureService) => () => Promise<void>;
+
+    beforeEach(() => {
+      factoryFn = platformFeatureInitFactory;
+      platformFeatureService = TestBed.get(PlatformFeatureService);
+    });
+
+    it('should return a function that calls initialize', () => {
+      const mockPromise = Promise.resolve(null);
+      const spy = spyOn(platformFeatureService, 'initialize')
+        .and.returnValue(mockPromise);
+
+      const returnedFn = factoryFn(platformFeatureService);
+      const returnedPromise = returnedFn();
+
+      expect(spy).toHaveBeenCalled();
+      expect(returnedPromise).toBe(mockPromise);
+    });
   });
 });

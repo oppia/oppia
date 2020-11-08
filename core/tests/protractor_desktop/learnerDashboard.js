@@ -42,7 +42,7 @@ describe('Learner dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('displays learners subscriptions', async function() {
+  it('should display learners subscriptions', async function() {
     await users.createUser(
       'learner1@learnerDashboard.com', 'learner1learnerDashboard');
     var creator1Id = 'creatorName';
@@ -86,7 +86,7 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('displays learner feedback threads', async function() {
+  it('should display learner feedback threads', async function() {
     await users.createUser(
       'learner2@learnerDashboard.com', 'learner2learnerDashboard');
     await users.createUser(

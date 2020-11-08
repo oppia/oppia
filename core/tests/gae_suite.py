@@ -33,6 +33,7 @@ import unittest
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk', 'platform',
@@ -41,7 +42,6 @@ GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
     os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.35'),
-    os.path.join(GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'),
     os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.2.2'),
     os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.7.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-1.45'),
@@ -78,8 +78,27 @@ def main(args=None):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
 
+    # The devappserver function fixes the system path by adding certain google
+    # appengine libraries that we need in oppia to the system path. The Google
+    # Cloud SDK comes with certain packages preinstalled including webapp2,
+    # jinja2, and pyyaml so this function makes sure that those libraries are
+    # installed.
     import dev_appserver
     dev_appserver.fix_sys_path()
+
+    # In the process of migrating Oppia from Python 2 to Python 3, we are using
+    # both google app engine apis that are contained in the Google Cloud SDK
+    # folder, and also google cloud apis that are installed in our
+    # 'third_party/python_libs' directory. Therefore, there is a confusion of
+    # where the google module is located and which google module to import from.
+    # The following code ensures that the google module that python looks at
+    # imports from the 'third_party/python_libs' folder so that the imports are
+    # correct.
+    if 'google' in sys.modules:
+        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_module = sys.modules['google']
+        google_module.__path__ = [google_path]
+        google_module.__file__ = os.path.join(google_path, '__init__.py')
 
     suites = create_test_suites(test_target=parsed_args.test_target)
 

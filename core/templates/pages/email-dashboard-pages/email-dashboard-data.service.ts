@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { QueryData, EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQuery } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
+  'domain/email-dashboard/email-dashboard-query.model';
 
 @Injectable({
   providedIn: 'root'
@@ -53,11 +53,11 @@ export class EmailDashboardDataService {
     return this.latestCursor;
   }
 
-  submitQuery(data: QueryData): Promise<EmailDashboardQuery[]> {
+  async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
-    return this.emailDashboardBackendApiService.submitQuery(
+    return this.emailDashboardBackendApiService.submitQueryAsync(
       data).then(query => {
       var newQueries = [query];
       this.queries = newQueries.concat(this.queries);
@@ -65,7 +65,7 @@ export class EmailDashboardDataService {
     });
   }
 
-  getNextQueries(): Promise<EmailDashboardQuery[]> {
+  async getNextQueriesAsync(): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 
@@ -77,7 +77,7 @@ export class EmailDashboardDataService {
       });
     } else {
       this.currentPageIndex = this.currentPageIndex + 1;
-      return this.emailDashboardBackendApiService.fetchQueriesPage(
+      return this.emailDashboardBackendApiService.fetchQueriesPageAsync(
         this.QUERIES_PER_PAGE, this.latestCursor).then(data => {
         this.queries = this.queries.concat(data.recentQueries);
         this.latestCursor = data.cursor;
@@ -102,8 +102,8 @@ export class EmailDashboardDataService {
     return (this.currentPageIndex > 0);
   }
 
-  fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
-    return this.emailDashboardBackendApiService.fetchQuery(queryId)
+  async fetchQueryAsync(queryId: string): Promise<EmailDashboardQuery> {
+    return this.emailDashboardBackendApiService.fetchQueryAsync(queryId)
       .then(newQuery => {
         this.queries.forEach(function(query, index, queries) {
           if (query.id === queryId) {

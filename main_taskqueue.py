@@ -44,6 +44,9 @@ URLS = [
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
+    main.get_redirect_route(
+        r'%s' % feconf.TASK_URL_DEFERRED,
+        tasks.DeferredTasksHandler),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

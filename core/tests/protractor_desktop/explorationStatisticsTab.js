@@ -41,7 +41,7 @@ describe('Statistics tab', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   });
 
-  it('checks statistics tab for an exploration', async function() {
+  it('should check statistics tab for an exploration', async function() {
     var EXPLORATION_TITLE = 'Exploration for stats testing';
     var EXPLORATION_OBJECTIVE = 'To explore something';
     var EXPLORATION_CATEGORY = 'Algorithms';
@@ -75,7 +75,7 @@ describe('Statistics tab', function() {
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'), 'Two', true, 'Equals',
-      'One');
+      ['One']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Try again'));
@@ -86,7 +86,7 @@ describe('Statistics tab', function() {
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'), 'Three', true, 'Equals',
-      'Two');
+      ['Two']);
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Try again'));
@@ -101,7 +101,7 @@ describe('Statistics tab', function() {
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'), 'End', true, 'Equals',
-      'Three');
+      ['Three']);
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Try again'));

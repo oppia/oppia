@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for ParameterMetadataService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/exploration-editor-page/services/parameter-metadata.service');
-require('domain/exploration/ParamMetadataObjectFactory.ts');
 require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -35,12 +34,9 @@ describe('Parameter Metadata Service', function() {
   var StatesObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ExplorationParamChangesService', {
       savedMemento: [{

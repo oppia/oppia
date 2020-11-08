@@ -16,13 +16,32 @@
  * @fileoverview Utility functions for unit testing.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, NgModule } from '@angular/core';
 import { NgZone, PlatformRef, Type } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 
+import { angularServices } from 'services/angular-services.index';
+
 declare var angular: ng.IAngularStatic;
+
+export const importAllAngularServices = (): void => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let servicePair of angularServices) {
+      $provide.value(
+        servicePair[0], TestBed.get(servicePair[1]));
+    }
+  }));
+};
+
 /**
  * Returns a div containing the compiled html.
  * @param {string} html - The html to be compiled.

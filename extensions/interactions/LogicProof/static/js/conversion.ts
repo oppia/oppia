@@ -21,24 +21,28 @@ var logicProofConversion = (function() {
   // NOTE: the 'old' values must all be single characters.
   var REPLACEMENT_PAIRS = [{
     old: '&',
-    // eslint-disable quote-props
+    // eslint-disable-next-line quote-props
     'new': '\u2227'
   }, {
     old: '|',
+    // eslint-disable-next-line quote-props
     'new': '\u2228'
   }, {
     old: '@',
+    // eslint-disable-next-line quote-props
     'new': '\u2200'
   }, {
     old: '$',
+    // eslint-disable-next-line quote-props
     'new': '\u2203'
   }, {
     old: '^',
+    // eslint-disable-next-line quote-props
     'new': '\u2227'
   }, {
     old: '\u0009',
+    // eslint-disable-next-line quote-props
     'new': '  '
-    // eslint-enable quote-props
   }];
 
   var convertToLogicCharacters = function(oldString) {

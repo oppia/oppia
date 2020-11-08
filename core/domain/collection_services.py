@@ -479,6 +479,7 @@ def record_played_exploration_in_collection_context(
 
     if exploration_id not in progress_model.completed_explorations:
         progress_model.completed_explorations.append(exploration_id)
+        progress_model.update_timestamps()
         progress_model.put()
 
 
@@ -537,6 +538,31 @@ def get_collection_summaries_subscribed_to(user_id):
         get_collection_summaries_matching_ids(
             subscription_services.get_collection_ids_subscribed_to(user_id)
         ) if summary is not None
+    ]
+
+
+def get_collection_summaries_where_user_has_role(user_id):
+    """Returns a list of CollectionSummary domain objects where the user has
+    some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(CollectionSummary). List of CollectionSummary domain objects
+        where the user has some role.
+    """
+    col_summary_models = collection_models.CollectionSummaryModel.query(
+        datastore_services.any_of(
+            collection_models.CollectionSummaryModel.owner_ids == user_id,
+            collection_models.CollectionSummaryModel.editor_ids == user_id,
+            collection_models.CollectionSummaryModel.viewer_ids == user_id,
+            collection_models.CollectionSummaryModel.contributor_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_collection_summary_from_model(col_summary_model)
+        for col_summary_model in col_summary_models
     ]
 
 
@@ -785,7 +811,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
-    create_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary(collection.id, committer_id)
 
 
 def save_new_collection(committer_id, collection):
@@ -928,7 +954,7 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
 
     _save_collection(committer_id, collection, commit_message, change_list)
-    update_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary(collection.id, committer_id)
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
@@ -936,29 +962,19 @@ def update_collection(
             committer_id, utils.get_current_time_in_millisecs())
 
 
-def create_collection_summary(collection_id, contributor_id_to_add):
-    """Creates and stores a summary of the given collection.
+def regenerate_collection_summary(collection_id, contributor_id_to_add):
+    """Regenerate a summary of the given collection. If the summary does not
+    exist, this function generates a new one.
 
     Args:
         collection_id: str. ID of the collection.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
+        contributor_id_to_add: str|None. ID of the contributor to be added to
+            the collection summary.
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = compute_summary_of_collection(
         collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
-
-
-def update_collection_summary(collection_id, contributor_id_to_add):
-    """Update the summary of an collection.
-
-    Args:
-        collection_id: str. ID of the collection.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
-    """
-    create_collection_summary(collection_id, contributor_id_to_add)
 
 
 def compute_summary_of_collection(collection, contributor_id_to_add):
@@ -992,6 +1008,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
             contributors_summary.get(contributor_id_to_add, 0) + 1)
+
     contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
@@ -1005,8 +1022,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
         collection_rights.owner_ids, collection_rights.editor_ids,
         collection_rights.viewer_ids, contributor_ids, contributors_summary,
         collection.version, collection_model_node_count,
-        collection_model_created_on,
-        collection_model_last_updated
+        collection_model_created_on, collection_model_last_updated
     )
 
     return collection_summary
@@ -1036,6 +1052,15 @@ def compute_collection_contributors_summary(collection_id):
             break
 
         current_version -= 1
+
+    contributor_ids = list(contributors_summary)
+    # Remove IDs that are deleted or do not exist.
+    users_settings = user_services.get_users_settings(contributor_ids)
+    for contributor_id, user_settings in python_utils.ZIP(
+            contributor_ids, users_settings):
+        if user_settings is None:
+            del contributors_summary[contributor_id]
+
     return contributors_summary
 
 
@@ -1073,11 +1098,14 @@ def save_collection_summary(collection_summary):
             collection_summary.id))
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)
+        collection_summary_model.update_timestamps()
         collection_summary_model.put()
     else:
         collection_summary_dict['id'] = collection_summary.id
-        collection_models.CollectionSummaryModel(
-            **collection_summary_dict).put()
+        model = collection_models.CollectionSummaryModel(
+            **collection_summary_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def delete_collection_summaries(collection_ids):

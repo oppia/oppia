@@ -157,7 +157,7 @@ describe('Lost Change Object Factory', () => {
     expect(lostChange.isNewValueEmpty()).toBe(true);
   });
 
-  it('should  evaluate values from a Lost Change with equal outcomes and' +
+  it('should evaluate values from a Lost Change with equal outcomes and' +
     ' rules', () => {
     const lostChange = lcof.createNew({
       cmd: 'edit_state_property',
@@ -210,7 +210,7 @@ describe('Lost Change Object Factory', () => {
     expect(lostChange.isOutcomeDestEqual()).toBe(false);
   });
 
-  it('should  evaluate values from a Lost Change with equal outcomes', () => {
+  it('should evaluate values from a Lost Change with equal outcomes', () => {
     const lostChange = lcof.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',

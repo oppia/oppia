@@ -15,13 +15,10 @@
 /**
  * @fileoverview Unit tests for Drag and Drop Sorting rules.
  */
-/* eslint-disable max-len */
-import { DragAndDropSortInputRulesService } from
-  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
-/* eslint-enable max-len */
+import { DragAndDropSortInputRulesService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 
 describe('Drag and Drop Sort Input rules service', () => {
-  let ddsrs: DragAndDropSortInputRulesService = null;
+  let ddsrs: DragAndDropSortInputRulesService;
   beforeEach(() => {
     ddsrs = new DragAndDropSortInputRulesService();
   });
@@ -80,6 +77,9 @@ describe('Drag and Drop Sort Input rules service', () => {
       [['a'], ['b']], RULE_INPUT)).toBe(true);
     expect(ddsrs.HasElementXAtPositionY(
       [['a'], ['d'], ['b', 'c']], RULE_INPUT)).toBe(false);
+    expect(
+      ddsrs.HasElementXAtPositionY([], RULE_INPUT)
+    ).toBe(false);
   });
 
   it('should have a correct \'has element X before element Y\' rule',

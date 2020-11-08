@@ -20,25 +20,25 @@
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/question-backend-api.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/SkillRightsObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
 import { EventEmitter } from '@angular/core';
+import { SkillRights } from 'domain/skill/skill-rights.model';
 
 angular.module('oppia').factory('SkillEditorStateService', [
-  'AlertsService', 'QuestionsListService',
+  '$rootScope', 'AlertsService', 'QuestionsListService',
   'SkillBackendApiService', 'SkillObjectFactory',
-  'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
+  'SkillRightsBackendApiService', 'UndoRedoService',
   function(
-      AlertsService, QuestionsListService,
+      $rootScope, AlertsService, QuestionsListService,
       SkillBackendApiService, SkillObjectFactory,
-      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService) {
+      SkillRightsBackendApiService, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = (
-      SkillRightsObjectFactory.createInterstitialSkillRights());
+      SkillRights.createInterstitialSkillRights());
     var _skillIsInitialized = false;
     var assignedSkillTopicData = null;
     var _skillIsBeingLoaded = false;
@@ -54,9 +54,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
       _skillIsInitialized = true;
     };
 
-    var _updateSkill = function(newBackendSkillObject) {
-      _setSkill(SkillObjectFactory.createFromBackendDict(
-        newBackendSkillObject));
+    var _updateSkill = function(skill) {
+      _setSkill(skill);
     };
 
     var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
@@ -115,14 +114,15 @@ angular.module('oppia').factory('SkillEditorStateService', [
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
             QuestionsListService.getQuestionSummariesAsync(
-              [skillId], true, false
+              skillId, true, false
             );
             _skillIsBeingLoaded = false;
+            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning();
             _skillIsBeingLoaded = false;
           });
-        SkillRightsBackendApiService.fetchSkillRights(
+        SkillRightsBackendApiService.fetchSkillRightsAsync(
           skillId).then(function(newSkillRightsObject) {
           _updateSkillRights(newSkillRightsObject);
           _skillIsBeingLoaded = false;
@@ -187,13 +187,14 @@ angular.module('oppia').factory('SkillEditorStateService', [
         SkillBackendApiService.updateSkill(
           _skill.getId(), _skill.getVersion(), commitMessage,
           UndoRedoService.getCommittableChangeList()).then(
-          function(skillBackendObject) {
-            _updateSkill(skillBackendObject);
+          function(skill) {
+            _updateSkill(skill);
             UndoRedoService.clearChanges();
             _skillIsBeingSaved = false;
             if (successCallback) {
               successCallback();
             }
+            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the skill');

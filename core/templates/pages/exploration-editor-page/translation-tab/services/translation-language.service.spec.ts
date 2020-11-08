@@ -71,7 +71,7 @@ describe('Translation language service', function() {
       expect(tls.getActiveLanguageDescription()).toBe('English');
     });
 
-    it('shouldn\'t show the language description of invalid state name',
+    it('should not show the language description of invalid state name',
       function() {
         tls.setActiveLanguageCode('eng');
         expect(tls.getActiveLanguageDescription()).toBeNull();

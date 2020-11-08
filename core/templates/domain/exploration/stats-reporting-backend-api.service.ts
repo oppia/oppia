@@ -26,7 +26,7 @@ import { ExplorationPlayerConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface StateStats {
+interface SessionStateStats {
   'total_answers_count': number;
   'useful_feedback_count': number;
   'total_hit_count': number;
@@ -40,7 +40,7 @@ export interface AggregatedStats {
   'num_completions': number;
   'num_actual_starts': number;
   'state_stats_mapping': {
-    [stateName: string]: StateStats
+    [stateName: string]: SessionStateStats
   };
 }
 

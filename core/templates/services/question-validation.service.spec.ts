@@ -18,15 +18,15 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-misconception-editor.component.ts is upgraded to Angular 8.
-/* eslint-disable max-len */
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 // ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('domain/question/QuestionObjectFactory.ts');
 require('services/question-validation.service.ts');
@@ -38,6 +38,7 @@ describe('Question Validation Service', function() {
   var QuestionObjectFactory = null;
   var qvs = null;
   var ses = null;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -159,7 +160,8 @@ describe('Question Validation Service', function() {
       },
       language_code: 'en',
       version: 1,
-      linked_skill_ids: ['abc']
+      linked_skill_ids: ['abc'],
+      inapplicable_skill_misconception_ids: ['abc-2']
     };
     mockMisconceptionObject = {
       abc: [

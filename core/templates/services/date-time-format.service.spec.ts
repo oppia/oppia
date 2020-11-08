@@ -17,20 +17,7 @@
  */
 
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import moment from 'moment';
-
-// Needed because MockDateContructor should be of same type as
-// DateConstructor to be used in callFake.
-interface MockDateContructorType {
-  parse: (s: string) => number;
-  UTC: (
-    year: number, month: number, date?: number, hours?: number,
-    minutes?: number, seconds?: number, ms?: number) => number;
-  now: () => number;
-
-  (millisSinceEpoch?: number): string;
-  new(): Date;
-}
+import dayjs from 'dayjs';
 
 describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -85,9 +72,9 @@ describe('datetimeformatter', () => {
   });
 
   it('should provide date time hour string', function() {
-    expect(
-      df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe(
-      moment(new Date(NOW_MILLIS)).format('MMM D HH:mm A'));
+    expect(df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe(
+      dayjs(new Date(NOW_MILLIS)).format('MMM D hh:mm A')
+    );
   });
 
   it('should provide correct date format MM/DD/YYY string', () => {
@@ -103,7 +90,5 @@ describe('datetimeformatter', () => {
       df.getLocaleDateString(NOW_MILLIS));
     expect((new Date(NaN).toLocaleDateString())).toBe(
       df.getLocaleDateString(NaN));
-    expect((new Date(null)).toLocaleDateString()).toBe(
-      df.getLocaleDateString(null));
   });
 });

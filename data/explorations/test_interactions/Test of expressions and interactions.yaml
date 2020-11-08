@@ -14,17 +14,13 @@ param_specs:
     obj_type: UnicodeString
   c:
     obj_type: UnicodeString
-schema_version: 30
+schema_version: 43
 states:
   Code REPL:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Write a program the prints 12.<br></p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -40,7 +36,7 @@ states:
         - inputs:
             x: '12'
           rule_type: OutputEquals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -64,7 +60,19 @@ states:
       hints: []
       id: CodeRepl
       solution: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Continue:
     classifier_model_id: null
     content:
@@ -80,15 +88,14 @@ states:
         \ 4}} should be true.</p><p>{{4 &gt;= 3}} should be true.</p><p>&lt; should\
         \ be an unescaped 'less-than' sign.</p><p>&gt; should be an unescaped 'greater-than'\
         \ sign.</p>"
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
         buttonText:
-          value: Continue
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
       default_outcome:
         dest: Multiple choice input
         feedback:
@@ -101,6 +108,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    next_content_id_index: 1
     param_changes:
     - customization_args:
         parse_with_jinja: false
@@ -122,13 +130,22 @@ states:
         value: '{{b/c}}'
       generator_id: Copier
       name: b
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
   END:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -139,7 +156,15 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
   Multiple choice input:
     classifier_model_id: null
     content:
@@ -147,10 +172,6 @@ states:
       html: "<p>Choose option B.<br></p><p>\_</p><p><strong>Parameters</strong></p><p>{{a}}\
         \ should be 1.</p><p>{{b}} should be 3.<br></p><p>{{c}} should be 2.</p><p>{{a*b}}\
         \ should be 3.</p>"
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -166,17 +187,25 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
-            \ filepath-with-value=\"&amp;quot;A_height_24_width_24.png&amp;quot;\"\
-            \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p>"
-          - <p>Option B<br></p>
-          - <p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br></p>
+          - content_id: ca_choices_2
+            html: "<oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\"\
+              \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
+              &amp;quot;A_height_24_width_24.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
+              </p>"
+          - content_id: ca_choices_3
+            html: <p>Option B<br></p>
+          - content_id: ca_choices_4
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;\\frac{x}{y}&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_152727_0lz7a7ui3f_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math><br></p>'
+        showChoicesInShuffledOrder:
+          value: false
       default_outcome:
         dest: Multiple choice input
         feedback:
@@ -189,21 +218,35 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 5
     param_changes:
     - customization_args:
         parse_with_jinja: true
         value: '{{a+c}}'
       generator_id: Copier
       name: b
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Music notes input:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Enter two E4 notes (bottom line).<br></p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -227,7 +270,7 @@ states:
                 num: 1
               readableNoteName: E4
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -255,7 +298,19 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Network Graph:
     classifier_model_id: null
     content:
@@ -263,10 +318,6 @@ states:
       html: <p>Do the following step by step:<br><br>1. Delete Node labelled B</p><p>2.
         Add Node labelled Z</p><p>3. Add Edge of weight 150 connecting A to Z</p><p>4.
         Delete Edge between A and F</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -299,7 +350,7 @@ states:
                 x: 155.0
                 y: 125.0
           rule_type: IsIsomorphicTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -348,16 +399,24 @@ states:
       hints: []
       id: GraphInput
       solution: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Numeric input:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Enter a number larger than 6.<br></p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -373,7 +432,7 @@ states:
         - inputs:
             x: 6.0
           rule_type: IsGreaterThan
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -389,16 +448,24 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    next_content_id_index: 2
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Set input:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Enter the set {abc, xyz}<br></p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -416,10 +483,14 @@ states:
             - abc
             - xyz
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_2
+            unicode_str: Add item
       default_outcome:
         dest: Set input
         feedback:
@@ -432,16 +503,26 @@ states:
       hints: []
       id: SetInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Text Area Input:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Please type hello.</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -457,12 +538,14 @@ states:
         - inputs:
             x: hello
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: Type your answer here.
         rows:
           value: 10
       default_outcome:
@@ -477,16 +560,26 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   Text input:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Enter the string rrrrr<br></p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -502,12 +595,14 @@ states:
         - inputs:
             x: rrrrr
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: Type your answer here.
         rows:
           value: 1
       default_outcome:
@@ -522,16 +617,26 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   World map:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Click on the USA.<br></p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -550,7 +655,7 @@ states:
             - 40.0
             - -105.0
           rule_type: Within
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -572,7 +677,19 @@ states:
       hints: []
       id: InteractiveMap
       solution: null
+    next_content_id_index: 2
     param_changes: []
-states_schema_version: 25
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+states_schema_version: 38
 tags: []
 title: Test of expressions and interactions

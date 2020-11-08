@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { RevertChangeList, ExplorationChangeList } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+  'domain/exploration/exploration-draft.model';
 
 export interface ExplorationSnapshot {
   'commit_message': string;

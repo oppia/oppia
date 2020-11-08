@@ -46,10 +46,7 @@ export class AlgebraicExpressionInputValidationService {
       customizationArgs: AlgebraicExpressionInputCustomizationArgs): Warning[] {
     let warningsList = [];
 
-    // TODO(#7434): Use dot notation after we find a way to get
-    // rid of the TS2339 error on AppConstants.
-    // eslint-disable-next-line dot-notation
-    let allowedLettersLimit = AppConstants['MAX_CUSTOM_LETTERS_FOR_OSK'];
+    let allowedLettersLimit = AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK;
     if (customizationArgs.customOskLetters.value.length > allowedLettersLimit) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -136,14 +133,10 @@ export class AlgebraicExpressionInputValidationService {
       }
     }
 
-    // TODO(#7434): Use dot notation after we find a way to get
-    // rid of the TS2339 error on AppConstants.
-    /* eslint-disable dot-notation */
     let greekLetters = Object.keys(
-      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
-      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
-    /* eslint-enable dot-notation */
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let missingVariables = [];
 
     for (let variable of seenVariables) {

@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,38 +16,35 @@
  * @fileoverview Unit tests for Expression Evaluator Service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { Type } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 
-require('App.ts');
-require('expressions/expression-evaluator.service.ts');
-require('expressions/expression-parser.service.ts');
-require('expressions/expression-syntax-tree.service.ts');
-require('services/utils.service.ts');
+import { ExpressionEvaluatorService } from
+  'expressions/expression-evaluator.service';
+import { ExpressionParserService } from
+  'expressions/expression-parser.service';
+import {
+  EnvDict,
+  Expr,
+  ExprUndefinedVarError,
+  ExprWrongArgTypeError,
+  ExprWrongNumArgsError,
+  ExpressionError,
+  ExpressionSyntaxTreeService,
+} from 'expressions/expression-syntax-tree.service';
 
-describe('Expression evaluator service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+describe('Expression evaluator service', () => {
+  let expressionEvaluatorService: ExpressionEvaluatorService;
+  let expressionParserService: ExpressionParserService;
+  let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
 
-  var ees = null;
-  var eps = null;
-  var ests = null;
-  var isString = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    ees = $injector.get('ExpressionEvaluatorService');
-    eps = $injector.get('ExpressionParserService');
-    ests = $injector.get('ExpressionSyntaxTreeService');
-    isString = $injector.get('UtilsService').isString;
-  }));
+  beforeEach(() => {
+    expressionEvaluatorService = TestBed.get(ExpressionEvaluatorService);
+    expressionParserService = TestBed.get(ExpressionParserService);
+    expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
+  });
 
-  var ENVS = [
+  const ENVS: EnvDict[] = [
     {
       numZero: 0,
       boolTrue: true,
@@ -58,8 +55,9 @@ describe('Expression evaluator service', function() {
     }
   ];
 
-  it('should get params used in expressions', function() {
-    [
+  describe('Getting params from expressions', () => {
+    type TestParam = [string, string[]];
+    (<TestParam[]> [
       ['numZero', ['numZero']],
       ['b + a', ['a', 'b']],
       ['a + b + a', ['a', 'b']],
@@ -77,48 +75,28 @@ describe('Expression evaluator service', function() {
       ['100 < num100_001 && 1 > num100_001', ['num100_001']],
       ['boolTrue == boolFalse', ['boolFalse', 'boolTrue']],
       ['strNull != strXYZ', ['strNull', 'strXYZ']],
-      ['if boolFalse then boolTrue else numZero', [
-        'boolFalse', 'boolTrue', 'numZero']],
+      [
+        'if boolFalse then boolTrue else numZero',
+        ['boolFalse', 'boolTrue', 'numZero']
+      ],
       ['num100_001 / 0', ['num100_001']],
       ['abs(-3)', []],
       ['pow(num100_001, numZero)', ['num100_001', 'numZero']],
       ['log(9, 3)', []],
       ['numZero + numOne', ['numOne', 'numZero']]
-    ].forEach(function(test) {
-      var expression = test[0];
-      var expectedParams = test[1];
-
-      var parsed = (
-        isString(expression) ? eps.parse(expression) : expression);
-      var parsedJson = JSON.stringify(parsed);
-      var failed = false;
-
-      var recordFailure = function(params, exception) {
-        console.error('input           : ' + expression);
-        console.error('parsed          : ' + parsedJson);
-        console.error('expected        : ' + JSON.stringify(expectedParams));
-        if (params !== undefined) {
-          console.error('evaluated       : ' + params);
-        } else {
-          console.error('exception       : ' + exception);
-        }
-        failed = true;
-      };
-
-      try {
-        var params = ests.getParamsUsedInExpression(expression);
-        if (!angular.equals(params, expectedParams)) {
-          recordFailure(params, undefined);
-        }
-      } catch (e) {
-        recordFailure(undefined, e);
-      }
-      expect(failed).toBe(false);
+    ]).forEach(([expression, expectedParams]) => {
+      it('should get references from the expression ' +
+        JSON.stringify(expression), () => {
+        expect(
+          expressionSyntaxTreeService.getParamsUsedInExpression(expression)
+        ).toEqual(expectedParams);
+      });
     });
   });
 
-  it('should evaluate to correct values', function() {
-    [
+  describe('Evaluating valid expressions', () => {
+    type TestParam = [string, Expr];
+    (<TestParam[]> [
       ['numZero', 0],
       ['+10', 10],
       ['2   + 10', 12],
@@ -139,68 +117,45 @@ describe('Expression evaluator service', function() {
       ['abs(-3)', 3],
       ['pow(num100_001, numZero)', 1],
       ['log(9, 3)', 2],
-      ['numZero + numOne', ests.ExprUndefinedVarError],
-      [['+', 10, 20, 30], ests.ExprWrongNumArgsError],
-      [['==', true], ests.ExprWrongNumArgsError],
-      [['+', 'abc', 1], ests.ExprWrongArgTypeError]
-    ].forEach(function(test) {
-      var expression = test[0];
-      var expected = test[1];
+    ]).forEach(([expression, expected]) => {
+      it('should evaluate ' + JSON.stringify(expression) + ' correctly', () => {
+        expect(
+          expressionSyntaxTreeService.applyFunctionToParseTree(
+            expressionParserService.parse(expression), ENVS,
+            (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs))
+        ).toEqual(expected);
+        expect(expressionEvaluatorService.evaluateExpression(expression, ENVS))
+          .toEqual(expected);
+      });
+    });
+  });
 
-      // 'expected' should be either a JavaScript primitive value that would be
-      // the result of evaluation 'expression', or an exception that is
-      // expected to be thrown.
-      // 'expression' is either a string (in which case parsed) or an array
-      // (representing a parse tree).
-      var parsed = (
-        isString(expression) ? eps.parse(expression) : expression);
-      var parsedJson = JSON.stringify(parsed);
-      var failed = false;
+  describe('Evaluating invalid expressions', () => {
+    type TestParam = [string, Expr[], Type<ExpressionError>];
+    (<TestParam[]> [
+      ['there are too many args', ['+', 10, 20, 30], ExprWrongNumArgsError],
+      ['there are too few args', ['==', true], ExprWrongNumArgsError],
+      ['an arg has the wrong type', ['+', 'abc', 1], ExprWrongArgTypeError],
+    ]).forEach(([problemDescription, expression, errorType]) => {
+      it('should report an error when ' + problemDescription, () => {
+        expect(
+          () => expressionSyntaxTreeService.applyFunctionToParseTree(
+            expression, ENVS,
+            (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs))
+        ).toThrowError(errorType);
+      });
+    });
 
-      var recordFailure = function(result, exception) {
-        console.error('input     : ' + expression);
-        console.error('parsed    : ' + parsedJson);
-        if (result !== undefined) {
-          console.error('evaluated : ' + result);
-          console.error('expected  : ' + expected);
-        }
-        if (exception !== undefined) {
-          console.error('exception : ' + exception);
-          console.error('expected  : (exception)');
-        }
-        failed = true;
-      };
-
-      try {
-        var evaled = ests.applyFunctionToParseTree(parsed, ENVS, ees.evaluate);
-        if (expected instanceof Error || evaled !== expected) {
-          recordFailure(evaled, undefined);
-        }
-      } catch (e) {
-        if (!(e instanceof expected)) {
-          // Wrong or unexpected exception.
-          recordFailure(undefined, e);
-        }
-      }
-      expect(failed).toBe(false);
-
-      if (typeof expression !== 'string') {
-        return;
-      }
-
-      failed = false;
-      try {
-        evaled = ees.evaluateExpression(expression, ENVS);
-        if (expected instanceof Error || evaled !== expected) {
-          recordFailure(evaled, undefined);
-        }
-      } catch (e) {
-        if (!(e instanceof expected)) {
-          // Wrong or unexpected exception.
-          recordFailure(undefined, e);
-        }
-      }
-      expect(failed).toBe(false);
+    it('should report an error when using an undefined variable', () => {
+      const expression = 'numZero + numOne'; // The param `numOne` is undefined.
+      expect(
+        () => expressionSyntaxTreeService.applyFunctionToParseTree(
+          expressionParserService.parse(expression), ENVS,
+          (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs)))
+        .toThrowError(ExprUndefinedVarError);
+      expect(
+        () => expressionEvaluatorService.evaluateExpression(expression, ENVS)
+      ).toThrowError(ExprUndefinedVarError);
     });
   });
 });

@@ -18,10 +18,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-answer-details-data.service.ts is upgraded to Angular 8.
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 
 require(
   'pages/exploration-editor-page/services/' +
@@ -35,7 +34,6 @@ describe('Learner answer details service', function() {
   var $httpBackend = null;
   var CsrfService = null;
   var $q = null;
-  var LearnerAnswerInfoObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -43,9 +41,6 @@ describe('Learner answer details service', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
-      $provide.value(
-        'LearnerAnswerDetailsObjectFactory',
-        new LearnerAnswerDetailsObjectFactory());
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -59,8 +54,6 @@ describe('Learner answer details service', function() {
     LearnerAnswerDetailsDataService = $injector.get(
       'LearnerAnswerDetailsDataService');
     $q = _$q_;
-    LearnerAnswerInfoObjectFactory = $injector.get(
-      'LearnerAnswerInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
@@ -100,7 +93,7 @@ describe('Learner answer details service', function() {
         var failHandler = jasmine.createSpy('fail');
 
         var createFromBackendDictSpy = spyOn(
-          LearnerAnswerInfoObjectFactory, 'createFromBackendDict');
+          LearnerAnswerInfo, 'createFromBackendDict');
 
         $httpBackend.expect(
           'GET', '/learneranswerinfohandler/' +
@@ -125,7 +118,7 @@ describe('Learner answer details service', function() {
         var failHandler = jasmine.createSpy('fail');
 
         var createFromBackendDictSpy = spyOn(
-          LearnerAnswerInfoObjectFactory, 'createFromBackendDict');
+          LearnerAnswerInfo, 'createFromBackendDict');
 
         $httpBackend.expect(
           'GET', '/learneranswerinfohandler/' +

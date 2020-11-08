@@ -79,6 +79,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.additional_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
                 self.story_id_2))
+        self.topic.meta_tag_content = 'topic meta content'
 
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story_1)
@@ -141,7 +142,8 @@ class TopicPageDataHandlerTests(
                 'thumbnail_bg_color': None,
                 'story_is_published': True,
                 'completed_node_titles': [],
-                'url_fragment': 'story-frag-one'
+                'url_fragment': 'story-frag-one',
+                'pending_node_dicts': []
             }],
             'additional_story_dicts': [{
                 'id': self.story_2.id,
@@ -152,7 +154,8 @@ class TopicPageDataHandlerTests(
                 'thumbnail_bg_color': None,
                 'story_is_published': True,
                 'completed_node_titles': [],
-                'url_fragment': 'story-frag-two'
+                'url_fragment': 'story-frag-two',
+                'pending_node_dicts': []
             }],
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [{
@@ -205,7 +208,8 @@ class TopicPageDataHandlerTests(
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
                     'completed_node_titles': [],
-                    'url_fragment': 'story-frag-one'
+                    'url_fragment': 'story-frag-one',
+                    'pending_node_dicts': []
                 }],
                 'additional_story_dicts': [{
                     'id': self.story_2.id,
@@ -216,7 +220,8 @@ class TopicPageDataHandlerTests(
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
                     'completed_node_titles': [],
-                    'url_fragment': 'story-frag-two'
+                    'url_fragment': 'story-frag-two',
+                    'pending_node_dicts': []
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{
@@ -239,6 +244,19 @@ class TopicPageDataHandlerTests(
             self.assertDictContainsSubset(expected_dict, json_response)
 
         self.logout()
+
+    def test_get_with_meta_tag_content(self):
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'topic_with_meta',
+            'topic-with-meta', 'description')
+        self.topic.meta_tag_content = 'meta content'
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        json_response = self.get_json(
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic-with-meta'))
+        expected_meta_tag_content = 'meta content'
+        self.assertEqual(
+            expected_meta_tag_content, json_response['meta_tag_content'])
 
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(

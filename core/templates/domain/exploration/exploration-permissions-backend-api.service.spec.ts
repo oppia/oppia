@@ -23,12 +23,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ContextService } from 'services/context.service';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
-import { ExplorationPermissionsObjectFactory } from
-  'domain/exploration/exploration-permissions-object.factory';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 
 describe('Exploration permissions backend api service', () => {
   let epbas: ExplorationPermissionsBackendApiService;
-  let epof: ExplorationPermissionsObjectFactory;
   let httpTestingController: HttpTestingController;
   let contextService: ContextService;
 
@@ -38,7 +36,6 @@ describe('Exploration permissions backend api service', () => {
     });
 
     epbas = TestBed.get(ExplorationPermissionsBackendApiService);
-    epof = TestBed.get(ExplorationPermissionsObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     contextService = TestBed.get(ContextService);
 
@@ -60,7 +57,8 @@ describe('Exploration permissions backend api service', () => {
       can_edit: true
     };
 
-    let expectedResponse = epof.createFromBackendDict(backendResponse);
+    let expectedResponse =
+      ExplorationPermissions.createFromBackendDict(backendResponse);
 
     epbas.getPermissions().then((expPermissions) => {
       expect(expPermissions).toEqual(expectedResponse);

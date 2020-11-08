@@ -23,16 +23,14 @@ import { Injectable } from '@angular/core';
 
 import {
   ExplorationStats,
-  ExplorationStatsObjectFactory,
   ExplorationStatsBackendDict
-} from 'domain/statistics/ExplorationStatsObjectFactory';
+} from 'domain/statistics/exploration-stats.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 @Injectable({providedIn: 'root'})
 export class ExplorationStatsBackendApiService {
   constructor(
-      private explorationStatsObjectFactory: ExplorationStatsObjectFactory,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
@@ -43,7 +41,7 @@ export class ExplorationStatsBackendApiService {
           exploration_id: expId
         })).toPromise()
       .then((dict: ExplorationStatsBackendDict) => {
-        return this.explorationStatsObjectFactory.createFromBackendDict(dict);
+        return ExplorationStats.createFromBackendDict(dict);
       });
   }
 }

@@ -24,23 +24,23 @@ import {
   ExplorationTask,
   ExplorationTaskType,
   ExplorationTaskBackendDict,
-  ExplorationTaskObjectFactory
-} from 'domain/improvements/ExplorationTaskObjectFactory';
+  ExplorationTaskModel
+} from 'domain/improvements/exploration-task.model';
 import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+  'domain/improvements/high-bounce-rate-task.model';
 import { StateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
+  'domain/statistics/state-stats-model';
 import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+  'domain/improvements/ineffective-feedback-loop-task.model';
 import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+  'domain/improvements/needs-guiding-response-task.model';
 import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+  'domain/improvements/successive-incorrect-answers-task.model';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStats, ExplorationStatsBackendDict } from
+  'domain/statistics/exploration-stats.model';
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
@@ -59,8 +59,6 @@ describe('Exploration improvements task registrar service', () => {
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
-  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
-  let explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
   let statesObjectFactory: StatesObjectFactory;
 
@@ -86,8 +84,6 @@ describe('Exploration improvements task registrar service', () => {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
 
     answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
-    explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
-    explorationTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
 
@@ -239,13 +235,13 @@ describe('Exploration improvements task registrar service', () => {
 
   const makeTask = (
     <T extends ExplorationTask = ExplorationTask>(dict = taskBackendDict) => {
-      return <T> explorationTaskObjectFactory.createFromBackendDict(dict);
+      return <T> ExplorationTaskModel.createFromBackendDict(dict);
     });
   const makeStates = (map = statesBackendDict) => {
     return statesObjectFactory.createFromBackendDict(map);
   };
   const makeExpStats = (dict = expStatsBackendDict) => {
-    return explorationStatsObjectFactory.createFromBackendDict(dict);
+    return ExplorationStats.createFromBackendDict(dict);
   };
   const makeAnswerStats = (dict = answerStatsBackendDict) => {
     return answerStatsObjectFactory.createFromBackendDict(dict);

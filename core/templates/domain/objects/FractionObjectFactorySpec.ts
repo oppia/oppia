@@ -22,8 +22,8 @@ import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 
 describe('Fraction Object Factory', () => {
-  let errors = null;
-  let fraction: FractionObjectFactory = null;
+  let errors: typeof ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
+  let fraction: FractionObjectFactory;
 
   beforeEach(() => {
     errors = ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
@@ -184,7 +184,7 @@ describe('Fraction Object Factory', () => {
       fraction.fromRawInputString('5/5').isImproperFraction()).toBe(true);
   });
 
-  it('shoud covert to simplest form', () => {
+  it('should convert to simplest form', () => {
     expect(fraction.fromRawInputString('1').convertToSimplestForm())
       .toEqual(new Fraction(false, 1, 0, 1));
     expect(fraction.fromRawInputString('0').convertToSimplestForm())

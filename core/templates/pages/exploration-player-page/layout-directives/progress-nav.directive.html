@@ -6,7 +6,7 @@
     <div ng-if="hasPrevious && !helpCardHasContinueButton">
       <md-button aria-label="Previous Card"
                  ng-click="changeCard(displayedCardIndex-1)"
-                 class="md-raised protractor-test-back-button oppia-back-button oppia-nav-button">
+                 class="md-raised protractor-test-back-button oppia-back-button oppia-nav-left-button">
         <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </md-button>
     </div>
@@ -55,11 +55,14 @@
   }
 
   progress-nav .oppia-nav-button {
-    margin: 0 0 12px 12px;
+    margin: 0 12px 12px 0;
   }
   progress-nav .oppia-arrow-right {
     font-size: 19px;
     padding-top: 1.5px;
+  }
+  progress-nav .oppia-nav-left-button {
+    margin: 0 0 12px 12px;
   }
 
   @media screen and (max-width: 959px) {

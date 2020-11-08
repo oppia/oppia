@@ -47,8 +47,9 @@
             <tr ng-repeat="message in $ctrl.allFeedbackMessages track by $index">
               <td><[$ctrl.getDatetimeAsString(message.createdOnMsecs)]></td>
               <td>
-                <a ng-href="<[$ctrl.getExplorationCreateUrl(message.explorationId)]>">
-                  <[message.explorationId]>
+                <a ng-if="$ctrl.isMessageFromExploration(message)"
+                   ng-href="<[$ctrl.getExplorationCreateUrl(message.entityId)]>">
+                  <[message.entityId]>
                 </a>
               </td>
               <td><[message.authorUsername]></td>

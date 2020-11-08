@@ -17,7 +17,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
@@ -26,7 +26,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class PageTitleService {
   pageTitleForMobile: string = null;
   pageSubtitleForMobile: string = null;
-  constructor(private titleService: Title) {}
+  constructor(
+    private metaTagService: Meta,
+    private titleService: Title) {}
 
   setPageTitle(title: string): void {
     this.titleService.setTitle(title);
@@ -34,6 +36,17 @@ export class PageTitleService {
 
   getPageTitle(): string {
     return this.titleService.getTitle();
+  }
+
+  /**
+   * Updates the description meta tag in the current HTML page
+   * with the provided content.
+   */
+  updateMetaTag(content: string): void {
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: content
+    });
   }
 
   setPageTitleForMobileView(title: string): void {

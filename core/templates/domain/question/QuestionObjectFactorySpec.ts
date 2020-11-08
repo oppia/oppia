@@ -44,6 +44,9 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state/StateObjectFactory.ts');
@@ -54,6 +57,7 @@ describe('Question object factory', function() {
   var sampleQuestion = null;
   var sampleQuestionBackendDict = null;
   var misconceptionObjectFactory = null;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -218,10 +222,10 @@ describe('Question object factory', function() {
     sampleQuestion.setLinkedSkillIds(['skill_id1', 'skill_id2']);
     expect(sampleQuestion.getLinkedSkillIds()).toEqual(
       ['skill_id1', 'skill_id2']);
-    expect(sampleQuestion.getInApplicableSkillMisconceptionIds()).toEqual(
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
       ['a-1', 'b-2']);
-    sampleQuestion.setInApplicableSkillMisconceptionIds(['abc-123']);
-    expect(sampleQuestion.getInApplicableSkillMisconceptionIds()).toEqual(
+    sampleQuestion.setInapplicableSkillMisconceptionIds(['abc-123']);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
       ['abc-123']);
     var stateData = sampleQuestion.getStateData();
     expect(stateData.name).toEqual('question');
@@ -263,7 +267,7 @@ describe('Question object factory', function() {
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     interaction.answerGroups[0].taggedSkillMisconceptionId = 'skillId1-id';
     expect(sampleQuestion.getUnaddressedMisconceptionNames(
-      misconceptionsDict)).toEqual(['name_2']);
+      misconceptionsDict)).toEqual(['name_2', 'name_3']);
   });
 
   it('should correctly validate question', function() {
@@ -299,7 +303,7 @@ describe('Question object factory', function() {
     expect(sampleQuestion1.getStateData()).toEqual(state);
     expect(sampleQuestion1.getLinkedSkillIds()).toEqual(
       ['skill_id3', 'skill_id4']);
-    expect(sampleQuestion.getInApplicableSkillMisconceptionIds()).toEqual(
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
       ['a-1', 'b-2']);
   });
 });

@@ -33,35 +33,26 @@ import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-/* eslint-disable max-len */
-import { AlgebraicExpressionInputRulesService } from
-  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
-import { DragAndDropSortInputRulesService } from
-  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
-import { MultipleChoiceInputRulesService } from
-  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
-import { ItemSelectionInputRulesService } from
-  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { DragAndDropSortInputRulesService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
+import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { MathEquationInputRulesService } from
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
-import { NumericExpressionInputRulesService } from
-  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
-import { RatioExpressionInputRulesService } from
-  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
+import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { ImageClickAnswer } from './answer-defs';
 import { ImageClickRuleInputs } from './rule-input-defs';
-/* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
@@ -77,14 +68,13 @@ describe('Rule spec services', function() {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value('RatioObjectFactory', new RatioObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
     $provide.value(
       'AlgebraicExpressionInputRulesService',
       new AlgebraicExpressionInputRulesService());
     $provide.value(
       'RatioExpressionInputRulesService',
-      new RatioExpressionInputRulesService(new RatioObjectFactory()));
+      new RatioExpressionInputRulesService());
     $provide.value(
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());

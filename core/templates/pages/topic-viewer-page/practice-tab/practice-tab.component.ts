@@ -42,6 +42,7 @@ export class PracticeTabComponent implements OnInit {
   availableSubtopics: Subtopic[] = [];
   selectedSubtopicIndices: boolean[] = [];
   questionsAreAvailable: boolean = false;
+  questionsStatusCallIsComplete: boolean = true;
 
   constructor(
     private questionBackendApiService: QuestionBackendApiService,
@@ -75,6 +76,7 @@ export class PracticeTabComponent implements OnInit {
 
   checkIfQuestionsExist(subtopicIndices: boolean[]): void {
     const skillIds = [];
+    this.questionsStatusCallIsComplete = false;
     for (let idx in subtopicIndices) {
       if (subtopicIndices[idx]) {
         skillIds.push(this.availableSubtopics[idx].getSkillIds());
@@ -84,9 +86,11 @@ export class PracticeTabComponent implements OnInit {
       this.questionBackendApiService.fetchTotalQuestionCountForSkillIds(
         skillIds).then(questionCount => {
         this.questionsAreAvailable = questionCount > 0;
+        this.questionsStatusCallIsComplete = true;
       });
     } else {
       this.questionsAreAvailable = false;
+      this.questionsStatusCallIsComplete = true;
     }
   }
 

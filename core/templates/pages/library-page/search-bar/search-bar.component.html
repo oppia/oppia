@@ -1,7 +1,7 @@
 <div class="oppia-same-row-container">
   <form class="navbar-form float-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group oppia-input-group">
+      <div class="input-group oppia-input-group" ng-class="{'classroom-page-input-group': $ctrl.classroomPageIsActive}">
         <div class="input-group-addon oppia-search-bar-icon">
           <i class="material-icons md-18" ng-if="!$ctrl.isSearchInProgress()">&#xE8B6;</i>
           <span ng-if="$ctrl.isSearchInProgress()">
@@ -9,7 +9,8 @@
           </span>
         </div>
         <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
-               ng-attr-placeholder="<[$ctrl.searchBarPlaceholder]>" ng-model="$ctrl.searchQuery" ng-change="$ctrl.onSearchQueryChangeExec()"
+               ng-attr-placeholder="<[$ctrl.searchBarPlaceholder]>" ng-model="$ctrl.searchQuery"
+               ng-change="$ctrl.classroomPageIsActive ? null : $ctrl.onSearchQueryChangeExec()"
                ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
       </div>
     </div>
@@ -108,15 +109,38 @@
     </li>
   </ul>
 </div>
+<div class="oppia-same-row-container">
+  <div class="float-left oppia-navbar-button-container">
+    <div ng-if="$ctrl.classroomPageIsActive"
+         class="oppia-search-button protractor-test-search-button"
+         ng-click="$ctrl.onSearchQueryChangeExec()"
+         title="Click here to search">
+         Go!
+    </div>
+  </div>
+</div>
 
 <style>
-  search-bar .oppia-search-bar-input {
+  search-bar .oppia-search-bar-input,
+  search-bar .oppia-search-button {
     background: #257D76;
-    border: 1px solid #257D76;
+    border-color: #257D76;
     border-radius: 0;
+    border-style: solid;
+    border-width: 1px 1px 1px 0;
     color: white;
     font-size: 15px;
     height: 35px;
+  }
+
+  search-bar .oppia-search-button {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 6px 15px 0 15px;
+  }
+
+  search-bar .oppia-search-button:hover {
+    cursor: pointer;
   }
 
   search-bar .oppia-search-bar-form {
@@ -128,7 +152,9 @@
   }
   search-bar .oppia-search-bar-icon {
     background: #257D76;
-    border: 1px solid #257D76;
+    border-color: #257D76;
+    border-style: solid;
+    border-width: 1px 0 1px 1px;
     color: rgba(255,255,255,0.95);
   }
   search-bar .oppia-search-bar-input.btn:hover,
@@ -158,6 +184,7 @@
     width: 17em;
   }
   search-bar .oppia-search-bar-dropdown-toggle {
+    border-radius: 0;
     max-width: 130px;
   }
   search-bar .oppia-search-bar-dropdown-menu-section {
@@ -168,9 +195,12 @@
     margin: 2px;
   }
   search-bar .oppia-search-bar-dropdown-toggle-button {
-    border-bottom-right-radius: 4px;
-    border-top-right-radius: 4px;
+    border-radius: 0;
     max-width: 130px;
+  }
+
+  search-bar .oppia-input-group.classroom-page-input-group {
+    width: 20em;
   }
 
   @media (max-width: 1100px) {
@@ -256,6 +286,12 @@
     search-bar .oppia-search-bar-category-selection-symbol {
       margin-top: -18px;
       padding-top: 16px;
+    }
+  }
+
+  @media (max-width: 500px) {
+    search-bar .oppia-input-group.classroom-page-input-group {
+      width: 15em;
     }
   }
 

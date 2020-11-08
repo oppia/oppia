@@ -51,6 +51,9 @@ angular.module('oppia').directive('adminNavbar', [
         ctrl.isConfigTabOpen = function() {
           return AdminRouterService.isConfigTabOpen();
         };
+        ctrl.isFeaturesTabOpen = function() {
+          return AdminRouterService.isFeaturesTabOpen();
+        };
         ctrl.isRolesTabOpen = function() {
           return AdminRouterService.isRolesTabOpen();
         };

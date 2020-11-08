@@ -22,13 +22,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
-import { LearnerExplorationSummaryObjectFactory } from
-  'domain/summary/learner-exploration-summary-object.factory';
+import { LearnerExplorationSummary } from
+  'domain/summary/learner-exploration-summary.model';
 
 describe('Exploration recommendations backend api service', () => {
   let httpTestingController: HttpTestingController;
   let erbas: ExplorationRecommendationsBackendApiService;
-  let lesof: LearnerExplorationSummaryObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -37,14 +36,13 @@ describe('Exploration recommendations backend api service', () => {
 
     httpTestingController = TestBed.get(HttpTestingController);
     erbas = TestBed.get(ExplorationRecommendationsBackendApiService);
-    lesof = TestBed.get(LearnerExplorationSummaryObjectFactory);
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('correctly fetches recommended explorations', fakeAsync(() => {
+  it('should correctly fetch recommended explorations', fakeAsync(() => {
     let backendResponse = {
       summaries: [{
         last_updated_msec: 1591296737470.528,
@@ -73,7 +71,7 @@ describe('Exploration recommendations backend api service', () => {
     };
 
     let expectedObject = backendResponse.summaries.map(
-      lesof.createFromBackendDict);
+      LearnerExplorationSummary.createFromBackendDict);
 
     erbas.getRecommendedSummaryDicts(
       ['0'], 'false', 'collectionId', 'storyId', 'nodeId', 'expId').then((

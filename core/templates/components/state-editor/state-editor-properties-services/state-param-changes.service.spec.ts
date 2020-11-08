@@ -17,10 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-/* eslint-disable max-len */
 import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service.ts';
-/* eslint-enable max-len */
-
 
 describe('State Param Changes service', () => {
   let spcs: StateParamChangesService = null;

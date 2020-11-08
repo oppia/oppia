@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AnswerStatsBackendDict } from
-  'domain/exploration/visualization-info-object.factory';
+  'domain/exploration/visualization-info.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { StateTopAnswersStats } from
@@ -66,7 +66,7 @@ describe('StateTopAnswersStatsService', () => {
       answer_groups: [{
         rule_specs: [{
           rule_type: 'Contains',
-          inputs: {x: 'hola'}
+          inputs: {x: ['hola']}
         }],
         outcome: {
           dest: 'Me Llamo',
@@ -219,7 +219,7 @@ describe('StateTopAnswersStatsService', () => {
       expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBeFalse();
     }));
 
-  it('only returns state names with stats', fakeAsync(async() => {
+  it('should only returns state names with stats', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
@@ -292,7 +292,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createNew('Contains', {x: 'adios'}));
+      ruleObjectFactory.createNew('Contains', {x: ['adios']}));
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
@@ -313,7 +313,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules = [
-      ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
+      ruleObjectFactory.createNew('Contains', {x: ['bonjour']})
     ];
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 

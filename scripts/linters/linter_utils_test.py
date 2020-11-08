@@ -231,3 +231,41 @@ class TempDirTest(test_utils.GenericTestBase):
     def test_directory_has_suffix_appended(self):
         with linter_utils.temp_dir(suffix='cba') as temp_dir_path:
             self.assertTrue(os.path.basename(temp_dir_path).endswith('cba'))
+
+
+class ColorMessagePrintTest(test_utils.GenericTestBase):
+    """Test for color message print."""
+
+    def setUp(self):
+        super(ColorMessagePrintTest, self).setUp()
+        self.log = ''
+
+        def mock_print(*args):
+            """Mock for python_utils.PRINT."""
+            self.log = ' '.join(python_utils.UNICODE(arg) for arg in args)
+
+        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+
+    def test_print_failure_message_prints_in_red_color(self):
+        message = 'Failure Message'
+        red_color_message_prefix = '\033[91m'
+        escape_sequence = '\033[0m'
+
+        with self.print_swap:
+            linter_utils.print_failure_message(message)
+
+        self.assertEqual(
+            self.log,
+            red_color_message_prefix + message + escape_sequence)
+
+    def test_print_success_message_in_green_color(self):
+        message = 'Failure Message'
+        green_color_message_prefix = '\033[92m'
+        escape_sequence = '\033[0m'
+
+        with self.print_swap:
+            linter_utils.print_success_message(message)
+
+        self.assertEqual(
+            self.log,
+            green_color_message_prefix + message + escape_sequence)

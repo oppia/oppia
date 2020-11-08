@@ -20,10 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-/* eslint-disable max-len */
-import { ItemSelectionInputValidationService } from
-  'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-/* eslint-enable max-len */
+import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';

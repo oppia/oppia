@@ -51,5 +51,10 @@ angular.module('oppia').constant(
   QuestionDomainConstants.QUESTION_PROPERTY_QUESTION_STATE_DATA);
 
 angular.module('oppia').constant(
+  'QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS',
+  // eslint-disable-next-line max-len
+  QuestionDomainConstants.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS);
+
+angular.module('oppia').constant(
   'CMD_UPDATE_QUESTION_PROPERTY',
   QuestionDomainConstants.CMD_UPDATE_QUESTION_PROPERTY);

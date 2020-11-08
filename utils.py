@@ -41,6 +41,9 @@ sys.path.insert(0, _YAML_PATH)
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
+SECONDS_IN_HOUR = 60 * 60
+SECONDS_IN_MINUTE = 60
 
 
 class InvalidInputException(Exception):
@@ -265,21 +268,44 @@ def get_random_choice(alist):
     return alist[index]
 
 
+def convert_png_data_url_to_binary(image_data_url):
+    """Converts a PNG base64 data URL to a PNG binary data.
+
+    Args:
+        image_data_url: str. A string that is to be interpreted as a PNG
+            data URL.
+
+    Returns:
+        str. Binary content of the PNG created from the data URL.
+
+    Raises:
+        Exception. The given string does not represent a PNG data URL.
+    """
+    if image_data_url.startswith(PNG_DATA_URL_PREFIX):
+        return base64.b64decode(
+            python_utils.urllib_unquote(
+                image_data_url[len(PNG_DATA_URL_PREFIX):]))
+    else:
+        raise Exception('The given string does not represent a PNG data URL.')
+
+
 def convert_png_binary_to_data_url(content):
-    """Converts a png image string (represented by 'content') to a data URL.
+    """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
         content: str. PNG binary file content.
 
     Returns:
-        str. Data url created from the binary content of the PNG.
+        str. Data URL created from the binary content of the PNG.
 
     Raises:
-        Exception. If the given binary string is not of a PNG image.
+        Exception. The given binary string does not represent a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % python_utils.url_quote(
-            base64.b64encode(content))
+        return '%s%s' % (
+            PNG_DATA_URL_PREFIX,
+            python_utils.url_quote(base64.b64encode(content))
+        )
     else:
         raise Exception('The given string does not represent a PNG image.')
 
@@ -473,6 +499,45 @@ def get_human_readable_time_string(time_msec):
     """
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
+
+
+def create_string_from_largest_unit_in_timedelta(timedelta_obj):
+    """Given the timedelta object, find the largest nonzero time unit and
+    return that value, along with the time unit, as a human readable string.
+    The returned string is not localized.
+
+    Args:
+        timedelta_obj: datetime.timedelta. A datetime timedelta object. Datetime
+            timedelta objects are created when you subtract two datetime
+            objects.
+
+    Returns:
+        str. A human readable string representing the value of the largest
+        nonzero time unit, along with the time units. If the largest time unit
+        is seconds, 1 minute is returned. The value is represented as an integer
+        in the string.
+
+    Raises:
+        Exception. If the provided timedelta is not positive.
+    """
+    total_seconds = timedelta_obj.total_seconds()
+    if total_seconds <= 0:
+        raise Exception(
+            'Expected a positive timedelta, received: %s.' % total_seconds)
+    elif timedelta_obj.days != 0:
+        return '%s day%s' % (
+            int(timedelta_obj.days), 's' if timedelta_obj.days > 1 else '')
+    else:
+        number_of_hours, remainder = divmod(total_seconds, SECONDS_IN_HOUR)
+        number_of_minutes, _ = divmod(remainder, SECONDS_IN_MINUTE)
+        if number_of_hours != 0:
+            return '%s hour%s' % (
+                int(number_of_hours), 's' if number_of_hours > 1 else '')
+        elif number_of_minutes > 1:
+            return '%s minutes' % int(number_of_minutes)
+        # Round any seconds up to one minute.
+        else:
+            return '1 minute'
 
 
 def are_datetimes_close(later_datetime, earlier_datetime):
@@ -759,6 +824,21 @@ def get_supported_audio_language_description(language_code):
     raise Exception('Unsupported audio language code: %s' % language_code)
 
 
+def is_pseudonymous_id(user_id):
+    """Check that the ID is a pseudonymous one.
+
+    Args:
+        user_id: str. The ID to be checked.
+
+    Returns:
+        bool. Whether the ID represents a pseudonymous user.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('pid_'),
+        len(user_id) == feconf.USER_ID_LENGTH))
+
+
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent.
 
@@ -839,6 +919,55 @@ def compute_list_difference(list_a, list_b):
         list. List of the set difference of list_a - list_b.
     """
     return list(set(list_a) - set(list_b))
+
+
+def is_local_server_environment():
+    """Returns wheter the app is being run locally in a development server.
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    This is necessary because the DEV_MODE constant only differentiates between
+    local development and operations on the production server. However,
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
+
+    Returns:
+        bool. Whether the current instance is running locally on a developer's
+        computer.
+    """
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Development/' in os.environ['SERVER_SOFTWARE'])
+
+
+def is_appengine_cloud_environment():
+    """Returns whether the app is being run in production in the Google App
+    Engine Cloud.
+
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    This is necessary because the DEV_MODE constant only differentiates between
+    local development and operations on the production server. However,
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
+
+    Returns:
+        bool. Whether the current instance is running in production.
+    """
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Google App Engine/' in os.environ['SERVER_SOFTWARE'])
 
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):

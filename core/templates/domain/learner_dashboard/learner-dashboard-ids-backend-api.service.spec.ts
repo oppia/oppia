@@ -22,14 +22,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { LearnerDashboardActivityIdsObjectFactory } from
-  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+import { LearnerDashboardActivityIds } from
+  'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 describe('Learner Dashboard Backend API Service', () => {
   var learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService = null;
-  var learnerDashboardActivityIdsObjectFactory:
-    LearnerDashboardActivityIdsObjectFactory = null;
   let httpTestingController: HttpTestingController;
 
   var sampleDataResults = {
@@ -59,8 +57,6 @@ describe('Learner Dashboard Backend API Service', () => {
     });
     learnerDashboardIdsBackendApiService = TestBed.get(
       LearnerDashboardIdsBackendApiService);
-    learnerDashboardActivityIdsObjectFactory = TestBed.get(
-      LearnerDashboardActivityIdsObjectFactory);
 
     httpTestingController = TestBed.get(HttpTestingController);
   });
@@ -74,7 +70,7 @@ describe('Learner Dashboard Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      learnerDashboardIdsBackendApiService.fetchLearnerDashboardIds()
+      learnerDashboardIdsBackendApiService.fetchLearnerDashboardIdsAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL);
@@ -84,7 +80,7 @@ describe('Learner Dashboard Backend API Service', () => {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+        LearnerDashboardActivityIds.createFromBackendDict(
           sampleDataResults.learner_dashboard_activity_ids));
       expect(failHandler).not.toHaveBeenCalled();
     }
@@ -97,7 +93,7 @@ describe('Learner Dashboard Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      learnerDashboardIdsBackendApiService.fetchLearnerDashboardIds()
+      learnerDashboardIdsBackendApiService.fetchLearnerDashboardIdsAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL);

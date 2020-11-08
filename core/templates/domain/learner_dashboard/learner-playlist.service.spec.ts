@@ -23,7 +23,12 @@ require('services/csrf-token.service.ts');
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
+import { LearnerDashboardActivityIds } from
+  'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Learner playlist service factory', function() {
@@ -37,8 +42,8 @@ describe('Learner playlist service factory', function() {
   var addToLearnerPlaylistUrl = '';
   var AlertsService = null;
   var CsrfService = null;
-  var LearnerDashboardActivityIdsObjectFactory = null;
   var $uibModal = null;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
@@ -63,8 +68,6 @@ describe('Learner playlist service factory', function() {
     spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
     CsrfService = $injector.get('CsrfTokenService');
     $uibModal = $injector.get('$uibModal');
-    LearnerDashboardActivityIdsObjectFactory = $injector.get(
-      'LearnerDashboardActivityIdsObjectFactory');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       var deferred = $q.defer();
@@ -176,7 +179,7 @@ describe('Learner playlist service factory', function() {
       };
     });
 
-    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+    var learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
@@ -194,7 +197,7 @@ describe('Learner playlist service factory', function() {
       ['1', '2']);
   });
 
-  it('should remove a collection from learner playlist ', function() {
+  it('should remove a collection from learner playlist', function() {
     spyOn($uibModal, 'open').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve();
@@ -202,7 +205,7 @@ describe('Learner playlist service factory', function() {
         result: deferred.promise
       };
     });
-    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+    var learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
@@ -229,7 +232,7 @@ describe('Learner playlist service factory', function() {
         result: deferred.promise
       };
     });
-    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+    var learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],

@@ -75,6 +75,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.get(topicId);
     await topicEditorPage.expectNumberOfSubtopicsToBe(1);
     await topicEditorPage.deleteSubtopicWithIndex(0);
+    await topicEditorPage.saveTopic('Deleted subtopic.');
     await topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
@@ -92,7 +93,8 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
       Constants.SKILL_STATUS_UNASSIGNED);
-    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill 1', 'Topic 1');
 
     await topicEditorPage.get(topicId);
     await topicEditorPage.moveToQuestionsTab();
@@ -103,7 +105,7 @@ describe('Topic editor functionality', function() {
       'TextInput', 'Placeholder', 5);
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', 'correct');
+      'FuzzyEquals', ['correct']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
     await explorationEditorMainTab.addHint('Hint 1');
@@ -173,15 +175,15 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
         Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-        0, TOPIC_NAME);
+      await topicsAndSkillsDashboardPage.assignSkillToTopic(
+        'Skill 3', TOPIC_NAME);
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
         Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-        0, TOPIC_NAME);
+      await topicsAndSkillsDashboardPage.assignSkillToTopic(
+        'Skill 2', TOPIC_NAME);
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
@@ -214,6 +216,8 @@ describe('Topic editor functionality', function() {
       await topicEditorPage.dragSkillFromSubtopicToUncategorized(0, 'Skill 2');
       await topicEditorPage.expectUncategorizedSkillsToBe(
         ['Skill 2']);
+      await topicEditorPage.saveRearrangedSkills();
+      await topicEditorPage.saveTopic('Rearranged skills');
     });
 
   afterEach(async function() {
@@ -349,6 +353,8 @@ describe('Chapter editor functionality', function() {
       await storyEditorPage.createNewChapter(
         'Chapter 3', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
       await storyEditorPage.expectExplorationIdAlreadyExistWarning();
+      await storyEditorPage.cancelChapterCreation();
+      await storyEditorPage.discardStoryChanges();
     }
   );
 
@@ -368,6 +374,7 @@ describe('Chapter editor functionality', function() {
 
       await storyEditorPage.dragChapterToAnotherChapter(
         'Chapter 2', 'Chapter 1');
+      await storyEditorPage.saveStory('Saving chapters');
       await storyEditorPage.expectChaptersListToBe(
         ['Chapter 3', 'Chapter 2', 'Chapter 1']);
     }
@@ -395,6 +402,7 @@ describe('Chapter editor functionality', function() {
       'prerequisite skill id ' +
       'list in .*');
     await storyEditorPage.expectWarningInIndicator(warningRegex);
+    await storyEditorPage.discardStoryChanges();
   });
 
   it('should delete prerequisite skill and acquired skill', async function() {
@@ -402,13 +410,14 @@ describe('Chapter editor functionality', function() {
     await storyEditorPage.deleteAcquiredSkillByIndex(0);
     await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
     await storyEditorPage.deletePrerequisiteSkillByIndex(0);
+    await storyEditorPage.saveStory('Deleted skill');
     await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
   });
 
   it('should delete one chapter and save', async function() {
-    await storyEditorPage.expectNumberOfChaptersToBe(2);
+    await storyEditorPage.expectNumberOfChaptersToBe(3);
     await storyEditorPage.deleteChapterWithIndex(1);
-    await storyEditorPage.expectNumberOfChaptersToBe(1);
+    await storyEditorPage.expectNumberOfChaptersToBe(2);
     await storyEditorPage.saveStory('Last');
   });
 

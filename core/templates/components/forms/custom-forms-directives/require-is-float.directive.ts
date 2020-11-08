@@ -21,7 +21,7 @@
 
 require('components/forms/validators/is-float.filter.ts');
 
-/* eslint-disable angular/directive-restrict */
+/* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('requireIsFloat', [
   '$filter', function($filter) {
     return {
@@ -39,4 +39,3 @@ angular.module('oppia').directive('requireIsFloat', [
       }
     };
   }]);
-/* eslint-enable angular/directive-restrict */

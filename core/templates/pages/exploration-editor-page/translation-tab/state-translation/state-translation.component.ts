@@ -96,8 +96,9 @@ angular.module('oppia').component('stateTranslation', {
     ) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      $scope.isVoiceoverModeActive = (
-        TranslationTabActiveModeService.isVoiceoverModeActive);
+      $scope.isVoiceoverModeActive = function() {
+        return (TranslationTabActiveModeService.isVoiceoverModeActive());
+      };
       var isTranslatedTextRequired = function() {
         return (
           TranslationTabActiveModeService.isVoiceoverModeActive() &&
@@ -462,10 +463,11 @@ angular.module('oppia').component('stateTranslation', {
         $scope.answerChoices = StateEditorService.getAnswerChoices(
           $scope.stateInteractionId, currentCustomizationArgs);
         $scope.interactionPreviewHtml = (
-          ExplorationHtmlFormatterService.getInteractionHtml(
-            $scope.stateInteractionId,
-            $scope.stateInteractionCustomizationArgs, false)
-        );
+          $scope.stateInteractionId ? (
+            ExplorationHtmlFormatterService.getInteractionHtml(
+              $scope.stateInteractionId,
+              $scope.stateInteractionCustomizationArgs, false)
+          ) : '');
         $scope.interactionCustomizationArgTranslatableContent = (
           $scope.getInteractionCustomizationArgTranslatableContents(
             $scope.stateInteractionCustomizationArgs)

@@ -26,8 +26,8 @@ import { ProfilePageDomainConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service.ts';
-import { UserProfile, UserProfileBackendDict, UserProfileObjectFactory } from
-  'domain/user/user-profile-object.factory';
+import { UserProfile, UserProfileBackendDict } from
+  'domain/user/user-profile.model';
 
 @Injectable({
   providedIn: 'root'
@@ -36,11 +36,10 @@ export class ProfilePageBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private urlService: UrlService,
-    private userProfileObjectFactory: UserProfileObjectFactory
+    private urlService: UrlService
   ) {}
 
-  _postSubscribe(creatorUsername: string): Promise<void> {
+  async _postSubscribeAsync(creatorUsername: string): Promise<void> {
     return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_SUBSCRIBE_URL,
       { creator_username: creatorUsername }
@@ -50,7 +49,7 @@ export class ProfilePageBackendApiService {
     });
   }
 
-  _postUnsubscribe(creatorUsername: string): Promise<void> {
+  async _postUnsubscribeAsync(creatorUsername: string): Promise<void> {
     return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_UNSUBSCRIBE_URL,
       { creator_username: creatorUsername }
@@ -59,15 +58,15 @@ export class ProfilePageBackendApiService {
     });
   }
 
-  _fetchProfileData(): Promise<UserProfile> {
+  async _fetchProfileDataAsync(): Promise<UserProfile> {
     return this.http.get<UserProfileBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ProfilePageDomainConstants.PROFILE_DATA_URL,
         {username: this.urlService.getUsernameFromProfileUrl()}
       )
     ).toPromise().then(
-      userProfileDict => this.userProfileObjectFactory
-        .createFromBackendDict(userProfileDict), errorResponse => {
+      userProfileDict => UserProfile.createFromBackendDict(
+        userProfileDict), errorResponse => {
         throw new Error(errorResponse.error.error);
       });
   }
@@ -76,23 +75,23 @@ export class ProfilePageBackendApiService {
    * Subscribes to a profile for the given username.
    * @param {String} creatorUsername - username of profile to be subscribed.
    */
-  subscribe(creatorUsername: string): Promise<void> {
-    return this._postSubscribe(creatorUsername);
+  async subscribeAsync(creatorUsername: string): Promise<void> {
+    return this._postSubscribeAsync(creatorUsername);
   }
 
   /**
    * Unsubscribes from a profile for the given username.
    * @param {String} creatorUsername - username of profile to be unsubscribed.
    */
-  unsubscribe(creatorUsername: string): Promise<void> {
-    return this._postUnsubscribe(creatorUsername);
+  async unsubscribeAsync(creatorUsername: string): Promise<void> {
+    return this._postUnsubscribeAsync(creatorUsername);
   }
 
   /**
    * Fetches the profile for username in URL.
    */
-  fetchProfileData(): Promise<UserProfile> {
-    return this._fetchProfileData();
+  async fetchProfileDataAsync(): Promise<UserProfile> {
+    return this._fetchProfileDataAsync();
   }
 }
 

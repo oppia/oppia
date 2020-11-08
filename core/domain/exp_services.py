@@ -42,6 +42,7 @@ from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
@@ -53,6 +54,7 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -60,7 +62,6 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -682,7 +683,7 @@ def _create_exploration(
     stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
-    create_exploration_summary(exploration.id, committer_id)
+    regenerate_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -768,17 +769,20 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     recommendations_services.delete_explorations_from_recommendations(
         exploration_ids)
     opportunity_services.delete_exploration_opportunities(exploration_ids)
+    feedback_services.delete_exploration_feedback_analytics(exploration_ids)
 
     # Remove the explorations from the featured activity references, if
     # necessary.
     activity_services.remove_featured_activities(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
 
+    feedback_services.delete_threads_for_multiple_entities(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_ids)
+
     # Remove from subscribers.
     taskqueue_services.defer(
-        delete_explorations_from_subscribed_users,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        exploration_ids)
+        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):
@@ -790,12 +794,16 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     if not exploration_ids:
         return
 
+    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
+    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
         user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
     ).fetch()
     for model in subscription_models:
         model.activity_ids = [
             id_ for id_ in model.activity_ids if id_ not in exploration_ids]
+    user_models.UserSubscriptionsModel.update_timestamps_multi(
+        subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
@@ -934,7 +942,7 @@ def update_exploration(
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    update_exploration_summary(exploration_id, committer_id)
+    regenerate_exploration_summary(exploration_id, committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         user_services.add_edited_exploration_id(committer_id, exploration_id)
@@ -949,9 +957,9 @@ def update_exploration(
             exploration_id)
 
 
-def create_exploration_summary(exploration_id, contributor_id_to_add):
-    """Create the summary model for an exploration, and store it in the
-    datastore.
+def regenerate_exploration_summary(exploration_id, contributor_id_to_add):
+    """Regenerate a summary of the given exploration. If the summary does not
+    exist, this function generates a new one.
 
     Args:
         exploration_id: str. The id of the exploration.
@@ -959,24 +967,6 @@ def create_exploration_summary(exploration_id, contributor_id_to_add):
             created the exploration will be added to the list of contributours
             for the exploration if the argument is not None and it is not a
             system id.
-    """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(
-        exploration, contributor_id_to_add)
-    save_exploration_summary(exp_summary)
-
-
-def update_exploration_summary(exploration_id, contributor_id_to_add):
-    """Update the summary of an exploration.
-
-    Args:
-        exploration_id: str. The id of the exploration whose summary is
-            to be updated.
-        contributor_id_to_add: str or None. The user_id of user who have
-            contributed (humans who have made a positive (not just a revert)
-            update to the exploration's content) will be added to the list of
-            contributours for the exploration if the argument is not None and it
-            is not a system id.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
@@ -993,10 +983,10 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
-        contributor_id_to_add: str or None. The user_id of user who have
+        contributor_id_to_add: str|None. The user_id of user who have
             contributed (humans who have made a positive (not just a revert)
             change to the exploration's content) will be added to the list of
-            contributours for the exploration if the argument is not None and it
+            contributors for the exploration if the argument is not None and it
             is not a system id.
 
     Returns:
@@ -1026,6 +1016,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
             contributors_summary.get(contributor_id_to_add, 0) + 1)
+
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
@@ -1077,6 +1068,15 @@ def compute_exploration_contributors_summary(exploration_id):
                 'version_number']
         else:
             current_version -= 1
+
+    contributor_ids = list(contributors_summary)
+    # Remove IDs that are deleted or do not exist.
+    users_settings = user_services.get_users_settings(contributor_ids)
+    for contributor_id, user_settings in python_utils.ZIP(
+            contributor_ids, users_settings):
+        if user_settings is None:
+            del contributors_summary[contributor_id]
+
     return contributors_summary
 
 
@@ -1115,10 +1115,13 @@ def save_exploration_summary(exp_summary):
     exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
     if exp_summary_model is not None:
         exp_summary_model.populate(**exp_summary_dict)
+        exp_summary_model.update_timestamps()
         exp_summary_model.put()
     else:
         exp_summary_dict['id'] = exp_summary.id
-        exp_models.ExpSummaryModel(**exp_summary_dict).put()
+        model = exp_models.ExpSummaryModel(**exp_summary_dict)
+        model.update_timestamps()
+        model.put()
 
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the
@@ -1192,7 +1195,7 @@ def revert_exploration(
 
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
-    update_exploration_summary(exploration_id, None)
+    regenerate_exploration_summary(exploration_id, None)
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
@@ -1664,6 +1667,7 @@ def create_or_update_draft(
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
     exp_user_data.draft_change_list_id = draft_change_list_id
+    exp_user_data.update_timestamps()
     exp_user_data.put()
 
 
@@ -1738,6 +1742,7 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list = None
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.update_timestamps()
         exp_user_data.put()
 
 

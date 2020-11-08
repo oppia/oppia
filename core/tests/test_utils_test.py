@@ -24,13 +24,11 @@ import os
 from constants import constants
 from core import jobs
 from core.domain import param_domain
-from core.domain import user_services
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
@@ -229,10 +227,10 @@ class TestUtilsTests(test_utils.GenericTestBase):
         FailingMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(None), 1)
-        with self.assertRaisesRegexp(
-            RuntimeError, 'MapReduce task to URL .+ failed'):
-            self.process_and_flush_pending_tasks()
+            self.count_jobs_in_mapreduce_taskqueue(None), 1)
+        self.assertRaisesRegexp(
+            RuntimeError, 'MapReduce task failed: Task<.*>',
+            self.process_and_flush_pending_mapreduce_tasks)
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
@@ -290,24 +288,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
             Exception, 'Expected params to be a dict'):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
-
-    def test_fetch_gravatar_with_headers(self):
-        user_email = 'user@example.com'
-        expected_gravatar_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
-            'gravatar_example.webp')
-        with python_utils.open_file(
-            expected_gravatar_filepath, 'rb', encoding=None) as f:
-            gravatar = f.read()
-
-        headers_dict = {
-            'content_type': 'application/json; charset=utf-8'
-        }
-        with self.urlfetch_mock(content=gravatar, headers=headers_dict):
-            profile_picture = user_services.fetch_gravatar(user_email)
-            gravatar_data_url = utils.convert_png_to_data_url(
-                expected_gravatar_filepath)
-            self.assertEqual(profile_picture, gravatar_data_url)
 
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
@@ -388,10 +368,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getenv(key, default): # pylint: disable=unused-argument
             return
         getenv_swap = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_kwargs=[
-                {'key': '123', 'default': '456'},
-                {'key': '678', 'default': '900'},
-            ])
+            os, 'getenv', mock_getenv,
+            expected_args=[('123',), ('678',)],
+            expected_kwargs=[{'default': '456'}, {'default': '900'}])
 
         with getenv_swap:
             SwapWithCheckTestClass.functions_with_kwargs()

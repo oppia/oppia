@@ -373,3 +373,89 @@ class UserContributionRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected can_review_questions to be a boolean value, '
                 'found: %s' % type(self.can_review_questions))
+
+
+class ModifiableUserData(python_utils.OBJECT):
+    """Domain object to represent the new values in a UserSettingsModel change
+    submitted by the Android client.
+    """
+
+    def __init__(
+            self, display_alias, pin, preferred_language_codes,
+            preferred_site_language_code, preferred_audio_language_code,
+            user_id=None):
+        """Constructs a ModifiableUserData domain object.
+
+        Args:
+            display_alias: str. Display alias of the user shown on Android.
+            pin: str or None. PIN of the user used for PIN based authentication
+                on Android. None if it hasn't been set till now.
+            preferred_language_codes: list(str) or None. Exploration language
+                preferences specified by the user.
+            preferred_site_language_code: str or None. System language
+                preference.
+            preferred_audio_language_code: str or None. Audio language
+                preference.
+            user_id: str or None. User ID of the user whose data is being
+                updated. None if request did not have a user_id for the user
+                yet and expects the backend to create a new user entry for it.
+        """
+        self.display_alias = display_alias
+        self.pin = pin
+        self.preferred_language_codes = preferred_language_codes
+        self.preferred_site_language_code = preferred_site_language_code
+        self.preferred_audio_language_code = preferred_audio_language_code
+        # The user_id is not intended to be a modifiable attribute, it is just
+        # needed to identify the object.
+        self.user_id = user_id
+
+    @classmethod
+    def from_dict(cls, modifiable_user_data_dict):
+        """Return a ModifiableUserData domain object from a dict.
+
+        Args:
+            modifiable_user_data_dict: dict. The dict representation of
+                ModifiableUserData object.
+
+        Returns:
+            ModifiableUserData. The corresponding ModifiableUserData domain
+            object.
+        """
+        return ModifiableUserData(
+            modifiable_user_data_dict['display_alias'],
+            modifiable_user_data_dict['pin'],
+            modifiable_user_data_dict['preferred_language_codes'],
+            modifiable_user_data_dict['preferred_site_language_code'],
+            modifiable_user_data_dict['preferred_audio_language_code'],
+            modifiable_user_data_dict['user_id'],
+        )
+
+    CURRENT_SCHEMA_VERSION = 1
+
+    @classmethod
+    def from_raw_dict(cls, raw_user_data_dict):
+        """Converts the raw_user_data_dict into a ModifiableUserData domain
+        object by converting it according to the latest schema format.
+
+        Args:
+            raw_user_data_dict: dict. The input raw form of user_data dict
+                coming from the controller layer, which has to be converted.
+
+        Returns:
+            ModifiableUserData. The domain object representing the user data
+            dict transformed according to the latest schema version.
+        """
+        data_schema_version = raw_user_data_dict.get('schema_version')
+
+        if data_schema_version is None:
+            raise Exception(
+                'Invalid modifiable user data: no schema version specified.')
+        if (data_schema_version < 1) or (
+                data_schema_version > cls.CURRENT_SCHEMA_VERSION):
+            raise Exception(
+                'Invalid version %s received. At present we can only process v1'
+                ' to v%s modifiable user data.' % (
+                    data_schema_version, cls.CURRENT_SCHEMA_VERSION)
+            )
+
+        return cls.from_dict(raw_user_data_dict)

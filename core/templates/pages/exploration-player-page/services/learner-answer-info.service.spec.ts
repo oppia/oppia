@@ -20,6 +20,9 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
+import { AnswerClassificationResult } from
+  'domain/classifier/answer-classification-result.model';
+
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
@@ -28,7 +31,6 @@ require('domain/state/StateObjectFactory.ts');
 describe('Learner answer info service', function() {
   var sof = null;
   var oof = null;
-  var acrof = null;
   var stateDict = null;
   var firstState = null;
   var secondState = null;
@@ -133,7 +135,6 @@ describe('Learner answer info service', function() {
 
     sof = $injector.get('StateObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
-    acrof = $injector.get('AnswerClassificationResultObjectFactory');
     LearnerAnswerInfoService = $injector.get('LearnerAnswerInfoService');
     AnswerClassificationService = $injector.get('AnswerClassificationService');
     ladbas = $injector.get(
@@ -144,8 +145,8 @@ describe('Learner answer info service', function() {
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
     spyOn(AnswerClassificationService, 'getMatchingClassificationResult')
-      .and.returnValue(acrof.createNew(
-        oof.createNew('default', 'default_outcome', '', []), 2,
+      .and.returnValue(new AnswerClassificationResult(
+        oof.createNew('default', 'default_outcome', '', []), 2, 0,
         DEFAULT_OUTCOME_CLASSIFICATION));
     mockAnswer = 'This is my answer';
     mockInteractionRulesService = {
@@ -242,10 +243,10 @@ describe('Learner answer info service', function() {
     });
 
     it('should record learner answer details', function() {
-      spyOn(ladbas, 'recordLearnerAnswerDetails');
+      spyOn(ladbas, 'recordLearnerAnswerDetailsAsync');
       LearnerAnswerInfoService.recordLearnerAnswerInfo('My details');
       expect(
-        ladbas.recordLearnerAnswerDetails).toHaveBeenCalledWith(
+        ladbas.recordLearnerAnswerDetailsAsync).toHaveBeenCalledWith(
         '10', 'new state', null, 'This is my answer', 'My details');
     });
   });

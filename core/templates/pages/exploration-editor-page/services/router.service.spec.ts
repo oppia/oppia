@@ -19,8 +19,7 @@
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import $ from 'jquery';
 import { Subscription } from 'rxjs';
-
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Router Service', () => {
   var RouterService = null;
@@ -41,12 +40,8 @@ describe('Router Service', () => {
   var refreshVersionHistorySpy = null;
   var refreshStateEditorSpy = null;
 
-  beforeEach(angular.mock.module('oppia', $provide => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
+
   beforeEach(angular.mock.inject($injector => {
     RouterService = $injector.get('RouterService');
     ExplorationStatesService = $injector.get('ExplorationStatesService');
@@ -337,7 +332,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
   });
 
-  it('should navigate to stats tab ', () => {
+  it('should navigate to stats tab', () => {
     RouterService.navigateToStatsTab();
     $rootScope.$apply();
 
@@ -349,7 +344,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
   });
 
-  it('should navigate to improvements tab ', fakeAsync(() => {
+  it('should navigate to improvements tab', fakeAsync(() => {
     spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
       .and.returnValue(Promise.resolve(true));
 
@@ -463,7 +458,7 @@ describe('Router Service', () => {
       expect(RouterService.getActiveTabName()).toEqual('stats');
     }));
 
-  it('should navigate to settings tab ', () => {
+  it('should navigate to settings tab', () => {
     RouterService.navigateToSettingsTab();
     $rootScope.$apply();
 
@@ -475,7 +470,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
   });
 
-  it('should navigate to history tab ', () => {
+  it('should navigate to history tab', () => {
     RouterService.navigateToHistoryTab();
     $rootScope.$apply();
 
@@ -487,7 +482,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
   });
 
-  it('should navigate to feedback tab ', () => {
+  it('should navigate to feedback tab', () => {
     RouterService.navigateToFeedbackTab();
     $rootScope.$apply();
 

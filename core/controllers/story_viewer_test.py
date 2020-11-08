@@ -57,11 +57,14 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.EXP_ID_7 = '7'
 
         self.save_new_valid_exploration(
-            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End',
+            correctness_feedback_enabled=True)
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End')
+            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End',
+            correctness_feedback_enabled=True)
         self.save_new_valid_exploration(
-            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End')
+            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
@@ -69,6 +72,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'Title', 'Description', self.TOPIC_ID,
             self.STORY_URL_FRAGMENT)
+        story.meta_tag_content = 'story meta content'
 
         exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -219,7 +223,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'story_title': 'Title',
             'story_description': 'Description',
             'story_nodes': [self.node_2, self.node_1, self.node_3],
-            'topic_name': 'Topic'
+            'topic_name': 'Topic',
+            'meta_tag_content': 'story meta content'
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 

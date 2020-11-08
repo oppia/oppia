@@ -26,6 +26,7 @@ from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 import feconf
+import utils
 
 
 class TopicViewerPage(base.BaseHandler):
@@ -66,24 +67,30 @@ class TopicPageDataHandler(base.BaseHandler):
 
         canonical_story_dicts = []
         for story_summary in canonical_story_summaries:
-            completed_node_titles = [
-                completed_node.title for completed_node in
-                story_fetchers.get_completed_nodes_in_story(
-                    self.user_id, story_summary.id)]
+            pending_nodes = story_fetchers.get_pending_nodes_in_story(
+                self.user_id, story_summary.id)
+            pending_node_titles = [node.title for node in pending_nodes]
+            completed_node_titles = utils.compute_list_difference(
+                story_summary.node_titles, pending_node_titles)
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
             story_summary_dict['completed_node_titles'] = completed_node_titles
+            story_summary_dict['pending_node_dicts'] = [
+                node.to_dict() for node in pending_nodes]
             canonical_story_dicts.append(story_summary_dict)
 
         additional_story_dicts = []
         for story_summary in additional_story_summaries:
-            completed_node_titles = [
-                completed_node.title for completed_node in
-                story_fetchers.get_completed_nodes_in_story(
-                    self.user_id, story_summary.id)]
+            pending_nodes = story_fetchers.get_pending_nodes_in_story(
+                self.user_id, story_summary.id)
+            pending_node_titles = [node.title for node in pending_nodes]
+            completed_node_titles = utils.compute_list_difference(
+                story_summary.node_titles, pending_node_titles)
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
             story_summary_dict['completed_node_titles'] = completed_node_titles
+            story_summary_dict['pending_node_dicts'] = [
+                node.to_dict() for node in pending_nodes]
             additional_story_dicts.append(story_summary_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
@@ -124,6 +131,7 @@ class TopicPageDataHandler(base.BaseHandler):
             'subtopics': subtopics,
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,
-            'practice_tab_is_displayed': topic.practice_tab_is_displayed
+            'practice_tab_is_displayed': topic.practice_tab_is_displayed,
+            'meta_tag_content': topic.meta_tag_content
         })
         self.render_json(self.values)

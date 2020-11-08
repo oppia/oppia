@@ -54,7 +54,7 @@ export class ProfileLinkImageComponent implements OnInit {
     // Returns a promise for the user profile picture, or the default
     // image if user is not logged in or has not uploaded a profile
     // picture, or the player is in preview mode.
-    this.profileLinkImageBackendApiService.fetchProfilePictureData(
+    this.profileLinkImageBackendApiService.fetchProfilePictureDataAsync(
       this.profileImageUrl).then((base64ProfilePicture: string) => {
       this.profilePicture = (
         base64ProfilePicture || DEFAULT_PROFILE_IMAGE_PATH);

@@ -28,10 +28,7 @@ import { AppConstants } from 'app.constants';
 })
 export class MathInteractionsService {
   private warningText = '';
-  // TODO(#7434): Use dot notation after we find a way to get
-  // rid of the TS2339 error on AppConstants.
-  // eslint-disable-next-line dot-notation
-  private mathFunctionNames = AppConstants['MATH_FUNCTION_NAMES'];
+  private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
 
   private cleanErrorMessage(
       errorMessage: string, expressionString: string): string {
@@ -248,13 +245,10 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
-    // TODO(#7434): Use dot notation after we find a way to get
-    // rid of the TS2339 error on AppConstants.
-    /* eslint-disable dot-notation */
     let greekLetters = Object.keys(
-      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
-      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     /* eslint-enable dot-notation */
     let greekLettersAndSymbols = [];
     for (let i = 0; i < greekLetters.length; i++) {

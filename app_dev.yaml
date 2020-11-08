@@ -242,8 +242,10 @@ libraries:
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
   version: "2.7.11"
-- name: webapp2
-  version: "2.5.2"
+- name: grpcio
+  version: 1.0.0
+- name: setuptools
+  version: 36.6.0
 
 # This is an access connector that connects to the Google Cloud Redis instance
 # used for memory caching. Please replace PROJECT_ID with the correct project id
@@ -296,6 +298,16 @@ skip_files:
 - third_party/static/bower-angular-translate-loader-static-files-2.18.1/
 - third_party/static/bower-angular-translate-storage-cookie-2.18.1/
 - third_party/static/bower-material-1.1.19/
+- third_party/python_libs/google/appengine/
+- third_party/python_libs/google/net/
+- third_party/python_libs/google_auth_oauthlib/
+- third_party/python_libs/googleapiclient/
+- third_party/python_libs/httplib2/
+- third_party/python_libs/oauthlib/
+- third_party/python_libs/requests_oauthlib/
+- third_party/python_libs/uritemplate/
+- third_party/python_libs/google/pyglib/
+- third_party/python_libs/grpc/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include
 # only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
 # find, flash, forms, iframe, image, link, liststyle, magicline, pagebreak,

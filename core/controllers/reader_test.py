@@ -36,10 +36,10 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -188,7 +188,6 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
     """
 
     def test_creation_of_state_classifier_mapping(self):
-        super(ExplorationStateClassifierMappingTests, self).setUp()
         exploration_id = '15'
 
         self.login(self.VIEWER_EMAIL)
@@ -259,7 +258,6 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             self.skill_id, 'user', description='Description')
 
     def test_get_exploration_pretests(self):
-        super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
@@ -1139,7 +1137,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hello Moderator,\n'
@@ -1626,6 +1624,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1694,6 +1693,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1736,6 +1736,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.unresolved_issues[0]['playthrough_ids'] = [
             'id1', 'id2', 'id3', 'id4', 'id5'
         ]
+        model.update_timestamps()
         model.put()
 
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {

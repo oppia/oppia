@@ -115,11 +115,11 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickThroughToNextCard = async function() {
-    await action.click('"Next Card" button', nextCardButton);
+    await action.click('Next Card button', nextCardButton);
   };
 
   this.clickSuggestChangesButton = async function() {
-    await action.click('Suggest changes button', suggestionPopupLink);
+    await action.click('Suggestion Popup link', suggestionPopupLink);
   };
 
   this.expectNextCardButtonTextToBe = async function(text) {
@@ -237,6 +237,8 @@ var ExplorationPlayerPage = function() {
   this.expectContentToMatch = async function(richTextInstructions) {
     await waitFor.visibilityOf(
       await conversationContent.first(), 'Conversation not visible');
+    await waitFor.visibilityOf(
+      await conversationContent.last(), 'Conversation not fully present');
     await forms.expectRichText(
       await conversationContent.last()
     ).toMatch(richTextInstructions);
@@ -282,6 +284,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationNameToBe = async function(name) {
+    await waitFor.visibilityOf(
+      explorationHeader, 'Exploration Header taking too long to appear.');
     expect(
       await explorationHeader.getText()
     ).toBe(name);
@@ -300,6 +304,8 @@ var ExplorationPlayerPage = function() {
       await elements.get(ratingValue - 1),
       'Rating Star takes too long to be clickable');
     await (await elements.get(ratingValue - 1)).click();
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for rating takes too long to appear.');
     await waitFor.elementToBeClickable(
       feedbackCloseButton, 'Close Feedback button is not clickable');
     await feedbackCloseButton.click();
