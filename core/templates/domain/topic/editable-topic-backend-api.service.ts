@@ -57,7 +57,7 @@ interface FetchTopicResponse {
   };
   skillIdToRubricsDict: {
     [skillId: string]: RubricBackendDict[];
-  };;
+  };
   classroomUrlFragment: string;
 }
 
