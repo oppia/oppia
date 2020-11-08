@@ -112,18 +112,21 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setLanguage = async function(language) {
-    await element(by.css('.protractor-test-exploration-language-select')).
-      element(by.cssContainingText('option', language)).click();
+    var languageButton = element(
+      by.css('.protractor-test-exploration-language-select')).element(
+        by.cssContainingText('option', language));
+    await action.click('Language button', languageButton);
   };
 
   this.setObjective = async function(objective) {
-    await explorationObjectiveInput.clear();
-    await explorationObjectiveInput.sendKeys(objective);
+    await action.clear('Exploration objective input', explorationObjectiveInput);
+    await action.sendKeys(
+      'Exploration objective input', explorationObjectiveInput, objective);
   };
 
   this.setTitle = async function(title) {
-    await explorationTitleInput.clear();
-    await explorationTitleInput.sendKeys(title);
+    await action.clear('Exploration title input', explorationTitleInput);
+    await action.sendKeys('Exploration title input', explorationTitleInput, title);
   };
 
   this.expectCategoryToBe = async function(category) {

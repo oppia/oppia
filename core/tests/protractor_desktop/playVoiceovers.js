@@ -44,9 +44,7 @@ describe('Voiceover player', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createUser(
-      'testVoiceovers@voiceovers.com', 'testVoiceovers');
-    await users.login('testVoiceovers@voiceovers.com');
+    await users.createAndLoginUser('testVoiceovers@voiceovers.com', 'testVoiceovers');
     await workflow.createExploration();
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorMainTab.setStateName('First');
@@ -68,11 +66,6 @@ describe('Voiceover player', function() {
       'Testing if voiceovers work');
     await explorationEditorPage.saveChanges('Done.');
     await workflow.publishExploration();
-    await users.logout();
-  });
-
-  beforeEach(async function() {
-    await users.login('testVoiceovers@voiceovers.com');
   });
 
   it('should play voiceovers for multiple languages', async function() {
