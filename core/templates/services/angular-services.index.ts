@@ -287,6 +287,7 @@ import { SchemaDefaultValueService } from 'services/schema-default-value.service
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
 import { SpeechSynthesisChunkerService } from 'services/speech-synthesis-chunker.service';
 import { StateInteractionStatsService } from 'services/state-interaction-stats.service';
 import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
@@ -535,6 +536,7 @@ export const angularServices: [string, unknown][] = [
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
   ['SolutionObjectFactory', SolutionObjectFactory],
   ['SolutionValidityService', SolutionValidityService],
+  ['SolutionVerificationService', SolutionVerificationService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],
   ['StateCardObjectFactory', StateCardObjectFactory],
   ['StateClassifierMappingService', StateClassifierMappingService],

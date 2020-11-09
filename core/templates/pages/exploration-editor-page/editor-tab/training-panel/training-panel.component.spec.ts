@@ -38,8 +38,11 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Training Panel Component', function() {
+  importAllAngularServices();
+
   var ctrl = null;
   var $scope = null;
   var explorationStatesService = null;

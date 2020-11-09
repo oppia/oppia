@@ -17,8 +17,8 @@
  */
 
 import { EventEmitter } from '@angular/core';
-
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Responses Service', function() {
   var ResponsesService = null;
@@ -40,6 +40,7 @@ describe('Responses Service', function() {
       $provide.value(key, value);
     }
   }));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StateSolutionService', {
       savedMemento: {

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // training-data.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
@@ -53,6 +54,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -80,6 +82,7 @@ describe('TrainingDataService', function() {
       $provide.value(key, value);
     }
   }));
+  importAllAngularServices();
 
   beforeEach(function() {
     angular.mock.module('oppia');
