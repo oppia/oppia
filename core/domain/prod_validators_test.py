@@ -69,7 +69,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
     audit_models, classifier_models, collection_models,
-    config_models, email_models, exp_models,
+    email_models, exp_models,
     feedback_models, job_models,
     opportunity_models, question_models, skill_models,
     story_models, subtopic_models, suggestion_models,
@@ -77,7 +77,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 
 ) = models.Registry.import_models([
     models.NAMES.audit, models.NAMES.classifier, models.NAMES.collection,
-    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.email, models.NAMES.exploration,
     models.NAMES.feedback, models.NAMES.job,
     models.NAMES.opportunity, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story,

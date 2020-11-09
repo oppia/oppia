@@ -56,13 +56,13 @@ import python_utils
 import utils
 
 (
-    base_models, collection_models, config_models,
+    base_models, collection_models,
     email_models, exp_models, feedback_models,
     job_models, question_models, skill_models, story_models,
     subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.base_model, models.NAMES.collection,
     models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
     models.NAMES.job, models.NAMES.question, models.NAMES.skill,
     models.NAMES.story, models.NAMES.subtopic,
