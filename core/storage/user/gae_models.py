@@ -2803,6 +2803,13 @@ class UserIdentifiersModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Currently, the model holds identifiers relevant only for backend that
+        should not be exported.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Currently, the model holds authentication details relevant only for
@@ -2812,6 +2819,11 @@ class UserIdentifiersModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @staticmethod
+    def export_data(unsuded_user_id):
+        """Do not export anything"""
+        return {}
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
