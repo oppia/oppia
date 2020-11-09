@@ -31,7 +31,7 @@ from core.platform import models
 import feconf
 import utils
 
-current_user_services = models.Registry.import_current_user_services()
+datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
@@ -254,6 +254,48 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
                     model, constants.ACTIVITY_TYPE_EXPLORATION))
 
     return exp_models_list
+
+
+def get_activity_rights_where_user_has_role(activity_type, user_id):
+    """Returns a list activity rights where the user has some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user has some
+        role.
+    """
+    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+        rights_model_class = exp_models.ExplorationRightsModel
+    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+        rights_model_class = collection_models.CollectionRightsModel
+    else:
+        raise Exception(
+            'Cannot get activity rights for unknown activity type: %s' % (
+                activity_type))
+
+    activity_rights_models = rights_model_class.query(
+        datastore_services.any_of(
+            rights_model_class.owner_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_activity_rights_from_model(activity_rights_model, activity_type)
+        for activity_rights_model in activity_rights_models
+    ]
+
+
+def get_exploration_rights_where_user_is_owner(user_id):
+    return get_activity_rights_where_user_has_role(
+        constants.ACTIVITY_TYPE_EXPLORATION, user_id
+    )
+
+
+def get_collection_rights_where_user_is_owner(user_id):
+    return get_activity_rights_where_user_has_role(
+        constants.ACTIVITY_TYPE_COLLECTION, user_id
+    )
 
 
 def is_exploration_private(exploration_id):
