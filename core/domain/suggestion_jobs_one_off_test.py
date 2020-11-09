@@ -2567,6 +2567,35 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
                 'default_state').to_dict()
         self.process_and_flush_pending_mapreduce_tasks()
 
+    def test_no_action_is_performed_for_suggestions_that_are_marked_deleted(
+            self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category='score_category'
+        ).put()
+
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        suggestion_model.deleted = True
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+        expected_output = [u'[u\'DELETED_MODELS\', 1]']
+        self._run_job_and_verify_output(expected_output)
+
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(suggestion_model.final_reviewer_id, None)
+
     def test_job_does_not_changes_valid_models(self):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
@@ -2582,7 +2611,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             score_category='score_category'
         ).put()
 
-        expected_output = []
+        expected_output = [u'[u\'UNCHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)
@@ -2611,7 +2640,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             updated_status=feedback_models.STATUS_CHOICES_FIXED
         ).put()
 
-        expected_output = [u'[u\'SUCCESS\', 1]']
+        expected_output = [u'[u\'CHANGED_MODELS\', 1]']
         self._run_job_and_verify_output(expected_output)
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)

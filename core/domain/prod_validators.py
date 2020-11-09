@@ -2152,10 +2152,11 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                             item.id, item.target_type,
                             model_id, model_class.__name__, model_id))
 
-                # Do not validate the subtype of score_category with the
-                # exploration category. The exploration category can be changed
-                # anytime in the future and the suggestion model's
-                # score_category does not get updated with the updated category.
+                # Note: An exploration's category can be changed after the
+                # suggestion is submitted. Since this operation does not update
+                # the suggestion's category, we cannot assume that the
+                # exploration category matches the suggestion score category,
+                # and thus do not validate it here.
 
         if score_category_type == suggestion_models.SCORE_TYPE_QUESTION:
             score_category_regex = (

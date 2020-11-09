@@ -374,7 +374,7 @@ class PopulateContributionStatsOneOffJob(
 
 class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to populate final_reviewer_id property in the
-    suggestion models which does not have but expected to have one.
+    suggestion models which do not have but are expected to have one.
     """
 
     @classmethod
@@ -384,12 +384,14 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
+            yield ('DELETED_MODELS', item.id)
             return
 
         if not (item.status in [
                 suggestion_models.STATUS_ACCEPTED,
                 suggestion_models.STATUS_REJECTED] and (
                     item.final_reviewer_id is None)):
+            yield ('UNCHANGED_MODELS', item.id)
             return
 
         message_status = feedback_models.STATUS_CHOICES_FIXED
@@ -413,11 +415,11 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         item.update_timestamps(update_last_updated_time=False)
         item.put()
-        yield ('SUCCESS', item.id)
+        yield ('CHANGED_MODELS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        if key == 'SUCCESS':
+        if key in ['CHANGED_MODELS', 'UNCHANGED_MODELS', 'DELETED_MODELS']:
             yield (key, len(values))
         else:
             yield (key, values)
