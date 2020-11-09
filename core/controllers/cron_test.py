@@ -325,7 +325,7 @@ class CronJobTests(test_utils.GenericTestBase):
             ]
         )
 
-    def test_run_cron_to_delete_models(self):
+    def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
@@ -340,6 +340,15 @@ class CronJobTests(test_utils.GenericTestBase):
             update_last_updated_time=False)
         completed_activities_model.put()
 
+        with self.testapp_swap:
+            self.get_html_response('/cron/models/cleanup')
+
+        self.assertIsNone(completed_activities_model.get_by_id(admin_user_id))
+
+    def test_run_cron_to_mark_old_models_as_deleted(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
         user_query_model = user_models.UserQueryModel(
             id='query_id',
             user_ids=[],
@@ -353,7 +362,6 @@ class CronJobTests(test_utils.GenericTestBase):
         with self.testapp_swap:
             self.get_html_response('/cron/models/cleanup')
 
-        self.assertIsNone(completed_activities_model.get_by_id(admin_user_id))
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
 
 
