@@ -111,8 +111,8 @@ var ExplorationEditorSettingsTab = function() {
   this.setLanguage = async function(language) {
     await action.click(
       'Exploration Language Input option',
-       explorationLanguageInput.element(
-         by.cssContainingText('option', language)));
+      explorationLanguageInput.element(
+        by.cssContainingText('option', language)));
   };
 
   this.setObjective = async function(objective) {
