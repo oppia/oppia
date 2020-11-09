@@ -21,7 +21,7 @@ import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 
 describe('Construct Translation Ids Service', () => {
-  let ctis;
+  let ctis : ConstructTranslationIdsService;
 
   beforeEach(() => {
     ctis = TestBed.get(ConstructTranslationIdsService);
