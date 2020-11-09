@@ -158,7 +158,6 @@ def pre_delete_user(user_id):
             taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
             user_id,
-            True
         )
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
@@ -252,7 +251,7 @@ def delete_user(pending_deletion_request):
     _delete_models(user_id, user_role, models.NAMES.improvements)
     if user_role != feconf.ROLE_ID_LEARNER:
         remove_user_from_activities_with_associated_rights_models(
-            pending_deletion_request.user_id, False)
+            pending_deletion_request.user_id)
         _pseudonymize_feedback_models(pending_deletion_request)
         _pseudonymize_suggestion_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
@@ -349,23 +348,15 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
     return user_is_verified
 
 
-def remove_user_from_activities_with_associated_rights_models(
-        user_id, use_user_subscriptions_ids):
+def remove_user_from_activities_with_associated_rights_models(user_id):
     """Remove the user from exploration, collection, and topic models.
 
     Args:
         user_id: str. The ID of the user for which to remove the user from
             explorations, collections, and topics.
-        use_user_subscriptions_ids: bool. Whether to use the IDs from user's
-            UserSubscriptionsModel. When False the IDs are gathered via
-            datastore queries.
     """
-    if use_user_subscriptions_ids:
-        subscribed_exploration_summaries = (
-            exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
-    else:
-        subscribed_exploration_summaries = (
-            exp_fetchers.get_exploration_summaries_where_user_has_role(user_id))
+    subscribed_exploration_summaries = (
+        exp_fetchers.get_exploration_summaries_where_user_has_role(user_id))
 
     explorations_to_be_deleted_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries if
@@ -396,28 +387,23 @@ def remove_user_from_activities_with_associated_rights_models(
         rights_manager.deassign_role_for_exploration(
             user_services.get_system_user(), exp_id, user_id)
 
-    if not use_user_subscriptions_ids:
-        # The summary model is hard-deleted when the exploration is only marked
-        # as deleted. Thus we need to retrieve the exploration other way and
-        # hard-delete it.
-        explorations_rights = (
-            rights_manager.get_exploration_rights_where_user_is_owner(user_id))
-        explorations_to_be_deleted_ids = [
-            exploration_rights.id for exploration_rights
-            in explorations_rights if
-            exploration_rights.is_private() and
-            exploration_rights.is_solely_owned_by_user(user_id)
-        ]
-        exp_services.delete_explorations(
-            user_id, explorations_to_be_deleted_ids, force_deletion=True)
+    # The summary model is hard-deleted when the exploration is only marked
+    # as deleted. Thus we need to retrieve the exploration in a different way
+    # and hard-delete it.
+    explorations_rights = (
+        rights_manager.get_exploration_rights_where_user_is_owner(user_id))
+    explorations_to_be_deleted_ids = [
+        exploration_rights.id for exploration_rights
+        in explorations_rights if
+        exploration_rights.is_private() and
+        exploration_rights.is_solely_owned_by_user(user_id)
+    ]
+    exp_services.delete_explorations(
+        user_id, explorations_to_be_deleted_ids, force_deletion=True)
 
-    if use_user_subscriptions_ids:
-        subscribed_collection_summaries = (
-            collection_services.get_collection_summaries_subscribed_to(user_id))
-    else:
-        subscribed_collection_summaries = (
-            collection_services.get_collection_summaries_where_user_has_role(
-                user_id))
+    subscribed_collection_summaries = (
+        collection_services.get_collection_summaries_where_user_has_role(
+            user_id))
 
     collections_to_be_deleted_ids = [
         col_summary.id for col_summary in subscribed_collection_summaries if
@@ -448,19 +434,18 @@ def remove_user_from_activities_with_associated_rights_models(
         rights_manager.deassign_role_for_collection(
             user_services.get_system_user(), col_id, user_id)
 
-    if not use_user_subscriptions_ids:
-        # The summary model is hard-deleted when the collection is only marked
-        # as deleted. Thus we need to retrieve the collection other way and
-        # hard-delete it.
-        collection_rights = (
-            rights_manager.get_collection_rights_where_user_is_owner(user_id))
-        collections_to_be_deleted_ids = [
-            collection_rights.id for collection_rights in collection_rights if
-            collection_rights.is_private() and
-            collection_rights.is_solely_owned_by_user(user_id)
-        ]
-        collection_services.delete_collections(
-            user_id, collections_to_be_deleted_ids, force_deletion=True)
+    # The summary model is hard-deleted when the collection is only marked
+    # as deleted. Thus we need to retrieve the collection in a different way and
+    # hard-delete it.
+    collection_rights = (
+        rights_manager.get_collection_rights_where_user_is_owner(user_id))
+    collections_to_be_deleted_ids = [
+        collection_rights.id for collection_rights in collection_rights if
+        collection_rights.is_private() and
+        collection_rights.is_solely_owned_by_user(user_id)
+    ]
+    collection_services.delete_collections(
+        user_id, collections_to_be_deleted_ids, force_deletion=True)
 
     topic_services.deassign_user_from_all_topics(
         user_services.get_system_user(), user_id)

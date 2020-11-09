@@ -257,7 +257,7 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
 
 
 def _get_activity_rights_where_user_is_owner(activity_type, user_id):
-    """Returns a list activity rights where the user has some role.
+    """Returns a list of activity rights where the user is the owner.
 
     Args:
         activity_type: str. The type of activity. Possible values:
@@ -286,7 +286,7 @@ def _get_activity_rights_where_user_is_owner(activity_type, user_id):
 
 
 def get_exploration_rights_where_user_is_owner(user_id):
-    """Returns a list exploration rights where the user has some role.
+    """Returns a list of exploration rights where the user is the owner.
 
     Args:
         user_id: str. The id of the user.
@@ -301,7 +301,7 @@ def get_exploration_rights_where_user_is_owner(user_id):
 
 
 def get_collection_rights_where_user_is_owner(user_id):
-    """Returns a list collection rights where the user has some role.
+    """Returns a list of collection rights where the user is the owner.
 
     Args:
         user_id: str. The id of the user.
