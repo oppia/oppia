@@ -256,7 +256,7 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
     return exp_models_list
 
 
-def get_activity_rights_where_user_is_owner(activity_type, user_id):
+def _get_activity_rights_where_user_is_owner(activity_type, user_id):
     """Returns a list activity rights where the user has some role.
 
     Args:
@@ -273,10 +273,6 @@ def get_activity_rights_where_user_is_owner(activity_type, user_id):
         rights_model_class = exp_models.ExplorationRightsModel
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         rights_model_class = collection_models.CollectionRightsModel
-    else:
-        raise Exception(
-            'Cannot get activity rights for unknown activity type: %s' % (
-                activity_type))
 
     activity_rights_models = rights_model_class.query(
         datastore_services.any_of(
@@ -299,7 +295,7 @@ def get_exploration_rights_where_user_is_owner(user_id):
         list(ActivityRights). List of domain objects where the user has some
         role.
     """
-    return get_activity_rights_where_user_is_owner(
+    return _get_activity_rights_where_user_is_owner(
         constants.ACTIVITY_TYPE_EXPLORATION, user_id
     )
 
@@ -314,7 +310,7 @@ def get_collection_rights_where_user_is_owner(user_id):
         list(ActivityRights). List of domain objects where the user has some
         role.
     """
-    return get_activity_rights_where_user_is_owner(
+    return _get_activity_rights_where_user_is_owner(
         constants.ACTIVITY_TYPE_COLLECTION, user_id
     )
 
