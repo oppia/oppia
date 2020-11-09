@@ -126,7 +126,7 @@ angular.module('oppia').factory('TranslationStatusService', [
           var noTranslationCount = 0;
           var recordedVoiceovers = (
             ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
-          var allContentId = recordedVoiceovers.getAllContentId();
+          var allContentIds = recordedVoiceovers.getAllContentId();
           var interactionId = ExplorationStatesService.getInteractionIdMemento(
             stateName);
           // This is used to prevent users from adding unwanted hints audio, as
@@ -137,17 +137,17 @@ angular.module('oppia').factory('TranslationStatusService', [
             INTERACTION_SPECS[interactionId].is_linear ||
             INTERACTION_SPECS[interactionId].is_terminal) {
             var contentIdToRemove = _getContentIdListRelatedToComponent(
-              COMPONENT_NAME_HINT);
+              COMPONENT_NAME_HINT, allContentIds);
             // Excluding default_outcome content status as default outcome's
             // content is left empty so the translation or voiceover is not
             // required.
             contentIdToRemove.push('default_outcome');
-            allContentId = allContentId.filter(function(contentId) {
+            allContentIds = allContentIds.filter(function(contentId) {
               return contentIdToRemove.indexOf(contentId) < 0;
             });
           }
-          explorationContentRequiredCount += allContentId.length;
-          allContentId.forEach(function(contentId) {
+          explorationContentRequiredCount += allContentIds.length;
+          allContentIds.forEach(function(contentId) {
             var availabilityStatus = _getContentAvailabilityStatus(
               stateName, contentId);
             if (!availabilityStatus.available) {
@@ -169,7 +169,7 @@ angular.module('oppia').factory('TranslationStatusService', [
           if (noTranslationCount === 0 && !stateNeedsUpdate) {
             stateWiseStatusColor[stateName] = ALL_ASSETS_AVAILABLE_COLOR;
           } else if (
-            noTranslationCount === allContentId.length && !stateNeedsUpdate) {
+            noTranslationCount === allContentIds.length && !stateNeedsUpdate) {
             stateWiseStatusColor[stateName] = NO_ASSETS_AVAILABLE_COLOR;
           } else {
             stateWiseStatusColor[stateName] = FEW_ASSETS_AVAILABLE_COLOR;
@@ -178,17 +178,9 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
-    var _getContentIdListRelatedToComponent = function(componentName) {
+    var _getContentIdListRelatedToComponent = function(
+        componentName, availableContentIds) {
       var contentIdList = [];
-      var availableContentIds = [];
-
-      if (TranslationTabActiveModeService.isTranslationModeActive()) {
-        var writtenTranslations = StateWrittenTranslationsService.displayed;
-        availableContentIds = writtenTranslations.getAllContentId();
-      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-        var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
-        availableContentIds = recordedVoiceovers.getAllContentId();
-      }
 
       if (availableContentIds.length > 0) {
         if (componentName === 'solution' || componentName === 'content') {
@@ -210,7 +202,8 @@ angular.module('oppia').factory('TranslationStatusService', [
     };
 
     var _getActiveStateComponentStatus = function(componentName) {
-      var contentIdList = _getContentIdListRelatedToComponent(componentName);
+      var contentIdList = _getContentIdListRelatedToComponent(
+        componentName, _getAvailableContentIds());
       var availableAudioCount = 0;
       if (contentIdList) {
         contentIdList.forEach(function(contentId) {
@@ -230,8 +223,22 @@ angular.module('oppia').factory('TranslationStatusService', [
       }
     };
 
+    var _getAvailableContentIds = function() {
+      var availableContentIds = [];
+      if (TranslationTabActiveModeService.isTranslationModeActive()) {
+        var writtenTranslations = StateWrittenTranslationsService.displayed;
+        availableContentIds = writtenTranslations.getAllContentId();
+      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+        var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
+        availableContentIds = recordedVoiceovers.getAllContentId();
+      }
+
+      return availableContentIds;
+    };
+
     var _getActiveStateComponentNeedsUpdateStatus = function(componentName) {
-      var contentIdList = _getContentIdListRelatedToComponent(componentName);
+      var contentIdList = _getContentIdListRelatedToComponent(
+        componentName, _getAvailableContentIds());
       var contentId = null;
       if (contentIdList) {
         for (var index in contentIdList) {
