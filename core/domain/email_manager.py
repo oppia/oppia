@@ -759,9 +759,8 @@ def send_role_notification_email(
 
     email_subject = email_subject_template % exploration_title
     email_body = email_body_template % (
-        recipient_username, inviter_user_settings.username,
-        role_description, exploration_id, exploration_title, rights_html,
-        exploration_id, EMAIL_FOOTER.value)
+        recipient_username, inviter_username, role_description, exploration_id,
+        exploration_title, rights_html, exploration_id, EMAIL_FOOTER.value)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,

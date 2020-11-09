@@ -637,7 +637,6 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
         include_marked_deleted: bool. Whether to included users that are being
             deleted.
 
-
     Returns:
         list(UserSettings|None). The UserSettings domain objects corresponding
         to the given user ids. If the given user_id does not exist, the

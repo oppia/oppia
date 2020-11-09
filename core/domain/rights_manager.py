@@ -256,10 +256,13 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
     return exp_models_list
 
 
-def get_activity_rights_where_user_has_role(activity_type, user_id):
+def get_activity_rights_where_user_is_owner(activity_type, user_id):
     """Returns a list activity rights where the user has some role.
 
     Args:
+        activity_type: str. The type of activity. Possible values:
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
         user_id: str. The id of the user.
 
     Returns:
@@ -287,13 +290,31 @@ def get_activity_rights_where_user_has_role(activity_type, user_id):
 
 
 def get_exploration_rights_where_user_is_owner(user_id):
-    return get_activity_rights_where_user_has_role(
+    """Returns a list exploration rights where the user has some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user has some
+        role.
+    """
+    return get_activity_rights_where_user_is_owner(
         constants.ACTIVITY_TYPE_EXPLORATION, user_id
     )
 
 
 def get_collection_rights_where_user_is_owner(user_id):
-    return get_activity_rights_where_user_has_role(
+    """Returns a list collection rights where the user has some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user has some
+        role.
+    """
+    return get_activity_rights_where_user_is_owner(
         constants.ACTIVITY_TYPE_COLLECTION, user_id
     )
 

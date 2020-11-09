@@ -2820,11 +2820,6 @@ class UserIdentifiersModel(base_models.BaseModel):
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    @staticmethod
-    def export_data(unsuded_user_id):
-        """Do not export anything"""
-        return {}
-
     @classmethod
     def apply_deletion_policy(cls, user_id):
         """Delete instances of UserIdentifiersModel for the user.
