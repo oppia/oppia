@@ -170,7 +170,7 @@ var CollectionEditorPage = function() {
       saveChangesButton, 'Save Changes button is not clickable');
     await action.click('Save Changes Button', saveChangesButton);
     await waitFor.invisibilityOf(
-      saveChangesButton, 'Save Changes modal takes too long to close');
+      saveChangesButton, 'Save Changes Modal takes too long to close');
     await waitFor.invisibilityOf(
       saveInProgressLabel, 'Collection is taking too long to save.');
   };
