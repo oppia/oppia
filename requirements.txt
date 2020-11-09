@@ -15,6 +15,7 @@ cachetools==3.1.1         # via google-auth
 callbacks==0.3.0          # via -r requirements.in
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
+contextlib2==0.6.0.post1  # via -r requirements.in
 enum34==1.1.10            # via google-cloud-tasks, grpcio
 funcsigs==1.0.2           # via mock
 future==0.18.2            # via -r requirements.in
