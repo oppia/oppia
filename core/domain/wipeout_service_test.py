@@ -20,6 +20,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
+from core.domain import collection_services
+from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -1014,6 +1016,81 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id,
             collection_mappings[self.COL_1_ID])
 
+    def test_collection_user_is_removed_from_contributors(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        old_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id(self.COL_1_ID))
+
+        self.assertNotIn(self.user_1_id, old_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, old_summary_model.contributors_summary)
+
+        old_summary_model.contributor_ids = [self.user_1_id]
+        old_summary_model.contributors_summary = {self.user_1_id: 2}
+        old_summary_model.update_timestamps()
+        old_summary_model.put()
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        new_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id(self.COL_1_ID))
+
+        self.assertNotIn(self.user_1_id, new_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, new_summary_model.contributors_summary)
+
+    def test_col_user_is_removed_from_contributor_ids_when_missing_from_summary(
+            self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        old_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id(self.COL_1_ID))
+
+        self.assertNotIn(self.user_1_id, old_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, old_summary_model.contributors_summary)
+
+        old_summary_model.contributor_ids = [self.user_1_id]
+        old_summary_model.contributors_summary = {}
+        old_summary_model.update_timestamps()
+        old_summary_model.put()
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        new_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id(self.COL_1_ID))
+
+        self.assertNotIn(self.user_1_id, new_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, new_summary_model.contributors_summary)
+
+    def test_delete_exp_where_user_has_role_when_rights_model_marked_as_deleted(
+            self):
+        self.save_new_valid_collection(self.COL_2_ID, self.user_1_id)
+        collection_services.delete_collection(self.user_1_id, self.COL_2_ID)
+
+        collection_rights_model = (
+            collection_models.CollectionRightsModel.get_by_id(self.COL_2_ID))
+        self.assertTrue(collection_rights_model.deleted)
+        collection_model = (
+            collection_models.CollectionModel.get_by_id(self.COL_2_ID))
+        self.assertTrue(collection_model.deleted)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            collection_models.CollectionRightsModel.get_by_id(self.COL_2_ID))
+        self.assertIsNone(
+            collection_models.CollectionModel.get_by_id(self.COL_2_ID))
+
     def test_multiple_collections_are_pseudonymized(self):
         self.save_new_valid_collection(self.COL_2_ID, self.user_1_id)
         self.publish_collection(self.user_1_id, self.COL_2_ID)
@@ -1333,7 +1410,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id, exploration_mappings[self.EXP_1_ID])
 
-    def test_one_exploration_user_is_removed_from_contributors(self):
+    def test_exploration_user_is_removed_from_contributors(self):
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
@@ -1356,6 +1433,53 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
         self.assertNotIn(self.user_1_id, new_summary_model.contributor_ids)
         self.assertNotIn(self.user_1_id, new_summary_model.contributors_summary)
+
+    def test_exp_user_is_removed_from_contributor_ids_when_missing_from_summary(
+            self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        old_summary_model = exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID)
+
+        self.assertNotIn(self.user_1_id, old_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, old_summary_model.contributors_summary)
+
+        old_summary_model.contributor_ids = [self.user_1_id]
+        old_summary_model.contributors_summary = {}
+        old_summary_model.update_timestamps()
+        old_summary_model.put()
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        new_summary_model = exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID)
+
+        self.assertNotIn(self.user_1_id, new_summary_model.contributor_ids)
+        self.assertNotIn(self.user_1_id, new_summary_model.contributors_summary)
+
+    def test_delete_exp_where_user_has_role_when_rights_model_marked_as_deleted(
+            self):
+        self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
+        exp_services.delete_exploration(self.user_1_id, self.EXP_2_ID)
+
+        exp_rights_model = (
+            exp_models.ExplorationRightsModel.get_by_id(self.EXP_2_ID))
+        self.assertTrue(exp_rights_model.deleted)
+        exp_model = (
+            exp_models.ExplorationRightsModel.get_by_id(self.EXP_2_ID))
+        self.assertTrue(exp_model.deleted)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            exp_models.ExplorationRightsModel.get_by_id(self.EXP_2_ID))
+        self.assertIsNone(
+            exp_models.ExplorationModel.get_by_id(self.EXP_2_ID))
 
     def test_multiple_explorations_are_pseudonymized(self):
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)

@@ -398,6 +398,21 @@ def remove_user_from_activities_with_associated_rights_models(
         rights_manager.deassign_role_for_exploration(
             user_services.get_system_user(), exp_id, user_id)
 
+    if not use_user_subscriptions_ids:
+        # The summary model is hard-deleted when the exploration is only marked
+        # as deleted. Thus we need to retrieve the exploration other way and
+        # hard-delete it.
+        explorations_rights = (
+            rights_manager.get_exploration_rights_where_user_is_owner(user_id))
+        explorations_to_be_deleted_ids = [
+            exploration_rights.id for exploration_rights
+            in explorations_rights if
+            exploration_rights.is_private() and
+            exploration_rights.is_solely_owned_by_user(user_id)
+        ]
+        exp_services.delete_explorations(
+            user_id, explorations_to_be_deleted_ids, force_deletion=True)
+
     if use_user_subscriptions_ids:
         subscribed_collection_summaries = (
             collection_services.get_collection_summaries_subscribed_to(user_id))
@@ -434,6 +449,20 @@ def remove_user_from_activities_with_associated_rights_models(
     for col_id in collections_to_remove_user_from_ids:
         rights_manager.deassign_role_for_collection(
             user_services.get_system_user(), col_id, user_id)
+
+    if not use_user_subscriptions_ids:
+        # The summary model is hard-deleted when the collection is only marked
+        # as deleted. Thus we need to retrieve the collection other way and
+        # hard-delete it.
+        collection_rights = (
+            rights_manager.get_collection_rights_where_user_is_owner(user_id))
+        collections_to_be_deleted_ids = [
+            collection_rights.id for collection_rights in collection_rights if
+            collection_rights.is_private() and
+            collection_rights.is_solely_owned_by_user(user_id)
+        ]
+        collection_services.delete_collections(
+            user_id, collections_to_be_deleted_ids, force_deletion=True)
 
     topic_services.deassign_user_from_all_topics(
         user_services.get_system_user(), user_id)
@@ -942,10 +971,10 @@ def _remove_user_id_from_contributors_in_summary_models(
         for summary_model in related_summary_models:
             summary_model.contributor_ids = [
                 contributor_id for contributor_id in
-                summary_model.contributor_ids
-                if contributor_id != user_id
+                summary_model.contributor_ids if contributor_id != user_id
             ]
-            del summary_model.contributors_summary[user_id]
+            if user_id in summary_model.contributors_summary:
+                del summary_model.contributors_summary[user_id]
 
         summary_model_class.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)
