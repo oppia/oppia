@@ -162,6 +162,10 @@ angular.module('oppia').directive('skillsList', [
                   AlertsService.addSuccessMessage(successToast, 1000);
                 });
               }
+            }, () => {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
