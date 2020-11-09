@@ -2785,3 +2785,65 @@ class UserAuthDetailsModel(base_models.BaseModel):
             mapped to the queried parent_user_id.
         """
         return cls.query(cls.parent_user_id == parent_user_id).fetch()
+
+
+class UserIdentifiersModel(base_models.BaseModel):
+    """Stores the relation between GAE ID and user ID.
+
+    Instances of this class are keyed by GAE ID.
+    """
+
+    # The main user ID that is used in the datastore.
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information
+        relevant to one user account.
+        """
+        return base_models.DELETION_POLICY.DELETE_AT_END
+
+    @classmethod
+    def get_export_policy(cls):
+        """Currently, the model holds authentication details relevant only for
+        backend, and no exportable user data. It may contain user data in
+        the future.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserIdentifiersModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserIdentifiersModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any UserIdentifiersModel refers to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @classmethod
+    def get_by_user_id(cls, user_id):
+        """Fetch a entry by user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            UserIdentifiersModel. The model with user_id field equal to user_id
+            argument.
+        """
+        return cls.query(cls.user_id == user_id).get()
