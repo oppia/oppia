@@ -198,7 +198,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
-                $rootScope.$apply();
+                $rootScope.$applyAsync();
               });
           },
           function(error) {
@@ -256,7 +256,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           topicId, subtopicId).then(
           function(newBackendSubtopicPageObject) {
             _updateSubtopicPage(newBackendSubtopicPageObject);
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           },
           function(error) {
             AlertsService.addWarning(
@@ -450,7 +450,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             if (successCallback) {
               successCallback();
             }
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the topic.');
@@ -497,7 +497,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             if (successCallback) {
               successCallback();
             }
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error ||
@@ -523,7 +523,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             if (successCallback) {
               successCallback();
             }
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error ||

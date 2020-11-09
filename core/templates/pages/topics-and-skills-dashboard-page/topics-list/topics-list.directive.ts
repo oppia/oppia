@@ -124,7 +124,7 @@ angular.module('oppia').directive('topicsList', [
                 function(status) {
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
-                  $rootScope.$apply();
+                  $rootScope.$applyAsync();
                 },
                 function(error) {
                   AlertsService.addWarning(
