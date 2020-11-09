@@ -209,7 +209,7 @@ def run_user_deletion_completion(pending_deletion_request):
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):
-        _delete_user_models_with_delete_after_verification_policy(
+        _delete_user_models_with_delete_at_end_policy(
             pending_deletion_request.user_id)
         user_models.DeletedUserModel(
             id=pending_deletion_request.user_id
@@ -223,7 +223,7 @@ def run_user_deletion_completion(pending_deletion_request):
         return wipeout_domain.USER_VERIFICATION_FAILURE
 
 
-def _delete_user_models_with_delete_after_verification_policy(user_id):
+def _delete_user_models_with_delete_at_end_policy(user_id):
     """Delete user models with deletion policy 'DELETE_AT_END'.
 
     Args:

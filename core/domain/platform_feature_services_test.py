@@ -175,23 +175,27 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_evaluate_dev_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
-                feature_services.is_feature_enabled(self.dev_feature.name))
+                feature_services.is_feature_enabled(
+                    self.dev_feature.name, self.user_id))
 
     def test_evaluate_prod_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
+                feature_services.is_feature_enabled(
+                    self.prod_feature.name, self.user_id))
 
     def test_evaluate_dev_feature_for_prod_server_returns_false(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertFalse(
-                feature_services.is_feature_enabled(self.dev_feature.name))
+                feature_services.is_feature_enabled(
+                    self.dev_feature.name, self.user_id))
 
     def test_evaluate_prod_feature_for_prod_server_returns_true(
             self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
+                feature_services.is_feature_enabled(
+                    self.prod_feature.name, self.user_id))
 
     def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
             self):
@@ -225,7 +229,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
+                feature_services.is_feature_enabled(
+                    self.prod_feature.name, self.user_id))
 
     def test_evaluate_feature_for_prod_server_no_user_defaults_match_to_en_lang(
             self):
@@ -259,7 +264,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
+                feature_services.is_feature_enabled(
+                    self.prod_feature.name, self.user_id))
 
     def test_evaluate_feature_for_en_user_defaults_match_to_en_lang(
             self):
@@ -295,7 +301,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
+                feature_services.is_feature_enabled(
+                    self.prod_feature.name, self.user_id))
 
     def test_evaluate_feature_for_fr_user_defaults_does_not_match_to_en_lang(
             self):
@@ -334,12 +341,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # for the current logged in user.
         with self.swap(constants, 'DEV_MODE', False):
             self.assertFalse(
-                feature_services.is_feature_enabled(self.prod_feature.name))
+                feature_services.is_feature_enabled(
+                    self.prod_feature.name, self.user_id))
 
     def test_get_feature_flag_values_with_unknown_name_raises_error(self):
         with self.assertRaisesRegexp(
             Exception, 'Unknown feature flag'):
-            feature_services.is_feature_enabled('feature_that_does_not_exist')
+            feature_services.is_feature_enabled(
+                'feature_that_does_not_exist', self.user_id)
 
     def test_update_feature_flag_rules_successfully_updates_rules(self):
         feature_services.update_feature_flag_rules(
@@ -364,7 +373,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', True):
             self.assertFalse(
-                feature_services.is_feature_enabled(self.dev_feature.name))
+                feature_services.is_feature_enabled(
+                    self.dev_feature.name, self.user_id))
 
     def test_update_feature_flag_rules_with_unknown_name_raises_error(self):
         unknown_name = 'feature_that_does_not_exist'

@@ -2143,3 +2143,129 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
                 ['FAILURE - PROFILE PICTURE NOT PNG', [self.NEW_USER_USERNAME]]
             ]
         )
+
+
+class UserAuthDetailsModelAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UserAuthDetailsModelAuditOneOffJob.create_new())
+        user_jobs_one_off.UserAuthDetailsModelAuditOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.UserAuthDetailsModelAuditOneOffJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        for item in eval_output:
+            if item[0] == 'FAILURE':
+                item[1] = sorted(item[1])
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(UserAuthDetailsModelAuditOneOffJobTests, self).setUp()
+
+    def test_multiple_user_auth_details_with_different_gae_ids_success(self):
+        # Generate 3 completely different models.
+        for i in python_utils.RANGE(3):
+            user_models.UserAuthDetailsModel(
+                id='user_id_%s' % i,
+                gae_id='gae_id_%s' % i
+            ).put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 3]])
+
+    def test_multiple_user_auth_details_with_same_gae_ids_failure(self):
+        # Generate two pairs of models with the same gae_id.
+        for i in python_utils.RANGE(4):
+            user_models.UserAuthDetailsModel(
+                id='user_id_%s' % i,
+                gae_id='gae_id_%s' % (i % 2)
+            ).put()
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['FAILURE', ['user_id_0', 'user_id_1', 'user_id_2', 'user_id_3']]]
+        )
+
+    def test_multiple_user_auth_details_with_various_gae_ids_mixed_resutls(
+            self):
+        # Generate pair of models with the same gae_id.
+        for i in python_utils.RANGE(2):
+            user_models.UserAuthDetailsModel(
+                id='user_id_%s' % i,
+                gae_id='gae_id_1'
+            ).put()
+        # Generate 3 completely different models.
+        for i in python_utils.RANGE(2, 5):
+            user_models.UserAuthDetailsModel(
+                id='user_id_%s' % i,
+                gae_id='gae_id_%s' % i
+            ).put()
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [['FAILURE', ['user_id_0', 'user_id_1']], ['SUCCESS', 3]]
+        )
+
+
+class GenerateUserIdentifiersModelOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob
+            .create_new())
+        user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(GenerateUserIdentifiersModelOneOffJobTests, self).setUp()
+
+    def test_from_user_auth_details_generate_user_identifiers_models(self):
+        # Generate 3 completely different models.
+        for i in python_utils.RANGE(3):
+            user_models.UserAuthDetailsModel(
+                id='user_id_%s' % i,
+                gae_id='gae_id_%s' % i
+            ).put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 3]])
+        for i in python_utils.RANGE(3):
+            user_auth_details_model = (
+                user_models.UserAuthDetailsModel.get_by_id('user_id_%s' % i))
+            user_identifiers_model = (
+                user_models.UserIdentifiersModel.get_by_id('gae_id_%s' % i))
+            self.assertIsNotNone(user_auth_details_model)
+            self.assertIsNotNone(user_identifiers_model)
+            self.assertEqual(
+                user_auth_details_model.id, user_identifiers_model.user_id)
+            self.assertEqual(
+                user_auth_details_model.gae_id, user_identifiers_model.id)
