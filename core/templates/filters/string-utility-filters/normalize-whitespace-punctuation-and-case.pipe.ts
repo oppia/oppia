@@ -30,7 +30,7 @@ export class NormalizeWhitespacePunctuationAndCasePipe
 implements PipeTransform {
   transform(input: string): string {
     if (typeof input === 'string') {
-      let isAlphanumeric = function(character) {
+      let isAlphanumeric = function(character: string) {
         return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
           character.toLowerCase()) !== -1;
       };
