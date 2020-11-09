@@ -37,6 +37,7 @@ import python_utils
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+datastore_services = models.Registry.import_datastore_services()
 
 
 def _migrate_states_schema(versioned_exploration_states, exploration_id):
@@ -377,3 +378,29 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
     result.update(db_results_dict)
     return result
+
+
+def get_exploration_summaries_where_user_has_role(user_id):
+    """Returns a list of ExplorationSummary domain objects where the user has
+    some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ExplorationSummary). List of ExplorationSummary domain objects
+        where the user has some role.
+    """
+    exp_summary_models = exp_models.ExpSummaryModel.query(
+        datastore_services.any_of(
+            exp_models.ExpSummaryModel.owner_ids == user_id,
+            exp_models.ExpSummaryModel.editor_ids == user_id,
+            exp_models.ExpSummaryModel.voice_artist_ids == user_id,
+            exp_models.ExpSummaryModel.viewer_ids == user_id,
+            exp_models.ExpSummaryModel.contributor_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_exploration_summary_from_model(exp_summary_model)
+        for exp_summary_model in exp_summary_models
+    ]

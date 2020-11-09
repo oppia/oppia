@@ -13,7 +13,7 @@
           class="dashboard-table-headings">
         <p ng-if="key === 'index'"></p>
         <p ng-if="key === 'name'" id="dashboard-table-headings-details">Details</p>
-        <p ng-if="key === 'canonical_story_count'">Stories</p>
+        <p ng-if="key === 'canonical_story_count'">Published Stories</p>
         <p ng-if="key === 'subtopic_count'">Subtopics</p>
         <p ng-if="key === 'skill_count'" class="text-center">Skills</p>
         <p ng-if="key === 'topic_status'" class="text-center">Topic Status</p>
@@ -124,7 +124,7 @@
               <span><[topic.canonicalStoryCount]></span>
             </div>
             <div class="topic-item-type">
-              Stories
+              Published Stories
             </div>
           </div>
           <div class="topic-item-entity">

@@ -69,7 +69,10 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
             feconf.EMAIL_INTENT_REMOVE_REVIEWER,
-            feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+            feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+            feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
             feconf.BULK_EMAIL_INTENT_TEST
@@ -88,6 +91,13 @@ class SentEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Users already have access to this data since emails were sent
+        to them.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -176,6 +186,7 @@ class SentEmailModel(base_models.BaseModel):
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
 
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
     def _pre_put_hook(self):
@@ -317,6 +328,13 @@ class BulkEmailModel(base_models.BaseModel):
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Users already have access to this data since the emails were sent
+        to them.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Users already have access to this data since the emails were sent
@@ -369,6 +387,7 @@ class BulkEmailModel(base_models.BaseModel):
             id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
+        email_model_instance.update_timestamps()
         email_model_instance.put()
 
 
@@ -394,12 +413,20 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """Feedback email reply to id should be deleted."""
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there can be
+        multiple GeneralFeedbackEmailReplyToIdModels per user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thread_id': base_models.EXPORT_POLICY.EXPORTED,
+            'thread_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'reply_to_id': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -487,6 +514,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id=thread_id,
             reply_to_id=reply_to_id)
 
+        feedback_email_reply_model_instance.update_timestamps()
         feedback_email_reply_model_instance.put()
         return feedback_email_reply_model_instance
 
@@ -550,7 +578,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """(Takeout) Export GeneralFeedbackEmailReplyToIdModel's user data.
+        """(Takeout) Export FeedbackEmailReplyToIdModel's user data.
 
         Args:
             user_id: str. The user_id denotes which user's data to extract.
@@ -562,5 +590,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         user_data = {}
         email_reply_models = cls.get_all().filter(cls.user_id == user_id)
         for model in email_reply_models:
-            user_data[model.thread_id] = model.reply_to_id
+            user_data[model.thread_id] = {
+                'reply_to_id': model.reply_to_id
+            }
         return user_data

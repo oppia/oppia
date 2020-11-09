@@ -66,7 +66,7 @@ describe('StateTopAnswersStatsService', () => {
       answer_groups: [{
         rule_specs: [{
           rule_type: 'Contains',
-          inputs: {x: 'hola'}
+          inputs: {x: ['hola']}
         }],
         outcome: {
           dest: 'Me Llamo',
@@ -292,7 +292,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createNew('Contains', {x: 'adios'}));
+      ruleObjectFactory.createNew('Contains', {x: ['adios']}));
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
@@ -313,7 +313,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules = [
-      ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
+      ruleObjectFactory.createNew('Contains', {x: ['bonjour']})
     ];
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 

@@ -55,6 +55,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         [entity_type].[entity_id].[generated_string]
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The type of entity the thread is linked to.
     entity_type = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the entity the thread is linked to.
@@ -93,22 +96,41 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """General feedback thread needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there
+        are multiple feedback threads relevant to a particular user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             'entity_id': base_models.EXPORT_POLICY.EXPORTED,
-            'original_author_id': base_models.EXPORT_POLICY.EXPORTED,
+            # We do not export the original_author_id because we should not
+            # export internal user ids.
+            'original_author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.EXPORTED,
             'subject': base_models.EXPORT_POLICY.EXPORTED,
             'summary': base_models.EXPORT_POLICY.EXPORTED,
             'has_suggestion': base_models.EXPORT_POLICY.EXPORTED,
             'message_count': base_models.EXPORT_POLICY.EXPORTED,
             'last_nonempty_message_text':
-                base_models.EXPORT_POLICY.EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_nonempty_message_author_id':
-                base_models.EXPORT_POLICY.EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def get_field_names_for_takeout(cls):
+        """Indicates that the last_updated variable is exported under the
+        name "last_updated_msec" in Takeout.
+        """
+        return dict(super(cls, cls).get_field_names_for_takeout(), ** {
+            'last_updated': 'last_updated_msec'
         })
 
     @classmethod
@@ -229,6 +251,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     The id of instances of this class has the form [thread_id].[message_id]
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = datastore_services.StringProperty(required=True, indexed=True)
     # 0-based sequential numerical ID. Sorting by this field will create the
@@ -256,13 +281,22 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """General feedback message needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there are
+        multiple feedback messages relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'message_id': base_models.EXPORT_POLICY.EXPORTED,
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
+            # We do not export the author_id because we should not export
+            # internal user ids.
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'updated_status': base_models.EXPORT_POLICY.EXPORTED,
             'updated_subject': base_models.EXPORT_POLICY.EXPORTED,
             'text': base_models.EXPORT_POLICY.EXPORTED,
@@ -539,12 +573,20 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there are
+        multiple feedback threads relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thread_id': base_models.EXPORT_POLICY.EXPORTED,
+            'thread_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'message_ids_read_by_user':
                 base_models.EXPORT_POLICY.EXPORTED
         })
@@ -637,6 +679,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
                 id=instance_id, user_id=user_id, thread_id=thread_id)
             new_instances.append(new_instance)
 
+        GeneralFeedbackThreadUserModel.update_timestamps_multi(new_instances)
         GeneralFeedbackThreadUserModel.put_multi(new_instances)
         return new_instances
 
@@ -675,8 +718,9 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
         for user_model in found_models:
-            user_data[user_model.thread_id] = (
-                user_model.message_ids_read_by_user)
+            user_data[user_model.thread_id] = {
+                'message_ids_read_by_user': user_model.message_ids_read_by_user
+            }
         return user_data
 
 
@@ -695,10 +739,15 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Feedback analytic model should be kept if the associated exploration
-        is public.
+        """FeedbackAnalyticsModel doesn't contain any data directly
+        corresponding to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -707,19 +756,6 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             'num_open_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'num_total_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """FeedbackAnalyticsModel doesn't reference any user_id directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-                should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def create(cls, model_id, num_open_threads, num_total_threads):
@@ -766,6 +802,11 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Unsent feedback email is kept until sent."""
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

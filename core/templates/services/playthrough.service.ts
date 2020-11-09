@@ -259,7 +259,7 @@ export class PlaythroughService {
     if (this.isRecordedPlaythroughHelpful()) {
       const playthrough = this.createNewPlaythrough();
       if (playthrough !== null) {
-        this.playthroughBackendApiService.storePlaythrough(playthrough, 1);
+        this.playthroughBackendApiService.storePlaythroughAsync(playthrough, 1);
       }
     }
   }
