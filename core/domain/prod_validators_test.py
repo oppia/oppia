@@ -19,11 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
 import math
 import random
 import time
-import types
 
 from constants import constants
 from core.domain import collection_domain
@@ -48,6 +48,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -618,12 +619,16 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'CollectionModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated CollectionModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'CollectionModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -1177,12 +1182,16 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'CollectionRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated CollectionRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'CollectionRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -2508,418 +2517,6 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(SentEmailModelValidatorTests, self).setUp()
-
-        def mock_generate_hash(
-                unused_cls, unused_recipient_id, unused_email_subject,
-                unused_email_body):
-            return 'Email Hash'
-
-        self.sender_email = 'noreply@oppia.org'
-        self.sender_id = 'sender'
-        self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id,
-            email=self.sender_email)
-        self.sender_model.update_timestamps()
-        self.sender_model.put()
-
-        self.recipient_email = 'recipient@email.com'
-        self.recipient_id = 'recipient'
-        self.recipient_model = user_models.UserSettingsModel(
-            id=self.recipient_id,
-            email=self.recipient_email)
-        self.recipient_model.update_timestamps()
-        self.recipient_model.put()
-
-        with self.swap(
-            email_models.SentEmailModel, '_generate_hash',
-            types.MethodType(mock_generate_hash, email_models.SentEmailModel)):
-            email_models.SentEmailModel.create(
-                self.recipient_id, self.recipient_email, self.sender_id,
-                self.sender_email, feconf.EMAIL_INTENT_SIGNUP,
-                'Email Subject', 'Email Body', datetime.datetime.utcnow())
-
-        self.model_instance = email_models.SentEmailModel.get_by_hash(
-            'Email Hash')[0]
-
-        self.job_class = (
-            prod_validation_jobs_one_off.SentEmailModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [u'[u\'fully-validated SentEmailModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SentEmailModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance.sent_datetime = (
-            datetime.datetime.utcnow() - datetime.timedelta(hours=20))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_sender_id(self):
-        self.sender_model.delete()
-        expected_output = [(
-            u'[u\'failed validation check for sender_id field check of '
-            'SentEmailModel\', '
-            '[u"Entity id %s: based on field sender_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.sender_id, self.sender_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_recipient_id(self):
-        self.recipient_model.delete()
-        expected_output = [(
-            u'[u\'failed validation check for recipient_id field check of '
-            'SentEmailModel\', '
-            '[u"Entity id %s: based on field recipient_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.recipient_id, self.recipient_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_recipient_email(self):
-        self.recipient_model.email = 'invalid@email.com'
-        self.recipient_model.update_timestamps()
-        self.recipient_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for recipient email check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: Recipient email %s in entity does not match '
-            'with email %s of user obtained through recipient id %s\']]') % (
-                self.model_instance.id, self.model_instance.recipient_email,
-                self.recipient_model.email, self.model_instance.recipient_id)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_sent_datetime_greater_than_current_time(self):
-        self.model_instance.sent_datetime = (
-            datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for sent datetime check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: The sent_datetime field has a value %s '
-            'which is greater than the time when the job was run\']]') % (
-                self.model_instance.id, self.model_instance.sent_datetime)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_instance_with_invalid_id = email_models.SentEmailModel(
-            id='invalid', recipient_id=self.recipient_id,
-            recipient_email=self.recipient_email, sender_id=self.sender_id,
-            sender_email='noreply@oppia.org', intent=feconf.EMAIL_INTENT_SIGNUP,
-            subject='Email Subject', html_body='Email Body',
-            sent_datetime=datetime.datetime.utcnow())
-        model_instance_with_invalid_id.update_timestamps()
-        model_instance_with_invalid_id.put()
-        expected_output = [(
-            u'[u\'fully-validated SentEmailModel\', 1]'
-        ), (
-            u'[u\'failed validation check for model id check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-        ) % 'invalid']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(BulkEmailModelValidatorTests, self).setUp()
-
-        self.sender_email = 'sender@email.com'
-        self.sender_id = 'sender'
-        self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id,
-            email=self.sender_email)
-        self.sender_model.update_timestamps()
-        self.sender_model.put()
-
-        self.recipient_ids = ['recipient1', 'recipient2']
-        self.recipient_model_1 = user_models.UserSettingsModel(
-            id=self.recipient_ids[0],
-            email='recipient1@email.com')
-        self.recipient_model_1.update_timestamps()
-        self.recipient_model_1.put()
-        self.recipient_model_2 = user_models.UserSettingsModel(
-            id=self.recipient_ids[1],
-            email='recipient2@email.com')
-        self.recipient_model_2.update_timestamps()
-        self.recipient_model_2.put()
-
-        self.model_id = 'bulkemailid1'
-        email_models.BulkEmailModel.create(
-            self.model_id, self.recipient_ids, self.sender_id,
-            self.sender_email, feconf.BULK_EMAIL_INTENT_MARKETING,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow())
-        self.model_instance = email_models.BulkEmailModel.get_by_id(
-            self.model_id)
-
-        self.job_class = (
-            prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [u'[u\'fully-validated BulkEmailModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of BulkEmailModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance.sent_datetime = (
-            datetime.datetime.utcnow() - datetime.timedelta(hours=20))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'BulkEmailModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_sender_id(self):
-        self.sender_model.delete()
-        expected_output = [(
-            u'[u\'failed validation check for sender_id field check of '
-            'BulkEmailModel\', '
-            '[u"Entity id %s: based on field sender_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.sender_id, self.sender_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_recipient_id(self):
-        self.recipient_model_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for recipient_id field check of '
-            'BulkEmailModel\', '
-            '[u"Entity id %s: based on field recipient_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.recipient_ids[0],
-                self.recipient_ids[0])]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_sender_email(self):
-        self.sender_model.email = 'invalid@email.com'
-        self.sender_model.update_timestamps()
-        self.sender_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for sender email check of '
-            'BulkEmailModel\', '
-            '[u\'Entity id %s: Sender email %s in entity does not match with '
-            'email %s of user obtained through sender id %s\']]') % (
-                self.model_instance.id, self.model_instance.sender_email,
-                self.sender_model.email, self.model_instance.sender_id)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_sent_datetime_greater_than_current_time(self):
-        self.model_instance.sent_datetime = (
-            datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for sent datetime check of '
-            'BulkEmailModel\', '
-            '[u\'Entity id %s: The sent_datetime field has a value %s '
-            'which is greater than the time when the job was run\']]') % (
-                self.model_instance.id, self.model_instance.sent_datetime)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_instance_with_invalid_id = email_models.BulkEmailModel(
-            id='invalid:id', recipient_ids=self.recipient_ids,
-            sender_id=self.sender_id, sender_email=self.sender_email,
-            intent=feconf.BULK_EMAIL_INTENT_MARKETING,
-            subject='Email Subject', html_body='Email Body',
-            sent_datetime=datetime.datetime.utcnow())
-        model_instance_with_invalid_id.update_timestamps()
-        model_instance_with_invalid_id.put()
-        expected_output = [(
-            u'[u\'fully-validated BulkEmailModel\', 1]'
-        ), (
-            u'[u\'failed validation check for model id check of '
-            'BulkEmailModel\', '
-            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-        ) % model_instance_with_invalid_id.id]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class GeneralFeedbackEmailReplyToIdModelValidatorTests(
-        test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(GeneralFeedbackEmailReplyToIdModelValidatorTests, self).setUp()
-
-        self.thread_id = feedback_services.create_thread(
-            'exploration', 'expid', None, 'a subject', 'some text')
-
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        self.model_instance = (
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.user_id, self.thread_id))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [(
-            u'[u\'fully-validated GeneralFeedbackEmailReplyToIdModel\', 1]')]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_user_id(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [(
-            u'[u\'failed validation check for item.id.user_id field check of '
-            'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u"Entity id %s: based on field item.id.user_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.user_id, self.user_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_thread_id(self):
-        feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id).delete()
-        expected_output = [(
-            u'[u\'failed validation check for item.id.thread_id field check of '
-            'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u"Entity id %s: based on field item.id.thread_id having value '
-            '%s, expected model GeneralFeedbackThreadModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.thread_id, self.thread_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_reply_to_id(self):
-        while len(
-                self.model_instance.reply_to_id) <= (
-                    email_models.REPLY_TO_ID_LENGTH):
-            self.model_instance.reply_to_id = (
-                self.model_instance.reply_to_id + 'invalid')
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for reply_to_id length check of '
-            'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Entity id %s: reply_to_id %s should have length less than or '
-            'equal to %s but instead has length %s\']]'
-        ) % (
-            self.model_instance.id, self.model_instance.reply_to_id,
-            email_models.REPLY_TO_ID_LENGTH,
-            len(self.model_instance.reply_to_id))]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-
 class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -2981,12 +2578,15 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated ExplorationModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'ExplorationModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -3281,6 +2881,47 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_maximum_of_ten_errors_are_emitted(self):
+        for i in python_utils.RANGE(20):
+            exp_services.update_exploration(
+                self.owner_id, '0', [exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title %s' % i
+                })], 'Changes.')
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, '', [])
+
+        self.process_and_flush_pending_tasks()
+        job_id = self.job_class.create_new()
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        self.job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.process_and_flush_pending_tasks()
+        actual_output = self.job_class.get_output(job_id)
+
+        self.assertEqual(len(actual_output), 2)
+
+        self.assertEqual(
+            actual_output[1],
+            '[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]')
+
+        full_error_list = []
+        for i in python_utils.RANGE(22):
+            full_error_list.append(
+                'Entity id 0-%s: based on field exploration_ids having '
+                'value 0, expected model ExplorationModel with id 0 but '
+                'it doesn\'t exist' % (i + 1))
+        actual_error_list = ast.literal_eval(actual_output[0])[1]
+        self.assertEqual(len(actual_error_list), 10)
+        for error in actual_error_list:
+            assert (error in full_error_list), ('Extra error: %s' % error)
+
 
 class ExplorationSnapshotContentModelValidatorTests(
         test_utils.AuditJobsTestBase):
@@ -3471,12 +3112,16 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated ExplorationRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'ExplorationRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -5522,12 +5167,16 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'QuestionModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated QuestionModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'QuestionModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -7715,12 +7364,16 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated TopicModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'TopicModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -8423,12 +8076,16 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated TopicRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'TopicRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -9554,12 +9211,16 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SubtopicPageModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated SubtopicPageModel\', 2]',
+            (
+                '[u\'failed validation check for current time check of '
+                'SubtopicPageModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater '
+                'than the time when the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -11537,6 +11198,80 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
+class UserIdentifiersModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(UserIdentifiersModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
+
+        # Note: There will be a total of 2 UserSettingsModels (hence 2
+        # UserAuthDetailsModels too) even though only one user signs up in the
+        # test since superadmin signup is also done in
+        # test_utils.AuditJobsTestBase.
+        self.model_instance = user_models.UserIdentifiersModel.get_by_id(
+            self.gae_id)
+        self.job_class = (
+            prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob)
+
+    def test_audit_standard_operation_passes(self):
+        expected_output = [
+            u'[u\'fully-validated UserIdentifiersModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_created_on_greater_than_last_updated_fails(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of UserIdentifiersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.gae_id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            ), u'[u\'fully-validated UserIdentifiersModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_audit_with_last_updated_greater_than_current_time_fails(self):
+        user_models.UserIdentifiersModel.get_by_id(
+            self.get_gae_id_from_email('tmpsuperadmin@example.com')
+        ).delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'UserIdentifiersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.gae_id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_missing_user_settings_model_fails(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids '
+                'field check of UserIdentifiersModel\', '
+                '[u"Entity id %s: based on '
+                'field user_settings_ids having value '
+                '%s, expected model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.gae_id, self.user_id, self.user_id),
+            u'[u\'fully-validated UserIdentifiersModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+
 class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -12768,6 +12503,11 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.sent_mail_id = self.model_instance.sent_email_model_id
+
+        self.model_instance.query_status = feconf.USER_QUERY_STATUS_COMPLETED
+        self.model_instance.deleted = False
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         self.job_class = (
             prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob)
 
@@ -12873,6 +12613,32 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
             'is missing for recipient with id %s\']]') % (
                 self.query_id, self.owner_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_not_marked_as_deleted_when_older_than_4_weeks(self):
+        self.model_instance.created_on = (
+            self.model_instance.created_on - datetime.timedelta(weeks=5))
+        self.model_instance.last_updated = (
+            self.model_instance.last_updated - datetime.timedelta(weeks=5))
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+        expected_output = [(
+            '[u\'failed validation check for entity stale check of '
+            'UserQueryModel\', [u\'Entity id %s: '
+            'Model older than 4 weeks\']]') % self.query_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_not_marked_as_deleted_when_query_status_set_as_archived(
+            self):
+        self.model_instance.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            '[u\'failed validation check for entity stale check of '
+            'UserQueryModel\', [u\'Entity id %s: '
+            'Archived model not marked as deleted\']]') % self.query_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

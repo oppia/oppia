@@ -30,6 +30,7 @@ from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
+from core.domain import wipeout_service
 from core.platform import models
 import python_utils
 
@@ -187,6 +188,9 @@ class DeferredTasksHandler(base.BaseHandler):
             stats_services.update_stats),
         taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
             question_services.untag_deleted_misconceptions),
+        taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: (
+            wipeout_service
+            .remove_user_from_activities_with_associated_rights_models)
     }
 
     def post(self):
