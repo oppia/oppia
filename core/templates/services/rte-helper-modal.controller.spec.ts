@@ -165,7 +165,7 @@ describe('Rte Helper Modal Controller', function() {
       var imageFile = new Blob();
       spyOn(
         AssetsBackendApiService, 'saveMathExpresionImageAsync').and.returnValue(
-          $q.resolve(response));
+        $q.resolve(response));
       spyOn(
         ImageUploadHelperService,
         'convertImageDataToImageFile').and.returnValue(imageFile);
@@ -193,7 +193,7 @@ describe('Rte Helper Modal Controller', function() {
       var imageFile = new Blob();
       spyOn(
         AssetsBackendApiService, 'saveMathExpresionImageAsync').and.returnValue(
-          $q.reject({}));
+        $q.reject({}));
       spyOn(
         ImageUploadHelperService,
         'convertImageDataToImageFile').and.returnValue(imageFile);
