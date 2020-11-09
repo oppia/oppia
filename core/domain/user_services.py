@@ -588,24 +588,6 @@ def get_email_from_user_id(user_id):
     return user_settings.email
 
 
-def get_email_from_username(username):
-    """Gets the email for a given username.
-
-    Args:
-        username: str. Identifiable username to display in the UI.
-
-    Returns:
-        str or None. If the user with given username does not exist,
-        return None. Otherwise return the corresponding user_email.
-    """
-    user_model = user_models.UserSettingsModel.get_by_normalized_username(
-        UserSettings.normalize_username(username))
-    if user_model is None:
-        return None
-    else:
-        return user_model.email
-
-
 def get_user_id_from_username(username):
     """Gets the user_id for a given username.
 

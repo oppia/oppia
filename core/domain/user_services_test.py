@@ -300,28 +300,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 python_utils.convert_to_bytes(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
-    def test_get_email_from_username(self):
-        gae_id = 'someUser'
-        username = 'username'
-        user_email = 'user@example.com'
-
-        user_settings = user_services.create_new_user(gae_id, user_email)
-        user_services.set_username(user_settings.user_id, username)
-        self.assertEqual(
-            user_services.get_username(user_settings.user_id), username)
-
-        # Handle usernames that exist.
-        self.assertEqual(
-            user_services.get_email_from_username(username), user_email)
-
-        # Handle usernames in the same equivalence class correctly.
-        self.assertEqual(
-            user_services.get_email_from_username('USERNAME'), user_email)
-
-        # Return None for usernames which don't exist.
-        self.assertIsNone(
-            user_services.get_email_from_username('fakeUsername'))
-
     def test_get_user_id_from_username(self):
         gae_id = 'someUser'
         username = 'username'
