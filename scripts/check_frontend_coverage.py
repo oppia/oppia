@@ -333,7 +333,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'story-node.model.ts',
     'story-summary-tile.directive.ts',
     'story-update.service.ts',
-    'story-viewer-backend-api.service.ts',
     'StoryContentsObjectFactory.ts',
     'student.ts',
     'subtitled-html-editor.directive.ts',
