@@ -389,14 +389,6 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 old_rating: int. The old rating of the exploration before
                     refreshing.
             """
-            logging.error('_refresh_average_ratings called')
-            logging.error(
-                'rating is None' if rating is None
-                else 'rating: %d' % rating)
-            logging.error(
-                'old_rating is None' if old_rating is None
-                else 'old_rating: %d' % old_rating)
-
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -502,10 +494,6 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         if num_ratings > 0:
             average_ratings = python_utils.divide(
                 sum_of_ratings, float(num_ratings))
-        logging.error('get_dashboard_stats called')
-        logging.error(
-            'average ratings is None' if average_ratings is None
-            else 'average rating: %d' % average_ratings)
 
         return {
             'total_plays': total_plays,

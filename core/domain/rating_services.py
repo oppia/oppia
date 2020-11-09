@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 
 from core.domain import event_services
 from core.domain import exp_fetchers
@@ -91,13 +90,6 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
 
     event_services.RateExplorationEventHandler.record(
         exploration_id, user_id, new_rating, old_rating)
-    logging.error('RateExplorationEventHandler.record called')
-    logging.error(
-        'old_rating is None' if old_rating is None
-        else 'old_rating: %d' % old_rating)
-    logging.error(
-        'new_rating is None' if new_rating is None
-        else 'new_rating: %d' % new_rating)
 
     exploration_summary.scaled_average_rating = (
         exp_services.get_scaled_average_rating(
