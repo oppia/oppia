@@ -81,6 +81,9 @@ ONE_OFF_JOB_MANAGERS = [
     interaction_jobs_one_off.ItemSelectionInteractionOneOffJob,
     interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
+    (
+        opportunity_jobs_one_off.
+        RenameExplorationOpportunitySummaryModelPropertiesJob),
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
@@ -128,6 +131,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
     user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
+    user_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
+    user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -186,6 +191,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
         .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
