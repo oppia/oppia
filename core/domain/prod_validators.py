@@ -4624,6 +4624,34 @@ class UserAuthDetailsModelValidator(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
 
+class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
+    """Class for validating UserIdentifiersModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        """Returns a regex for model id.
+
+        This method can be overridden by subclasses, if needed.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            str. A regex pattern to be followed by the model id.
+        """
+        return '^[0-9-]{1,24}$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_settings_ids',
+                user_models.UserSettingsModel,
+                [item.user_id]
+            )
+        ]
+
+
 class PlatformParameterModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating PlatformParameterModel."""
 
