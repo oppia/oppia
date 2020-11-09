@@ -649,29 +649,30 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
         'ExplorationSnapshotMetadataModel': {
             'parent_model_class': exp_models.ExplorationModel,
             'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
-            'id_string_format': 'exploration-%s-%s'
+            'id_string_format': 'exploration-%s-%s',
+            'id_field': 'exploration_id'
         },
         'QuestionSnapshotMetadataModel': {
+            'parent_model_class': question_models.QuestionModel,
             'commit_log_model_class': (
                 question_models.QuestionCommitLogEntryModel),
-            'id_string_format': 'question-%s-%s'
+            'id_string_format': 'question-%s-%s',
+            'id_field': 'question_id'
         },
         'SkillSnapshotMetadataModel': {
+            'parent_model_class': skill_models.SkillModel,
             'commit_log_model_class': skill_models.SkillCommitLogEntryModel,
-            'id_string_format': 'skill-%s-%s'
+            'id_string_format': 'skill-%s-%s',
+            'id_field': 'skill_id'
         },
         'ExplorationRightsSnapshotMetadataModel': {
             'parent_model_class': exp_models.ExplorationRightsModel,
             'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
-            'id_string_format': 'rights-%s-%s'
+            'id_string_format': 'rights-%s-%s',
+            'id_field': 'exploration_id'
+
         }
     }
-    # This list consists of the snapshot models whose parent model has the
-    # post commit status.
-    MODELS_WITH_COMMIT_STATUS = [
-        'ExplorationSnapshotMetadataModel',
-        'ExplorationRightsSnapshotMetadataModel'
-    ]
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -686,47 +687,45 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
         model_properties = job_class.MODEL_NAMES_TO_PROPERTIES[class_name]
         commit_log_id = (
             model_properties['id_string_format'] % (model_id, version))
-        commit_log_model_class = (
+        commit_log_model = (
             model_properties['commit_log_model_class'].get_by_id(
                 commit_log_id))
         commit_logs_should_exist = True
 
-        if class_name in job_class.MODELS_WITH_COMMIT_STATUS:
-            parent_model = (
-                model_properties['parent_model_class'].get_by_id(model_id))
+        parent_model = (
+            model_properties['parent_model_class'].get_by_id(model_id))
         if class_name == 'ExplorationRightsSnapshotMetadataModel':
             if snapshot_model.commit_type in ['create', 'delete']:
                 commit_logs_should_exist = False
 
-        if commit_log_model_class is None and commit_logs_should_exist:
-            # Public is the default value for post_commit_status for the
-            # question and skill models. For the exp model, it is assigned
-            # from the rights model.
-            commit_log_model = model_properties['commit_log_model_class'](
-                id=commit_log_id,
-                user_id=snapshot_model.committer_id,
-                commit_type=snapshot_model.commit_type,
-                commit_message=snapshot_model.commit_message,
-                commit_cmds=snapshot_model.commit_cmds,
-                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
-                version=int(version)
-            )
-            if class_name == 'SkillSnapshotMetadataModel':
-                commit_log_model.skill_id = model_id
-            elif class_name == 'QuestionSnapshotMetadataModel':
-                commit_log_model.question_id = model_id
-            elif class_name == 'ExplorationRightsSnapshotMetadataModel':
-                commit_log_model.exploration_id = model_id
-                commit_log_model.post_commit_status = parent_model.status
-            elif class_name == 'ExplorationSnapshotMetadataModel':
-                commit_log_model.exploration_id = model_id
-                rights_model = exp_models.ExplorationRightsModel.get_by_id(
-                    model_id)
-                commit_log_model.post_commit_status = rights_model.status
-            commit_log_model.put()
-            yield (
-                'Added missing commit log model-%s' % class_name,
-                snapshot_model.id)
+        if commit_log_model is None and commit_logs_should_exist:
+            if parent_model is not None:
+                # Public is the default value for post_commit_status for the
+                # question and skill models. For the exp model, it is assigned
+                # from the rights model.
+                commit_log_model = model_properties['commit_log_model_class'](
+                    id=commit_log_id,
+                    user_id=snapshot_model.committer_id,
+                    commit_type=snapshot_model.commit_type,
+                    commit_message=snapshot_model.commit_message,
+                    commit_cmds=snapshot_model.commit_cmds,
+                    post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+                    version=int(version)
+                )
+                setattr(
+                    commit_log_model, model_properties['id_field'], model_id)
+                if class_name == 'ExplorationRightsSnapshotMetadataModel':
+                    commit_log_model.post_commit_status = parent_model.status
+                elif class_name == 'ExplorationSnapshotMetadataModel':
+                    rights_model = exp_models.ExplorationRightsModel.get_by_id(
+                        model_id)
+                    commit_log_model.post_commit_status = rights_model.status
+                commit_log_model.put()
+                yield (
+                    'Added missing commit log model-%s' % class_name,
+                    snapshot_model.id)
+            else:
+                yield ('Missing Parent Model-No changes-%s' % class_name, 1)
         else:
             yield ('Found commit log model-%s' % class_name, 1)
 

@@ -2253,6 +2253,15 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_add_missing_question_commit_logs(self):
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        question_model = question_models.QuestionModel(
+            id=self.QUESTION_ID,
+            question_state_data=question_state_data,
+            question_state_data_schema_version=1,
+            language_code='en'
+        )
+        base_models.BaseModel.put_multi([question_model])
         question_models.QuestionSnapshotMetadataModel(
             id='%s-1' % self.QUESTION_ID,
             committer_id=self.albert_id,
@@ -2277,6 +2286,20 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_add_missing_skill_commit_logs(self):
+        skill_model = skill_models.SkillModel(
+            id=self.SKILL_ID,
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=1,
+            all_questions_merged=False
+        )
+        base_models.BaseModel.put_multi([skill_model])
+
         skill_models.SkillSnapshotMetadataModel(
             id='%s-1' % self.SKILL_ID,
             committer_id=self.albert_id,
@@ -2298,4 +2321,28 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
         ]
 
         self.assertIsNotNone(commit_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_skill_parent_model(self):
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-%s-%s' % (self.SKILL_ID, 1)))
+
+        expected_output = [
+            [
+                'Missing Parent Model-No changes-' +
+                'SkillSnapshotMetadataModel',
+                1
+            ]
+        ]
+
+        self.assertIsNone(commit_model)
         self.assertItemsEqual(expected_output, actual_output)
