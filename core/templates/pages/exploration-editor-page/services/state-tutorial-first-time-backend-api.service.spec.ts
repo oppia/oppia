@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { StateTutorialFirstTimeBackendApiService } from
 './state-tutorial-first-time-backend-api.service';
 
-fdescribe('StateTutorialFirstTimeService backend api service', () => {
+describe('StateTutorialFirstTimeService backend api service', () => {
   let backendService: StateTutorialFirstTimeBackendApiService;
   let httpTestingController: HttpTestingController;
 
@@ -41,7 +41,7 @@ fdescribe('StateTutorialFirstTimeService backend api service', () => {
     httpTestingController.verify();
   });
 
-  fit(
+  it(
     'should successfully register tutorial start event in backend',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
@@ -62,7 +62,7 @@ fdescribe('StateTutorialFirstTimeService backend api service', () => {
     })
   );
 
-  fit(
+  it(
     'should use rejection handler if tutorial start event registration fails',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
@@ -87,7 +87,7 @@ fdescribe('StateTutorialFirstTimeService backend api service', () => {
     })
   );
 
-  fit(
+  it(
     'should successfully register translation tutorial start event in backend',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
@@ -108,7 +108,7 @@ fdescribe('StateTutorialFirstTimeService backend api service', () => {
     })
   );
 
-  fit(
+  it(
     'should use rejection handler if translation tutorial' +
     'start event registration fails',
     fakeAsync(() => {
