@@ -146,29 +146,34 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_0.commit(
             feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
         expected_output = [
+            u'[u\'fully-validated TopicModel\', 2]',
             (
                 u'[u\'failed validation check for time field relation check '
                 'of TopicModel\', '
                 '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated TopicModel\', 2]']
+                '%s of last_updated field\']]'
+            ) % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            )
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            u'[u\'fully-validated TopicModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'TopicModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
