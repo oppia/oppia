@@ -27,6 +27,7 @@ from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
@@ -153,9 +154,12 @@ def pre_delete_user(user_id):
             )
         )
     if user_settings.role != feconf.ROLE_ID_LEARNER:
-        _remove_user_from_activities_with_associated_rights_models(
-            user_id, True)
-
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            user_id,
+            True
+        )
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
         user_services.update_email_preferences(
@@ -205,7 +209,7 @@ def run_user_deletion_completion(pending_deletion_request):
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):
-        _delete_user_models_with_delete_after_verification_policy(
+        _delete_user_models_with_delete_at_end_policy(
             pending_deletion_request.user_id)
         user_models.DeletedUserModel(
             id=pending_deletion_request.user_id
@@ -219,7 +223,7 @@ def run_user_deletion_completion(pending_deletion_request):
         return wipeout_domain.USER_VERIFICATION_FAILURE
 
 
-def _delete_user_models_with_delete_after_verification_policy(user_id):
+def _delete_user_models_with_delete_at_end_policy(user_id):
     """Delete user models with deletion policy 'DELETE_AT_END'.
 
     Args:
@@ -247,7 +251,7 @@ def delete_user(pending_deletion_request):
     _delete_models(user_id, user_role, models.NAMES.feedback)
     _delete_models(user_id, user_role, models.NAMES.improvements)
     if user_role != feconf.ROLE_ID_LEARNER:
-        _remove_user_from_activities_with_associated_rights_models(
+        remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id, False)
         _pseudonymize_feedback_models(pending_deletion_request)
         _pseudonymize_suggestion_models(pending_deletion_request)
@@ -345,7 +349,7 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
     return user_is_verified
 
 
-def _remove_user_from_activities_with_associated_rights_models(
+def remove_user_from_activities_with_associated_rights_models(
         user_id, use_user_subscriptions_ids):
     """Remove the user from exploration, collection, and topic models.
 
