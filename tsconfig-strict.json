@@ -82,7 +82,7 @@
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
     "extensions/interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service.ts",
-    "extensions/interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service.ts",
+    "extensions/interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service.spec.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts",
   ],
