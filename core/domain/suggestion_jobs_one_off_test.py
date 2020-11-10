@@ -2617,7 +2617,7 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
 
-    def test_model_with_none_final_reviewer_id_gets_updated(self):
+    def test_accepted_suggestion_with_none_final_reviewer_id_gets_updated(self):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
@@ -2638,6 +2638,35 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
             message_id=0,
             author_id=self.reviewer_id,
             updated_status=feedback_models.STATUS_CHOICES_FIXED
+        ).put()
+
+        expected_output = [u'[u\'CHANGED_MODELS\', 1]']
+        self._run_job_and_verify_output(expected_output)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
+
+    def test_rejected_suggestion_with_none_final_reviewer_id_gets_updated(self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_REJECTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category='score_category'
+        ).put()
+
+        feedback_models.GeneralFeedbackMessageModel(
+            id=self.EXPLORATION_THREAD_ID + '.0',
+            thread_id=self.EXPLORATION_THREAD_ID,
+            message_id=0,
+            author_id=self.reviewer_id,
+            updated_status=feedback_models.STATUS_CHOICES_IGNORED
         ).put()
 
         expected_output = [u'[u\'CHANGED_MODELS\', 1]']
