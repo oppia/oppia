@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Create new skill modal controller.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Create new skill modal', function() {
   var $scope = null;
@@ -26,12 +26,7 @@ describe('Create new skill modal', function() {
   var COMPONENT_NAME_EXPLANATION = null;
   var SubtitledHtmlObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');

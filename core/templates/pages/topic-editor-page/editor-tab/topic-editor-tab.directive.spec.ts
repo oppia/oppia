@@ -28,6 +28,7 @@ describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
+
   var $scope = null;
   var $uibModalInstance = null;
   var ctrl = null;
@@ -62,7 +63,6 @@ describe('Topic editor tab directive', function() {
       return mockTasdReinitializedEventEmitter;
     }
   };
-
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');

@@ -21,6 +21,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 const CONSTANTS = require('constants.ts');
 
@@ -31,6 +32,8 @@ describe('Create New Story Modal Controller', function() {
   var StoryEditorStateService = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
