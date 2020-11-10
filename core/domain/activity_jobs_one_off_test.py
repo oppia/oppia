@@ -2194,6 +2194,17 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             init_state_name='init_state_name'
         )
         base_models.BaseModel.put_multi([exploration])
+        data_dic = {
+            'title': 'title',
+            'category': 'category',
+            'states_schema_version': 1,
+            'init_state_name': 'init_state_name'
+        }
+
+        exp_models.ExplorationSnapshotContentModel(
+            id='%s-1' % self.EXP_ID,
+            content=data_dic
+        ).put()
         exp_models.ExplorationSnapshotMetadataModel(
             id='%s-1' % self.EXP_ID,
             committer_id=self.albert_id,
@@ -2228,7 +2239,19 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             status='public'
         )
         base_models.BaseModel.put_multi([exp_rights])
+        data_dic = {
+            'status': 'public',
+            'owner_ids': self.albert_id,
+            'editor_ids': self.albert_id,
+            'voice_artist_ids': self.albert_id,
+            'viewer_ids': self.albert_id
 
+        }
+
+        exp_models.ExplorationRightsSnapshotContentModel(
+            id='%s-1' % self.EXP_ID,
+            content=data_dic
+        ).put()
         exp_models.ExplorationRightsSnapshotMetadataModel(
             id='%s-1' % self.EXP_ID,
             committer_id=self.albert_id,
@@ -2262,6 +2285,8 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             language_code='en'
         )
         base_models.BaseModel.put_multi([question_model])
+        question_models.QuestionSnapshotContentModel(
+            id='%s-1' % self.QUESTION_ID).put()
         question_models.QuestionSnapshotMetadataModel(
             id='%s-1' % self.QUESTION_ID,
             committer_id=self.albert_id,

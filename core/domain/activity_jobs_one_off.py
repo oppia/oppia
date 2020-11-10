@@ -673,6 +673,15 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
 
         }
     }
+    # "Public" is the default value for post_commit_status for the
+    # question and skill models.
+    MODELS_NAMES_WITH_DEFAULT_COMMIT_STATUS = [
+        'QuestionSnapshotMetadataModel', 'SkillSnapshotMetadataModel']
+    # For the exp model, post_commit_status is assigned from the
+    # exp rights model.
+    MODELS_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS = [
+        'ExplorationRightsSnapshotMetadataModel',
+        'ExplorationSnapshotMetadataModel']
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -683,8 +692,9 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
     def map(snapshot_model):
         job_class = AddMissingCommitLogsJob
         class_name = snapshot_model.__class__.__name__
-        model_id, version = snapshot_model.id.rsplit('-', 1)
+        model_id, version_str = snapshot_model.id.rsplit('-', 1)
         model_properties = job_class.MODEL_NAMES_TO_PROPERTIES[class_name]
+        version = int(version_str)
         commit_log_id = (
             model_properties['id_string_format'] % (model_id, version))
         commit_log_model = (
@@ -698,36 +708,35 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             if snapshot_model.commit_type in ['create', 'delete']:
                 commit_logs_should_exist = False
 
-        if commit_log_model is None and commit_logs_should_exist:
-            if parent_model is not None:
-                # Public is the default value for post_commit_status for the
-                # question and skill models. For the exp model, it is assigned
-                # from the rights model.
-                commit_log_model = model_properties['commit_log_model_class'](
-                    id=commit_log_id,
-                    user_id=snapshot_model.committer_id,
-                    commit_type=snapshot_model.commit_type,
-                    commit_message=snapshot_model.commit_message,
-                    commit_cmds=snapshot_model.commit_cmds,
-                    post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
-                    version=int(version)
-                )
-                setattr(
-                    commit_log_model, model_properties['id_field'], model_id)
-                if class_name == 'ExplorationRightsSnapshotMetadataModel':
-                    commit_log_model.post_commit_status = parent_model.status
-                elif class_name == 'ExplorationSnapshotMetadataModel':
-                    rights_model = exp_models.ExplorationRightsModel.get_by_id(
-                        model_id)
-                    commit_log_model.post_commit_status = rights_model.status
-                commit_log_model.put()
-                yield (
-                    'Added missing commit log model-%s' % class_name,
-                    snapshot_model.id)
-            else:
-                yield ('Missing Parent Model-No changes-%s' % class_name, 1)
-        else:
+        if commit_log_model is not None or not commit_logs_should_exist:
             yield ('Found commit log model-%s' % class_name, 1)
+            return
+
+        if parent_model is None:
+            yield ('Missing Parent Model-No changes-%s' % class_name, 1)
+            return
+
+        commit_log_model = model_properties['commit_log_model_class'](
+            id=commit_log_id,
+            user_id=snapshot_model.committer_id,
+            commit_type=snapshot_model.commit_type,
+            commit_message=snapshot_model.commit_message,
+            commit_cmds=snapshot_model.commit_cmds,
+            version=version
+        )
+        setattr(
+            commit_log_model, model_properties['id_field'], model_id)
+        if class_name in job_class.MODELS_NAMES_WITH_DEFAULT_COMMIT_STATUS:
+            commit_log_model.post_commit_status = (
+                constants.ACTIVITY_STATUS_PUBLIC)
+        elif class_name in job_class.MODELS_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS:
+            rights_model = exp_models.ExplorationRightsModel.get_version(
+                model_id, version)
+            commit_log_model.post_commit_status = rights_model.status
+        commit_log_model.put()
+        yield (
+            'Added missing commit log model-%s' % class_name,
+            snapshot_model.id)
 
     @staticmethod
     def reduce(key, values):
