@@ -35,12 +35,12 @@ var ContributorDashboardTranslateTextTab = function() {
     by.css('.protractor-test-language-selector-featured-explanation'));
 
   var _openLanguageSelector = async function() {
-    await action.click('Language selector', selectorContainer);
+    await action.click('Test Language Selector Container', selectorContainer);
   };
 
   var _selectLanguage = async function(language) {
     await _openLanguageSelector();
-    var languageOptionElement = await selectorContainer.element(
+    var selectorOption = selectorContainer.element(
       by.cssContainingText(
         '.protractor-test-language-selector-option',
         language
@@ -80,18 +80,12 @@ var ContributorDashboardTranslateTextTab = function() {
   this.expectFeaturedLanguageExplanationToBe = async function(explanation) {
     await waitFor.visibilityOf(
       featuredLanguageExplanation,
-      'featured language explanation took too long to show'
+      'Featured language explanation took too long to show'
     );
     expect(await featuredLanguageExplanation.getText()).toEqual(explanation);
   };
 
   this.expectSelectedLanguageToBe = async function(language) {
-    /*await waitFor.visibilityOf(
-      selectedLanguageElement,
-      'Selected language element taking too long to show up.');
-    var selectedLanguage = await selectedLanguageElement.getText();
-    expect(selectedLanguage).toMatch(language);
-    */
     var text = action.getText('Selected language element', selectedLanguageElement);
     expect(text).toMatch(language);
   };
