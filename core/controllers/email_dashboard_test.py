@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import taskqueue_services
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -176,19 +177,24 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
     def setUp(self):
         super(EmailDashboardResultTests, self).setUp()
-        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         # User A has one created exploration.
-        # User B has one created exploration.
-        # Submitter and new_submitter are submitter of query.
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)
+        user_services.update_email_preferences(
+            self.user_a_id, True, True, True, True)
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.user_a_id, end_state_name='End')
+        # User B has one created exploration.
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         self.user_b_id = self.get_user_id_from_email(
             self.USER_B_EMAIL)
-        self.save_new_valid_exploration(
-            self.EXP_ID_1, self.user_a_id, end_state_name='End')
+        user_services.update_email_preferences(
+            self.user_b_id, True, True, True, True)
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
+
+        # Submitter and new_submitter are submitter of query.
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(
             self.SUBMITTER_EMAIL)
@@ -676,6 +682,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         query_models = user_models.UserQueryModel.query().fetch()
         self.assertEqual(
             query_models[0].query_status, feconf.USER_QUERY_STATUS_ARCHIVED)
+        self.assertTrue(query_models[0].deleted)
         self.login(self.SUBMITTER_EMAIL)
         with self.assertRaisesRegexp(Exception, '400 Bad Request'):
             self.get_html_response(
@@ -761,6 +768,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 '/emaildashboardcancelresult/%s' % query_models[0].id, {},
                 csrf_token=csrf_token)
             self.logout()
+
+            query_models = user_models.UserQueryModel.query().fetch()
+            self.assertEqual(
+                query_models[0].query_status, feconf.USER_QUERY_STATUS_ARCHIVED)
+            self.assertTrue(query_models[0].deleted)
 
             # Check that no email is sent to qualified users.
             messages_a = self._get_sent_email_messages(
