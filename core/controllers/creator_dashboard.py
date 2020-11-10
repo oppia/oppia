@@ -192,6 +192,14 @@ class CreatorDashboardHandler(base.BaseHandler):
             exp_summary_dicts,
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
+        for index, exp_summary_dict in enumerate(exp_summary_dicts):
+            logging.error(
+                'index %d :: exp name %s ::'
+                'num_open_threads %d :: last_updated_msec %f'
+                % (
+                    index, exp_summary_dict['title'],
+                    exp_summary_dict['num_open_threads'],
+                    exp_summary_dict['last_updated_msec']))
 
         topic_summaries = topic_services.get_all_topic_summaries()
         topic_summary_dicts = [
