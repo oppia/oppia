@@ -37,19 +37,20 @@ require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/contextual/url.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').component('storyViewerPage', {
   template: require('./story-viewer-page.component.html'),
   controller: [
-    '$rootScope', 'AlertsService', 'AssetsBackendApiService',
+    '$rootScope', '$window', 'AlertsService', 'AssetsBackendApiService',
     'LoaderService', 'StoryViewerBackendApiService',
-    'UrlInterpolationService', 'UrlService', 'ENTITY_TYPE',
-    'FATAL_ERROR_CODES',
+    'UrlInterpolationService', 'UrlService', 'UserService',
+    'ENTITY_TYPE', 'FATAL_ERROR_CODES',
     function(
-        $rootScope, AlertsService, AssetsBackendApiService,
+        $rootScope, $window, AlertsService, AssetsBackendApiService,
         LoaderService, StoryViewerBackendApiService,
-        UrlInterpolationService, UrlService, ENTITY_TYPE,
-        FATAL_ERROR_CODES) {
+        UrlInterpolationService, UrlService, UserService,
+        ENTITY_TYPE, FATAL_ERROR_CODES) {
       var ctrl = this;
 
       ctrl.storyViewerBackendApiService = (
@@ -105,6 +106,14 @@ angular.module('oppia').component('storyViewerPage', {
         return true;
       };
 
+      ctrl.signIn = function() {
+        UserService.getLoginUrlAsync().then(
+          loginUrl => {
+            loginUrl ? $window.location = loginUrl : (
+              $window.location.reload());
+          });
+      };
+
       ctrl.getExplorationUrl = function(node) {
         var result = '/explore/' + node.getExplorationId();
         result = UrlService.addField(
@@ -123,6 +132,10 @@ angular.module('oppia').component('storyViewerPage', {
 
       ctrl.$onInit = function() {
         ctrl.storyIsLoaded = false;
+        ctrl.isLoggedIn = false;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          ctrl.isLoggedIn = userInfo.isLoggedIn();
+        });
         LoaderService.showLoadingScreen('Loading');
         var topicUrlFragment = (
           UrlService.getTopicUrlFragmentFromLearnerUrl());

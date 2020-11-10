@@ -108,6 +108,7 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-topic-meta-tag-content-label'));
   var easyRubricDifficulty = element(
     by.css('.protractor-test-skill-difficulty-easy'));
+  var storyTitleClassname = '.protractor-test-story-title';
 
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -393,6 +394,17 @@ var TopicEditorPage = function() {
       storyListTable, 'Story list table takes too long to appear.');
     var storyItem = await storyListItems.get(index);
     await storyItem.click();
+    await waitFor.pageToFullyLoad();
+    await waitFor.invisibilityOf(
+      storyListTable, 'Story list table too long to disappear.');
+  };
+
+  this.navigateToStoryWithTitle = async function(storyName) {
+    await waitFor.visibilityOf(
+      storyListTable, 'Story list table takes too long to appear.');
+    var storyItem = element(
+      by.cssContainingText(storyTitleClassname, storyName));
+    await action.click('Story Item', storyItem);
     await waitFor.pageToFullyLoad();
     await waitFor.invisibilityOf(
       storyListTable, 'Story list table too long to disappear.');

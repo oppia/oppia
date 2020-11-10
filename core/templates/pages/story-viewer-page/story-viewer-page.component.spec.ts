@@ -36,7 +36,8 @@ describe('Story Viewer Page component', function() {
   var assetsBackendApiService = null;
   var storyViewerBackendApiService = null;
   var urlService = null;
-
+  var userService = null;
+  var mockWindow = null;
   var storyPlaythrough = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -52,12 +53,23 @@ describe('Story Viewer Page component', function() {
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    mockWindow = {
+      location: {
+        reload: jasmine.createSpy('reload', () => {})
+      }
+    };
+
+    $provide.value('$window', mockWindow);
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     alertsService = $injector.get('AlertsService');
     assetsBackendApiService = $injector.get('AssetsBackendApiService');
     urlService = $injector.get('UrlService');
+    userService = $injector.get('UserService');
 
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and
       .returnValue('thumbnail-url');
@@ -67,6 +79,11 @@ describe('Story Viewer Page component', function() {
       'clasroom_1');
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
       'story_1');
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
+    spyOn(userService, 'getLoginUrlAsync').and.returnValue($q.resolve('/home'));
+
 
     ctrl = $componentController('storyViewerPage', {
       $rootScope: $rootScope,
@@ -184,6 +201,13 @@ describe('Story Viewer Page component', function() {
       thumbnailIconUrl: 'thumbnail-url',
       thumbnailBgColor: '#000'
     }]);
+  });
+
+  it('should sign in correctly', function() {
+    expect(mockWindow.location).not.toEqual('/home');
+    ctrl.signIn();
+    $rootScope.$apply();
+    expect(mockWindow.location).toEqual('/home');
   });
 
   it('should show warning when fetching story data fails', function() {
