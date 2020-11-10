@@ -290,6 +290,10 @@ jobs:
           name: Run e2e topic and story editor test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
+      - run:
+          name: Run e2e topic and story viewer test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer"
 
 notify:
   webhooks:
