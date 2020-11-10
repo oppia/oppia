@@ -928,12 +928,14 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             observed_log_messages,
             [
-                'The commit log model \'CollectionCommitLogEntryModel\' and '
+                '[WIPEOUT] The commit log model '
+                '\'CollectionCommitLogEntryModel\' and '
                 'snapshot models [\'CollectionSnapshotMetadataModel\', '
                 '\'CollectionRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
                 'commit logs without snapshots: [u\'%s\'].' % self.COL_2_ID,
-                'The commit log model \'ExplorationCommitLogEntryModel\' and '
+                '[WIPEOUT] The commit log model '
+                '\'ExplorationCommitLogEntryModel\' and '
                 'snapshot models [\'ExplorationSnapshotMetadataModel\', '
                 '\'ExplorationRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
@@ -1332,7 +1334,8 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             observed_log_messages,
             [
-                'The commit log model \'ExplorationCommitLogEntryModel\' and '
+                '[WIPEOUT] The commit log model '
+                '\'ExplorationCommitLogEntryModel\' and '
                 'snapshot models [\'ExplorationSnapshotMetadataModel\', '
                 '\'ExplorationRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
@@ -2197,9 +2200,9 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             observed_log_messages,
-            ['The commit log model \'QuestionCommitLogEntryModel\' and '
-             'snapshot models [\'QuestionSnapshotMetadataModel\'] IDs differ. '
-             'Snapshots without commit logs: [], '
+            ['[WIPEOUT] The commit log model \'QuestionCommitLogEntryModel\' '
+             'and snapshot models [\'QuestionSnapshotMetadataModel\'] IDs '
+             'differ. Snapshots without commit logs: [], '
              'commit logs without snapshots: [u\'%s\'].' % self.QUESTION_2_ID])
 
         # Verify user is deleted.
@@ -2595,7 +2598,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             observed_log_messages,
-            ['The commit log model \'SkillCommitLogEntryModel\' and '
+            ['[WIPEOUT] The commit log model \'SkillCommitLogEntryModel\' and '
              'snapshot models [\'SkillSnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
              'commit logs without snapshots: [u\'%s\'].' % self.SKILL_2_ID])
@@ -2907,7 +2910,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             observed_log_messages,
-            ['The commit log model \'StoryCommitLogEntryModel\' and '
+            ['[WIPEOUT] The commit log model \'StoryCommitLogEntryModel\' and '
              'snapshot models [\'StorySnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
              'commit logs without snapshots: [u\'%s\'].' % self.STORY_2_ID])
@@ -3234,8 +3237,8 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             observed_log_messages,
-            ['The commit log model \'SubtopicPageCommitLogEntryModel\' and '
-             'snapshot models [\'SubtopicPageSnapshotMetadataModel\'] '
+            ['[WIPEOUT] The commit log model \'SubtopicPageCommitLogEntryModel\''
+             ' and snapshot models [\'SubtopicPageSnapshotMetadataModel\'] '
              'IDs differ. Snapshots without commit logs: [], '
              'commit logs without snapshots: [u\'%s\'].' % self.SUBTOP_2_ID])
 
@@ -3797,8 +3800,8 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             observed_log_messages,
             [
-                'The commit log model \'TopicCommitLogEntryModel\' and '
-                'snapshot models [\'TopicSnapshotMetadataModel\', '
+                '[WIPEOUT] The commit log model \'TopicCommitLogEntryModel\' '
+                'and snapshot models [\'TopicSnapshotMetadataModel\', '
                 '\'TopicRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
                 'commit logs without snapshots: [u\'%s\'].' % self.TOP_2_ID

@@ -190,7 +190,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             user_services.get_username(user_id),
-            user_services.USER_IDENTIFICATION_FOR_USER_BEING_DELETED)
+            user_services.LABEL_FOR_USER_BEING_DELETED)
 
     def test_get_username_none(self):
         user_id = user_services.create_new_user(
@@ -2090,7 +2090,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             ['nonexistent_id'], strict=False)
         self.assertEqual(
             user_ids,
-            [user_services.USER_IDENTIFICATION_FOR_USER_BEING_DELETED])
+            [user_services.LABEL_FOR_USER_BEING_DELETED])
 
     def test_created_on_gets_updated_correctly(self):
         # created_on should not be updated upon updating other attributes of

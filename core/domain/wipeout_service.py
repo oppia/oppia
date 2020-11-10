@@ -47,9 +47,10 @@ import python_utils
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
 
-current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
+
+WIPEOUT_LOGS_PREFIX = '[WIPEOUT]'
 
 
 def get_pending_deletion_request(user_id):
@@ -343,8 +344,8 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
                 and model_class.has_reference_to_user_id(user_id)
         ):
             logging.error(
-                '%s is not deleted for user with ID %s' % (
-                    model_class.__name__, user_id))
+                '%s %s is not deleted for user with ID %s' % (
+                    WIPEOUT_LOGS_PREFIX, model_class.__name__, user_id))
             user_is_verified = False
     return user_is_verified
 
@@ -581,17 +582,19 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
             for model in commit_log_models)
         if snapshot_metadata_ids != commit_log_ids:
             logging.error(
-                'The commit log model \'%s\' and snapshot models %s IDs '
+                '%s The commit log model \'%s\' and snapshot models %s IDs '
                 'differ. Snapshots without commit logs: %s, '
-                'commit logs without snapshots: %s.',
-                commit_log_model_class.__name__,
-                [
-                    snapshot_metadata_model_class.__name__
-                    for snapshot_metadata_model_class
-                    in snapshot_metadata_model_classes
-                ],
-                list(snapshot_metadata_ids - commit_log_ids),
-                list(commit_log_ids - snapshot_metadata_ids)
+                'commit logs without snapshots: %s.' % (
+                    WIPEOUT_LOGS_PREFIX,
+                    commit_log_model_class.__name__,
+                    [
+                        snapshot_metadata_model_class.__name__
+                        for snapshot_metadata_model_class
+                        in snapshot_metadata_model_classes
+                    ],
+                    list(snapshot_metadata_ids - commit_log_ids),
+                    list(commit_log_ids - snapshot_metadata_ids)
+                )
             )
     model_ids = snapshot_metadata_ids | commit_log_ids
 
