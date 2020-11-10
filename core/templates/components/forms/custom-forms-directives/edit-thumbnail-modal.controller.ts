@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ThumbnailDisplayComponent } from "./thumbnail-display.component";
+
 /**
  * @fileoverview Controller for edit thumbnail modal.
  */
@@ -19,6 +21,9 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/forms/custom-forms-directives/' +
+  'thumbnail-display.component.ts');
 
 require('services/image-upload-helper.service.ts');
 

@@ -75,6 +75,7 @@ import { ThumbnailDisplayComponent } from
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TranslatePipe
   ],
 
@@ -102,6 +103,7 @@ import { ThumbnailDisplayComponent } from
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TranslatePipe
   ],
 })

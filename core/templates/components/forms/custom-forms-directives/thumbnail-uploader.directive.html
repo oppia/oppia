@@ -11,17 +11,23 @@
       </i>
       <thumbnail-display ng-show="!thumbnailIsLoading"
                         [source]="editableThumbnailDataUrl"
+                        [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                         [background]="getBgColor()">
+      </thumbnail-display>
+      <thumbnail-display 
+        ng-if="useLocalStorage && newThumbnailDataUrl"
+        [source]="newThumbnailDataUrl"
+        [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+        [background]="localStorageBgcolor">
       </thumbnail-display>
       <!-- <img ng-show="!thumbnailIsLoading"
            ng-src="<[editableThumbnailDataUrl]>"
            class="img-thumbnail protractor-test-custom-photo"
            ng-style="{background: getBgColor()}"> -->
-
-      <img ng-if="useLocalStorage && newThumbnailDataUrl"
+      <!-- <img ng-if="useLocalStorage && newThumbnailDataUrl"
            ng-src="<[newThumbnailDataUrl]>"
            ng-style="{background: localStorageBgcolor}"
-           class="img-thumbnail protractor-test-custom-photo">
+           class="img-thumbnail protractor-test-custom-photo"> -->
     </div>
   </div>
 </div>
