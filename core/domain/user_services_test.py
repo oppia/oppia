@@ -2074,7 +2074,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id='unregistered_user_id',
             email='user@example.com',
-            username='').put()
+            username=''
+        ).put()
 
         user_ids = user_services.get_human_readable_user_ids(
             [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
@@ -2086,10 +2087,15 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_get_human_readable_user_ids_with_nonexistent_id_non_strict_passes(
             self):
-        user_ids = user_services.get_human_readable_user_ids(
-            ['nonexistent_id'], strict=False)
+        user_id = (
+            user_services.create_new_user('gae_id', 'user@example.com').user_id)
+        user_services.set_username(user_id, 'username')
+        user_services.mark_user_for_deletion(user_id)
+        human_readable_user_ids = user_services.get_human_readable_user_ids(
+            [user_id], strict=False)
+
         self.assertEqual(
-            user_ids,
+            human_readable_user_ids,
             [user_services.LABEL_FOR_USER_BEING_DELETED])
 
     def test_created_on_gets_updated_correctly(self):
