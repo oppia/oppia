@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,25 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to wrap the window object.
+ * @fileoverview Constants for the story viewer domain.
  */
 
-import { Injectable } from '@angular/core';
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { StoryViewerDomainConstants } from
+  'domain/story_viewer/story-viewer-domain.constants';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class WindowRef {
-  /**
-  * @returns The global native browser window object.
-  */
-  _window(): Window {
-    return window;
-  }
-  /**
-  * @returns The global native browser window object.
-  */
-  get nativeWindow(): Window {
-    return this._window();
-  }
-}
+angular.module('oppia').constant(
+  'STORY_PROGRESS_URL_TEMPLATE',
+  StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE);

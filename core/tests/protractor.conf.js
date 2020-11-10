@@ -149,6 +149,10 @@ var suites = {
       'protractor_desktop/skillEditor.js'
     ],
 
+    topicAndStoryViewer: [
+      'protractor_desktop/topicAndStoryViewer.js'
+    ],
+
     users: [
       'protractor_desktop/userJourneys.js',
     ],

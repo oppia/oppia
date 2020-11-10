@@ -290,6 +290,10 @@ jobs:
           name: Run e2e topic and story editor test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
+      - run:
+          name: Run e2e topic and story viewer test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer"
       # Feature Gating test suites must run in non-production environment because
       # the dummy_feature being used must not be enabled in production environment.
       - run:
