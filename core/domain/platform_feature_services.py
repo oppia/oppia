@@ -105,19 +105,19 @@ def evaluate_all_feature_flag_values_for_client(context):
         ALL_FEATURES_NAMES_SET, context)
 
 
-def is_feature_enabled(feature_name):
+def is_feature_enabled(feature_name, user_id):
     """A short-form method for server-side usage. This method evaluates and
     returns the values of the feature flag, using context from the server only.
 
     Args:
         feature_name: str. The name of the feature flag that needs to
             be evaluated.
+        user_id: str. The id of the user with which to evaluate the flag.
 
     Returns:
         bool. The value of the feature flag, True if it's enabled.
     """
-    user_settings = user_services.get_user_settings_by_gae_id(
-        current_user_services.get_current_gae_id())
+    user_settings = user_services.get_user_settings(user_id)
     return _evaluate_feature_flag_value_for_server(feature_name, user_settings)
 
 
