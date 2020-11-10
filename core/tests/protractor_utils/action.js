@@ -36,7 +36,7 @@ var getText = async function(elementName, textElement) {
   await waitFor.visibilityOf(
     textElement, `${elementName} is not visible.`);
   return await textElement.getText();
-}
+};
 
 var select = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);

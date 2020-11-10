@@ -40,7 +40,7 @@ var ContributorDashboardTranslateTextTab = function() {
 
   var _selectLanguage = async function(language) {
     await _openLanguageSelector();
-    var selectorOption = selectorContainer.element(
+    var languageOptionElement = selectorContainer.element(
       by.cssContainingText(
         '.protractor-test-language-selector-option',
         language
@@ -86,7 +86,8 @@ var ContributorDashboardTranslateTextTab = function() {
   };
 
   this.expectSelectedLanguageToBe = async function(language) {
-    var text = action.getText('Selected language element', selectedLanguageElement);
+    var text = action.getText(
+      'Selected language element', selectedLanguageElement);
     expect(text).toMatch(language);
   };
 };
