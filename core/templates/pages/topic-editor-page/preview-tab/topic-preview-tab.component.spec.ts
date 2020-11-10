@@ -19,16 +19,18 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { EditableStoryBackendApiService } from
-  'domain/story/editable-story-backend-api.service';
-import { StorySummary} from
-  'domain/story/story-summary.model';
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
+import { StorySummary} from 'domain/story/story-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Topic preview tab', function() {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
   var TopicEditorStateService = null;
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     TestBed.configureTestingModule({

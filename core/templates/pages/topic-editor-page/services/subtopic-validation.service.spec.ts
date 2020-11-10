@@ -23,6 +23,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 
 describe('Subtopic validation service', function() {
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();

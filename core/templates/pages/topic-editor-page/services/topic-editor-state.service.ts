@@ -36,12 +36,12 @@ import { StorySummary } from 'domain/story/story-summary.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 
 angular.module('oppia').factory('TopicEditorStateService', [
-  'AlertsService',
+  '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
   'RubricObjectFactory', 'SubtopicPageObjectFactory',
   'TopicObjectFactory', 'TopicRightsBackendApiService', 'UndoRedoService',
   function(
-      AlertsService,
+      $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
       RubricObjectFactory, SubtopicPageObjectFactory, TopicObjectFactory,
       TopicRightsBackendApiService, UndoRedoService) {
@@ -198,6 +198,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
+                $rootScope.$applyAsync();
               });
           },
           function(error) {
@@ -255,6 +256,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           topicId, subtopicId).then(
           function(newBackendSubtopicPageObject) {
             _updateSubtopicPage(newBackendSubtopicPageObject);
+            $rootScope.$applyAsync();
           },
           function(error) {
             AlertsService.addWarning(
@@ -448,6 +450,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             if (successCallback) {
               successCallback();
             }
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the topic.');
@@ -494,6 +497,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             if (successCallback) {
               successCallback();
             }
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error ||
@@ -519,6 +523,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             if (successCallback) {
               successCallback();
             }
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error ||

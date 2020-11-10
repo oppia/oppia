@@ -16,18 +16,19 @@
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
-
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
 import { EventEmitter } from '@angular/core';
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Topics List Directive', function() {
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
   var $q = null;
-  var $httpBackend = null;
   var $rootScope = null;
   var directive = null;
   var AlertsService = null;
@@ -36,19 +37,29 @@ describe('Topics List Directive', function() {
   var tasdReinitializedSpy = null;
   var testSubscription = null;
 
+  var httpTestingController = null;
+
   var MockTopicsAndSkillsDashboardBackendApiService = {
     get onTopicsAndSkillsDashboardReinitialized() {
       return mockTasdReinitializedEventEmitter;
     }
   };
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
 
   beforeEach(angular.mock.inject(function($injector) {
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
     directive = $injector.get('topicsListDirective')[0];
     $q = $injector.get('$q');
     AlertsService = $injector.get('AlertsService');
@@ -75,6 +86,7 @@ describe('Topics List Directive', function() {
 
   afterEach(() => {
     testSubscription.unsubscribe();
+    httpTestingController.verify();
   });
 
   it('should init the controller', function() {
@@ -144,21 +156,26 @@ describe('Topics List Directive', function() {
   });
 
   it('should reinitialize the page after successfully deleting the topic',
-    function() {
+    fakeAsync(() => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
 
       var topicId = 'CdjnJUE332dd';
       var url = `/topic_editor_handler/data/${topicId}`;
-      $httpBackend.expectDELETE(url).respond(200);
       ctrl.deleteTopic(topicId);
+      $scope.$apply();
 
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(url);
+      expect(req.request.method).toEqual('DELETE');
+      req.flush({ status: 200 });
+
+      flushMicrotasks();
+
       expect(tasdReinitializedSpy).toHaveBeenCalled();
-    });
+    }));
 
-  it('should show the warning if deleting a topic failed', function() {
+  it('should show the warning if deleting a topic failed', fakeAsync(() => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
@@ -166,11 +183,20 @@ describe('Topics List Directive', function() {
 
     var topicId = 'CdjnJUE332dd';
     var url = '/topic_editor_handler/data/CdjnJUE332dd';
-    $httpBackend.expectDELETE(url).respond(400);
+
     ctrl.deleteTopic(topicId);
-    $httpBackend.flush();
+    $scope.$apply();
+
+    let req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('DELETE');
+    req.flush('There was an error when deleting the topic.', {
+      status: 400,
+      statusText: 'There was an error when deleting the topic.'
+    });
+
+    flushMicrotasks();
 
     expect(alertSpy).toHaveBeenCalledWith(
       'There was an error when deleting the topic.');
-  });
+  }));
 });

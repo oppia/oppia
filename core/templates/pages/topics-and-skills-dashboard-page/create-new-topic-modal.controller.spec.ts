@@ -25,6 +25,8 @@ import { NewlyCreatedTopic } from
   'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
 describe('Create new topic modal', function() {
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();

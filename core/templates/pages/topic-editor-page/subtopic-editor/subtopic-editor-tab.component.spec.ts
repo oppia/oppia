@@ -22,6 +22,8 @@ import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Subtopic editor tab', function() {
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();

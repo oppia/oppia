@@ -39,7 +39,7 @@ describe('Skills List Directive', function() {
   var $rootScope = null;
   var directive = null;
   var $timeout = null;
-  var EditableTopicBackendApiService = null;
+  var editableTopicBackendApiService = null;
   var SkillBackendApiService = null;
 
   var mockTasdReinitializedEventEmitter;
@@ -65,7 +65,7 @@ describe('Skills List Directive', function() {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
 
-    EditableTopicBackendApiService =
+    editableTopicBackendApiService =
         $injector.get('EditableTopicBackendApiService');
     SkillBackendApiService = $injector.get('SkillBackendApiService');
     directive = $injector.get('skillsListDirective')[0];
@@ -210,7 +210,7 @@ describe('Skills List Directive', function() {
       var skillId = 'CdjnJUE332dd';
 
       var topicUpdateSpy = (spyOn(
-        EditableTopicBackendApiService, 'updateTopic').and.returnValue(
+        editableTopicBackendApiService, 'updateTopic').and.returnValue(
         $q.resolve()));
 
       ctrl.assignSkillToTopic(skillId);
