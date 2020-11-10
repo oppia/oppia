@@ -30,6 +30,7 @@ angular.module('oppia').factory('UserService', [
 
     var userInfo = null;
     var userContributionRightsInfo = null;
+    var returnUrl = '';
 
     var getUserInfoAsync = function() {
       if (UrlService.getPathname() === '/signup') {
@@ -76,9 +77,12 @@ angular.module('oppia').factory('UserService', [
           data: newProfileImageDataUrl
         });
       },
+      setReturnUrl: function(newReturnUrl) {
+        returnUrl = newReturnUrl;
+      },
       getLoginUrlAsync: function() {
         var urlParameters = {
-          current_url: $window.location.pathname
+          current_url: returnUrl || $window.location.pathname
         };
         return $http.get('/url_handler', {params: urlParameters}).then(
           function(response) {
