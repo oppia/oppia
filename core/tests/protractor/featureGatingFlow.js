@@ -46,7 +46,7 @@ describe('Feature Gating Flow', function() {
   let adminPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage();
+    adminPage = new AdminPage.AdminPage();
     await users.createUser(ADMIN_USER1_EMAIL, ADMIN_USERNAME1);
     await users.createUser(ADMIN_USER2_EMAIL, ADMIN_USERNAME2);
   });
