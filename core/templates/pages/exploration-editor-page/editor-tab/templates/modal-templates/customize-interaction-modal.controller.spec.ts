@@ -359,7 +359,7 @@ describe('Customize Interaction Modal Controller', function() {
         $scope.$apply();
         expect($uibModalInstance.dismiss).not.toHaveBeenCalledWith('cancel');
 
-        angular.element(document.querySelector(".modal-title")).remove();
+        angular.element(document.querySelector('.modal-title')).remove();
       }
     );
   });
