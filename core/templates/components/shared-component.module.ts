@@ -53,6 +53,8 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { ThumbnailDisplayComponent } from
+  './forms/custom-forms-directives/thumbnail-display.component';
 
 
 @NgModule({
@@ -86,7 +88,8 @@ import { ProfileLinkTextComponent } from
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    ThumbnailDisplayComponent
   ],
 
   exports: [
