@@ -36,8 +36,7 @@ require(
 require(
   'pages/exploration-player-page/learner-experience/' +
   'continue-button.component.ts');
-  
-  
+
 angular.module('oppia').directive('supplementalCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
