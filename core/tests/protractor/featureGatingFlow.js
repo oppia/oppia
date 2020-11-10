@@ -16,7 +16,7 @@
  * @fileoverview End-to-end tests to login, enable feature and re-login.
  */
 
-const { AdminPage } = require('../protractor_utils/AdminPage.js');
+const AdminPage = require('../protractor_utils/AdminPage.js');
 const general = require('../protractor_utils/general.js');
 const users = require('../protractor_utils/users.js');
 
