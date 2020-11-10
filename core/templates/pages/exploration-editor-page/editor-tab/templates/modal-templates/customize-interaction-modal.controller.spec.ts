@@ -49,6 +49,7 @@ import { SubtitledUnicode } from
 describe('Customize Interaction Modal Controller', function() {
   var $injector = null;
   var $scope = null;
+  var $uibModal = null;
   var $uibModalInstance = null;
   var imageClickInputValidationService = null;
   var editorFirstTimeEventsService = null;
@@ -96,6 +97,8 @@ describe('Customize Interaction Modal Controller', function() {
       $injector = _$injector_;
       var $rootScope = $injector.get('$rootScope');
 
+      $uibModalInstance = jasmine.createSpyObj('$uibModal', ['open']);
+
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
@@ -114,6 +117,7 @@ describe('Customize Interaction Modal Controller', function() {
       $controller('CustomizeInteractionModalController', {
         $injector: $injector,
         $scope: $scope,
+        $uibModal: $uibModal,
         $uibModalInstance: $uibModalInstance,
         EditorFirstTimeEventsService: editorFirstTimeEventsService,
         imageClickInputValidationService: imageClickInputValidationService,
