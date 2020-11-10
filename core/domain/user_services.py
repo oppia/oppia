@@ -636,7 +636,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
         strict: bool. Whether to fail noisily if one or more user IDs don't
             exist in the datastore. Defaults to False.
         include_marked_deleted: bool. Whether to included users that are being
-            deleted.
+            deleted. This should be deleted only for retrieving the usernames.
 
     Returns:
         list(UserSettings|None). The UserSettings domain objects corresponding
@@ -664,6 +664,8 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
+            if model is not None and model.deleted:
+                model.username = USERNAME_FOR_USER_BEING_DELETED
             result.append(
                 _get_user_settings_from_model(model)
                 if model is not None else None
@@ -1646,8 +1648,6 @@ def get_usernames(user_ids, strict=False):
         if user_settings:
             usernames[non_system_user_indices[index]] = (
                 user_settings.username
-                if not user_settings.deleted
-                else USERNAME_FOR_USER_BEING_DELETED
             )
 
     return usernames
