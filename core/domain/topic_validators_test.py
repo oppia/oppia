@@ -170,8 +170,8 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for current time check of '
                 'TopicModel\', '
-                '[u\'Entity id %s: The last_updated field has a '
-                'value %s which is greater than the time when the job was run\']]'
+                '[u\'Entity id %s: The last_updated field has a value '
+                '%s which is greater than the time when the job was run\']]'
             ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
         ]
 
