@@ -73,15 +73,11 @@ var CreatorDashboardPage = function() {
   };
 
   this.navigateToExplorationEditor = async function() {
-    await waitFor.elementToBeClickable(explorationDashboardCard);
     await action.click('Exploration Dashboard Card', explorationDashboardCard);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickCreateActivityButton = async function() {
-    await waitFor.elementToBeClickable(
-      createActivityButton,
-      'Create Activity button takes too long to be clickable');
     await action.click('Create Activity Button', createActivityButton);
     await waitFor.pageToFullyLoad();
   };
@@ -89,43 +85,28 @@ var CreatorDashboardPage = function() {
   this.clickCreateCollectionButton = async function() {
     await waitFor.visibilityOf(
       activityCreationModal, 'Activity Creation modal is not visible');
-    await waitFor.elementToBeClickable(
-      createCollectionButton,
-      'Create Collection button takes too long to be clickable');
     await action.click('Create Collection Button', createCollectionButton);
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(collectionEditorContainer);
   };
 
   this.clickCreateExplorationButton = async function() {
-    await waitFor.elementToBeClickable(
-      createExplorationButton,
-      'Create Exploration button takes too long to be clickable');
     await action.click('Create Exploration Button', createExplorationButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickCreateNewExplorationButton = async function() {
-    await waitFor.elementToBeClickable(
-      createNewExplorationButton,
-      'Create Exploration button on the creator' +
-      'dashboard page takes too long to be clickable');
-    await action.click('Create New Exploration Button', createNewExplorationButton);
+    await action.click('Create New Exploration Button', 
+    createNewExplorationButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToCollectionEditor = async function() {
-    await waitFor.elementToBeClickable(
-      collectionCard,
-      'Collection Card tab takes too long to be clickable');
     await action.click('Collection Card', collectionCard);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToSubscriptionDashboard = async function() {
-    await waitFor.elementToBeClickable(
-      subscriptionTab,
-      'Subscription Dashboard tab takes too long to be clickable');
     await action.click('Subscription Tab', subscriptionTab);
     await waitFor.pageToFullyLoad();
   };
@@ -138,9 +119,6 @@ var CreatorDashboardPage = function() {
     }
     var explorationElement = elems[0].element(
       by.css('.protractor-test-title-mask'));
-    await waitFor.elementToBeClickable(
-      explorationElement,
-      'Unable to click on exploration: ' + explorationTitle);
     await action.click('Exploration Element', explorationElement);
     await waitFor.pageToFullyLoad();
   };
