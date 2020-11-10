@@ -263,16 +263,8 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
-        try:
-            # If this is a CSRF request and the user is not yet loaded produce
-            # an error. The user might not be loaded due to an eventual
-            # consistency that does not guarantee that the UserAuthDetailsModel
-            # will be returned by a query even when we are sure that the model
-            # was added to the datastore. More info in #10951.
-            if 'csrf' in self.request.uri and self.gae_id and not self.user_id:
-                raise self.UnauthorizedUserException('User details not found.')
-
-            if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+        if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+            try:
                 # If user opens a new tab during signup process, the user_id
                 # parameter is set to None and this causes the signup session
                 # to expire. The code here checks if user is on the signup
@@ -295,11 +287,11 @@ class BaseHandler(webapp2.RequestHandler):
                     raise self.UnauthorizedUserException(
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
-        except Exception as e:
-            logging.error('%s: payload %s', e, self.payload)
+            except Exception as e:
+                logging.error('%s: payload %s', e, self.payload)
 
-            self.handle_exception(e, self.app.debug)
-            return
+                self.handle_exception(e, self.app.debug)
+                return
 
         super(BaseHandler, self).dispatch()
 
