@@ -179,7 +179,8 @@ class ExplorationDisplayableSummariesTest(
             contributors_summary))
 
     def test_get_human_readable_contributors_summary_with_deleted_user(self):
-        contributors_summary = {'nonexistent_id': 10}
+        user_services.mark_user_for_deletion(self.albert_id)
+        contributors_summary = {self.albert_id: 10}
         self.assertEqual(
             {'[User being deleted]': {'num_commits': 10}},
             summary_services.get_human_readable_contributors_summary(

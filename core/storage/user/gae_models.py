@@ -304,7 +304,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
-        """Returns whether or not a given normalized_username is taken.
+        """Returns whether or not a given normalized_username is taken or was
+        used by some deleted user.
 
         Args:
             normalized_username: str. The given user's normalized username.
@@ -312,8 +313,15 @@ class UserSettingsModel(base_models.BaseModel):
         Returns:
             bool. Whether the normalized_username has already been taken.
          """
-        return bool(cls.get_all().filter(
-            cls.normalized_username == normalized_username).get())
+        return (
+            cls.query().filter(
+                cls.normalized_username == normalized_username
+            ).get() is not None
+            or DeletedUserModel.query().filter(
+                cls.normalized_username == normalized_username
+            ).get() is not None
+        )
+
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
@@ -2507,6 +2515,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # The email of the user.
     email = datastore_services.StringProperty(required=True, indexed=True)
+    # Normalized username of the deleted user. May be None in the cases when
+    # the user was deleted after a short time and thus the username wasn't that
+    # known in the codebase.
+    normalized_username = datastore_services.StringProperty(indexed=True)
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
     role = datastore_services.StringProperty(required=True, indexed=True)
@@ -2588,6 +2600,11 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 class DeletedUserModel(base_models.BaseModel):
     """Model for storing deleted user IDs."""
 
+    # Normalized username of the deleted user. May be None in the cases when
+    # the user was deleted after a short time and thus the username wasn't that
+    # known in the codebase.
+    normalized_username = datastore_services.StringProperty(indexed=True)
+
     @staticmethod
     def get_deletion_policy():
         """DeletedUserModel contains only IDs that were deleted."""
@@ -2614,7 +2631,6 @@ class DeletedUserModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
 
 class PseudonymizedUserModel(base_models.BaseModel):
     """Model for storing pseudonymized user IDs."""

@@ -67,6 +67,7 @@ def get_pending_deletion_request(user_id):
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
+        pending_deletion_request_model.normalized_username,
         pending_deletion_request_model.role,
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.pseudonymizable_entity_mappings
@@ -101,6 +102,7 @@ def save_pending_deletion_requests(pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {
             'email': deletion_request.email,
+            'normalized_username': deletion_request.normalized_username,
             'role': deletion_request.role,
             'deletion_complete': deletion_request.deletion_complete,
             'pseudonymizable_entity_mappings': (
@@ -166,6 +168,8 @@ def pre_delete_user(user_id):
             user_id, False, False, False, False)
 
     user_services.mark_user_for_deletion(user_id)
+    normalized_username = None
+    if
     pending_deletion_requests.append(
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id, user_settings.email, user_settings.role
