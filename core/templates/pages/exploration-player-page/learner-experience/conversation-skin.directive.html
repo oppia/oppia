@@ -48,11 +48,11 @@
                            is-learn-again-button="isLearnAgainButton()">
         </supplemental-card>
       </div>
-      <div ng-if="canAskLearnerForAnswerInfo()">
+      <div ng-if="getCanAskLearnerForAnswerInfo()">
         <learner-answer-info-card submit-answer="submitAnswer">
         </learner-answer-info-card>
       </div>
-      <div ng-if="!canAskLearnerForAnswerInfo()">
+      <div ng-if="!getCanAskLearnerForAnswerInfo()">
         <progress-nav on-submit="submitAnswerFromProgressNav()"
                       is-learn-again-button="isLearnAgainButton()"
                       submit-button-is-disabled="isSubmitButtonDisabled()"
@@ -82,7 +82,7 @@
                          displayed-card="displayedCard"
                          is-learn-again-button="isLearnAgainButton()">
       </supplemental-card>
-      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !canAskLearnerForAnswerInfo()">
+      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
         <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                    ng-click="submitAnswerFromProgressNav()"
                    ng-disabled="isSubmitButtonDisabled()"
