@@ -190,7 +190,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             user_services.get_username(user_id),
-            user_services.LABEL_FOR_USER_BEING_DELETED)
+            user_services.USERNAME_FOR_USER_BEING_DELETED)
 
     def test_get_username_none(self):
         user_id = user_services.create_new_user(
