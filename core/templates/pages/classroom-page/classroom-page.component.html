@@ -17,7 +17,7 @@
     <div ng-repeat="topicSummary in $ctrl.classroomData.getTopicSummaries()" class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
       <topic-summary-tile topic-summary="topicSummary"
                           classroom-url-fragment="$ctrl.classroomUrlFragment"
-                          published="topicSummary.isPublished">
+                          published="topicSummary.isTopicPublished()">
       </topic-summary-tile>
     </div>
   </div>
