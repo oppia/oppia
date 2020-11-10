@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
-import { StorySummary } from 'domain/story/story-summary.model';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
+import { StorySummary} from
+  'domain/story/story-summary.model';
 
 describe('Topic preview tab', function() {
   var ctrl = null;
@@ -24,7 +30,17 @@ describe('Topic preview tab', function() {
   var $scope = null;
   var TopicEditorStateService = null;
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [EditableStoryBackendApiService]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
+  }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');

@@ -1181,6 +1181,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_supports_android(self, 'NumericInput')
         _verify_interaction_supports_android(self, 'TextInput')
         _verify_interaction_supports_android(self, 'NumericExpressionInput')
+        _verify_interaction_supports_android(self, 'RatioExpressionInput')
         _verify_interaction_supports_android(self, None)
 
         _verify_interaction_does_not_support_android(self, 'CodeRepl')
@@ -1189,8 +1190,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_does_not_support_android(self, 'LogicProof')
         _verify_interaction_does_not_support_android(self, 'MusicNotesInput')
         _verify_interaction_does_not_support_android(self, 'PencilCodeEditor')
-        _verify_interaction_does_not_support_android(
-            self, 'RatioExpressionInput')
         _verify_interaction_does_not_support_android(self, 'SetInput')
 
         _verify_all_interaction_ids_checked(self)
