@@ -53,6 +53,7 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { LearnerDashboardSuggestionModalComponent } from 'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component';
 
 
 @NgModule({
@@ -70,6 +71,7 @@ import { ProfileLinkTextComponent } from
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
+    LearnerDashboardSuggestionModalComponent,
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
@@ -82,6 +84,7 @@ import { ProfileLinkTextComponent } from
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
+    LearnerDashboardSuggestionModalComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -97,6 +100,7 @@ import { ProfileLinkTextComponent } from
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     SharingLinksComponent,
+    LearnerDashboardSuggestionModalComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     TranslatePipe

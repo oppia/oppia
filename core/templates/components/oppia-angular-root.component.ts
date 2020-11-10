@@ -486,6 +486,9 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from 'services/translate.service';
+import { LearnerDashboardSuggestionModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component';
 
 @Component({
   selector: 'oppia-angular-root',
@@ -494,7 +497,8 @@ import { TranslateService } from 'services/translate.service';
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
-
+  static learnerDashboardSuggestionModalComponent:
+    LearnerDashboardSuggestionModalComponent;
   static adminBackendApiService: AdminBackendApiService;
   static adminDataService: AdminDataService;
   static adminRouterService: AdminRouterService;
@@ -786,6 +790,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
 
   constructor(
+    private learnerDashboardSuggestionModalComponent:
+      LearnerDashboardSuggestionModalComponent,
     private adminBackendApiService: AdminBackendApiService,
 private adminDataService: AdminDataService,
 private adminRouterService: AdminRouterService,
@@ -1080,6 +1086,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
   ) {}
 
   public ngAfterViewInit(): void {
+    OppiaAngularRootComponent.learnerDashboardSuggestionModalComponent = (
+      this.learnerDashboardSuggestionModalComponent);
     OppiaAngularRootComponent.adminBackendApiService = (
       this.adminBackendApiService);
     OppiaAngularRootComponent.adminDataService = this.adminDataService;

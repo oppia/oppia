@@ -63,7 +63,7 @@ describe('Learner dashboard page', function() {
 
   importAllAngularServices();
 
-  describe('when succesfully fetching learner dashboard data', function() {
+  fdescribe('when succesfully fetching learner dashboard data', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
@@ -691,7 +691,7 @@ describe('Learner dashboard page', function() {
         expect(ctrl.messageSendingInProgress).toBe(false);
       });
 
-    it('should show new and old content when opening suggestion modal',
+    fit('should show new and old content when opening suggestion modal',
       function() {
         spyOn(SuggestionModalForLearnerDashboardService, 'showSuggestionModal')
           .and.callThrough();
