@@ -50,6 +50,7 @@ describe('Customize Interaction Modal Controller', function() {
   var $injector = null;
   var $scope = null;
   var $uibModal = null;
+  var $q = null;
   var $uibModalInstance = null;
   var imageClickInputValidationService = null;
   var editorFirstTimeEventsService = null;
@@ -96,8 +97,8 @@ describe('Customize Interaction Modal Controller', function() {
     beforeEach(angular.mock.inject(function(_$injector_, $controller) {
       $injector = _$injector_;
       var $rootScope = $injector.get('$rootScope');
-
-      $uibModalInstance = jasmine.createSpyObj('$uibModal', ['open']);
+      $uibModal = $injector.get('$uibModal');
+      $q = $injector.get('$q');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -327,6 +328,40 @@ describe('Customize Interaction Modal Controller', function() {
       injectorSpy.and.callThrough();
       expect($scope.isSaveInteractionButtonEnabled()).toBe(true);
     });
+
+    it('should open a confirmation modal with resolution', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      $scope.cancelWithConfirm();
+      $scope.$apply();
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+    });
+
+    it('should open a confirmation modal with rejection', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      $scope.cancelWithConfirm();
+      $scope.$apply();
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should not open a new confirmation modal if one is already open',
+      function() {
+        var mockDiv = document.createElement('div');
+        mockDiv.setAttribute('class', 'modal-title');
+        mockDiv.textContent = 'Confirmation Required';
+        var $document = angular.element(document);
+        $document.find('body').append(mockDiv.outerHTML);
+
+        $scope.cancelWithConfirm();
+        $scope.$apply();
+        expect($uibModalInstance.dismiss).not.toHaveBeenCalledWith('cancel');
+
+        angular.element(document.querySelector(".modal-title")).remove();
+      }
+    );
   });
 
   describe('when state editor is not in question mode', function() {
