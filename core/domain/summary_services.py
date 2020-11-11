@@ -86,7 +86,7 @@ def get_human_readable_contributors_summary(contributors_summary):
     """
     contributor_ids = list(contributors_summary.keys())
     contributor_usernames = user_services.get_human_readable_user_ids(
-        contributor_ids)
+        contributor_ids, strict=False)
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],

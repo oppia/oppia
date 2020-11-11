@@ -470,8 +470,7 @@ class UserInfoHandler(base.BaseHandler):
                 'preferred_site_language_code': (
                     user_settings.preferred_site_language_code),
                 'username': user_settings.username,
-                'email': user_services.get_email_from_username(
-                    user_settings.username),
+                'email': user_settings.email,
                 'user_is_logged_in': True
             })
         else:
