@@ -36,7 +36,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
             self,
             user_id,
             email,
-            normalized_username,
+            hashed_normalized_username,
             role,
             deletion_complete,
             pseudonymizable_entity_mappings):
@@ -45,8 +45,8 @@ class PendingDeletionRequest(python_utils.OBJECT):
         Args:
             user_id: str. The ID of the user who is being deleted.
             email: str. The email of the user who is being deleted.
-            normalized_username: str | None. The normalized username of the user
-            who is being deleted. Can be None.
+            hashed_normalized_username: str | None. The hashed normalized
+                username of the user who is being deleted. Can be None.
             role: str. The role of the user who is being related.
             deletion_complete: bool. Whether the deletion is completed.
             pseudonymizable_entity_mappings: dict(str, str). Mapping between
@@ -54,25 +54,27 @@ class PendingDeletionRequest(python_utils.OBJECT):
         """
         self.user_id = user_id
         self.email = email
-        self.normalized_username = normalized_username
+        self.hashed_normalized_username = hashed_normalized_username
         self.role = role
         self.deletion_complete = deletion_complete
         self.pseudonymizable_entity_mappings = pseudonymizable_entity_mappings
 
     @classmethod
-    def create_default(cls, user_id, email, normalized_username, role):
+    def create_default(cls, user_id, email, hashed_normalized_username, role):
         """Creates a PendingDeletionRequest object with default values.
 
         Args:
             user_id: str. The ID of the user who is being deleted.
             email: str. The email of the user who is being deleted.
+            hashed_normalized_username: str | None. The hashed normalized
+                username of the user who is being deleted. Can be None.
             role: str. The role of the user who is being deleted.
 
         Returns:
             PendingDeletionRequest. The default pending deletion request
             domain object.
         """
-        return cls(user_id, email, normalized_username, role, False, {})
+        return cls(user_id, email, hashed_normalized_username, role, False, {})
 
     def validate(self):
         """Checks that the domain object is valid.
