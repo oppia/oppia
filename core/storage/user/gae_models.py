@@ -319,7 +319,9 @@ class UserSettingsModel(base_models.BaseModel):
             cls.query().filter(
                 cls.normalized_username == normalized_username
             ).get() is not None
-            or DeletedUsernameModel.get(hashed_normalized_username) is not None
+            or DeletedUsernameModel.get(
+                hashed_normalized_username, strict=False
+            ) is not None
         )
 
     @classmethod
@@ -2514,10 +2516,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # The email of the user.
     email = datastore_services.StringProperty(required=True, indexed=True)
-    # Hashed normalized username of the deleted user. May be None in the cases
-    # when the user was deleted after a short time and thus the username wasn't
-    # that known in the codebase.
-    hashed_normalized_username = datastore_services.StringProperty(indexed=True)
+    # Normalized username of the deleted user. May be None in the cases when
+    # the user was deleted after a short time and thus the username wasn't that
+    # known in the codebase.
+    normalized_username = datastore_services.StringProperty(indexed=True)
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
     role = datastore_services.StringProperty(required=True, indexed=True)

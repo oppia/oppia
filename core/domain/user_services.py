@@ -1884,6 +1884,22 @@ def mark_user_for_deletion(user_id):
         _save_user_identifiers(user_identifiers)
 
 
+def save_deleted_username(normalized_username):
+    """Save the username of deleted user.
+
+    Args:
+        normalized_username: str. Normalized version of the username to be
+            saved.
+    """
+    hashed_normalized_username = utils.convert_to_hash(
+        normalized_username, user_models.DeletedUsernameModel.ID_LENGTH
+    )
+    deleted_user_model = (
+        user_models.DeletedUsernameModel(id=hashed_normalized_username))
+    deleted_user_model.update_timestamps()
+    deleted_user_model.put()
+
+
 def get_human_readable_user_ids(user_ids, strict=True):
     """Converts the given ids to usernames, or truncated email addresses.
     Requires all users to be known.

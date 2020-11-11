@@ -35,7 +35,6 @@ from core.domain import wipeout_domain
 from core.platform import models
 import feconf
 import python_utils
-import utils
 
 (
     base_models, collection_models, config_models,
@@ -70,8 +69,8 @@ def get_pending_deletion_request(user_id):
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
-        pending_deletion_request_model.normalized_username,
         pending_deletion_request_model.role,
+        pending_deletion_request_model.normalized_username,
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.pseudonymizable_entity_mappings
     )
@@ -174,21 +173,17 @@ def pre_delete_user(user_id):
         datetime.datetime.utcnow() - PERIOD_TO_SAVE_THE_USERNAME)
     user_services.mark_user_for_deletion(user_id)
 
-    hashed_normalized_username = None
-    if user_settings.created_on < date_before_which_username_should_be_saved:
-        hashed_normalized_username = (
-            utils.convert_to_hash(
-                user_settings.normalize_username,
-                user_models.DeletedUsernameModel.ID_LENGTH
-            )
-        )
-
+    normalized_username = (
+        user_settings.normalized_username
+        if user_settings.created_on < date_before_which_username_should_be_saved
+        else None
+    )
     pending_deletion_requests.append(
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
             user_settings.email,
             user_settings.role,
-            hashed_normalized_username=hashed_normalized_username
+            normalized_username=normalized_username
         )
     )
 
@@ -234,10 +229,9 @@ def run_user_deletion_completion(pending_deletion_request):
         user_models.DeletedUserModel(
             id=pending_deletion_request.user_id
         ).put()
-        if pending_deletion_request.hashed_normalized_username is not None:
-            user_models.DeletedUsernameModel(
-                id=pending_deletion_request.hashed_normalized_username
-            ).put()
+        if pending_deletion_request.normalized_username is not None:
+            user_services.save_deleted_username(
+                pending_deletion_request.normalized_username)
         email_manager.send_account_deleted_email(
             pending_deletion_request.user_id, pending_deletion_request.email)
         return wipeout_domain.USER_VERIFICATION_SUCCESS
