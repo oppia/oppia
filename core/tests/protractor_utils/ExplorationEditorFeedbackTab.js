@@ -140,7 +140,7 @@ var ExplorationEditorFeedbackTab = function() {
   this.selectLatestFeedbackThread = async function() {
     await waitFor.visibilityOf(
       await element.all(
-      by.css(suggestionRowClassName)).first(),
+        by.css(suggestionRowClassName)).first(),
         'No feedback messages are visible.');
     var suggestionRowClassNameFirst =
       element.all(by.css(suggestionRowClassName)).first();
