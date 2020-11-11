@@ -89,9 +89,9 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     if old_rating:
         exploration_summary.ratings[python_utils.UNICODE(old_rating)] -= 1
 
+    logging.error('RateExplorationEventHandler.record called')
     event_services.RateExplorationEventHandler.record(
         exploration_id, user_id, new_rating, old_rating)
-    logging.error('RateExplorationEventHandler.record called')
     logging.error(
         'old_rating is None' if old_rating is None
         else 'old_rating: %d' % old_rating)

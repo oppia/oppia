@@ -390,6 +390,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     refreshing.
             """
             logging.error('_refresh_average_ratings called')
+            logging.error('userid %s' % user_id)
             logging.error(
                 'rating is None' if rating is None
                 else 'rating: %d' % rating)
@@ -505,7 +506,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         logging.error('get_dashboard_stats called')
         logging.error(
             'average ratings is None' if average_ratings is None
-            else 'average rating: %d' % average_ratings)
+            else 'average rating: %f' % average_ratings)
 
         return {
             'total_plays': total_plays,
