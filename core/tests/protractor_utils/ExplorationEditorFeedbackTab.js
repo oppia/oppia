@@ -60,8 +60,6 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-    await waitFor.visibilityOf(
-      matchingRow, 'Matching Row is taking too long to appear');
     expect(await matchingRow.isDisplayed()).toBe(true);
     await action.click('Matching Row', matchingRow);
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
