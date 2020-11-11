@@ -52,10 +52,6 @@ angular.module('oppia').factory('HintAndSolutionModalService', [
             index: () => index
           },
           controller: 'DisplayHintModalController'
-        }).result.then(() => {}, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
         });
       },
       displaySolutionModal: function() {
@@ -65,10 +61,6 @@ angular.module('oppia').factory('HintAndSolutionModalService', [
             'hint-and-solution-modal.template.html'),
           backdrop: 'static',
           controller: 'DisplaySolutionModalController'
-        }).result.then(() => {}, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
         });
       },
       displaySolutionInterstitialModal: function() {
