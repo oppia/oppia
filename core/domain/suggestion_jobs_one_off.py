@@ -29,8 +29,9 @@ from core.domain import suggestion_services
 from core.platform import models
 import feconf
 
-(suggestion_models, user_models,) = models.Registry.import_models(
-    [models.NAMES.suggestion, models.NAMES.user])
+(feedback_models, suggestion_models, user_models,) = (
+    models.Registry.import_models(
+        [models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user]))
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -369,3 +370,56 @@ class PopulateContributionStatsOneOffJob(
 
         # Only yield the values from the transactions.
         yield (key_from_transaction, count_value_from_transaction)
+
+
+class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate final_reviewer_id property in the
+    suggestion models which do not have but are expected to have one.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield ('DELETED_MODELS', item.id)
+            return
+
+        if not (item.status in [
+                suggestion_models.STATUS_ACCEPTED,
+                suggestion_models.STATUS_REJECTED] and (
+                    item.final_reviewer_id is None)):
+            yield ('UNCHANGED_MODELS', item.id)
+            return
+
+        message_status = feedback_models.STATUS_CHOICES_FIXED
+        if item.status == suggestion_models.STATUS_REJECTED:
+            message_status = feedback_models.STATUS_CHOICES_IGNORED
+
+        message_model_class = feedback_models.GeneralFeedbackMessageModel
+        message_models = message_model_class.query(
+            message_model_class.thread_id == item.id,
+            message_model_class.updated_status == message_status).fetch()
+
+        if not message_models:
+            yield ('FAILED_NONE_MESSAGE_MODEL', (item.id, item.status))
+            return
+
+        if len(message_models) != 1:
+            yield ('FAILED_MULTIPLE_MESSAGE_MODEL', (item.id, item.status))
+            return
+
+        item.final_reviewer_id = message_models[0].author_id
+
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+        yield ('CHANGED_MODELS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key in ['CHANGED_MODELS', 'UNCHANGED_MODELS', 'DELETED_MODELS']:
+            yield (key, len(values))
+        else:
+            yield (key, values)
