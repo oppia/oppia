@@ -50,10 +50,12 @@ angular.module('oppia').directive('adminPage', [
       controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$scope', 'AdminDataService',
-        'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
+        'AdminRouterService', 'CsrfTokenService', 'PlatformFeatureService',
+        'DEV_MODE',
         function(
             $location, $rootScope, $scope, AdminDataService,
-            AdminRouterService, CsrfTokenService, DEV_MODE) {
+            AdminRouterService, CsrfTokenService, PlatformFeatureService,
+            DEV_MODE) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
@@ -78,6 +80,10 @@ angular.module('oppia').directive('adminPage', [
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the directive is migrated to angular.
             $rootScope.$applyAsync();
+          };
+
+          ctrl.isDummyFeatureEnabled = function() {
+            return PlatformFeatureService.status.DummyFeature.isEnabled;
           };
 
           ctrl.$onInit = function() {

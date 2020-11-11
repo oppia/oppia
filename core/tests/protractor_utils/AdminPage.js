@@ -174,6 +174,78 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.getFeaturesTab = async function() {
+    await this.get();
+    const featuresTab = element(by.css('.protractor-test-admin-features-tab'));
+    await action.click('Admin features tab', featuresTab);
+    const featureFlagElements = element.all(
+      by.css('.protractor-test-feature-flag'));
+    await waitFor.visibilityOf(
+      featureFlagElements.first(), 'Feature flags not showing up');
+  };
+
+  this.getDummyFeatureElement = async function() {
+    const featureFlagElements = element.all(
+      by.css('.protractor-test-feature-flag'));
+
+    const count = await featureFlagElements.count();
+    for (let i = 0; i < count; i++) {
+      const elem = await featureFlagElements.get(i);
+      if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
+          'dummy_feature') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
+  this.removeAllRulesOfFeature = async function(featureElement) {
+    while (!await featureElement.isElementPresent(
+      by.css('.protractor-test-no-rule-indicator'))) {
+      await action.click(
+        'Remove feature rule button',
+        featureElement
+          .element(by.css('.protractor-test-remove-rule-button'))
+      );
+    }
+  };
+
+  this.saveChangeOfFeature = async function(featureElement) {
+    await action.click(
+      'Save feature button',
+      featureElement
+        .element(by.css('.protractor-test-save-button'))
+    );
+
+    await general.acceptAlert();
+    await waitFor.visibilityOf(statusMessage);
+  };
+
+  this.enableFeatureForDev = async function(featureElement) {
+    await this.removeAllRulesOfFeature(featureElement);
+
+    await action.click(
+      'Add feature rule button',
+      featureElement
+        .element(by.css('.protractor-test-feature-add-rule-button'))
+    );
+
+    await action.sendKeys(
+      'Rule value selector',
+      featureElement
+        .element(by.css('.protractor-test-value-selector')),
+      'Enabled');
+
+    await action.click(
+      'Add condition button',
+      featureElement
+        .element(by.css('.protractor-test-add-condition-button'))
+    );
+
+    await this.saveChangeOfFeature(featureElement);
+  };
+
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();

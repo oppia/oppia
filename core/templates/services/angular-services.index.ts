@@ -89,6 +89,7 @@ import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObje
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from 'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
@@ -486,6 +487,8 @@ export const angularServices: [string, unknown][] = [
   ['PlatformFeatureAdminBackendApiService',
     PlatformFeatureAdminBackendApiService],
   ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
+  ['PlatformFeatureDummyBackendApiService',
+    PlatformFeatureDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
   ['PlayerCorrectnessFeedbackEnabledService',
     PlayerCorrectnessFeedbackEnabledService],
