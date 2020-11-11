@@ -178,6 +178,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ):
             user_services.get_username('fakeUser')
 
+    def test_get_username_for_user_being_deleted(self):
+        gae_id = 'someUser'
+        username = 'newUsername'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com'
+        ).user_id
+        user_services.set_username(user_id, username)
+
+        user_services.mark_user_for_deletion(user_id)
+
+        self.assertEqual(
+            user_services.get_username(user_id),
+            user_services.USERNAME_FOR_USER_BEING_DELETED)
+
     def test_get_username_none(self):
         user_id = user_services.create_new_user(
             'fakeUser', 'user@example.com').user_id
@@ -299,28 +313,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_settings = user_services.create_new_user(
                 python_utils.convert_to_bytes(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
-
-    def test_get_email_from_username(self):
-        gae_id = 'someUser'
-        username = 'username'
-        user_email = 'user@example.com'
-
-        user_settings = user_services.create_new_user(gae_id, user_email)
-        user_services.set_username(user_settings.user_id, username)
-        self.assertEqual(
-            user_services.get_username(user_settings.user_id), username)
-
-        # Handle usernames that exist.
-        self.assertEqual(
-            user_services.get_email_from_username(username), user_email)
-
-        # Handle usernames in the same equivalence class correctly.
-        self.assertEqual(
-            user_services.get_email_from_username('USERNAME'), user_email)
-
-        # Return None for usernames which don't exist.
-        self.assertIsNone(
-            user_services.get_email_from_username('fakeUsername'))
 
     def test_get_user_id_from_username(self):
         gae_id = 'someUser'
@@ -2082,7 +2074,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id='unregistered_user_id',
             email='user@example.com',
-            username='').put()
+            username=''
+        ).put()
 
         user_ids = user_services.get_human_readable_user_ids(
             [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
@@ -2091,6 +2084,19 @@ class UserSettingsTests(test_utils.GenericTestBase):
             '[Awaiting user registration: u..@example.com]']
 
         self.assertEqual(user_ids, expected_user_ids)
+
+    def test_get_human_readable_user_ids_with_nonexistent_id_non_strict_passes(
+            self):
+        user_id = (
+            user_services.create_new_user('gae_id', 'user@example.com').user_id)
+        user_services.set_username(user_id, 'username')
+        user_services.mark_user_for_deletion(user_id)
+        human_readable_user_ids = user_services.get_human_readable_user_ids(
+            [user_id], strict=False)
+
+        self.assertEqual(
+            human_readable_user_ids,
+            [user_services.LABEL_FOR_USER_BEING_DELETED])
 
     def test_created_on_gets_updated_correctly(self):
         # created_on should not be updated upon updating other attributes of
