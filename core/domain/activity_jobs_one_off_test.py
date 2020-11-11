@@ -2183,6 +2183,24 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             stringified_item in stringified_output]
         return eval_output
 
+    def test_validate_model_names_list(self):
+        job_class = activity_jobs_one_off.AddMissingCommitLogsJob
+        class_names = [
+            cls.__name__ for cls in (
+                job_class.SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS)]
+        model_names_with_default_commit_status = (
+            job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS)
+        model_names_with_commit_status_in_rights = (
+            job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS)
+        aggregate_model_names = []
+        aggregate_model_names.extend(model_names_with_default_commit_status)
+        aggregate_model_names.extend(model_names_with_commit_status_in_rights)
+        common_model_names = (set(model_names_with_default_commit_status) &
+         set(model_names_with_commit_status_in_rights))
+
+        self.assertEqual(len(common_model_names), 0)
+        self.assertItemsEqual(class_names, aggregate_model_names)
+
     def test_add_missing_exp_commit_logs(self):
         rights_manager.create_new_exploration_rights(
             self.EXP_ID, self.albert_id)
@@ -2194,7 +2212,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             init_state_name='init_state_name'
         )
         base_models.BaseModel.put_multi([exploration])
-        data_dic = {
+        content_dict = {
             'title': 'title',
             'category': 'category',
             'states_schema_version': 1,
@@ -2203,7 +2221,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
 
         exp_models.ExplorationSnapshotContentModel(
             id='%s-1' % self.EXP_ID,
-            content=data_dic
+            content=content_dict
         ).put()
         exp_models.ExplorationSnapshotMetadataModel(
             id='%s-1' % self.EXP_ID,
@@ -2239,7 +2257,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             status='public'
         )
         base_models.BaseModel.put_multi([exp_rights])
-        data_dic = {
+        content_dict = {
             'status': 'public',
             'owner_ids': self.albert_id,
             'editor_ids': self.albert_id,
@@ -2250,7 +2268,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
 
         exp_models.ExplorationRightsSnapshotContentModel(
             id='%s-1' % self.EXP_ID,
-            content=data_dic
+            content=content_dict
         ).put()
         exp_models.ExplorationRightsSnapshotMetadataModel(
             id='%s-1' % self.EXP_ID,

@@ -675,11 +675,11 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
     }
     # "Public" is the default value for post_commit_status for the
     # question and skill models.
-    MODELS_NAMES_WITH_DEFAULT_COMMIT_STATUS = [
+    MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS = [
         'QuestionSnapshotMetadataModel', 'SkillSnapshotMetadataModel']
     # For the exp model, post_commit_status is assigned from the
     # exp rights model.
-    MODELS_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS = [
+    MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS = [
         'ExplorationRightsSnapshotMetadataModel',
         'ExplorationSnapshotMetadataModel']
 
@@ -722,17 +722,37 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             commit_type=snapshot_model.commit_type,
             commit_message=snapshot_model.commit_message,
             commit_cmds=snapshot_model.commit_cmds,
+            created_on=snapshot_model.created_on,
+            last_updated=snapshot_model.last_updated,
             version=version
         )
         setattr(
             commit_log_model, model_properties['id_field'], model_id)
-        if class_name in job_class.MODELS_NAMES_WITH_DEFAULT_COMMIT_STATUS:
+        if class_name in job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS:
             commit_log_model.post_commit_status = (
                 constants.ACTIVITY_STATUS_PUBLIC)
-        elif class_name in job_class.MODELS_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS:
+        elif class_name in job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS:
+            if class_name == 'ExplorationRightsSnapshotMetadataModel':
+                exp_rights_model_version = version
+            else:
+                created_date = snapshot_model.created_on
+                rights_snapshot_model_class = (
+                    exp_models.ExplorationRightsSnapshotMetadataModel)
+                # We fetch the rights snapshot model that was created before
+                # the considered snapshot model and fetch the correct version
+                # of the exploration rights model.
+                rights_snapshot_model = (
+                    rights_snapshot_model_class.query().filter(
+                    rights_snapshot_model_class.created_on <= created_date
+                    ).fetch(limit=1))
+                assert len(rights_snapshot_model) != 0
+                _ , exp_rights_model_version = (
+                    rights_snapshot_model[0].id.rsplit('-', 1))
+
             rights_model = exp_models.ExplorationRightsModel.get_version(
-                model_id, version)
+                model_id, int(exp_rights_model_version))
             commit_log_model.post_commit_status = rights_model.status
+        commit_log_model.update_timestamps(update_last_updated_time=False)
         commit_log_model.put()
         yield (
             'Added missing commit log model-%s' % class_name,
