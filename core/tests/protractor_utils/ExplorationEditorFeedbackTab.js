@@ -67,7 +67,8 @@ var ExplorationEditorFeedbackTab = function() {
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await action.click('View Suggestion Button', viewSuggestionButton);
     expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
-    await action.sendKeys('Suggestion Commit Message Input', 
+    await action.sendKeys(
+      'Suggestion Commit Message Input',
       suggestionCommitMessageInput, 'Commit message');
     await action.click('Accept Suggestion Button', acceptSuggestionButton);
     await waitFor.invisibilityOf(
@@ -127,7 +128,8 @@ var ExplorationEditorFeedbackTab = function() {
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await action.click('View Suggestion Button', viewSuggestionButton);
     expect(await rejectSuggestionButton.isDisplayed()).toBe(true);
-    await action.sendKeys('Suggestion Review Message Input', 
+    await action.sendKeys(
+      'Suggestion Review Message Input',
       suggestionReviewMessageInput, 'Review message');
     await action.click('Reject Suggestion Button', rejectSuggestionButton);
     await waitFor.invisibilityOf(
@@ -137,7 +139,8 @@ var ExplorationEditorFeedbackTab = function() {
 
   this.selectLatestFeedbackThread = async function() {
     await waitFor.visibilityOf(
-      await element.all(by.css(suggestionRowClassName)).first(),
+      await element.all(
+      by.css(suggestionRowClassName)).first(),
       'No feedback messages are visible.');
     var suggestionRowClassNameFirst = 
       element.all(by.css(suggestionRowClassName)).first();
@@ -147,7 +150,8 @@ var ExplorationEditorFeedbackTab = function() {
 
   this.sendResponseToLatestFeedback = async function(feedbackResponse) {
     await this.selectLatestFeedbackThread();
-    await action.sendKeys('Feedback Response Text Area', 
+    await action.sendKeys(
+      'Feedback Response Text Area',
       feedbackResponseTextArea, feedbackResponseTextArea);
     await action.click(
       'Feedback Send Response Button', feedbackSendResponseButton);
@@ -155,10 +159,11 @@ var ExplorationEditorFeedbackTab = function() {
 
   this.changeFeedbackStatus = async function(
       feedbackStatus, feedbackResponse) {
-    await action.sendKeys('Feedback Response Text Area', 
+    await action.sendKeys(
+      'Feedback Response Text Area',
       feedbackResponseTextArea, feedbackResponseTextArea);
     await action.click('Feedback Status Dropdow', feedbackStatusDropdown);
-    var optionLabelFeedbackStatus = 
+    var optionLabelFeedbackStatus =
       element(by.css('option[label="' + feedbackStatus + '"]'));
     await action.click(
       'Option[label = "feedback status"', optionLabelFeedbackStatus);
