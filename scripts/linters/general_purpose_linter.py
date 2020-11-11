@@ -286,6 +286,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             'backend-api.service.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
+            'services/http.service.ts'
         'excluded_dirs': ()
     }
 ]
