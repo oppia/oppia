@@ -141,7 +141,7 @@ var ExplorationEditorFeedbackTab = function() {
     await waitFor.visibilityOf(
       await element.all(
         by.css(suggestionRowClassName)).first(),
-        'No feedback messages are visible.');
+      'No feedback messages are visible.');
     var suggestionRowClassNameFirst =
       element.all(by.css(suggestionRowClassName)).first();
     await action.click(
