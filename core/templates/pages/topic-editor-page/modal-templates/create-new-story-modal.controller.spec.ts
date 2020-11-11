@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for CreateNewStoryModalController.
  */
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -29,6 +30,8 @@ describe('Create New Story Modal Controller', function() {
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
   var StoryEditorStateService = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
 

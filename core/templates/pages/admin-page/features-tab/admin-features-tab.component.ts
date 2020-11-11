@@ -31,6 +31,9 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import {
   PlatformParameterFilterType,
   PlatformParameterFilter,
@@ -121,11 +124,15 @@ export class AdminFeaturesTabComponent implements OnInit {
   featureFlags: PlatformParameter[] = [];
   featureFlagNameToBackupMap: Map<string, PlatformParameter>;
 
+  isDummyApiEnabled: boolean = false;
+
   constructor(
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
-    private apiService: PlatformFeatureAdminBackendApiService
+    private apiService: PlatformFeatureAdminBackendApiService,
+    private featureService: PlatformFeatureService,
+    private dummyApiService: PlatformFeatureDummyBackendApiService,
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
@@ -293,8 +300,19 @@ export class AdminFeaturesTabComponent implements OnInit {
     return issues;
   }
 
+  get isDummyFeatureEnabled(): boolean {
+    return this.featureService.status.DummyFeature.isEnabled;
+  }
+
+  async reloadDummyHandlerStatusAsync(): Promise<void> {
+    if (this.isDummyFeatureEnabled) {
+      this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
+    }
+  }
+
   ngOnInit(): void {
     this.reloadFeatureFlagsAsync();
+    this.reloadDummyHandlerStatusAsync();
   }
 }
 
