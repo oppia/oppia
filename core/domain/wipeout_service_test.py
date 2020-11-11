@@ -3237,9 +3237,10 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             observed_log_messages,
-            ['[WIPEOUT] The commit log model \'SubtopicPageCommitLogEntryModel\''
-             ' and snapshot models [\'SubtopicPageSnapshotMetadataModel\'] '
-             'IDs differ. Snapshots without commit logs: [], '
+            ['[WIPEOUT] The commit log model '
+             '\'SubtopicPageCommitLogEntryModel\' and snapshot models '
+             '[\'SubtopicPageSnapshotMetadataModel\'] IDs differ. '
+             'Snapshots without commit logs: [], '
              'commit logs without snapshots: [u\'%s\'].' % self.SUBTOP_2_ID])
 
         # Verify user is deleted.

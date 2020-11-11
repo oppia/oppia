@@ -292,8 +292,8 @@ def get_exploration_rights_where_user_is_owner(user_id):
         user_id: str. The id of the user.
 
     Returns:
-        list(ActivityRights). List of domain objects where the user has some
-        role.
+        list(ActivityRights). List of domain objects where the user is
+        the owner.
     """
     return _get_activity_rights_where_user_is_owner(
         constants.ACTIVITY_TYPE_EXPLORATION, user_id
@@ -307,8 +307,8 @@ def get_collection_rights_where_user_is_owner(user_id):
         user_id: str. The id of the user.
 
     Returns:
-        list(ActivityRights). List of domain objects where the user has some
-        role.
+        list(ActivityRights). List of domain objects where the user is
+        the owner.
     """
     return _get_activity_rights_where_user_is_owner(
         constants.ACTIVITY_TYPE_COLLECTION, user_id

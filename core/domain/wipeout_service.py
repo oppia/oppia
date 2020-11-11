@@ -412,9 +412,9 @@ def remove_user_from_activities_with_associated_rights_models(user_id):
         rights_manager.deassign_role_for_exploration(
             user_services.get_system_user(), exp_id, user_id)
 
-    # The summary model is hard-deleted when the exploration is only marked
-    # as deleted. Thus we need to retrieve the exploration in a different way
-    # and hard-delete it.
+    # To hard-delete explorations marked as deleted we are using the rights
+    # model to retrieve the exploration as the summary model gets hard-deleted
+    # while marking the exploration as deleted.
     explorations_rights = (
         rights_manager.get_exploration_rights_where_user_is_owner(user_id))
     explorations_to_be_deleted_ids = [
@@ -459,9 +459,9 @@ def remove_user_from_activities_with_associated_rights_models(user_id):
         rights_manager.deassign_role_for_collection(
             user_services.get_system_user(), col_id, user_id)
 
-    # The summary model is hard-deleted when the collection is only marked
-    # as deleted. Thus we need to retrieve the collection in a different way and
-    # hard-delete it.
+    # To hard-delete collections marked as deleted we are using the rights
+    # model to retrieve the collection as the summary model gets hard-deleted
+    # while marking the collection as deleted.
     collection_rights = (
         rights_manager.get_collection_rights_where_user_is_owner(user_id))
     collections_to_be_deleted_ids = [
