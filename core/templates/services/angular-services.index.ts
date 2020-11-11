@@ -89,6 +89,7 @@ import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObje
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from 'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
@@ -131,6 +132,7 @@ import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageContentsObjectFactory';
 import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -365,6 +367,7 @@ export const angularServices: [string, unknown][] = [
     DragAndDropSortInputValidationService],
   ['EditabilityService', EditabilityService],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
+  ['EditableTopicBackendApiService', EditableTopicBackendApiService],
   ['EditableStoryBackendApiService', EditableStoryBackendApiService],
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
@@ -484,6 +487,8 @@ export const angularServices: [string, unknown][] = [
   ['PlatformFeatureAdminBackendApiService',
     PlatformFeatureAdminBackendApiService],
   ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
+  ['PlatformFeatureDummyBackendApiService',
+    PlatformFeatureDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
   ['PlayerCorrectnessFeedbackEnabledService',
     PlayerCorrectnessFeedbackEnabledService],
