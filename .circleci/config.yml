@@ -261,6 +261,12 @@ jobs:
           name: Run e2e contributor dashboard test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard"
+      # Feature Gating test suites must run in non-production environment because
+      # the dummy_feature being used must not be enabled in production environment.
+      - run:
+          name: Run e2e feature gating test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="featureGating"
 
   e2e_non_prod_new_structure_tests:
     <<: *job_defaults
