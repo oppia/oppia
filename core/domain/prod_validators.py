@@ -1963,10 +1963,15 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                     [item.target_id]))
         if item.final_reviewer_id and user_services.is_user_id_valid(
                 item.final_reviewer_id):
-            field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'reviewer_ids', user_models.UserSettingsModel,
-                    [item.final_reviewer_id]))
+
+            # Bot rejects suggestions when the suggestion's targeted entity gets
+            # removed from the topic. The bot doesn't have a UserSettingsModel
+            # for their user_id. Exclude external model validation for bot.
+            if item.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID:
+                field_name_to_external_model_references.append(
+                    base_model_validators.ExternalModelFetcherDetails(
+                        'reviewer_ids', user_models.UserSettingsModel,
+                        [item.final_reviewer_id]))
         return field_name_to_external_model_references
 
     @classmethod
@@ -2091,9 +2096,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         score_category_type = (
             item.score_category.split(
                 suggestion_models.SCORE_CATEGORY_DELIMITER)[0])
-        score_category_sub_type = (
-            item.score_category.split(
-                suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
+
         if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
             target_model_references = (
                 field_name_to_external_model_references[
@@ -2113,15 +2116,13 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                         'doesn\'t exist' % (
                             item.id, item.target_type,
                             model_id, model_class.__name__, model_id))
-                    continue
-                if target_model.category != score_category_sub_type:
-                    cls._add_error(
-                        'score category sub%s' % (
-                            base_model_validators.ERROR_CATEGORY_TYPE_CHECK),
-                        'Entity id %s: score category sub %s does not match'
-                        ' target exploration category %s' % (
-                            item.id, score_category_sub_type,
-                            target_model.category))
+
+                # Note: An exploration's category can be changed after the
+                # suggestion is submitted. Since this operation does not update
+                # the suggestion's category, we cannot assume that the
+                # exploration category matches the suggestion score category,
+                # and thus do not validate it here.
+
         if score_category_type == suggestion_models.SCORE_TYPE_QUESTION:
             score_category_regex = (
                 '^(%s)$' % ('|').join(VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION))
