@@ -60,13 +60,15 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-    await waitFor.visibilityOf(matchingRow, 'Matching Row is taking too long to appear');
+    await waitFor.visibilityOf(
+      matchingRow, 'Matching Row is taking too long to appear');
     expect(await matchingRow.isDisplayed()).toBe(true);
     await action.click('Matching Row', matchingRow);
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await action.click('View Suggestion Button', viewSuggestionButton);
     expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
-    await action.sendKeys('Suggestion Commit Message Input', suggestionCommitMessageInput, 'Commit message');
+    await action.sendKeys(
+      'Suggestion Commit Message Input', suggestionCommitMessageInput, 'Commit message');
     await action.click('Accept Suggestion Button', acceptSuggestionButton);
     await waitFor.invisibilityOf(
       acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
@@ -125,7 +127,8 @@ var ExplorationEditorFeedbackTab = function() {
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await action.click('View Suggestion Button', viewSuggestionButton);
     expect(await rejectSuggestionButton.isDisplayed()).toBe(true);
-    await action.sendKeys('Suggestion Review Message Input', suggestionReviewMessageInput, 'Review message');
+    await action.sendKeys(
+      'Suggestion Review Message Input', suggestionReviewMessageInput, 'Review message');
     await action.click('Reject Suggestion Button', rejectSuggestionButton);
     await waitFor.invisibilityOf(
       acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
@@ -136,20 +139,25 @@ var ExplorationEditorFeedbackTab = function() {
     await waitFor.visibilityOf(
       await element.all(by.css(suggestionRowClassName)).first(),
       'No feedback messages are visible.');
-    await action.click('Suggestion Row Class Name', element.all(by.css(suggestionRowClassName)).first());
+    await action.click(
+      'Suggestion Row Class Name', element.all(by.css(suggestionRowClassName)).first());
   };
 
   this.sendResponseToLatestFeedback = async function(feedbackResponse) {
     await this.selectLatestFeedbackThread();
-    await action.sendKeys('Feedback Response Text Area', feedbackResponseTextArea, feedbackResponseTextArea);
-    await action.click('Feedback Send Response Button', feedbackSendResponseButton);
+    await action.sendKeys(
+      'Feedback Response Text Area', feedbackResponseTextArea, feedbackResponseTextArea);
+    await action.click(
+      'Feedback Send Response Button', feedbackSendResponseButton);
   };
 
   this.changeFeedbackStatus = async function(
       feedbackStatus, feedbackResponse) {
-    await action.sendKeys('Feedback Response Text Area', feedbackResponseTextArea, feedbackResponseTextArea);
+    await action.sendKeys(
+      'Feedback Response Text Area', feedbackResponseTextArea, feedbackResponseTextArea);
     await action.click('Feedback Status Dropdow', feedbackStatusDropdown);
-    await action.click('Option[label = "feedback status"', element(by.css('option[label="' + feedbackStatus + '"]')));
+    await action.click(
+      'Option[label = "feedback status"', element(by.css('option[label="' + feedbackStatus + '"]')));
     await action.click('Feedback Send Response Button', feedbackSendResponseButton);
   };
 
