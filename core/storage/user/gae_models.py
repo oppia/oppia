@@ -322,7 +322,6 @@ class UserSettingsModel(base_models.BaseModel):
             or DeletedUsernameModel.get(hashed_normalized_username) is not None
         )
 
-
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
         """Returns a user model given a normalized username.
@@ -2676,14 +2675,17 @@ class PseudonymizedUserModel(base_models.BaseModel):
 
 
 class DeletedUsernameModel(base_models.BaseModel):
-    """Model for storing deleted username hashes."""
+    """Model for storing deleted username hashes. The username hash is stored
+    in the ID of this model.
+    """
 
     ID_LENGTH = 32
 
     @staticmethod
     def get_deletion_policy():
         """DeletedUserModel contains only hashes of usernames that were
-        deleted."""
+        deleted.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
@@ -2694,7 +2696,8 @@ class DeletedUsernameModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """DeletedUsernameModel contains only hashes of usernames that were
-        deleted."""
+        deleted.
+        """
         return dict(super(cls, cls).get_export_policy(), **{})
 
 

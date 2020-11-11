@@ -45,7 +45,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
         Args:
             user_id: str. The ID of the user who is being deleted.
             email: str. The email of the user who is being deleted.
-            hashed_normalized_username: str | None. The hashed normalized
+            hashed_normalized_username: str|None. The hashed normalized
                 username of the user who is being deleted. Can be None.
             role: str. The role of the user who is being related.
             deletion_complete: bool. Whether the deletion is completed.
@@ -60,13 +60,14 @@ class PendingDeletionRequest(python_utils.OBJECT):
         self.pseudonymizable_entity_mappings = pseudonymizable_entity_mappings
 
     @classmethod
-    def create_default(cls, user_id, email, hashed_normalized_username, role):
+    def create_default(
+            cls, user_id, email, role, hashed_normalized_username=None):
         """Creates a PendingDeletionRequest object with default values.
 
         Args:
             user_id: str. The ID of the user who is being deleted.
             email: str. The email of the user who is being deleted.
-            hashed_normalized_username: str | None. The hashed normalized
+            hashed_normalized_username: str|None. The hashed normalized
                 username of the user who is being deleted. Can be None.
             role: str. The role of the user who is being deleted.
 

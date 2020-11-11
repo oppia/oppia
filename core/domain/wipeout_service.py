@@ -187,8 +187,8 @@ def pre_delete_user(user_id):
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
             user_settings.email,
-            hashed_normalized_username,
-            user_settings.role
+            user_settings.role,
+            hashed_normalized_username=hashed_normalized_username
         )
     )
 
