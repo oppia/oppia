@@ -28,7 +28,7 @@ import {
   SubtopicPageContentsObjectFactory
 } from 'domain/topic/SubtopicPageContentsObjectFactory';
 
-interface SubtopicPageBackendDict {
+export interface SubtopicPageBackendDict {
   'id': string;
   'topic_id': string;
   'page_contents': SubtopicPageContentsBackendDict;
