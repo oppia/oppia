@@ -35,7 +35,7 @@ import feconf
 transaction_services = models.Registry.import_transaction_services()
 
 
-class QuestionSuggestionMigrationManager(jobs.BaseMapReduceOneOffJobManager):
+class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that can be used to migrate sate schema
     versions of question suggestions.
 

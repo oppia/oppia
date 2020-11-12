@@ -44,7 +44,7 @@ import utils
         models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.user]))
 
 
-class QuestionSuggestionMigrationManagerTests(test_utils.GenericTestBase):
+class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -52,9 +52,8 @@ class QuestionSuggestionMigrationManagerTests(test_utils.GenericTestBase):
     QUESTION_ID = 'question_id'
 
     def setUp(self):
-        super(QuestionSuggestionMigrationManagerTests, self).setUp()
+        super(QuestionSuggestionMigrationJobManagerTests, self).setUp()
 
-        # Setup user who will own the test questions.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
@@ -85,7 +84,7 @@ class QuestionSuggestionMigrationManagerTests(test_utils.GenericTestBase):
             self.albert_id, suggestion_change, 'test description')
 
     def _run_job_and_verify_output(self, expected_output):
-        """Runs the QuestionSuggestionMigrationManager and
+        """Runs the QuestionSuggestionMigrationJobManager and
         verifies that the output matches the expected output.
 
         Args:
@@ -94,16 +93,16 @@ class QuestionSuggestionMigrationManagerTests(test_utils.GenericTestBase):
         """
         job_id = (
             suggestion_jobs_one_off
-            .QuestionSuggestionMigrationManager.create_new())
+            .QuestionSuggestionMigrationJobManager.create_new())
         (
             suggestion_jobs_one_off
-            .QuestionSuggestionMigrationManager.enqueue(job_id)
+            .QuestionSuggestionMigrationJobManager.enqueue(job_id)
         )
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
-            .QuestionSuggestionMigrationManager.get_output(job_id))
+            .QuestionSuggestionMigrationJobManager.get_output(job_id))
 
         self.assertItemsEqual(actual_output, expected_output)
 
