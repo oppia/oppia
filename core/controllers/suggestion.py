@@ -96,6 +96,10 @@ class SuggestionHandler(base.BaseHandler):
     @acl_decorators.can_suggest_changes
     def post(self):
         try:
+            # The create_suggestion method needs to be run in transaction as it
+            # generates multiple connected models (suggestion, feedback thread,
+            # feedback message etc.) and all these models needs to be created
+            # together, in a batch.
             suggestion = transaction_services.run_in_transaction(
                 suggestion_services.create_suggestion,
                 self.payload.get('suggestion_type'),
