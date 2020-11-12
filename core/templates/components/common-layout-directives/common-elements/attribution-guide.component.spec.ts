@@ -26,6 +26,10 @@ import { AttributionService } from 'services/attribution.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 
 class MockAttributionService {
+  init() {
+    return;
+  }
+
   isGenerateAttributionAllowed() {
     return true;
   }

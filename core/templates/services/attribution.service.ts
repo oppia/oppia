@@ -36,7 +36,7 @@ export class AttributionService {
       ExplorationSummaryBackendApiService)
   ) {}
 
-  private _init(): void {
+  init(): void {
     this.explorationSummaryBackendApiService
       .loadPublicAndPrivateExplorationSummaries(
         [this.contextService.getExplorationId()]).then(responseObject => {
@@ -55,12 +55,8 @@ export class AttributionService {
             })
         );
         this.explorationTitle = summaries.length ? summaries[0].title : '';
-        this.attributionModalIsShown = true;
         this.applicationRef.tick();
-      }, () => {
-        this.attributionModalIsShown = false;
-        this.applicationRef.tick();
-      });
+      }, () => {});
   }
 
   isGenerateAttributionAllowed(): boolean {
@@ -68,11 +64,7 @@ export class AttributionService {
   }
 
   showAttributionModal(): void {
-    if (this.authors.length && this.explorationTitle) {
-      this.attributionModalIsShown = true;
-      return;
-    }
-    this._init();
+    this.attributionModalIsShown = true;
   }
 
   hideAttributionModal(): void {
