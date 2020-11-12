@@ -10,15 +10,14 @@
         &#xE254;
       </i>
       <thumbnail-display ng-show="!thumbnailIsLoading"
-                        [source]="editableThumbnailDataUrl"
-                        [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
-                        [background]="getBgColor()">
+                         [source]="editableThumbnailDataUrl"
+                         [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                         [background]="getBgColor()">
       </thumbnail-display>
-      <thumbnail-display 
-        ng-if="useLocalStorage && newThumbnailDataUrl"
-        [source]="newThumbnailDataUrl"
-        [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
-        [background]="localStorageBgcolor">
+      <thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
+                         [source]="newThumbnailDataUrl"
+                         [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                         [background]="localStorageBgcolor">
       </thumbnail-display>
       <!-- <img ng-show="!thumbnailIsLoading"
            ng-src="<[editableThumbnailDataUrl]>"

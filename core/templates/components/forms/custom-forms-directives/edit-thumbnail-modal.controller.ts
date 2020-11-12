@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ThumbnailDisplayComponent } from "./thumbnail-display.component";
-
 /**
  * @fileoverview Controller for edit thumbnail modal.
  */

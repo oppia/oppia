@@ -27,4 +27,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 #  that the introduction of bypassSecurityTrust was the only option.
 
 EXCLUDED_BYPASS_SECURITY_TRUST_FILES = ()
-EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES = ()
+EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES = (
+    'core/templates/components/forms/custom-forms-directives/thumbnail-display.component.ts', # pylint: disable=line-too-long
+    'core/templates/services/image-upload-helper.service.ts')
