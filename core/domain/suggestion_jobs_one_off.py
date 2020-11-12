@@ -215,8 +215,9 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         if suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
             # Set the language code to be the language of the question.
-            suggestion.language_code = suggestion.change.question_dict[
-                'language_code']
+            suggestion.change.question_dict['language_code'] = (
+                constants.DEFAULT_LANGUAGE_CODE)
+            suggestion.language_code = constants.DEFAULT_LANGUAGE_CODE
         elif suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             # Set the language code to be the language of the translation.
