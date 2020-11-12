@@ -670,6 +670,10 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
     # question and skill models.
     MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS = [
         'QuestionSnapshotMetadataModel', 'SkillSnapshotMetadataModel']
+    # For the exp rights commit log model, post_commit_status is assigned
+    # from the exp rights model.
+    MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS = [
+        'ExplorationRightsSnapshotMetadataModel']
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -719,7 +723,7 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
         if class_name in job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS:
             commit_log_model.post_commit_status = (
                 constants.ACTIVITY_STATUS_PUBLIC)
-        elif class_name == 'ExplorationRightsSnapshotMetadataModel':
+        elif class_name in job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS:
             rights_model = exp_models.ExplorationRightsModel.get_version(
                 model_id, version)
             commit_log_model.post_commit_status = rights_model.status

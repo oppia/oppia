@@ -2182,6 +2182,26 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             ast.literal_eval(stringified_item) for
             stringified_item in stringified_output]
         return eval_output
+    
+    def test_validate_model_names_list(self):
+        job_class = activity_jobs_one_off.AddMissingCommitLogsJob
+        class_names = [
+            cls.__name__ for cls in (
+                job_class.SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS)]
+        model_names_with_default_commit_status = (
+            job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS)
+        model_names_with_commit_status_in_rights = (
+            job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS)
+        aggregate_model_names = []
+        aggregate_model_names.extend(model_names_with_default_commit_status)
+        aggregate_model_names.extend(model_names_with_commit_status_in_rights)
+        common_model_names = (set(model_names_with_default_commit_status) &
+         set(model_names_with_commit_status_in_rights))
+
+        self.assertEqual(len(common_model_names), 0)
+        self.assertItemsEqual(class_names, aggregate_model_names)
+        self.assertItemsEqual(
+            class_names, job_class.MODEL_NAMES_TO_PROPERTIES.keys())
 
     def test_add_missing_exp_rights_commit_logs(self):
         exp_rights = exp_models.ExplorationRightsModel(
