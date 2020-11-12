@@ -143,7 +143,7 @@ class UserSettings(python_utils.OBJECT):
                 web because we don't use it there.
             deleted: bool. Whether the user has requested removal of their
                 account.
-            created_on: Datetime. When the user was created on.
+            created_on: datetime.datetime. When the user was created on.
         """
         self.user_id = user_id
         self.email = email

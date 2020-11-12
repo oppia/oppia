@@ -2518,8 +2518,9 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     email = datastore_services.StringProperty(required=True, indexed=True)
     # Normalized username of the deleted user. May be None in the cases when
     # the user was deleted after a short time and thus the username wasn't that
-    # known in the codebase.
-    normalized_username = datastore_services.StringProperty(indexed=True)
+    # known on the Oppia site.
+    normalized_long_term_username = (
+        datastore_services.StringProperty(indexed=True))
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
     role = datastore_services.StringProperty(required=True, indexed=True)
@@ -2570,6 +2571,8 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'normalized_long_term_username': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pseudonymizable_entity_mappings': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
@@ -2688,7 +2691,7 @@ class DeletedUsernameModel(base_models.BaseModel):
         """DeletedUserModel contains only hashes of usernames that were
         deleted.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():

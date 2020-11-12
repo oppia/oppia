@@ -2431,8 +2431,8 @@ class DeletedUsernameModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            user_models.DeletedUserModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            user_models.DeletedUsernameModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class UserAuthDetailsModelTests(test_utils.GenericTestBase):

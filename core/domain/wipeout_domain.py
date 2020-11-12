@@ -37,7 +37,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
             user_id,
             email,
             role,
-            normalized_username,
+            normalized_long_term_username,
             deletion_complete,
             pseudonymizable_entity_mappings):
         """Constructs a PendingDeletionRequest domain object.
@@ -45,8 +45,10 @@ class PendingDeletionRequest(python_utils.OBJECT):
         Args:
             user_id: str. The ID of the user who is being deleted.
             email: str. The email of the user who is being deleted.
-            normalized_username: str|None. The normalized username of the user
-                who is being deleted. Can be None.
+            normalized_long_term_username: str|None. The normalized username of
+                the user who is being deleted. Can be None when the user was on
+                the Oppia site only for a short time and thus the username
+                wasn't that known.
             role: str. The role of the user who is being related.
             deletion_complete: bool. Whether the deletion is completed.
             pseudonymizable_entity_mappings: dict(str, str). Mapping between
@@ -54,28 +56,31 @@ class PendingDeletionRequest(python_utils.OBJECT):
         """
         self.user_id = user_id
         self.email = email
-        self.normalized_username = normalized_username
+        self.normalized_long_term_username = normalized_long_term_username
         self.role = role
         self.deletion_complete = deletion_complete
         self.pseudonymizable_entity_mappings = pseudonymizable_entity_mappings
 
     @classmethod
     def create_default(
-            cls, user_id, email, role, normalized_username=None):
+            cls, user_id, email, role, normalized_long_term_username=None):
         """Creates a PendingDeletionRequest object with default values.
 
         Args:
             user_id: str. The ID of the user who is being deleted.
             email: str. The email of the user who is being deleted.
-            normalized_username: str|None. The normalized username of the user
-                who is being deleted. Can be None.
+            normalized_long_term_username: str|None. The normalized username of
+                the user who is being deleted. Can be None when the user was on
+                the Oppia site only for a short time and thus the username
+                wasn't that known.
             role: str. The role of the user who is being deleted.
 
         Returns:
             PendingDeletionRequest. The default pending deletion request
             domain object.
         """
-        return cls(user_id, email, role, normalized_username, False, {})
+        return cls(
+            user_id, email, role, normalized_long_term_username, False, {})
 
     def validate(self):
         """Checks that the domain object is valid.
