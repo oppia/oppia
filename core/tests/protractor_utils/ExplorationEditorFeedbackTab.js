@@ -104,7 +104,7 @@ var ExplorationEditorFeedbackTab = function() {
     var rowCount = await rows.count();
     for (var i = 0; i < rowCount; i++) {
       var row = await rows.get(i);
-      await action.click('Row', row);
+      await action.click('suggestionRow at row index ' + i, row);
       await waitFor.visibilityOf(
         explorationFeedback, 'Feedback message text is not visible');
       var message = await explorationFeedback.getText();
@@ -118,7 +118,7 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-    await action.click('Matching Row', matchingRow);
+    await action.click('Matching Suggestion Row and feedback subject', matchingRow);
     await action.click('View Suggestion Button', viewSuggestionButton);
     await action.sendKeys(
       'Suggestion Review Message Input',
@@ -130,21 +130,17 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.selectLatestFeedbackThread = async function() {
-    await waitFor.visibilityOf(
-      await element.all(
-        by.css(suggestionRowClassName)).first(),
-      'No feedback messages are visible.');
-    var suggestionRowClassNameFirst =
+    var suggestionRowFirst =
       element.all(by.css(suggestionRowClassName)).first();
     await action.click(
-      'Suggestion Row Class Name', suggestionRowClassNameFirst);
+      'Suggestion Row First', suggestionRowClassNameFirst);
   };
 
   this.sendResponseToLatestFeedback = async function(feedbackResponse) {
     await this.selectLatestFeedbackThread();
     await action.sendKeys(
       'Feedback Response Text Area',
-      feedbackResponseTextArea, feedbackResponseTextArea);
+      feedbackResponseTextArea, feedbackResponse);
     await action.click(
       'Feedback Send Response Button', feedbackSendResponseButton);
   };
