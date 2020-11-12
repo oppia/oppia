@@ -977,6 +977,14 @@ class UserAuthDetailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.UserAuthDetailsModel]
 
 
+class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserIdentifiersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserIdentifiersModel]
+
+
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates PlatformParameterModel."""
 
