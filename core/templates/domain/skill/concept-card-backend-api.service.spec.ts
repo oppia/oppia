@@ -160,7 +160,7 @@ describe('Concept card backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      conceptCardBackendApiService.loadConceptCards(['1']).then(
+      conceptCardBackendApiService.loadConceptCardsAsync(['1']).then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne('/concept_card_handler/1');
       expect(req.request.method).toEqual('GET');
@@ -181,7 +181,7 @@ describe('Concept card backend API service', () => {
       let conceptCardDataUrl = (
         '/concept_card_handler/' + encodeURIComponent('1,2'));
 
-      conceptCardBackendApiService.loadConceptCards(['1', '2']).then(
+      conceptCardBackendApiService.loadConceptCardsAsync(['1', '2']).then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(conceptCardDataUrl);
       expect(req.request.method).toEqual('GET');
@@ -196,9 +196,9 @@ describe('Concept card backend API service', () => {
 
   it('should get all concept cards even the one which was fetched before',
     fakeAsync(() => {
-      conceptCardBackendApiService.loadConceptCards(['1']).then(
+      conceptCardBackendApiService.loadConceptCardsAsync(['1']).then(
         (conceptCards) => {
-          conceptCardBackendApiService.loadConceptCards(['1', '2']).then(
+          conceptCardBackendApiService.loadConceptCardsAsync(['1', '2']).then(
             (conceptCards2) => {
               expect(conceptCards).toEqual(conceptCardSampleResponse1);
               expect(conceptCards2).toEqual(conceptCardSampleResponse3);
@@ -221,7 +221,7 @@ describe('Concept card backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      conceptCardBackendApiService.loadConceptCards(['1']).then(
+      conceptCardBackendApiService.loadConceptCardsAsync(['1']).then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne('/concept_card_handler/1');
       expect(req.request.method).toEqual('GET');
@@ -238,9 +238,9 @@ describe('Concept card backend API service', () => {
     }));
 
   it('should not fetch the same concept card', fakeAsync(() => {
-    conceptCardBackendApiService.loadConceptCards(['1'])
+    conceptCardBackendApiService.loadConceptCardsAsync(['1'])
       .then((conceptCards) => {
-        conceptCardBackendApiService.loadConceptCards(['1'])
+        conceptCardBackendApiService.loadConceptCardsAsync(['1'])
           .then((conceptCards2) => {
             expect(conceptCards).toEqual(conceptCards2);
             expect(conceptCards2).toEqual(conceptCardSampleResponse1);

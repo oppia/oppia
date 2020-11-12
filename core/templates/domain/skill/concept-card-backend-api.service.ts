@@ -89,7 +89,7 @@ export class ConceptCardBackendApiService {
     return uncachedSkillIds;
   }
 
-  loadConceptCards(skillIds: string[]): Promise<ConceptCard[]> {
+  async loadConceptCardsAsync(skillIds: string[]): Promise<ConceptCard[]> {
     return new Promise((resolve, reject) => {
       var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
       var conceptCards = [];
