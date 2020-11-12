@@ -48,7 +48,7 @@ angular.module('oppia').directive('adminRolesTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/roles-tab/role-graph.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {
+      controller: ['$scope', function($scope) {
         var ctrl = this;
 
         var handleErrorResponse = function(errorResponse) {
@@ -310,6 +310,9 @@ angular.module('oppia').directive('adminRolesTab', [
           refreshFormData();
           ctrl.resultRolesVisible = false;
           ctrl.contributionReviewersDataFetched = false;
+          $scope.$watch('$ctrl.formData.viewContributionReviewers.filterCriterion', function() {
+            ctrl.contributionReviewersDataFetched = false;
+          });
           ctrl.result = {};
           ctrl.setStatusMessage('');
 
