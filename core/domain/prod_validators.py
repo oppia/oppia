@@ -2399,11 +2399,11 @@ class CommunityContributionStatsModelValidator(
         expected_question_suggestion_count = (
             suggestion_models.GeneralSuggestionModel.get_all()
             .filter(
-                suggestion_models.GeneralSuggestionModel.status == (
-                    suggestion_models.STATUS_IN_REVIEW))
-            .filter(
                 suggestion_models.GeneralSuggestionModel.suggestion_type == (
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.status == (
+                    suggestion_models.STATUS_IN_REVIEW))
             .count()
         )
         if item.question_suggestion_count != expected_question_suggestion_count:
