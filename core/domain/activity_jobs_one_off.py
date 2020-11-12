@@ -720,9 +720,8 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             commit_log_model.post_commit_status = (
                 constants.ACTIVITY_STATUS_PUBLIC)
         elif class_name == 'ExplorationRightsSnapshotMetadataModel':
-            exp_rights_model_version = version
             rights_model = exp_models.ExplorationRightsModel.get_version(
-                model_id, int(exp_rights_model_version))
+                model_id, version)
             commit_log_model.post_commit_status = rights_model.status
         commit_log_model.update_timestamps(update_last_updated_time=False)
         commit_log_model.put()
