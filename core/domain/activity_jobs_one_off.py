@@ -640,18 +640,11 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
     # models are missing. The commit logs were found missing in a validation
     # job.
     SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS = [
-        exp_models.ExplorationSnapshotMetadataModel,
         exp_models.ExplorationRightsSnapshotMetadataModel,
         question_models.QuestionSnapshotMetadataModel,
         skill_models.SkillSnapshotMetadataModel
     ]
     MODEL_NAMES_TO_PROPERTIES = {
-        'ExplorationSnapshotMetadataModel': {
-            'parent_model_class': exp_models.ExplorationModel,
-            'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
-            'id_string_format': 'exploration-%s-%s',
-            'id_field': 'exploration_id'
-        },
         'QuestionSnapshotMetadataModel': {
             'parent_model_class': question_models.QuestionModel,
             'commit_log_model_class': (
@@ -677,11 +670,6 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
     # question and skill models.
     MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS = [
         'QuestionSnapshotMetadataModel', 'SkillSnapshotMetadataModel']
-    # For the exp model, post_commit_status is assigned from the
-    # exp rights model.
-    MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS = [
-        'ExplorationRightsSnapshotMetadataModel',
-        'ExplorationSnapshotMetadataModel']
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -731,24 +719,8 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
         if class_name in job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS:
             commit_log_model.post_commit_status = (
                 constants.ACTIVITY_STATUS_PUBLIC)
-        elif class_name in job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS:
-            if class_name == 'ExplorationRightsSnapshotMetadataModel':
-                exp_rights_model_version = version
-            else:
-                created_date = snapshot_model.created_on
-                rights_snapshot_model_class = (
-                    exp_models.ExplorationRightsSnapshotMetadataModel)
-                # We fetch the rights snapshot model that was created before
-                # the considered snapshot model and fetch the correct version
-                # of the exploration rights model.
-                rights_snapshot_model = (
-                    rights_snapshot_model_class.query().filter(
-                    rights_snapshot_model_class.created_on <= created_date
-                    ).fetch(limit=1))
-                assert len(rights_snapshot_model) != 0
-                _ , exp_rights_model_version = (
-                    rights_snapshot_model[0].id.rsplit('-', 1))
-
+        elif class_name == 'ExplorationRightsSnapshotMetadataModel':
+            exp_rights_model_version = version
             rights_model = exp_models.ExplorationRightsModel.get_version(
                 model_id, int(exp_rights_model_version))
             commit_log_model.post_commit_status = rights_model.status
