@@ -613,8 +613,6 @@ def require_valid_name(name, name_type, allow_empty=False):
 
     Raises:
         Exception. Name isn't a string.
-        Exception. The length of the name_type isn't between
-            1 and 50.
         Exception. Name starts or ends with whitespace.
         Exception. Adjacent whitespace in name_type isn't collapsed.
         Exception. Invalid character is present in name.
@@ -626,12 +624,7 @@ def require_valid_name(name, name_type, allow_empty=False):
         return
 
     # This check is needed because state names are used in URLs and as ids
-    # for statistics, so the name length should be bounded above.
-    if len(name) > 50 or len(name) < 1:
-        raise ValidationError(
-            'The length of %s should be between 1 and 50 '
-            'characters; received %s' % (name_type, name))
-
+    # for statistics.
     if name[0] in string.whitespace or name[-1] in string.whitespace:
         raise ValidationError(
             'Names should not start or end with whitespace.')

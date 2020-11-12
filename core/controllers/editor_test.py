@@ -207,11 +207,6 @@ class EditorTests(BaseEditorControllerTests):
             _get_payload('', version=current_version))
         self.assertIn('should be between 1 and 50', response_dict['error'])
 
-        # A request with a really long state name is invalid.
-        response_dict = _put_and_expect_400_error(
-            _get_payload('a' * 100, version=current_version))
-        self.assertIn('should be between 1 and 50', response_dict['error'])
-
         # A request with a state name containing invalid characters is
         # invalid.
         response_dict = _put_and_expect_400_error(
