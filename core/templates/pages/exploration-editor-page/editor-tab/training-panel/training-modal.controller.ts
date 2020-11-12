@@ -99,7 +99,7 @@ angular.module('oppia').controller('TrainingModalController', [
     };
 
     $scope.exitTrainer = function() {
-      $uibModalInstance.dismiss();
+      $uibModalInstance.close();
     };
 
     $scope.onConfirm = function() {

@@ -188,7 +188,7 @@ describe('Training Modal Controller', function() {
 
       it('should exit training modal', function() {
         $scope.exitTrainer();
-        expect($uibModalInstance.dismiss).toHaveBeenCalled();
+        expect($uibModalInstance.close).toHaveBeenCalled();
       });
     });
 
@@ -342,7 +342,7 @@ describe('Training Modal Controller', function() {
 
     it('should exit training modal', function() {
       $scope.exitTrainer();
-      expect($uibModalInstance.dismiss).toHaveBeenCalled();
+      expect($uibModalInstance.close).toHaveBeenCalled();
     });
   });
 
@@ -480,7 +480,7 @@ describe('Training Modal Controller', function() {
 
       it('should exit training modal', function() {
         $scope.exitTrainer();
-        expect($uibModalInstance.dismiss).toHaveBeenCalled();
+        expect($uibModalInstance.close).toHaveBeenCalled();
       });
     });
 });

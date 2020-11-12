@@ -642,6 +642,10 @@ angular.module('oppia').directive('questionsList', [
                   ContextService.resetImageSaveDestination();
                   ctrl.saveAndPublishQuestion(commitMessage);
                 }
+              }, () => {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             } else {
               if (ctrl.skillLinkageModificationsArray.length > 0) {
