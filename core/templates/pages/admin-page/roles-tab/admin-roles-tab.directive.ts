@@ -310,8 +310,10 @@ angular.module('oppia').directive('adminRolesTab', [
           refreshFormData();
           ctrl.resultRolesVisible = false;
           ctrl.contributionReviewersDataFetched = false;
-          $scope.$watch('$ctrl.formData.viewContributionReviewers.filterCriterion', function() {
-            ctrl.contributionReviewersDataFetched = false;
+          $scope.$watch(
+            '$ctrl.formData.viewContributionReviewers.filterCriterion',
+            function() {
+              ctrl.contributionReviewersDataFetched = false;
           });
           ctrl.result = {};
           ctrl.setStatusMessage('');
