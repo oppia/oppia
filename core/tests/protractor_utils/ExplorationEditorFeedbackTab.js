@@ -72,7 +72,8 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.expectToHaveFeedbackThread = async function() {
-    expect(await feedbackTabRow.isPresent()).toBe(true);
+    await waitFor.presenceOf(
+      feedbackTabRow,'Feedback Tab Row takes too long to appear');
   };
 
   this.getSuggestionThreads = async function() {
@@ -149,7 +150,7 @@ var ExplorationEditorFeedbackTab = function() {
       feedbackStatus, feedbackResponse) {
     await action.sendKeys(
       'Feedback Response Text Area',
-      feedbackResponseTextArea, feedbackResponseTextArea);
+      feedbackResponseTextArea, feedbackResponse);
     await action.click('Feedback Status Dropdow', feedbackStatusDropdown);
     var optionLabelFeedbackStatus =
       element(by.css('option[label="' + feedbackStatus + '"]'));
