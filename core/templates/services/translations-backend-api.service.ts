@@ -43,9 +43,9 @@ export class TranslationsBackendApiService {
       `${this.prefix}${languageCode}${this.suffix}`).toPromise();
   }
 
-  async loadTranslationFileAsync(url: string): Promise<TranslationsDict> {
+  async loadTranslationFileAsync(url: string): Promise<Object> {
     return this.http.get<TranslationsDict>(
-      this.urlInterpolationService.getStaticAssetUrl(url)).toPromise();
+      this.urlInterpolationService.getStaticAssetUrl(url), { observe: 'response' }).toPromise();
   }
 }
 

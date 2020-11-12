@@ -32,9 +32,9 @@ angular.module('oppia').factory('TranslationFileHashLoaderService', [
         options.key,
         options.suffix
       ].join('');
-      return TranslationsBackendApiService.loadTranslationFileAsync(fileUrl)
-        .then(function(result) {
-          return result;
+      TranslationsBackendApiService.loadTranslationFileAsync(fileUrl)
+        .then((result) => {
+          return result.body;
         }, function() {
           return $q.reject(options.key);
         });
