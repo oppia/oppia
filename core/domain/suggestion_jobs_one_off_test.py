@@ -2491,3 +2491,247 @@ class PopulateContributionStatsOneOffJobTests(
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code['en']
             ), 1)
+
+
+class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
+
+    target_id = 'exp1'
+    target_version_at_submission = 1
+    exploration_category = 'Algebra'
+    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
+    SKILL_THREAD_ID = 'skill1.thread1'
+    AUTHOR_EMAIL = 'author1@example.com'
+    REVIEWER_EMAIL = 'reviewer@example.com'
+
+    edit_state_content_change_dict = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'Introduction',
+        'new_value': {
+            'content_id': 'content',
+            'html': 'new html content'
+        },
+        'old_value': {
+            'content_id': 'content',
+            'html': 'old html content'
+        }
+    }
+
+    # The question_state_data is set to valid state data in the setup.
+    add_question_change_dict = {
+        'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+        'question_dict': {
+            'question_state_data': {},
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_1'],
+            'inapplicable_skill_misconception_ids': ['skillid12345-1']
+        },
+        'skill_id': 'skill_1',
+        'skill_difficulty': 0.3,
+    }
+
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the PopulateFinalReviewerIdOneOffJobTests and
+        verifies that the output matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one off
+                job.
+        """
+        job_id = (
+            suggestion_jobs_one_off
+            .PopulateFinalReviewerIdOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off
+            .PopulateFinalReviewerIdOneOffJob.enqueue(job_id)
+        )
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off
+            .PopulateFinalReviewerIdOneOffJob.get_output(job_id))
+
+        self.assertEqual(actual_output, expected_output)
+
+    def setUp(self):
+        super(PopulateFinalReviewerIdOneOffJobTests, self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        # Add valid question state data to the question dict.
+        self.add_question_change_dict['question_dict'][
+            'question_state_data'] = self._create_valid_question_data(
+                'default_state').to_dict()
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_no_action_is_performed_for_suggestions_that_are_marked_deleted(
+            self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category='score_category'
+        ).put()
+
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        suggestion_model.deleted = True
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+        expected_output = [u'[u\'DELETED_MODELS\', 1]']
+        self._run_job_and_verify_output(expected_output)
+
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(suggestion_model.final_reviewer_id, None)
+
+    def test_job_does_not_changes_valid_models(self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.author_id,
+            final_reviewer_id=self.reviewer_id,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category='score_category'
+        ).put()
+
+        expected_output = [u'[u\'UNCHANGED_MODELS\', 1]']
+        self._run_job_and_verify_output(expected_output)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
+
+    def test_accepted_suggestion_with_none_final_reviewer_id_gets_updated(self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category='score_category'
+        ).put()
+
+        feedback_models.GeneralFeedbackMessageModel(
+            id=self.EXPLORATION_THREAD_ID + '.0',
+            thread_id=self.EXPLORATION_THREAD_ID,
+            message_id=0,
+            author_id=self.reviewer_id,
+            updated_status=feedback_models.STATUS_CHOICES_FIXED
+        ).put()
+
+        expected_output = [u'[u\'CHANGED_MODELS\', 1]']
+        self._run_job_and_verify_output(expected_output)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
+
+    def test_rejected_suggestion_with_none_final_reviewer_id_gets_updated(self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_REJECTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category='score_category'
+        ).put()
+
+        feedback_models.GeneralFeedbackMessageModel(
+            id=self.EXPLORATION_THREAD_ID + '.0',
+            thread_id=self.EXPLORATION_THREAD_ID,
+            message_id=0,
+            author_id=self.reviewer_id,
+            updated_status=feedback_models.STATUS_CHOICES_IGNORED
+        ).put()
+
+        expected_output = [u'[u\'CHANGED_MODELS\', 1]']
+        self._run_job_and_verify_output(expected_output)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(suggestion_model.final_reviewer_id, self.reviewer_id)
+
+    def test_job_with_no_message_model_yields_without_update(self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category='score_category'
+        ).put()
+
+        expected_output = [
+            u'[u\'FAILED_NONE_MESSAGE_MODEL\', '
+            '[u"(\'exploration.exp1.thread_1\', u\'accepted\')"]]']
+        self._run_job_and_verify_output(expected_output)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(suggestion_model.final_reviewer_id, None)
+
+    def test_job_with_multi_message_models_yields_without_update(self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category='score_category'
+        ).put()
+
+        feedback_models.GeneralFeedbackMessageModel(
+            id=self.EXPLORATION_THREAD_ID + '.0',
+            thread_id=self.EXPLORATION_THREAD_ID,
+            message_id=0,
+            author_id=self.reviewer_id,
+            updated_status=feedback_models.STATUS_CHOICES_FIXED
+        ).put()
+        feedback_models.GeneralFeedbackMessageModel(
+            id=self.EXPLORATION_THREAD_ID + '.1',
+            thread_id=self.EXPLORATION_THREAD_ID,
+            message_id=1,
+            author_id=self.reviewer_id,
+            updated_status=feedback_models.STATUS_CHOICES_FIXED
+        ).put()
+
+        expected_output = [
+            u'[u\'FAILED_MULTIPLE_MESSAGE_MODEL\', '
+            '[u"(\'exploration.exp1.thread_1\', u\'accepted\')"]]']
+        self._run_job_and_verify_output(expected_output)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.EXPLORATION_THREAD_ID)
+        self.assertEqual(suggestion_model.final_reviewer_id, None)

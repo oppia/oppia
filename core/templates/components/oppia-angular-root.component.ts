@@ -302,6 +302,8 @@ import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from
@@ -664,6 +666,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static platformFeatureAdminBackendApiService:
     PlatformFeatureAdminBackendApiService;
   static platformFeatureBackendApiService: PlatformFeatureBackendApiService;
+  static platformFeatureDummyBackendApiService:
+    PlatformFeatureDummyBackendApiService;
   static platformFeatureService: PlatformFeatureService;
   static playerPositionService: PlayerPositionService;
   static playerTranscriptService: PlayerTranscriptService;
@@ -955,6 +959,8 @@ private pencilCodeEditorValidationService:
 private platformFeatureAdminBackendApiService:
   PlatformFeatureAdminBackendApiService,
 private platformFeatureBackendApiService: PlatformFeatureBackendApiService,
+private platformFeatureDummyBackendApiService:
+  PlatformFeatureDummyBackendApiService,
 private platformFeatureService: PlatformFeatureService,
 private playerCorrectnessFeedbackEnabledService:
   PlayerCorrectnessFeedbackEnabledService,
@@ -1349,6 +1355,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.platformFeatureAdminBackendApiService);
     OppiaAngularRootComponent.platformFeatureBackendApiService = (
       this.platformFeatureBackendApiService);
+    OppiaAngularRootComponent.platformFeatureDummyBackendApiService = (
+      this.platformFeatureDummyBackendApiService);
     OppiaAngularRootComponent.platformFeatureService = (
       this.platformFeatureService);
     OppiaAngularRootComponent.playerCorrectnessFeedbackEnabledService = (
