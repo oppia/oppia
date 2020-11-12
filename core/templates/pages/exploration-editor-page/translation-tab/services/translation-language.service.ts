@@ -41,7 +41,7 @@ export class TranslationLanguageService {
     return this.activeLanguageCode;
   }
 
-  setActiveLanguageCode(newActiveLanguageCode: string): null {
+  setActiveLanguageCode(newActiveLanguageCode: string): void {
     if (this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
       this.loggerService.error(
         'Invalid active language code: ' + newActiveLanguageCode);

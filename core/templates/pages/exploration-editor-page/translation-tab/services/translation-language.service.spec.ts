@@ -16,7 +16,6 @@
  * @fileoverview Unit test for the Translation language service.
  */
 
-// eslint-disable-next-line max-len
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TestBed } from '@angular/core/testing';
