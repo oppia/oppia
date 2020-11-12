@@ -118,10 +118,15 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
                 break;
               }
             }
-            clearActiveThread();
-          })['catch'](function() {
-            $log.error('Error resolving suggestion');
-          });
+          }
+          clearActiveThread();
+        })['catch'](function() {
+          $log.error('Error resolving suggestion');
+        });
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     };
 
