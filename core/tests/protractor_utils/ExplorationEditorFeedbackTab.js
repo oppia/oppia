@@ -60,11 +60,8 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-    expect(await matchingRow.isDisplayed()).toBe(true);
     await action.click('Matching Row', matchingRow);
-    expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await action.click('View Suggestion Button', viewSuggestionButton);
-    expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
     await action.sendKeys(
       'Suggestion Commit Message Input',
       suggestionCommitMessageInput, 'Commit message');
@@ -121,11 +118,8 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-    expect(await matchingRow.isDisplayed()).toBe(true);
     await action.click('Matching Row', matchingRow);
-    expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await action.click('View Suggestion Button', viewSuggestionButton);
-    expect(await rejectSuggestionButton.isDisplayed()).toBe(true);
     await action.sendKeys(
       'Suggestion Review Message Input',
       suggestionReviewMessageInput, 'Review message');
