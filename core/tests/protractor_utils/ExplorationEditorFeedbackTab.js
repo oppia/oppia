@@ -119,7 +119,8 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-    await action.click('Matching Suggestion Row and feedback subject', matchingRow);
+    await action.click(
+      'Matching Suggestion Row and feedback subject', matchingRow);
     await action.click('View Suggestion Button', viewSuggestionButton);
     await action.sendKeys(
       'Suggestion Review Message Input',
@@ -134,7 +135,7 @@ var ExplorationEditorFeedbackTab = function() {
     var suggestionRowFirst =
       element.all(by.css(suggestionRowClassName)).first();
     await action.click(
-      'Suggestion Row First', suggestionRowClassNameFirst);
+      'Suggestion Row First', suggestionRowFirst);
   };
 
   this.sendResponseToLatestFeedback = async function(feedbackResponse) {
