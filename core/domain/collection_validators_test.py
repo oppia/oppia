@@ -1434,7 +1434,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_0 = (
             collection_models.CollectionSummaryModel.get_by_id('0'))
         self.model_instance_0.put()
-
+        
         self.model_instance_1 = (
             collection_models.CollectionSummaryModel.get_by_id('1'))
         self.model_instance_2 = (
