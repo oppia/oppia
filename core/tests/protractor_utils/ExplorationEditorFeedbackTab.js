@@ -73,7 +73,7 @@ var ExplorationEditorFeedbackTab = function() {
 
   this.expectToHaveFeedbackThread = async function() {
     await waitFor.presenceOf(
-      feedbackTabRow,'Feedback Tab Row takes too long to appear');
+      feedbackTabRow, 'Feedback Tab Row takes too long to appear');
   };
 
   this.getSuggestionThreads = async function() {
