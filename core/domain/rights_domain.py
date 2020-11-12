@@ -220,6 +220,17 @@ class ActivityRights(python_utils.OBJECT):
         """
         return bool(self.status == ACTIVITY_STATUS_PRIVATE)
 
+    def is_solely_owned_by_user(self, user_id):
+        """Checks whether the activity is solely owned by the user.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            bool. Whether the activity is solely owned by the user.
+        """
+        return user_id in self.owner_ids and len(self.owner_ids) == 1
+
 
 class ExplorationRightsChange(change_domain.BaseChange):
     """Domain object class for an exploration rights change.
