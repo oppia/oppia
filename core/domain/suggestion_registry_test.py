@@ -1623,8 +1623,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            'Expected question state schema version to be %s, received %s' % (
-                feconf.CURRENT_STATE_SCHEMA_VERSION, 0)):
+            'Expected question state schema version to be %s, received 0' % (
+                feconf.CURRENT_STATE_SCHEMA_VERSION)):
             suggestion.validate()
 
     def test_validate_change_skill_difficulty_none(self):

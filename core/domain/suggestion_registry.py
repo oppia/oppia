@@ -686,15 +686,16 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.language_code = language_code
         self.last_updated = last_updated
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
-        self._updated_change()
+        self._update_change_to_latest_state_schema_version()
 
-    def _updated_change(self):
+    def _update_change_to_latest_state_schema_version(self):
         """Holds the responsibility of performing a step-by-step, sequential
-        update of the state structure based on the schema version of the current
-        state dictionary.
+        update of the state structure inside the change_cmd based on the schema
+        version of the current state dictionary.
 
         Raises:
-            Exception. The given state_schema_version is invalid.
+            Exception. The state_schema_version of suggestion cannot be
+                processed.
         """
         state_schema_version = self.change.question_dict[
             'question_state_data_schema_version']
@@ -710,8 +711,9 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not (25 <= state_schema_version
                 <= feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise Exception(
-                'Sorry, we can only process v25-v%d state schemas at present.' %
-                feconf.CURRENT_STATE_SCHEMA_VERSION)
+                'Expected state schema version to be in between 25 and %d, '
+                'received %s.' % (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION, state_schema_version))
 
         while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
             question_domain.Question.update_state_from_model(

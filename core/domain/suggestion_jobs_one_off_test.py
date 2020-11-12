@@ -123,7 +123,7 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
                 'question_state_data_schema_version'],
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    def test_migration_job_skips_deleted_question_suggestion(self):
+    def test_migration_job_after_deleting_question_suggestion(self):
         suggestion_models.GeneralSuggestionModel.delete_by_id(
             self.suggestion.suggestion_id)
 

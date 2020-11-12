@@ -36,7 +36,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
-    """A reusable one-time job that can be used to migrate sate schema
+    """A reusable one-time job that can be used to migrate state schema
     versions of question suggestions.
 
     This job will create domain objects out of the models. The object conversion
@@ -55,9 +55,14 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
             return
 
-        # Suggestion class itself updates the question state dict of the
-        # suggestion while initializing the object.
-        suggestion = suggestion_services.get_suggestion_from_model(item)
+        try:
+            # Suggestion class itself updates the question state dict of the
+            # suggestion while initializing the object.
+            suggestion = suggestion_services.get_suggestion_from_model(item)
+        except Exception as e:
+            yield ('MIGRATION_FAILURE', (item.id, e))
+            return
+
         try:
             suggestion.validate()
         except Exception as e:
