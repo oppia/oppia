@@ -314,7 +314,7 @@ angular.module('oppia').directive('adminRolesTab', [
             '$ctrl.formData.viewContributionReviewers.filterCriterion',
             function() {
               ctrl.contributionReviewersDataFetched = false;
-          });
+            });
           ctrl.result = {};
           ctrl.setStatusMessage('');
 
