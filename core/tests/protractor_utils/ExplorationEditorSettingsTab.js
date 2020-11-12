@@ -80,6 +80,7 @@ var ExplorationEditorSettingsTab = function() {
   this.expectAvailableFirstStatesToBe = async function(names) {
     var options = await initialStateSelect.all(by.tagName('option'))
       .map(async function(elem) {
+        await waitFor.visibilityOf(elem, 'Element taking too long to appear');
         return await elem.getText();
       });
     expect(options.sort()).toEqual(names.sort());
@@ -105,12 +106,13 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setFirstState = async function(stateName) {
     await action.click(
-      'Initial State Select Option', initialStateSelectOption(stateName));
+      'Initial State Select Option ' + stateName,
+      initialStateSelectOption(stateName));
   };
 
   this.setLanguage = async function(language) {
     await action.click(
-      'Exploration Language Input option',
+      'Exploration Language Input option ' + language,
       explorationLanguageInput.element(
         by.cssContainingText('option', language)));
   };
