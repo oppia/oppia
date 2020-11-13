@@ -41,8 +41,11 @@ import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Training Panel Component', function() {
+  importAllAngularServices();
+
   var ctrl = null;
   var $scope = null;
   var explorationStatesService = null;

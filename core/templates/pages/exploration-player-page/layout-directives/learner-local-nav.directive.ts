@@ -34,6 +34,7 @@ require(
   'pages/exploration-player-page/suggestion-modal-for-learner-local-view/' +
   'suggestion-modal-for-exploration-player.service.ts');
 require('services/alerts.service.ts');
+require('services/attribution.service');
 require('services/user.service.ts');
 
 require(
@@ -51,7 +52,7 @@ angular.module('oppia').directive('learnerLocalNav', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$uibModal', 'AlertsService',
-        'ExplorationEngineService',
+        'AttributionService', 'ExplorationEngineService',
         'LoaderService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService',
@@ -59,7 +60,7 @@ angular.module('oppia').directive('learnerLocalNav', [
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
             $http, $rootScope, $uibModal, AlertsService,
-            ExplorationEngineService,
+            AttributionService, ExplorationEngineService,
             LoaderService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserService,
@@ -113,6 +114,15 @@ angular.module('oppia').directive('learnerLocalNav', [
               // No further action is needed.
             });
           };
+
+          ctrl.toggleAttributionModal = function() {
+            if (AttributionService.isAttributionModalShown()) {
+              AttributionService.hideAttributionModal();
+            } else {
+              AttributionService.showAttributionModal();
+            }
+          };
+
           ctrl.$onInit = function() {
             ctrl.explorationId = ExplorationEngineService.getExplorationId();
             ReadOnlyExplorationBackendApiService

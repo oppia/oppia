@@ -84,6 +84,10 @@ angular.module('oppia').directive('learnerViewInfo', [
                 }
               },
               controller: 'InformationCardModalController'
+            }).result.then(null, () => {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
           ctrl.$onInit = function() {
