@@ -45,19 +45,19 @@ require(
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/suggestions.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').component('creatorDashboardPage', {
   template: require('./creator-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$window', 'AlertsService',
+    '$http', '$q', '$rootScope', '$window', 'AlertsService',
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
     'ThreadMessageObjectFactory', 'ThreadStatusDisplayService',
-    'UrlInterpolationService', 'UserService',
+    'UrlInterpolationService', 'UserBackendApiService',
     'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
     'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
     'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
@@ -65,12 +65,12 @@ angular.module('oppia').component('creatorDashboardPage', {
     'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
     'SUBSCRIPTION_SORT_BY_KEYS',
     function(
-        $http, $q, $window, AlertsService,
+        $http, $q, $rootScope, $window, AlertsService,
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
         ThreadMessageObjectFactory, ThreadStatusDisplayService,
-        UrlInterpolationService, UserService,
+        UrlInterpolationService, UserBackendApiService,
         ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
         DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
         EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
@@ -254,9 +254,12 @@ angular.module('oppia').component('creatorDashboardPage', {
 
         ctrl.canCreateCollections = null;
         LoaderService.showLoadingScreen('Loading');
-        var userInfoPromise = UserService.getUserInfoAsync();
+        var userInfoPromise = UserBackendApiService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.canCreateCollections = userInfo.canCreateCollections();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         var dashboardDataPromise = (

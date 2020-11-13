@@ -30,7 +30,7 @@ require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/url.service.ts');
 
 angular.module('oppia').animation(
@@ -55,16 +55,16 @@ angular.module('oppia').directive('collectionPlayerPage', [
         '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location', '$scope', 'AlertsService',
-        'GuestCollectionProgressService', 'LoaderService', 'PageTitleService',
-        'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
-        'UrlService', 'UserService',
+        '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
+        'AlertsService', 'GuestCollectionProgressService', 'LoaderService',
+        'PageTitleService', 'ReadOnlyCollectionBackendApiService',
+        'UrlInterpolationService', 'UrlService', 'UserBackendApiService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location, $scope, AlertsService,
+            $anchorScroll, $http, $location, $rootScope, $scope, AlertsService,
             GuestCollectionProgressService, LoaderService, PageTitleService,
             ReadOnlyCollectionBackendApiService, UrlInterpolationService,
-            UrlService, UserService,
+            UrlService, UserBackendApiService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -316,32 +316,36 @@ angular.module('oppia').directive('collectionPlayerPage', [
                 var collectionAllowsGuestProgress = (
                   ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                     ctrl.collectionId) !== -1);
-                UserService.getUserInfoAsync().then(function(userInfo) {
-                  LoaderService.hideLoadingScreen();
-                  ctrl.isLoggedIn = userInfo.isLoggedIn();
-                  if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
-                      GuestCollectionProgressService
-                        .hasCompletedSomeExploration(ctrl.collectionId)) {
-                    var completedExplorationIds = (
-                      GuestCollectionProgressService.getCompletedExplorationIds(
-                        ctrl.collection));
-                    var nextExplorationId = (
-                      GuestCollectionProgressService.getNextExplorationId(
-                        ctrl.collection, completedExplorationIds));
-                    ctrl.collectionPlaythrough = (
-                      CollectionPlaythrough.create(
-                        nextExplorationId, completedExplorationIds));
-                  } else {
-                    ctrl.collectionPlaythrough = collection.getPlaythrough();
-                  }
-                  ctrl.nextExplorationId =
-                    ctrl.collectionPlaythrough.getNextExplorationId();
+                UserBackendApiService.getUserInfoAsync().then(
+                  function(userInfo) {
+                    LoaderService.hideLoadingScreen();
+                    ctrl.isLoggedIn = userInfo.isLoggedIn();
+                    if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
+                        GuestCollectionProgressService
+                          .hasCompletedSomeExploration(ctrl.collectionId)) {
+                      var completedExplorationIds = (
+                        GuestCollectionProgressService.getCompletedExplorationIds(
+                          ctrl.collection));
+                      var nextExplorationId = (
+                        GuestCollectionProgressService.getNextExplorationId(
+                          ctrl.collection, completedExplorationIds));
+                      ctrl.collectionPlaythrough = (
+                        CollectionPlaythrough.create(
+                          nextExplorationId, completedExplorationIds));
+                    } else {
+                      ctrl.collectionPlaythrough = collection.getPlaythrough();
+                    }
+                    ctrl.nextExplorationId =
+                      ctrl.collectionPlaythrough.getNextExplorationId();
 
-                  ctrl.isCompletedExploration = function(explorationId) {
-                    var completedExplorationIds = (
-                      ctrl.collectionPlaythrough.getCompletedExplorationIds());
-                    return completedExplorationIds.indexOf(explorationId) > -1;
-                  };
+                    ctrl.isCompletedExploration = function(explorationId) {
+                      var completedExplorationIds = (
+                        ctrl.collectionPlaythrough.getCompletedExplorationIds());
+                      return completedExplorationIds.indexOf(explorationId) > -1;
+                    };
+                    // TODO(#8521): Remove the use of $rootScope.$apply()
+                    // once the controller is migrated to angular.
+                    $rootScope.$applyAsync();
                 });
               },
               function() {
