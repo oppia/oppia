@@ -26,9 +26,6 @@ import {
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
 
-
-
-
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -499,8 +496,7 @@ import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
-  'domain/topic/topic-creation-backend-api.service.ts';
-import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';  
+  'domain/topic/topic-creation-backend-api.service.ts'; 
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len

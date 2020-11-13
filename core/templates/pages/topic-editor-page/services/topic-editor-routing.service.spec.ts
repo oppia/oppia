@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for TopicEditorRoutingService.
  */
-import { SpyLocation, MockLocationStrategy } from '@angular/common/testing';
+import { SpyLocation } from '@angular/common/testing';
 import { Location } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
