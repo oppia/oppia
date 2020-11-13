@@ -338,7 +338,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertIsNone(
-            pending_deletion_request.normalized_username)
+            pending_deletion_request.normalized_long_term_username)
 
     def test_pre_delete_username_is_saved_for_user_older_than_week(self):
         date_10_days_ago = (
@@ -353,7 +353,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(user_3_id))
         self.assertEqual(
-            pending_deletion_request.normalized_username, self.USER_3_USERNAME)
+            pending_deletion_request.normalized_long_term_username,
+            self.USER_3_USERNAME)
 
     def test_pre_delete_user_with_activities_multiple_owners(self):
         user_services.update_user_role(
