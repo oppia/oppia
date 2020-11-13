@@ -212,6 +212,7 @@ describe('Interactions', function() {
       'explorationEditor@interactions.com', 'explorationEditor');
     await workflow.createExploration();
 
+    await waitFor.pageToFullyLoad();
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));
