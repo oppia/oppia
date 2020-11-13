@@ -84,7 +84,6 @@ describe('Topic editor tab directive', function() {
     $provide.value(
       'TopicEditorRoutingService', TestBed.get(TopicEditorRoutingService));
     topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
-    location = TestBed.get(Location);
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
