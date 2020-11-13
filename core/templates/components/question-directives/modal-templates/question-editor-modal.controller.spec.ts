@@ -21,6 +21,9 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Editor Modal Controller', function() {
   importAllAngularServices();
@@ -34,6 +37,7 @@ describe('Question Editor Modal Controller', function() {
   let QuestionUndoRedoService = null;
   let ShortSkillSummaryObjectFactory = null;
   let StateEditorService = null;
+  importAllAngularServices();
 
   const associatedSkillSummariesDict = [{
     id: '1',

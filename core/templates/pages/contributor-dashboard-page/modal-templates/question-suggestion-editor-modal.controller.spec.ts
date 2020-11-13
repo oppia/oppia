@@ -15,6 +15,9 @@
 /**
  * @fileoverview Unit tests for QuestionSuggestionEditorModalController.
  */
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
@@ -40,6 +43,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let questionStateData = null;
   let skill = null;
   const skillDifficulty = 0.3;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
 

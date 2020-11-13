@@ -20,10 +20,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-const constants = require('constants.ts');
 import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+const constants = require('constants.ts');
 
 export interface QuestionBackendDict {
   'id': string;

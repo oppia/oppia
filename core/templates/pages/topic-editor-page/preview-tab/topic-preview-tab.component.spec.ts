@@ -16,9 +16,13 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
-import { StorySummary } from 'domain/story/story-summary.model';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
+import { StorySummary} from 'domain/story/story-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Topic preview tab', function() {
@@ -28,8 +32,21 @@ describe('Topic preview tab', function() {
   var $rootScope = null;
   var $scope = null;
   var TopicEditorStateService = null;
-  beforeEach(angular.mock.module('oppia'));
 
+  importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [EditableStoryBackendApiService]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
+  }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');

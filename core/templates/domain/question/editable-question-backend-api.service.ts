@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,36 +17,51 @@
  *  backend.
  */
 
-require('domain/collection/guest-collection-progress.service.ts');
-require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/HintObjectFactory.ts');
-require('domain/exploration/OutcomeObjectFactory.ts');
-require('domain/exploration/ParamSpecObjectFactory.ts');
-require('domain/question/QuestionObjectFactory.ts');
-require('domain/exploration/WrittenTranslationObjectFactory.ts');
-require('domain/objects/FractionObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-require('domain/question/question-domain.constants.ajs.ts');
+import { HttpClient } from '@angular/common/http';
+import { QuestionObjectFactory, QuestionBackendDict, Question } from 'domain/question/QuestionObjectFactory';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { QuestionDomainConstants } from 'domain/question/question-domain.constants';
 
-angular.module('oppia').factory('EditableQuestionBackendApiService', [
-  '$http', '$q', 'QuestionObjectFactory',
-  'UrlInterpolationService',
-  'EDITABLE_QUESTION_DATA_URL_TEMPLATE', 'QUESTION_CREATION_URL',
-  'QUESTION_SKILL_LINK_URL_TEMPLATE',
-  function(
-      $http, $q, QuestionObjectFactory,
-      UrlInterpolationService,
-      EDITABLE_QUESTION_DATA_URL_TEMPLATE, QUESTION_CREATION_URL,
-      QUESTION_SKILL_LINK_URL_TEMPLATE) {
-    var _createQuestion = function(
-        skillIds, skillDifficulties,
-        questionDict, imagesData, successCallback, errorCallback) {
-      var postData = {
-        question_dict: questionDict,
+export interface EditableQuestionBackendResponse {
+  questionId: string;
+}
+export interface UpdateEditableQuestionBackendResponse {
+  questionDict: QuestionBackendDict;
+}
+export interface fetchQuestionResponse{
+  questionObject: Question
+}
+export interface ImageData {
+  filename: string,
+  imageBlob: Blob
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class EditableQuestionBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private questionObjectFactory: QuestionObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  private _createQuestion(
+      skillIds: string[],
+      skillDifficulties: number[],
+      questionObject: Question,
+      imagesData: ImageData[],
+      successCallback: (value: EditableQuestionBackendResponse) => void,
+      errorCallback: (reason?: string) => void)
+    : Promise<EditableQuestionBackendResponse> {
+    return new Promise((resolve, reject) => {
+      let postData = {
+        question_dict: questionObject,
         skill_ids: skillIds,
         skill_difficulties: skillDifficulties
       };
+
       let body = new FormData();
       body.append('payload', JSON.stringify(postData));
       let filenames = imagesData.map(obj => obj.filename);
@@ -54,109 +69,113 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       for (let idx in imageBlobs) {
         body.append(filenames[idx], imageBlobs[idx]);
       }
-      $http.post(QUESTION_CREATION_URL, (body), {
-        // The actual header to be added for form-data is 'multipart/form-data',
-        // But adding it manually won't work because we will miss the boundary
-        // parameter. When we keep 'Content-Type' as undefined the browser
-        // automatically fills the boundary parameter according to the form
-        // data. Refer https://stackoverflow.com/questions/37039852/. and
-        // https://stackoverflow.com/questions/34983071/.
-        // Note: This should be removed and a convetion similar to
-        // SkillCreationBackendApiService should be followed once this service
-        // is migrated to Angular 8.
-        headers: {
-          'Content-Type': undefined
-        }
-      }).then(function(response) {
-        var questionId = response.data.question_id;
-        if (successCallback) {
-          successCallback(questionId);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _fetchQuestion = function(questionId, successCallback, errorCallback) {
-      var questionDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
+      this.http.post<EditableQuestionBackendResponse>(
+        QuestionDomainConstants.QUESTION_CREATION_URL, body).toPromise()
+        .then(response => {
+          successCallback(
+            {
+              questionId: response.questionId
+            });
+        },
+        errorResponse => {
+          errorCallback(errorResponse.error.error);
+        });
+    });
+  }
+  private _fetchQuestion(
+      questionId: string,
+      successCallback: (value: Question) => void,
+      errorCallback: (reason?: string) => void): Promise<Question> {
+    return new Promise((resolve, reject) => {
+      const questionDataUrl = this.urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
           question_id: questionId
         });
 
-      $http.get(questionDataUrl).then(function(response) {
-        var questionObject =
-          QuestionObjectFactory.createFromBackendDict(
-            response.data.question_dict);
-        var skillDicts = angular.copy(
-          response.data.associated_skill_dicts);
-        if (successCallback) {
-          successCallback({
-            questionObject: questionObject,
-            associated_skill_dicts: skillDicts
+      this.http.get<UpdateEditableQuestionBackendResponse>(questionDataUrl)
+        .toPromise().then(
+          response => {
+            successCallback(
+              this.questionObjectFactory
+                .createFromBackendDict(response.questionDict),
+            );
+          },
+          errorResponse => {
+            errorCallback(errorResponse.error.error);
           });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _updateQuestion = function(
-        questionId, questionVersion, commitMessage, changeList,
-        successCallback, errorCallback) {
-      var editableQuestionDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
+    });
+  }
+  private _updateQuestion(
+      questionId: string,
+      questionVersion: string,
+      commitMessage: string,
+      changeList:string[],
+      successCallback: (value: QuestionBackendDict) => void,
+      errorCallback: (reason?: string) => void)
+      : Promise<QuestionBackendDict> {
+    return new Promise((resolve, reject) => {
+      let editableQuestionDataUrl = this.urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
           question_id: questionId
         });
 
-      var putData = {
+      let putData = {
         version: questionVersion,
         commit_message: commitMessage,
         change_list: changeList
       };
-      $http.put(editableQuestionDataUrl, putData).then(function(response) {
-        // The returned data is an updated question dict.
-        var questionDict = angular.copy(response.data.question_dict);
-
-        if (successCallback) {
-          successCallback(questionDict);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _editQuestionSkillLinks = function(
-        questionId, skillIdsTaskArray, difficulty,
-        successCallback, errorCallback) {
-      var editQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
-        QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId
+      this.http.put<UpdateEditableQuestionBackendResponse>(
+        editableQuestionDataUrl, putData).toPromise()
+        .then(response => {
+          let questionDict = angular.copy(response.questionDict);
+          successCallback(
+            // The returned data is an updated question dict.
+            questionDict);
+        },
+        errorResponse => {
+          errorCallback(errorResponse.error.error);
         });
-      $http.put(editQuestionSkillLinkUrl, {
+    });
+  }
+
+  private _editQuestionSkillLinks(
+      questionId: string,
+      skillIdsTaskArray: (string | number)[],
+      difficulty: number,
+      successCallback: (value: void) => void,
+      errorCallback: (reason?: string) => void)
+    : Promise<Question> {
+    return new Promise((resolve, reject) => {
+      var editQuestionSkillLinkUrl = this.urlInterpolationService
+        .interpolateUrl(
+          QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE, {
+            question_id: questionId
+          });
+      this.http.put(editQuestionSkillLinkUrl, {
         action: 'edit_links',
         difficulty: difficulty,
         skill_ids_task_list: skillIdsTaskArray
-      }).then(function(response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
+      }).toPromise()
+        .then(
+          response => {
+            successCallback();
+          },
+          errorResponse => {
+            errorCallback(errorResponse.error.error);
+          });
+    });
+  }
 
-    var _changeDifficulty = function(
-        questionId, skillId, newDifficulty, successCallback, errorCallback) {
-      var changeDifficultyUrl = UrlInterpolationService.interpolateUrl(
-        QUESTION_SKILL_LINK_URL_TEMPLATE, {
+  private _changeDifficulty(
+      questionId: string,
+      skillId: string,
+      newDifficulty: number,
+      successCallback: (value: void) => void,
+      errorCallback: (reason?: string) => void)
+    : Promise<Question> {
+    return new Promise((resolve, reject) => {
+      var changeDifficultyUrl = this.urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE, {
           question_id: questionId
         });
       var putData = {
@@ -164,66 +183,83 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
         action: 'update_difficulty',
         skill_id: skillId
       };
-      $http.put(changeDifficultyUrl, putData).then(function(response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    return {
-      createQuestion: function(
-          skillIds, skillDifficulties, questionDict, imagesData) {
-        return $q(function(resolve, reject) {
-          _createQuestion(
-            skillIds, skillDifficulties, questionDict, imagesData, resolve,
-            reject);
-        });
-      },
-
-      fetchQuestion: function(questionId) {
-        return $q(function(resolve, reject) {
-          _fetchQuestion(questionId, resolve, reject);
-        });
-      },
-
-      editQuestionSkillLinks: function(
-          questionId, skillIdsTaskArray, difficulty) {
-        return $q(function(resolve, reject) {
-          _editQuestionSkillLinks(
-            questionId, skillIdsTaskArray, difficulty, resolve, reject);
-        });
-      },
-
-      changeDifficulty: function(questionId, skillId, newDifficulty) {
-        return $q(function(resolve, reject) {
-          _changeDifficulty(
-            questionId, skillId, newDifficulty, resolve, reject);
-        });
-      },
-
-      /**
-       * Updates a question in the backend with the provided question ID.
-       * The changes only apply to the question of the given version and the
-       * request to update the question will fail if the provided question
-       * version is older than the current version stored in the backend. Both
-       * the changes and the message to associate with those changes are used
-       * to commit a change to the question. The new question is passed to
-       * the success callback, if one is provided to the returned promise
-       * object. Errors are passed to the error callback, if one is provided.
-       */
-      updateQuestion: function(
-          questionId, questionVersion, commitMessage, changeList) {
-        return $q(function(resolve, reject) {
-          _updateQuestion(
-            questionId, questionVersion, commitMessage, changeList,
-            resolve, reject);
-        });
-      }
-    };
+      this.http.put(changeDifficultyUrl, putData).toPromise()
+        .then(
+          response => {
+            successCallback();
+          },
+          errorResponse => {
+            errorCallback(errorResponse.error.error);
+          });
+    });
   }
-]);
+
+  createQuestion(
+      skillIds: string[],
+      skillDifficulties: number[],
+      questionDict: Question,
+      imagesData: ImageData[])
+      : Promise<EditableQuestionBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this._createQuestion(
+        skillIds, skillDifficulties, questionDict, imagesData, resolve, reject);
+    });
+  }
+
+  fetchQuestion(questionId: string)
+  : Promise<Question> {
+    return new Promise((resolve, reject) => {
+      this._fetchQuestion(questionId, resolve, reject);
+    });
+  }
+
+  editQuestionSkillLinks(
+      questionId: string,
+      skillIdsTaskArray: (string | number)[],
+      difficulty: number)
+      : Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._editQuestionSkillLinks(
+        questionId, skillIdsTaskArray, difficulty, resolve, reject);
+    });
+  }
+
+  changeDifficulty(
+      questionId: string,
+      skillId: string,
+      newDifficulty: number)
+      : Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._changeDifficulty(
+        questionId, skillId, newDifficulty, resolve, reject);
+    });
+  }
+
+  /**
+  * Updates a question in the backend with the provided question ID.
+  * The changes only apply to the question of the given version and the
+  * request to update the question will fail if the provided question
+  * version is older than the current version stored in the backend. Both
+  * the changes and the message to associate with those changes are used
+  * to commit a change to the question. The new question is passed to
+  * the success callback, if one is provided to the returned promise
+  * object. Errors are passed to the error callback, if one is provided.
+  */
+  updateQuestion(
+      questionId: string,
+      questionVersion: string,
+      commitMessage: string,
+      changeList: string[])
+      : Promise<QuestionBackendDict> {
+    return new Promise((resolve, reject) => {
+      this._updateQuestion(
+        questionId, questionVersion,
+        commitMessage, changeList, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'EditableQuestionBackendApiService',
+  downgradeInjectable(EditableQuestionBackendApiService)
+);

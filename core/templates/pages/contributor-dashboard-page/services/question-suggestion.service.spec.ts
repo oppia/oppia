@@ -16,6 +16,9 @@
 /**
  * @fileoverview Unit tests for QuestionSuggestionService.
  */
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
@@ -34,6 +37,7 @@ describe('Question Suggestion Service', function() {
   let question = null;
   let skill = null;
   const skillDifficulty = 0.3;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
 
