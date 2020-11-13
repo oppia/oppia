@@ -41,7 +41,6 @@ describe('Topic editor tab directive', function() {
   var skillSummary = null;
   var story1 = null;
   var story2 = null;
-  let location;
   let topicEditorRoutingService : TopicEditorRoutingService;
   var directive = null;
   var TopicEditorStateService = null;
