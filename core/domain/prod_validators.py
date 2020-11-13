@@ -30,6 +30,7 @@ from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
+from core.domain import cron_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -104,41 +105,6 @@ TARGET_TYPE_TO_TARGET_MODEL = {
 VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
-
-
-class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating RoleQueryAuditModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        # Valid id: [user_id].[timestamp_in_sec].[intent].[random_number]
-        regex_string = '^%s\\.\\d+\\.%s\\.\\d+$' % (item.user_id, item.intent)
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_ids', user_models.UserSettingsModel, [item.user_id])]
-
-
-class UsernameChangeAuditModelValidator(
-        base_model_validators.BaseModelValidator):
-    """Class for validating UsernameChangeAuditModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        # Valid id: [committer_id].[timestamp_in_sec]
-        # committer_id refers to the user that is making the change.
-        regex_string = '^%s\\.\\d+$' % item.committer_id
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
 
 
 class ClassifierTrainingJobModelValidator(
@@ -1997,10 +1963,15 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                     [item.target_id]))
         if item.final_reviewer_id and user_services.is_user_id_valid(
                 item.final_reviewer_id):
-            field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'reviewer_ids', user_models.UserSettingsModel,
-                    [item.final_reviewer_id]))
+
+            # Bot rejects suggestions when the suggestion's targeted entity gets
+            # removed from the topic. The bot doesn't have a UserSettingsModel
+            # for their user_id. Exclude external model validation for bot.
+            if item.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID:
+                field_name_to_external_model_references.append(
+                    base_model_validators.ExternalModelFetcherDetails(
+                        'reviewer_ids', user_models.UserSettingsModel,
+                        [item.final_reviewer_id]))
         return field_name_to_external_model_references
 
     @classmethod
@@ -2125,9 +2096,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         score_category_type = (
             item.score_category.split(
                 suggestion_models.SCORE_CATEGORY_DELIMITER)[0])
-        score_category_sub_type = (
-            item.score_category.split(
-                suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
+
         if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
             target_model_references = (
                 field_name_to_external_model_references[
@@ -2147,15 +2116,13 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                         'doesn\'t exist' % (
                             item.id, item.target_type,
                             model_id, model_class.__name__, model_id))
-                    continue
-                if target_model.category != score_category_sub_type:
-                    cls._add_error(
-                        'score category sub%s' % (
-                            base_model_validators.ERROR_CATEGORY_TYPE_CHECK),
-                        'Entity id %s: score category sub %s does not match'
-                        ' target exploration category %s' % (
-                            item.id, score_category_sub_type,
-                            target_model.category))
+
+                # Note: An exploration's category can be changed after the
+                # suggestion is submitted. Since this operation does not update
+                # the suggestion's category, we cannot assume that the
+                # exploration category matches the suggestion score category,
+                # and thus do not validate it here.
+
         if score_category_type == suggestion_models.SCORE_TYPE_QUESTION:
             score_category_regex = (
                 '^(%s)$' % ('|').join(VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION))
@@ -4310,8 +4277,47 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
                             item.id, recipient_user_ids[index]))
 
     @classmethod
+    def _validate_old_models_marked_deleted(cls, item):
+        """Validate that there are no models that were last updated more than
+        four weeks ago, these models should be deleted.
+
+        Args:
+            item: UserQueryModel. UserQueryModel to validate.
+        """
+        date_four_weeks_ago = (
+            datetime.datetime.utcnow() -
+            cron_services.PERIOD_TO_MARK_MODELS_AS_DELETED
+        )
+        if item.last_updated < date_four_weeks_ago:
+            cls._add_error(
+                'entity %s' % base_model_validators.ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: Model older than 4 weeks' % item.id
+            )
+
+    @classmethod
+    def _validate_archived_models_marked_deleted(cls, item):
+        """Validate that there are no models that were last updated more than
+        four weeks ago, these models should be deleted.
+
+        Args:
+            item: UserQueryModel. UserQueryModel to validate.
+        """
+        if item.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
+            cls._add_error(
+                'entity %s' % base_model_validators.ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: Archived model not marked as deleted' % item.id
+            )
+
+    @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_sender_and_recipient_ids]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_old_models_marked_deleted,
+            cls._validate_archived_models_marked_deleted
+        ]
 
 
 class UserBulkEmailsModelValidator(
@@ -4407,8 +4413,7 @@ class UserSkillMasteryModelValidator(
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_skill_mastery]
+        return [cls._validate_skill_mastery]
 
 
 class UserContributionProficiencyModelValidator(
@@ -4583,6 +4588,34 @@ class UserAuthDetailsModelValidator(
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id])]
+
+
+class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
+    """Class for validating UserIdentifiersModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        """Returns a regex for model id.
+
+        This method can be overridden by subclasses, if needed.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            str. A regex pattern to be followed by the model id.
+        """
+        return '^[0-9-]{1,24}$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_settings_ids',
+                user_models.UserSettingsModel,
+                [item.user_id]
+            )
+        ]
 
 
 class PlatformParameterModelValidator(base_model_validators.BaseModelValidator):

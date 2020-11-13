@@ -31,10 +31,11 @@ import utils
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'accessibility', 'adminPage', 'classroomPage',
     'classroomPageFileUploadFeatures', 'collections', 'contributorDashboard',
-    'fileUploadExtensions', 'fileUploadFeatures', 'library', 'navigation',
-    'playVoiceovers', 'preferences', 'profileFeatures', 'profileMenu',
-    'publication', 'subscriptions', 'topicsAndSkillsDashboard',
-    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users']
+    'featureGating', 'fileUploadExtensions', 'fileUploadFeatures', 'library',
+    'navigation', 'playVoiceovers', 'preferences', 'profileFeatures',
+    'profileMenu', 'publication', 'subscriptions', 'topicsAndSkillsDashboard',
+    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users',
+    'topicAndStoryViewer']
 
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
