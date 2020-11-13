@@ -16,32 +16,22 @@
 /**
  * @fileoverview Unit tests for the subtopic editor tab component.
  */
-
-import { EventEmitter } from '@angular/core';
-
-import { UpgradedServices } from 'services/UpgradedServices';
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SpyLocation } from '@angular/common/testing';
 import { Location } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { angularServices } from 'services/angular-services.index';
+import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 
-
-fdescribe('Subtopic editor tab', function() {
+describe('Subtopic editor tab', function() {
   beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  let locat: SpyLocation;
   var ctrl = null;
   var skillSummary = null;
   var TopicEditorStateService = null;
   var TopicUpdateService = null;
   var SubtopicValidationService = null;
-  let TopicEditorRoutingService =null;
+  var topicEditorRoutingService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var ShortSkillSummaryObjectFactory = null;
@@ -50,32 +40,31 @@ fdescribe('Subtopic editor tab', function() {
     isWindowNarrow: () => false
   };
   var $location = null;
-
+  let location = null;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        // TopicEditorRoutingService,
-        {provide: Location, useClass: SpyLocation},
-        // PageTitleService
-      ]
+        TopicEditorRoutingService,
+        {provide: Location, useClass: SpyLocation}]
     });
   });
-
-  beforeEach(() => {
-    locat = TestBed.get(Location);
-    // TopicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
-    // let pageTitleService : PageTitleService =TestBed.get(PageTitleService);
-  })
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let servicePair of angularServices) {
+      $provide.value(
+        servicePair[0], TestBed.get(servicePair[1]));
+    }
+    $provide.value(
+      'TopicEditorRoutingService', TestBed.get(TopicEditorRoutingService));
+    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
+    location = TestBed.get(Location);
+  }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
-    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     ShortSkillSummaryObjectFactory = $injector.get(
@@ -341,9 +330,9 @@ fdescribe('Subtopic editor tab', function() {
     ctrl.toggleSubtopicPreview();
   });
 
-  it('should call TopicEditorRoutingService to navigate To Topic Editor',
+  it('should call topicEditorRoutingService to navigate To Topic Editor',
     function() {
-      var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
+      var navigateSpy = spyOn(topicEditorRoutingService, 'navigateToMainTab');
       ctrl.navigateToTopicEditor();
       expect(navigateSpy).toHaveBeenCalled();
     });
@@ -362,12 +351,9 @@ fdescribe('Subtopic editor tab', function() {
     expect(ctrl.schemaEditorIsShown).toEqual(false);
   });
 
-  fit('should redirect to topic editor if subtopic id is invalid', function() {
-    // console.log("1");
-    var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
-    locat.simulateHashChange('/subtopic_editor/99');
-    console.log("spec = "+locat.path());
-    // console.log("2");
+  it('should redirect to topic editor if subtopic id is invalid', function() {
+    var navigateSpy = spyOn(topicEditorRoutingService, 'navigateToMainTab');
+    location.go('/subtopic_editor/99');
     ctrl.initEditor();
     expect(navigateSpy).toHaveBeenCalled();
   });

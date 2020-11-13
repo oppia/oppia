@@ -40,14 +40,14 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
-    '$scope','$location', 'QuestionBackendApiService',
+    '$scope', 'QuestionBackendApiService',
     'SubtopicValidationService', 'TopicEditorRoutingService',
     'TopicEditorStateService', 'TopicUpdateService',
     'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
-        $scope,$location, QuestionBackendApiService,
+        $scope, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorRoutingService,
         TopicEditorStateService, TopicUpdateService,
         UrlInterpolationService, WindowDimensionsService, WindowRef,
@@ -62,15 +62,10 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.initEditor = function() {
         ctrl.hostname = WindowRef.nativeWindow.location.hostname;
         ctrl.topic = TopicEditorStateService.getTopic();
-        // console.log(ctrl.topic);
-        // console.log(TopicEditorRoutingService);
-        console.log("comp = "+$location.path());
         ctrl.classroomUrlFragment = (
           TopicEditorStateService.getClassroomUrlFragment());
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
-        console.log("subtopicId = "+ctrl.subtopicId);
-        // console.log(ctrl.subtopic);
         if (!ctrl.subtopic) {
           TopicEditorRoutingService.navigateToMainTab();
         }

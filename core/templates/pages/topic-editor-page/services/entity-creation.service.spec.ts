@@ -18,18 +18,16 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SpyLocation } from '@angular/common/testing';
+import { Location } from '@angular/common';
+import { TopicEditorRoutingService } from './topic-editor-routing.service';
+import { angularServices } from 'services/angular-services.index';
 // ^^^ This block is to be removed.
 
 describe('Entity creation service', function() {
   beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   var $rootScope = null;
   var $uibModal = null;
@@ -37,16 +35,35 @@ describe('Entity creation service', function() {
   var $location = null;
   var TopicObjectFactory = null;
   var TopicEditorStateService = null;
-  var TopicEditorRoutingService = null;
+  let topicEditorRoutingService : TopicEditorRoutingService;
+  let location = null;
   var EntityCreationService = null;
   var SubtopicObjectFactory = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        TopicEditorRoutingService,
+        {provide: Location, useClass: SpyLocation}]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let servicePair of angularServices) {
+      $provide.value(
+        servicePair[0], TestBed.get(servicePair[1]));
+    }
+    $provide.value(
+      'TopicEditorRoutingService', TestBed.get(TopicEditorRoutingService));
+    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
+    location = TestBed.get(Location);
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $location = $injector.get('$location');
     $q = $injector.get('$q');
     $uibModal = $injector.get('$uibModal');
-    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
@@ -70,7 +87,7 @@ describe('Entity creation service', function() {
       });
 
       var routingSpy = (
-        spyOn(TopicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
+        spyOn(topicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
       EntityCreationService.createSubtopic();
       $rootScope.$apply();
       expect(routingSpy).toHaveBeenCalledWith('1');
@@ -84,7 +101,7 @@ describe('Entity creation service', function() {
   });
 
   it('should return subtopic Id from URL', function() {
-    $location.path('/subtopic_editor/2');
-    expect(TopicEditorRoutingService.getSubtopicIdFromUrl()).toEqual(2);
+    location.go('/subtopic_editor/2');
+    expect(topicEditorRoutingService.getSubtopicIdFromUrl()).toEqual(2);
   });
 });

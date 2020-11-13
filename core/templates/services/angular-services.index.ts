@@ -130,7 +130,6 @@ import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactor
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -579,7 +578,6 @@ export const angularServices: [string, unknown][] = [
   ['ThreadMessageSummaryObjectFactory', ThreadMessageSummaryObjectFactory],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
-  ['TopicEditorRoutingService' , TopicEditorRoutingService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
   ['TopicsAndSkillsDashboardBackendApiService',

@@ -45,8 +45,6 @@ export class TopicEditorRoutingService {
     private windowRef: WindowRef) {
     this.currentPath = this.location.path();
     this.location.onUrlChange((newPath: string, state: unknown) => {
-      // console.log(newPath);
-      // newPath = newPath.split('#')[1];
       if (newPath === '') {
         this.location.go(this.currentPath);
         return;
@@ -115,10 +113,6 @@ export class TopicEditorRoutingService {
   }
 
   getSubtopicIdFromUrl(): number {
-    console.log("Router = "+this.location.path());
-    // console.log("getId ");
-    // console.log(parseInt(this.location.path().split('/')[0]));
-    // console.log(parseInt(this.location.path().split('/')[1]));
     return parseInt(this.location.path().split('/')[2]);
   }
 
