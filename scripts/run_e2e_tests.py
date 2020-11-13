@@ -664,6 +664,11 @@ def run_tests(args=None):
     suite_name = parsed_args.suite.lower()
     if len(flaky_tests_list) > 0 and p.returncode != 0:
         for i, line in enumerate(output_lines):
+            try:
+                line = python_utils.UNICODE(line)
+            except:
+                # Not a unicode line, can skip it.
+                continue
             if line == u'*                    Failures                    *':
                 test_name = output_lines[i + 3][3:].strip().lower()
 
