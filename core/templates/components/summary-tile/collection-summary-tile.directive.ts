@@ -21,7 +21,7 @@ require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require('components/summary-tile/collection-summary-tile.constants.ajs.ts');
 
@@ -50,11 +50,12 @@ angular.module('oppia').directive('collectionSummaryTile', [
         '/components/summary-tile/collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'DateTimeFormatService', 'UserService', 'ACTIVITY_TYPE_COLLECTION',
-        'COLLECTION_EDITOR_URL', 'COLLECTION_VIEWER_URL',
-        function(
-            DateTimeFormatService, UserService, ACTIVITY_TYPE_COLLECTION,
-            COLLECTION_EDITOR_URL, COLLECTION_VIEWER_URL) {
+        '$rootScope', 'DateTimeFormatService', 'UserBackendApiService',
+        'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_EDITOR_URL',
+        'COLLECTION_VIEWER_URL', function(
+            $rootScope, DateTimeFormatService, UserBackendApiService,
+            ACTIVITY_TYPE_COLLECTION, COLLECTION_EDITOR_URL,
+            COLLECTION_VIEWER_URL) {
           var ctrl = this;
           ctrl.getLastUpdatedDatetime = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
@@ -86,8 +87,11 @@ angular.module('oppia').directive('collectionSummaryTile', [
           };
           ctrl.$onInit = function() {
             ctrl.userIsLoggedIn = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
             ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
             ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;

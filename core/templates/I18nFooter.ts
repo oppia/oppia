@@ -29,11 +29,13 @@ angular.module('oppia').directive('i18nFooter', [
       template: require('./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$translate', 'I18nLanguageCodeService',
-        'UserService', 'SUPPORTED_SITE_LANGUAGES',
+        '$http', '$rootScope', '$translate',
+        'I18nLanguageCodeService', 'UserBackendApiService',
+        'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $translate, I18nLanguageCodeService,
-            UserService, SUPPORTED_SITE_LANGUAGES) {
+            $http, $rootScope, $translate,
+            I18nLanguageCodeService, UserBackendApiService,
+            SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           // Changes the language of the translations.
           var siteLanguageUrl = '/save_site_language';
@@ -41,12 +43,15 @@ angular.module('oppia').directive('i18nFooter', [
             $translate.use(ctrl.currentLanguageCode);
             I18nLanguageCodeService.setI18nLanguageCode(
               ctrl.currentLanguageCode);
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.isLoggedIn()) {
                 $http.put(siteLanguageUrl, {
                   site_language_code: ctrl.currentLanguageCode
                 });
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
           };
           ctrl.$onInit = function() {

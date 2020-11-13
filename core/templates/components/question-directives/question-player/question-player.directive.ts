@@ -117,7 +117,7 @@ require(
 
 require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 
@@ -140,19 +140,19 @@ angular.module('oppia').directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$sanitize', '$sce', '$scope', '$uibModal', '$window',
-        'ExplorationPlayerStateService', 'PlayerPositionService',
+        '$location', '$sanitize', '$sce', 'rootScope', '$scope', '$uibModal',
+        '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
         'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
-        'UserService', 'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM',
+        'UserBackendApiService', 'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'MAX_SCORE_PER_QUESTION', 'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
         'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
         'WRONG_ANSWER_PENALTY_FOR_MASTERY',
         function(
-            $location, $sanitize, $sce, $scope, $uibModal, $window,
-            ExplorationPlayerStateService, PlayerPositionService,
+            $location, $sanitize, $sce, $rootScope, $scope, $uibModal,
+            $window, ExplorationPlayerStateService, PlayerPositionService,
             QuestionPlayerStateService, SkillMasteryBackendApiService,
-            UserService, COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM,
+            UserBackendApiService, COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
             MAX_SCORE_PER_QUESTION, QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
             VIEW_HINT_PENALTY_FOR_MASTERY, WRONG_ANSWER_PENALTY,
@@ -576,9 +576,12 @@ angular.module('oppia').directive('questionPlayer', [
               }
             });
             ctrl.userIsLoggedIn = null;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
             // The initResults function is written separately since it is also
             // called in $scope.$on when some external events are triggered.
