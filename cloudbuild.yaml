@@ -1,4 +1,5 @@
 timeout: 1800s # 30 minutes
+logsBucket: 'gs://oppia-cloudbuild-logs'
 steps:
   - id: build-oppia-base
     name: gcr.io/kaniko-project/executor:latest
