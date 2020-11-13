@@ -46,7 +46,8 @@ angular.module('oppia').component('statisticsTab', {
     'StateInteractionStatsService', 'StatesObjectFactory',
     'UrlInterpolationService',
     function(
-        $q, $rootScope, $scope, $uibModal, AlertsService, ComputeGraphService,
+        $q, $rootScope, $scope, $uibModal,
+        AlertsService, ComputeGraphService,
         ExplorationDataService, ExplorationStatsService,
         ReadOnlyExplorationBackendApiService, RouterService,
         StateInteractionStatsService, StatesObjectFactory,
@@ -92,7 +93,7 @@ angular.module('oppia').component('statisticsTab', {
           if (expStats.numActualStarts > 0) {
             $scope.explorationHasBeenVisited = true;
           }
-          $rootScope.$apply();
+          $rootScope.$applyAsync();
         });
       };
 

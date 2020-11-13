@@ -433,11 +433,12 @@ describe('Compare versions service', function() {
         });
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData1[0]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=7');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=7');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[6]));
 
@@ -469,11 +470,12 @@ describe('Compare versions service', function() {
           });
         });
 
-        let req = httpTestingController.expectOne('/explorehandler/init/0?v=5');
+        const req = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=5');
         expect(req.request.method).toEqual('GET');
         req.flush(_getStatesData(testExplorationData1[4]));
 
-        let req2 = httpTestingController.expectOne(
+        const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=8');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData1[7]));
@@ -500,11 +502,12 @@ describe('Compare versions service', function() {
         });
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=7');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=7');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData1[6]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=9');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=9');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[8]));
 
@@ -535,11 +538,12 @@ describe('Compare versions service', function() {
         });
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=8');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=8');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData1[7]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=10');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=10');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[9]));
 
@@ -570,11 +574,13 @@ describe('Compare versions service', function() {
         });
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=11');
+      const req = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=11');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData1[10]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=13');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=13');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[12]));
 
@@ -606,11 +612,12 @@ describe('Compare versions service', function() {
         });
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData1[0]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=11');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=11');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[10]));
 
@@ -632,11 +639,12 @@ describe('Compare versions service', function() {
         });
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=2');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=2');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData1[1]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=4');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=4');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[3]));
 
@@ -668,11 +676,12 @@ describe('Compare versions service', function() {
           });
         });
 
-        let req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
+        const req = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=1');
         expect(req.request.method).toEqual('GET');
         req.flush(_getStatesData(testExplorationData1[0]));
 
-        let req2 = httpTestingController.expectOne(
+        const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=13');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData1[12]));
@@ -862,11 +871,12 @@ describe('Compare versions service', function() {
           });
         });
 
-        let req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
+        const req = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=1');
         expect(req.request.method).toEqual('GET');
         req.flush(_getStatesData(testExplorationData2[0]));
 
-        let req2 = httpTestingController.expectOne(
+        const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData2[4]));
@@ -894,11 +904,12 @@ describe('Compare versions service', function() {
           });
         });
 
-        let req = httpTestingController.expectOne('/explorehandler/init/0?v=3');
+        const req = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=3');
         expect(req.request.method).toEqual('GET');
         req.flush(_getStatesData(testExplorationData2[2]));
 
-        let req2 = httpTestingController.expectOne(
+        const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData2[4]));
@@ -926,11 +937,12 @@ describe('Compare versions service', function() {
           });
         });
 
-        let req = httpTestingController.expectOne('/explorehandler/init/0?v=4');
+        const req = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=4');
         expect(req.request.method).toEqual('GET');
         req.flush(_getStatesData(testExplorationData2[3]));
 
-        let req2 = httpTestingController.expectOne(
+        const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData2[4]));
@@ -962,11 +974,12 @@ describe('Compare versions service', function() {
           });
         });
 
-        let req = httpTestingController.expectOne('/explorehandler/init/0?v=5');
+        const req = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=5');
         expect(req.request.method).toEqual('GET');
         req.flush(_getStatesData(testExplorationData2[4]));
 
-        let req2 = httpTestingController.expectOne(
+        const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=8');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData2[7]));
@@ -1212,11 +1225,12 @@ describe('Compare versions service', function() {
         }]);
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData3[0]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=2');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=2');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[1]));
 
@@ -1251,11 +1265,12 @@ describe('Compare versions service', function() {
         }]);
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=5');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=5');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData3[4]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=6');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=6');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[5]));
 
@@ -1290,11 +1305,12 @@ describe('Compare versions service', function() {
         }]);
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=3');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=3');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData3[2]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=5');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=5');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[4]));
 
@@ -1317,11 +1333,12 @@ describe('Compare versions service', function() {
         }]);
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=2');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=2');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData3[1]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=7');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=7');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[6]));
 
@@ -1356,11 +1373,12 @@ describe('Compare versions service', function() {
         }]);
       });
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0?v=6');
+      const req = httpTestingController.expectOne('/explorehandler/init/0?v=6');
       expect(req.request.method).toEqual('GET');
       req.flush(_getStatesData(testExplorationData3[5]));
 
-      let req2 = httpTestingController.expectOne('/explorehandler/init/0?v=8');
+      const req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=8');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[7]));
 

@@ -58,7 +58,7 @@ angular.module('oppia').component('explorationPlayerPage', {
               'content', response.exploration.title);
             angular.element('meta[property="og:description"]').attr(
               'content', response.exploration.objective);
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           });
         KeyboardShortcutService.bindExplorationPlayerShortcuts();
       };

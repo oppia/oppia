@@ -74,7 +74,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         .loadExploration(explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
-          $rootScope.$apply();
+          $rootScope.$applyAsync();
         });
     }
 

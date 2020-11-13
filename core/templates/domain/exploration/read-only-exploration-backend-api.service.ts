@@ -28,10 +28,6 @@ import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactor
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-interface StateClassifierMappingBackendDict {
-  [state: string]: ClassifierBackendDict;
-}
-
 interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
   'param_changes': ParamChangeBackendDict[];
@@ -51,21 +47,18 @@ interface FetchExplorationBackendResponse {
   'session_id': string;
   'version': number;
   'preferred_audio_language_code': string;
-  'state_classifier_mapping': StateClassifierMappingBackendDict;
+  'state_classifier_mapping': Record<string, ClassifierBackendDict>;
   'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'record_playthrough_probability': number;
-}
-
-interface ExplorationCache {
-  [explorationId: string]: FetchExplorationBackendResponse;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReadOnlyExplorationBackendApiService {
-  private _explorationCache: ExplorationCache = {};
+  private _explorationCache:
+    Record<string, FetchExplorationBackendResponse> = {};
 
   constructor(
     private http: HttpClient,
@@ -146,7 +139,7 @@ export class ReadOnlyExplorationBackendApiService {
         }
       } else {
         this._fetchExploration(
-          explorationId, null, (exploration) => {
+          explorationId, null, exploration => {
             // Save the fetched exploration to avoid future fetches.
             this._explorationCache[explorationId] = exploration;
             if (resolve) {

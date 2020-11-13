@@ -92,7 +92,7 @@ angular.module('oppia').directive('learnerViewInfo', [
               explorationId, UrlService.getExplorationVersionFromUrl())
               .then(function(response) {
                 ctrl.explorationTitle = response.exploration.title;
-                $rootScope.$apply();
+                $rootScope.$applyAsync();
               });
           };
         }

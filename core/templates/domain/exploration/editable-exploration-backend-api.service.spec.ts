@@ -217,8 +217,7 @@ describe('Editable exploration backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
-  }
-  ));
+  }));
 
   it('should delete exploration from the backend', function() {
     var successHandler = jasmine.createSpy('success');

@@ -97,7 +97,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         .loadExploration(_explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
-          $rootScope.$apply();
+          $rootScope.$applyAsync();
         });
     }
 

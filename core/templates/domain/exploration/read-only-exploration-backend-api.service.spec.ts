@@ -73,6 +73,22 @@ describe('Read only exploration backend API service', () => {
     httpTestingController.verify();
   });
 
+  it('should successfully fetch an existing exploration from the backend',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      roebas.fetchExploration('0', null).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/explorehandler/init/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
   it('should successfully fetch an existing exploration with version from' +
     ' the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
@@ -97,8 +113,7 @@ describe('Read only exploration backend API service', () => {
 
       roebas.loadExploration('0', null).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/explorehandler/init/0');
+      let req = httpTestingController.expectOne('/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading exploration 0.'
@@ -120,8 +135,7 @@ describe('Read only exploration backend API service', () => {
 
     roebas.loadLatestExploration('0').then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/explorehandler/init/0');
+    let req = httpTestingController.expectOne('/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
     flushMicrotasks();
@@ -144,8 +158,7 @@ describe('Read only exploration backend API service', () => {
     roebas.loadLatestExploration('0').then(
       successHandler, failHandler);
 
-    req = httpTestingController.expectOne(
-      '/explorehandler/init/0');
+    req = httpTestingController.expectOne('/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
     flushMicrotasks();
