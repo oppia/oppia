@@ -2289,6 +2289,9 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
                 job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
+        for item in eval_output:
+            if item[0] == 'FAILURE':
+                item[1] = sorted(item[1])
         return eval_output
 
     def setUp(self):
@@ -2319,7 +2322,7 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
             model.update_timestamps()
             model.put()
         output = self._run_one_off_job()
-        self.assertEqual(output, [['SUCCESS', 4]])
+        self.assertEqual(output, [])
 
     def test_audit_users_with_different_usernames_all_hashes_same_fails(self):
         # Generate 4 different users.
@@ -2341,7 +2344,9 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
         with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
             output = self._run_one_off_job()
 
-        self.assertEqual(output, [['FAILURE', [4, 1]]])
+        self.assertEqual(
+            output,
+            [['FAILURE', ['username%s' % i for i in python_utils.RANGE(4)]]])
 
     def test_audit_users_with_different_usernames_some_hashes_same_fails(self):
         # Generate 5 different users.
@@ -2365,4 +2370,4 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
         with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
             output = self._run_one_off_job()
 
-        self.assertEqual(output, [['FAILURE', [5, 4]]])
+        self.assertEqual(output, [['FAILURE', ['username1', 'username2']]])

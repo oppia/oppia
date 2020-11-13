@@ -2689,7 +2689,8 @@ class DeletedUsernameModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """DeletedUserModel contains only hashes of usernames that were
-        deleted.
+        deleted. The hashes are kept in order to prevent the reuse of usernames
+        of deleted users.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 

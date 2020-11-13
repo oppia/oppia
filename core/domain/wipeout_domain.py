@@ -48,7 +48,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
             normalized_long_term_username: str|None. The normalized username of
                 the user who is being deleted. Can be None when the user was on
                 the Oppia site only for a short time and thus the username
-                wasn't that known.
+                hasn't been well-established yet.
             role: str. The role of the user who is being related.
             deletion_complete: bool. Whether the deletion is completed.
             pseudonymizable_entity_mappings: dict(str, str). Mapping between
@@ -72,7 +72,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
             normalized_long_term_username: str|None. The normalized username of
                 the user who is being deleted. Can be None when the user was on
                 the Oppia site only for a short time and thus the username
-                wasn't that known.
+                hasn't been well-established yet.
             role: str. The role of the user who is being deleted.
 
         Returns:

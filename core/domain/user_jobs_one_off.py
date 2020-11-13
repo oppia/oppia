@@ -784,11 +784,11 @@ class UniqueHashedNormalizedUsernameAuditJob(
             yield ('SUCCESS USERNAME NONE', 1)
         else:
             yield (
-                'SUCCESS',
                 utils.convert_to_hash(
                     model.normalized_username,
                     user_models.DeletedUsernameModel.ID_LENGTH
-                )
+                ),
+                model.normalized_username
             )
 
     @staticmethod
@@ -797,7 +797,5 @@ class UniqueHashedNormalizedUsernameAuditJob(
             yield (key, len(values))
             return
 
-        if len(values) == len(set(values)):
-            yield ('SUCCESS', len(values))
-        else:
-            yield ('FAILURE', (len(values), len(set(values))))
+        if len(values) != 1:
+            yield ('FAILURE', values)
