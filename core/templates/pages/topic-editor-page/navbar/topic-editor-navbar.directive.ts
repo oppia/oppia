@@ -43,12 +43,12 @@ angular.module('oppia').directive('topicEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/navbar/topic-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$window', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicRightsBackendApiService', 'UndoRedoService', 'UrlService',
         'TOPIC_VIEWER_URL_TEMPLATE',
         function(
-            $scope, $uibModal, $window, AlertsService,
+            $rootScope, $scope, $uibModal, $window, AlertsService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicRightsBackendApiService, UndoRedoService, UrlService,
             TOPIC_VIEWER_URL_TEMPLATE) {
@@ -138,6 +138,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 }
                 $scope.topicRights.markTopicAsPublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
+                $rootScope.$applyAsync();
               }
             ).then(function() {
               var successToast = 'Topic published.';
