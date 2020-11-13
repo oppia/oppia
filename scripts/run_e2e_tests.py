@@ -746,7 +746,7 @@ def main(args=None):
     return_code = 1
 
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
-        print_color_message('***Attempt %s.***' % attempt_num + 1)
+        print_color_message('***Attempt %s.***' % (attempt_num + 1))
         output, return_code = run_tests(args)
         if return_code == 0 or not is_test_output_flaky(
                 output, args.suite):
