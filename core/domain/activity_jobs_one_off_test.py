@@ -2156,6 +2156,12 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             'different_field': 'test'
         }
     ]
+    DUMMY_CREATE_COMMIT_CMDS = [
+        {
+            'cmd': 'create_new',
+            'other_field': 'test'
+        }
+    ]
 
     def setUp(self):
         super(AddMissingCommitLogsJobTests, self).setUp()
@@ -2243,6 +2249,42 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
         ]
 
         self.assertIsNotNone(commit_model)
+        self.assertItemsEqual(expected_output, actual_output)
+    
+    def test_add_missing_exp_rights_commit_logs(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public'
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        content_dict = {
+            'status': 'public',
+            'owner_ids': self.albert_id,
+            'editor_ids': self.albert_id,
+            'voice_artist_ids': self.albert_id,
+            'viewer_ids': self.albert_id
+        }
+
+        exp_models.ExplorationRightsSnapshotContentModel(
+            id='%s-1' % self.EXP_ID,
+            content=content_dict
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='create',
+            commit_cmds=self.DUMMY_CREATE_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        expected_output = [
+            [
+                'Found commit log model-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                1
+            ]
+        ]
+
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_add_missing_question_commit_logs(self):
