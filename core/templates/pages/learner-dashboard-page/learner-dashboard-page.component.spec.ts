@@ -45,7 +45,7 @@ describe('Learner dashboard page', function() {
   var ExplorationObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
   var SuggestionModalForLearnerDashboardService = null;
-  var UserService = null;
+  var UserBackendApiService = null;
 
   var profilePictureDataUrl = 'profile-picture-url';
   var userInfo = {
@@ -73,7 +73,7 @@ describe('Learner dashboard page', function() {
         'LearnerDashboardBackendApiService');
       SuggestionModalForLearnerDashboardService = $injector.get(
         'SuggestionModalForLearnerDashboardService');
-      UserService = $injector.get('UserService');
+      UserBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
@@ -226,10 +226,10 @@ describe('Learner dashboard page', function() {
           ));
       }
 
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(profilePictureDataUrl));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
-        userInfo));
+      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync').and
+        .returnValue($q.resolve(profilePictureDataUrl));
+      spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve(userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.resolve({
           completedExplorationsList: (

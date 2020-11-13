@@ -34,7 +34,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/keyboard-shortcut.service.ts');
 require('services/search.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/i18n-language-code.service.ts');
@@ -44,16 +44,16 @@ require('pages/library-page/library-page.constants.ajs.ts');
 angular.module('oppia').component('libraryPage', {
   template: require('./library-page.component.html'),
   controller: [
-    '$http', '$log', '$scope', '$timeout', '$window',
+    '$http', '$log', '$rootScope', '$scope', '$timeout', '$window',
     'I18nLanguageCodeService', 'KeyboardShortcutService', 'LoaderService',
     'SearchService', 'UrlInterpolationService',
-    'UserService', 'WindowDimensionsService', 'LIBRARY_PAGE_MODES',
+    'UserBackendApiService', 'WindowDimensionsService', 'LIBRARY_PAGE_MODES',
     'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
     function(
-        $http, $log, $scope, $timeout, $window,
+        $http, $log, $rootScope, $scope, $timeout, $window,
         I18nLanguageCodeService, KeyboardShortcutService, LoaderService,
         SearchService, UrlInterpolationService,
-        UserService, WindowDimensionsService, LIBRARY_PAGE_MODES,
+        UserBackendApiService, WindowDimensionsService, LIBRARY_PAGE_MODES,
         LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
       var ctrl = this;
 
@@ -256,7 +256,7 @@ angular.module('oppia').component('libraryPage', {
           $http.get('/libraryindexhandler').then(function(response) {
             ctrl.libraryGroups =
               response.data.activity_summary_dicts_by_category;
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.activitiesOwned = {explorations: {}, collections: {}};
               if (userInfo.isLoggedIn()) {
                 $http.get('/creatordashboardhandler/data')
@@ -307,6 +307,9 @@ angular.module('oppia').component('libraryPage', {
               } else {
                 LoaderService.hideLoadingScreen();
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
 
             I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(

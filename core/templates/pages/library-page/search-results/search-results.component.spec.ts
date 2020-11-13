@@ -16,9 +16,11 @@
  * @fileoverview Unit tests for searchResults.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { EventEmitter } from '@angular/core';
+import { UserBackendApiService } from 'services/user-backend-api.service.ts';
 
 describe('Search Results component', function() {
   var ctrl = null;
@@ -28,12 +30,19 @@ describe('Search Results component', function() {
   var $scope = null;
   var searchService = null;
   var siteAnalyticsService = null;
-  var userService = null;
+  var userBackendApiService = null;
 
   var mockWindow = {
     location: ''
   };
   var initialSearchResultsLoadedEmitter = new EventEmitter();
+
+  beforeEach(function() {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    userBackendApiService = TestBed.get(UserBackendApiService);
+  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
@@ -48,11 +57,11 @@ describe('Search Results component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     searchService = $injector.get('SearchService');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));
 

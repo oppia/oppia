@@ -17,6 +17,7 @@
  */
 
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -26,7 +27,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { of } from 'rxjs';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { UserBackendApiService } from 'services/user-backend-api.service.ts';
 
 
 describe('Library controller', function() {
@@ -39,7 +40,7 @@ describe('Library controller', function() {
   var classroomBackendApiService = null;
   var csrfTokenService = null;
   var i18nLanguageCodeService = null;
-  var userService = null;
+  var userBackendApiService = null;
 
   var logErrorSpy = null;
   var mockWindow = null;
@@ -51,6 +52,7 @@ describe('Library controller', function() {
 
     classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
+    userBackendApiService = TestBed.get(UserBackendApiService);
     OppiaAngularRootComponent.pageTitleService = (
       TestBed.get(PageTitleService)
     );
@@ -90,14 +92,14 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
+      userBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
       logErrorSpy = spyOn($log, 'error');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
 
@@ -355,14 +357,14 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
+      userBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
       logErrorSpy = spyOn($log, 'error');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => false
       }));
 
@@ -464,13 +466,13 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
+      userBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
 
