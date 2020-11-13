@@ -24,7 +24,7 @@ import { SpyLocation } from '@angular/common/testing';
 import { Location } from '@angular/common';
 import { TopicEditorRoutingService } from './topic-editor-routing.service';
 import { angularServices } from 'services/angular-services.index';
-// ^^^ This block is to be removed.
+
 
 describe('Entity creation service', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -32,11 +32,10 @@ describe('Entity creation service', function() {
   var $rootScope = null;
   var $uibModal = null;
   var $q = null;
-  var $location = null;
   var TopicObjectFactory = null;
   var TopicEditorStateService = null;
   let topicEditorRoutingService : TopicEditorRoutingService;
-  let location = null;
+  let location;
   var EntityCreationService = null;
   var SubtopicObjectFactory = null;
 
@@ -61,7 +60,6 @@ describe('Entity creation service', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
-    $location = $injector.get('$location');
     $q = $injector.get('$q');
     $uibModal = $injector.get('$uibModal');
     TopicObjectFactory = $injector.get('TopicObjectFactory');

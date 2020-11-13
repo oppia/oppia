@@ -496,7 +496,7 @@ import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
-  'domain/topic/topic-creation-backend-api.service.ts'; 
+  'domain/topic/topic-creation-backend-api.service.ts';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
@@ -677,7 +677,7 @@ export class UpgradedServices {
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
-        new TopicsAndSkillsDashboardPageService();  
+        new TopicsAndSkillsDashboardPageService();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();

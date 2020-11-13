@@ -18,8 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+
 
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
@@ -37,7 +36,6 @@ describe('Topic editor page', function() {
   var ContextService = null;
   var PageTitleService = null;
   let topicEditorRoutingService : TopicEditorRoutingService;
-  var location = null;
   var UndoRedoService = null;
   var TopicEditorStateService = null;
   var UrlService = null;
@@ -63,7 +61,6 @@ describe('Topic editor page', function() {
     $provide.value(
       'TopicEditorRoutingService', TestBed.get(TopicEditorRoutingService));
     topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
-    location = TestBed.get(Location);
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

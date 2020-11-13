@@ -21,10 +21,6 @@ import { TestBed } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 
-import { UpgradedServices } from 'services/UpgradedServices';
-
-// ^^^ This block is to be removed.
-
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -32,12 +28,11 @@ describe('Topic editor routing service', () => {
   let ters: TopicEditorRoutingService;
   let locat: SpyLocation;
   let openspy = jasmine.createSpy('open');
-  let window: WindowRef;
 
-  class MockWindowRef{
+  class MockWindowRef {
     _window = {
       open: openspy
-    }
+    };
     get nativeWindow() {
       return this._window;
     }
@@ -53,7 +48,6 @@ describe('Topic editor routing service', () => {
     });
     ters = TestBed.get(TopicEditorRoutingService);
     locat = TestBed.get(Location);
-    window = TestBed.get(WindowRef);
   });
 
   it('should return the default active tab name', () => {
@@ -62,11 +56,10 @@ describe('Topic editor routing service', () => {
 
   it('should navigate to different tabs', () => {
     expect(ters.getActiveTabName()).toEqual('main');
-    
+
     ters.navigateToSubtopicPreviewTab(1);
     expect(
       ters.getActiveTabName()).toEqual('subtopic_preview');
-
     ters.navigateToSubtopicEditorWithId(1);
     expect(
       ters.getActiveTabName()).toEqual('subtopic_editor');
@@ -85,7 +78,7 @@ describe('Topic editor routing service', () => {
   it('should handle calls with unexpect paths', () => {
     expect(ters.getActiveTabName()).toEqual('main');
 
-    locat.simulateHashChange('');    
+    locat.simulateHashChange('');
     expect(ters.getActiveTabName()).toEqual('main');
   });
 
@@ -96,7 +89,7 @@ describe('Topic editor routing service', () => {
   });
 
   it('should return last tab visited', () => {
-    ters.navigateToSubtopicEditorWithId(1);    
+    ters.navigateToSubtopicEditorWithId(1);
     expect(ters.getLastTabVisited()).toEqual('subtopic');
 
     ters.navigateToMainTab();
@@ -105,12 +98,12 @@ describe('Topic editor routing service', () => {
 
   it('should return last visited subtopic id', () => {
     ters.navigateToSubtopicPreviewTab(1);
-    
+
     ters.navigateToQuestionsTab();
     expect(ters.getLastSubtopicIdVisited()).toEqual(1);
 
     ters.navigateToSubtopicPreviewTab(5);
-    
+
     ters.navigateToQuestionsTab();
     expect(ters.getLastSubtopicIdVisited()).toEqual(5);
   });

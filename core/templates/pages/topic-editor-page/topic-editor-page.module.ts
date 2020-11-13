@@ -112,5 +112,3 @@ angular.module('oppia').directive(
   downgradeComponent({
     component: OppiaAngularRootComponent
   }) as angular.IDirectiveFactory);
-
-
