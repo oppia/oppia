@@ -20,8 +20,13 @@
 import { EventEmitter } from '@angular/core';
 
 import { UpgradedServices } from 'services/UpgradedServices';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SpyLocation } from '@angular/common/testing';
+import { Location } from '@angular/common';
 
-describe('Subtopic editor tab', function() {
+
+fdescribe('Subtopic editor tab', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -30,12 +35,13 @@ describe('Subtopic editor tab', function() {
       $provide.value(key, value);
     }
   }));
+  let locat: SpyLocation;
   var ctrl = null;
   var skillSummary = null;
   var TopicEditorStateService = null;
   var TopicUpdateService = null;
   var SubtopicValidationService = null;
-  var TopicEditorRoutingService = null;
+  let TopicEditorRoutingService =null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var ShortSkillSummaryObjectFactory = null;
@@ -47,6 +53,23 @@ describe('Subtopic editor tab', function() {
 
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        // TopicEditorRoutingService,
+        {provide: Location, useClass: SpyLocation},
+        // PageTitleService
+      ]
+    });
+  });
+
+  beforeEach(() => {
+    locat = TestBed.get(Location);
+    // TopicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
+    // let pageTitleService : PageTitleService =TestBed.get(PageTitleService);
+  })
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
@@ -339,9 +362,12 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.schemaEditorIsShown).toEqual(false);
   });
 
-  it('should redirect to topic editor if subtopic id is invalid', function() {
+  fit('should redirect to topic editor if subtopic id is invalid', function() {
+    // console.log("1");
     var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
-    $location.path('/subtopic_editor/99');
+    locat.simulateHashChange('/subtopic_editor/99');
+    console.log("spec = "+locat.path());
+    // console.log("2");
     ctrl.initEditor();
     expect(navigateSpy).toHaveBeenCalled();
   });

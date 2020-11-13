@@ -31,21 +31,23 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
+
 
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
-    '$scope', 'QuestionBackendApiService',
+    '$scope','$location', 'QuestionBackendApiService',
     'SubtopicValidationService', 'TopicEditorRoutingService',
     'TopicEditorStateService', 'TopicUpdateService',
     'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
-        $scope, QuestionBackendApiService,
+        $scope,$location, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorRoutingService,
         TopicEditorStateService, TopicUpdateService,
         UrlInterpolationService, WindowDimensionsService, WindowRef,
@@ -60,10 +62,15 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.initEditor = function() {
         ctrl.hostname = WindowRef.nativeWindow.location.hostname;
         ctrl.topic = TopicEditorStateService.getTopic();
+        // console.log(ctrl.topic);
+        // console.log(TopicEditorRoutingService);
+        console.log("comp = "+$location.path());
         ctrl.classroomUrlFragment = (
           TopicEditorStateService.getClassroomUrlFragment());
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
+        console.log("subtopicId = "+ctrl.subtopicId);
+        // console.log(ctrl.subtopic);
         if (!ctrl.subtopic) {
           TopicEditorRoutingService.navigateToMainTab();
         }

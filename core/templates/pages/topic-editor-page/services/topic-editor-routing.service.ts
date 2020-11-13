@@ -115,6 +115,10 @@ export class TopicEditorRoutingService {
   }
 
   getSubtopicIdFromUrl(): number {
+    console.log("Router = "+this.location.path());
+    // console.log("getId ");
+    // console.log(parseInt(this.location.path().split('/')[0]));
+    // console.log(parseInt(this.location.path().split('/')[1]));
     return parseInt(this.location.path().split('/')[2]);
   }
 

@@ -19,12 +19,16 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
+import { Location, LocationStrategy, PlatformLocation } from '@angular/common';
 import {
   HttpClient,
   HttpXhrBackend,
   // eslint-disable-next-line camelcase
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
+let location : Location,platformLocation : PlatformLocation,locationStrategy:  LocationStrategy;
+
+
 
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
@@ -497,6 +501,7 @@ import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service.ts';
+import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';  
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
@@ -531,6 +536,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { SpyLocation, MockLocationStrategy, MockPlatformLocation } from '@angular/common/testing';
+import { platform } from 'os';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -678,6 +685,13 @@ export class UpgradedServices {
     upgradedServices['Title'] = new Title({});
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
         new TopicsAndSkillsDashboardPageService();
+    upgradedServices['TopicEditorRoutingService'] = new TopicEditorRoutingService(
+      // new Location( locationStrategy , platformLocation),
+      // location,
+      new SpyLocation(),
+      upgradedServices['PageTitleService'],upgradedServices['UrlInterpolationService'],
+      upgradedServices['WindowRef']
+    );    
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
