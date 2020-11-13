@@ -52,7 +52,7 @@ interface PreferencesBackendDict {
 interface UrlBackendDict {
   'login_url': string;
 }
-interface UserCommunityRightsDataBackendDict {
+interface UserContributionRightsDataBackendDict {
   'can_review_translation_for_language_codes': boolean;
   'can_review_voiceover_for_language_codes': boolean;
   'can_review_questions': boolean;
@@ -71,10 +71,11 @@ export class UserBackendApiService {
   ) {}
 
     private PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    private USER_COMMUNITY_RIGHTS_DATA_URL = '/usercommunityrightsdatahandler';
+    private USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
 
-    private userCommunityRightsInfo = null;
+    private userContributionRightsInfo = null;
     private userInfo = null;
+    private returnUrl = '';
 
     getUserInfoAsync(): Promise<UserInfo> {
       return new Promise((resolve, reject) => {
@@ -134,7 +135,7 @@ export class UserBackendApiService {
     }
     getLoginUrlAsync(): Promise<string> {
       const urlParameters = {
-        current_url: this.windowRef.nativeWindow.location.pathname
+        current_url: this.returnUrl || this.windowRef.nativeWindow.location.pathname
       };
       return this.http.get<UrlBackendDict>('/url_handler',
         { params: urlParameters }).toPromise().then(
@@ -142,17 +143,20 @@ export class UserBackendApiService {
           return backendDict.login_url;
         });
     }
-    getUserCommunityRightsData():
-      Promise<UserCommunityRightsDataBackendDict> {
+    setReturnUrl(newReturnUrl: string) {
+      this.returnUrl = newReturnUrl;
+    }
+    getUserContributionRightsData():
+      Promise<UserContributionRightsDataBackendDict> {
       return new Promise((resolve, reject) => {
-        if (this.userCommunityRightsInfo) {
-          return resolve(this.userCommunityRightsInfo);
+        if (this.userContributionRightsInfo) {
+          return resolve(this.userContributionRightsInfo);
         } else {
-          return this.http.get<UserCommunityRightsDataBackendDict>(
-            this.USER_COMMUNITY_RIGHTS_DATA_URL).toPromise().then(
+          return this.http.get<UserContributionRightsDataBackendDict>(
+            this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise().then(
             (backendDict) => {
-              this.userCommunityRightsInfo = backendDict;
-              return resolve(this.userCommunityRightsInfo);
+              this.userContributionRightsInfo = backendDict;
+              return resolve(this.userContributionRightsInfo);
             });
         }
       });

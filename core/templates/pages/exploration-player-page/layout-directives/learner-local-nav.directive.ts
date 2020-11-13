@@ -35,7 +35,7 @@ require(
   'suggestion-modal-for-exploration-player.service.ts');
 require('services/alerts.service.ts');
 require('services/attribution.service');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
@@ -51,19 +51,19 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$uibModal', 'AlertsService', 'AttributionService',
-        'ExplorationEngineService',
+        '$http', '$rootScope', '$uibModal', 'AlertsService',
+        'AttributionService', 'ExplorationEngineService',
         'LoaderService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
-        'UrlInterpolationService', 'UserService',
+        'UrlInterpolationService', 'UserBackendApiService',
         'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $uibModal, AlertsService, AttributionService,
-            ExplorationEngineService,
-            LoaderService, ReadOnlyExplorationBackendApiService,
+            $http, $rootScope, $uibModal, AlertsService, AttributionService,
+            ExplorationEngineService, LoaderService,
+            ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
-            UrlInterpolationService, UserService,
+            UrlInterpolationService, UserBackendApiService,
             ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
@@ -133,7 +133,7 @@ angular.module('oppia').directive('learnerLocalNav', [
             ctrl.username = '';
             ctrl.feedbackOptionIsShown = true;
             LoaderService.showLoadingScreen('Loading');
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
               if (
                 ctrl.username === null &&
@@ -141,6 +141,9 @@ angular.module('oppia').directive('learnerLocalNav', [
                 ctrl.feedbackOptionIsShown = false;
               }
               LoaderService.hideLoadingScreen();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
           };
         }

@@ -282,6 +282,22 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
+  it('should return the login url with the correct return url', function() {
+    const loginUrl = '/login';
+    const returnUrl = 'home';
+    
+    userBackendApiService.setReturnUrl(returnUrl);
+    userBackendApiService.getLoginUrlAsync().then(function(dataUrl) {
+      expect(dataUrl).toBe(loginUrl);
+    });
+    const req = httpTestingController.expectOne(
+    '/url_handler?current_url=' + returnUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({login_url: loginUrl});
+
+    flushMicrotasks();
+  });
+
   it('should set a profile image data url', fakeAsync(() => {
     const newProfileImageDataurl = '/avatar/x.png';
     userBackendApiService.setProfileImageDataUrlAsync(
@@ -314,47 +330,47 @@ describe('User Backend Api Service', () => {
       flushMicrotasks();
     }));
 
-  it('should return user community rights data', fakeAsync(() => {
-    const sampleUserCommunityRightsDict = {
+  it('should return user contribution rights data', fakeAsync(() => {
+    const sampleUserContributionRightsDict = {
       translation: ['hi'],
       voiceover: [],
       question: true
     };
 
-    userBackendApiService.getUserCommunityRightsData().then(
-      (userCommunityRights) => {
-        expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
+    userBackendApiService.getUserContributionRightsData().then(
+      (userContributionRights) => {
+        expect(userContributionRights).toEqual(sampleUserContributionRightsDict);
       });
     const req = httpTestingController.expectOne(
-      '/usercommunityrightsdatahandler');
+      '/usercontributionrightsdatahandler');
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleUserCommunityRightsDict);
+    req.flush(sampleUserContributionRightsDict);
 
     flushMicrotasks();
   }));
 
-  it('should not fetch userCommunityRights if it is was fetched before',
+  it('should not fetch user contribution rights if it is was fetched before',
     fakeAsync(() => {
-      const sampleUserCommunityRightsDict = {
+      const sampleUserContributionRightsDict = {
         translation: ['hi'],
         voiceover: [],
         question: true
       };
 
-      userBackendApiService.getUserCommunityRightsData().then(
-        (userCommunityRights) => {
-          expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
+      userBackendApiService.getUserContributionRightsData().then(
+        (userContributionRights) => {
+          expect(userContributionRights).toEqual(sampleUserContributionRightsDict);
           // Fetch userCommunityRightsInfo again.
-          userBackendApiService.getUserCommunityRightsData().then((
-              sameUserCommunityRights) => {
-            expect(sameUserCommunityRights).toEqual(
-              sampleUserCommunityRightsDict);
+          userBackendApiService.getUserContributionRightsData().then((
+              sameUserContributionRights) => {
+            expect(sameUserContributionRights).toEqual(
+              sampleUserContributionRightsDict);
           });
         });
       const req = httpTestingController.expectOne(
-        '/usercommunityrightsdatahandler');
+        '/usercontributionrightsdatahandler');
       expect(req.request.method).toEqual('GET');
-      req.flush(sampleUserCommunityRightsDict);
+      req.flush(sampleUserContributionRightsDict);
 
       flushMicrotasks();
     }));
