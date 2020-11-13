@@ -664,7 +664,7 @@ def run_tests(args=None):
     suite_name = parsed_args.suite.lower()
     if len(flaky_tests_list) > 0 and p.returncode != 0:
         for i, line in enumerate(output_lines):
-            if line == '*                    Failures                    *':
+            if line == u'*                    Failures                    *':
                 test_name = output_lines[i + 3][3:].strip().lower()
 
                 # Remove coloring characters.
@@ -678,10 +678,10 @@ def run_tests(args=None):
                     flaky_error_message = row[2].strip().lower()
                     if (
                             suite_name == flaky_suite_name or
-                            flaky_suite_name == '[general]'):
+                            flaky_suite_name == u'[general]'):
                         if (
                                 test_name == flaky_test_message or
-                                flaky_test_message == 'many'):
+                                flaky_test_message == u'many'):
                             if flaky_error_message in failure_log:
                                 update_flaky_tests_count(sheet, index, row[3])
                                 try:
