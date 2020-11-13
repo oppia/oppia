@@ -47,9 +47,10 @@ import python_utils
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
 
-current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
+
+WIPEOUT_LOGS_PREFIX = '[WIPEOUT]'
 
 
 def get_pending_deletion_request(user_id):
@@ -158,7 +159,6 @@ def pre_delete_user(user_id):
             taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
             user_id,
-            True
         )
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
@@ -252,7 +252,7 @@ def delete_user(pending_deletion_request):
     _delete_models(user_id, user_role, models.NAMES.improvements)
     if user_role != feconf.ROLE_ID_LEARNER:
         remove_user_from_activities_with_associated_rights_models(
-            pending_deletion_request.user_id, False)
+            pending_deletion_request.user_id)
         _pseudonymize_feedback_models(pending_deletion_request)
         _pseudonymize_suggestion_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
@@ -343,29 +343,21 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
                 and model_class.has_reference_to_user_id(user_id)
         ):
             logging.error(
-                '%s is not deleted for user with ID %s' % (
-                    model_class.__name__, user_id))
+                '%s %s is not deleted for user with ID %s' % (
+                    WIPEOUT_LOGS_PREFIX, model_class.__name__, user_id))
             user_is_verified = False
     return user_is_verified
 
 
-def remove_user_from_activities_with_associated_rights_models(
-        user_id, use_user_subscriptions_ids):
+def remove_user_from_activities_with_associated_rights_models(user_id):
     """Remove the user from exploration, collection, and topic models.
 
     Args:
         user_id: str. The ID of the user for which to remove the user from
             explorations, collections, and topics.
-        use_user_subscriptions_ids: bool. Whether to use the IDs from user's
-            UserSubscriptionsModel. When False the IDs are gathered via
-            datastore queries.
     """
-    if use_user_subscriptions_ids:
-        subscribed_exploration_summaries = (
-            exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
-    else:
-        subscribed_exploration_summaries = (
-            exp_fetchers.get_exploration_summaries_where_user_has_role(user_id))
+    subscribed_exploration_summaries = (
+        exp_fetchers.get_exploration_summaries_where_user_has_role(user_id))
 
     explorations_to_be_deleted_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries if
@@ -396,13 +388,23 @@ def remove_user_from_activities_with_associated_rights_models(
         rights_manager.deassign_role_for_exploration(
             user_services.get_system_user(), exp_id, user_id)
 
-    if use_user_subscriptions_ids:
-        subscribed_collection_summaries = (
-            collection_services.get_collection_summaries_subscribed_to(user_id))
-    else:
-        subscribed_collection_summaries = (
-            collection_services.get_collection_summaries_where_user_has_role(
-                user_id))
+    # To hard-delete explorations marked as deleted we are using the rights
+    # model to retrieve the exploration as the summary model gets hard-deleted
+    # while marking the exploration as deleted.
+    explorations_rights = (
+        rights_manager.get_exploration_rights_where_user_is_owner(user_id))
+    explorations_to_be_deleted_ids = [
+        exploration_rights.id for exploration_rights
+        in explorations_rights if
+        exploration_rights.is_private() and
+        exploration_rights.is_solely_owned_by_user(user_id)
+    ]
+    exp_services.delete_explorations(
+        user_id, explorations_to_be_deleted_ids, force_deletion=True)
+
+    subscribed_collection_summaries = (
+        collection_services.get_collection_summaries_where_user_has_role(
+            user_id))
 
     collections_to_be_deleted_ids = [
         col_summary.id for col_summary in subscribed_collection_summaries if
@@ -432,6 +434,19 @@ def remove_user_from_activities_with_associated_rights_models(
     for col_id in collections_to_remove_user_from_ids:
         rights_manager.deassign_role_for_collection(
             user_services.get_system_user(), col_id, user_id)
+
+    # To hard-delete collections marked as deleted we are using the rights
+    # model to retrieve the collection as the summary model gets hard-deleted
+    # while marking the collection as deleted.
+    collection_rights = (
+        rights_manager.get_collection_rights_where_user_is_owner(user_id))
+    collections_to_be_deleted_ids = [
+        collection_rights.id for collection_rights in collection_rights if
+        collection_rights.is_private() and
+        collection_rights.is_solely_owned_by_user(user_id)
+    ]
+    collection_services.delete_collections(
+        user_id, collections_to_be_deleted_ids, force_deletion=True)
 
     topic_services.deassign_user_from_all_topics(
         user_services.get_system_user(), user_id)
@@ -552,17 +567,19 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
             for model in commit_log_models)
         if snapshot_metadata_ids != commit_log_ids:
             logging.error(
-                'The commit log model \'%s\' and snapshot models %s IDs '
+                '%s The commit log model \'%s\' and snapshot models %s IDs '
                 'differ. Snapshots without commit logs: %s, '
-                'commit logs without snapshots: %s.',
-                commit_log_model_class.__name__,
-                [
-                    snapshot_metadata_model_class.__name__
-                    for snapshot_metadata_model_class
-                    in snapshot_metadata_model_classes
-                ],
-                list(snapshot_metadata_ids - commit_log_ids),
-                list(commit_log_ids - snapshot_metadata_ids)
+                'commit logs without snapshots: %s.' % (
+                    WIPEOUT_LOGS_PREFIX,
+                    commit_log_model_class.__name__,
+                    [
+                        snapshot_metadata_model_class.__name__
+                        for snapshot_metadata_model_class
+                        in snapshot_metadata_model_classes
+                    ],
+                    list(snapshot_metadata_ids - commit_log_ids),
+                    list(commit_log_ids - snapshot_metadata_ids)
+                )
             )
     model_ids = snapshot_metadata_ids | commit_log_ids
 
@@ -940,10 +957,10 @@ def _remove_user_id_from_contributors_in_summary_models(
         for summary_model in related_summary_models:
             summary_model.contributor_ids = [
                 contributor_id for contributor_id in
-                summary_model.contributor_ids
-                if contributor_id != user_id
+                summary_model.contributor_ids if contributor_id != user_id
             ]
-            del summary_model.contributors_summary[user_id]
+            if user_id in summary_model.contributors_summary:
+                del summary_model.contributors_summary[user_id]
 
         summary_model_class.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)

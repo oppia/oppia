@@ -6230,6 +6230,20 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_bot_as_final_reviewer_does_not_fail_reviewer_id_validation(self):
+        self.assertEqual(
+            user_models.UserSettingsModel.get_by_id(
+                feconf.SUGGESTION_BOT_USER_ID), None)
+
+        self.model_instance.final_reviewer_id = feconf.SUGGESTION_BOT_USER_ID
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_invalid_target_version(self):
         self.model_instance.target_version_at_submission = 5
         self.model_instance.update_timestamps()
@@ -6326,51 +6340,6 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
-
-    def test_validate_score_category_for_content_suggestion(self):
-        self.model_instance.score_category = 'content.invalid'
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for score category subtype check of '
-            'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
-            'valid does not match target exploration category Art\']]') % (
-                self.model_instance.id)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_validate_score_category_for_transalation_suggestion(self):
-        change = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p>This is a content.</p>',
-            'translation_html': '<p>This is translated html.</p>'
-        }
-        score_category = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'invalid')
-
-        thread_id = feedback_services.create_thread(
-            'exploration', '0', self.owner_id, 'description',
-            'suggestion', has_suggestion=True)
-
-        suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0',
-            1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, thread_id, 'hi')
-        model_instance = (
-            suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
-        expected_output = [((
-            u'[u\'failed validation check for score category subtype check of '
-            'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
-            'valid does not match target exploration category Art\']]') % (
-                model_instance.id)),
-                           u'[u\'fully-validated GeneralSuggestionModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
 
     def test_validate_score_category_for_question_suggestion(self):
         rubrics = [

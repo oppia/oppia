@@ -69,7 +69,7 @@ describe('AttributionService', () => {
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=true';
 
-
+      attributionService.init();
       attributionService.showAttributionModal();
 
       const req = httpTestingController.expectOne(requestUrl);
@@ -103,7 +103,7 @@ describe('AttributionService', () => {
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=true';
 
-
+      attributionService.init();
       attributionService.showAttributionModal();
 
       const req = httpTestingController.expectOne(requestUrl);
@@ -122,7 +122,7 @@ describe('AttributionService', () => {
       expect(attributionService.isAttributionModalShown()).toBeTrue();
     }));
 
-  it('should show and hide modal correctly',
+  it('should not initialise fields if backend call fails',
     fakeAsync(() => {
       spyOn(contextService, 'getExplorationId').and.returnValue('0');
       const explorationIds = ['0'];
@@ -131,8 +131,7 @@ describe('AttributionService', () => {
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=true';
 
-
-      attributionService.showAttributionModal();
+      attributionService.init();
 
       const req = httpTestingController.expectOne(requestUrl);
       expect(req.request.method).toEqual('GET');
@@ -145,6 +144,8 @@ describe('AttributionService', () => {
 
       flushMicrotasks();
       expect(attributionService.isAttributionModalShown()).toBeFalse();
+      expect(attributionService.getAuthors()).toEqual([]);
+      expect(attributionService.getExplorationTitle()).toEqual('');
     }));
 
   it('should allow attribution generation in exp player page', () => {

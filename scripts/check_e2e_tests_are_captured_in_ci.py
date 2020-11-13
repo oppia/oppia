@@ -31,9 +31,9 @@ import utils
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'accessibility', 'adminPage', 'classroomPage',
     'classroomPageFileUploadFeatures', 'collections', 'contributorDashboard',
-    'fileUploadExtensions', 'fileUploadFeatures', 'library', 'navigation',
-    'playVoiceovers', 'preferences', 'profileFeatures', 'profileMenu',
-    'publication', 'subscriptions', 'topicsAndSkillsDashboard',
+    'featureGating', 'fileUploadExtensions', 'fileUploadFeatures', 'library',
+    'navigation', 'playVoiceovers', 'preferences', 'profileFeatures',
+    'profileMenu', 'publication', 'subscriptions', 'topicsAndSkillsDashboard',
     'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users',
     'topicAndStoryViewer']
 
