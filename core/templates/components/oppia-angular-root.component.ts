@@ -464,7 +464,6 @@ import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_ski
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -775,7 +774,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     TopicsAndSkillsDashboardPageService;
   static topicViewerBackendApiService: TopicViewerBackendApiService;
   static translateService: TranslateService;
-  static translationLanguageService: TranslationLanguageService;
   static unitsObjectFactory: UnitsObjectFactory;
   static urlInterpolationService: UrlInterpolationService;
   static urlService: UrlService;
@@ -1071,7 +1069,6 @@ private topicsAndSkillsDashboardPageService:
   TopicsAndSkillsDashboardPageService,
 private topicViewerBackendApiService: TopicViewerBackendApiService,
 private translateService: TranslateService,
-private translateLanguageService: TranslationLanguageService,
 private unitsObjectFactory: UnitsObjectFactory,
 private urlInterpolationService: UrlInterpolationService,
 private urlService: UrlService,
@@ -1541,8 +1538,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.topicViewerBackendApiService = (
       this.topicViewerBackendApiService);
     OppiaAngularRootComponent.translateService = this.translateService;
-    OppiaAngularRootComponent.translationLanguageService = (
-      this.translateLanguageService);
     OppiaAngularRootComponent.unitsObjectFactory = this.unitsObjectFactory;
     OppiaAngularRootComponent.urlInterpolationService = (
       this.urlInterpolationService);
