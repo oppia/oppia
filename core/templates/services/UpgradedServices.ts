@@ -533,7 +533,6 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -1223,10 +1222,6 @@ export class UpgradedServices {
     upgradedServices['TranslationsBackendApiService'] =
       new TranslationsBackendApiService(
         upgradedServices['HttpClient']);
-    upgradedServices['TranslationLanguageService'] =
-      new TranslationLanguageService(
-        upgradedServices['LanguageUtilService'],
-        upgradedServices['LoggerService']);
     // Topological level: 4.
     upgradedServices['CollectionCreationService'] =
       new CollectionCreationService(
