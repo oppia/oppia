@@ -16,17 +16,17 @@
  * @fileoverview Controller for registration session expired modal.
  */
 
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').controller(
   'RegistrationSessionExpiredModalController', [
-    '$scope', '$timeout', '$uibModalInstance', '$window',
-    'UserService',
+    '$rootScope', '$scope', '$timeout', '$uibModalInstance', '$window',
+    'UserBackendApiService',
     function(
-        $scope, $timeout, $uibModalInstance, $window,
-        UserService) {
+        $rootScope, $scope, $timeout, $uibModalInstance, $window,
+        UserBackendApiService) {
       $scope.continueRegistration = function() {
-        UserService.getLoginUrlAsync().then(
+        UserBackendApiService.getLoginUrlAsync().then(
           function(loginUrl) {
             if (loginUrl) {
               $timeout(function() {
@@ -35,6 +35,9 @@ angular.module('oppia').controller(
             } else {
               $window.location.reload();
             }
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           }
         );
         $uibModalInstance.dismiss('cancel');

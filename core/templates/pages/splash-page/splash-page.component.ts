@@ -20,16 +20,16 @@ require('base-components/base-content.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$timeout', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService', 'WindowRef',
+    '$rootScope', '$timeout', 'LoaderService', 'SiteAnalyticsService',
+    'UrlInterpolationService', 'UserBackendApiService', 'WindowRef',
     function(
-        $timeout, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, WindowRef) {
+        $rootScope, $timeout, LoaderService, SiteAnalyticsService,
+        UrlInterpolationService, UserBackendApiService, WindowRef) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -66,9 +66,12 @@ angular.module('oppia').component('splashPage', {
       ctrl.$onInit = function() {
         ctrl.userIsLoggedIn = null;
         LoaderService.showLoadingScreen('Loading');
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
       };
     }
