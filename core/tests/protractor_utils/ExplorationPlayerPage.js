@@ -17,6 +17,7 @@
  * tests.
  */
 
+var action = require('./action.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
@@ -117,15 +118,11 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickThroughToNextCard = async function() {
-    await waitFor.elementToBeClickable(
-      nextCardButton, '"Next Card" button takes too long to be clickable');
-    await nextCardButton.click();
+    await action.click('Next Card button', nextCardButton);
   };
 
   this.clickSuggestChangesButton = async function() {
-    await waitFor.elementToBeClickable(
-      suggestionPopupLink, 'Suggest changes button taking too long to appear');
-    await suggestionPopupLink.click();
+    await action.click('Suggestion Popup link', suggestionPopupLink);
   };
 
   this.expectNextCardButtonTextToBe = async function(text) {
@@ -178,17 +175,22 @@ var ExplorationPlayerPage = function() {
   };
 
   this.viewHint = async function() {
+    var until = protractor.ExpectedConditions;
+    const WAIT_FOR_FIRST_HINT_MSEC = 60000;
     // We need to wait some time for the solution to activate.
-    await waitFor.elementToBeClickable(
-      viewHintButton, '"View Hint" button takes too long to be clickable');
+    await browser.wait(
+      until.elementToBeClickable(viewHintButton), WAIT_FOR_FIRST_HINT_MSEC,
+      '"View Hint" button takes too long to be clickable');
     await viewHintButton.click();
     await clickGotItButton();
   };
 
   this.viewSolution = async function() {
+    var until = protractor.ExpectedConditions;
+    const WAIT_FOR_SUBSEQUENT_HINTS = 30000;
     // We need to wait some time for the solution to activate.
-    await waitFor.elementToBeClickable(
-      viewSolutionButton,
+    await browser.wait(
+      until.elementToBeClickable(viewSolutionButton), WAIT_FOR_SUBSEQUENT_HINTS,
       '"View Solution" button takes too long to be clickable');
     await viewSolutionButton.click();
     await waitFor.elementToBeClickable(
@@ -243,6 +245,8 @@ var ExplorationPlayerPage = function() {
   this.expectContentToMatch = async function(richTextInstructions) {
     await waitFor.visibilityOf(
       await conversationContent.first(), 'Conversation not visible');
+    await waitFor.visibilityOf(
+      await conversationContent.last(), 'Conversation not fully present');
     await forms.expectRichText(
       await conversationContent.last()
     ).toMatch(richTextInstructions);
@@ -288,6 +292,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationNameToBe = async function(name) {
+    await waitFor.visibilityOf(
+      explorationHeader, 'Exploration Header taking too long to appear.');
     expect(
       await explorationHeader.getText()
     ).toBe(name);

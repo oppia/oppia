@@ -23,54 +23,38 @@ import {
 
 export class ClassroomData {
   _name: string;
-  _publicTopicSummaries: TopicSummary[];
-  _privateTopicSummaries: TopicSummary[];
+  _topicSummaries: TopicSummary[];
   _courseDetails: string;
   _topicListIntro: string;
 
   constructor(
-      name: string, publicTopicSummaries: TopicSummary[],
-      privateTopicSummaries: TopicSummary[], courseDetails: string,
-      topicListIntro: string) {
+      name: string, topicSummaries: TopicSummary[],
+      courseDetails: string, topicListIntro: string) {
     this._name = name;
-    this._publicTopicSummaries = publicTopicSummaries;
-    this._privateTopicSummaries = privateTopicSummaries;
+    this._topicSummaries = topicSummaries;
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
   }
 
   static createFromBackendData(
-      name: string, publicTopicSummaryDicts: TopicSummaryBackendDict[],
-      privateTopicSummaryDicts: TopicSummaryBackendDict[],
+      name: string, topicSummaryDicts: TopicSummaryBackendDict[],
       courseDetails: string, topicListIntro: string): ClassroomData {
-    let publicTopicSummaries = publicTopicSummaryDicts.map(
-      (summaryDict) => {
-        return TopicSummary.createFromBackendDict(
-          summaryDict);
-      }
-    );
-    let privateTopicSummaries = privateTopicSummaryDicts.map(
+    let topicSummaries = topicSummaryDicts.map(
       (summaryDict) => {
         return TopicSummary.createFromBackendDict(
           summaryDict);
       }
     );
     return new ClassroomData(
-      name, publicTopicSummaries, privateTopicSummaries, courseDetails,
-      topicListIntro
-    );
+      name, topicSummaries, courseDetails, topicListIntro);
   }
 
   getName(): string {
     return this._name;
   }
 
-  getPublicTopicSummaries(): TopicSummary[] {
-    return this._publicTopicSummaries.slice();
-  }
-
-  getPrivateTopicSummaries(): TopicSummary[] {
-    return this._privateTopicSummaries.slice();
+  getTopicSummaries(): TopicSummary[] {
+    return this._topicSummaries.slice();
   }
 
   getCourseDetails(): string {
