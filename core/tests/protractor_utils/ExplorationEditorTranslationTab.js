@@ -219,7 +219,6 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.visibilityOf(
       languageSelectorElement,
       'Language selector takes too long to appear.');
-    //var testInteractionButton = element(by.css('.protractor-test-interaction'));
     var languageSelectorElementOption = await languageSelectorElement.element(
       by.cssContainingText('option', language));
     await action.click(
@@ -480,7 +479,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectContentAccessibilityToMatch = async function(content) {
     await waitFor.visibilityOf(
-      translationTabContentAccessibility, 
+      translationTabContentAccessibility,
       'Translation tab content taking to long to appear');
     expect(await translationTabContentAccessibility.getAttribute(
       'aria-label')).toMatch(content);
@@ -488,7 +487,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectFeedbackAccessibilityToMatch = async function(content) {
     await waitFor.visibilityOf(
-      translationTabFeedbackAccessibility, 
+      translationTabFeedbackAccessibility,
       'translation tab feedback taking to long to appear');
     expect(await translationTabFeedbackAccessibility.getAttribute(
       'aria-label')).toMatch(content);
@@ -496,7 +495,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectHintAccessibilityToMatch = async function(content) {
     await waitFor.visibilityOf(
-      translationTabHintAccessibility, 
+      translationTabHintAccessibility,
       'Translation tab hint taking to long to appear');
     expect(await translationTabHintAccessibility.getAttribute(
       'aria-label')).toMatch(content);
@@ -504,7 +503,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectSolutionAccessibilityToMatch = async function(content) {
     await waitFor.visibilityOf(
-      translationTabSolutionAccessibility, 
+      translationTabSolutionAccessibility,
       'Translation tab solution taking to long to appear');
     expect(await translationTabSolutionAccessibility.getAttribute(
       'aria-label')).toMatch(content);
@@ -512,7 +511,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectStartRecordingAccessibilityToMatch = async function(content) {
     await waitFor.visibilityOf(
-      translationTabStartRecordingAccessibility, 
+      translationTabStartRecordingAccessibility,
       'Translation tab start recording taking to long to appear');
     expect(await translationTabStartRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
@@ -520,7 +519,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectUploadRecordingAccessibilityToMatch = async function(content) {
     await waitFor.visibilityOf(
-      translationTabUploadRecordingAccessibility, 
+      translationTabUploadRecordingAccessibility,
       'Translation tab upload record taking to long to appear');
     expect(await translationTabUploadRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
@@ -528,7 +527,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectPlayRecordingAccessibilityToMatch = async function(content) {
     await waitFor.visibilityOf(
-      translationTabPlayRecordingAccessibility, 
+      translationTabPlayRecordingAccessibility,
       'Translate tab play recording taking to long to appear');
     expect(await translationTabPlayRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
