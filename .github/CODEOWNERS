@@ -183,7 +183,7 @@
 /scripts/linters/ts_ignore_exceptions.json @nishantwrp
 /ubuntu_dockerfile @DubeySandeep
 /cloudbuild.yaml @seanlip
-/Dockerfile @seanlip
+/Dockerfile.base @seanlip
 
 # Exploration project.
 /core/controllers/editor*.py @aks681
