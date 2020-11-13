@@ -19,6 +19,8 @@ RUN bash /home/oppia/scripts/install_prerequisites.sh
 # Install chrome.
 COPY ./scripts/install_chrome.sh /home/oppia/scripts/
 RUN bash /home/oppia/scripts/install_chrome.sh
+ENV CHROME_BIN /usr/bin/google-chrome
+RUN export CHROME_BIN 
 
 RUN pip install enum34==1.1.10 protobuf==3.13.0 wheel==0.35.0 codecov
 
@@ -27,8 +29,9 @@ ENV JAVA_HOME /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/
 ENV PATH $PATH:$JAVA_HOME/bin
 RUN export JAVA_HOME
 
-# Set env vars for tests
-ENV CHROME_BIN /usr/bin/google-chrome
-RUN export CHROME_BIN 
+# set up xvfb
+RUN sudo apt-get install -y xvfb
+ENV XVFB_WHD=${XVFB_WHD:-1280x720x16}
+RUN Xvfb :99 -ac -screen 0 $XVFB_WHD -nolisten tcp &
 ENV DISPLAY=:99.0
 RUN export DISPLAY
