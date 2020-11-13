@@ -666,7 +666,7 @@ def run_tests(args=None):
         for i, line in enumerate(output_lines):
             try:
                 line = python_utils.UNICODE(line)
-            except:
+            except UnicodeDecodeError:
                 # Not a unicode line, can skip it.
                 continue
             if line == u'*                    Failures                    *':
