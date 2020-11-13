@@ -18,5 +18,5 @@ sudo apt-get install -y lsb-release
 curl -L "https://raw.githubusercontent.com/webnicer/chrome-downloads/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb" -o google-chrome.deb
 sudo  dpkg -i google-chrome.deb
 sudo apt-get -f install -y
-sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox --no-sandbox --headless|g' /opt/google/chrome/google-chrome
+sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox --no-sandbox|g' /opt/google/chrome/google-chrome
 google-chrome --version

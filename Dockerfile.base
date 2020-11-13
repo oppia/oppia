@@ -29,9 +29,7 @@ ENV JAVA_HOME /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/
 ENV PATH $PATH:$JAVA_HOME/bin
 RUN export JAVA_HOME
 
-# set up xvfb
-RUN sudo apt-get install -y xvfb
-ENV XVFB_WHD=${XVFB_WHD:-1280x720x16}
-RUN Xvfb :99 -ac -screen 0 $XVFB_WHD -nolisten tcp &
-ENV DISPLAY=:99.0
-RUN export DISPLAY
+# Install xvfb
+RUN apt-get install -y xvfb
+
+
