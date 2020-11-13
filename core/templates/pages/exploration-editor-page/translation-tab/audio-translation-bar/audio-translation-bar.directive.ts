@@ -57,7 +57,7 @@ require('services/audio-player.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/id-generation.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 require('services/external-save.service.ts');
 
 import WaveSurfer from 'wavesurfer.js';
@@ -76,11 +76,11 @@ interface AudioTranslationBarCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('audioTranslationBar', [
-  'UrlInterpolationService', 'UserExplorationPermissionsService',
-  'UserService',
+  '$rootScope', 'UrlInterpolationService', 'UserBackendApiService',
+  'UserExplorationPermissionsService',
   function(
-      UrlInterpolationService, UserExplorationPermissionsService,
-      UserService) {
+      $rootScope, UrlInterpolationService, UserBackendApiService,
+      UserExplorationPermissionsService) {
     return {
       restrict: 'E',
       scope: {
@@ -90,7 +90,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         scope.getVoiceoverRecorder();
 
         var userIsLoggedIn;
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
           return UserExplorationPermissionsService.getPermissionsAsync();
         }).then(function(permissions) {
@@ -99,6 +99,9 @@ angular.module('oppia').directive('audioTranslationBar', [
             scope.dropAreaIsAccessible = permissions.canVoiceover;
             scope.userIsGuest = !userIsLoggedIn;
             scope.$digest();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
             return false;
           });
         });

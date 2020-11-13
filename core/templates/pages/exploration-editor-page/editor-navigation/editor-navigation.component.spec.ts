@@ -18,7 +18,9 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subscription } from 'rxjs';
+import { UserBackendApiService } from 'services/user-backend-api.service.ts';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
@@ -38,7 +40,7 @@ describe('Editor Navigation Component', function() {
   var explorationWarningsService = null;
   var stateTutorialFirstTimeService = null;
   var threadDataService = null;
-  var userService = null;
+  var userBackendApiService = null;
   var windowDimensionsService = null;
 
   var mockOpenPostTutorialHelpPopover = new EventEmitter();
@@ -59,10 +61,17 @@ describe('Editor Navigation Component', function() {
   };
   var isImprovementsTabEnabledAsyncSpy = null;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
   importAllAngularServices();
 
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
+    userBackendApiService = TestBed.get(UserBackendApiService);
   });
 
   describe('when screen is large', function() {
@@ -81,7 +90,6 @@ describe('Editor Navigation Component', function() {
       explorationImprovementsService = $injector.get(
         'ExplorationImprovementsService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
-      userService = $injector.get('UserService');
       threadDataService = $injector.get('ThreadDataService');
       stateTutorialFirstTimeService = (
         $injector.get('StateTutorialFirstTimeService'));
@@ -91,7 +99,7 @@ describe('Editor Navigation Component', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(userInfo);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
@@ -353,7 +361,6 @@ describe('Editor Navigation Component', function() {
       explorationImprovementsService = $injector.get(
         'ExplorationImprovementsService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
-      userService = $injector.get('UserService');
       threadDataService = $injector.get('ThreadDataService');
       stateTutorialFirstTimeService = (
         $injector.get('StateTutorialFirstTimeService'));
@@ -363,7 +370,7 @@ describe('Editor Navigation Component', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(768);
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(userInfo);
 
       spyOnProperty(
         stateTutorialFirstTimeService,

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -25,6 +26,7 @@ import { SuggestionThreadObjectFactory } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
@@ -39,9 +41,15 @@ describe('Feedback Tab Component', function() {
   var suggestionModalForExplorationEditorService = null;
   var suggestionThreadObjectFactory = null;
   var threadDataService = null;
-  var userService = null;
+  var userBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
@@ -56,6 +64,8 @@ describe('Feedback Tab Component', function() {
     $provide.value(
       'SuggestionModalService', TestBed.get(SuggestionModalService));
     $provide.value('RouterService', {});
+    $provide.value(
+      'UserBackendApiService', TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -68,9 +78,9 @@ describe('Feedback Tab Component', function() {
     suggestionModalForExplorationEditorService = $injector.get(
       'SuggestionModalForExplorationEditorService');
     threadDataService = $injector.get('ThreadDataService');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));
     spyOn(threadDataService, 'getThreadsAsync').and.returnValue(

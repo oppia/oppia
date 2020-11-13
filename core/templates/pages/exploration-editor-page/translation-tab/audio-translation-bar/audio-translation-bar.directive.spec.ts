@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for Audio Translation Bar directive.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AnswerGroupsCacheService } from
@@ -53,6 +54,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
@@ -86,7 +88,7 @@ describe('Audio translation bar directive', function() {
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var userExplorationPermissionsService = null;
-  var userService = null;
+  var userBackendApiService = null;
   var voiceoverRecordingService = null;
 
   var stateName = 'State1';
@@ -104,6 +106,13 @@ describe('Audio translation bar directive', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('directiveTemplates'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     editabilityService = TestBed.get(EditabilityService);
@@ -142,6 +151,8 @@ describe('Audio translation bar directive', function() {
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value('UserBackendApiService',
+      TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -737,11 +748,12 @@ describe('Audio translation bar directive', function() {
       $uibModal = $injector.get('$uibModal');
       userExplorationPermissionsService = $injector.get(
         'UserExplorationPermissionsService');
-      userService = $injector.get('UserService');
+      userBackendApiService = $injector.get('UserBackendApiService');
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
