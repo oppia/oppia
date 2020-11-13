@@ -44,7 +44,8 @@ describe('Voiceover player', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createAndLoginUser('testVoiceovers@voiceovers.com', 'testVoiceovers');
+    await users.createAndLoginUser(
+      'testVoiceovers@voiceovers.com', 'testVoiceovers');
     await workflow.createExploration();
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorMainTab.setStateName('First');

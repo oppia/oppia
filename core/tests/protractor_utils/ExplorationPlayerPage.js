@@ -110,7 +110,7 @@ var ExplorationPlayerPage = function() {
     await waitFor.visibilityOf(
       voiceoverLanguageSelector, 'Language selector takes too long to appear.');
     var languageButton = voiceoverLanguageSelector.element(
-      by.cssContainingText('option', language))
+      by.cssContainingText('option', language));
     await action.click('Language button', languageButton);
   };
 

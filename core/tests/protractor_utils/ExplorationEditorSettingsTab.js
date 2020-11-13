@@ -114,7 +114,7 @@ var ExplorationEditorSettingsTab = function() {
   this.setLanguage = async function(language) {
     var languageButton = element(
       by.css('.protractor-test-exploration-language-select')).element(
-        by.cssContainingText('option', language));
+      by.cssContainingText('option', language));
     await action.click('Language button', languageButton);
   };
 
@@ -127,7 +127,8 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setTitle = async function(title) {
     await action.clear('Exploration title input', explorationTitleInput);
-    await action.sendKeys('Exploration title input', explorationTitleInput, title);
+    await action.sendKeys(
+      'Exploration title input', explorationTitleInput, title);
   };
 
   this.expectCategoryToBe = async function(category) {

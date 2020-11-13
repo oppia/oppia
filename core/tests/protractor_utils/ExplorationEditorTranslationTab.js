@@ -237,24 +237,12 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.uploadAudioRecord = async function(audioPath) {
-    /*await waitFor.elementToBeClickable(
-      uploadAudioButton,
-      'Audio Record button is not clickable');
-    await uploadAudioButton.click();*/
     await action.click('Audio Record Button', uploadAudioButton);
     absPath = path.resolve(__dirname, audioPath);
-    /*await waitFor.visibilityOf(
-      audioUploadInput,
-      'Audio upload input field is not visible');
-    await audioUploadInput.sendKeys(absPath);*/
     await action.sendKeys('Audio upload input', audioUploadInput, absPath);
   };
 
   this.saveAudioRecord = async function() {
-    /*await waitFor.elementToBeClickable(
-      saveUploadedAudioButton,
-      'Save uploaded audio button is not clickable');
-    await saveUploadedAudioButton.click();*/
     await action.click('Save uploaded audio button', saveUploadedAudioButton);
     await waitFor.pageToFullyLoad();
   };
@@ -328,11 +316,8 @@ var ExplorationEditorTranslationTab = function() {
   this.uploadAudio = async function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    // await audioUploadInput.sendKeys(audioAbsolutePath);
-    await action.sendKeys('Audio upload input', audioUploadInput, audioAbsolutePath);
-    /*await waitFor.elementToBeClickable(
-      saveUploadedAudioButton, 'Save button is not clickable');
-    await saveUploadedAudioButton.click();*/
+    await action.sendKeys(
+      'Audio upload input', audioUploadInput, audioAbsolutePath);
     await action.click('Save uploaded audio button', saveUploadedAudioButton);
     await waitFor.invisibilityOf(
       saveUploadedAudioButton,
@@ -367,9 +352,6 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.openUploadAudioModal = async function() {
-    /*await waitFor.elementToBeClickable(
-      uploadAudioButton, 'Upload Audio button is not clickable');
-    await uploadAudioButton.click();*/
     await action.click('Upload Audio button', uploadAudioButton);
   };
 
