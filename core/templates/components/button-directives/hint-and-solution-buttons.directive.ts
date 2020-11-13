@@ -45,12 +45,12 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         'hint-and-solution-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'ContextService', 'ExplorationPlayerStateService',
+        '$rootScope', 'ContextService', 'ExplorationPlayerStateService',
         'HintAndSolutionModalService', 'HintsAndSolutionManagerService',
         'PlayerPositionService', 'PlayerTranscriptService',
         'StatsReportingService',
         function(
-            ContextService, ExplorationPlayerStateService,
+            $rootScope, ContextService, ExplorationPlayerStateService,
             HintAndSolutionModalService, HintsAndSolutionManagerService,
             PlayerPositionService, PlayerTranscriptService,
             StatsReportingService) {
@@ -158,6 +158,10 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
                   }
                 }
               )
+            );
+            ctrl.directiveSubscriptions.add(
+              HintsAndSolutionManagerService.onTimeoutElapsed$.subscribe(
+                () => $rootScope.$apply())
             );
           };
           ctrl.$onDestroy = function() {
