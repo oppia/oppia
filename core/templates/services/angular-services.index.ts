@@ -89,6 +89,7 @@ import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObje
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from 'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
@@ -223,6 +224,7 @@ import { AudioTranslationManagerService } from 'pages/exploration-player-page/se
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { LearnerParamsService } from 'pages/exploration-player-page/services/learner-params.service';
 import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
 import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
@@ -302,6 +304,7 @@ import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/t
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
+import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -416,6 +419,7 @@ export const angularServices: [string, unknown][] = [
   ['GuestCollectionProgressService', GuestCollectionProgressService],
   ['GuppyConfigurationService', GuppyConfigurationService],
   ['GuppyInitializationService', GuppyInitializationService],
+  ['HintsAndSolutionManagerService', HintsAndSolutionManagerService],
   ['HintObjectFactory', HintObjectFactory],
   ['HtmlEscaperService', HtmlEscaperService],
   ['I18nLanguageCodeService', I18nLanguageCodeService],
@@ -486,6 +490,8 @@ export const angularServices: [string, unknown][] = [
   ['PlatformFeatureAdminBackendApiService',
     PlatformFeatureAdminBackendApiService],
   ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
+  ['PlatformFeatureDummyBackendApiService',
+    PlatformFeatureDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
   ['PlayerCorrectnessFeedbackEnabledService',
     PlayerCorrectnessFeedbackEnabledService],
@@ -500,6 +506,7 @@ export const angularServices: [string, unknown][] = [
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],
   ['ProfileLinkImageBackendApiService', ProfileLinkImageBackendApiService],
   ['ProfilePageBackendApiService', ProfilePageBackendApiService],
+  ['PromoBarBackendApiService', PromoBarBackendApiService],
   ['PythonProgramTokenizer', PythonProgramTokenizer],
   ['EditableQuestionBackendApiService', EditableQuestionBackendApiService],
   ['QuestionObjectFactory', QuestionObjectFactory],

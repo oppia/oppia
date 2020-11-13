@@ -31,10 +31,29 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+
+let dummyFeatureStatus = false;
+const mockDummyFeatureStatus = (status: boolean) => dummyFeatureStatus = status;
+
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      DummyFeature: {
+        get isEnabled() {
+          return dummyFeatureStatus;
+        }
+      }
+    };
+  }
+}
 
 describe('Admin page feature tab', function() {
   let component: AdminFeaturesTabComponent;
@@ -54,6 +73,12 @@ describe('Admin page feature tab', function() {
       .configureTestingModule({
         imports: [FormsModule, HttpClientTestingModule],
         declarations: [AdminFeaturesTabComponent],
+        providers: [
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService
+          }
+        ]
       })
       .compileComponents();
 
@@ -633,5 +658,54 @@ describe('Admin page feature tab', function() {
         'In the 1-th rule, 1-th filter: the 1-th & 2-th conditions' +
         ' are identical.']);
     });
+  });
+
+  describe('.isDummyFeatureEnabled', () => {
+    it('should return true when dummy feature is enabled', () => {
+      mockDummyFeatureStatus(true);
+      expect(component.isDummyFeatureEnabled).toBeTrue();
+    });
+
+    it('should return false when dummy feature is disabled', () => {
+      mockDummyFeatureStatus(false);
+      expect(component.isDummyFeatureEnabled).toBeFalse();
+    });
+  });
+
+  describe('.reloadDummyHandlerStatusAsync', () => {
+    let dummyApiService: PlatformFeatureDummyBackendApiService;
+
+    let dummyApiSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      dummyApiService = TestBed.get(PlatformFeatureDummyBackendApiService);
+
+      dummyApiSpy = spyOn(dummyApiService, 'isHandlerEnabled')
+        .and.resolveTo(null);
+    });
+
+    it('should not request dummy handler if the dummy feature is disabled',
+      fakeAsync(() => {
+        mockDummyFeatureStatus(false);
+
+        component.reloadDummyHandlerStatusAsync();
+
+        flushMicrotasks();
+
+        expect(dummyApiSpy).not.toHaveBeenCalled();
+      })
+    );
+
+    it('should request dummy handler if the dummy feature is enabled',
+      fakeAsync(() => {
+        mockDummyFeatureStatus(true);
+
+        component.reloadDummyHandlerStatusAsync();
+
+        flushMicrotasks();
+
+        expect(dummyApiSpy).toHaveBeenCalled();
+      })
+    );
   });
 });
