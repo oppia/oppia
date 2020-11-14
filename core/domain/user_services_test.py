@@ -216,6 +216,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
+    def test_is_username_taken_when_user_marked_as_deleted_has_same_username(
+            self):
+        gae_id = 'someUser'
+        username = 'camelCase'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
+        user_services.set_username(user_id, username)
+        user_services.mark_user_for_deletion(user_id)
+        self.assertTrue(user_services.is_username_taken(username))
+
+    def test_is_username_taken_when_deleted_user_had_same_username(self):
+        username = 'userName123'
+        user_services.save_deleted_username(
+            user_services.UserSettings.normalize_username(username)
+        )
+        self.assertTrue(user_services.is_username_taken(username))
+
     def test_set_invalid_usernames(self):
         gae_id = 'someUser'
         user_id = user_services.create_new_user(

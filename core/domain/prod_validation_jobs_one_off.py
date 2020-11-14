@@ -945,6 +945,14 @@ class DeletedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.DeletedUserModel]
 
 
+class DeletedUsernameModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates DeletedUsernameModels."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.DeletedUsernameModel]
+
+
 class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates TaskEntryModel."""
 

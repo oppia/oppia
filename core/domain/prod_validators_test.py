@@ -12914,8 +12914,6 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
         wipeout_service.run_user_deletion_completion(
             wipeout_service.get_pending_deletion_request(self.user_id))
 
-        user_models.DeletedUserModel(id=self.user_id).put()
-
         self.model_instance = (
             user_models.DeletedUserModel.get_by_id(self.user_id))
 
@@ -13052,6 +13050,72 @@ class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
+
+
+class DeletedUsernameModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(DeletedUsernameModelValidatorTests, self).setUp()
+
+        date_10_days_ago = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=10))
+        with self.mock_datetime_utcnow(date_10_days_ago):
+            self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        # Run the full user deletion process as it works when the user
+        # pre-deletes itself via frontend and then is fully deleted via
+        # subsequent cron jobs.
+        wipeout_service.pre_delete_user(self.user_id)
+        wipeout_service.run_user_deletion(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+        wipeout_service.run_user_deletion_completion(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+
+        self.model_instance = (
+            user_models.DeletedUsernameModel.get_by_id(
+                utils.convert_to_hash(
+                    USER_NAME, user_models.DeletedUsernameModel.ID_LENGTH)))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.DeletedUsernameModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated DeletedUsernameModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of DeletedUsernameModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'DeletedUsernameModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
 
 class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):

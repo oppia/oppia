@@ -134,6 +134,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
     user_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
     user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob,
+    user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -169,6 +170,7 @@ AUDIT_JOB_MANAGERS = [
     ),
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
     prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob,
+    prod_validation_jobs_one_off.DeletedUsernameModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,

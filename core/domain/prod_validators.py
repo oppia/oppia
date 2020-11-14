@@ -4579,6 +4579,29 @@ class PseudonymizedUserModelValidator(
         return [cls._validate_user_settings_with_same_id_not_exist]
 
 
+class DeletedUsernameModelValidator(
+        base_model_validators.BaseUserModelValidator):
+    """Class for validating DeletedUsernameModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        """Returns a regex for model id.
+
+        This method can be overridden by subclasses, if needed.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            str. A regex pattern to be followed by the model id.
+        """
+        return '^[a-zA-Z0-9]{1,32}$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+
 class UserAuthDetailsModelValidator(
         base_model_validators.BaseUserModelValidator):
     """Class for validating UserAuthDetailsModels."""

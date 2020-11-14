@@ -43,6 +43,7 @@ from core.tests import test_utils
 from core.tests.data import image_constants
 import feconf
 import python_utils
+import utils
 
 (user_models, feedback_models, exp_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
@@ -2269,3 +2270,104 @@ class GenerateUserIdentifiersModelOneOffJobTests(test_utils.GenericTestBase):
                 user_auth_details_model.id, user_identifiers_model.user_id)
             self.assertEqual(
                 user_auth_details_model.gae_id, user_identifiers_model.id)
+
+
+class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob
+            .create_new())
+        user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        for item in eval_output:
+            if item[0] == 'FAILURE':
+                item[1] = sorted(item[1])
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(UniqueHashedNormalizedUsernameAuditJobTests, self).setUp()
+
+    def test_audit_user_with_username_is_successful(self):
+        model = user_models.UserSettingsModel(id='id', email='email@email.com')
+        model.update_timestamps()
+        model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS USERNAME NONE', 1]])
+
+    def test_audit_users_with_different_usernames_is_successful(self):
+        # Generate 4 different users.
+        for i in python_utils.RANGE(4):
+            model = user_models.UserSettingsModel(
+                id='id%s' % i,
+                email='email%s@email.com' % i,
+                normalized_username='username%s' % i
+            )
+            model.update_timestamps()
+            model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [])
+
+    def test_audit_users_with_different_usernames_all_hashes_same_fails(self):
+        # Generate 4 different users.
+        for i in python_utils.RANGE(4):
+            model = user_models.UserSettingsModel(
+                id='id%s' % i,
+                email='email%s@email.com' % i,
+                normalized_username='username%s' % i
+            )
+            model.update_timestamps()
+            model.put()
+
+        def mock_convert_to_hash(*_):
+            """Function that takes any number of arguments and returns the
+            same hash for all inputs.
+            """
+            return 'hashhash'
+
+        with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            output = self._run_one_off_job()
+
+        self.assertEqual(
+            output,
+            [['FAILURE', ['username%s' % i for i in python_utils.RANGE(4)]]])
+
+    def test_audit_users_with_different_usernames_some_hashes_same_fails(self):
+        # Generate 5 different users.
+        for i in python_utils.RANGE(5):
+            model = user_models.UserSettingsModel(
+                id='id%s' % i,
+                email='email%s@email.com' % i,
+                normalized_username='username%s' % i
+            )
+            model.update_timestamps()
+            model.put()
+
+        def mock_convert_to_hash(username, _):
+            """Function that takes username and returns the same hash for some
+            usernames and unique hash for others.
+            """
+            if username in ('username1', 'username2'):
+                return 'hashhash'
+            return hash(username)
+
+        with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            output = self._run_one_off_job()
+
+        self.assertEqual(output, [['FAILURE', ['username1', 'username2']]])
