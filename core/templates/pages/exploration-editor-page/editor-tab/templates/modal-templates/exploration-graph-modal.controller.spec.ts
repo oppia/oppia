@@ -20,6 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration Graph Modal Controller', function() {
   var $scope = null;
@@ -30,6 +31,7 @@ describe('Exploration Graph Modal Controller', function() {
   var isEditable = true;
   var graphData = {};
   var stateName = 'Introduction';
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(

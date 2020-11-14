@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { Classifier } from 'domain/classifier/classifier.model';
 
-interface StateClassifierMappingBackendDict {
+export interface StateClassifierMappingBackendDict {
   [state: string]: {
     'algorithm_id': string;
     'classifier_data': ClassifierData;

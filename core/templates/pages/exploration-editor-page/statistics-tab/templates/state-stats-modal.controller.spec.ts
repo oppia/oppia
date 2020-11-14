@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // file is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('State Stats Modal Controller', function() {
@@ -43,7 +44,7 @@ describe('State Stats Modal Controller', function() {
   }];
   var interactionArgs = {
   };
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

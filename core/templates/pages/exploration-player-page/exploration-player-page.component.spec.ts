@@ -20,6 +20,7 @@
 // App.ts is upgraded to Angular 8.
 
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 import { TestBed } from '@angular/core/testing';
@@ -35,6 +36,7 @@ describe('Exploration player page', function() {
   var ContextService = null;
   var PageTitleService = null;
   var ReadOnlyExplorationBackendApiService = null;
+  importAllAngularServices();
 
   var explorationId = 'exp1';
   var exploration = {

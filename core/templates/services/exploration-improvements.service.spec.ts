@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { StateObjectsBackendDict } from
@@ -46,6 +45,7 @@ import { StateTopAnswersStatsService } from
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.
@@ -143,6 +143,7 @@ describe('ExplorationImprovementsService', function() {
     return (
       new ExplorationPermissions(null, null, null, null, null, null, canEdit));
   };
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
@@ -151,8 +152,6 @@ describe('ExplorationImprovementsService', function() {
     }
   }));
   beforeEach(angular.mock.inject($injector => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-
     $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
     contextService = $injector.get('ContextService');

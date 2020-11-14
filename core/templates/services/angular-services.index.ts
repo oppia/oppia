@@ -67,6 +67,8 @@ import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObject
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from 'domain/exploration/ParamTypeObjectFactory';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { RecordedVoiceoversObjectFactory } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
@@ -522,6 +524,8 @@ export const angularServices: [string, unknown][] = [
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
   ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
+  ['ReadOnlyExplorationBackendApiService',
+    ReadOnlyExplorationBackendApiService],
   ['RecordedVoiceoversObjectFactory', RecordedVoiceoversObjectFactory],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],

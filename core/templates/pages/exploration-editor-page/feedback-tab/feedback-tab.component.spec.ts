@@ -25,6 +25,7 @@ import { SuggestionThreadObjectFactory } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
@@ -42,6 +43,7 @@ describe('Feedback Tab Component', function() {
   var userService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);

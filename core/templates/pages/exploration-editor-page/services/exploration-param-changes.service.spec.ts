@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require(
@@ -27,6 +28,7 @@ require(
 
 describe('Exploration Param Changes Service', function() {
   var epcs = null;
+  importAllAngularServices();
 
   beforeEach(function() {
     angular.mock.module('oppia');

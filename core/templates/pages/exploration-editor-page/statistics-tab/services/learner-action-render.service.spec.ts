@@ -22,6 +22,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-action-render.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 import { LearnerActionObjectFactory } from
@@ -40,6 +41,7 @@ describe('Learner Action Render Service', function() {
   let explorationStatesService = null;
   let learnerActionObjectFactory: LearnerActionObjectFactory = null;
   let learnerActionRenderService = null;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();

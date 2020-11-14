@@ -25,6 +25,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 class MockRouterService {
   private refreshStatisticsTabEventEmitter: EventEmitter<void>;
@@ -117,6 +118,7 @@ describe('Statistics Tab Component', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({

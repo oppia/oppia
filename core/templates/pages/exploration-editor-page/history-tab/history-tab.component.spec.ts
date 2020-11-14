@@ -49,6 +49,7 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('History tab component', function() {
   var ctrl = null;
@@ -64,6 +65,7 @@ describe('History tab component', function() {
   var windowRef = null;
 
   var mockRefreshVersionHistoryEmitter = new EventEmitter();
+  importAllAngularServices();
 
   var explorationId = 'exp1';
   var snapshots = [{

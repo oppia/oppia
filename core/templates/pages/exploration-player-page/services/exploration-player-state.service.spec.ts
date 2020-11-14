@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-player-state.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require(
@@ -32,6 +33,7 @@ describe('Exploration Player State Service', () => {
   let StatsReportingService = null;
   let $rootScope = null;
   let $q = null;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', ($provide) => {

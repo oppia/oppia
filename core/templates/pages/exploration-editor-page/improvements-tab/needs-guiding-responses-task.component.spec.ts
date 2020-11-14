@@ -20,6 +20,7 @@
 // TODO(#7222): Remove usages of UpgradedServices. Used here because too many
 // indirect AngularJS dependencies are required.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/exploration-editor-page/improvements-tab/' +
@@ -33,6 +34,7 @@ describe('NeedsGuidingResponsesTask component', function() {
 
   let task = {targetId: stateName};
   let stats = {answerStats: [], stateStats: {totalAnswersCount}};
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', $provide => {
     const ugs = new UpgradedServices();

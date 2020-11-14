@@ -19,6 +19,7 @@
 import { EventEmitter } from '@angular/core';
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Editor Navbar Breadcrumb directive', function() {
   var ctrl = null;
@@ -28,6 +29,7 @@ describe('Editor Navbar Breadcrumb directive', function() {
   var ExplorationPropertyService = null;
   var FocusManagerService = null;
   var RouterService = null;
+  importAllAngularServices();
 
   var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 

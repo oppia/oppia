@@ -25,6 +25,7 @@ import { StateInteractionIdService } from
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Unresolved Answers Overview Component', function() {
   var $q = null;
@@ -43,6 +44,7 @@ describe('Unresolved Answers Overview Component', function() {
   var stateName = 'State1';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
   beforeEach(function() {
     editabilityService = TestBed.get(EditabilityService);

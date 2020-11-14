@@ -19,12 +19,16 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/local-storage.service');
 require('services/alerts.service');
 require('services/contextual/logger.service');
+
+import { HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 describe('Exploration data service', function() {
   var eds = null;
@@ -34,6 +38,7 @@ describe('Exploration data service', function() {
   var $q = null;
   var $httpBackend = null;
   var CsrfService = null;
+  let httpTestingController: HttpTestingController;
   var sampleDataResults = {
     draft_change_list_id: 3,
     version: 1,
@@ -74,6 +79,8 @@ describe('Exploration data service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -96,6 +103,7 @@ describe('Exploration data service', function() {
     als = $injector.get('AlertsService');
     $q = $injector.get('$q');
     $httpBackend = $injector.get('$httpBackend');
+    httpTestingController = TestBed.get(HttpTestingController);
     CsrfService = $injector.get('CsrfTokenService');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
@@ -104,6 +112,10 @@ describe('Exploration data service', function() {
       return deferred.promise;
     });
   }));
+
+  afterEach(function() {
+    httpTestingController.verify();
+  });
 
   it('should autosave draft changes when draft ids match', function() {
     var errorCallback = jasmine.createSpy('error');
@@ -233,21 +245,22 @@ describe('Exploration data service', function() {
     expect(failHandler).toHaveBeenCalled();
   });
 
-  it('should get last saved data', function() {
+  it('should get last saved data', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
     var logInfoSpy = spyOn(ls, 'info').and.callThrough();
 
-    $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-      sampleDataResults);
     eds.getLastSavedData().then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne('/explorehandler/init/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
       sampleDataResults.exploration);
     expect(logInfoSpy).toHaveBeenCalledTimes(2);
-  });
+  }));
 
   it('should resolve answers', function() {
     var stateName = 'First State';
@@ -380,6 +393,7 @@ describe('Exploration data service', function() {
   var pathname = '/exploration/0';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

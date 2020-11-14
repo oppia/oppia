@@ -48,6 +48,7 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require(
@@ -64,6 +65,7 @@ describe('ExplorationStatesService', function() {
   var ExplorationStatesService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
