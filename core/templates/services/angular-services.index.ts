@@ -305,7 +305,7 @@ import { TranslationsBackendApiService } from 'services/translations-backend-api
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
-import { SuggestionModalForCreatorDashboardBackendApiService } from 
+import { SuggestionModalForCreatorDashboardBackendApiService } from
 // eslint-disable-next-line max-len
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/suggestion-modal-for-creator-dashboard-backend-api.service';
 
@@ -590,6 +590,7 @@ export const angularServices: [string, unknown][] = [
   ['SubtopicPageContentsObjectFactory', SubtopicPageContentsObjectFactory],
   ['SubtopicPageObjectFactory', SubtopicPageObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
+  // eslint-disable-next-line max-len
   ['SuggestionModalForCreatorDashboardBackendApiService', SuggestionModalForCreatorDashboardBackendApiService],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionObjectFactory', SuggestionObjectFactory],

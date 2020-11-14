@@ -120,7 +120,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             }
             clearActiveThread();
           }, function() {
-           $log.error('Error resolving suggestion');
+            $log.error('Error resolving suggestion');
           });
       }, () => {
         // Note to developers:
