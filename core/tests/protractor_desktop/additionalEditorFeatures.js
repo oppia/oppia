@@ -248,7 +248,7 @@ describe('Full exploration editor', function() {
     await users.login('user6@editorAndPlayer.com');
     await workflow.createExploration();
 
-    await browser.sleep(5000);
+    await browser.sleep(8000);
 
     // Create an exploration with multiple groups.
     await explorationEditorMainTab.setStateName('first card');
