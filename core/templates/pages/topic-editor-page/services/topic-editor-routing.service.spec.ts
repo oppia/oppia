@@ -78,7 +78,7 @@ describe('Topic editor routing service', () => {
   it('should handle calls with unexpect paths', () => {
     expect(ters.getActiveTabName()).toEqual('main');
 
-    locat.path();
+    locat.go('/');
     expect(ters.getActiveTabName()).toEqual('main');
 
     locat.simulateHashChange('');
