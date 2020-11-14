@@ -705,9 +705,6 @@ class SuggestionAddQuestion(BaseSuggestion):
                 self.change.question_dict['question_state_data'])
         }
 
-        if state_schema_version is None or state_schema_version < 1:
-            state_schema_version = 0
-
         if not (25 <= state_schema_version
                 <= feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise Exception(

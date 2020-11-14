@@ -2163,6 +2163,63 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['language_code'], self.fake_date)
         suggestion.accept('commit_message')
 
+    def test_contructor_updates_state_shema_in_change_cmd(self):
+        score_category = (
+            suggestion_models.SCORE_TYPE_QUESTION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
+        change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self.VERSION_27_STATE_DICT,
+                'question_state_data_schema_version': 27,
+                'language_code': 'en',
+                'linked_skill_ids': ['skill_id'],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': 'skill_id',
+            'skill_difficulty': 0.3
+        }
+        self.assertEqual(
+            change['question_dict']['question_state_data_schema_version'], 27)
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'suggestionId', 'target_id', 1, suggestion_models.STATUS_IN_REVIEW,
+            self.author_id, None, change, score_category, 'en', self.fake_date)
+        self.assertEqual(
+            suggestion.change.question_dict[
+                'question_state_data_schema_version'],
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    def test_contructor_raise_exception_for_invalid_state_shema_version(self):
+        score_category = (
+            suggestion_models.SCORE_TYPE_QUESTION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
+        change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self.VERSION_27_STATE_DICT,
+                'question_state_data_schema_version': None,
+                'language_code': 'en',
+                'linked_skill_ids': ['skill_id'],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': 'skill_id',
+            'skill_difficulty': 0.3
+        }
+        self.assertEqual(
+            change['question_dict']['question_state_data_schema_version'], None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected state schema version to be in between 25'):
+            suggestion_registry.SuggestionAddQuestion(
+                'suggestionId', 'target_id', 1,
+                suggestion_models.STATUS_IN_REVIEW, self.author_id, None,
+                change, score_category, 'en', self.fake_date)
+
 
 class MockInvalidVoiceoverApplication(
         suggestion_registry.BaseVoiceoverApplication):

@@ -51,7 +51,7 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.suggestion_type != (
+        if item.deleted or item.suggestion_type != (
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
             return
 
