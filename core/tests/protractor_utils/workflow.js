@@ -31,6 +31,7 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
   '.protractor-thumbnail-reset-button'));
+var editorWelcomeModal = element(by.css('.protractor-test-welcome-modal'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -61,6 +62,10 @@ var createExploration = async function() {
   await createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
+
+  await waitFor.visibilityOf(
+    editorWelcomeModal, 'Welcome Modal takes too long to appear.');
+
   await explorationEditorMainTab.exitTutorial();
 };
 
