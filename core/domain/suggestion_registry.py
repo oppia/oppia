@@ -723,12 +723,15 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
-        if self.language_code is None:
-            raise utils.ValidationError('language_code cannot be None')
+        if self.language_code != constants.DEFAULT_LANGUAGE_CODE:
+            raise utils.ValidationError(
+                'Expected language_code to be %s, received %s' % (
+                    constants.DEFAULT_LANGUAGE_CODE, self.language_code))
 
         if self.language_code != self.change.question_dict['language_code']:
             raise utils.ValidationError(
-                'Expected language_code to be %s, received %s' % (
+                'Expected question language_code(%s) to be same as suggestion '
+                'language_code(%s)' % (
                     self.change.question_dict['language_code'],
                     self.language_code))
 

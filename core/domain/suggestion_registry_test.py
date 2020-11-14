@@ -1958,15 +1958,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         expected_question_dict = (
             expected_suggestion_dict['change']['question_dict']
         )
-        expected_language_code = expected_question_dict['language_code']
         suggestion.validate()
 
-        suggestion.language_code = 'wrong_language_code'
-
+        expected_question_dict['language_code'] = 'wrong_language_code'
         with self.assertRaisesRegexp(
             Exception,
-            'Expected language_code to be %s, received wrong_language_code' % (
-                expected_language_code)):
+            'Expected question language_code.wrong_language_code. to be same '
+            'as suggestion language_code.en.'):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
@@ -1985,7 +1983,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.language_code = None
 
         with self.assertRaisesRegexp(
-            Exception, 'language_code cannot be None'):
+            Exception,
+            'Expected language_code to be en, received None'):
             suggestion.validate()
 
     def test_get_all_html_conztent_strings(self):
