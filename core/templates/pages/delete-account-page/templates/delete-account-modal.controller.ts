@@ -19,19 +19,24 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').controller('DeleteAccountModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'UserService',
-  function($controller, $scope, $uibModalInstance, UserService) {
+  '$controller', '$rootScope', '$scope', '$uibModalInstance',
+  'UserBackendApiService', function(
+    $controller, $rootScope, $scope, $uibModalInstance,
+    UserBackendApiService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
 
     let expectedUsername = null;
-    UserService.getUserInfoAsync().then(function(userInfo) {
+    UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
       expectedUsername = userInfo.getUsername();
+      // TODO(#8521): Remove the use of $rootScope.$apply()
+      // once the controller is migrated to angular.
+      $rootScope.$applyAsync();
     });
 
     $scope.isValid = function() {

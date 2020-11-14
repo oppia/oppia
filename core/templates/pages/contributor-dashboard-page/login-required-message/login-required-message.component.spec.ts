@@ -16,12 +16,17 @@
  * @fileoverview Unit tests for loginRequiredMessage.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// file is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 describe('Login required message component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
   var $q = null;
   var $scope = null;
-  var userService = null;
+  var userBackendApiService = null;
 
   var mockWindow = null;
 
@@ -35,11 +40,18 @@ describe('Login required message component', function() {
     $provide.value('$window', mockWindow);
   }));
 
+  beforeEach(angular.mock.module('oppia', $provide => {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     var $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('loginRequiredMessage');
@@ -53,7 +65,7 @@ describe('Login required message component', function() {
     });
 
   it('should go to login url when login button is clicked', function() {
-    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+    spyOn(userBackendApiService, 'getLoginUrlAsync').and.returnValue(
       $q.resolve('login-url'));
 
     ctrl.onLoginButtonClicked();
@@ -65,7 +77,7 @@ describe('Login required message component', function() {
 
   it('should refresh page if login url is not provided when login button is' +
     ' clicked', function() {
-    spyOn(userService, 'getLoginUrlAsync').and.returnValue($q.resolve(null));
+    spyOn(userBackendApiService, 'getLoginUrlAsync').and.returnValue($q.resolve(null));
 
     ctrl.onLoginButtonClicked();
     $scope.$apply();

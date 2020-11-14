@@ -17,19 +17,20 @@
  */
 
 require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').component('loginRequiredMessage', {
   template: require('./login-required-message.component.html'),
   controller: [
-    '$timeout', '$window', 'SiteAnalyticsService', 'UrlInterpolationService',
-    'UserService', 'OPPIA_AVATAR_LINK_URL',
-    function(
-        $timeout, $window, SiteAnalyticsService, UrlInterpolationService,
-        UserService, OPPIA_AVATAR_LINK_URL) {
+    '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
+    'UrlInterpolationService', 'UserBackendApiService',
+    'OPPIA_AVATAR_LINK_URL', function(
+        $rootScope, $timeout, $window, SiteAnalyticsService,
+        UrlInterpolationService, UserBackendApiService,
+        OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
       ctrl.onLoginButtonClicked = function() {
-        UserService.getLoginUrlAsync().then(
+        UserBackendApiService.getLoginUrlAsync().then(
           function(loginUrl) {
             if (loginUrl) {
               SiteAnalyticsService.registerStartLoginEvent('loginButton');
@@ -39,6 +40,9 @@ angular.module('oppia').component('loginRequiredMessage', {
             } else {
               $window.location.reload();
             }
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           }
         );
       };

@@ -29,7 +29,7 @@ describe('Contributor dashboard page', function() {
   var $q = null;
   var $rootScope = null;
   var LocalStorageService = null;
-  var UserService = null;
+  var UserBackendApiService = null;
   var TranslationLanguageService = null;
   var userProfileImage = 'profile-data-url';
   var userContributionRights = {
@@ -47,7 +47,7 @@ describe('Contributor dashboard page', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
-    UserService = $injector.get('UserService');
+    UserBackendApiService = $injector.get('UserBackendApiService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     ctrl = $componentController('contributorDashboardPage');
@@ -65,11 +65,11 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve(userContributionRights));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync')
+        .and.returnValue($q.resolve(userProfileImage));
+      spyOn(UserBackendApiService, 'getUserContributionRightsData')
+        .and.returnValue($q.resolve(userContributionRights));
+      spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();
       $rootScope.$apply();
@@ -136,11 +136,11 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve(userContributionRights));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync')
+        .and.returnValue($q.resolve(userProfileImage));
+      spyOn(UserBackendApiService, 'getUserContributionRightsData')
+        .and.returnValue($q.resolve(userContributionRights));
+      spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();
       $rootScope.$apply();

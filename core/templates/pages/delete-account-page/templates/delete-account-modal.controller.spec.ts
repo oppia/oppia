@@ -16,13 +16,25 @@
  * @fileoverview Unit tests for the delete account modal.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 describe('Delete account modal', function() {
   beforeEach(angular.mock.module('oppia'));
+  
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   var $q = null;
   var $scope = null;
   var $uibModalInstance = null;
-  var UserService = null;
+  var UserBackendApiService = null;
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
@@ -31,8 +43,8 @@ describe('Delete account modal', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
     $scope = $rootScope.$new();
-    UserService = $injector.get('UserService');
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+    UserBackendApiService = $injector.get('UserBackendApiService');
+    spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         getUsername: () => 'username'
       })

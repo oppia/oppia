@@ -37,19 +37,19 @@ require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/contextual/url.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 angular.module('oppia').component('storyViewerPage', {
   template: require('./story-viewer-page.component.html'),
   controller: [
     '$rootScope', '$window', 'AlertsService', 'AssetsBackendApiService',
     'LoaderService', 'StoryViewerBackendApiService',
-    'UrlInterpolationService', 'UrlService', 'UserService',
+    'UrlInterpolationService', 'UrlService', 'UserBackendApiService',
     'ENTITY_TYPE', 'FATAL_ERROR_CODES',
     function(
         $rootScope, $window, AlertsService, AssetsBackendApiService,
         LoaderService, StoryViewerBackendApiService,
-        UrlInterpolationService, UrlService, UserService,
+        UrlInterpolationService, UrlService, UserBackendApiService,
         ENTITY_TYPE, FATAL_ERROR_CODES) {
       var ctrl = this;
 
@@ -107,10 +107,13 @@ angular.module('oppia').component('storyViewerPage', {
       };
 
       ctrl.signIn = function() {
-        UserService.getLoginUrlAsync().then(
+        UserBackendApiService.getLoginUrlAsync().then(
           loginUrl => {
             loginUrl ? $window.location = loginUrl : (
               $window.location.reload());
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           });
       };
 
@@ -133,8 +136,11 @@ angular.module('oppia').component('storyViewerPage', {
       ctrl.$onInit = function() {
         ctrl.storyIsLoaded = false;
         ctrl.isLoggedIn = false;
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
           ctrl.isLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
         LoaderService.showLoadingScreen('Loading');
         var topicUrlFragment = (

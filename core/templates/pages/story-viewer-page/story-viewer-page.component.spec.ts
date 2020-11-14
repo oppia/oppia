@@ -27,6 +27,7 @@ import { ReadOnlyStoryNode } from
 import { StoryNode } from 'domain/story/story-node.model';
 import { PageTitleService } from 'services/page-title.service';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
+import { UserBackendApiService } from 'services/user-backend-api.service.ts';
 
 describe('Story Viewer Page component', function() {
   var ctrl = null;
@@ -36,7 +37,7 @@ describe('Story Viewer Page component', function() {
   var assetsBackendApiService = null;
   var storyViewerBackendApiService = null;
   var urlService = null;
-  var userService = null;
+  var userBackendApiService = null;
   var mockWindow = null;
   var storyPlaythrough = null;
 
@@ -51,6 +52,7 @@ describe('Story Viewer Page component', function() {
       TestBed.get(PageTitleService)
     );
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
+    userBackendApiService = TestBed.get(UserBackendApiService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -69,7 +71,7 @@ describe('Story Viewer Page component', function() {
     alertsService = $injector.get('AlertsService');
     assetsBackendApiService = $injector.get('AssetsBackendApiService');
     urlService = $injector.get('UrlService');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and
       .returnValue('thumbnail-url');
@@ -79,10 +81,11 @@ describe('Story Viewer Page component', function() {
       'clasroom_1');
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
       'story_1');
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
+    spyOn(userBackendApiService, 'getUserInfoAsync')
+      .and.returnValue($q.resolve({isLoggedIn: () => true
     }));
-    spyOn(userService, 'getLoginUrlAsync').and.returnValue($q.resolve('/home'));
+    spyOn(userBackendApiService, 'getLoginUrlAsync')
+      .and.returnValue($q.resolve('/home'));
 
 
     ctrl = $componentController('storyViewerPage', {
