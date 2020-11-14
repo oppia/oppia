@@ -97,7 +97,7 @@ var CreatorDashboardPage = function() {
 
   this.clickCreateNewExplorationButton = async function() {
     await action.click(
-      'Create New Exploration Button',createNewExplorationButton);
+      'Create New Exploration Button', createNewExplorationButton);
     await waitFor.pageToFullyLoad();
   };
 
