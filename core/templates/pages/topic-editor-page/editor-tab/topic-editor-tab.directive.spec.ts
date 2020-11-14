@@ -27,11 +27,15 @@ import { Location } from '@angular/common';
 import { angularServices } from 'services/angular-services.index';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-// ^^^ This block is to be removed.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 
 describe('Topic editor tab directive', function() {
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
+  importAllAngularServices();
   var $scope = null;
   var $uibModalInstance = null;
   var ctrl = null;

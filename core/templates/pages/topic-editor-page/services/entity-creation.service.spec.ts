@@ -24,10 +24,15 @@ import { SpyLocation } from '@angular/common/testing';
 import { Location } from '@angular/common';
 import { TopicEditorRoutingService } from './topic-editor-routing.service';
 import { angularServices } from 'services/angular-services.index';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 describe('Entity creation service', function() {
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   var $rootScope = null;
   var $uibModal = null;

@@ -225,6 +225,19 @@ describe('User Service', function() {
     $httpBackend.flush();
   });
 
+  it('should return the login url with the correct return url', function() {
+    var loginUrl = '/login';
+    var returnUrl = 'home';
+    UserService.setReturnUrl(returnUrl);
+    $httpBackend.expect('GET', '/url_handler?current_url=' + returnUrl)
+      .respond({login_url: loginUrl});
+
+    UserService.getLoginUrlAsync().then(function(dataUrl) {
+      expect(dataUrl).toBe(loginUrl);
+    });
+    $httpBackend.flush();
+  });
+
   it('should set a profile image data url', function() {
     var newProfileImageDataurl = '/avatar/x.png';
     $httpBackend.expect('PUT', '/preferenceshandler/data')

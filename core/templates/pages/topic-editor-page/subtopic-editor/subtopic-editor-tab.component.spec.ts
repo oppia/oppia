@@ -23,9 +23,14 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { angularServices } from 'services/angular-services.index';
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Subtopic editor tab', function() {
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
   var ctrl = null;
   var skillSummary = null;
   var TopicEditorStateService = null;
