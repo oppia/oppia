@@ -35,6 +35,53 @@ import feconf
 transaction_services = models.Registry.import_transaction_services()
 
 
+class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that can be used to migrate state schema
+    versions of question suggestions.
+
+    This job will create domain objects out of the models. The object conversion
+    process of a suggestion automatically performs schema updating. This
+    job persists that conversion work, keeping question suggestions up-to-date
+    and improving the load time of question suggestions.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted or item.suggestion_type != (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            return
+
+        try:
+            # Suggestion class itself updates the question state dict of the
+            # suggestion while initializing the object.
+            suggestion = suggestion_services.get_suggestion_from_model(item)
+        except Exception as e:
+            yield ('MIGRATION_FAILURE', (item.id, e))
+            return
+
+        try:
+            suggestion.validate()
+        except Exception as e:
+            yield ('POST_MIGRATION_VALIDATION_FALIURE', (item.id, e))
+            return
+
+        item.change_cmd = suggestion.change.to_dict()
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+
+        yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, value):
+        if key == 'SUCCESS':
+            value = len(value)
+        yield (key, value)
+
+
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks for existence of math components in the suggestions."""
 

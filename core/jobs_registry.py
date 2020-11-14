@@ -108,6 +108,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     story_jobs_one_off.OrphanStoriesAuditJob,
+    suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,
     suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
     suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
