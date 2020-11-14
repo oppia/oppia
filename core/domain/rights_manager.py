@@ -256,8 +256,8 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
     return exp_models_list
 
 
-def get_activity_rights_where_user_is_owner(activity_type, user_id):
-    """Returns a list activity rights where the user has some role.
+def _get_activity_rights_where_user_is_owner(activity_type, user_id):
+    """Returns a list of activity rights where the user is the owner.
 
     Args:
         activity_type: str. The type of activity. Possible values:
@@ -273,10 +273,6 @@ def get_activity_rights_where_user_is_owner(activity_type, user_id):
         rights_model_class = exp_models.ExplorationRightsModel
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         rights_model_class = collection_models.CollectionRightsModel
-    else:
-        raise Exception(
-            'Cannot get activity rights for unknown activity type: %s' % (
-                activity_type))
 
     activity_rights_models = rights_model_class.query(
         datastore_services.any_of(
@@ -290,31 +286,31 @@ def get_activity_rights_where_user_is_owner(activity_type, user_id):
 
 
 def get_exploration_rights_where_user_is_owner(user_id):
-    """Returns a list exploration rights where the user has some role.
+    """Returns a list of exploration rights where the user is the owner.
 
     Args:
         user_id: str. The id of the user.
 
     Returns:
-        list(ActivityRights). List of domain objects where the user has some
-        role.
+        list(ActivityRights). List of domain objects where the user is
+        the owner.
     """
-    return get_activity_rights_where_user_is_owner(
+    return _get_activity_rights_where_user_is_owner(
         constants.ACTIVITY_TYPE_EXPLORATION, user_id
     )
 
 
 def get_collection_rights_where_user_is_owner(user_id):
-    """Returns a list collection rights where the user has some role.
+    """Returns a list of collection rights where the user is the owner.
 
     Args:
         user_id: str. The id of the user.
 
     Returns:
-        list(ActivityRights). List of domain objects where the user has some
-        role.
+        list(ActivityRights). List of domain objects where the user is
+        the owner.
     """
-    return get_activity_rights_where_user_is_owner(
+    return _get_activity_rights_where_user_is_owner(
         constants.ACTIVITY_TYPE_COLLECTION, user_id
     )
 

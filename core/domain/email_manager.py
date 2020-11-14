@@ -1646,8 +1646,7 @@ def send_accepted_voiceover_application_email(
     if can_user_receive_email:
         language = utils.get_supported_audio_language_description(language_code)
         email_body = email_body_template % (
-            recipient_username.username, lesson_title, language,
-            EMAIL_FOOTER.value)
+            recipient_username, lesson_title, language, EMAIL_FOOTER.value)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,

@@ -181,6 +181,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 skillWorkedExamples: () => skillWorkedExamples
               },
               controller: 'SkillPreviewModalController'
+            }).result.then(() => {}, () => {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

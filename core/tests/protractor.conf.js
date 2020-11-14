@@ -81,6 +81,10 @@ var suites = {
       'protractor_desktop/extensions.js'
     ],
 
+    featureGating: [
+      'protractor/featureGatingFlow.js'
+    ],
+
     fileUploadFeatures: [
       'protractor_desktop/voiceoverUploadFeatures.js'
     ],
@@ -143,6 +147,10 @@ var suites = {
 
     skillEditor: [
       'protractor_desktop/skillEditor.js'
+    ],
+
+    topicAndStoryViewer: [
+      'protractor_desktop/topicAndStoryViewer.js'
     ],
 
     users: [

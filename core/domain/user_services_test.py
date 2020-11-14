@@ -190,7 +190,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             user_services.get_username(user_id),
-            user_services.USER_IDENTIFICATION_FOR_USER_BEING_DELETED)
+            user_services.USERNAME_FOR_USER_BEING_DELETED)
 
     def test_get_username_none(self):
         user_id = user_services.create_new_user(
@@ -215,6 +215,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             gae_id, 'user@example.com').user_id
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
+
+    def test_is_username_taken_when_user_marked_as_deleted_has_same_username(
+            self):
+        gae_id = 'someUser'
+        username = 'camelCase'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
+        user_services.set_username(user_id, username)
+        user_services.mark_user_for_deletion(user_id)
+        self.assertTrue(user_services.is_username_taken(username))
+
+    def test_is_username_taken_when_deleted_user_had_same_username(self):
+        username = 'userName123'
+        user_services.save_deleted_username(
+            user_services.UserSettings.normalize_username(username)
+        )
+        self.assertTrue(user_services.is_username_taken(username))
 
     def test_set_invalid_usernames(self):
         gae_id = 'someUser'
@@ -2074,7 +2091,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id='unregistered_user_id',
             email='user@example.com',
-            username='').put()
+            username=''
+        ).put()
 
         user_ids = user_services.get_human_readable_user_ids(
             [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
@@ -2086,11 +2104,16 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_get_human_readable_user_ids_with_nonexistent_id_non_strict_passes(
             self):
-        user_ids = user_services.get_human_readable_user_ids(
-            ['nonexistent_id'], strict=False)
+        user_id = (
+            user_services.create_new_user('gae_id', 'user@example.com').user_id)
+        user_services.set_username(user_id, 'username')
+        user_services.mark_user_for_deletion(user_id)
+        human_readable_user_ids = user_services.get_human_readable_user_ids(
+            [user_id], strict=False)
+
         self.assertEqual(
-            user_ids,
-            [user_services.USER_IDENTIFICATION_FOR_USER_BEING_DELETED])
+            human_readable_user_ids,
+            [user_services.LABEL_FOR_USER_BEING_DELETED])
 
     def test_created_on_gets_updated_correctly(self):
         # created_on should not be updated upon updating other attributes of
