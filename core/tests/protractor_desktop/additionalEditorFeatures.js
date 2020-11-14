@@ -30,7 +30,6 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-const { browser } = require('protractor');
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
@@ -248,7 +247,10 @@ describe('Full exploration editor', function() {
     await users.login('user6@editorAndPlayer.com');
     await workflow.createExploration();
 
-    await browser.sleep(8000);
+    var editorWelcomeModal = element(by.css('.protractor-test-welcome-modal'));
+    await waitFor.visibilityOf(
+      editorWelcomeModal, 'Welcome Modal takes too long to appear.');
+    await explorationEditorMainTab.exitTutorial();
 
     // Create an exploration with multiple groups.
     await explorationEditorMainTab.setStateName('first card');

@@ -213,6 +213,11 @@ describe('Interactions', function() {
       'explorationEditor@interactions.com', 'explorationEditor');
     await workflow.createExploration();
 
+    var editorWelcomeModal = element(by.css('.protractor-test-welcome-modal'));
+    await waitFor.visibilityOf(
+      editorWelcomeModal, 'Welcome Modal takes too long to appear.');
+    await explorationEditorMainTab.exitTutorial();
+
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));

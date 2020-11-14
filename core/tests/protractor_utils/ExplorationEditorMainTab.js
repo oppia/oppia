@@ -891,7 +891,6 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setStateName = async function(name) {
-    await this.exitTutorial();
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
     await waitFor.elementToBeClickable(
