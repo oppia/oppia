@@ -20,36 +20,51 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ReadOnlyExplorationBackendApiService } from
+import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
   'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Read only exploration backend API service', () => {
   let roebas: ReadOnlyExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
-  let sampleDataResults = {
+  let sampleDataResults: FetchExplorationBackendResponse = {
     exploration_id: '0',
     is_logged_in: true,
     session_id: 'KERH',
     exploration: {
       init_state_name: 'Introduction',
+      param_changes: [],
+      param_specs: null,
+      title: 'Exploration',
+      language_code: 'en',
+      correctness_feedback_enabled: true,
+      objective: 'To learn',
       states: {
         Introduction: {
           param_changes: [],
+          classifier_model_id: null,
+          recorded_voiceovers: null,
+          solicit_answer_details: true,
+          written_translations: null,
+          next_content_id_index: null,
           content: {
             html: '',
-            audio_translations: {}
+            content_id: 'content'
           },
-          unresolved_answers: {},
           interaction: {
             customization_args: {},
             answer_groups: [],
+            solution: null,
+            hints: [],
             default_outcome: {
               param_changes: [],
               dest: 'Introduction',
               feedback: {
                 html: '',
-                audio_translations: {}
-              }
+                content_id: 'content'
+              },
+              labelled_as_correct: true,
+              refresher_exploration_id: 'exp',
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             id: null
@@ -58,7 +73,12 @@ describe('Read only exploration backend API service', () => {
       }
     },
     version: 1,
-    state_classifier_mapping: {}
+    state_classifier_mapping: {},
+    can_edit: true,
+    preferred_audio_language_code: 'en',
+    auto_tts_enabled: true,
+    correctness_feedback_enabled: true,
+    record_playthrough_probability: 1
   };
 
   beforeEach(() => {

@@ -39,7 +39,7 @@ interface ReadOnlyExplorationBackendDict {
   'correctness_feedback_enabled': boolean;
 }
 
-interface FetchExplorationBackendResponse {
+export interface FetchExplorationBackendResponse {
   'can_edit': boolean;
   'exploration': ReadOnlyExplorationBackendDict;
   'exploration_id': string;
@@ -65,20 +65,18 @@ export class ReadOnlyExplorationBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _fetchExploration(
-      explorationId: string, version: number | null,
-      successCallback: (value: FetchExplorationBackendResponse) => void,
-      errorCallback: (reason: string) => void): void {
-    const explorationDataUrl = this._getExplorationUrl(explorationId, version);
+      explorationId: string, version: number | null
+  ): Promise<FetchExplorationBackendResponse> {
+    return new Promise((resolve, reject) => {
+      const explorationDataUrl = this._getExplorationUrl(
+        explorationId, version);
 
-    this.http.get<FetchExplorationBackendResponse>(
-      explorationDataUrl).toPromise().then(response => {
-      if (successCallback) {
-        successCallback(response);
-      }
-    }, errorResponse => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
+      this.http.get<FetchExplorationBackendResponse>(
+        explorationDataUrl).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 
@@ -115,9 +113,7 @@ export class ReadOnlyExplorationBackendApiService {
    */
   fetchExploration(explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
-    return new Promise((resolve, reject) => {
-      this._fetchExploration(explorationId, version, resolve, reject);
-    });
+    return this._fetchExploration(explorationId, version);
   }
 
   /**
@@ -138,14 +134,13 @@ export class ReadOnlyExplorationBackendApiService {
           resolve(this._explorationCache[explorationId]);
         }
       } else {
-        this._fetchExploration(
-          explorationId, null, exploration => {
-            // Save the fetched exploration to avoid future fetches.
-            this._explorationCache[explorationId] = exploration;
-            if (resolve) {
-              resolve(exploration);
-            }
-          }, reject);
+        this._fetchExploration(explorationId, null).then(exploration => {
+          // Save the fetched exploration to avoid future fetches.
+          this._explorationCache[explorationId] = exploration;
+          if (resolve) {
+            resolve(exploration);
+          }
+        }, reject);
       }
     });
   }
@@ -160,12 +155,9 @@ export class ReadOnlyExplorationBackendApiService {
   loadExploration(explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchExploration(
-        explorationId, version, (exploration) => {
-          if (resolve) {
-            resolve(exploration);
-          }
-        }, reject);
+      this._fetchExploration(explorationId, version).then(exploration => {
+        resolve(exploration);
+      }, reject);
     });
   }
 
