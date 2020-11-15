@@ -47,7 +47,7 @@ describe('Story Viewer Page component', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    
+
     OppiaAngularRootComponent.pageTitleService = (
       TestBed.get(PageTitleService)
     );
