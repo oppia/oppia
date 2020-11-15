@@ -25,6 +25,7 @@ var ruleTemplates = require(
 var waitFor = require('../protractor_utils/waitFor.js');
 var action = require('./action.js');
 const { browser } = require('protractor');
+const { element } = require('angular');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -153,7 +154,9 @@ var ExplorationEditorMainTab = function() {
   // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
-    await browser.sleep(5000);
+    await waitFor.visibilityOf(
+      element(by.css('.oppia-state-name-text')),
+      'State name takes too long to appear.');
 
     // If the editor welcome modal shows up, exit it.
     var isVisible = await editorWelcomeModal.isPresent();
