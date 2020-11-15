@@ -24,8 +24,6 @@ var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
 var waitFor = require('../protractor_utils/waitFor.js');
 var action = require('./action.js');
-const { browser } = require('protractor');
-const { element } = require('angular');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
