@@ -157,8 +157,8 @@ describe('Preferences', function() {
 
   it('should navigate to account deletion page',
     async function() {
-      await users.createUser('lorem@preferences.com', 'loremPreferences');
-      await users.login('lorem@preferences.com');
+      await users.createUser('delete@page.com', 'deletePage');
+      await users.login('delete@page.com');
       await preferencesPage.get();
       await preferencesPage.clickDeleteAccountButton();
       expect(await browser.getCurrentUrl()).toEqual(
