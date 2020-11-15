@@ -41,7 +41,6 @@ describe('Search Results component', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    userBackendApiService = TestBed.get(UserBackendApiService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -50,6 +49,7 @@ describe('Search Results component', function() {
 
   beforeEach(function() {
     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+    userBackendApiService = TestBed.get(UserBackendApiService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -57,13 +57,13 @@ describe('Search Results component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     searchService = $injector.get('SearchService');
-    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);
-    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
 
     $scope = $rootScope.$new();
     ctrl = $componentController('searchResults', {

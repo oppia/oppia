@@ -66,7 +66,6 @@ describe('Activity tiles infinity grid component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     searchService = $injector.get('SearchService');
-    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);

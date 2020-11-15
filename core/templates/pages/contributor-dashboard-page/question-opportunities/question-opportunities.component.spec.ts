@@ -69,7 +69,6 @@ describe('Question opportunities component', function() {
     contributionOpportunitiesService = $injector.get(
       'ContributionOpportunitiesService');
     questionUndoRedoService = $injector.get('QuestionUndoRedoService');
-    userBackendApiService = $injector.get('UserBackendApiService');
 
     opportunitiesArray = [
       SkillOpportunity.createFromBackendDict({

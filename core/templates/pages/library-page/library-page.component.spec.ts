@@ -27,7 +27,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { of } from 'rxjs';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { UserBackendApiService } from 'services/user-backend-api.service.ts';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 
 describe('Library controller', function() {
@@ -92,7 +92,6 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
@@ -357,7 +356,6 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
@@ -466,7 +464,6 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));

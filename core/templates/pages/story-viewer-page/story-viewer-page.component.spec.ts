@@ -46,8 +46,9 @@ describe('Story Viewer Page component', function() {
   beforeEach(function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
-    });
+  });
 
+  beforeEach(function() {
     OppiaAngularRootComponent.pageTitleService = (
       TestBed.get(PageTitleService)
     );
@@ -71,7 +72,6 @@ describe('Story Viewer Page component', function() {
     alertsService = $injector.get('AlertsService');
     assetsBackendApiService = $injector.get('AssetsBackendApiService');
     urlService = $injector.get('UrlService');
-    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and
       .returnValue('thumbnail-url');
@@ -82,8 +82,9 @@ describe('Story Viewer Page component', function() {
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
       'story_1');
     spyOn(userBackendApiService, 'getUserInfoAsync')
-      .and.returnValue($q.resolve({isLoggedIn: () => true
-    }));
+      .and.returnValue($q.resolve({
+        isLoggedIn: () => true
+      }));
     spyOn(userBackendApiService, 'getLoginUrlAsync')
       .and.returnValue($q.resolve('/home'));
 
