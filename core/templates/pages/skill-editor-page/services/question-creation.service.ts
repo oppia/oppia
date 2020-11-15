@@ -240,6 +240,10 @@ angular.module('oppia').factory('QuestionCreationService', [
       }).result.then(function() {
         $location.hash(null);
         saveAndPublishQuestion();
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     };
     return {
