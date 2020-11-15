@@ -45,6 +45,7 @@ export class TopicEditorRoutingService {
     private windowRef: WindowRef) {
     this.currentPath = this.location.path();
     this.location.onUrlChange((newPath: string, state: unknown) => {
+      newPath = newPath.split('#')[1];
       if (newPath === '') {
         this.location.go(this.currentPath);
         return;
@@ -79,41 +80,35 @@ export class TopicEditorRoutingService {
 
   navigateToMainTab(): void {
     this.lastTabVisited = 'topic';
-    this.pageTitleService.setPageTitleForMobileView('Topic Editor');
-    this.activeTabName = 'main';
-    this.location.go('');
+    this.location.go('#/');
   }
 
   navigateToSubtopicPreviewTab(subtopicId: string | number): void {
     this.lastTabVisited = 'subtopic';
     this.pageTitleService.setPageTitleForMobileView('Subtopic Preview');
-    this.activeTabName = 'subtopic_preview';
-    this.location.go('/subtopic_preview/' + subtopicId);
+    this.location.go('#/subtopic_preview/' + subtopicId);
   }
 
   navigateToTopicPreviewTab(): void {
     this.lastTabVisited = 'topic';
     this.pageTitleService.setPageTitleForMobileView('Topic Preview');
-    this.activeTabName = 'topic_preview';
-    this.location.go('/topic_preview/');
+    this.location.go('#/topic_preview/');
   }
 
   navigateToSubtopicEditorWithId(subtopicId: string | number): void {
     this.lastTabVisited = 'subtopic';
     this.pageTitleService.setPageTitleForMobileView('Subtopic Editor');
-    this.activeTabName = 'subtopic_editor';
-    this.location.go('/subtopic_editor/' + subtopicId);
+    this.location.go('#/subtopic_editor/' + subtopicId);
   }
 
   navigateToQuestionsTab(): void {
     this.lastSubtopicId = this.getSubtopicIdFromUrl();
     this.pageTitleService.setPageTitleForMobileView('Question Editor');
-    this.activeTabName = 'questions';
-    this.location.go('/questions');
+    this.location.go('#/questions');
   }
 
   getSubtopicIdFromUrl(): number {
-    return parseInt(this.location.path().split('/')[2]);
+    return parseInt(this.location.path().split('/')[3]);
   }
 
   navigateToSkillEditorWithId(skillId: string): void {

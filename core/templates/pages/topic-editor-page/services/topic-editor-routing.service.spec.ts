@@ -17,7 +17,7 @@
  */
 import { SpyLocation } from '@angular/common/testing';
 import { Location } from '@angular/common';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, tick, fakeAsync } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 
@@ -54,34 +54,36 @@ describe('Topic editor routing service', () => {
     expect(ters.getActiveTabName()).toEqual('main');
   });
 
-  it('should navigate to different tabs', () => {
+  it('should navigate to different tabs', fakeAsync(() => {
     expect(ters.getActiveTabName()).toEqual('main');
 
     ters.navigateToSubtopicPreviewTab(1);
-    expect(
-      ters.getActiveTabName()).toEqual('subtopic_preview');
+    tick(20);
+    expect(ters.getActiveTabName()).toEqual('subtopic_preview');
     ters.navigateToSubtopicEditorWithId(1);
-    expect(
-      ters.getActiveTabName()).toEqual('subtopic_editor');
+    tick(20);
+    expect(ters.getActiveTabName()).toEqual('subtopic_editor');
 
     ters.navigateToQuestionsTab();
+    tick(20);
     expect(ters.getActiveTabName()).toEqual('questions');
 
     ters.navigateToMainTab();
+    tick(20);
     expect(ters.getActiveTabName()).toEqual('main');
 
     ters.navigateToTopicPreviewTab();
-    expect(ters.getActiveTabName()).toEqual(
-      'topic_preview');
-  });
+    tick(20);
+    expect(ters.getActiveTabName()).toEqual('topic_preview');
+  }));
 
   it('should handle calls with unexpect paths', () => {
     expect(ters.getActiveTabName()).toEqual('main');
 
-    locat.go('/');
+    locat.go('#/');
     expect(ters.getActiveTabName()).toEqual('main');
 
-    locat.simulateHashChange('');
+    locat.go('#');
     expect(ters.getActiveTabName()).toEqual('main');
   });
 

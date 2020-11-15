@@ -104,7 +104,7 @@ describe('Entity creation service', function() {
   });
 
   it('should return subtopic Id from URL', function() {
-    location.go('/subtopic_editor/2');
+    location.go('#/subtopic_editor/2');
     expect(topicEditorRoutingService.getSubtopicIdFromUrl()).toEqual(2);
   });
 });
