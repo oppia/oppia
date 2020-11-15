@@ -47,14 +47,11 @@ describe('Story Viewer Page component', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-  });
-
-  beforeEach(function() {
+    
     OppiaAngularRootComponent.pageTitleService = (
       TestBed.get(PageTitleService)
     );
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
-    userBackendApiService = TestBed.get(UserBackendApiService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -65,6 +62,7 @@ describe('Story Viewer Page component', function() {
     };
 
     $provide.value('$window', mockWindow);
+    $provide.value('UserBackendApiService', TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -73,6 +71,7 @@ describe('Story Viewer Page component', function() {
     alertsService = $injector.get('AlertsService');
     assetsBackendApiService = $injector.get('AssetsBackendApiService');
     urlService = $injector.get('UrlService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and
       .returnValue('thumbnail-url');

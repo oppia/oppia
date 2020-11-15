@@ -28,7 +28,6 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UrlService } from './contextual/url.service';
 
-
 class MockWindowRef {
   _window = {
     location: {
