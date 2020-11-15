@@ -100,7 +100,7 @@ class UserSettings(python_utils.OBJECT):
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
             preferred_audio_language_code=None, pin=None, display_alias=None,
-            deleted=False):
+            deleted=False, created_on=None):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -143,6 +143,7 @@ class UserSettings(python_utils.OBJECT):
                 web because we don't use it there.
             deleted: bool. Whether the user has requested removal of their
                 account.
+            created_on: datetime.datetime. When the user was created on.
         """
         self.user_id = user_id
         self.email = email
@@ -170,6 +171,7 @@ class UserSettings(python_utils.OBJECT):
         self.pin = pin
         self.display_alias = display_alias
         self.deleted = deleted
+        self.created_on = created_on
 
     def validate(self):
         """Checks that the user_id, email, role, pin and display_alias
@@ -317,7 +319,8 @@ class UserSettings(python_utils.OBJECT):
                 self.preferred_audio_language_code),
             'pin': self.pin,
             'display_alias': self.display_alias,
-            'deleted': self.deleted
+            'deleted': self.deleted,
+            'created_on': self.created_on
         }
 
     @property
@@ -1177,7 +1180,8 @@ def _get_user_settings_from_model(user_settings_model):
             user_settings_model.preferred_audio_language_code),
         pin=user_settings_model.pin,
         display_alias=user_settings_model.display_alias,
-        deleted=user_settings_model.deleted
+        deleted=user_settings_model.deleted,
+        created_on=user_settings_model.created_on
     )
 
 
@@ -1878,6 +1882,22 @@ def mark_user_for_deletion(user_id):
         )
         user_identifiers.deleted = True
         _save_user_identifiers(user_identifiers)
+
+
+def save_deleted_username(normalized_username):
+    """Save the username of deleted user.
+
+    Args:
+        normalized_username: str. Normalized version of the username to be
+            saved.
+    """
+    hashed_normalized_username = utils.convert_to_hash(
+        normalized_username, user_models.DeletedUsernameModel.ID_LENGTH
+    )
+    deleted_user_model = (
+        user_models.DeletedUsernameModel(id=hashed_normalized_username))
+    deleted_user_model.update_timestamps()
+    deleted_user_model.put()
 
 
 def get_human_readable_user_ids(user_ids, strict=True):

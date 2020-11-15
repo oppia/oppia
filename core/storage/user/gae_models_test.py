@@ -2397,7 +2397,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
 
 
 class DeletedUserModelTests(test_utils.GenericTestBase):
-    """Tests for DeletedUserModelTests."""
+    """Tests for DeletedUserModel."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -2424,6 +2424,15 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
             user_models.PseudonymizedUserModel.get_new_id('exploration')
+
+
+class DeletedUsernameModelTests(test_utils.GenericTestBase):
+    """Tests for DeletedUsernameModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.DeletedUsernameModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class UserAuthDetailsModelTests(test_utils.GenericTestBase):
