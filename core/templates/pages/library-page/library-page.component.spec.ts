@@ -49,10 +49,10 @@ describe('Library controller', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-
+  });
+  beforeEach(function() {
     classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
-    userBackendApiService = TestBed.get(UserBackendApiService);
     OppiaAngularRootComponent.pageTitleService = (
       TestBed.get(PageTitleService)
     );
@@ -61,6 +61,8 @@ describe('Library controller', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'KeyboardShortcutService', TestBed.get(KeyboardShortcutService));
+    $provide.value(
+      'UserBackendApiService', TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -92,6 +94,7 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
+      userBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
@@ -356,6 +359,7 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
+      userBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
@@ -464,7 +468,7 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-
+      userBackendApiService = $injector.get('UserBackendApiService');
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 

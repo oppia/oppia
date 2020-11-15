@@ -21,6 +21,9 @@ import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { EventEmitter } from '@angular/core';
 import { UserBackendApiService } from 'services/user-backend-api.service.ts';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Search Results component', function() {
   var ctrl = null;
@@ -37,6 +40,8 @@ describe('Search Results component', function() {
   };
   var initialSearchResultsLoadedEmitter = new EventEmitter();
 
+  importAllAngularServices();
+
   beforeEach(function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -49,7 +54,6 @@ describe('Search Results component', function() {
 
   beforeEach(function() {
     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-    userBackendApiService = TestBed.get(UserBackendApiService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -57,6 +61,7 @@ describe('Search Results component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     searchService = $injector.get('SearchService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);

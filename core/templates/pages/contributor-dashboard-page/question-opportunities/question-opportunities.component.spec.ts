@@ -26,7 +26,7 @@ import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { AlertsService } from 'services/alerts.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { UserBackendApiService } from 'services/user-backend-api.service.ts';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -51,8 +51,8 @@ describe('Question opportunities component', function() {
     });
 
     alertsService = TestBed.get(AlertsService);
-    userBackendApiService = TestBed.get(UserBackendApiService);
     skillObjectFactory = TestBed.get(SkillObjectFactory);
+    userBackendApiService = TestBed.get(UserBackendApiService);
   });
 
   beforeEach(angular.mock.module(
