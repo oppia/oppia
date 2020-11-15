@@ -81,6 +81,7 @@ USER_NAME = 'username'
     models.NAMES.user
 ])
 
+
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
