@@ -20,7 +20,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { List } from 'lodash';
+import List from 'lodash/List';
 
 import { AppConstants } from 'app.constants';
 import { UserInfo, UserInfoBackendDict } from
