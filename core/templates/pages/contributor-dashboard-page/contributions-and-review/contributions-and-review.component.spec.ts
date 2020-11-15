@@ -33,7 +33,7 @@ describe('Contributions and review component', function() {
   var misconceptionObjectFactory = null;
   var skillBackendApiService = null;
   var skillObjectFactory = null;
-  var userService = null;
+  var userBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -46,17 +46,18 @@ describe('Contributions and review component', function() {
       $uibModal = $injector.get('$uibModal');
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
-      userService = $injector.get('UserService');
+      userBackendApiService = $injector.get('UserBackendApiService');
       contextService = $injector.get('ContextService');
       skillBackendApiService = $injector.get('SkillBackendApiService');
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
+      spyOn(userBackendApiService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
       }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
+      spyOn(userBackendApiService, 'getUserContributionRightsData')
+        .and.returnValue($q.resolve({
           can_review_translation_for_language_codes: [{}],
           can_review_questions: true
         }));
@@ -250,7 +251,7 @@ describe('Contributions and review component', function() {
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
+      userBackendApiService = $injector.get('UserBackendApiService');
       contextService = $injector.get('ContextService');
       skillBackendApiService = $injector.get('SkillBackendApiService');
       skillObjectFactory = $injector.get('SkillObjectFactory');
@@ -260,14 +261,16 @@ describe('Contributions and review component', function() {
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
-          can_review_translation_for_language_codes: [],
-          can_review_questions: false
+      spyOn(userBackendApiService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
         }));
+      spyOn(userBackendApiService, 'getUserContributionRightsData')
+        .and.returnValue(
+          $q.resolve({
+            can_review_translation_for_language_codes: [],
+            can_review_questions: false
+          }));
       spyOn(
         contributionAndReviewService, 'getUserCreatedQuestionSuggestions')
         .and.callFake(callback => callback({
@@ -445,7 +448,7 @@ describe('Contributions and review component', function() {
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
+      userBackendApiService = $injector.get('UserBackendApiService');
       contextService = $injector.get('ContextService');
       skillBackendApiService = $injector.get('SkillBackendApiService');
       skillObjectFactory = $injector.get('SkillObjectFactory');
@@ -455,14 +458,16 @@ describe('Contributions and review component', function() {
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
+      spyOn(userBackendApiService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
       }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
-          can_review_translation_for_language_codes: [],
-          can_review_questions: false
-        }));
+      spyOn(userBackendApiService, 'getUserContributionRightsData')
+        .and.returnValue(
+          $q.resolve({
+            can_review_translation_for_language_codes: [],
+            can_review_questions: false
+          }));
       spyOn(
         contributionAndReviewService, 'getUserCreatedQuestionSuggestions')
         .and.callFake(callback => callback({

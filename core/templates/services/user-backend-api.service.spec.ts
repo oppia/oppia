@@ -282,21 +282,22 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should return the login url with the correct return url', function() {
-    const loginUrl = '/login';
-    const returnUrl = 'home';
-    
-    userBackendApiService.setReturnUrl(returnUrl);
-    userBackendApiService.getLoginUrlAsync().then(function(dataUrl) {
-      expect(dataUrl).toBe(loginUrl);
-    });
-    const req = httpTestingController.expectOne(
-    '/url_handler?current_url=' + returnUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({login_url: loginUrl});
+  it('should return the login url with the correct return url',
+    fakeAsync(() => {
+      const loginUrl = '/login';
+      const returnUrl = 'home';
+      
+      userBackendApiService.setReturnUrl(returnUrl);
+      userBackendApiService.getLoginUrlAsync().then(function(dataUrl) {
+        expect(dataUrl).toBe(loginUrl);
+      });
+      const req = httpTestingController.expectOne(
+      '/url_handler?current_url=' + returnUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({login_url: loginUrl});
 
-    flushMicrotasks();
-  });
+      flushMicrotasks();
+  }));
 
   it('should set a profile image data url', fakeAsync(() => {
     const newProfileImageDataurl = '/avatar/x.png';

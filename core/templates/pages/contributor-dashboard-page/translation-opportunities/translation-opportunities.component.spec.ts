@@ -24,6 +24,7 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
+import { UserBackendApiService } from 'services/user-backend-api.service.ts';
 
 describe('Translation opportunities component', function() {
   var ctrl = null;
@@ -33,7 +34,7 @@ describe('Translation opportunities component', function() {
   var $uibModal = null;
   var contributionOpportunitiesService = null;
   var translationLanguageService = null;
-  var userService = null;
+  var userBackendApiService = null;
 
   var opportunitiesArray = [];
   var activeLanguageChangedEmitter = new EventEmitter();
@@ -49,6 +50,8 @@ describe('Translation opportunities component', function() {
       'ContributionOpportunitiesBackendApiService',
       TestBed.get(ContributionOpportunitiesBackendApiService));
     $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
+    $provide.value(
+      'UserBackendApiService', TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -58,7 +61,7 @@ describe('Translation opportunities component', function() {
     contributionOpportunitiesService = $injector.get(
       'ContributionOpportunitiesService');
     translationLanguageService = $injector.get('TranslationLanguageService');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
       .returnValue(activeLanguageChangedEmitter);
@@ -162,8 +165,9 @@ describe('Translation opportunities component', function() {
     });
 
   it('should open translation modal when clicking button', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
     }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
@@ -179,8 +183,9 @@ describe('Translation opportunities component', function() {
   });
 
   it('should close translation modal when clicking save', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
     }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
@@ -199,8 +204,9 @@ describe('Translation opportunities component', function() {
   });
 
   it('should dismiss translation modal when clicking cancel', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
     }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
@@ -219,8 +225,9 @@ describe('Translation opportunities component', function() {
   });
 
   it('should not open translation modal when user is not logged', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => false
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => false
     }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {

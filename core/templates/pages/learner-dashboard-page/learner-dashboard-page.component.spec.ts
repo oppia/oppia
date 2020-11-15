@@ -854,15 +854,15 @@ describe('Learner dashboard page', function() {
       CsrfTokenService = $injector.get('CsrfTokenService');
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
-      UserService = $injector.get('UserService');
+      UserBackendApiService = $injector.get('UserBackendApiService');
 
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(profilePictureDataUrl));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
-        userInfo));
+      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync')
+        .and.returnValue($q.resolve(profilePictureDataUrl));
+      spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve(userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404

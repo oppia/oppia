@@ -52,12 +52,12 @@ angular.module('oppia').component('contributionsAndReview', {
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService',
     'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService', 'IMAGE_CONTEXT',
+    'UrlInterpolationService', 'UserBackendApiService', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService,
         QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserService, IMAGE_CONTEXT) {
+        UrlInterpolationService, UserBackendApiService, IMAGE_CONTEXT) {
       var ctrl = this;
       var SUGGESTION_LABELS = {
         review: {
@@ -329,11 +329,11 @@ angular.module('oppia').component('contributionsAndReview', {
           }
         ];
 
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           ctrl.userDetailsLoading = false;
           if (ctrl.userIsLoggedIn) {
-            UserService.getUserContributionRightsData().then(
+            UserBackendApiService.getUserContributionRightsData().then(
               function(userContributionRights) {
                 var userCanReviewTranslationSuggestionsInLanguages = (
                   userContributionRights
@@ -361,8 +361,14 @@ angular.module('oppia').component('contributionsAndReview', {
                   ctrl.switchToTab(
                     ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION);
                 }
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$applyAsync();
               });
           }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
       };
     }

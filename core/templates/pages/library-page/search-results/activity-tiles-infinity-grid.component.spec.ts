@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for activityTilesInfinityGrid.
  */
 
+import { HttpClientTestingModule } from
+  '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('Activity tiles infinity grid component', function() {
   var ctrl = null;
@@ -28,7 +31,7 @@ describe('Activity tiles infinity grid component', function() {
   var $rootScope = null;
   var $scope = null;
   var searchService = null;
-  var userService = null;
+  var userBackendApiService = null;
   var windowDimensionsService = null;
 
   var mockWindow = {
@@ -45,6 +48,13 @@ describe('Activity tiles infinity grid component', function() {
   }));
 
   beforeEach(function() {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
+  beforeEach(function() {
+    userBackendApiService = TestBed.get(UserBackendApiService);
     windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
@@ -56,12 +66,13 @@ describe('Activity tiles infinity grid component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     searchService = $injector.get('SearchService');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
     }));
 
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(

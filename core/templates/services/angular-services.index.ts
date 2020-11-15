@@ -301,6 +301,7 @@ import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
@@ -608,6 +609,7 @@ export const angularServices: [string, unknown][] = [
   ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],
   ['UrlService', UrlService],
+  ['UserBackendApiService', UserBackendApiService],
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
