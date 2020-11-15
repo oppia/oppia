@@ -16,27 +16,21 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
-require('domain/question/QuestionObjectFactory');
-require('domain/question/editable-question-backend-api.service.ts');
-require('services/csrf-token.service.ts');
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
-
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service.ts';
 
 describe('Editable question backend API service', function() {
-  importAllAngularServices();
-  
-  var EditableQuestionBackendApiService = null;
-  var QuestionObjectFactory;
-  var sampleDataResults = null;
-  var sampleDataResultsObjects = null;
-  var $httpBackend = null;
-  var CsrfService = null;
+  let editableQuestionBackendApiService: EditableQuestionBackendApiService;
+  let questionObjectFactory: QuestionObjectFactory = null;
+  let sampleDataResults = null;
+  let sampleDataResultsObjects = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
