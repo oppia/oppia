@@ -19,9 +19,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-
-import List from 'lodash/List';
-
 import { AppConstants } from 'app.constants';
 import { UserInfo, UserInfoBackendDict } from
   'domain/user/user-info.model.ts';
@@ -47,7 +44,7 @@ interface PreferencesBackendDict {
   'can_receive_editor_role_email': boolean;
   'can_receive_feedback_message_email': boolean;
   'can_receive_subscription_email': boolean;
-  'subscription_list': List<SubscriptionSummary>;
+  'subscription_list': SubscriptionSummary[];
 }
 interface UrlBackendDict {
   'login_url': string;
