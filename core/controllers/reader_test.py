@@ -197,7 +197,6 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             self.skill_id, 'user', description='Description')
 
     def test_get_exploration_pretests(self):
-        super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(

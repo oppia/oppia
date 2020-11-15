@@ -75,10 +75,10 @@ module.exports = {
     };
 
     var extractMessage = function(node) {
-      if (node.type === 'Literal') {
-        return node.value;
-      } else if (node.type === 'BinaryExpression') {
+      if (node.type === 'BinaryExpression') {
         return extractMessage(node.left) + extractMessage(node.right);
+      } else {
+        return node.value;
       }
     };
 

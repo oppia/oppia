@@ -628,6 +628,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -659,6 +660,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
 
             # No user-facing error should surface.
@@ -707,6 +709,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
 
             # No user-facing error should surface.
@@ -753,6 +756,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
 
             # No user-facing error should surface.
@@ -785,6 +789,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Email Sender')
 
             self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -818,6 +823,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -853,6 +859,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -896,6 +903,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(all_models), 0)
 
             self.login(self.EDITOR_EMAIL)
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -5439,11 +5447,8 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         expected_email_subject = 'Account deleted'
         expected_email_html_body = (
             'Hi applicant@example.com,<br><br>'
-            'Your account was successfully deleted.'
-            '- The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
+            'Your account was successfully deleted.<br><br>'
+            '- The Oppia Team')
 
         with self.can_send_emails_ctx:
             email_manager.send_account_deleted_email(

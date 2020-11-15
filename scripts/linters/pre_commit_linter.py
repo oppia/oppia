@@ -122,6 +122,9 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'simple-crypt-%s' % common.SIMPLE_CRYPT_VERSION),
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 
@@ -571,6 +574,7 @@ def main(args=None):
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
+        failed = True
         _print_errors_stacktrace(errors_stacktrace)
 
     if failed:
