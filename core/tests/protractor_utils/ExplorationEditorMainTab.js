@@ -152,6 +152,9 @@ var ExplorationEditorMainTab = function() {
   // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
+    await waitFor.visibilityOf(
+      stateNameContainer, 'Editor page takes too long to load.');
+
     // If the editor welcome modal shows up, exit it.
     var isVisible = await editorWelcomeModal.isPresent();
 
