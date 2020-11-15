@@ -212,6 +212,14 @@ describe('Interactions', function() {
     await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
     await workflow.createExploration();
+
+    var dismissWelcomeModalButton = element(
+      by.css('.protractor-test-dismiss-welcome-modal'));
+    await waitFor.elementToBeClickable(
+      dismissWelcomeModalButton,
+      'Welcome modal is taking too long to appear');
+    await explorationEditorMainTab.exitTutorial();
+
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));
