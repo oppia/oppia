@@ -18,10 +18,21 @@
 
 import { BaseUndoRedo } from './base-undo-redo.service';
 
+const undoRedoServiceFactory = (): BaseUndoRedo => {
+  var child = new BaseUndoRedo();
+  child.init();
+  return child;
+};
+
+class UndoRedoService extends BaseUndoRedo {}
+
+export const provide = {
+  provide: UndoRedoService, useFactory: undoRedoServiceFactory};
+
+// TODO(#7222): Remove the following lines after all the files have been
+// migrated to Angular.
 angular.module('oppia').factory('UndoRedoService', [
   function() {
-    var child = new BaseUndoRedo();
-    child.init();
-    return child;
+    return undoRedoServiceFactory();
   }
 ]);
