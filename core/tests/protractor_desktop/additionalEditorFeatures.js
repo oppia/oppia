@@ -247,13 +247,6 @@ describe('Full exploration editor', function() {
     await users.login('user6@editorAndPlayer.com');
     await workflow.createExploration();
 
-    var dismissWelcomeModalButton = element(
-      by.css('.protractor-test-dismiss-welcome-modal'));
-    await waitFor.elementToBeClickable(
-      dismissWelcomeModalButton,
-      'Welcome modal is taking too long to appear');
-    await explorationEditorMainTab.exitTutorial();
-
     // Create an exploration with multiple groups.
     await explorationEditorMainTab.setStateName('first card');
     await explorationEditorMainTab.setContent(await forms.toRichText(
