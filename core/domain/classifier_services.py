@@ -53,27 +53,27 @@ def generate_signature(secret, message, vm_id):
         secret, msg=message, digestmod=hashlib.sha256).hexdigest()
 
 
-def verify_signature(message, vm_id, received_signature):
+def verify_signature(oppia_ml_auth_info):
     """Function that checks if the signature received from the VM is valid.
 
     Args:
-        message: dict. The message payload data.
-        vm_id: str. The ID of the VM instance.
-        received_signature: str. The signature received from the VM.
+        oppia_ml_auth_info: OppiaMLAuthInfo. Domain object containing
+            authentication information.
 
     Returns:
         bool. Whether the incoming request is valid.
     """
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
-        if val['vm_id'] == vm_id:
+        if val['vm_id'] == oppia_ml_auth_info.vm_id:
             secret = python_utils.convert_to_bytes(val['shared_secret_key'])
             break
     if secret is None:
         return False
 
-    generated_signature = generate_signature(secret, message, vm_id)
-    if generated_signature != received_signature:
+    generated_signature = generate_signature(
+        secret, oppia_ml_auth_info.message, oppia_ml_auth_info.vm_id)
+    if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True
 

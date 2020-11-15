@@ -15,10 +15,11 @@
 """Controllers for communicating with the VM for training classifiers."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -62,7 +63,8 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
         payload_proto.ParseFromString(self.request.body)
         signature = payload_proto.signature
         vm_id = payload_proto.vm_id
-        return payload_proto.job_result.SerializeToString(), vm_id, signature
+        return classifier_domain.OppiaMLAuthInfo(
+            payload_proto.job_result.SerializeToString(), vm_id, signature)
 
     @acl_decorators.is_from_oppia_ml
     def post(self):
@@ -188,7 +190,7 @@ class NextJobHandler(base.OppiaMLVMHandler):
         signature = self.payload.get('signature')
         vm_id = self.payload.get('vm_id')
         message = self.payload.get('message')
-        return message, vm_id, signature
+        return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
     @acl_decorators.is_from_oppia_ml
     def post(self):

@@ -642,7 +642,9 @@ class OppiaMLVMHandler(BaseHandler):
     """
 
     def extract_request_message_vm_id_and_signature(self):
-        """Returns the message, vm_id and signature from the incoming request.
+        """Returns the OppiaMLAuthInfo domain object containing
+        information from the incoming request that is necessary for
+        authentication.
 
         Since incoming request can be either a protobuf serialized binary or
         a JSON object, the derived classes must implement the necessary

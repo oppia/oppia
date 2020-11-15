@@ -24,6 +24,7 @@ import json
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import question_services
 from core.domain import rights_domain
@@ -3454,7 +3455,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             signature = self.payload.get('signature')
             vm_id = self.payload.get('vm_id')
             message = self.payload.get('message')
-            return message, vm_id, signature
+            return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
         @acl_decorators.is_from_oppia_ml
         def post(self):

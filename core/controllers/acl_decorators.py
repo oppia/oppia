@@ -2878,11 +2878,12 @@ def is_from_oppia_ml(handler):
             UnauthorizedUserException. If incoming request is not from a valid
                 Oppia-ML VM instance.
         """
-        message, vm_id, signature = (
+        oppia_ml_auth_info = (
             self.extract_request_message_vm_id_and_signature())
-        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
+        if (oppia_ml_auth_info.vm_id == feconf.DEFAULT_VM_ID and
+                not constants.DEV_MODE):
             raise self.UnauthorizedUserException
-        if not classifier_services.verify_signature(message, vm_id, signature):
+        if not classifier_services.verify_signature(oppia_ml_auth_info):
             raise self.UnauthorizedUserException
 
         return handler(self, **kwargs)

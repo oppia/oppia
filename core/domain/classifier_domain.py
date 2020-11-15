@@ -496,3 +496,41 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected job_id to be str, received %s' % (
                         self.algorithm_ids_to_job_ids[algorithm_id]))
+
+
+class OppiaMLAuthInfo(python_utils.OBJECT):
+    """Domain object containing information necessary for authentication
+    of Oppia ML.
+
+    Attributes:
+        message: str. The message being communicated.
+        vm_id: str. The ID of the Oppia ML VM to be authenticated.
+        signature: str. The authentication signature signed by Oppia ML.
+    """
+
+    def __init__(self, message, vm_id, signature):
+        """Creates new OppiaMLAuthInfo object.
+
+        Args:
+            message: str. The message being communicated.
+            vm_id: str. The ID of the Oppia ML VM to be authenticated.
+            signature: str. The authentication signature signed by Oppia ML.
+        """
+        self._message = message
+        self._vm_id = vm_id
+        self._signature = signature
+
+    @property
+    def message(self):
+        """Returns the message sent by OppiaML."""
+        return self._message
+
+    @property
+    def vm_id(self):
+        """Returns the vm_id of OppiaML VM."""
+        return self._vm_id
+
+    @property
+    def signature(self):
+        """Returns the signature sent by OppiaML."""
+        return self._signature
