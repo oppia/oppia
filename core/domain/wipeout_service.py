@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import logging
 import re
 
@@ -51,6 +52,7 @@ datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 WIPEOUT_LOGS_PREFIX = '[WIPEOUT]'
+PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED = datetime.timedelta(weeks=1)
 
 
 def get_pending_deletion_request(user_id):
@@ -68,6 +70,7 @@ def get_pending_deletion_request(user_id):
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
         pending_deletion_request_model.role,
+        pending_deletion_request_model.normalized_long_term_username,
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.pseudonymizable_entity_mappings
     )
@@ -101,6 +104,8 @@ def save_pending_deletion_requests(pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {
             'email': deletion_request.email,
+            'normalized_long_term_username': (
+                deletion_request.normalized_long_term_username),
             'role': deletion_request.role,
             'deletion_complete': deletion_request.deletion_complete,
             'pseudonymizable_entity_mappings': (
@@ -165,10 +170,22 @@ def pre_delete_user(user_id):
         user_services.update_email_preferences(
             user_id, False, False, False, False)
 
+    date_now = datetime.datetime.utcnow()
+    date_before_which_username_should_be_saved = (
+        date_now - PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED)
     user_services.mark_user_for_deletion(user_id)
+
+    normalized_long_term_username = (
+        user_settings.normalized_username
+        if user_settings.created_on < date_before_which_username_should_be_saved
+        else None
+    )
     pending_deletion_requests.append(
         wipeout_domain.PendingDeletionRequest.create_default(
-            user_id, user_settings.email, user_settings.role
+            user_id,
+            user_settings.email,
+            user_settings.role,
+            normalized_long_term_username=normalized_long_term_username
         )
     )
 
@@ -214,6 +231,9 @@ def run_user_deletion_completion(pending_deletion_request):
         user_models.DeletedUserModel(
             id=pending_deletion_request.user_id
         ).put()
+        if pending_deletion_request.normalized_long_term_username is not None:
+            user_services.save_deleted_username(
+                pending_deletion_request.normalized_long_term_username)
         email_manager.send_account_deleted_email(
             pending_deletion_request.user_id, pending_deletion_request.email)
         return wipeout_domain.USER_VERIFICATION_SUCCESS
