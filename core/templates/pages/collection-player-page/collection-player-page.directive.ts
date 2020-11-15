@@ -61,10 +61,10 @@ angular.module('oppia').directive('collectionPlayerPage', [
         'UrlInterpolationService', 'UrlService', 'UserBackendApiService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location, $rootScope, $scope, AlertsService,
-            GuestCollectionProgressService, LoaderService, PageTitleService,
-            ReadOnlyCollectionBackendApiService, UrlInterpolationService,
-            UrlService, UserBackendApiService,
+            $anchorScroll, $http, $location, $rootScope, $scope,
+            AlertsService, GuestCollectionProgressService, LoaderService,
+            PageTitleService, ReadOnlyCollectionBackendApiService,
+            UrlInterpolationService, UrlService, UserBackendApiService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -324,8 +324,8 @@ angular.module('oppia').directive('collectionPlayerPage', [
                         GuestCollectionProgressService
                           .hasCompletedSomeExploration(ctrl.collectionId)) {
                       var completedExplorationIds = (
-                        GuestCollectionProgressService.getCompletedExplorationIds(
-                          ctrl.collection));
+                        GuestCollectionProgressService
+                          .getCompletedExplorationIds(ctrl.collection));
                       var nextExplorationId = (
                         GuestCollectionProgressService.getNextExplorationId(
                           ctrl.collection, completedExplorationIds));
@@ -339,9 +339,10 @@ angular.module('oppia').directive('collectionPlayerPage', [
                       ctrl.collectionPlaythrough.getNextExplorationId();
 
                     ctrl.isCompletedExploration = function(explorationId) {
-                      var completedExplorationIds = (
-                        ctrl.collectionPlaythrough.getCompletedExplorationIds());
-                      return completedExplorationIds.indexOf(explorationId) > -1;
+                      var completedExplorationIds = ctrl.collectionPlaythrough
+                        .getCompletedExplorationIds();
+                      return completedExplorationIds.indexOf(
+                        explorationId) > -1;
                     };
                     // TODO(#8521): Remove the use of $rootScope.$apply()
                     // once the controller is migrated to angular.

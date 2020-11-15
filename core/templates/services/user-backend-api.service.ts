@@ -144,7 +144,7 @@ export class UserBackendApiService {
           return backendDict.login_url;
         });
     }
-    setReturnUrl(newReturnUrl: string) {
+    setReturnUrl(newReturnUrl: string): void {
       this.returnUrl = newReturnUrl;
     }
     getUserContributionRightsData():

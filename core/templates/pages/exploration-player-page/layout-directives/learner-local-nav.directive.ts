@@ -59,9 +59,9 @@ angular.module('oppia').directive('learnerLocalNav', [
         'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $rootScope, $uibModal, AlertsService, AttributionService,
-            ExplorationEngineService, LoaderService,
-            ReadOnlyExplorationBackendApiService,
+            $http, $rootScope, $uibModal, AlertsService,
+            AttributionService, ExplorationEngineService,
+            LoaderService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserBackendApiService,
             ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS, FEEDBACK_POPOVER_PATH,

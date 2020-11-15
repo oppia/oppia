@@ -140,14 +140,15 @@ angular.module('oppia').directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$sanitize', '$sce', 'rootScope', '$scope', '$uibModal',
+        '$location', '$sanitize', '$sce', '$rootScope', '$scope', '$uibModal',
         '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
         'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
         'UserBackendApiService', 'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'MAX_SCORE_PER_QUESTION', 'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
         'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
-        'WRONG_ANSWER_PENALTY_FOR_MASTERY', function(
+        'WRONG_ANSWER_PENALTY_FOR_MASTERY', 
+        function(
             $location, $sanitize, $sce, $rootScope, $scope, $uibModal,
             $window, ExplorationPlayerStateService, PlayerPositionService,
             QuestionPlayerStateService, SkillMasteryBackendApiService,

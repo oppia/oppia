@@ -52,12 +52,13 @@ angular.module('oppia').component('preferencesPage', {
     'DASHBOARD_TYPE_LEARNER', 'ENABLE_ACCOUNT_DELETION',
     'ENABLE_ACCOUNT_EXPORT', 'SUPPORTED_AUDIO_LANGUAGES',
     'SUPPORTED_SITE_LANGUAGES', function(
-        $http, $q, $rootScope, $timeout, $translate, $uibModal, $window,
-        AlertsService, I18nLanguageCodeService,
+        $http, $q, $rootScope, $timeout, $translate, $uibModal,
+        $window, AlertsService, I18nLanguageCodeService,
         LanguageUtilService, LoaderService, UrlInterpolationService,
-        UserBackendApiService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
-        ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
-        SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
+        UserBackendApiService, DASHBOARD_TYPE_CREATOR,
+        DASHBOARD_TYPE_LEARNER, ENABLE_ACCOUNT_DELETION,
+        ENABLE_ACCOUNT_EXPORT, SUPPORTED_AUDIO_LANGUAGES,
+        SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
       var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
 

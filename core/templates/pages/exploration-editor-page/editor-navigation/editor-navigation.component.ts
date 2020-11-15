@@ -47,9 +47,8 @@ angular.module('oppia').component('editorNavigation', {
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
     'StateTutorialFirstTimeService',
-    'ThreadDataService', 'UrlInterpolationService',
-    'UserExplorationPermissionsService', 'UserBackendApiService',
-    'WindowDimensionsService',
+    'ThreadDataService', 'UrlInterpolationService', 'UserBackendApiService',
+    'UserExplorationPermissionsService', 'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
         ContextService, EditabilityService,
@@ -57,9 +56,8 @@ angular.module('oppia').component('editorNavigation', {
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
         StateTutorialFirstTimeService,
-        ThreadDataService, UrlInterpolationService,
-        UserExplorationPermissionsService, UserBackendApiService,
-        WindowDimensionsService) {
+        ThreadDataService, UrlInterpolationService, UserBackendApiService,
+        UserExplorationPermissionsService, WindowDimensionsService) {
       this.directiveSubscriptions = new Subscription();
       $scope.showUserHelpModal = () => {
         var explorationId = ContextService.getExplorationId();
