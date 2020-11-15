@@ -16,33 +16,43 @@
  * @fileoverview Service for solution verification.
  */
 
-require('pages/exploration-editor-page/services/angular-name.service.ts');
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('SolutionVerificationService', [
-  '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'StateEditorService',
-  function(
-      $injector, AngularNameService, AnswerClassificationService,
-      StateEditorService) {
-    return {
-      verifySolution: function(stateName, interaction, correctAnswer) {
-        var interactionId = interaction.id;
-        var rulesServiceName = (
-          AngularNameService.getNameOfInteractionRulesService(interactionId));
-        var rulesService = $injector.get(rulesServiceName);
-        var result = (
-          AnswerClassificationService.getMatchingClassificationResult(
-            stateName, interaction, correctAnswer, rulesService
-          ));
-        if (StateEditorService.isInQuestionMode()) {
-          return result.outcome.labelledAsCorrect;
-        }
-        return stateName !== result.outcome.dest;
-      }
-    };
-  }]);
+import { StateEditorService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-editor.service.ts';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service.ts';
+import { InteractionRulesRegistryService } from
+  'services/interaction-rules-registry.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SolutionVerificationService {
+  constructor(
+      private interactionRulesRegistryService: InteractionRulesRegistryService,
+      private answerClassificationService: AnswerClassificationService,
+      private stateEditorService: StateEditorService) {}
+
+  verifySolution(
+      stateName: string,
+      interaction: Interaction,
+      correctAnswer: InteractionAnswer): boolean {
+    let rulesService = this.interactionRulesRegistryService.
+      getRulesServiceByInteractionId(interaction.id);
+    let result =
+      this.answerClassificationService.getMatchingClassificationResult(
+        stateName, interaction, correctAnswer, rulesService
+      );
+    if (this.stateEditorService.isInQuestionMode()) {
+      return result.outcome.labelledAsCorrect;
+    }
+    return stateName !== result.outcome.dest;
+  }
+}
+angular.module('oppia').factory('SolutionVerificationService',
+  downgradeInjectable(SolutionVerificationService));

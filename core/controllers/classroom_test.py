@@ -101,13 +101,16 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
         public_topic_summary_dict = (
             topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
+        public_topic_summary_dict['is_published'] = True
         private_topic_summary_dict = (
             topic_services.get_topic_summary_by_id(topic_id_1).to_dict())
+        private_topic_summary_dict['is_published'] = False
 
         expected_dict = {
             'name': 'math',
-            'public_topic_summary_dicts': [public_topic_summary_dict],
-            'private_topic_summary_dicts': [private_topic_summary_dict],
+            'topic_summary_dicts': [
+                private_topic_summary_dict, public_topic_summary_dict
+            ],
             'course_details': 'Course details for classroom.',
             'topic_list_intro': 'Topics covered for classroom'
         }

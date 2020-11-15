@@ -160,8 +160,13 @@ angular.module('oppia').directive('skillsList', [
                   var successToast = (
                     'The skill has been unassigned to the topic.');
                   AlertsService.addSuccessMessage(successToast, 1000);
+                  $rootScope.$applyAsync();
                 });
               }
+            }, () => {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -199,6 +204,7 @@ angular.module('oppia').directive('skillsList', [
                       var successToast = (
                         'The skill has been assigned to the topic.');
                       AlertsService.addSuccessMessage(successToast, 1000);
+                      $rootScope.$applyAsync();
                     });
                   }
                 }

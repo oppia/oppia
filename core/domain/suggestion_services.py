@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import heapq
 import re
 
+from constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -115,8 +116,12 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        change['question_dict']['language_code'] = (
+            constants.DEFAULT_LANGUAGE_CODE)
+        change['question_dict']['question_state_data_schema_version'] = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         # The language code of the question, used for querying purposes.
-        language_code = change['question_dict']['language_code']
+        language_code = constants.DEFAULT_LANGUAGE_CODE
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
