@@ -31,8 +31,4 @@ export const provide = {
 
 // TODO(#7222): Remove the following lines after all the files have been
 // migrated to Angular.
-angular.module('oppia').factory('UndoRedoService', [
-  function() {
-    return undoRedoServiceFactory();
-  }
-]);
+angular.module('oppia').factory('UndoRedoService', [undoRedoServiceFactory]);
