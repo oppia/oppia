@@ -64,13 +64,13 @@ angular.module('oppia').component('questionOpportunities', {
   controller: [
     '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionOpportunitiesService', 'QuestionObjectFactory',
-    'QuestionUndoRedoService', 'UrlInterpolationService', 'UserService',
-    'MAX_QUESTIONS_PER_SKILL',
+    'QuestionUndoRedoService', 'UrlInterpolationService',
+    'UserBackendApiService', 'MAX_QUESTIONS_PER_SKILL',
     function(
         $rootScope, $uibModal, AlertsService, ContextService,
         ContributionOpportunitiesService, QuestionObjectFactory,
-        QuestionUndoRedoService, UrlInterpolationService, UserService,
-        MAX_QUESTIONS_PER_SKILL) {
+        QuestionUndoRedoService, UrlInterpolationService,
+        UserBackendApiService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
 
@@ -168,8 +168,11 @@ angular.module('oppia').component('questionOpportunities', {
         ctrl.moreOpportunitiesAvailable = true;
         ctrl.progressBarRequired = true;
         ctrl.opportunityHeadingTruncationLength = 45;
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
         ContributionOpportunitiesService.getSkillOpportunities(
           updateWithNewOpportunities);
