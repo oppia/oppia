@@ -1545,7 +1545,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.urlInterpolationService = (
       this.urlInterpolationService);
     OppiaAngularRootComponent.urlService = this.urlService;
-    OppiaAngularRootComponent.userBackendApiService = this.userBackendApiService;
+    OppiaAngularRootComponent.userBackendApiService = (
+      this.userBackendApiService);
     OppiaAngularRootComponent.userExplorationPermissionsService = (
       this.userExplorationPermissionsService);
     OppiaAngularRootComponent.utilsService = this.utilsService;

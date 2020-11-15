@@ -101,9 +101,10 @@ describe('Library controller', function() {
 
       logErrorSpy = spyOn($log, 'error');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
 
       $httpBackend.expectGET('/libraryindexhandler').respond({
         activity_summary_dicts_by_category: [{
@@ -366,9 +367,10 @@ describe('Library controller', function() {
 
       logErrorSpy = spyOn($log, 'error');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => false
-      }));
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => false
+        }));
 
       $httpBackend.expectGET('/libraryindexhandler').respond({
         activity_summary_dicts_by_category: [{
@@ -473,9 +475,10 @@ describe('Library controller', function() {
         $q.resolve('sample-csrf-token'));
 
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
 
       $httpBackend.expectGET('/librarygrouphandler?group_name=top-rated')
         .respond({

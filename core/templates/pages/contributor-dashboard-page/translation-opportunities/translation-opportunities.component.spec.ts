@@ -168,7 +168,7 @@ describe('Translation opportunities component', function() {
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
-    }));
+      }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
         callback(opportunitiesArray, false);
@@ -186,7 +186,7 @@ describe('Translation opportunities component', function() {
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
-    }));
+      }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
         callback(opportunitiesArray, false);
@@ -207,7 +207,7 @@ describe('Translation opportunities component', function() {
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
-    }));
+      }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
         callback(opportunitiesArray, false);
@@ -228,7 +228,7 @@ describe('Translation opportunities component', function() {
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => false
-    }));
+      }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
         callback(opportunitiesArray, false);

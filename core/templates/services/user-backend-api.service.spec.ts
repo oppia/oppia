@@ -286,18 +286,18 @@ describe('User Backend Api Service', () => {
     fakeAsync(() => {
       const loginUrl = '/login';
       const returnUrl = 'home';
-      
+
       userBackendApiService.setReturnUrl(returnUrl);
       userBackendApiService.getLoginUrlAsync().then(function(dataUrl) {
         expect(dataUrl).toBe(loginUrl);
       });
       const req = httpTestingController.expectOne(
-      '/url_handler?current_url=' + returnUrl);
+        '/url_handler?current_url=' + returnUrl);
       expect(req.request.method).toEqual('GET');
       req.flush({login_url: loginUrl});
 
       flushMicrotasks();
-  }));
+    }));
 
   it('should set a profile image data url', fakeAsync(() => {
     const newProfileImageDataurl = '/avatar/x.png';
@@ -318,12 +318,10 @@ describe('User Backend Api Service', () => {
     fakeAsync(() => {
       const newProfileImageDataurl = '/avatar/x.png';
       const errorMessage = 'It\'s not possible to set a new profile image data';
-      userBackendApiService.setProfileImageDataUrlAsync(newProfileImageDataurl)
-        /* eslint-disable dot-notation */
-        .catch((error) => {
-        /* eslint-enable dot-notation */
-          expect(error.data).toEqual(errorMessage);
-        });
+      userBackendApiService.setProfileImageDataUrlAsync(
+        newProfileImageDataurl)['catch']((error) => {
+        expect(error.data).toEqual(errorMessage);
+      });
       const req = httpTestingController.expectOne('/preferenceshandler/data');
       expect(req.request.method).toEqual('PUT');
       req.flush(errorMessage);
@@ -340,7 +338,8 @@ describe('User Backend Api Service', () => {
 
     userBackendApiService.getUserContributionRightsData().then(
       (userContributionRights) => {
-        expect(userContributionRights).toEqual(sampleUserContributionRightsDict);
+        expect(userContributionRights).
+          toEqual(sampleUserContributionRightsDict);
       });
     const req = httpTestingController.expectOne(
       '/usercontributionrightsdatahandler');
@@ -360,7 +359,8 @@ describe('User Backend Api Service', () => {
 
       userBackendApiService.getUserContributionRightsData().then(
         (userContributionRights) => {
-          expect(userContributionRights).toEqual(sampleUserContributionRightsDict);
+          expect(userContributionRights)
+            .toEqual(sampleUserContributionRightsDict);
           // Fetch userCommunityRightsInfo again.
           userBackendApiService.getUserContributionRightsData().then((
               sameUserContributionRights) => {

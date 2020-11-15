@@ -135,10 +135,11 @@ export class UserBackendApiService {
     }
     getLoginUrlAsync(): Promise<string> {
       const urlParameters = {
-        current_url: this.returnUrl || this.windowRef.nativeWindow.location.pathname
+        current_url: this.returnUrl ||
+        this.windowRef.nativeWindow.location.pathname
       };
-      return this.http.get<UrlBackendDict>('/url_handler',
-        { params: urlParameters }).toPromise().then(
+      return this.http.get<UrlBackendDict>(
+        '/url_handler', { params: urlParameters }).toPromise().then(
         (backendDict) => {
           return backendDict.login_url;
         });

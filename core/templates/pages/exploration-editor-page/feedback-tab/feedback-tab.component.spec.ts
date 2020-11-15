@@ -80,9 +80,10 @@ describe('Feedback Tab Component', function() {
     threadDataService = $injector.get('ThreadDataService');
     userBackendApiService = $injector.get('UserBackendApiService');
 
-    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
     spyOn(threadDataService, 'getThreadsAsync').and.returnValue(
       $q.resolve({}));
 

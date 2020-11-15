@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Delete account modal', function() {
   beforeEach(angular.mock.module('oppia'));
-  
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

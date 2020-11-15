@@ -142,7 +142,7 @@ describe('Question opportunities component', function() {
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve(
         {isLoggedIn: () => false
-      }));
+        }));
     ctrl.$onInit();
     $rootScope.$apply();
 
@@ -162,7 +162,7 @@ describe('Question opportunities component', function() {
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve(
         {isLoggedIn: () => true
-      }));
+        }));
     ctrl.$onInit();
     $rootScope.$apply();
 
@@ -204,7 +204,7 @@ describe('Question opportunities component', function() {
       spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(
           {isLoggedIn: () => true
-        }));
+          }));
       ctrl.$onInit();
       $rootScope.$apply();
       alertsService.clearWarnings();

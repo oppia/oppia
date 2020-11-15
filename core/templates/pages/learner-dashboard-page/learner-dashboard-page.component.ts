@@ -442,7 +442,7 @@ angular.module('oppia').component('learnerDashboardPage', {
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
             $rootScope.$applyAsync();
-        });
+          });
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.username = '';

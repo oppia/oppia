@@ -77,7 +77,8 @@ describe('Login required message component', function() {
 
   it('should refresh page if login url is not provided when login button is' +
     ' clicked', function() {
-    spyOn(userBackendApiService, 'getLoginUrlAsync').and.returnValue($q.resolve(null));
+    spyOn(userBackendApiService, 'getLoginUrlAsync')
+      .and.returnValue($q.resolve(null));
 
     ctrl.onLoginButtonClicked();
     $scope.$apply();

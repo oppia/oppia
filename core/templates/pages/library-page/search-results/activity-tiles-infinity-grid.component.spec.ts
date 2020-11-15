@@ -72,7 +72,7 @@ describe('Activity tiles infinity grid component', function() {
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
-    }));
+      }));
 
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
       of(new Event('resize')));

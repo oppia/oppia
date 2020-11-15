@@ -41,7 +41,7 @@ angular.module('oppia').directive('createActivityButton', [
         function(
             $rootScope, $timeout, $uibModal, $window,
             ExplorationCreationService, SiteAnalyticsService,
-            UrlService, UserBackendApiService  , ALLOW_YAML_FILE_UPLOAD) {
+            UrlService, UserBackendApiService, ALLOW_YAML_FILE_UPLOAD) {
           var ctrl = this;
           ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent(

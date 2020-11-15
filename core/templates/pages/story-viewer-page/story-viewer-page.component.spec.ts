@@ -46,6 +46,7 @@ describe('Story Viewer Page component', function() {
   beforeEach(function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
+    });
   });
 
   beforeEach(function() {

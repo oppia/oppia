@@ -24,8 +24,8 @@ require('services/user-backend-api.service.ts');
 angular.module('oppia').controller('DeleteAccountModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',
   'UserBackendApiService', function(
-    $controller, $rootScope, $scope, $uibModalInstance,
-    UserBackendApiService) {
+      $controller, $rootScope, $scope, $uibModalInstance,
+      UserBackendApiService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

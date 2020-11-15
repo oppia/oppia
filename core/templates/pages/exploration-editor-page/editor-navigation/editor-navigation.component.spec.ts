@@ -99,7 +99,8 @@ describe('Editor Navigation Component', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(userInfo);
+      spyOn(userBackendApiService, 'getUserInfoAsync').
+        and.returnValue(userInfo);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
@@ -370,7 +371,8 @@ describe('Editor Navigation Component', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(768);
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(userInfo);
+      spyOn(userBackendApiService, 'getUserInfoAsync')
+        .and.returnValue(userInfo);
 
       spyOnProperty(
         stateTutorialFirstTimeService,

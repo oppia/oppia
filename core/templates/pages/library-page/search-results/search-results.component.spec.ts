@@ -20,9 +20,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { EventEmitter } from '@angular/core';
-import { UserBackendApiService } from 'services/user-backend-api.service.ts';
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Search Results component', function() {

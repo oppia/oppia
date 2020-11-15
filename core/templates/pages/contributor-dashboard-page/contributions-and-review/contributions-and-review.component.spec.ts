@@ -55,7 +55,7 @@ describe('Contributions and review component', function() {
       spyOn(userBackendApiService, 'getUserInfoAsync')
         .and.returnValue($q.resolve({
           isLoggedIn: () => true
-      }));
+        }));
       spyOn(userBackendApiService, 'getUserContributionRightsData')
         .and.returnValue($q.resolve({
           can_review_translation_for_language_codes: [{}],
@@ -461,7 +461,7 @@ describe('Contributions and review component', function() {
       spyOn(userBackendApiService, 'getUserInfoAsync')
         .and.returnValue($q.resolve({
           isLoggedIn: () => true
-      }));
+        }));
       spyOn(userBackendApiService, 'getUserContributionRightsData')
         .and.returnValue(
           $q.resolve({

@@ -151,8 +151,8 @@ describe('Audio translation bar directive', function() {
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
-    $provide.value('UserBackendApiService',
-      TestBed.get(UserBackendApiService));
+    $provide.value(
+      'UserBackendApiService', TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

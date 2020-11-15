@@ -306,7 +306,7 @@ angular.module('oppia').directive('topNavigationBar', [
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$applyAsync();
-            });
+              });
 
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
               ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
