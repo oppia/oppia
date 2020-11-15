@@ -60,7 +60,6 @@ require('services/html-escaper.service.ts');
 require('services/id-generation.service.ts');
 require('services/interaction-rules-registry.service.ts');
 require('services/navigation.service.ts');
-require('services/promo-bar.service.ts');
 require('services/rte-helper.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-interaction-stats.service.ts');
@@ -139,7 +138,7 @@ angular.module('oppia').config([
       'PredictionAlgorithmRegistryService', 'PretestQuestionBackendApiService',
       'ProfilePageBackendApiService', 'QuestionBackendApiService',
       'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',
-      'RatingComputationService', 'ReadOnlyCollectionBackendApiService',
+      'RatingComputationService',
       'ReadOnlySubtopicPageObjectFactory', 'ReviewTestBackendApiService',
       'RubricObjectFactory', 'SchemaDefaultValueService',
       'SchemaUndefinedLastElementService', 'SidebarStatusService',

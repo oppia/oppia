@@ -19,11 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
-import math
 import random
-import time
-import types
 
 from constants import constants
 from core.domain import collection_domain
@@ -44,6 +42,7 @@ from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -58,7 +57,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
-CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
     audit_models, classifier_models, collection_models,
@@ -74,197 +72,6 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
-
-
-class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(RoleQueryAuditModelValidatorTests, self).setUp()
-
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
-        admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
-        admin_model.role = feconf.ROLE_ID_ADMIN
-        admin_model.update_timestamps()
-        admin_model.put()
-
-        model_id = '%s.%s.%s.%s' % (
-            self.admin_id, int(math.floor(time.time())),
-            feconf.ROLE_ACTION_UPDATE, random.randint(0, 1000))
-        self.model_instance = audit_models.RoleQueryAuditModel(
-            id=model_id, user_id=self.admin_id,
-            intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [u'[u\'fully-validated RoleQueryAuditModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of RoleQueryAuditModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'RoleQueryAuditModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_user_id(self):
-        user_models.UserSettingsModel.get(self.admin_id).delete()
-        expected_output = [(
-            u'[u\'failed validation check for user_ids field check of '
-            'RoleQueryAuditModel\', '
-            '[u"Entity id %s: based on field user_ids having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.admin_id, self.admin_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_invalid_id = '%s.%s.%s.%s' % (
-            'a', int(math.floor(time.time())), feconf.ROLE_ACTION_UPDATE,
-            random.randint(0, 1000))
-        model_instance_with_invalid_id = audit_models.RoleQueryAuditModel(
-            id=model_invalid_id, user_id=self.admin_id,
-            intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
-        model_instance_with_invalid_id.update_timestamps()
-        model_instance_with_invalid_id.put()
-        expected_output = [(
-            u'[u\'fully-validated RoleQueryAuditModel\', 1]'
-        ), (
-            u'[u\'failed validation check for model id check of '
-            'RoleQueryAuditModel\', '
-            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-        ) % model_invalid_id]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(UsernameChangeAuditModelValidatorTests, self).setUp()
-
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
-        admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
-        admin_model.role = feconf.ROLE_ID_ADMIN
-        admin_model.update_timestamps()
-        admin_model.put()
-
-        model_id = (
-            '%s.%d' % (self.admin_id, utils.get_current_time_in_millisecs()))
-        self.model_instance = audit_models.UsernameChangeAuditModel(
-            id=model_id, committer_id=self.admin_id,
-            old_username=USER_NAME, new_username='new')
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off.UsernameChangeAuditModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [
-            u'[u\'fully-validated UsernameChangeAuditModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of UsernameChangeAuditModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'UsernameChangeAuditModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_user_id(self):
-        user_models.UserSettingsModel.get(self.admin_id).delete()
-        expected_output = [(
-            u'[u\'failed validation check for committer_ids field check of '
-            'UsernameChangeAuditModel\', '
-            '[u"Entity id %s: based on field committer_ids having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.admin_id, self.admin_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_invalid_id = (
-            '%d.%s' % (utils.get_current_time_in_millisecs(), self.admin_id))
-        model_instance_with_invalid_id = audit_models.UsernameChangeAuditModel(
-            id=model_invalid_id, committer_id=self.admin_id,
-            old_username=USER_NAME, new_username='new')
-        model_instance_with_invalid_id.update_timestamps()
-        model_instance_with_invalid_id.put()
-        expected_output = [(
-            u'[u\'fully-validated UsernameChangeAuditModel\', 1]'
-        ), (
-            u'[u\'failed validation check for model id check of '
-            'UsernameChangeAuditModel\', '
-            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-        ) % model_invalid_id]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
 
 
 class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -609,12 +416,16 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'CollectionModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated CollectionModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'CollectionModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -1168,12 +979,16 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'CollectionRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated CollectionRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'CollectionRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -2499,418 +2314,6 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(SentEmailModelValidatorTests, self).setUp()
-
-        def mock_generate_hash(
-                unused_cls, unused_recipient_id, unused_email_subject,
-                unused_email_body):
-            return 'Email Hash'
-
-        self.sender_email = 'noreply@oppia.org'
-        self.sender_id = 'sender'
-        self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id,
-            email=self.sender_email)
-        self.sender_model.update_timestamps()
-        self.sender_model.put()
-
-        self.recipient_email = 'recipient@email.com'
-        self.recipient_id = 'recipient'
-        self.recipient_model = user_models.UserSettingsModel(
-            id=self.recipient_id,
-            email=self.recipient_email)
-        self.recipient_model.update_timestamps()
-        self.recipient_model.put()
-
-        with self.swap(
-            email_models.SentEmailModel, '_generate_hash',
-            types.MethodType(mock_generate_hash, email_models.SentEmailModel)):
-            email_models.SentEmailModel.create(
-                self.recipient_id, self.recipient_email, self.sender_id,
-                self.sender_email, feconf.EMAIL_INTENT_SIGNUP,
-                'Email Subject', 'Email Body', datetime.datetime.utcnow())
-
-        self.model_instance = email_models.SentEmailModel.get_by_hash(
-            'Email Hash')[0]
-
-        self.job_class = (
-            prod_validation_jobs_one_off.SentEmailModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [u'[u\'fully-validated SentEmailModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SentEmailModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance.sent_datetime = (
-            datetime.datetime.utcnow() - datetime.timedelta(hours=20))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_sender_id(self):
-        self.sender_model.delete()
-        expected_output = [(
-            u'[u\'failed validation check for sender_id field check of '
-            'SentEmailModel\', '
-            '[u"Entity id %s: based on field sender_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.sender_id, self.sender_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_recipient_id(self):
-        self.recipient_model.delete()
-        expected_output = [(
-            u'[u\'failed validation check for recipient_id field check of '
-            'SentEmailModel\', '
-            '[u"Entity id %s: based on field recipient_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.recipient_id, self.recipient_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_recipient_email(self):
-        self.recipient_model.email = 'invalid@email.com'
-        self.recipient_model.update_timestamps()
-        self.recipient_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for recipient email check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: Recipient email %s in entity does not match '
-            'with email %s of user obtained through recipient id %s\']]') % (
-                self.model_instance.id, self.model_instance.recipient_email,
-                self.recipient_model.email, self.model_instance.recipient_id)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_sent_datetime_greater_than_current_time(self):
-        self.model_instance.sent_datetime = (
-            datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for sent datetime check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: The sent_datetime field has a value %s '
-            'which is greater than the time when the job was run\']]') % (
-                self.model_instance.id, self.model_instance.sent_datetime)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_instance_with_invalid_id = email_models.SentEmailModel(
-            id='invalid', recipient_id=self.recipient_id,
-            recipient_email=self.recipient_email, sender_id=self.sender_id,
-            sender_email='noreply@oppia.org', intent=feconf.EMAIL_INTENT_SIGNUP,
-            subject='Email Subject', html_body='Email Body',
-            sent_datetime=datetime.datetime.utcnow())
-        model_instance_with_invalid_id.update_timestamps()
-        model_instance_with_invalid_id.put()
-        expected_output = [(
-            u'[u\'fully-validated SentEmailModel\', 1]'
-        ), (
-            u'[u\'failed validation check for model id check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-        ) % 'invalid']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(BulkEmailModelValidatorTests, self).setUp()
-
-        self.sender_email = 'sender@email.com'
-        self.sender_id = 'sender'
-        self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id,
-            email=self.sender_email)
-        self.sender_model.update_timestamps()
-        self.sender_model.put()
-
-        self.recipient_ids = ['recipient1', 'recipient2']
-        self.recipient_model_1 = user_models.UserSettingsModel(
-            id=self.recipient_ids[0],
-            email='recipient1@email.com')
-        self.recipient_model_1.update_timestamps()
-        self.recipient_model_1.put()
-        self.recipient_model_2 = user_models.UserSettingsModel(
-            id=self.recipient_ids[1],
-            email='recipient2@email.com')
-        self.recipient_model_2.update_timestamps()
-        self.recipient_model_2.put()
-
-        self.model_id = 'bulkemailid1'
-        email_models.BulkEmailModel.create(
-            self.model_id, self.recipient_ids, self.sender_id,
-            self.sender_email, feconf.BULK_EMAIL_INTENT_MARKETING,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow())
-        self.model_instance = email_models.BulkEmailModel.get_by_id(
-            self.model_id)
-
-        self.job_class = (
-            prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [u'[u\'fully-validated BulkEmailModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of BulkEmailModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance.sent_datetime = (
-            datetime.datetime.utcnow() - datetime.timedelta(hours=20))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'BulkEmailModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_sender_id(self):
-        self.sender_model.delete()
-        expected_output = [(
-            u'[u\'failed validation check for sender_id field check of '
-            'BulkEmailModel\', '
-            '[u"Entity id %s: based on field sender_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.sender_id, self.sender_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_recipient_id(self):
-        self.recipient_model_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for recipient_id field check of '
-            'BulkEmailModel\', '
-            '[u"Entity id %s: based on field recipient_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.recipient_ids[0],
-                self.recipient_ids[0])]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_sender_email(self):
-        self.sender_model.email = 'invalid@email.com'
-        self.sender_model.update_timestamps()
-        self.sender_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for sender email check of '
-            'BulkEmailModel\', '
-            '[u\'Entity id %s: Sender email %s in entity does not match with '
-            'email %s of user obtained through sender id %s\']]') % (
-                self.model_instance.id, self.model_instance.sender_email,
-                self.sender_model.email, self.model_instance.sender_id)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_sent_datetime_greater_than_current_time(self):
-        self.model_instance.sent_datetime = (
-            datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for sent datetime check of '
-            'BulkEmailModel\', '
-            '[u\'Entity id %s: The sent_datetime field has a value %s '
-            'which is greater than the time when the job was run\']]') % (
-                self.model_instance.id, self.model_instance.sent_datetime)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_instance_with_invalid_id = email_models.BulkEmailModel(
-            id='invalid:id', recipient_ids=self.recipient_ids,
-            sender_id=self.sender_id, sender_email=self.sender_email,
-            intent=feconf.BULK_EMAIL_INTENT_MARKETING,
-            subject='Email Subject', html_body='Email Body',
-            sent_datetime=datetime.datetime.utcnow())
-        model_instance_with_invalid_id.update_timestamps()
-        model_instance_with_invalid_id.put()
-        expected_output = [(
-            u'[u\'fully-validated BulkEmailModel\', 1]'
-        ), (
-            u'[u\'failed validation check for model id check of '
-            'BulkEmailModel\', '
-            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-        ) % model_instance_with_invalid_id.id]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class GeneralFeedbackEmailReplyToIdModelValidatorTests(
-        test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(GeneralFeedbackEmailReplyToIdModelValidatorTests, self).setUp()
-
-        self.thread_id = feedback_services.create_thread(
-            'exploration', 'expid', None, 'a subject', 'some text')
-
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        self.model_instance = (
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.user_id, self.thread_id))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [(
-            u'[u\'fully-validated GeneralFeedbackEmailReplyToIdModel\', 1]')]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_user_id(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [(
-            u'[u\'failed validation check for item.id.user_id field check of '
-            'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u"Entity id %s: based on field item.id.user_id having value '
-            '%s, expected model UserSettingsModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.user_id, self.user_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_non_existent_thread_id(self):
-        feedback_models.GeneralFeedbackThreadModel.get_by_id(
-            self.thread_id).delete()
-        expected_output = [(
-            u'[u\'failed validation check for item.id.thread_id field check of '
-            'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u"Entity id %s: based on field item.id.thread_id having value '
-            '%s, expected model GeneralFeedbackThreadModel with '
-            'id %s but it doesn\'t exist"]]') % (
-                self.model_instance.id, self.thread_id, self.thread_id)]
-
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_reply_to_id(self):
-        while len(
-                self.model_instance.reply_to_id) <= (
-                    email_models.REPLY_TO_ID_LENGTH):
-            self.model_instance.reply_to_id = (
-                self.model_instance.reply_to_id + 'invalid')
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for reply_to_id length check of '
-            'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Entity id %s: reply_to_id %s should have length less than or '
-            'equal to %s but instead has length %s\']]'
-        ) % (
-            self.model_instance.id, self.model_instance.reply_to_id,
-            email_models.REPLY_TO_ID_LENGTH,
-            len(self.model_instance.reply_to_id))]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-
 class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -2972,12 +2375,15 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated ExplorationModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'ExplorationModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -3272,6 +2678,47 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_maximum_of_ten_errors_are_emitted(self):
+        for i in python_utils.RANGE(20):
+            exp_services.update_exploration(
+                self.owner_id, '0', [exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title %s' % i
+                })], 'Changes.')
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, '', [])
+
+        self.process_and_flush_pending_tasks()
+        job_id = self.job_class.create_new()
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        self.job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.process_and_flush_pending_tasks()
+        actual_output = self.job_class.get_output(job_id)
+
+        self.assertEqual(len(actual_output), 2)
+
+        self.assertEqual(
+            actual_output[1],
+            '[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]')
+
+        full_error_list = []
+        for i in python_utils.RANGE(22):
+            full_error_list.append(
+                'Entity id 0-%s: based on field exploration_ids having '
+                'value 0, expected model ExplorationModel with id 0 but '
+                'it doesn\'t exist' % (i + 1))
+        actual_error_list = ast.literal_eval(actual_output[0])[1]
+        self.assertEqual(len(actual_error_list), 10)
+        for error in actual_error_list:
+            assert (error in full_error_list), ('Extra error: %s' % error)
+
 
 class ExplorationSnapshotContentModelValidatorTests(
         test_utils.AuditJobsTestBase):
@@ -3462,12 +2909,16 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated ExplorationRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'ExplorationRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -5513,12 +4964,16 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'QuestionModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated QuestionModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'QuestionModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -6636,909 +6091,6 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(StoryModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s' % i,
-            title='title %d' % i,
-            category='category',
-        ) for i in python_utils.RANGE(6)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-            self.publish_exploration(self.owner_id, exp.id)
-
-        topic = topic_domain.Topic.create_default_topic(
-            '0', 'topic', 'abbrev', 'description')
-        topic_services.save_new_topic(self.owner_id, topic)
-
-        language_codes = ['ar', 'en', 'en']
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d' % i,
-            'description %d' % i,
-            '0',
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(3)]
-
-        for index, story in enumerate(stories):
-            story.language_code = language_codes[index]
-            story_services.save_new_story(self.owner_id, story)
-            topic_services.add_canonical_story(
-                self.owner_id, topic.id, story.id)
-            story_services.update_story(
-                self.owner_id, story.id, [story_domain.StoryChange({
-                    'cmd': 'add_story_node',
-                    'node_id': 'node_1',
-                    'title': 'Node1',
-                }), story_domain.StoryChange({
-                    'cmd': 'add_story_node',
-                    'node_id': 'node_2',
-                    'title': 'Node2',
-                }), story_domain.StoryChange({
-                    'cmd': 'update_story_node_property',
-                    'property_name': 'destination_node_ids',
-                    'node_id': 'node_1',
-                    'old_value': [],
-                    'new_value': ['node_2']
-                }), story_domain.StoryChange({
-                    'cmd': 'update_story_node_property',
-                    'property_name': 'exploration_id',
-                    'node_id': 'node_1',
-                    'old_value': None,
-                    'new_value': explorations[index * 2].id
-                }), story_domain.StoryChange({
-                    'cmd': 'update_story_node_property',
-                    'property_name': 'exploration_id',
-                    'node_id': 'node_2',
-                    'old_value': None,
-                    'new_value': explorations[index * 2 + 1].id
-                })], 'Changes.')
-
-        self.model_instance_0 = story_models.StoryModel.get_by_id('0')
-        self.model_instance_1 = story_models.StoryModel.get_by_id('1')
-        self.model_instance_2 = story_models.StoryModel.get_by_id('2')
-
-        self.job_class = (
-            prod_validation_jobs_one_off.StoryModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        story_services.update_story(
-            self.owner_id, '0', [story_domain.StoryChange({
-                'cmd': 'update_story_property',
-                'property_name': 'title',
-                'new_value': 'New title',
-                'old_value': 'title 0'
-            })], 'Changes.')
-
-        expected_output = [
-            u'[u\'fully-validated StoryModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.commit(
-            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of StoryModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated StoryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'StoryModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_story_schema(self):
-        expected_output = [
-            (
-                u'[u\'failed validation check for domain object check of '
-                'StoryModel\', '
-                '[u\'Entity id %s: Entity fails domain validation with the '
-                'error Invalid language code: %s\']]'
-            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
-            u'[u\'fully-validated StoryModel\', 2]']
-        with self.swap(
-            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
-                'code': 'en', 'description': 'English'}]):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('1').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for exploration_ids field '
-                'check of StoryModel\', '
-                '[u"Entity id 0: based on field exploration_ids having value '
-                '1, expected model ExplorationModel with id 1 but it '
-                'doesn\'t exist"]]'),
-            u'[u\'fully-validated StoryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_story_commit_log_entry_model_failure(self):
-        story_services.update_story(
-            self.owner_id, '0', [story_domain.StoryChange({
-                'cmd': 'update_story_property',
-                'property_name': 'title',
-                'new_value': 'New title',
-                'old_value': 'title 0'
-            })], 'Changes.')
-        story_models.StoryCommitLogEntryModel.get_by_id(
-            'story-0-1').delete()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for '
-                'story_commit_log_entry_ids field check of '
-                'StoryModel\', '
-                '[u"Entity id 0: based on field '
-                'story_commit_log_entry_ids having value '
-                'story-0-1, expected model StoryCommitLogEntryModel '
-                'with id story-0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated StoryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_summary_model_failure(self):
-        story_models.StorySummaryModel.get_by_id('0').delete()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for story_summary_ids '
-                'field check of StoryModel\', '
-                '[u"Entity id 0: based on field story_summary_ids having '
-                'value 0, expected model StorySummaryModel with id 0 '
-                'but it doesn\'t exist"]]'),
-            u'[u\'fully-validated StoryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_snapshot_metadata_model_failure(self):
-        story_models.StorySnapshotMetadataModel.get_by_id(
-            '0-1').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_metadata_ids '
-                'field check of StoryModel\', '
-                '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expected model StorySnapshotMetadataModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated StoryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_missing_snapshot_content_model_failure(self):
-        story_models.StorySnapshotContentModel.get_by_id(
-            '0-1').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_content_ids '
-                'field check of StoryModel\', '
-                '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expected model StorySnapshotContentModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated StoryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class StorySnapshotMetadataModelValidatorTests(
-        test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(StorySnapshotMetadataModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        topic = topic_domain.Topic.create_default_topic(
-            '0', 'topic', 'abbrev', 'description')
-
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d' % i,
-            'description %d' % i,
-            '0',
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(3)]
-
-        for story in stories:
-            if story.id != '0':
-                story_services.save_new_story(self.owner_id, story)
-            else:
-                story_services.save_new_story(self.user_id, story)
-            topic.add_canonical_story(story.id)
-
-        topic_services.save_new_topic(self.owner_id, topic)
-
-        self.model_instance_0 = (
-            story_models.StorySnapshotMetadataModel.get_by_id(
-                '0-1'))
-        self.model_instance_1 = (
-            story_models.StorySnapshotMetadataModel.get_by_id(
-                '1-1'))
-        self.model_instance_2 = (
-            story_models.StorySnapshotMetadataModel.get_by_id(
-                '2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .StorySnapshotMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        story_services.update_story(
-            self.owner_id, '0', [story_domain.StoryChange({
-                'cmd': 'update_story_property',
-                'property_name': 'title',
-                'new_value': 'New title',
-                'old_value': 'title 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated StorySnapshotMetadataModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of StorySnapshotMetadataModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'StorySnapshotMetadataModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'StorySnapshotMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('0').delete(
-            self.user_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for story_ids '
-                'field check of StorySnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field story_ids '
-                'having value 0, expected model StoryModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'story_ids having value 0, expected model '
-                'StoryModel with id 0 but it doesn\'t exist"]]'
-            ), (
-                u'[u\'fully-validated '
-                'StorySnapshotMetadataModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, literal_eval=True)
-
-    def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for committer_ids field '
-                'check of StorySnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expected model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]'
-            ) % (self.user_id, self.user_id), (
-                u'[u\'fully-validated '
-                'StorySnapshotMetadataModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_story_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            story_models.StorySnapshotMetadataModel(
-                id='0-3', committer_id=self.owner_id, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for story model '
-                'version check of StorySnapshotMetadataModel\', '
-                '[u\'Entity id 0-3: Story model corresponding to '
-                'id 0 has a version 1 which is less than the version 3 in '
-                'snapshot metadata model id\']]'
-            ), (
-                u'[u\'fully-validated StorySnapshotMetadataModel\', '
-                '3]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_commit_cmd_schmea(self):
-        self.model_instance_0.commit_cmds = [{
-            'cmd': 'add_story_node'
-        }, {
-            'cmd': 'delete_story_node',
-            'invalid_attribute': 'invalid'
-        }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for commit cmd '
-                'delete_story_node check of '
-                'StorySnapshotMetadataModel\', '
-                '[u"Entity id 0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'delete_story_node\', '
-                'u\'invalid_attribute\': u\'invalid\'} failed with error: '
-                'The following required attributes are missing: '
-                'node_id, The following extra attributes are present: '
-                'invalid_attribute"]]'
-            ), (
-                u'[u\'failed validation check for commit cmd add_story_node '
-                'check of StorySnapshotMetadataModel\', '
-                '[u"Entity id 0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'add_story_node\'} '
-                'failed with error: The following required attributes '
-                'are missing: node_id, title"]]'
-            ), u'[u\'fully-validated StorySnapshotMetadataModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(StorySnapshotContentModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        topic = topic_domain.Topic.create_default_topic(
-            '0', 'topic', 'abbrev', 'description')
-
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d' % i,
-            'description %d' % i,
-            '0',
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(3)]
-
-        for story in stories:
-            story_services.save_new_story(self.owner_id, story)
-            topic.add_canonical_story(story.id)
-
-        topic_services.save_new_topic(self.owner_id, topic)
-
-        self.model_instance_0 = (
-            story_models.StorySnapshotContentModel.get_by_id(
-                '0-1'))
-        self.model_instance_1 = (
-            story_models.StorySnapshotContentModel.get_by_id(
-                '1-1'))
-        self.model_instance_2 = (
-            story_models.StorySnapshotContentModel.get_by_id(
-                '2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .StorySnapshotContentModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        story_services.update_story(
-            self.owner_id, '0', [story_domain.StoryChange({
-                'cmd': 'update_story_property',
-                'property_name': 'title',
-                'new_value': 'New title',
-                'old_value': 'title 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated StorySnapshotContentModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of StorySnapshotContentModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'StorySnapshotContentModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'StorySnapshotContentModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('0').delete(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for story_ids '
-                'field check of StorySnapshotContentModel\', '
-                '[u"Entity id 0-1: based on field story_ids '
-                'having value 0, expected model StoryModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'story_ids having value 0, expected model '
-                'StoryModel with id 0 but it doesn\'t exist"]]'
-            ), (
-                u'[u\'fully-validated '
-                'StorySnapshotContentModel\', 2]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_invalid_story_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            story_models.StorySnapshotContentModel(
-                id='0-3'))
-        model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for story model '
-                'version check of StorySnapshotContentModel\', '
-                '[u\'Entity id 0-3: Story model corresponding to '
-                'id 0 has a version 1 which is less than '
-                'the version 3 in snapshot content model id\']]'
-            ), (
-                u'[u\'fully-validated StorySnapshotContentModel\', '
-                '3]')]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(StoryCommitLogEntryModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        topic = topic_domain.Topic.create_default_topic(
-            '0', 'topic', 'abbrev', 'description')
-
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d' % i,
-            'description %d' % i,
-            '0',
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(3)]
-
-        for story in stories:
-            story_services.save_new_story(self.owner_id, story)
-            topic.add_canonical_story(story.id)
-
-        topic_services.save_new_topic(self.owner_id, topic)
-
-        self.model_instance_0 = (
-            story_models.StoryCommitLogEntryModel.get_by_id(
-                'story-0-1'))
-        self.model_instance_1 = (
-            story_models.StoryCommitLogEntryModel.get_by_id(
-                'story-1-1'))
-        self.model_instance_2 = (
-            story_models.StoryCommitLogEntryModel.get_by_id(
-                'story-2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .StoryCommitLogEntryModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        story_services.update_story(
-            self.owner_id, '0', [story_domain.StoryChange({
-                'cmd': 'update_story_property',
-                'property_name': 'title',
-                'new_value': 'New title',
-                'old_value': 'title 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated StoryCommitLogEntryModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of StoryCommitLogEntryModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'StoryCommitLogEntryModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('0').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for story_ids '
-                'field check of StoryCommitLogEntryModel\', '
-                '[u"Entity id story-0-1: based on field story_ids '
-                'having value 0, expected model StoryModel with id 0 '
-                'but it doesn\'t exist", u"Entity id story-0-2: based '
-                'on field story_ids having value 0, expected model '
-                'StoryModel with id 0 but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=True)
-
-    def test_invalid_story_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            story_models.StoryCommitLogEntryModel.create(
-                '0', 3, self.owner_id, 'edit', 'msg', [{}],
-                constants.ACTIVITY_STATUS_PUBLIC, False))
-        model_with_invalid_version_in_id.story_id = '0'
-        model_with_invalid_version_in_id.update_timestamps()
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for story model '
-                'version check of StoryCommitLogEntryModel\', '
-                '[u\'Entity id %s: Story model corresponding '
-                'to id 0 has a version 1 which is less than '
-                'the version 3 in commit log entry model id\']]'
-            ) % (model_with_invalid_version_in_id.id),
-            u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_id(self):
-        model_with_invalid_id = (
-            story_models.StoryCommitLogEntryModel(
-                id='invalid-0-1',
-                user_id=self.owner_id,
-                commit_type='edit',
-                commit_message='msg',
-                commit_cmds=[{}],
-                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
-                post_commit_is_private=False))
-        model_with_invalid_id.story_id = '0'
-        model_with_invalid_id.update_timestamps()
-        model_with_invalid_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for model id check of '
-                'StoryCommitLogEntryModel\', '
-                '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id), (
-                u'[u\'failed validation check for commit cmd check of '
-                'StoryCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
-                'No commit command domain object defined for entity with '
-                'commands: [{}]\']]'),
-            u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_commit_type(self):
-        self.model_instance_0.commit_type = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for commit type check of '
-                'StoryCommitLogEntryModel\', '
-                '[u\'Entity id story-0-1: Commit type invalid is '
-                'not allowed\']]'
-            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_post_commit_status(self):
-        self.model_instance_0.post_commit_status = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit status check '
-                'of StoryCommitLogEntryModel\', '
-                '[u\'Entity id story-0-1: Post commit status invalid '
-                'is invalid\']]'
-            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_true_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'public'
-        self.model_instance_0.post_commit_is_private = True
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit is private '
-                'check of StoryCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'public but post_commit_is_private is True\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_false_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'private'
-        self.model_instance_0.post_commit_is_private = False
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit is private '
-                'check of StoryCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'private but post_commit_is_private is False\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_commit_cmd_schmea(self):
-        self.model_instance_0.commit_cmds = [{
-            'cmd': 'add_story_node'
-        }, {
-            'cmd': 'delete_story_node',
-            'invalid_attribute': 'invalid'
-        }]
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for commit cmd '
-                'delete_story_node check of '
-                'StoryCommitLogEntryModel\', '
-                '[u"Entity id story-0-1: Commit command domain '
-                'validation for command: {u\'cmd\': u\'delete_story_node\', '
-                'u\'invalid_attribute\': u\'invalid\'} failed with error: '
-                'The following required attributes are missing: node_id, '
-                'The following extra attributes are present: '
-                'invalid_attribute"]]'
-            ), (
-                u'[u\'failed validation check for commit cmd '
-                'add_story_node check of StoryCommitLogEntryModel\', '
-                '[u"Entity id story-0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'add_story_node\'} '
-                'failed with error: The following required attributes '
-                'are missing: node_id, title"]]'
-            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(StorySummaryModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        language_codes = ['ar', 'en', 'en']
-
-        topic = topic_domain.Topic.create_default_topic(
-            '0', 'topic', 'abbrev', 'description')
-
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d' % i,
-            'description %d' % i,
-            '0',
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(3)]
-
-        for index, story in enumerate(stories):
-            story.description = 'story-test'
-            story.language_code = language_codes[index]
-            story_services.save_new_story(self.owner_id, story)
-            topic.add_canonical_story(story.id)
-
-        topic_services.save_new_topic(self.owner_id, topic)
-
-        self.model_instance_0 = story_models.StorySummaryModel.get_by_id('0')
-        self.model_instance_1 = story_models.StorySummaryModel.get_by_id('1')
-        self.model_instance_2 = story_models.StorySummaryModel.get_by_id('2')
-
-        self.job_class = (
-            prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        story_services.update_story(
-            self.owner_id, '1', [story_domain.StoryChange({
-                'cmd': 'update_story_property',
-                'property_name': 'title',
-                'new_value': 'New title',
-                'old_value': 'title 0'
-            })], 'Changes.')
-        expected_output = [
-            u'[u\'fully-validated StorySummaryModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of StorySummaryModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), u'[u\'fully-validated StorySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        story_services.delete_story(self.owner_id, '1')
-        story_services.delete_story(self.owner_id, '2')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'StorySummaryModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_story_model_failure(self):
-        story_model = story_models.StoryModel.get_by_id('0')
-        story_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-        self.model_instance_0.story_model_last_updated = (
-            story_model.last_updated)
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for story_ids '
-                'field check of StorySummaryModel\', '
-                '[u"Entity id 0: based on field story_ids having '
-                'value 0, expected model StoryModel with id 0 but '
-                'it doesn\'t exist"]]'),
-            u'[u\'fully-validated StorySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_node_titles(self):
-        self.model_instance_0.node_titles = ['Title 1']
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for node titles check of '
-                'StorySummaryModel\', [u"Entity id 0: Node titles: '
-                '[u\'Title 1\'] does not match the nodes in story_contents '
-                'dict: []"]]'
-            ), u'[u\'fully-validated StorySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_story_related_property(self):
-        self.model_instance_0.title = 'invalid'
-        self.model_instance_0.update_timestamps()
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for title field check of '
-                'StorySummaryModel\', '
-                '[u\'Entity id %s: title field in entity: invalid does not '
-                'match corresponding story title field: title 0\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated StorySummaryModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
 class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(GeneralSuggestionModelValidatorTests, self).setUp()
@@ -7673,6 +6225,20 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_bot_as_final_reviewer_does_not_fail_reviewer_id_validation(self):
+        self.assertEqual(
+            user_models.UserSettingsModel.get_by_id(
+                feconf.SUGGESTION_BOT_USER_ID), None)
+
+        self.model_instance.final_reviewer_id = feconf.SUGGESTION_BOT_USER_ID
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_invalid_target_version(self):
         self.model_instance.target_version_at_submission = 5
         self.model_instance.update_timestamps()
@@ -7769,51 +6335,6 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
-
-    def test_validate_score_category_for_content_suggestion(self):
-        self.model_instance.score_category = 'content.invalid'
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for score category subtype check of '
-            'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
-            'valid does not match target exploration category Art\']]') % (
-                self.model_instance.id)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_validate_score_category_for_transalation_suggestion(self):
-        change = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p>This is a content.</p>',
-            'translation_html': '<p>This is translated html.</p>'
-        }
-        score_category = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'invalid')
-
-        thread_id = feedback_services.create_thread(
-            'exploration', '0', self.owner_id, 'description',
-            'suggestion', has_suggestion=True)
-
-        suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0',
-            1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, thread_id, 'hi')
-        model_instance = (
-            suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
-        expected_output = [((
-            u'[u\'failed validation check for score category subtype check of '
-            'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
-            'valid does not match target exploration category Art\']]') % (
-                model_instance.id)),
-                           u'[u\'fully-validated GeneralSuggestionModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
 
     def test_validate_score_category_for_question_suggestion(self):
         rubrics = [
@@ -8609,12 +7130,16 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated TopicModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'TopicModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -9317,12 +7842,16 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'TopicRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated TopicRightsModel\', 2]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'TopicRightsModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -10448,12 +8977,16 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SubtopicPageModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+        expected_output = [
+            '[u\'fully-validated SubtopicPageModel\', 2]',
+            (
+                '[u\'failed validation check for current time check of '
+                'SubtopicPageModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater '
+                'than the time when the job was run\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
