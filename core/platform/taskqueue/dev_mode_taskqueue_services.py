@@ -54,7 +54,8 @@ def _task_handler(url, payload, queue_name, task_name=None):
     requests.post(
         complete_url,
         json=payload,
-        headers=headers)
+        headers=headers,
+        timeout=30)
 
 
 CLIENT = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
