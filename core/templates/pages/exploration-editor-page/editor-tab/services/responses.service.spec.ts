@@ -34,12 +34,12 @@ import {
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-fdescribe('Responses Service', () => {
+describe('Responses Service', () => {
   let responsesService: ResponsesService = null;
   let interactionObjectFactory: InteractionObjectFactory = null;
   let outcomeObjectFactory: OutcomeObjectFactory = null;
   let stateEditorService: StateEditorService = null;
-  let alertsService: AlertsService = null;
+  // Let alertsService: AlertsService = null;
   let stateInteractionIdService: StateInteractionIdService = null;
   let answerGroupsCacheService: AnswerGroupsCacheService = null;
   let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
@@ -67,7 +67,7 @@ fdescribe('Responses Service', () => {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
-    // alertsService = TestBed.get(AlertsService);
+    // AlertsService = TestBed.get(AlertsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     answerGroupsCacheService = TestBed.get(AnswerGroupsCacheService);
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
@@ -211,7 +211,8 @@ fdescribe('Responses Service', () => {
   });
 
   it('should update default outcome', () => {
-    // Let addInfoMessageSpy = spyOn(alertsService, 'addInfoMessage'); <-- Error this was never called
+    // eslint-disable-next-line max-len
+    // Let addInfoMessageSpy = spyOn(alertsService, 'addInfoMessage');
 
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
@@ -522,7 +523,7 @@ fdescribe('Responses Service', () => {
     'should update answer choices when savedMemento is' +
       ' DragAndDropSortInput and rule type is' +
       ' HasElementXAtPositionY',
-    function () {
+    () => {
       interactionDataWithRules.id = 'DragAndDropSortInput';
       interactionDataWithRules.answerGroups[0].rules[0].type =
         'HasElementXAtPositionY';
@@ -630,7 +631,7 @@ fdescribe('Responses Service', () => {
   it(
     'should update answer choices when savedMemento is' +
       ' DragAndDropSortInput and choices had changed',
-    function () {
+    () => {
       interactionDataWithRules.id = 'DragAndDropSortInput';
       // Any other method from DragAndDropSortInputRulesService.
       interactionDataWithRules.answerGroups[0].rules[0].type =
@@ -707,7 +708,7 @@ fdescribe('Responses Service', () => {
             label: ''
           },
         ],
-        // function () {}
+        // Function () {}
       );
 
       var newAnswerChoices = [
@@ -724,10 +725,10 @@ fdescribe('Responses Service', () => {
           label: ''
         },
       ];
-      // var callbackSpy = jasmine.createSpy('callback');
+      // Var callbackSpy = jasmine.createSpy('callback');
       responsesService.updateAnswerChoices(newAnswerChoices);
 
-      // expect(callbackSpy).not.toHaveBeenCalled();
+      // Expect(callbackSpy).not.toHaveBeenCalled();
       expect(responsesService.getAnswerGroup(0)).toEqual(
         interactionDataWithRules.answerGroups[0]
       );
@@ -834,7 +835,7 @@ fdescribe('Responses Service', () => {
   );
 
   it('should save new answer group and default outcome', () => {
-    // var addInfoMessageSpy = spyOn(
+    // Var addInfoMessageSpy = spyOn(
     //   alertsService,
     //   'addInfoMessage'
     // ).and.callThrough();
@@ -865,7 +866,7 @@ fdescribe('Responses Service', () => {
       callbackSpy
     );
 
-    // expect(addInfoMessageSpy).toHaveBeenCalledTimes(2);
+    // Expect(addInfoMessageSpy).toHaveBeenCalledTimes(2);
     // expect(addInfoMessageSpy).toHaveBeenCalledWith(
     //   'The solution is now valid!'
     // );
@@ -879,7 +880,7 @@ fdescribe('Responses Service', () => {
   });
 
   it('should save new answer group and default outcome twice', () => {
-    // var addInfoMessageSpy = spyOn(
+    // Var addInfoMessageSpy = spyOn(
     //   alertsService,
     //   'addInfoMessage'
     // ).and.callThrough();
@@ -925,7 +926,7 @@ fdescribe('Responses Service', () => {
       callbackSpy
     );
 
-    // expect(addInfoMessageSpy).toHaveBeenCalledWith(
+    // Expect(addInfoMessageSpy).toHaveBeenCalledWith(
     //   'The current solution is no longer valid.'
     // );
     expect(responsesService.getDefaultOutcome()).toEqual(updatedDefaultOutcome);
